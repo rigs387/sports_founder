@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.3 | September 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed*
+*Version 1.4 | September 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports)*
 
 ---
 
@@ -231,6 +231,13 @@ sport, your sport and rivals alike.
   uninterested, and only through specific causes: scandals, unpopular rule changes (purists),
   league health decline, or rival poaching. Casual loss is routine churn; hardcore loss is a
   visible event. The hardcore base is how the game represents strength built over time.
+- **Winning over rival hardcore fans is slow (decided 2026-09-13).** Poaching works both ways and
+  follows the same rule. Where a sport is strong, a small share of another sport's hardcore fans
+  in that country demote to casual about the sport they held. From there they can become hardcore
+  about the stronger sport through normal casual → hardcore conversion. The pull scales with local
+  strength and is deliberately slow (rates in config): overtaking an entrenched sport takes decades,
+  not seasons. The "other sports" bucket loses fans the same way but never defends. Rival defense
+  slows the pull further.
 
 **Fandom Score:** `hardcore fans + (casual fans × casual weight)`, using raw population counts,
 summed across all countries. The casual weight (e.g., 0.3) is a config value. Casuals count, but
@@ -569,7 +576,7 @@ snowballing. Works alongside tier-scaled costs, tier-scaled negative events, and
   - **Modeled rivals:** soccer, cricket, basketball, American football, baseball, ice hockey,
     rugby, and a combined combat sports bucket.
   - **"Other sports" bucket:** holds each country's remaining hardcore share. It can lose fans to
-    the player but never defends.
+    the player (slowly, through demotion; see Fan Model) but never defends.
   - **Phase 0:** soccer (global giant) and cricket (regional stronghold).
   - Each rival has its own genome (driving the similarity rule), home regions, and fan buckets in
     every country.

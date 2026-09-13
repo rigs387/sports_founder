@@ -18,7 +18,9 @@ population), held for X turns. Play continues past the win: legacy goals, rivals
 anchor collapse no longer ends the run, and a Retire option plays a final retrospective.
 
 **Fan Model:** Per country, per sport: Uninterested → Casual (non-exclusive, churns) → Hardcore
-(exclusive, sticky; lost only by demotion to casual through specific causes).
+(exclusive, sticky; lost only by demotion to casual through specific causes). Poaching is slow and
+two-way: where a sport is strong, a few of another sport's hardcore fans demote to casual each
+quarter and can then convert. The "other" bucket loses fans this way but never defends.
 
 **Genome:** 10 discrete trait axes × 6 country attributes = affinity. Identity (locked): surface,
 equipment, physical profile, field footprint. Rule (evolvable): contact, team size, match length,

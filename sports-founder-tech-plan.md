@@ -37,6 +37,7 @@ surface before playtesting or during it.
 | 2026-09-13 | Country attribute definitions, neighbors, continents (GDD v1.3) | Decided |
 | 2026-09-13 | Real-world data: salient FIFA markets, World Bank sources, survey-based fan buckets, rival genomes (GDD v1.3) | Decided |
 | 2026-09-13 | Differentiation exit criterion ranks top-10 countries by Fandom Score ÷ population | Decided |
+| 2026-09-13 | Hardcore poaching between sports: slow, two-way demotion to casual, then normal conversion (GDD v1.4) | Decided |
 
 ---
 
