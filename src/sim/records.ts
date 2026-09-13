@@ -65,6 +65,13 @@ export const landmarks = {
     from,
     to,
   }),
+  nodeBought: (turn: number, quarter: number, nodeId: string, cost: number): Landmark => ({
+    kind: "nodeBought",
+    turn,
+    quarter,
+    nodeId,
+    cost,
+  }),
   rivalEscalated: (
     turn: number,
     quarter: number,

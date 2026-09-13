@@ -240,3 +240,59 @@ describe("save and resume", () => {
     expect(() => deserializeSave(text, reordered)).toThrow(/does not fit the current game content/);
   });
 });
+
+describe("saves with the growth tree (format 5)", () => {
+  const setup = setupFor(4471, firstAnchor, presetGenome("long-innings"));
+  const bought = (state: GameState) => state.landmarks.filter((l) => l.kind === "nodeBought");
+
+  it("resumes identically when the bot bought nodes before the save and keeps buying after", () => {
+    let midway = createCampaign(world, setup);
+    let saveAfter = 0;
+    while (bought(midway).length < 4 && saveAfter < 100) {
+      midway = playWithPolicy(midway, 1);
+      saveAfter += 1;
+    }
+    expect(bought(midway).length).toBeGreaterThanOrEqual(4);
+    expect(new Set(bought(midway).map((l) => l.turn)).size).toBeGreaterThan(1);
+
+    const uninterrupted = playWithPolicy(createCampaign(world, setup), saveAfter + 50);
+    const resumed = playWithPolicy(deserializeSave(serializeSave(midway), world), 50);
+    expect(resumed).toStrictEqual(uninterrupted);
+    expect(serializeSave(resumed)).toBe(serializeSave(uninterrupted));
+    expect(bought(uninterrupted).length).toBeGreaterThan(bought(midway).length);
+    expect(uninterrupted.growthNodes).toStrictEqual(bought(uninterrupted).map((l) => l.nodeId));
+  });
+
+  it("migrates a version 4 save: no nodes owned, everything else kept, same key order", () => {
+    const current = playWithPolicy(createCampaign(world, setup), 60);
+    expect(current.growthNodes.length).toBeGreaterThan(0);
+    const withoutTree: GameState = {
+      ...current,
+      growthNodes: [],
+      landmarks: current.landmarks.filter((l) => l.kind !== "nodeBought"),
+    };
+    const { growthNodes: _g, ...v4State } = withoutTree;
+    const loaded = deserializeSave(JSON.stringify({ formatVersion: 4, state: v4State }), world);
+    expect(loaded.growthNodes).toStrictEqual([]);
+    expect(serializeSave(loaded)).toBe(serializeSave(withoutTree));
+    const later = playWithPolicy(loaded, 6);
+    expect(JSON.parse(serializeSave(later)).formatVersion).toBe(5);
+  });
+
+  it("rejects a save with an unknown node, both sides of a fork, or a node before its prerequisite", () => {
+    const base = JSON.parse(serializeSave(createCampaign(world, setupFor(3))));
+    const load = (nodes: string[]) =>
+      deserializeSave(
+        JSON.stringify({ ...base, state: { ...base.state, growthNodes: nodes } }),
+        world,
+      );
+    expect(() => load(["hall-of-fame"])).toThrow(/"hall-of-fame" is not in the growth tree/);
+    expect(() => load(["backyard-clinics", "street-courts", "club-grounds"])).toThrow(
+      /both owned in fork where-to-play/,
+    );
+    expect(() => load(["word-of-mouth", "backyard-clinics"])).toThrow(
+      /bought before its prerequisite "backyard-clinics"/,
+    );
+    expect(load(["backyard-clinics", "word-of-mouth"]).growthNodes).toHaveLength(2);
+  });
+});

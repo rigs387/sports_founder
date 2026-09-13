@@ -20,6 +20,11 @@ export function App() {
   const anchorLeague = anchor?.league ?? null;
   const anchorRivals = anchor?.rivals ?? [];
   const countryName = (id: string) => names?.countries[id] ?? id;
+  const nodeName = (id: string) => t(`growth.nodes.${id}`, { defaultValue: id });
+  const growthNodes = snapshot?.growthNodes ?? [];
+  const ownedNodes = growthNodes.filter((node) => node.status === "owned");
+  const availableNodes = growthNodes.filter((node) => node.status === "available");
+  const lockedCount = growthNodes.filter((node) => node.status === "locked").length;
   const topCountries = snapshot
     ? [...snapshot.countries]
         .filter((country) => country.casual + country.hardcore > 0)
@@ -156,6 +161,52 @@ export function App() {
                 </div>
               ))}
             </dl>
+          </section>
+
+          <section className="growth" aria-label={t("growth.heading")} data-testid="growth-tree">
+            <h2>{t("growth.heading")}</h2>
+            <dl className="league-list">
+              <div>
+                <dt>{t("growth.owned")}</dt>
+                <dd data-testid="growth-owned">
+                  {ownedNodes.length === 0
+                    ? t("growth.noneOwned")
+                    : ownedNodes
+                        .map((node) => nodeName(node.nodeId))
+                        .join(t("campaign.listSeparator"))}
+                </dd>
+              </div>
+              <div>
+                <dt>{t("growth.available")}</dt>
+                <dd>
+                  {availableNodes.length === 0 ? (
+                    t("growth.noneAvailable")
+                  ) : (
+                    <ul className="node-list" data-testid="growth-available">
+                      {availableNodes.map((node) => (
+                        <li
+                          key={node.nodeId}
+                          className={node.affordable ? undefined : "unaffordable"}
+                        >
+                          <span>
+                            {t("growth.nodeWithCategory", {
+                              name: nodeName(node.nodeId),
+                              category: t(`growth.categories.${node.category}`),
+                            })}
+                          </span>
+                          <span className="node-cost">
+                            {node.affordable
+                              ? t("growth.cost", { cost: node.cost })
+                              : t("growth.tooExpensive", { cost: node.cost })}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </dd>
+              </div>
+            </dl>
+            <p className="meta">{t("growth.lockedCount", { count: lockedCount })}</p>
           </section>
 
           <section className="genome" aria-label={t("genome.heading")}>

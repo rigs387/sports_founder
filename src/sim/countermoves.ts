@@ -2,7 +2,8 @@ import type { Config, CountryState, TimedCountermoveKind } from "./types";
 
 // Effects of rival countermoves in effect in a country (GDD Rival AI). A countermove stored in a
 // country's state is in effect for every quarter until its end quarter; the rival AI removes it
-// after that (src/sim/rivals.ts). Every size is config.
+// after that (src/sim/rivals.ts). Every size is config. `effect` is the growth tree's countermove
+// factor in that country (1 = full size; countermove resistance lowers it; src/sim/growth.ts).
 
 type WithCountermoves = Pick<CountryState, "countermoves">;
 
@@ -23,9 +24,13 @@ export function mediaReachBlocked(country: WithCountermoves): boolean {
 }
 
 /** A sponsor lockout lowers the player's league media and sponsor revenue in the country. */
-export function mediaRevenueFactor(country: WithCountermoves, config: Config): number {
+export function mediaRevenueFactor(
+  country: WithCountermoves,
+  config: Config,
+  effect: number,
+): number {
   return hasCountermove(country, "sponsorLockout")
-    ? 1 - config.rivalAI.countermoves.sponsorLockout.mediaRevenueCut
+    ? 1 - config.rivalAI.countermoves.sponsorLockout.mediaRevenueCut * effect
     : 1;
 }
 
@@ -34,15 +39,19 @@ export function rivalConversionBoosts(
   country: WithCountermoves,
   sportId: string,
   config: Config,
+  effect: number,
 ): { casual: number; hardcore: number } {
   const { mediaBlitz, youthPrograms } = config.rivalAI.countermoves;
   return {
     casual:
-      1 + (hasCountermove(country, "mediaBlitz", sportId) ? mediaBlitz.casualConversionBoost : 0),
+      1 +
+      (hasCountermove(country, "mediaBlitz", sportId)
+        ? mediaBlitz.casualConversionBoost * effect
+        : 0),
     hardcore:
       1 +
       (hasCountermove(country, "youthPrograms", sportId)
-        ? youthPrograms.hardcoreConversionBoost
+        ? youthPrograms.hardcoreConversionBoost * effect
         : 0),
   };
 }

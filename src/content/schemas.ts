@@ -134,6 +134,77 @@ export const namesFileSchema = z.strictObject({
   sports: z.record(z.string(), z.string().min(1)),
 });
 
+// ---- Growth tree (GDD PP Growth Tree) ------------------------------------------------------
+
+/** The GDD's growth categories. Phase 0 content defines Grassroots and Media only. */
+export const growthCategorySchema = z.enum([
+  "grassroots",
+  "media",
+  "infrastructure",
+  "culture",
+  "global",
+]);
+export type GrowthCategory = z.infer<typeof growthCategorySchema>;
+
+/**
+ * The closed node effect vocabulary the simulation can apply today (GDD PP Growth Tree). The GDD
+ * also lists cash opportunity unlocks and backlash resistance; content using them is rejected until
+ * the systems they act on exist.
+ */
+export const NODE_EFFECT_TYPES = [
+  "spreadChannel",
+  "casualConversion",
+  "hardcoreConversion",
+  "churnReduction",
+  "formationThresholdReduction",
+  "coldLaunchCostReduction",
+  "ppIncome",
+  "runningCostReduction",
+  "countermoveResistance",
+] as const;
+export type NodeEffectType = (typeof NODE_EFFECT_TYPES)[number];
+const NOT_YET_BUILT = ["cashOpportunityUnlock", "backlashResistance"];
+
+export const nodeEffectTypeSchema = z.enum(NODE_EFFECT_TYPES, {
+  error: (issue) => {
+    const input = String(issue.input);
+    const later = NOT_YET_BUILT.includes(input)
+      ? " (in the GDD vocabulary, but the simulation cannot apply it yet)"
+      : "";
+    return `unknown node effect "${input}"${later}; allowed: ${NODE_EFFECT_TYPES.join(", ")}`;
+  },
+});
+
+export const spreadChannelSchema = z.enum(["proximity", "language", "media"]);
+export type SpreadChannel = z.infer<typeof spreadChannelSchema>;
+
+export const nodeEffectSchema = z.strictObject({
+  type: nodeEffectTypeSchema,
+  /** Only for spreadChannel. */
+  channel: spreadChannelSchema.optional(),
+  amount: z
+    .number()
+    .min(-1)
+    .max(1)
+    .refine((value) => value !== 0, { message: "must not be zero" }),
+  conditions: leverConditionsSchema.optional(),
+});
+
+export const growthNodeSchema = z.strictObject({
+  id,
+  category: growthCategorySchema,
+  cost: z.number().positive(),
+  requires: z.array(id).default([]),
+  effects: z.array(nodeEffectSchema).min(1),
+});
+
+export const growthTreeFileSchema = z.strictObject({
+  categories: z.partialRecord(growthCategorySchema, z.strictObject({ unlockTier: z.int().min(1) })),
+  limits: z.strictObject({ minFactor: z.number().gt(0).max(1) }),
+  forks: z.array(z.strictObject({ id, nodes: z.array(id).min(2) })).default([]),
+  nodes: z.array(growthNodeSchema).min(1),
+});
+
 // ---- Config --------------------------------------------------------------------------------
 
 const rate = unitInterval;
@@ -191,6 +262,7 @@ export const ppTierSchema = z.strictObject({
 
 const leagueTierConfigSchema = z.strictObject({
   runningCost: z.number().min(0),
+  minRunningCost: z.number().min(0),
   revenueMultiplier: z.number().positive(),
   promotion: z
     .strictObject({
@@ -306,6 +378,10 @@ export const configFileSchema = z.strictObject({
       hardcoreConversionRate: rate,
     }),
   }),
+  turnover: z.strictObject({
+    annualRate: rate,
+    floorShare: z.number().min(0).lt(1),
+  }),
   poaching: z.strictObject({
     rate: rate,
     referenceShare: z.number().gt(0).max(1),
@@ -410,6 +486,7 @@ export const configFileSchema = z.strictObject({
     differentiationSharedShare: unitInterval,
     dominanceLimit: unitInterval,
     pacingTolerance: unitInterval,
+    earlyCollapseTurn: z.int().min(1),
     turnsInTier: z.array(z.int().min(1)).min(1),
     naiveBot: z.string().min(1),
   }),
@@ -428,6 +505,9 @@ export type GenomeContent = z.infer<typeof genomeFileSchema>;
 export type RivalSport = z.infer<typeof rivalSportSchema>;
 export type SportsContent = z.infer<typeof sportsFileSchema>;
 export type Names = z.infer<typeof namesFileSchema>;
+export type NodeEffect = z.infer<typeof nodeEffectSchema>;
+export type GrowthNode = z.infer<typeof growthNodeSchema>;
+export type GrowthTreeContent = z.infer<typeof growthTreeFileSchema>;
 export type Curve = z.infer<typeof curveSchema>;
 export type PpTier = z.infer<typeof ppTierSchema>;
 export type LeagueTierConfig = z.infer<typeof leagueTierConfigSchema>;

@@ -1,5 +1,6 @@
 import { mediaReachBlocked } from "./countermoves";
 import { fandomScore } from "./fandom";
+import { growthFactors } from "./growth";
 import { type GameState, PLAYER_INDEX, type World } from "./types";
 
 // Cross-border spread and exposure (GDD Spread Model). Only casual exposure crosses borders: a
@@ -7,12 +8,17 @@ import { type GameState, PLAYER_INDEX, type World } from "./types";
 // exposure it creates in a target is that strength × channel link ÷ target population, summed over
 // every source and the three channels (proximity, language, media reach). Local word of mouth
 // adds the country's own following share, and a focus slot adds direct outreach. A rival's
-// exclusive broadcast deal blocks the media reach channel into a country (GDD Rival AI).
+// exclusive broadcast deal blocks the media reach channel into a country (GDD Rival AI), less the
+// share the player's countermove resistance holds open. Growth tree nodes multiply each inbound
+// channel in the target country (src/sim/growth.ts).
 
 export interface CountryExposure {
   /** Word of mouth: localWeight × player Fandom Score ÷ population. */
   local: number;
-  /** Inbound spread by channel, after the focus inbound multiplier and any broadcast deal. */
+  /**
+   * Inbound spread by channel, after growth tree channel factors, the focus inbound multiplier and
+   * any broadcast deal.
+   */
   proximity: number;
   language: number;
   media: number;
@@ -54,11 +60,12 @@ export function unblockedMediaReach(
 
 /** Exposure to the player's sport in every country at the current state. */
 export function computeExposure(
-  state: Pick<GameState, "countries" | "focus">,
+  state: Pick<GameState, "countries" | "focus" | "growthNodes">,
   world: World,
 ): CountryExposure[] {
   const { exposure: settings, focus: focusSettings } = world.config;
   const strengths = outboundStrengths(state, world);
+  const growth = growthFactors(world, state.growthNodes);
   const focused = new Set(state.focus.filter((id): id is string => id !== null));
 
   return state.countries.map((countryState, target) => {
@@ -68,7 +75,8 @@ export function computeExposure(
     const population = country.population;
     const isFocused = focused.has(country.id);
     const inboundMultiplier = isFocused ? focusSettings.inboundMultiplier : 1;
-    const mediaOpen = !mediaReachBlocked(countryState);
+    const factors = growth[target];
+    if (!factors) throw new Error(`No growth factors for country #${target}`);
 
     let proximity = 0;
     let language = 0;
@@ -79,8 +87,12 @@ export function computeExposure(
       const perCapita = strength / population;
       proximity += link.proximity * perCapita;
       language += link.language * perCapita;
-      if (mediaOpen) media += link.media * perCapita;
+      media += link.media * perCapita;
     }
+    proximity *= factors.proximity;
+    language *= factors.language;
+    media *= factors.media;
+    if (mediaReachBlocked(countryState)) media *= 1 - factors.countermoveEffect;
     const local = (settings.localWeight * (strengths[target] ?? 0)) / population;
     const organic = local + proximity + language + media;
     const outreach = isFocused ? focusSettings.outreachPeople / population : 0;

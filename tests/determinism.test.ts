@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { builder, randomBot } from "../src/runner/policy";
+import { builder, greedySpread, mediaRush, randomBot } from "../src/runner/policy";
 import {
   applyAction,
   createCampaign,
@@ -50,6 +50,20 @@ describe("determinism", () => {
     expect(a.landmarks.some((l) => l.kind === "rivalEscalated")).toBe(true);
     expect(a.landmarks.some((l) => l.kind === "rivalCountermove")).toBe(true);
     expect(a.rivals.some((rival) => rival.budgetSpent > 0)).toBe(true);
+  });
+
+  it.each([
+    ["greedy-spread", greedySpread],
+    ["media-rush", mediaRush],
+  ] as const)("is deterministic while %s buys growth nodes turn after turn", (_name, bot) => {
+    const setup = setupFor(31, "caldera", presetGenome("street-court"));
+    const a = runWithPolicy(createCampaign(world, setup), 100, bot);
+    const b = runWithPolicy(createCampaign(world, setup), 100, bot);
+    expect(b).toStrictEqual(a);
+    expect(serializeSave(b)).toBe(serializeSave(a));
+    const purchases = a.landmarks.filter((l) => l.kind === "nodeBought");
+    expect(purchases.length).toBeGreaterThan(5);
+    expect(new Set(purchases.map((l) => l.turn)).size).toBeGreaterThan(3);
   });
 
   it("is deterministic under the random bot, whose dice never touch the simulation's RNG", () => {

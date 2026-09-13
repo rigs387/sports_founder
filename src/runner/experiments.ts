@@ -12,7 +12,14 @@ import {
 import { type PlayedCampaign, playCampaign } from "./campaign";
 import { formatGenome, randomGenome } from "./genome-arg";
 import { type BotId, runBot } from "./policy";
-import { countBy, median, type OptionOutcome, optionOutcomes } from "./report";
+import {
+  countBy,
+  median,
+  type NodeOutcome,
+  nodeOutcomes,
+  type OptionOutcome,
+  optionOutcomes,
+} from "./report";
 
 // Balance experiments for the tech plan's Phase 0 exit criteria. Every campaign counts, and every
 // result is reported with its numbers; a failure is never folded into a pass. Campaigns use a
@@ -47,6 +54,10 @@ export interface CollapseCell {
   collapses: number;
   rate: number;
   medianCollapseTurn: number | null;
+  /** Every collapse turn, in seed order. */
+  collapseTurns: number[];
+  /** Collapses on or before balanceTargets.earlyCollapseTurn. */
+  earlyCollapses: number;
   peakTiers: Record<string, number>;
 }
 
@@ -54,6 +65,9 @@ export interface CollapseReport {
   seeds: number[];
   turns: number;
   naiveBot: BotId;
+  earlyCollapseTurn: number;
+  /** Population of every anchor in the report. */
+  populations: Record<string, number>;
   cells: CollapseCell[];
   /** Anchors the naive bot never collapsed. The criterion fails if any exist. */
   safeAnchorsUnderNaiveBot: string[];
@@ -77,15 +91,20 @@ export function runCollapse(
         return played.result;
       });
       const collapsed = results.filter((r) => r.collapsed);
+      const collapseTurns = collapsed
+        .map((r) => r.collapseTurn)
+        .filter((t): t is number => t !== null);
       cells.push({
         anchor,
         bot,
         campaigns: results.length,
         collapses: collapsed.length,
         rate: results.length > 0 ? collapsed.length / results.length : 0,
-        medianCollapseTurn: median(
-          collapsed.map((r) => r.collapseTurn).filter((t): t is number => t !== null),
-        ),
+        medianCollapseTurn: median(collapseTurns),
+        collapseTurns,
+        earlyCollapses: collapseTurns.filter(
+          (t) => t <= world.config.balanceTargets.earlyCollapseTurn,
+        ).length,
         peakTiers: countBy(results.map((r) => r.peakTier)),
       });
     }
@@ -97,6 +116,13 @@ export function runCollapse(
     seeds: settings.seeds,
     turns: settings.turns,
     naiveBot: settings.naiveBot,
+    earlyCollapseTurn: world.config.balanceTargets.earlyCollapseTurn,
+    populations: Object.fromEntries(
+      settings.anchors.map((anchor) => [
+        anchor,
+        world.countries.find((country) => country.id === anchor)?.population ?? 0,
+      ]),
+    ),
     cells,
     safeAnchorsUnderNaiveBot: safe,
     passed: safe.length === 0,
@@ -228,6 +254,11 @@ export interface OptionsReport {
   dominanceLimit: number;
   byAnchor: { anchor: string; outcomes: OptionOutcome[]; aboveLimit: string[] }[];
   combined: { outcomes: OptionOutcome[]; aboveLimit: string[] };
+  /** The same question for growth tree nodes: owned in more than the limit of top-quartile runs. */
+  nodes: {
+    byAnchor: { anchor: string; outcomes: NodeOutcome[]; aboveLimit: string[] }[];
+    combined: { outcomes: NodeOutcome[]; aboveLimit: string[] };
+  };
 }
 
 export function runOptions(
@@ -240,6 +271,10 @@ export function runOptions(
     outcomes.filter((o) => o.exceedsDominanceLimit).map((o) => `${o.axis}=${o.option}`);
   const all: PlayedCampaign["result"][] = [];
   const byAnchor: OptionsReport["byAnchor"] = [];
+  const nodeIds = world.growthTree.nodes.map((node) => node.id);
+  const nodesAbove = (outcomes: NodeOutcome[]) =>
+    outcomes.filter((o) => o.exceedsDominanceLimit).map((o) => o.nodeId);
+  const nodesByAnchor: OptionsReport["nodes"]["byAnchor"] = [];
   for (const anchor of settings.anchors) {
     const results = settings.seeds.map((seed) => {
       const played = randomGenomeCampaign(world, seed, anchor, settings.bot, settings.turns);
@@ -249,8 +284,11 @@ export function runOptions(
     all.push(...results);
     const outcomes = optionOutcomes(results, limit);
     byAnchor.push({ anchor, outcomes, aboveLimit: above(outcomes) });
+    const nodes = nodeOutcomes(results, nodeIds, limit);
+    nodesByAnchor.push({ anchor, outcomes: nodes, aboveLimit: nodesAbove(nodes) });
   }
   const combined = optionOutcomes(all, limit);
+  const combinedNodes = nodeOutcomes(all, nodeIds, limit);
   return {
     anchors: settings.anchors,
     bot: settings.bot,
@@ -259,6 +297,10 @@ export function runOptions(
     dominanceLimit: limit,
     byAnchor,
     combined: { outcomes: combined, aboveLimit: above(combined) },
+    nodes: {
+      byAnchor: nodesByAnchor,
+      combined: { outcomes: combinedNodes, aboveLimit: nodesAbove(combinedNodes) },
+    },
   };
 }
 

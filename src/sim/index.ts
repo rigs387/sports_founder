@@ -3,6 +3,7 @@ export * from "./calendar";
 export * from "./countermoves";
 export * from "./fandom";
 export * from "./genome";
+export * from "./growth";
 export * from "./hints";
 export * from "./invariants";
 export * from "./leagues";

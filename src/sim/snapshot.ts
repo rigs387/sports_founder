@@ -2,6 +2,7 @@ import { seasonalWindowOpen, turnLengthQuarters, yearOfQuarter } from "./calenda
 import { mediaRevenueFactor } from "./countermoves";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
 import { leverMultipliers, similarityEffect } from "./genome";
+import { growthFactorsAt, type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
 import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
 import { computeExposure } from "./spread";
 import { tierStatus } from "./tiers";
@@ -10,6 +11,7 @@ import {
   type GameOutcome,
   type GameState,
   type Genome,
+  type GrowthCategory,
   type HealthLevel,
   type LeagueTierId,
   type PendingTierUp,
@@ -67,6 +69,22 @@ export interface TierTrackSnapshot {
   next: { tier: number; scoreProgress: number; breadthProgress: number } | null;
 }
 
+/** One growth tree node as the UI sees it (GDD PP Growth Tree). No text: the UI names it. */
+export interface GrowthNodeSnapshot {
+  nodeId: string;
+  category: GrowthCategory;
+  /** owned; available (every rule met, whether or not the PP is there); locked. */
+  status: "owned" | "available" | "locked";
+  /** Price right now: base cost × the PP cost multiplier. */
+  cost: number;
+  affordable: boolean;
+  /** Why it cannot be bought (null when available or owned). */
+  lock: Exclude<NodeBlocker, { kind: "owned" }> | null;
+  requires: string[];
+  /** Fork siblings this node would lock out, or that lock it out. */
+  forkSiblings: string[];
+}
+
 /** What the UI shows after a turn. Plain data, cheap to send across the worker boundary. */
 export interface TurnSnapshot {
   seed: number;
@@ -86,7 +104,27 @@ export interface TurnSnapshot {
   sports: SportTotals[];
   /** Same order as content. */
   countries: CountrySnapshot[];
+  /** Every growth tree node in content order, with its status and current price. */
+  growthNodes: GrowthNodeSnapshot[];
   landmarkCount: number;
+}
+
+export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeSnapshot[] {
+  return world.growthTree.nodes.map((node): GrowthNodeSnapshot => {
+    const blocker = nodeBlocker(state, world, node.id);
+    const cost = nodeCost(state, world, node.id);
+    const fork = world.growthTree.forks.find((candidate) => candidate.nodes.includes(node.id));
+    return {
+      nodeId: node.id,
+      category: node.category,
+      status: blocker === null ? "available" : blocker.kind === "owned" ? "owned" : "locked",
+      cost,
+      affordable: state.pp >= cost,
+      lock: blocker === null || blocker.kind === "owned" ? null : blocker,
+      requires: [...node.requires],
+      forkSiblings: fork ? fork.nodes.filter((id) => id !== node.id) : [],
+    };
+  });
 }
 
 export function snapshot(state: GameState, world: World): TurnSnapshot {
@@ -130,9 +168,18 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
               league.tier,
               fans,
               state.ppTier,
-              mediaRevenueFactor(countryState, world.config),
+              mediaRevenueFactor(
+                countryState,
+                world.config,
+                growthFactorsAt(world, state.growthNodes, index).countermoveEffect,
+              ),
             ).total,
-            runningCostPerQuarter: runningCostPerQuarter(world, index, league.tier),
+            runningCostPerQuarter: runningCostPerQuarter(
+              world,
+              index,
+              league.tier,
+              state.growthNodes,
+            ),
             lastFlowPerQuarter: league.lastFlowPerQuarter,
           }
         : null,
@@ -176,6 +223,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     outcome: state.outcome,
     sports: sportTotals(state, world),
     countries,
+    growthNodes: growthNodeSnapshots(state, world),
     landmarkCount: state.landmarks.length,
   };
 }

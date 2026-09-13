@@ -116,7 +116,8 @@ body {
   font-weight: bold;
 }
 
-.league h2 {
+.league h2,
+.growth h2 {
   font-size: 1.2rem;
   margin: 24px 0 8px;
 }
@@ -160,4 +161,30 @@ body {
 .escalation-entrenched {
   color: #9a1e1e;
   font-weight: bold;
+}
+
+.node-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.node-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 2px 0;
+}
+
+.node-list .node-cost {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.growth .league-list > div:nth-child(2) {
+  grid-column: span 3;
+}
+
+.node-list li.unaffordable {
+  color: #8a8070;
 }

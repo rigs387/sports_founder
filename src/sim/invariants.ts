@@ -1,5 +1,6 @@
 import { genomeSchema, IDENTITY_AXES } from "../content";
 import { QUARTERS_PER_YEAR } from "./calendar";
+import { forkOf } from "./growth";
 import {
   ESCALATION_LEVELS,
   type GameState,
@@ -59,6 +60,29 @@ export function invariantsOf(state: GameState, world: World): string[] {
     if (focused.has(countryId)) problems.push(`"${countryId}" holds more than one focus slot`);
     focused.add(countryId);
   });
+
+  // Growth tree: known nodes, owned once, prerequisites owned first, at most one side of a fork.
+  const nodeIds = new Set(world.growthTree.nodes.map((node) => node.id));
+  const ownedSoFar = new Set<string>();
+  for (const nodeId of state.growthNodes) {
+    const node = world.growthTree.nodes.find((candidate) => candidate.id === nodeId);
+    if (!nodeIds.has(nodeId) || !node) {
+      problems.push(`growth node "${nodeId}" is not in the growth tree`);
+      continue;
+    }
+    if (ownedSoFar.has(nodeId)) problems.push(`growth node "${nodeId}" is owned more than once`);
+    for (const required of node.requires) {
+      if (!ownedSoFar.has(required)) {
+        problems.push(`growth node "${nodeId}" was bought before its prerequisite "${required}"`);
+      }
+    }
+    const fork = forkOf(world, nodeId);
+    const sibling = fork?.nodes.find((id) => id !== nodeId && ownedSoFar.has(id));
+    if (fork && sibling !== undefined) {
+      problems.push(`growth nodes "${sibling}" and "${nodeId}" are both owned in fork ${fork.id}`);
+    }
+    ownedSoFar.add(nodeId);
+  }
 
   const expectedSports = [
     PLAYER_SPORT_ID,

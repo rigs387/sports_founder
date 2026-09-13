@@ -217,6 +217,16 @@ poaching:
   # defense slows the pull further"). The "other" bucket never defends: it always takes the full pull.
   defenseResistance: { none: 1, watching: 1, defending: 0.75, entrenched: 0.5 }
 
+# Generational turnover (GDD Late-Game Pressure): every year a small share of every sport's hardcore
+# fans ages out, in every country, for the player, the rivals and the "other sports" bucket alike.
+# They demote to casual about the same sport (hardcore loss is demotion; nobody skips a bucket), and
+# from there churn and decay carry them to uninterested unless exposure keeps them. Applied each
+# quarter at 1 − (1 − annualRate)^(1/4), so a year compounds to annualRate. Turnover never takes a
+# sport below floorShare of a country's population.
+turnover:
+  annualRate: 0.04
+  floorShare: 0.0001
+
 # Rival defense (GDD Rival AI, Late-Game Pressure). Rivals defend; they don't hunt. Runs once per
 # quarter, deterministic, no randomness.
 rivalAI:
@@ -285,7 +295,8 @@ hints:
 # Leagues (GDD League tiers, Business Layer Phase 0 subset, League Health Ladder). Cash is per
 # country and never produces PP.
 leagues:
-  # Per tier: runningCost per quarter (before the wealth and size factors below), revenue
+  # Per tier: runningCost per quarter (before the wealth and size factors below), minRunningCost (a
+  # floor on that result, so a tiny country's professional league still costs something), revenue
   # multiplier, and promotion INTO this tier: hardcore fans needed = max(minHardcore, hardcoreShare
   # × population), cash reserve needed and cash cost, both in quarters of this tier's running cost.
   # minHardcore keeps the fixed starting fan base from qualifying a tiny country for promotion
@@ -293,18 +304,22 @@ leagues:
   tiers:
     amateur:
       runningCost: 0.4
+      minRunningCost: 0
       revenueMultiplier: 1
       promotion: null
     semi-pro:
       runningCost: 6
+      minRunningCost: 1.5
       revenueMultiplier: 1.5
       promotion: { hardcoreShare: 0.0004, minHardcore: 1500, reserveQuarters: 2.5, costQuarters: 2 }
     professional:
       runningCost: 40
+      minRunningCost: 6
       revenueMultiplier: 2
       promotion: { hardcoreShare: 0.003, minHardcore: 3000, reserveQuarters: 2.5, costQuarters: 2 }
     elite:
       runningCost: 90
+      minRunningCost: 15
       revenueMultiplier: 2.5
       promotion: { hardcoreShare: 0.02, minHardcore: 15000, reserveQuarters: 2.5, costQuarters: 2 }
   formation:
@@ -315,8 +330,9 @@ leagues:
     startingCashQuarters: 40
     # After a league folds, a new one cannot form for this many quarters.
     reformCooldownQuarters: 8
-  # Running cost per quarter = tier runningCost × (wealthFloor + (1 − wealthFloor) × wealth score)
-  #   × (population ÷ referencePopulation) ^ populationExponent
+  # Running cost per quarter = max(tier minRunningCost, tier runningCost × (wealthFloor + (1 −
+  #   wealthFloor) × wealth score) × (population ÷ referencePopulation) ^ populationExponent)
+  #   × the growth tree's running cost factor in that country
   costs:
     wealthFloor: 0.3
     referencePopulation: 1000000
@@ -370,5 +386,7 @@ balanceTargets:
   # Turns spent in each PP tier (GDD campaign length table), and the allowed deviation.
   turnsInTier: [20, 30, 40, 40]
   pacingTolerance: 0.3
+  # Collapses on or before this turn are reported separately: they should be very rare.
+  earlyCollapseTurn: 20
   # The naive strategy for the "no safe anchor" criterion.
   naiveBot: greedy-spread

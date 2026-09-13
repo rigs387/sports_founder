@@ -15,12 +15,13 @@ import {
   type World,
 } from "../sim";
 import { type BotId, runBot } from "./policy";
-import type {
-  CampaignResult,
-  CountryRow,
-  RivalCampaignReport,
-  TurnRow,
-  WhereAndWhen,
+import {
+  type CampaignResult,
+  type CountryRow,
+  PP_TIMELINE_TURNS,
+  type RivalCampaignReport,
+  type TurnRow,
+  type WhereAndWhen,
 } from "./report";
 
 export interface CampaignPlan {
@@ -78,6 +79,9 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     peakAnchorLevel: 0,
   }));
   let peakPlayerShare = lowest(0);
+  const nodesBought: CampaignResult["nodesBought"] = [];
+  let ppSpentOnNodes = 0;
+  const ppTimeline: CampaignResult["ppTimeline"] = [];
   let anchorOvertakeYears: number | null = null;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
@@ -130,8 +134,14 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   observe(state, 0);
 
   for (let t = 0; t < plan.turns && state.outcome === null; t += 1) {
+    const landmarksBefore = state.landmarks.length;
     const step = runBot(plan.bot, state, world);
     actions.push(...step.actions);
+    for (const landmark of step.state.landmarks.slice(landmarksBefore)) {
+      if (landmark.kind !== "nodeBought") continue;
+      nodesBought.push({ nodeId: landmark.nodeId, turn: t + 1, cost: landmark.cost });
+      ppSpentOnNodes += landmark.cost;
+    }
     const tierBefore = step.state.ppTier;
     state = endTurn(step.state, world);
     if (state.ppTier > tierBefore && tierReached[state.ppTier] === undefined) {
@@ -139,6 +149,9 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     }
     for (const problem of checkInvariants(state, world)) violations.add(problem);
     observe(state, t + 1);
+    if (PP_TIMELINE_TURNS.includes(t + 1)) {
+      ppTimeline.push({ turn: t + 1, banked: state.pp, spentOnNodes: ppSpentOnNodes });
+    }
 
     const snap = snapshot(state, world);
     const player = snap.sports.find((sport) => sport.kind === "player");
@@ -164,6 +177,8 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       playerHardcore: player.hardcore,
       playerFandomScore: player.fandomScore,
       anchorPlayerHardcoreShare: (anchorSnap?.hardcore ?? 0) / anchorPopulation,
+      nodesOwned: state.growthNodes.length,
+      ppSpentOnNodes,
       rivals: rivalSports.map((sport, r) => ({
         sportId: sport.id,
         anchorHardcoreShare:
@@ -282,6 +297,15 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         (state.countries[anchorIndex]?.fans[PLAYER_INDEX]?.hardcore ?? 0) / anchorPopulation,
       peakPlayerHardcoreShare: peakPlayerShare,
       anchorOvertakeYears,
+      nodesBought,
+      ppSpentOnNodes,
+      forkChoices: Object.fromEntries(
+        world.growthTree.forks.map((fork) => [
+          fork.id,
+          fork.nodes.find((id) => state.growthNodes.includes(id)) ?? null,
+        ]),
+      ),
+      ppTimeline,
       rivalReports,
       landmarks: state.landmarks.length,
       tierReached,

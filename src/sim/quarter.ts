@@ -1,14 +1,23 @@
 import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { rivalConversionBoosts } from "./countermoves";
-import { playerFandomScore } from "./fandom";
+import { fandomScore } from "./fandom";
 import { leverMultipliers, similarityEffect } from "./genome";
+import { type GrowthFactors, growthFactors } from "./growth";
 import { stepLeagueQuarter } from "./leagues";
 import { poachableHardcore, poachingRates } from "./poaching";
 import { yearlySnapshot } from "./records";
 import { stepRivals } from "./rivals";
 import { nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { type CountryExposure, computeExposure } from "./spread";
-import type { Config, CountryState, GameState, Landmark, SportState, World } from "./types";
+import {
+  type Config,
+  type CountryState,
+  type GameState,
+  type Landmark,
+  PLAYER_INDEX,
+  type SportState,
+  type World,
+} from "./types";
 
 // Quarterly simulation (GDD Fan Model, Sport Genome, Spread Model, Rival AI, Business Layer). Every
 // rate is config.
@@ -21,18 +30,23 @@ import type { Config, CountryState, GameState, Landmark, SportState, World } fro
 //                           similarity) × share of people with no hardcore sport × focus bonus
 // Exposure comes from src/sim/spread.ts: local word of mouth, inbound spread over the proximity,
 // language and media channels (only casual exposure crosses borders), and focus outreach.
+// Growth tree nodes (src/sim/growth.ts) multiply the player's casual conversion, churn and decay,
+// and hardcore conversion in each country, and shrink rival countermove boosts there.
 // Rivals: slow local drift with no spread and no affinity, boosted where that rival's media blitz
 // or youth programs are in effect (src/sim/countermoves.ts). "Other" never converts anyone.
 // Hardcore poaching (src/sim/poaching.ts): every sport's hardcore fans demote to casual about the
-// same sport at a rate set by the sports pulling on them. Hardcore fans never go straight to
-// uninterested; the only other hardcore loss is the league causes at the end of a turn.
+// same sport at a rate set by the sports pulling on them.
+// Generational turnover (GDD Late-Game Pressure): every sport's hardcore fans above a floor age out
+// at a small annual rate and demote to casual about the same sport. Hardcore fans never go straight
+// to uninterested; the only other hardcore loss is the league causes at the end of a turn.
 // Hardcore is exclusive: if the sports together would convert more people than have no hardcore
 // sport, the conversions are scaled down to fit.
 //
 // After fans move, league business runs (src/sim/leagues.ts): leagues form at the hardcore
 // threshold, and existing leagues earn revenue and pay running costs. Cash never feeds PP.
 // Then the rival AI runs (src/sim/rivals.ts): budgets, escalation and countermoves.
-// PP income per quarter: scale × (player Fandom Score ^ exponent).
+// PP income per quarter: scale × (player Fandom Score ^ exponent) × the growth tree's PP income
+// factor, averaged over countries weighted by the player's Fandom Score in each.
 // At the end of each in-game year the yearly world snapshot is recorded.
 
 /** Advances the simulation by one in-game quarter. Pure: returns a new state. */
@@ -40,13 +54,15 @@ export function stepQuarter(state: GameState, world: World): GameState {
   const { config } = world;
   const rng = restoreRng(state.rng);
   const exposure = computeExposure(state, world);
+  const growth = growthFactors(world, state.growthNodes);
   const quarter = state.quarter + 1;
   const found: Landmark[] = [];
 
   const afterBusiness = state.countries.map((countryState, index) => {
     const country = world.countries[index];
     const countryExposure = exposure[index];
-    if (!country || country.id !== countryState.countryId || !countryExposure) {
+    const factors = growth[index];
+    if (!country || country.id !== countryState.countryId || !countryExposure || !factors) {
       throw new Error(
         `Game state and content disagree at country #${index} ("${countryState.countryId}")`,
       );
@@ -67,23 +83,27 @@ export function stepQuarter(state: GameState, world: World): GameState {
         levers.affinity *
         rivalry.casualFactor *
         countryExposure.total *
-        (countryExposure.focused ? config.focus.conversionMultiplier : 1),
+        (countryExposure.focused ? config.focus.conversionMultiplier : 1) *
+        factors.casualConversion,
       casualChurn:
-        config.dynamics.player.casualChurnRate +
-        config.dynamics.player.casualDecayRate *
-          (1 - Math.min(1, countryExposure.total / config.exposure.retentionSaturation)),
+        (config.dynamics.player.casualChurnRate +
+          config.dynamics.player.casualDecayRate *
+            (1 - Math.min(1, countryExposure.total / config.exposure.retentionSaturation))) *
+        factors.churn,
       hardcoreConversion:
         config.dynamics.player.hardcoreConversionRate *
         levers.depth *
         levers.affinity *
         rivalry.hardcoreFactor *
-        (countryExposure.focused ? config.focus.conversionMultiplier : 1),
+        (countryExposure.focused ? config.focus.conversionMultiplier : 1) *
+        factors.hardcoreConversion,
     };
     const moved = stepCountryFans(
       countryState,
       country.population,
       state.sports,
       playerRates,
+      factors,
       config,
       rng,
     );
@@ -95,8 +115,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
   const defended = stepRivals(state, afterBusiness, quarter, world);
   found.push(...defended.landmarks);
   const countries = defended.countries;
-  const score = playerFandomScore(state.sports, countries, config.fandomScore.casualWeight);
-  const ppIncome = config.ppIncome.scale * score ** config.ppIncome.exponent;
+  const ppIncome = quarterPpIncome(countries, growth, config);
   const yearEnded = quarter % QUARTERS_PER_YEAR === 0;
 
   return {
@@ -113,6 +132,33 @@ export function stepQuarter(state: GameState, world: World): GameState {
   };
 }
 
+/**
+ * PP income for a quarter: scale × score ^ exponent × the Fandom-Score-weighted mean of each
+ * country's growth tree PP income factor (so an unconditional +8% node adds exactly 8%).
+ */
+export function quarterPpIncome(
+  countries: readonly CountryState[],
+  growth: readonly GrowthFactors[],
+  config: Config,
+): number {
+  let score = 0;
+  let weighted = 0;
+  countries.forEach((country, index) => {
+    const fans = country.fans[PLAYER_INDEX];
+    if (!fans) return;
+    const here = fandomScore(fans.casual, fans.hardcore, config.fandomScore.casualWeight);
+    score += here;
+    weighted += here * (growth[index]?.ppIncome ?? 1);
+  });
+  if (score <= 0) return 0;
+  return config.ppIncome.scale * score ** config.ppIncome.exponent * (weighted / score);
+}
+
+/** Per-quarter turnover rate that compounds to the configured annual rate. */
+export function quarterlyTurnoverRate(config: Config): number {
+  return 1 - (1 - config.turnover.annualRate) ** (1 / QUARTERS_PER_YEAR);
+}
+
 /** The player's effective per-quarter rates in one country, after every multiplier. */
 interface PlayerRates {
   casualConversion: number;
@@ -124,7 +170,7 @@ interface Flows {
   casualGain: number;
   casualChurn: number;
   hardcoreGain: number;
-  /** Hardcore fans poached this quarter: they demote to casual about the same sport. */
+  /** Hardcore fans poached or aged out this quarter: they demote to casual about the same sport. */
   hardcoreLoss: number;
 }
 
@@ -133,6 +179,7 @@ function stepCountryFans(
   population: number,
   sports: readonly SportState[],
   playerRates: PlayerRates,
+  factors: GrowthFactors,
   config: Config,
   rng: Rng,
 ): CountryState {
@@ -141,6 +188,8 @@ function stepCountryFans(
   const unattached = population - totalHardcore;
   const unattachedShare = unattached / population;
   const poaching = poachingRates(countryState, sports, population, config);
+  const turnoverRate = quarterlyTurnoverRate(config);
+  const turnoverFloor = Math.ceil(config.turnover.floorShare * population);
 
   // All flows are computed from the start-of-quarter snapshot, so sport order does not matter.
   // Each sport kind draws the same rolls every quarter whatever the config, so the random
@@ -151,12 +200,19 @@ function stepCountryFans(
       throw new Error(`Sport order mismatch in "${countryState.countryId}" at #${index}`);
     }
     const uninterested = population - fans.casual - fans.hardcore;
-    const hardcoreLoss = drawFlow(
+    const poached = drawFlow(
       rng,
       poachableHardcore(fans.hardcore, population, config),
       poaching[index] ?? 0,
       noise,
     );
+    const agedOut = drawFlow(
+      rng,
+      Math.max(0, fans.hardcore - poached - turnoverFloor),
+      turnoverRate,
+      noise,
+    );
+    const hardcoreLoss = poached + agedOut;
     if (sport.kind === "player") {
       const casualGain = drawFlow(rng, uninterested, playerRates.casualConversion, noise);
       const casualChurn = drawFlow(rng, fans.casual, playerRates.casualChurn, noise);
@@ -170,7 +226,12 @@ function stepCountryFans(
     }
     if (sport.kind === "rival") {
       const rates = config.dynamics.rival;
-      const boosts = rivalConversionBoosts(countryState, sport.id, config);
+      const boosts = rivalConversionBoosts(
+        countryState,
+        sport.id,
+        config,
+        factors.countermoveEffect,
+      );
       const reach = (fans.casual + fans.hardcore) / population;
       const casualGain = drawFlow(
         rng,

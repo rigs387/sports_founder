@@ -63,7 +63,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
         return { sportId: sport.id, casual: counts.casual, hardcore: counts.hardcore };
       }),
       // The anchor starts with a tiny founding Amateur league (GDD Starting state).
-      league: isAnchor ? newLeague(world, index, 0, start.anchorHardcoreFans) : null,
+      league: isAnchor ? newLeague(world, index, 0, start.anchorHardcoreFans, []) : null,
       leaguesFolded: 0,
       formationReadyQuarter: 0,
       // No rival is paying attention yet, and no countermove is in effect.
@@ -95,6 +95,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
       slotsToDrop: 0,
     },
     focus,
+    growthNodes: [],
     outcome: null,
     sports,
     // Rival genomes start from content and become campaign state (rule copying changes them).

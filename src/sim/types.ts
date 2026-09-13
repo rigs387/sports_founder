@@ -18,6 +18,7 @@ export type {
   CountryDerived,
   EscalationLevel,
   Genome,
+  GrowthCategory,
   HealthLevel,
   LeagueTierId,
   Names,
@@ -157,6 +158,7 @@ export type Landmark =
       leagueTier: LeagueTierId;
     }
   | { kind: "ppTierUp" | "ppTierDown"; turn: number; quarter: number; from: number; to: number }
+  | { kind: "nodeBought"; turn: number; quarter: number; nodeId: string; cost: number }
   | {
       kind: "rivalEscalated" | "rivalDeescalated";
       turn: number;
@@ -217,6 +219,8 @@ export interface GameState {
   tierTrack: TierTrack;
   /** Focus slots: the country each slot is on, or null if empty. */
   focus: (string | null)[];
+  /** Growth tree nodes owned, in purchase order (GDD PP Growth Tree). No refunds. */
+  growthNodes: string[];
   /** Set once the campaign has ended; nothing may be played after that. */
   outcome: GameOutcome | null;
   /** The player's sport first, then rivals in content order, then the "other" bucket. */

@@ -356,3 +356,91 @@ describe("content validation", () => {
     expect(error.message).toContain("could not be read");
   });
 });
+
+describe("growth tree content validation", () => {
+  // Node order in the shipped growth-tree.yaml: 0 backyard-clinics, 1 word-of-mouth,
+  // 2 weekend-leagues, ..., 10 local-radio.
+  const TREE = "growth-tree.yaml";
+
+  it("an unknown effect names the file and field and lists the vocabulary", () => {
+    const dir = copyOfContent();
+    editYaml(dir, TREE, ["nodes", 0, "effects", 0, "type"], setValue("fanDiscount"));
+    const error = loadError(dir);
+    expect(error.message).toContain("growth-tree.yaml at nodes[0].effects[0].type");
+    expect(error.message).toContain('unknown node effect "fanDiscount"');
+    expect(error.message).toContain("casualConversion");
+  });
+
+  it("a GDD effect the simulation cannot apply yet is rejected with that reason", () => {
+    const dir = copyOfContent();
+    editYaml(dir, TREE, ["nodes", 0, "effects", 0, "type"], setValue("backlashResistance"));
+    expect(loadError(dir).message).toContain("cannot apply it yet");
+  });
+
+  it("a prerequisite that does not exist names the node and field", () => {
+    const dir = copyOfContent();
+    editYaml(dir, TREE, ["nodes", 1, "requires", 0], setValue("ghost-node"));
+    expect(loadError(dir).message).toContain(
+      'growth-tree.yaml at nodes[1].requires[0]: unknown node "ghost-node"',
+    );
+  });
+
+  it("cyclic prerequisites are rejected, showing the cycle", () => {
+    const dir = copyOfContent();
+    editYaml(dir, TREE, ["nodes", 0, "requires"], setValue(["weekend-leagues"]));
+    const error = loadError(dir);
+    expect(error.message).toContain("growth-tree.yaml at nodes[");
+    expect(error.message).toMatch(/cyclic prerequisites: .*backyard-clinics.*weekend-leagues/);
+  });
+
+  it("a fork pointing at a missing node names the fork and field", () => {
+    const dir = copyOfContent();
+    editYaml(dir, TREE, ["forks", 0, "nodes", 1], setValue("ghost-node"));
+    expect(loadError(dir).message).toContain(
+      'growth-tree.yaml at forks[0].nodes[1]: unknown node "ghost-node"',
+    );
+  });
+
+  it("a fork whose node requires its sibling, or that spans categories, is rejected", () => {
+    const dir = copyOfContent();
+    editYaml(dir, TREE, ["forks", 0, "nodes"], setValue(["backyard-clinics", "word-of-mouth"]));
+    expect(loadError(dir).message).toContain('"word-of-mouth" requires "backyard-clinics"');
+
+    const dir2 = copyOfContent();
+    editYaml(dir2, TREE, ["forks", 0, "nodes"], setValue(["street-courts", "local-radio"]));
+    expect(loadError(dir2).message).toContain(
+      "forks[0].nodes: a fork's nodes must share one category",
+    );
+  });
+
+  it("a prerequisite in another category and a spread effect without a channel are rejected", () => {
+    const dir = copyOfContent();
+    editYaml(dir, TREE, ["nodes", 10, "requires"], setValue(["backyard-clinics"]));
+    editYaml(dir, TREE, ["nodes", 1, "effects", 0, "channel"], remove);
+    const message = loadError(dir).message;
+    expect(message).toContain("nodes[10].requires[0]");
+    expect(message).toContain("prerequisites must be in the same category");
+    expect(message).toContain(
+      "nodes[1].effects[0].channel: a spreadChannel effect needs a channel",
+    );
+  });
+
+  it("duplicate ids, zero amounts and an unlock tier beyond the tier table are rejected", () => {
+    const dir = copyOfContent();
+    editYaml(dir, TREE, ["nodes", 2, "id"], setValue("word-of-mouth"));
+    editYaml(dir, TREE, ["categories", "media", "unlockTier"], setValue(9));
+    const message = loadError(dir).message;
+    expect(message).toContain('nodes[2].id: duplicate node id "word-of-mouth"');
+    expect(message).toContain("categories.media.unlockTier: no tier 9 in config ppTiers");
+
+    const dir2 = copyOfContent();
+    editYaml(dir2, TREE, ["nodes", 0, "effects", 0, "amount"], setValue(0));
+    expect(loadError(dir2).message).toContain("nodes[0].effects[0].amount: must not be zero");
+  });
+
+  it("a missing growth tree file is named", () => {
+    const dir = copyOfContent();
+    rmSync(join(dir, TREE));
+    expect(loadError(dir).message).toContain("growth-tree.yaml");
+  });
+});

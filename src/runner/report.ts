@@ -11,6 +11,9 @@ import {
 import type { SportTotals } from "../sim";
 import type { BotId } from "./policy";
 
+/** Turns at which PP banked and spent are sampled for the growth tree report. */
+export const PP_TIMELINE_TURNS = [10, 20, 50, 100, 150, 200];
+
 /** A value with the country and turn where it was seen. */
 export interface WhereAndWhen {
   value: number;
@@ -79,6 +82,13 @@ export interface CampaignResult {
   peakPlayerHardcoreShare: WhereAndWhen;
   /** In-game years until the player's hardcore fans outnumbered every rival's in the anchor. */
   anchorOvertakeYears: number | null;
+  /** Growth tree nodes bought, in order, with the turn and the PP paid. */
+  nodesBought: { nodeId: string; turn: number; cost: number }[];
+  ppSpentOnNodes: number;
+  /** Per fork id: the node chosen, or null if the fork was never decided. */
+  forkChoices: Record<string, string | null>;
+  /** PP banked and cumulative PP spent on nodes after the sampled turns that were played. */
+  ppTimeline: { turn: number; banked: number; spentOnNodes: number }[];
   rivalReports: RivalCampaignReport[];
   landmarks: number;
   /** First time each tier was reached: turns completed and quarters elapsed at that moment. */
@@ -105,6 +115,9 @@ export interface TurnRow {
   playerHardcore: number;
   playerFandomScore: number;
   anchorPlayerHardcoreShare: number;
+  nodesOwned: number;
+  /** Cumulative PP spent on growth tree nodes. */
+  ppSpentOnNodes: number;
   /** Each rival's hardcore share and escalation level in the anchor. */
   rivals: { sportId: string; anchorHardcoreShare: number; anchorLevel: EscalationLevel }[];
 }
@@ -231,6 +244,107 @@ export function rivalAggregate(results: CampaignResult[]) {
   });
 }
 
+/** Growth tree activity across campaigns (GDD PP Growth Tree). */
+export function growthAggregate(
+  results: CampaignResult[],
+  tree: { nodes: { id: string }[]; forks: { id: string; nodes: string[] }[] },
+) {
+  const nodes = tree.nodes.map((node) => {
+    const turns = results.flatMap((r) =>
+      r.nodesBought.filter((bought) => bought.nodeId === node.id).map((bought) => bought.turn),
+    );
+    return {
+      nodeId: node.id,
+      boughtIn: turns.length,
+      of: results.length,
+      medianTurnBought: median(turns),
+    };
+  });
+  const forks = tree.forks.map((fork) => ({
+    forkId: fork.id,
+    choices: Object.fromEntries(
+      [...fork.nodes, "undecided"].map((choice) => [
+        choice,
+        results.filter((r) => (r.forkChoices[fork.id] ?? "undecided") === choice).length,
+      ]),
+    ),
+  }));
+  const timeline = PP_TIMELINE_TURNS.map((turn) => {
+    const points = results.flatMap((r) => r.ppTimeline.filter((p) => p.turn === turn));
+    return {
+      turn,
+      campaigns: points.length,
+      medianBanked: median(points.map((p) => p.banked)),
+      medianSpentOnNodes: median(points.map((p) => p.spentOnNodes)),
+    };
+  });
+  return {
+    nodesBoughtPerCampaign: distribution(results.map((r) => r.nodesBought.length)),
+    ppSpentOnNodes: distribution(results.map((r) => r.ppSpentOnNodes)),
+    finalPpBanked: distribution(results.map((r) => r.pp)),
+    nodes,
+    forks,
+    timeline,
+  };
+}
+
+/** Per-node ownership among top-quartile campaigns, to spot a dominant node. */
+export interface NodeOutcome {
+  nodeId: string;
+  campaigns: number;
+  /** Share of all campaigns that own the node at the end. */
+  ownedShare: number | null;
+  /** Share of top-quartile campaigns (by Fandom Score) that own it. */
+  topQuartileShare: number | null;
+  exceedsDominanceLimit: boolean;
+}
+
+export function nodeOutcomes(
+  results: CampaignResult[],
+  nodeIds: string[],
+  dominanceLimit: number,
+): NodeOutcome[] {
+  const sorted = [...results].sort((a, b) => b.player.fandomScore - a.player.fandomScore);
+  const topQuartile = sorted.slice(0, Math.max(1, Math.floor(sorted.length / 4)));
+  const owns = (result: CampaignResult, nodeId: string) =>
+    result.nodesBought.some((bought) => bought.nodeId === nodeId);
+  return nodeIds.map((nodeId) => {
+    const campaigns = results.filter((result) => owns(result, nodeId)).length;
+    const topQuartileShare =
+      results.length > 0
+        ? topQuartile.filter((result) => owns(result, nodeId)).length / topQuartile.length
+        : null;
+    return {
+      nodeId,
+      campaigns,
+      ownedShare: results.length > 0 ? campaigns / results.length : null,
+      topQuartileShare,
+      exceedsDominanceLimit: topQuartileShare !== null && topQuartileShare > dominanceLimit,
+    };
+  });
+}
+
+export function nodeOutcomesCsv(anchor: string, outcomes: NodeOutcome[]): string {
+  return toCsv(
+    [
+      "anchor",
+      "node",
+      "campaigns_owning",
+      "owned_share",
+      "top_quartile_share",
+      "exceeds_dominance_limit",
+    ],
+    outcomes.map((o) => [
+      anchor,
+      o.nodeId,
+      o.campaigns,
+      o.ownedShare === null ? null : round(o.ownedShare, 3),
+      o.topQuartileShare === null ? null : round(o.topQuartileShare, 3),
+      o.exceedsDominanceLimit,
+    ]),
+  );
+}
+
 export function aggregate(results: CampaignResult[], tierCount: number) {
   const scores = results.map((result) => result.player.fandomScore);
   const turnsToTier: Record<string, { reached: number; of: number; medianTurns: number | null }> =
@@ -330,6 +444,7 @@ const snake = (text: string) => text.replace(/[A-Z]/g, (letter) => `_${letter.to
 export function campaignsCsv(results: CampaignResult[], tierCount: number): string {
   const tiers = Array.from({ length: tierCount - 1 }, (_, i) => i + 2);
   const rivalIds = results[0]?.rivalReports.map((rival) => rival.sportId) ?? [];
+  const forkIds = Object.keys(results[0]?.forkChoices ?? {});
   const rivalColumns = rivalIds.flatMap((id) => [
     `${id}_budget_spent`,
     `${id}_escalations`,
@@ -378,6 +493,10 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     "peak_player_hardcore_country",
     "peak_player_hardcore_turn",
     "anchor_overtake_years",
+    "nodes_bought",
+    "pp_spent_on_nodes",
+    "nodes",
+    ...forkIds.map((id) => `fork_${snake(id).replaceAll("-", "_")}`),
     "landmarks",
     "top_countries_by_share",
     ...AXIS_IDS,
@@ -417,6 +536,10 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     r.peakPlayerHardcoreShare.countryId,
     r.peakPlayerHardcoreShare.turn,
     r.anchorOvertakeYears,
+    r.nodesBought.length,
+    Math.round(r.ppSpentOnNodes),
+    r.nodesBought.map((bought) => `${bought.nodeId}@${bought.turn}`).join("|"),
+    ...forkIds.map((id) => r.forkChoices[id] ?? ""),
     r.landmarks,
     r.topCountriesByShare.join("|"),
     ...AXIS_IDS.map((axis) => r.genome[axis]),
@@ -467,6 +590,8 @@ export function turnsCsv(rows: TurnRow[]): string {
     "player_hardcore",
     "player_fandom_score",
     "anchor_player_hardcore_share",
+    "nodes_owned",
+    "pp_spent_on_nodes",
     ...rivalIds.flatMap((id) => [`${id}_anchor_hardcore_share`, `${id}_anchor_level`]),
   ];
   return toCsv(
@@ -490,6 +615,8 @@ export function turnsCsv(rows: TurnRow[]): string {
       r.playerHardcore,
       Math.round(r.playerFandomScore),
       round(r.anchorPlayerHardcoreShare, 5),
+      r.nodesOwned,
+      Math.round(r.ppSpentOnNodes),
       ...rivalIds.flatMap((id) => {
         const rival = r.rivals.find((entry) => entry.sportId === id);
         return [round(rival?.anchorHardcoreShare ?? 0, 5), rival?.anchorLevel ?? ""];

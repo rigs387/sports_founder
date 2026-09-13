@@ -316,6 +316,7 @@ describe("each countermove has its effect", () => {
       config.dynamics.rival.casualChurnRate = 0;
       config.dynamics.rival.hardcoreConversionRate = 0;
       config.poaching.rate = 0;
+      config.turnover.annualRate = 0;
       config.rivalAI.movesPerQuarter = 0;
     });
     const base = createCampaign(w, setupFor(1, VALDORIA));
@@ -336,6 +337,7 @@ describe("each countermove has its effect", () => {
       config.dynamics.rival.casualConversionRate = 0;
       config.dynamics.rival.casualChurnRate = 0;
       config.poaching.rate = 0;
+      config.turnover.annualRate = 0;
       config.rivalAI.movesPerQuarter = 0;
     });
     const base = createCampaign(w, setupFor(1, VALDORIA));
@@ -402,7 +404,7 @@ describe("each countermove has its effect", () => {
       open.league.tier,
       fans,
       1,
-      mediaRevenueFactor(open, world.config),
+      mediaRevenueFactor(open, world.config, 1),
     );
     const lockedRevenue = revenuePerQuarter(
       world,
@@ -410,7 +412,7 @@ describe("each countermove has its effect", () => {
       open.league.tier,
       fans,
       1,
-      mediaRevenueFactor(locked, world.config),
+      mediaRevenueFactor(locked, world.config, 1),
     );
     const cut = world.config.rivalAI.countermoves.sponsorLockout.mediaRevenueCut;
     expect(openRevenue.media).toBeGreaterThan(0);

@@ -18,7 +18,7 @@ import { defaultGenome } from "./setup";
 import type { GameState, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 4;
+export const SAVE_FORMAT_VERSION = 5;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -70,6 +70,13 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     to: z.int().min(1),
   }),
   z.strictObject({
+    kind: z.literal("nodeBought"),
+    turn: z.int().min(1),
+    quarter: count,
+    nodeId: z.string().min(1),
+    cost: z.number().min(0),
+  }),
+  z.strictObject({
     kind: z.enum(["rivalEscalated", "rivalDeescalated"]),
     turn: z.int().min(1),
     quarter: count,
@@ -116,6 +123,7 @@ const gameStateSchema = z.strictObject({
     slotsToDrop: count,
   }),
   focus: z.array(z.string().min(1).nullable()),
+  growthNodes: z.array(z.string().min(1)),
   outcome: z
     .strictObject({
       kind: z.literal("anchorCollapse"),
@@ -246,7 +254,7 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
             fans: country.fans,
             league:
               index === anchorIndex
-                ? { ...newLeague(world, index, Number(quarter) || 0, hardcore) }
+                ? { ...newLeague(world, index, Number(quarter) || 0, hardcore, []) }
                 : null,
             leaguesFolded: 0,
             formationReadyQuarter: 0,
@@ -307,6 +315,21 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
         yearly,
       },
     };
+  },
+
+  // 4 → 5: the growth tree arrived. Nothing was ever bought, so the campaign owns no nodes.
+  // Generational turnover needs no state and starts with the next quarter.
+  4: (save) => {
+    const { focus, ...rest } = save.state;
+    const state: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(rest)) {
+      state[key] = value;
+      if (key === "tierTrack") {
+        state.focus = focus;
+        state.growthNodes = [];
+      }
+    }
+    return { formatVersion: 5, state };
   },
 };
 

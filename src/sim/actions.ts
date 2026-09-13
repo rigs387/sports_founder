@@ -1,4 +1,5 @@
 import { costMultiplier, seasonalWindowOpen } from "./calendar";
+import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
 import {
   bailoutTerms,
   demoteHardcore,
@@ -17,8 +18,10 @@ import { type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } from "./types"
 //   promoteLeague   promote a qualifying league, in the seasonal window only (GDD League tiers)
 //   stepDownLeague  restructure a Near-Collapse league one tier down
 //   bailoutLeague   emergency PP → cash for a league in trouble, with a cooldown
+//   buyNode         buy a growth tree node (GDD PP Growth Tree); permanent, no refunds
 
 export type Action =
+  | { type: "buyNode"; nodeId: string }
   | { type: "assignFocus"; slot: number; countryId: string }
   | { type: "dropFocusSlot"; slot: number }
   | { type: "promoteLeague"; countryId: string }
@@ -38,16 +41,21 @@ export class IllegalActionError extends Error {
 /**
  * PP cost of pointing a focus slot at a country. A cold launch (no exposure) costs the most;
  * existing organic exposure makes it cheaper, down to exposedCost once exposure reaches
- * costSaturationExposure. Scaled by the PP cost multiplier ("growing pains").
+ * costSaturationExposure. The cold-launch premium (the part above exposedCost) is scaled by the
+ * growth tree's factor in that country, and the whole cost by the PP cost multiplier ("growing
+ * pains").
  */
 export function focusCostFromExposure(
   organicExposure: number,
-  state: Pick<GameState, "tierTrack">,
+  state: Pick<GameState, "tierTrack" | "growthNodes">,
   world: World,
+  countryIndex: number,
 ): number {
   const { focus } = world.config;
   const level = Math.min(1, organicExposure / focus.costSaturationExposure);
-  const base = focus.coldLaunchCost - (focus.coldLaunchCost - focus.exposedCost) * level;
+  const premium = growthFactorsAt(world, state.growthNodes, countryIndex).coldLaunchPremium;
+  const base =
+    focus.exposedCost + (focus.coldLaunchCost - focus.exposedCost) * (1 - level) * premium;
   return base * costMultiplier(state, world.config);
 }
 
@@ -55,7 +63,7 @@ export function focusCost(state: GameState, world: World, countryId: string): nu
   const index = countryIndexOf(world, countryId);
   if (index < 0) throw new Error(`Unknown country "${countryId}"`);
   const exposure = computeExposure(state, world)[index];
-  return focusCostFromExposure(exposure?.organic ?? 0, state, world);
+  return focusCostFromExposure(exposure?.organic ?? 0, state, world, index);
 }
 
 function countryIndexOf(world: World, countryId: string): number {
@@ -67,6 +75,28 @@ const money = (value: number) => value.toFixed(1);
 /** Returns why an action is illegal, or null if it is legal. */
 export function checkAction(state: GameState, world: World, action: Action): string | null {
   if (state.outcome !== null) return "the campaign has ended";
+
+  if (action.type === "buyNode") {
+    if (!world.growthTree.nodes.some((node) => node.id === action.nodeId)) {
+      return `unknown growth node "${action.nodeId}"`;
+    }
+    const blocker = nodeBlocker(state, world, action.nodeId);
+    if (blocker !== null) {
+      switch (blocker.kind) {
+        case "owned":
+          return `"${action.nodeId}" is already owned (nodes are permanent)`;
+        case "fork":
+          return `"${action.nodeId}" is locked out: "${blocker.takenBy}" was chosen in the ${blocker.forkId} fork`;
+        case "tier":
+          return `${growthNode(world, action.nodeId).category} nodes unlock at PP tier ${blocker.unlockTier} (you are at tier ${state.ppTier})`;
+        case "prerequisites":
+          return `"${action.nodeId}" needs ${blocker.missing.map((id) => `"${id}"`).join(" and ")} first`;
+      }
+    }
+    const cost = nodeCost(state, world, action.nodeId);
+    if (state.pp < cost) return `not enough PP: costs ${money(cost)}, you have ${money(state.pp)}`;
+    return null;
+  }
 
   if (action.type === "dropFocusSlot") {
     if (state.tierTrack.slotsToDrop <= 0) return "no focus slot needs to be dropped";
@@ -108,7 +138,7 @@ export function checkAction(state: GameState, world: World, action: Action): str
     if (!seasonalWindowOpen(state, world.config)) {
       return "leagues can only be promoted in the seasonal window";
     }
-    const terms = promotionTerms(world, index, league.tier);
+    const terms = promotionTerms(world, index, league.tier, state.growthNodes);
     if (terms === null) return `the league is already ${league.tier}, the top tier`;
     const hardcore = country.fans[PLAYER_INDEX]?.hardcore ?? 0;
     if (hardcore < terms.hardcoreNeeded) {
@@ -145,6 +175,18 @@ export function applyAction(state: GameState, world: World, action: Action): Gam
   if (reason !== null) throw new IllegalActionError(action, reason);
 
   switch (action.type) {
+    case "buyNode": {
+      const cost = nodeCost(state, world, action.nodeId);
+      return {
+        ...state,
+        pp: state.pp - cost,
+        growthNodes: [...state.growthNodes, action.nodeId],
+        landmarks: [
+          ...state.landmarks,
+          landmarks.nodeBought(state.turn, state.quarter, action.nodeId, cost),
+        ],
+      };
+    }
     case "assignFocus": {
       const cost = focusCost(state, world, action.countryId);
       const focus = [...state.focus];
@@ -160,7 +202,7 @@ export function applyAction(state: GameState, world: World, action: Action): Gam
     case "promoteLeague":
       return updateLeague(state, world, action.countryId, (country, index) => {
         const league = country.league;
-        const terms = league ? promotionTerms(world, index, league.tier) : null;
+        const terms = league ? promotionTerms(world, index, league.tier, state.growthNodes) : null;
         if (!league || !terms) throw new Error("unreachable: promotion was checked");
         return {
           country: {
@@ -259,5 +301,5 @@ function updateLeague(
 export function leagueRunningCost(state: GameState, world: World, countryId: string): number {
   const index = countryIndexOf(world, countryId);
   const league = state.countries[index]?.league;
-  return league ? runningCostPerQuarter(world, index, league.tier) : 0;
+  return league ? runningCostPerQuarter(world, index, league.tier, state.growthNodes) : 0;
 }

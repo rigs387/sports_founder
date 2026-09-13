@@ -94,7 +94,7 @@ function frozenWithTurnLength(quarters: number): World {
 
 describe("league formation", () => {
   const index = countryIndex(world, OTHER);
-  const threshold = formationThreshold(world, index);
+  const threshold = formationThreshold(world, index, []);
   const base = createCampaign(world, setupFor(1, ANCHOR));
 
   it("does not form one fan short of the threshold, and forms exactly at it", () => {
@@ -108,7 +108,7 @@ describe("league formation", () => {
     expect(reached.country.league?.tier).toBe("amateur");
     expect(reached.country.league?.cash).toBeCloseTo(
       world.config.leagues.formation.startingCashQuarters *
-        runningCostPerQuarter(world, index, "amateur"),
+        runningCostPerQuarter(world, index, "amateur", []),
       6,
     );
     expect(reached.landmark).toMatchObject({
@@ -128,7 +128,7 @@ describe("league formation", () => {
         const hardcore = country.fans[PLAYER_INDEX]?.hardcore ?? 0;
         const expected =
           before?.league !== null ||
-          (hardcore >= formationThreshold(world, i) &&
+          (hardcore >= formationThreshold(world, i, []) &&
             next.quarter >= (before?.formationReadyQuarter ?? 0));
         expect(country.league !== null, `${country.countryId} at quarter ${next.quarter}`).toBe(
           expected,
@@ -164,7 +164,7 @@ describe("League Health Ladder", () => {
       config.leagues.tiers.amateur.runningCost = 1000;
     });
     const start = createCampaign(w, setupFor(1, ANCHOR));
-    const cost = runningCostPerQuarter(w, countryIndex(w, ANCHOR), "amateur");
+    const cost = runningCostPerQuarter(w, countryIndex(w, ANCHOR), "amateur", []);
     return { w, state: withCountry(start, w, ANCHOR, { league: { cash: cost * 30 } }) };
   }
 
@@ -200,7 +200,7 @@ describe("League Health Ladder", () => {
   it("each step down the ladder demotes hardcore fans to casual; none become uninterested", () => {
     const { w, state } = sinking(1);
     // Eight quarters of runway: inside the Struggling band, so the first evaluation steps down.
-    const cost = runningCostPerQuarter(w, countryIndex(w, ANCHOR), "amateur");
+    const cost = runningCostPerQuarter(w, countryIndex(w, ANCHOR), "amateur", []);
     const withFans = withCountry(state, w, ANCHOR, {
       hardcore: 100_000,
       casual: 50_000,
@@ -259,7 +259,7 @@ describe("League Health Ladder", () => {
     });
     const index = countryIndex(slipping, ANCHOR);
     const start = createCampaign(slipping, setupFor(1, ANCHOR));
-    const cash = 40 * runningCostPerQuarter(slipping, index, "amateur");
+    const cash = 40 * runningCostPerQuarter(slipping, index, "amateur", []);
     const fans = { hardcore: 4_000, casual: 200_000 };
     const amateur = withCountry(start, slipping, ANCHOR, {
       ...fans,
@@ -269,8 +269,8 @@ describe("League Health Ladder", () => {
       ...fans,
       league: { tier: "professional", cash },
     });
-    expect(runningCostPerQuarter(slipping, index, "professional")).toBeGreaterThan(
-      runningCostPerQuarter(slipping, index, "amateur"),
+    expect(runningCostPerQuarter(slipping, index, "professional", [])).toBeGreaterThan(
+      runningCostPerQuarter(slipping, index, "amateur", []),
     );
 
     const rung = (s: GameState) => {
@@ -319,7 +319,7 @@ describe("league actions are validated", () => {
   const population = world.countries[index]?.population ?? 0;
   const start = createCampaign(world, setupFor(1, ANCHOR));
   const promotion = world.config.leagues.tiers["semi-pro"].promotion;
-  const semiCost = runningCostPerQuarter(world, index, "semi-pro");
+  const semiCost = runningCostPerQuarter(world, index, "semi-pro", []);
   const qualified = withCountry(start, world, ANCHOR, {
     hardcore: Math.ceil((promotion?.hardcoreShare ?? 0) * population) + 10,
     league: { cash: (promotion?.reserveQuarters ?? 0) * semiCost + 1 },

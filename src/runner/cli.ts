@@ -31,7 +31,9 @@ import {
   type CountryRow,
   campaignsCsv,
   countriesCsv,
+  growthAggregate,
   median,
+  nodeOutcomesCsv,
   optionOutcomesCsv,
   type TurnRow,
   turnsCsv,
@@ -68,22 +70,26 @@ Usage: npm run sim -- [options]
                                         naive bot named in config
                        hard-anchor      outcomes from the hardest anchor, per bot
                        pacing           turns to each PP tier against the GDD budget table
-                       options          per-option outcomes from random genomes, per anchor
+                       options          per-option and per-growth-node outcomes from random
+                                        genomes, per anchor (no option or node in more than 40%
+                                        of top-quartile runs)
                        rivals           rivals persist: no rival's hardcore fans ever reach zero in
                                         any country or worldwide, for every anchor × bot (random
                                         genomes); reports the lowest rival share seen and where
                        benchmark        a 120-year campaign: time, save size, load time
   --anchors <ids>    anchors for collapse and rivals (default: all) and for pacing and options
                      (default: the first country of each climate)
-  --bots <ids>       bots for collapse and hard-anchor (default: greedy-spread,anchor-turtle,random)
-                     and rivals (default: greedy-spread,builder,anchor-turtle,random)
+  --bots <ids>       bots for collapse and hard-anchor (default:
+                     greedy-spread,anchor-turtle,media-rush,random) and rivals (default:
+                     greedy-spread,builder,anchor-turtle,media-rush,random)
   --hard-anchor <id> anchor for hard-anchor (default: the smallest country)
   --presets <ids>    presets for differentiation (default: all)
   --content <dir>    content directory (default: ./content)
   --out <dir>        output directory (default: runs/latest)
 
 Writes summary.json, campaigns.csv, countries.csv, turns.csv (plain runs and differentiation only),
-options.csv (options experiment) and one JSON file per experiment. Exits with code 1 if any
+options.csv and nodes.csv (options experiment) and one JSON file per experiment. Every run also
+prints the growth tree report: nodes bought, fork choices, PP banked vs spent. Exits with code 1 if any
 campaign produced an invalid state. Experiment misses are reported, not treated as errors.`;
 
 function wholeNumber(value: string, name: string, min: number, max: number): number {
@@ -169,6 +175,24 @@ function printCollapse(report: CollapseReport): void {
     });
     console.log(`  ${anchor.padEnd(14)}${row.join("")}`);
   }
+  const naive = report.cells.filter((cell) => cell.bot === report.naiveBot);
+  const early = naive.reduce((sum, cell) => sum + cell.earlyCollapses, 0);
+  const total = naive.reduce((sum, cell) => sum + cell.campaigns, 0);
+  console.log(
+    `  Collapses by turn ${report.earlyCollapseTurn} under ${report.naiveBot}: ${early}/${total} campaigns; all bots: ${report.cells.reduce((sum, cell) => sum + cell.earlyCollapses, 0)}/${report.cells.reduce((sum, cell) => sum + cell.campaigns, 0)}`,
+  );
+  const smallest = [...new Set(report.cells.map((cell) => cell.anchor))]
+    .map((anchor) => ({ anchor, population: report.populations[anchor] ?? 0 }))
+    .sort((a, b) => a.population - b.population)
+    .slice(0, 4);
+  console.log("  Collapse turns, four smallest anchors:");
+  for (const { anchor } of smallest) {
+    for (const cell of report.cells.filter((c) => c.anchor === anchor)) {
+      console.log(
+        `    ${anchor.padEnd(14)} ${cell.bot.padEnd(14)} ${cell.collapses}/${cell.campaigns}; turns [${cell.collapseTurns.join(", ")}]; median ${cell.medianCollapseTurn ?? "-"}`,
+      );
+    }
+  }
   const safe = report.safeAnchorsUnderNaiveBot;
   console.log(
     `  No safe anchor: ${report.passed ? "PASSED" : "FAILED"}${safe.length > 0 ? ` (never collapsed under ${report.naiveBot}: ${safe.join(", ")})` : ""}`,
@@ -209,6 +233,52 @@ function printOptions(report: OptionsReport): void {
   const combined =
     report.combined.aboveLimit.length === 0 ? "none" : report.combined.aboveLimit.join(", ");
   console.log(`  ${"all anchors".padEnd(14)} above limit: ${combined}`);
+  console.log("  Growth tree nodes owned in more than the limit of top-quartile runs:");
+  for (const entry of report.nodes.byAnchor) {
+    const above = entry.aboveLimit.length === 0 ? "none" : entry.aboveLimit.join(", ");
+    console.log(`    ${entry.anchor.padEnd(14)} ${above}`);
+  }
+  const shares = report.nodes.combined.outcomes
+    .map(
+      (o) =>
+        `${o.nodeId} ${o.topQuartileShare === null ? "-" : pct(o.topQuartileShare)} (all ${o.ownedShare === null ? "-" : pct(o.ownedShare)})`,
+    )
+    .join("; ");
+  console.log(
+    `    ${"all anchors".padEnd(14)} ${report.nodes.combined.aboveLimit.length === 0 ? "none" : report.nodes.combined.aboveLimit.join(", ")}`,
+  );
+  console.log(`    top-quartile ownership (all campaigns in brackets): ${shares}`);
+}
+
+function printGrowth(growth: ReturnType<typeof growthAggregate>, campaigns: number): void {
+  const d = growth.nodesBoughtPerCampaign;
+  console.log(
+    `  Growth tree: nodes bought per campaign min ${fmt(d.min)}, median ${fmt(d.median)}, max ${fmt(d.max)}; PP spent on nodes median ${fmt(growth.ppSpentOnNodes.median)}; final PP banked median ${fmt(growth.finalPpBanked.median)}`,
+  );
+  console.log(
+    `  Forks: ${growth.forks
+      .map(
+        (fork) =>
+          `${fork.forkId} ${Object.entries(fork.choices)
+            .map(([choice, n]) => `${choice} ${n}`)
+            .join(" / ")}`,
+      )
+      .join("; ")}`,
+  );
+  console.log(
+    `  Nodes bought (campaigns of ${campaigns}, median turn): ${growth.nodes
+      .map((node) => `${node.nodeId} ${node.boughtIn} (t${fmt(node.medianTurnBought)})`)
+      .join("; ")}`,
+  );
+  console.log(
+    `  PP banked vs spent on nodes (medians): ${growth.timeline
+      .filter((point) => point.campaigns > 0)
+      .map(
+        (point) =>
+          `turn ${point.turn}: banked ${fmt(point.medianBanked)}, spent ${fmt(point.medianSpentOnNodes)} (${point.campaigns})`,
+      )
+      .join("; ")}`,
+  );
 }
 
 const lowPoint = (low: RivalLowPoint | null, asShare: boolean) =>
@@ -338,7 +408,9 @@ function main(): number {
       `content/config.yaml balanceTargets.naiveBot "${naiveBotId}" is not a bot (${BOT_IDS.join(", ")})`,
     );
   }
-  const bots = checkBots(listOf(values.bots) ?? ["greedy-spread", "anchor-turtle", "random"]);
+  const bots = checkBots(
+    listOf(values.bots) ?? ["greedy-spread", "anchor-turtle", "media-rush", "random"],
+  );
   const smallest = [...world.countries].sort((a, b) => a.population - b.population)[0]?.id ?? "";
   const hardAnchor = checkAnchors(world, [values["hard-anchor"] ?? smallest])[0] ?? smallest;
   const listedAnchors = listOf(values.anchors);
@@ -360,6 +432,9 @@ function main(): number {
     writeFileSync(join(outDir, `${name}.json`), `${JSON.stringify(report, null, 2)}\n`);
   };
   let optionsCsv = "";
+  let nodesCsv = "";
+  const joinCsv = (parts: string[]) =>
+    parts.map((csv, i) => (i === 0 ? csv : csv.slice(csv.indexOf("\n") + 1))).join("");
 
   if (experiments.length === 0) {
     const choice = parseGenomeArg(values.genome, world);
@@ -437,13 +512,22 @@ function main(): number {
             return i === 0 ? csv : csv.slice(csv.indexOf("\n") + 1);
           })
           .join("");
+        nodesCsv = joinCsv(
+          report.nodes.byAnchor.map((entry) => nodeOutcomesCsv(entry.anchor, entry.outcomes)),
+        );
         printOptions(report);
         break;
       }
       case "rivals": {
         const anchors = checkAnchors(world, listedAnchors ?? world.countries.map((c) => c.id));
         const rivalBots = checkBots(
-          listOf(values.bots) ?? ["greedy-spread", "builder", "anchor-turtle", "random"],
+          listOf(values.bots) ?? [
+            "greedy-spread",
+            "builder",
+            "anchor-turtle",
+            "media-rush",
+            "random",
+          ],
         );
         const report = runRivalsPersist(
           world,
@@ -467,6 +551,7 @@ function main(): number {
   const { results, turnRows, countryRows } = collected;
   const tierCount = world.config.ppTiers.length;
   const agg = aggregate(results, tierCount);
+  const growth = growthAggregate(results, world.growthTree);
   const summary = {
     settings: {
       campaigns,
@@ -481,6 +566,7 @@ function main(): number {
     },
     anchorGenomeHints: anchorGenomeHints(world, anchor),
     aggregate: agg,
+    growth,
     experimentReports: written,
     campaigns: experiments.length === 0 ? results : undefined,
   };
@@ -489,6 +575,7 @@ function main(): number {
   writeFileSync(join(outDir, "countries.csv"), countriesCsv(countryRows));
   if (turnRows.length > 0) writeFileSync(join(outDir, "turns.csv"), turnsCsv(turnRows));
   if (optionsCsv !== "") writeFileSync(join(outDir, "options.csv"), optionsCsv);
+  if (nodesCsv !== "") writeFileSync(join(outDir, "nodes.csv"), nodesCsv);
 
   console.log(
     `\nPlayed ${results.length} campaign(s) in ${(elapsedMs / 1000).toFixed(1)} s. Output: ${outDir}`,
@@ -511,6 +598,7 @@ function main(): number {
   if (results.length > 0) {
     console.log(`  Rival activity and player hardcore across all ${results.length} campaign(s):`);
     printRivalActivity(agg);
+    printGrowth(growth, results.length);
   }
   console.log(`  invalid campaigns: ${agg.campaignsWithInvariantViolations}`);
 

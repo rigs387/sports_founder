@@ -23,6 +23,7 @@ const RIVAL = "fieldball";
 function onlyPoaching(base: World): World {
   return withConfig(base, (config) => {
     config.dynamics.noise = 0;
+    config.turnover.annualRate = 0;
     config.dynamics.player = {
       casualConversionRate: 0,
       casualChurnRate: 0,

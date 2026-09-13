@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "Sports Founder",
-    "subtitle": "Foundation build: genome, spread, leagues, the tier track and rival defense are live; no map yet."
+    "subtitle": "Foundation build: genome, spread, leagues, the tier track, rival defense and the growth tree are live; no map yet."
   },
   "status": {
     "loading": "Setting up the backyard…",
@@ -72,6 +72,47 @@
       "sponsorLockout": "sponsor lockout"
     }
   },
+  "growth": {
+    "heading": "Growth tree",
+    "owned": "Owned",
+    "available": "Available now",
+    "noneOwned": "Nothing bought yet",
+    "noneAvailable": "Nothing to buy right now",
+    "lockedCount_one": "{{count}} node still locked",
+    "lockedCount_other": "{{count}} nodes still locked",
+    "nodeWithCategory": "{{name}} ({{category}})",
+    "cost": "{{cost, number(maximumFractionDigits: 0)}} PP",
+    "tooExpensive": "{{cost, number(maximumFractionDigits: 0)}} PP (not enough PP)",
+    "categories": {
+      "grassroots": "Grassroots",
+      "media": "Media",
+      "infrastructure": "Infrastructure",
+      "culture": "Culture",
+      "global": "Global"
+    },
+    "nodes": {
+      "backyard-clinics": "Backyard Clinics",
+      "word-of-mouth": "Word of Mouth",
+      "weekend-leagues": "Weekend Leagues",
+      "street-courts": "Street Courts",
+      "club-grounds": "Club Grounds",
+      "fan-meetups": "Fan Meetups",
+      "volunteer-organisers": "Volunteer Organisers",
+      "border-tournaments": "Border Tournaments",
+      "community-ownership": "Community Ownership",
+      "barnstorming-tours": "Barnstorming Tours",
+      "local-radio": "Local Radio",
+      "newspaper-columns": "Newspaper Columns",
+      "highlight-reels": "Highlight Reels",
+      "dubbed-broadcasts": "Dubbed Broadcasts",
+      "pay-tv-exclusivity": "Pay-TV Exclusivity",
+      "free-to-air": "Free-to-Air",
+      "star-profiles": "Star Profiles",
+      "sponsor-showcase": "Sponsor Showcase",
+      "tabloid-buzz": "Tabloid Buzz",
+      "satellite-feed": "Satellite Feed"
+    }
+  },
   "genome": {
     "heading": "Your sport's genome",
     "axes": {
@@ -104,13 +145,41 @@
         "precision": "Precision",
         "endurance": "Endurance"
       },
-      "footprint": { "small": "Small", "medium": "Medium", "large": "Large" },
-      "contact": { "none": "None", "incidental": "Incidental", "full": "Full" },
-      "teamSize": { "small": "Small (2–5)", "medium": "Medium (6–9)", "large": "Large (10–15)" },
-      "matchLength": { "short": "Short", "standard": "Standard", "long": "Long" },
-      "scoring": { "low": "Low", "medium": "Medium", "high": "High" },
-      "complexity": { "simple": "Simple", "moderate": "Moderate", "intricate": "Intricate" },
-      "structure": { "continuous": "Continuous", "stop-start": "Stop-start", "innings": "Innings" }
+      "footprint": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large"
+      },
+      "contact": {
+        "none": "None",
+        "incidental": "Incidental",
+        "full": "Full"
+      },
+      "teamSize": {
+        "small": "Small (2–5)",
+        "medium": "Medium (6–9)",
+        "large": "Large (10–15)"
+      },
+      "matchLength": {
+        "short": "Short",
+        "standard": "Standard",
+        "long": "Long"
+      },
+      "scoring": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "complexity": {
+        "simple": "Simple",
+        "moderate": "Moderate",
+        "intricate": "Intricate"
+      },
+      "structure": {
+        "continuous": "Continuous",
+        "stop-start": "Stop-start",
+        "innings": "Innings"
+      }
     }
   },
   "fans": {

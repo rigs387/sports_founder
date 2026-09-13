@@ -1,5 +1,6 @@
 import { costMultiplier, tierEntry } from "./calendar";
 import { mediaRevenueFactor } from "./countermoves";
+import { growthFactorsAt } from "./growth";
 import { landmarks } from "./records";
 import {
   type Config,
@@ -20,7 +21,8 @@ import {
 // Abstract leagues (GDD League tiers, Business Layer Phase 0 subset, League Health Ladder).
 // One top league per country. Cash is per country, accrues per quarter, and never produces PP.
 // Health is evaluated once per turn and moves at most one rung; a league must spend a full turn
-// at Near-Collapse before it can collapse. Every number is config.
+// at Near-Collapse before it can collapse. Every number is config. Growth tree nodes (`owned`) cut
+// running costs and formation thresholds, and resist sponsor lockouts (src/sim/growth.ts).
 
 export function leagueTierIndex(tier: LeagueTierId): number {
   return LEAGUE_TIERS.indexOf(tier);
@@ -33,17 +35,20 @@ function countryAt(world: World, countryIndex: number) {
   return { country, derived };
 }
 
-/** Running cost per quarter of a league at `tier` in a country. */
+/** Running cost per quarter of a league at `tier` in a country, with the growth nodes `owned`. */
 export function runningCostPerQuarter(
   world: World,
   countryIndex: number,
   tier: LeagueTierId,
+  owned: readonly string[],
 ): number {
   const { costs, tiers } = world.config.leagues;
   const { country, derived } = countryAt(world, countryIndex);
   const wealthFactor = costs.wealthFloor + (1 - costs.wealthFloor) * derived.wealth;
   const size = (country.population / costs.referencePopulation) ** costs.populationExponent;
-  return tiers[tier].runningCost * wealthFactor * size;
+  const factor = growthFactorsAt(world, owned, countryIndex).runningCost;
+  const base = Math.max(tiers[tier].minRunningCost, tiers[tier].runningCost * wealthFactor * size);
+  return base * factor;
 }
 
 export interface Revenue {
@@ -81,11 +86,20 @@ export function revenuePerQuarter(
   return { gate, media, total: gate + media };
 }
 
-/** Player hardcore fans needed for a league to form in a country. */
-export function formationThreshold(world: World, countryIndex: number): number {
+/** Player hardcore fans needed for a league to form in a country, with the growth nodes `owned`. */
+export function formationThreshold(
+  world: World,
+  countryIndex: number,
+  owned: readonly string[],
+): number {
   const { formation } = world.config.leagues;
   const { country } = countryAt(world, countryIndex);
-  return Math.max(formation.minHardcore, Math.ceil(formation.hardcoreShare * country.population));
+  const base = Math.max(
+    formation.minHardcore,
+    Math.ceil(formation.hardcoreShare * country.population),
+  );
+  const factor = growthFactorsAt(world, owned, countryIndex).formationThreshold;
+  return Math.max(1, Math.ceil(base * factor));
 }
 
 /** A newly formed Amateur league. */
@@ -94,10 +108,11 @@ export function newLeague(
   countryIndex: number,
   quarter: number,
   hardcore: number,
+  owned: readonly string[],
 ): LeagueState {
   const cash =
     world.config.leagues.formation.startingCashQuarters *
-    runningCostPerQuarter(world, countryIndex, "amateur");
+    runningCostPerQuarter(world, countryIndex, "amateur", owned);
   return {
     tier: "amateur",
     health: "healthy",
@@ -128,13 +143,14 @@ export function promotionTerms(
   world: World,
   countryIndex: number,
   from: LeagueTierId,
+  owned: readonly string[],
 ): PromotionTerms | null {
   const to = LEAGUE_TIERS[leagueTierIndex(from) + 1];
   if (to === undefined) return null;
   const promotion = world.config.leagues.tiers[to].promotion;
   if (!promotion) return null;
   const { country } = countryAt(world, countryIndex);
-  const cost = runningCostPerQuarter(world, countryIndex, to);
+  const cost = runningCostPerQuarter(world, countryIndex, to, owned);
   return {
     to,
     hardcoreNeeded: Math.max(
@@ -157,7 +173,8 @@ export function bailoutTerms(state: GameState, world: World, countryIndex: numbe
   return {
     ppCost: bailout.ppCost * costMultiplier(state, world.config),
     cash: league
-      ? bailout.cashQuarters * runningCostPerQuarter(world, countryIndex, league.tier)
+      ? bailout.cashQuarters *
+        runningCostPerQuarter(world, countryIndex, league.tier, state.growthNodes)
       : 0,
   };
 }
@@ -177,7 +194,7 @@ export function stepLeagueQuarter(
   country: CountryState,
   countryIndex: number,
   world: World,
-  state: Pick<GameState, "turn" | "ppTier">,
+  state: Pick<GameState, "turn" | "ppTier" | "growthNodes">,
   quarter: number,
 ): QuarterLeagueResult {
   const fans = country.fans[PLAYER_INDEX];
@@ -185,8 +202,10 @@ export function stepLeagueQuarter(
 
   if (country.league === null) {
     if (quarter < country.formationReadyQuarter) return { country, landmark: null };
-    if (fans.hardcore < formationThreshold(world, countryIndex)) return { country, landmark: null };
-    const league = newLeague(world, countryIndex, quarter, fans.hardcore);
+    if (fans.hardcore < formationThreshold(world, countryIndex, state.growthNodes)) {
+      return { country, landmark: null };
+    }
+    const league = newLeague(world, countryIndex, quarter, fans.hardcore, state.growthNodes);
     return {
       country: { ...country, league },
       landmark: landmarks.leagueFormed(
@@ -205,9 +224,13 @@ export function stepLeagueQuarter(
     league.tier,
     fans,
     state.ppTier,
-    mediaRevenueFactor(country, world.config),
+    mediaRevenueFactor(
+      country,
+      world.config,
+      growthFactorsAt(world, state.growthNodes, countryIndex).countermoveEffect,
+    ),
   ).total;
-  const cost = runningCostPerQuarter(world, countryIndex, league.tier);
+  const cost = runningCostPerQuarter(world, countryIndex, league.tier, state.growthNodes);
   return {
     country: { ...country, league: { ...league, cash: league.cash + income - cost } },
     landmark: null,

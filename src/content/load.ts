@@ -9,6 +9,7 @@ import {
   countriesFileSchema,
   ESCALATION_LEVELS,
   genomeFileSchema,
+  growthTreeFileSchema,
   LEAGUE_TIERS,
   LEVERS,
   namesFileSchema,
@@ -20,6 +21,7 @@ export const CONTENT_FILES = {
   countries: "countries.yaml",
   sports: "sports.yaml",
   genome: "genome.yaml",
+  growthTree: "growth-tree.yaml",
   names: "names.yaml",
   config: "config.yaml",
 } as const;
@@ -94,9 +96,10 @@ export function loadWorld(sources: ContentSources): World {
   const countriesFile = parseSource(sources.countries, countriesFileSchema, issues);
   const sportsFile = parseSource(sources.sports, sportsFileSchema, issues);
   const genome = parseSource(sources.genome, genomeFileSchema, issues);
+  const growthTree = parseSource(sources.growthTree, growthTreeFileSchema, issues);
   const names = parseSource(sources.names, namesFileSchema, issues);
   const config = parseSource(sources.config, configFileSchema, issues);
-  if (!countriesFile || !sportsFile || !genome || !names || !config) {
+  if (!countriesFile || !sportsFile || !genome || !growthTree || !names || !config) {
     throw new ContentValidationError(issues);
   }
 
@@ -105,6 +108,7 @@ export function loadWorld(sources: ContentSources): World {
     rivals: sportsFile.rivals,
     otherSports: sportsFile.otherSports,
     genome,
+    growthTree,
     names,
     config,
   });
@@ -315,6 +319,13 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
     if (entry.runningCost < leagues.tiers[lower].runningCost) {
       issue(sources.config, `${field}.runningCost`, `must not be lower than the ${lower} tier's`);
     }
+    if (entry.minRunningCost < leagues.tiers[lower].minRunningCost) {
+      issue(
+        sources.config,
+        `${field}.minRunningCost`,
+        `must not be lower than the ${lower} tier's`,
+      );
+    }
     const lowerPromotion = leagues.tiers[lower].promotion;
     if (
       entry.promotion &&
@@ -406,4 +417,137 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
       "must not exceed coldLaunchCost (existing exposure makes a push cheaper)",
     );
   }
+
+  checkGrowthTree(world, sources, issues);
+}
+
+/** Growth tree cross-references: categories, prerequisites (no cycles), effects and forks. */
+function checkGrowthTree(world: World, sources: ContentSources, issues: ContentIssue[]): void {
+  const tree = world.growthTree;
+  const issue = (field: string, message: string) =>
+    issues.push({ file: sources.growthTree.path, field, message });
+  const tierCount = world.config.ppTiers.length;
+
+  for (const [category, entry] of Object.entries(tree.categories)) {
+    if (entry && entry.unlockTier > tierCount) {
+      issue(
+        `categories.${category}.unlockTier`,
+        `no tier ${entry.unlockTier} in config ppTiers (there are ${tierCount})`,
+      );
+    }
+  }
+
+  const byId = new Map<string, number>();
+  tree.nodes.forEach((node, i) => {
+    if (byId.has(node.id)) issue(`nodes[${i}].id`, `duplicate node id "${node.id}"`);
+    else byId.set(node.id, i);
+  });
+
+  tree.nodes.forEach((node, i) => {
+    const at = `nodes[${i}]`;
+    if (tree.categories[node.category] === undefined) {
+      issue(`${at}.category`, `category "${node.category}" has no entry under categories`);
+    }
+    const seenRequires = new Set<string>();
+    node.requires.forEach((requiredId, j) => {
+      const field = `${at}.requires[${j}]`;
+      const required = tree.nodes[byId.get(requiredId) ?? -1];
+      if (!required) issue(field, `unknown node "${requiredId}"`);
+      else if (requiredId === node.id) issue(field, "a node cannot require itself");
+      else if (required.category !== node.category) {
+        issue(
+          field,
+          `"${requiredId}" is in category ${required.category}; prerequisites must be in the same category (${node.category})`,
+        );
+      }
+      if (seenRequires.has(requiredId)) issue(field, `"${requiredId}" is listed more than once`);
+      seenRequires.add(requiredId);
+    });
+    node.effects.forEach((effect, j) => {
+      const field = `${at}.effects[${j}]`;
+      if (effect.type === "spreadChannel" && effect.channel === undefined) {
+        issue(`${field}.channel`, "a spreadChannel effect needs a channel");
+      }
+      if (effect.type !== "spreadChannel" && effect.channel !== undefined) {
+        issue(
+          `${field}.channel`,
+          `only spreadChannel effects take a channel (this is ${effect.type})`,
+        );
+      }
+    });
+  });
+
+  // Cycles: depth-first search over prerequisites.
+  const state = new Map<string, "visiting" | "done">();
+  const reported = new Set<string>();
+  const visit = (id: string, path: string[]) => {
+    if (state.get(id) === "done") return;
+    if (state.get(id) === "visiting") {
+      const cycle = [...path.slice(path.indexOf(id)), id];
+      const key = [...cycle].sort().join("|");
+      if (!reported.has(key)) {
+        reported.add(key);
+        issue(`nodes[${byId.get(id)}].requires`, `cyclic prerequisites: ${cycle.join(" → ")}`);
+      }
+      return;
+    }
+    state.set(id, "visiting");
+    for (const next of tree.nodes[byId.get(id) ?? -1]?.requires ?? []) {
+      if (byId.has(next)) visit(next, [...path, id]);
+    }
+    state.set(id, "done");
+  };
+  for (const node of tree.nodes) visit(node.id, []);
+
+  const forkIds = new Set<string>();
+  const inFork = new Map<string, string>();
+  tree.forks.forEach((fork, i) => {
+    const at = `forks[${i}]`;
+    if (forkIds.has(fork.id)) issue(`${at}.id`, `duplicate fork id "${fork.id}"`);
+    forkIds.add(fork.id);
+    const categories = new Set<string>();
+    fork.nodes.forEach((nodeId, j) => {
+      const field = `${at}.nodes[${j}]`;
+      const node = tree.nodes[byId.get(nodeId) ?? -1];
+      if (!node) {
+        issue(field, `unknown node "${nodeId}"`);
+        return;
+      }
+      categories.add(node.category);
+      const other = inFork.get(nodeId);
+      if (other !== undefined) {
+        issue(field, `"${nodeId}" is already in fork "${other}" (a node belongs to one fork)`);
+      }
+      inFork.set(nodeId, fork.id);
+    });
+    if (categories.size > 1) issue(`${at}.nodes`, "a fork's nodes must share one category");
+    // A fork node that needs a sibling could never be bought.
+    for (const nodeId of fork.nodes) {
+      const ancestors = prerequisiteClosure(tree.nodes, byId, nodeId);
+      for (const sibling of fork.nodes) {
+        if (sibling !== nodeId && ancestors.has(sibling)) {
+          issue(
+            `${at}.nodes`,
+            `"${nodeId}" requires "${sibling}", its fork sibling, so it could never be bought`,
+          );
+        }
+      }
+    }
+  });
+}
+
+function prerequisiteClosure(
+  nodes: World["growthTree"]["nodes"],
+  byId: Map<string, number>,
+  start: string,
+): Set<string> {
+  const found = new Set<string>();
+  const stack = [...(nodes[byId.get(start) ?? -1]?.requires ?? [])];
+  while (stack.length > 0) {
+    const id = stack.pop();
+    if (id === undefined || found.has(id)) continue;
+    found.add(id);
+    stack.push(...(nodes[byId.get(id) ?? -1]?.requires ?? []));
+  }
+  return found;
 }

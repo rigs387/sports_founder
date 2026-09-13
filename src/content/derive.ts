@@ -5,6 +5,7 @@ import type {
   Curve,
   FanShares,
   GenomeContent,
+  GrowthTreeContent,
   Names,
   RivalSport,
   SportsContent,
@@ -20,6 +21,7 @@ export interface WorldContent {
   rivals: RivalSport[];
   otherSports: SportsContent["otherSports"];
   genome: GenomeContent;
+  growthTree: GrowthTreeContent;
   names: Names;
   config: Config;
 }
@@ -171,6 +173,7 @@ export function deriveWorld(content: WorldContent): World {
     rivals: content.rivals,
     otherSports: content.otherSports,
     genome: content.genome,
+    growthTree: content.growthTree,
     names: content.names,
     config: content.config,
   };
