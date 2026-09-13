@@ -36,6 +36,7 @@ surface before playtesting or during it.
 | 2026-09-13 | Genome trait list, option-level lever modifiers, identity/rule split, similarity measure (GDD v1.3) | Decided |
 | 2026-09-13 | Country attribute definitions, neighbors, continents (GDD v1.3) | Decided |
 | 2026-09-13 | Real-world data: salient FIFA markets, World Bank sources, survey-based fan buckets, rival genomes (GDD v1.3) | Decided |
+| 2026-09-13 | Differentiation exit criterion ranks top-10 countries by Fandom Score ÷ population | Decided |
 
 ---
 
@@ -65,7 +66,9 @@ external human playtest gates. Phase 0 exits when heavy headless balancing meets
 starting targets (thresholds adjustable as data arrives):
 
 - **Genome differentiation:** with anchor and seeds held constant, contrasting genomes share fewer
-  than half of their top-10 fandom countries, verified across many seeds.
+  than half of their top-10 fandom countries, verified across many seeds. Countries are ranked by
+  Fandom Score ÷ population, so the measure shows where the sport caught on rather than which
+  countries are largest (decided 2026-09-13; the raw-score ranking is still reported).
 - **No dominant genome:** no single trait option appears in more than 40% of top-quartile runs.
 - **No safe anchor:** every anchor country has a nonzero collapse rate under a naive strategy.
 - **Hard anchors are winnable:** the best bot wins from Tuvalu some of the time.

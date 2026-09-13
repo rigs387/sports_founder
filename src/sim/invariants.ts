@@ -1,8 +1,20 @@
 import { genomeSchema } from "../content";
-import { type GameState, OTHER_SPORT_ID, PLAYER_SPORT_ID, type World } from "./types";
+import { QUARTERS_PER_YEAR } from "./calendar";
+import {
+  type GameState,
+  HEALTH_LEVELS,
+  LEAGUE_TIERS,
+  OTHER_SPORT_ID,
+  PLAYER_SPORT_ID,
+  type World,
+} from "./types";
 
 /** Returns every way `state` is invalid for `world`. An empty list means the state is valid. */
 export function checkInvariants(state: GameState, world: World): string[] {
+  return invariantsOf(state, world);
+}
+
+export function invariantsOf(state: GameState, world: World): string[] {
   const problems: string[] = [];
 
   if (!Number.isInteger(state.turn) || state.turn < 1)
@@ -13,7 +25,8 @@ export function checkInvariants(state: GameState, world: World): string[] {
   if (!Number.isFinite(state.pp) || state.pp < 0) problems.push(`pp ${state.pp} is invalid`);
   const tier = world.config.ppTiers.find((entry) => entry.tier === state.ppTier);
   if (!tier) problems.push(`ppTier ${state.ppTier} is not in the tier table`);
-  if (!world.countries.some((country) => country.id === state.anchorCountryId)) {
+  const anchorIndex = world.countries.findIndex((country) => country.id === state.anchorCountryId);
+  if (anchorIndex < 0) {
     problems.push(`anchor "${state.anchorCountryId}" is not a known country`);
   }
 
@@ -24,9 +37,16 @@ export function checkInvariants(state: GameState, world: World): string[] {
     }
   }
 
-  if (tier && state.focus.length !== tier.focusSlots) {
+  const track = state.tierTrack;
+  if (track.peakTier < state.ppTier) {
+    problems.push(`peak tier ${track.peakTier} is below the current tier ${state.ppTier}`);
+  }
+  if (track.pendingTierUp && track.pendingTierUp.tier !== state.ppTier + 1) {
+    problems.push(`pending tier-up to ${track.pendingTierUp.tier} is not the next tier`);
+  }
+  if (tier && state.focus.length !== tier.focusSlots + track.slotsToDrop) {
     problems.push(
-      `${state.focus.length} focus slot(s) but tier ${tier.tier} has ${tier.focusSlots}`,
+      `${state.focus.length} focus slot(s) but tier ${tier.tier} has ${tier.focusSlots} plus ${track.slotsToDrop} to drop`,
     );
   }
   const focused = new Set<string>();
@@ -85,6 +105,42 @@ export function checkInvariants(state: GameState, world: World): string[] {
     });
     if (hardcore > country.population) {
       problems.push(`${country.id}: hardcore fans across sports exceed population`);
+    }
+
+    const league = countryState.league;
+    if (league) {
+      if (!LEAGUE_TIERS.includes(league.tier)) problems.push(`${country.id}: bad league tier`);
+      if (!HEALTH_LEVELS.includes(league.health)) problems.push(`${country.id}: bad league health`);
+      if (!Number.isFinite(league.cash)) problems.push(`${country.id}: league cash is not finite`);
+      if (league.formedQuarter > state.quarter) {
+        problems.push(`${country.id}: league formed in the future`);
+      }
+    }
+    if (index === anchorIndex && state.outcome === null && league === null) {
+      problems.push(`the anchor has no league but the campaign has not ended`);
+    }
+  });
+
+  if (state.outcome !== null && state.outcome.countryId !== state.anchorCountryId) {
+    problems.push(`the campaign ended on "${state.outcome.countryId}", which is not the anchor`);
+  }
+  // Yearly snapshots run consecutively up to the last completed year. A campaign migrated from an
+  // older save may lack the years before history was recorded, but never has gaps or extras.
+  const fullYears = Math.floor(state.quarter / QUARTERS_PER_YEAR);
+  if (state.yearly.length > fullYears) {
+    problems.push(`${state.yearly.length} yearly snapshots after ${fullYears} full year(s)`);
+  }
+  const lastFullYear = world.config.calendar.startYear + fullYears - 1;
+  state.yearly.forEach((snapshot, i) => {
+    const expectedYear = lastFullYear - (state.yearly.length - 1 - i);
+    if (snapshot.year !== expectedYear) {
+      problems.push(`yearly snapshot ${i} is for ${snapshot.year}, expected ${expectedYear}`);
+    }
+  });
+  const fansPerYear = state.countries.length * state.sports.length * 2;
+  state.yearly.forEach((snapshot, i) => {
+    if (snapshot.fans.length !== fansPerYear) {
+      problems.push(`yearly snapshot ${i} has ${snapshot.fans.length} values, not ${fansPerYear}`);
     }
   });
 

@@ -14,6 +14,9 @@ export function App() {
   }, [startCampaign]);
 
   const player = snapshot?.sports.find((sport) => sport.kind === "player");
+  const anchorLeague =
+    snapshot?.countries.find((country) => country.countryId === snapshot.anchorCountryId)?.league ??
+    null;
   const countryName = (id: string) => names?.countries[id] ?? id;
   const topCountries = snapshot
     ? [...snapshot.countries]
@@ -73,6 +76,64 @@ export function App() {
                 .join(t("campaign.listSeparator")),
             })}
           </p>
+
+          {snapshot.outcome && (
+            <p role="alert" className="game-over" data-testid="game-over">
+              {t("campaign.over", {
+                country: countryName(snapshot.outcome.countryId),
+                turn: snapshot.outcome.turn,
+              })}
+            </p>
+          )}
+          <p className="meta" data-testid="window">
+            {snapshot.seasonalWindowOpen ? t("campaign.windowOpen") : t("campaign.windowClosed")}
+          </p>
+          {snapshot.tierTrack.pendingTierUp && (
+            <p className="meta">
+              {t("campaign.approaching", {
+                tier: snapshot.tierTrack.pendingTierUp.tier,
+                name: t(`tiers.${snapshot.tierTrack.pendingTierUp.tier}`),
+                count: snapshot.tierTrack.pendingTierUp.turnsLeft,
+              })}
+            </p>
+          )}
+          {snapshot.tierTrack.atRisk && (
+            <p className="meta warning">
+              {t("campaign.atRisk", { count: snapshot.tierTrack.atRisk.turnsUntilDemotion })}
+            </p>
+          )}
+
+          <section className="league" aria-label={t("league.heading")} data-testid="anchor-league">
+            <h2>{t("league.heading")}</h2>
+            {anchorLeague ? (
+              <dl className="league-list">
+                <div>
+                  <dt>{t("league.tier")}</dt>
+                  <dd>{t(`league.tiers.${anchorLeague.tier}`)}</dd>
+                </div>
+                <div>
+                  <dt>{t("league.health")}</dt>
+                  <dd className={`health-${anchorLeague.health}`}>
+                    {t(`league.healthLevels.${anchorLeague.health}`)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t("league.cash")}</dt>
+                  <dd>{t("format.money", { value: anchorLeague.cash })}</dd>
+                </div>
+                <div>
+                  <dt>{t("league.flow")}</dt>
+                  <dd>
+                    {anchorLeague.lastFlowPerQuarter === null
+                      ? t("league.notYetMeasured")
+                      : t("format.money", { value: anchorLeague.lastFlowPerQuarter })}
+                  </dd>
+                </div>
+              </dl>
+            ) : (
+              <p>{t("league.none")}</p>
+            )}
+          </section>
 
           <section className="genome" aria-label={t("genome.heading")}>
             <h2>{t("genome.heading")}</h2>

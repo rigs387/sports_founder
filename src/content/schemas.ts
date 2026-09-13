@@ -153,12 +153,52 @@ const clampSchema = z
   .strictObject({ min: z.number().min(0), max: z.number().min(0) })
   .refine((c) => c.max >= c.min, { message: "max must be at least min" });
 
+// ---- Leagues (GDD League tiers, League Health Ladder) ---------------------------------------
+
+/** League professionalization tiers, lowest first. Fixed by design; numbers live in config. */
+export const leagueTierSchema = z.enum(["amateur", "semi-pro", "professional", "elite"]);
+export const LEAGUE_TIERS = leagueTierSchema.options;
+export type LeagueTierId = z.infer<typeof leagueTierSchema>;
+
+/** Standing League Health Ladder rungs. "Collapsed" is not a standing rung: the league folds. */
+export const healthLevelSchema = z.enum(["healthy", "struggling", "near-collapse"]);
+export const HEALTH_LEVELS = healthLevelSchema.options;
+export type HealthLevel = z.infer<typeof healthLevelSchema>;
+
+/** A PP tier's breadth condition (GDD Global PP Tier Track). */
+export const breadthConditionSchema = z.discriminatedUnion("type", [
+  z.strictObject({ type: z.literal("none") }),
+  z.strictObject({ type: z.literal("anchorLeagueTier"), leagueTier: leagueTierSchema }),
+  z.strictObject({ type: z.literal("anchorHardcoreShare"), share: z.number().gt(0).max(1) }),
+  z.strictObject({
+    type: z.literal("leaguesOnContinents"),
+    leagueTier: leagueTierSchema,
+    continents: z.int().min(1).max(6),
+  }),
+  z.strictObject({ type: z.literal("globalRank"), rank: z.int().min(1) }),
+]);
+export type BreadthCondition = z.infer<typeof breadthConditionSchema>;
+
 export const ppTierSchema = z.strictObject({
   tier: z.int().min(1),
   fandomScoreRequired: z.number().min(0),
+  breadth: breadthConditionSchema,
   turnLengthQuarters: z.int().min(1).max(4),
   focusSlots: z.int().min(1),
   costMultiplier: z.number().positive(),
+  mediaRevenueMultiplier: z.number().positive(),
+});
+
+const leagueTierConfigSchema = z.strictObject({
+  runningCost: z.number().min(0),
+  revenueMultiplier: z.number().positive(),
+  promotion: z
+    .strictObject({
+      hardcoreShare: unitInterval,
+      reserveQuarters: z.number().min(0),
+      costQuarters: z.number().min(0),
+    })
+    .nullable(),
 });
 
 const axisWeights = Object.fromEntries(AXIS_IDS.map((axis) => [axis, z.number().min(0)])) as {
@@ -232,6 +272,62 @@ export const configFileSchema = z.strictObject({
     plus: z.number(),
     minus: z.number(),
   }),
+  leagues: z.strictObject({
+    tiers: z.strictObject({
+      amateur: leagueTierConfigSchema,
+      "semi-pro": leagueTierConfigSchema,
+      professional: leagueTierConfigSchema,
+      elite: leagueTierConfigSchema,
+    }),
+    formation: z.strictObject({
+      minHardcore: z.int().min(1),
+      hardcoreShare: unitInterval,
+      startingCashQuarters: z.number().min(0),
+      reformCooldownQuarters: z.int().min(0),
+    }),
+    costs: z.strictObject({
+      wealthFloor: unitInterval,
+      referencePopulation: z.number().positive(),
+      populationExponent: z.number().min(0).max(1),
+    }),
+    revenue: z.strictObject({
+      gatePerHardcore: z.number().min(0),
+      mediaPerCasual: z.number().min(0),
+      wealthFloor: unitInterval,
+      mediaMarketFloor: unitInterval,
+    }),
+    health: z.strictObject({
+      strugglingRunwayQuarters: z.number().positive(),
+      nearCollapseRunwayQuarters: z.number().positive(),
+      hardcoreFallingRate: z.number().min(0),
+      demotionShare: z.strictObject({
+        struggling: unitInterval,
+        "near-collapse": unitInterval,
+        collapsed: unitInterval,
+      }),
+    }),
+    stepDown: z.strictObject({ hardcoreDemotionShare: unitInterval }),
+    bailout: z.strictObject({
+      ppCost: z.number().min(0),
+      cashQuarters: z.number().min(0),
+      cooldownQuarters: z.int().min(0),
+    }),
+  }),
+  seasonalWindow: z.strictObject({ quarterOfYear: z.int().min(1).max(4) }),
+  tierTrack: z.strictObject({
+    telegraphTurns: z.int().min(0),
+    demotionLine: z.number().gt(0).lt(1),
+    demotionTurns: z.int().min(1),
+    cooldownTurns: z.int().min(0),
+  }),
+  balanceTargets: z.strictObject({
+    differentiationTopN: z.int().min(1),
+    differentiationSharedShare: unitInterval,
+    dominanceLimit: unitInterval,
+    pacingTolerance: unitInterval,
+    turnsInTier: z.array(z.int().min(1)).min(1),
+    naiveBot: z.string().min(1),
+  }),
 });
 
 // ---- Types ---------------------------------------------------------------------------------
@@ -249,5 +345,6 @@ export type SportsContent = z.infer<typeof sportsFileSchema>;
 export type Names = z.infer<typeof namesFileSchema>;
 export type Curve = z.infer<typeof curveSchema>;
 export type PpTier = z.infer<typeof ppTierSchema>;
+export type LeagueTierConfig = z.infer<typeof leagueTierConfigSchema>;
 export type Config = z.infer<typeof configFileSchema>;
 export type { AxisId, Genome } from "./genome-axes";

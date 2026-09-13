@@ -238,6 +238,61 @@ describe("content validation", () => {
     expect(error.message).toContain("ppIncome.exponent");
   });
 
+  it("bad league config names the file and field", () => {
+    const dir = copyOfContent();
+    editYaml(
+      dir,
+      "config.yaml",
+      ["leagues", "tiers", "amateur", "promotion"],
+      setValue({
+        hardcoreShare: 0.001,
+        reserveQuarters: 1,
+        costQuarters: 1,
+      }),
+    );
+    expect(loadError(dir).message).toContain(
+      "config.yaml at leagues.tiers.amateur.promotion: the lowest tier cannot be promoted into",
+    );
+
+    const dir2 = copyOfContent();
+    editYaml(dir2, "config.yaml", ["leagues", "tiers", "elite", "runningCost"], setValue(0.01));
+    expect(loadError(dir2).message).toContain("config.yaml at leagues.tiers.elite.runningCost");
+
+    const dir3 = copyOfContent();
+    editYaml(
+      dir3,
+      "config.yaml",
+      ["leagues", "health", "nearCollapseRunwayQuarters"],
+      setValue(99),
+    );
+    expect(loadError(dir3).message).toContain("leagues.health.nearCollapseRunwayQuarters");
+
+    const dir4 = copyOfContent();
+    editYaml(dir4, "config.yaml", ["leagues", "tiers", "semi-pro", "health"], setValue("fine"));
+    expect(loadError(dir4).message).toContain("config.yaml at leagues.tiers.semi-pro");
+  });
+
+  it("bad PP tier breadth conditions name the file and field", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "config.yaml", ["ppTiers", 1, "breadth"], setValue({ type: "none" }));
+    expect(loadError(dir).message).toContain(
+      "config.yaml at ppTiers[1].breadth: every tier above the first needs a breadth condition",
+    );
+
+    const dir2 = copyOfContent();
+    editYaml(
+      dir2,
+      "config.yaml",
+      ["ppTiers", 3, "breadth"],
+      setValue({ type: "leaguesOnContinents", leagueTier: "legendary", continents: 3 }),
+    );
+    expect(loadError(dir2).message).toContain("config.yaml at ppTiers[3].breadth.leagueTier");
+
+    const dir3 = copyOfContent();
+    editYaml(dir3, "config.yaml", ["seasonalWindow", "quarterOfYear"], setValue(5));
+    expect(loadError(dir3).message).toContain("config.yaml at seasonalWindow.quarterOfYear");
+  });
+
   it("a missing file is named", () => {
     const dir = copyOfContent();
     rmSync(join(dir, "genome.yaml"));

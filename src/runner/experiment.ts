@@ -1,29 +1,24 @@
 import type { World } from "../sim";
-import { type CampaignPlan, type PlayedCampaign, playCampaign } from "./campaign";
-import type { PolicyId } from "./policy";
+import { type PlayedCampaign, playCampaign } from "./campaign";
+import type { BotId } from "./policy";
 import { mean } from "./report";
 
 // Genome differentiation experiment (tech plan 2.1 exit criterion): with anchor and seeds held
-// constant, contrasting genomes should share fewer than half of their top-10 fandom countries.
-// Every pair and every seed is reported, passes and failures alike. Two rankings are measured:
-// by raw Fandom Score (the criterion as written; large countries weigh heavily) and by Fandom
-// Score per head of population (where the sport caught on most).
+// constant, contrasting genomes share fewer than half of their top-10 fandom countries. "Top-10
+// fandom countries" means top-10 by Fandom Score ÷ population (decided 2026-09-13); the raw-score
+// ranking is reported alongside. Every pair and every seed is reported, passes and failures alike.
 
-export const TOP_N = 10;
-/** Pass if the mean shared count is strictly below half of TOP_N. */
-export const SHARED_LIMIT = TOP_N / 2;
-
-export type Ranking = "byScore" | "byShare";
-export const RANKINGS: Ranking[] = ["byScore", "byShare"];
+export type Ranking = "byShare" | "byScore";
+export const RANKINGS: Ranking[] = ["byShare", "byScore"];
 
 export interface RankingComparison {
-  /** Per seed, in seed order: how many of the two top-10 lists coincide. */
+  /** Per seed, in seed order: how many of the two top-N lists coincide. */
   sharedBySeed: number[];
   meanShared: number;
-  /** Seeds where the two genomes shared at least half their top-10. */
-  seedsAtOrAboveHalf: number;
+  /** Seeds where the two genomes shared at least the limit. */
+  seedsAtOrAboveLimit: number;
   passed: boolean;
-  /** Countries in one genome's top-10 in a majority of seeds but not the other's. */
+  /** Countries in one genome's top-N in a majority of seeds but not the other's. */
   distinctiveA: string[];
   distinctiveB: string[];
 }
@@ -31,45 +26,38 @@ export interface RankingComparison {
 export interface PairResult {
   a: string;
   b: string;
-  byScore: RankingComparison;
   byShare: RankingComparison;
+  byScore: RankingComparison;
 }
 
 export interface PresetOutcome {
   preset: string;
-  /** Per seed: final player Fandom Score and countries with any fans. */
   fandomScoreBySeed: number[];
-  countriesWithFansBySeed: number[];
-  medianFandomScore: number | null;
+  collapsedSeeds: number[];
 }
 
 export interface DifferentiationReport {
   anchorCountryId: string;
+  bot: BotId;
   seeds: number[];
   turns: number;
+  topN: number;
+  sharedLimit: number;
   presets: string[];
   outcomes: PresetOutcome[];
   pairs: PairResult[];
-  /** Pass counts per ranking. */
   pairsPassed: Record<Ranking, number>;
   pairsFailed: Record<Ranking, number>;
-  /** The criterion as written: every pair passes by raw Fandom Score. */
+  /** The criterion: every pair passes by population share. */
   passed: boolean;
-  passedByShare: boolean;
 }
 
-export interface ExperimentSettings {
+export interface DifferentiationSettings {
   anchorCountryId: string;
   seeds: number[];
   turns: number;
-  policy: PolicyId;
-  /** Preset ids to pair up; all pairs are run. */
+  bot: BotId;
   presets: string[];
-}
-
-interface TopLists {
-  byScore: string[];
-  byShare: string[];
 }
 
 function majority(lists: string[][]): Set<string> {
@@ -78,19 +66,19 @@ function majority(lists: string[][]): Set<string> {
   return new Set([...counts].filter(([, n]) => n > lists.length / 2).map(([id]) => id));
 }
 
-function compare(listsA: string[][], listsB: string[][]): RankingComparison {
+function compare(listsA: string[][], listsB: string[][], limit: number): RankingComparison {
   const sharedBySeed = listsA.map((listA, s) => {
     const setB = new Set(listsB[s] ?? []);
     return listA.filter((id) => setB.has(id)).length;
   });
-  const meanShared = mean(sharedBySeed) ?? TOP_N;
+  const meanShared = mean(sharedBySeed) ?? Number.POSITIVE_INFINITY;
   const usualA = majority(listsA);
   const usualB = majority(listsB);
   return {
     sharedBySeed,
     meanShared,
-    seedsAtOrAboveHalf: sharedBySeed.filter((n) => n >= SHARED_LIMIT).length,
-    passed: meanShared < SHARED_LIMIT,
+    seedsAtOrAboveLimit: sharedBySeed.filter((n) => n >= limit).length,
+    passed: meanShared < limit,
     distinctiveA: [...usualA].filter((id) => !usualB.has(id)),
     distinctiveB: [...usualB].filter((id) => !usualA.has(id)),
   };
@@ -98,49 +86,42 @@ function compare(listsA: string[][], listsB: string[][]): RankingComparison {
 
 export function runDifferentiation(
   world: World,
-  settings: ExperimentSettings,
+  settings: DifferentiationSettings,
   onCampaign?: (played: PlayedCampaign) => void,
 ): DifferentiationReport {
+  const { differentiationTopN: topN, differentiationSharedShare } = world.config.balanceTargets;
+  const sharedLimit = topN * differentiationSharedShare;
   const presets = settings.presets.map((id) => {
     const preset = world.genome.presets.find((candidate) => candidate.id === id);
     if (!preset) throw new Error(`Unknown genome preset "${id}"`);
     return preset;
   });
-  if (presets.length < 2)
+  if (presets.length < 2) {
     throw new Error("The differentiation experiment needs two or more presets");
+  }
 
-  const top = new Map<string, TopLists[]>();
+  const lists = new Map<string, { byShare: string[][]; byScore: string[][] }>();
   const outcomes: PresetOutcome[] = [];
   for (const preset of presets) {
-    const lists: TopLists[] = [];
-    const scores: number[] = [];
-    const reach: number[] = [];
+    const entry = { byShare: [] as string[][], byScore: [] as string[][] };
+    const outcome: PresetOutcome = { preset: preset.id, fandomScoreBySeed: [], collapsedSeeds: [] };
     for (const seed of settings.seeds) {
-      const plan: CampaignPlan = {
+      const played = playCampaign(world, {
         seed,
         anchorCountryId: settings.anchorCountryId,
         genome: preset.genome,
         genomeLabel: preset.id,
-        policy: settings.policy,
+        bot: settings.bot,
         turns: settings.turns,
-      };
-      const played = playCampaign(world, plan);
+      });
       onCampaign?.(played);
-      const byShare = [...played.countryRows]
-        .sort((x, y) => y.share - x.share || y.fandomScore - x.fandomScore)
-        .slice(0, TOP_N)
-        .map((row) => row.countryId);
-      lists.push({ byScore: played.result.topCountries.slice(0, TOP_N), byShare });
-      scores.push(played.result.player.fandomScore);
-      reach.push(played.result.countriesWithFans);
+      entry.byShare.push(played.result.topCountriesByShare.slice(0, topN));
+      entry.byScore.push(played.result.topCountries.slice(0, topN));
+      outcome.fandomScoreBySeed.push(played.result.player.fandomScore);
+      if (played.result.collapsed) outcome.collapsedSeeds.push(seed);
     }
-    top.set(preset.id, lists);
-    outcomes.push({
-      preset: preset.id,
-      fandomScoreBySeed: scores,
-      countriesWithFansBySeed: reach,
-      medianFandomScore: mean(scores),
-    });
+    lists.set(preset.id, entry);
+    outcomes.push(outcome);
   }
 
   const pairs: PairResult[] = [];
@@ -148,37 +129,34 @@ export function runDifferentiation(
     for (let j = i + 1; j < presets.length; j += 1) {
       const a = presets[i]?.id ?? "";
       const b = presets[j]?.id ?? "";
-      const listsA = top.get(a) ?? [];
-      const listsB = top.get(b) ?? [];
+      const listsA = lists.get(a);
+      const listsB = lists.get(b);
+      if (!listsA || !listsB) continue;
       pairs.push({
         a,
         b,
-        byScore: compare(
-          listsA.map((l) => l.byScore),
-          listsB.map((l) => l.byScore),
-        ),
-        byShare: compare(
-          listsA.map((l) => l.byShare),
-          listsB.map((l) => l.byShare),
-        ),
+        byShare: compare(listsA.byShare, listsB.byShare, sharedLimit),
+        byScore: compare(listsA.byScore, listsB.byScore, sharedLimit),
       });
     }
   }
   const passedCount = (ranking: Ranking) => pairs.filter((pair) => pair[ranking].passed).length;
-  const pairsPassed = { byScore: passedCount("byScore"), byShare: passedCount("byShare") };
+  const pairsPassed = { byShare: passedCount("byShare"), byScore: passedCount("byScore") };
   return {
     anchorCountryId: settings.anchorCountryId,
+    bot: settings.bot,
     seeds: settings.seeds,
     turns: settings.turns,
+    topN,
+    sharedLimit,
     presets: presets.map((preset) => preset.id),
     outcomes,
     pairs,
     pairsPassed,
     pairsFailed: {
-      byScore: pairs.length - pairsPassed.byScore,
       byShare: pairs.length - pairsPassed.byShare,
+      byScore: pairs.length - pairsPassed.byScore,
     },
-    passed: pairsPassed.byScore === pairs.length,
-    passedByShare: pairsPassed.byShare === pairs.length,
+    passed: pairs.length > 0 && pairsPassed.byShare === pairs.length,
   };
 }

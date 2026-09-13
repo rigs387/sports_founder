@@ -1,10 +1,30 @@
+import { seasonalWindowOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
 import { leverMultipliers, similarityEffect } from "./genome";
+import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
 import { computeExposure } from "./spread";
-import { turnLengthQuarters } from "./turn";
-import { type GameState, type Genome, PLAYER_INDEX, type World } from "./types";
+import { tierStatus } from "./tiers";
+import {
+  type GameOutcome,
+  type GameState,
+  type Genome,
+  type HealthLevel,
+  type LeagueTierId,
+  type PendingTierUp,
+  PLAYER_INDEX,
+  type World,
+} from "./types";
 
 const QUARTERS_PER_YEAR = 4;
+
+export interface LeagueSnapshot {
+  tier: LeagueTierId;
+  health: HealthLevel;
+  cash: number;
+  revenuePerQuarter: number;
+  runningCostPerQuarter: number;
+  lastFlowPerQuarter: number | null;
+}
 
 /** One country as the UI sees it: the player's standing there and why it is moving. */
 export interface CountrySnapshot {
@@ -22,6 +42,17 @@ export interface CountrySnapshot {
   depth: number;
   /** Similarity to the country's dominant rival, 0–1. */
   rivalSimilarity: number;
+  league: LeagueSnapshot | null;
+}
+
+export interface TierTrackSnapshot {
+  peakTier: number;
+  /** An announced tier-up ("Approaching National Pastime"). */
+  pendingTierUp: PendingTierUp | null;
+  /** Turns at risk so far, and turns left before demotion; null when not at risk. */
+  atRisk: { turnsBelowLine: number; turnsUntilDemotion: number } | null;
+  slotsToDrop: number;
+  next: { tier: number; scoreProgress: number; breadthProgress: number } | null;
 }
 
 /** What the UI shows after a turn. Plain data, cheap to send across the worker boundary. */
@@ -36,10 +67,14 @@ export interface TurnSnapshot {
   ppTier: number;
   turnLengthQuarters: number;
   pp: number;
+  seasonalWindowOpen: boolean;
+  tierTrack: TierTrackSnapshot;
   focus: (string | null)[];
+  outcome: GameOutcome | null;
   sports: SportTotals[];
   /** Same order as content. */
   countries: CountrySnapshot[];
+  landmarkCount: number;
 }
 
 export function snapshot(state: GameState, world: World): TurnSnapshot {
@@ -51,6 +86,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     if (!country || !fans) throw new Error(`Country #${index} is missing from content or state`);
     const levers = leverMultipliers(world, state.genome, index);
     const score = fandomScore(fans.casual, fans.hardcore, casualWeight);
+    const league = countryState.league;
     return {
       countryId: country.id,
       population: country.population,
@@ -70,21 +106,50 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
         state.sports,
         country.population,
       ).similarity,
+      league: league
+        ? {
+            tier: league.tier,
+            health: league.health,
+            cash: league.cash,
+            revenuePerQuarter: revenuePerQuarter(world, index, league.tier, fans, state.ppTier)
+              .total,
+            runningCostPerQuarter: runningCostPerQuarter(world, index, league.tier),
+            lastFlowPerQuarter: league.lastFlowPerQuarter,
+          }
+        : null,
     };
   });
+  const track = state.tierTrack;
+  const { demotionTurns } = world.config.tierTrack;
   return {
     seed: state.seed,
     anchorCountryId: state.anchorCountryId,
     genome: state.genome,
     turn: state.turn,
     quarter: state.quarter,
-    year: world.config.calendar.startYear + Math.floor(state.quarter / QUARTERS_PER_YEAR),
+    year: yearOfQuarter(state.quarter, world.config),
     quarterOfYear: (state.quarter % QUARTERS_PER_YEAR) + 1,
     ppTier: state.ppTier,
     turnLengthQuarters: turnLengthQuarters(state.ppTier, world.config),
     pp: state.pp,
+    seasonalWindowOpen: seasonalWindowOpen(state, world.config),
+    tierTrack: {
+      peakTier: track.peakTier,
+      pendingTierUp: track.pendingTierUp,
+      atRisk:
+        track.turnsBelowLine > 0
+          ? {
+              turnsBelowLine: track.turnsBelowLine,
+              turnsUntilDemotion: demotionTurns - track.turnsBelowLine,
+            }
+          : null,
+      slotsToDrop: track.slotsToDrop,
+      next: tierStatus(state, world).next,
+    },
     focus: [...state.focus],
+    outcome: state.outcome,
     sports: sportTotals(state, world),
     countries,
+    landmarkCount: state.landmarks.length,
   };
 }

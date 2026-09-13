@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { builder } from "../src/runner/policy";
 import {
   applyAction,
   checkAction,
   checkInvariants,
   createCampaign,
+  endTurn,
   focusCost,
   IllegalActionError,
   runTurns,
@@ -67,7 +69,12 @@ describe("focus slot actions go through one validated function", () => {
   });
 
   it("extra slots arrive with tier-ups and can be filled", () => {
-    const later = { ...runTurns(start, world, 40), pp: 10_000 };
+    // Tier 2 needs a Semi-Pro anchor league, so a bot has to promote it.
+    let played = start;
+    for (let i = 0; i < 80 && played.ppTier < 2 && played.outcome === null; i += 1) {
+      played = endTurn(builder(played, world).state, world);
+    }
+    const later = { ...played, pp: 10_000 };
     expect(later.ppTier).toBeGreaterThanOrEqual(2);
     expect(later.focus.length).toBeGreaterThanOrEqual(2);
     const filled = applyAction(later, world, {

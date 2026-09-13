@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "Sports Founder",
-    "subtitle": "Foundation build: genome, affinity and spread are live; no map yet."
+    "subtitle": "Foundation build: genome, spread, leagues and the tier track are live; no map yet."
   },
   "status": {
     "loading": "Setting up the backyard…",
@@ -28,7 +28,33 @@
     "meta": "Seed {{seed}} · Anchor country: {{country}}",
     "focus": "Focus: {{countries}}",
     "emptySlot": "(empty slot)",
-    "listSeparator": ", "
+    "listSeparator": ", ",
+    "windowOpen": "Seasonal window open this turn",
+    "windowClosed": "No seasonal window this turn",
+    "approaching": "Approaching tier {{tier}}: {{name}} in {{count}} turn(s)",
+    "atRisk_one": "Tier at risk: demotion in {{count}} turn unless it recovers",
+    "atRisk_other": "Tier at risk: demotion in {{count}} turns unless it recovers",
+    "over": "Campaign over: the {{country}} league collapsed on turn {{turn}}. The sport has lost its birthplace."
+  },
+  "league": {
+    "heading": "The founding league",
+    "none": "No league",
+    "tier": "Tier",
+    "health": "Health",
+    "cash": "Cash",
+    "flow": "Cash flow per quarter",
+    "tiers": {
+      "amateur": "Amateur",
+      "semi-pro": "Semi-Pro",
+      "professional": "Professional",
+      "elite": "Elite"
+    },
+    "healthLevels": {
+      "healthy": "Healthy",
+      "struggling": "Struggling",
+      "near-collapse": "Near-Collapse"
+    },
+    "notYetMeasured": "Not measured yet"
   },
   "genome": {
     "heading": "Your sport's genome",
@@ -93,7 +119,8 @@
   "format": {
     "count": "{{value, number(maximumFractionDigits: 0)}}",
     "percent": "{{value, number(style: percent; maximumFractionDigits: 2)}}",
-    "multiplier": "{{value, number(maximumFractionDigits: 2)}}×"
+    "multiplier": "{{value, number(maximumFractionDigits: 2)}}×",
+    "money": "{{value, number(maximumFractionDigits: 1)}}"
   },
   "actions": {
     "endTurn": "End Turn"

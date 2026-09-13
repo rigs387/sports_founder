@@ -7,9 +7,10 @@ Mistakes to avoid: `sports-founder-technical-lessons.md`. Summary: `sports-found
 
 ```
 content/              Game content and balance config (YAML data only; validated by Zod at load)
-  config.yaml         Every tunable number: rates, weights, PP tier table, starting values
+  config.yaml         Every tunable number: rates, weights, PP tier table, leagues, balance targets
   countries.yaml      Countries and their attributes (placeholder, invented)
-  sports.yaml         Rival sports (placeholder, invented)
+  genome.yaml         Genome option modifiers and quick-start presets
+  sports.yaml         Rival sports and the "other sports" bucket (placeholder, invented)
   names.yaml          All display names for countries and sports (the one moddable names file)
 src/content/          Zod schemas + YAML loader. Pure: may import only zod and yaml
 src/sim/              Simulation core. Pure and deterministic: may import only src/content,
@@ -27,7 +28,10 @@ runs/                 Runner and smoke-test output (git-ignored)
 
 - `npm run check`: type check, Biome, purity check, and tests. Run this before calling anything done.
 - `npm run sim -- --campaigns 20 --turns 100`: headless runner, which writes to `runs/latest/`.
-  `--help` lists the options.
+  `--help` lists the options, bots (greedy-spread, builder, anchor-turtle, random) and experiments.
+- `npm run sim -- --experiment all --campaigns 10 --turns 200`: every balance experiment for the
+  tech plan exit criteria (differentiation, collapse, hard-anchor, pacing, options, benchmark).
+  Misses are reported, never counted as passes.
 - `npm run dev`: launch the app with hot reload.
 - `npm run smoke`: build the app, launch it, click End Turn, and save screenshots and a report to
   `runs/smoke/`.
@@ -47,7 +51,10 @@ runs/                 Runner and smoke-test output (git-ignored)
   DOM or Node types.
 - The simulation advances in quarters (`stepQuarter`); a turn is N quarters, with N set by the PP
   tier table in config (`endTurn`). The UI updates once per turn from a `TurnSnapshot`.
-- Current fan, PP, and tier dynamics are placeholders (see the header of `src/sim/quarter.ts`).
+- The genome, affinity, spread, league, cash, health and PP tier models follow the GDD; their
+  numbers are tuning. Rival behavior is still a placeholder drift (see `src/sim/quarter.ts`).
+- Every player action goes through `applyAction` in `src/sim/actions.ts`; bots use the same path.
+- An anchor league collapse sets `outcome` and ends the campaign; `endTurn` refuses to continue.
 
 ## Steam
 - Steam is deferred until the game is playable. Do not add steamworks.js, a Steam adapter, or

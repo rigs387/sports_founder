@@ -115,3 +115,35 @@ body {
 .countries tr.focused th[scope="row"] {
   font-weight: bold;
 }
+
+.league h2 {
+  font-size: 1.2rem;
+  margin: 24px 0 8px;
+}
+
+.league-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px 16px;
+  margin: 0;
+}
+
+.league-list dt {
+  font-size: 0.8rem;
+  color: #6b6153;
+}
+
+.league-list dd {
+  margin: 0;
+}
+
+.health-struggling,
+.warning {
+  color: #8a5a00;
+}
+
+.health-near-collapse,
+.game-over {
+  color: #9a1e1e;
+  font-weight: bold;
+}

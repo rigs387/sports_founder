@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { greedySpread } from "../src/runner/policy";
+import { builder, randomBot } from "../src/runner/policy";
 import {
   applyAction,
   createCampaign,
@@ -12,11 +12,11 @@ import { firstAnchor, presetGenome, setupFor, world } from "./helpers";
 
 const TURNS = 80;
 
-/** Plays turns with the greedy-spread policy acting before each one (legal actions only). */
-function runWithPolicy(state: GameState, turns: number): GameState {
+/** Plays turns with a bot acting before each one (legal actions only), until the end if sooner. */
+function runWithPolicy(state: GameState, turns: number, bot = builder): GameState {
   let current = state;
-  for (let i = 0; i < turns; i += 1) {
-    current = endTurn(greedySpread(current, world).state, world);
+  for (let i = 0; i < turns && current.outcome === null; i += 1) {
+    current = endTurn(bot(current, world).state, world);
   }
   return current;
 }
@@ -24,8 +24,9 @@ function runWithPolicy(state: GameState, turns: number): GameState {
 describe("determinism", () => {
   it("the same seed and inputs produce an identical complete state", () => {
     const setup = setupFor(4471);
-    const a = runTurns(createCampaign(world, setup), world, TURNS);
-    const b = runTurns(createCampaign(world, setup), world, TURNS);
+    // A bot promotes the anchor league, so tiers rise and multi-quarter turns are reached.
+    const a = runWithPolicy(createCampaign(world, setup), TURNS);
+    const b = runWithPolicy(createCampaign(world, setup), TURNS);
 
     expect(b).toStrictEqual(a);
     expect(serializeSave(b)).toBe(serializeSave(a));
@@ -35,13 +36,23 @@ describe("determinism", () => {
     expect(a.countries.filter((c) => (c.fans[0]?.casual ?? 0) > 0).length).toBeGreaterThan(5);
   });
 
-  it("is deterministic with focus actions and slot growth (a bot moving slots every turn)", () => {
+  it("is deterministic with focus, promotion and rescue actions (a bot acting every turn)", () => {
     const setup = setupFor(17, firstAnchor, presetGenome("street-court"));
     const a = runWithPolicy(createCampaign(world, setup), TURNS);
     const b = runWithPolicy(createCampaign(world, setup), TURNS);
     expect(b).toStrictEqual(a);
+    expect(serializeSave(b)).toBe(serializeSave(a));
     expect(a.focus.length).toBeGreaterThan(1);
     expect(a.focus.filter((id) => id !== null && id !== firstAnchor).length).toBeGreaterThan(0);
+    expect(a.landmarks.some((l) => l.kind === "leaguePromoted")).toBe(true);
+    expect(a.yearly.length).toBe(Math.floor(a.quarter / 4));
+  });
+
+  it("is deterministic under the random bot, whose dice never touch the simulation's RNG", () => {
+    const setup = setupFor(23, "oruna", presetGenome("ice-paddle"));
+    const a = runWithPolicy(createCampaign(world, setup), TURNS, randomBot);
+    const b = runWithPolicy(createCampaign(world, setup), TURNS, randomBot);
+    expect(b).toStrictEqual(a);
   });
 
   it.each(world.countries.map((country) => country.id))(

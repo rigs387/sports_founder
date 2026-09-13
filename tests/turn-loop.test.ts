@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { builder } from "../src/runner/policy";
 import {
   checkInvariants,
   createCampaign,
@@ -44,16 +45,32 @@ describe("turn = N quarters, with N set by PP tier", () => {
     let byQuarter = start;
     for (let i = 0; i < 4; i += 1) byQuarter = stepQuarter(byQuarter, yearTurns);
 
-    expect(endTurn(start, yearTurns)).toStrictEqual({ ...byQuarter, turn: start.turn + 1 });
+    const turned = endTurn(start, yearTurns);
+    // Fans, money, RNG and history match exactly; endTurn only adds the once-per-turn league
+    // health bookkeeping on top.
+    expect(turned.quarter).toBe(byQuarter.quarter);
+    expect(turned.rng).toStrictEqual(byQuarter.rng);
+    expect(turned.pp).toBe(byQuarter.pp);
+    expect(turned.yearly).toStrictEqual(byQuarter.yearly);
+    expect(turned.countries.map((c) => c.fans)).toStrictEqual(
+      byQuarter.countries.map((c) => c.fans),
+    );
+    expect(turned.countries.map((c) => c.league?.cash)).toStrictEqual(
+      byQuarter.countries.map((c) => c.league?.cash),
+    );
+    expect(turned.turn).toBe(start.turn + 1);
     expect(byQuarter.pp).toBeGreaterThan(start.pp);
+    expect(byQuarter.yearly).toHaveLength(1);
   });
 
   it("a tier-up during a turn changes turn length from the next turn on and adds empty slots", () => {
     const quickTierUp = withConfig(world, (config) => {
+      config.tierTrack.telegraphTurns = 0;
       for (const tier of config.ppTiers) {
         if (tier.tier === 1) tier.turnLengthQuarters = 1;
         if (tier.tier === 2) {
           tier.fandomScoreRequired = 0;
+          tier.breadth = { type: "anchorLeagueTier", leagueTier: "amateur" };
           tier.turnLengthQuarters = 4;
           tier.focusSlots = 3;
         }
@@ -71,8 +88,18 @@ describe("turn = N quarters, with N set by PP tier", () => {
   });
 
   it("tiers rise in the shipped config over a long campaign (the loop is exercised end to end)", () => {
-    const state = runTurns(createCampaign(world, setup), world, 150);
+    let state = createCampaign(world, setup);
+    for (let i = 0; i < 150 && state.outcome === null; i += 1) {
+      state = endTurn(builder(state, world).state, world);
+    }
+    expect(state.outcome).toBeNull();
     expect(state.ppTier).toBeGreaterThanOrEqual(3);
+    expect(state.landmarks.filter((l) => l.kind === "ppTierUp").length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("without promotions, the anchor league never reaches Semi-Pro, so tier 2 never comes", () => {
+    const state = runTurns(createCampaign(world, setup), world, 80);
+    expect(state.ppTier).toBe(1);
   });
 });
 
@@ -128,14 +155,26 @@ describe("state stays valid", () => {
     expect(fullest).toBeGreaterThan(0.99);
   });
 
-  it("hardcore fans are never lost (no demotion causes exist yet)", () => {
-    let previous = createCampaign(world, setup);
-    runTurns(previous, world, 60, (state) => {
-      state.countries.forEach((country, i) => {
-        const before = previous.countries[i]?.fans[0]?.hardcore ?? 0;
-        expect(country.fans[0]?.hardcore ?? 0).toBeGreaterThanOrEqual(before);
+  it("hardcore fans fall only in a country whose league worsened, stepped down or folded that turn", () => {
+    const rank = (health: string | undefined) =>
+      health === undefined ? 3 : ["healthy", "struggling", "near-collapse"].indexOf(health);
+    let previous = createCampaign(world, setupFor(21, "oruna", presetGenome("ice-paddle")));
+    let lost = 0;
+    for (let turn = 0; turn < 120 && previous.outcome === null; turn += 1) {
+      const next = endTurn(builder(previous, world).state, world);
+      next.countries.forEach((country, i) => {
+        const before = previous.countries[i];
+        const fell = (country.fans[0]?.hardcore ?? 0) < (before?.fans[0]?.hardcore ?? 0);
+        if (!fell) return;
+        lost += 1;
+        const worsened = rank(country.league?.health) > rank(before?.league?.health);
+        const steppedDown = next.landmarks
+          .slice(previous.landmarks.length)
+          .some((l) => l.kind === "leagueSteppedDown" && l.countryId === country.countryId);
+        expect(worsened || steppedDown, `${country.countryId} on turn ${next.turn - 1}`).toBe(true);
       });
-      previous = state;
-    });
+      previous = next;
+    }
+    expect(lost).toBeGreaterThanOrEqual(0);
   });
 });

@@ -7,6 +7,7 @@ import {
   configFileSchema,
   countriesFileSchema,
   genomeFileSchema,
+  LEAGUE_TIERS,
   LEVERS,
   namesFileSchema,
   RESERVED_SPORT_IDS,
@@ -282,6 +283,62 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
   );
   if (weightTotal <= 0) {
     issue(sources.config, "similarity.axisWeights", "at least one axis weight must be positive");
+  }
+  tiers.forEach((tier, i) => {
+    const field = `ppTiers[${i}].breadth`;
+    if (i === 0 && tier.breadth.type !== "none") {
+      issue(sources.config, field, 'the starting tier has no breadth condition (use type "none")');
+    }
+    if (i > 0 && tier.breadth.type === "none") {
+      issue(sources.config, field, "every tier above the first needs a breadth condition");
+    }
+  });
+
+  const { leagues } = world.config;
+  LEAGUE_TIERS.forEach((leagueTier, i) => {
+    const entry = leagues.tiers[leagueTier];
+    const field = `leagues.tiers.${leagueTier}`;
+    if (i === 0 && entry.promotion !== null) {
+      issue(
+        sources.config,
+        `${field}.promotion`,
+        "the lowest tier cannot be promoted into (use null)",
+      );
+    }
+    if (i > 0 && entry.promotion === null) {
+      issue(sources.config, `${field}.promotion`, "needs promotion thresholds");
+    }
+    const lower = LEAGUE_TIERS[i - 1];
+    if (lower === undefined) return;
+    if (entry.runningCost < leagues.tiers[lower].runningCost) {
+      issue(sources.config, `${field}.runningCost`, `must not be lower than the ${lower} tier's`);
+    }
+    const lowerPromotion = leagues.tiers[lower].promotion;
+    if (
+      entry.promotion &&
+      lowerPromotion &&
+      entry.promotion.hardcoreShare < lowerPromotion.hardcoreShare
+    ) {
+      issue(
+        sources.config,
+        `${field}.promotion.hardcoreShare`,
+        `must not be lower than the ${lower} tier's`,
+      );
+    }
+  });
+  if (leagues.health.nearCollapseRunwayQuarters >= leagues.health.strugglingRunwayQuarters) {
+    issue(
+      sources.config,
+      "leagues.health.nearCollapseRunwayQuarters",
+      "must be shorter than strugglingRunwayQuarters",
+    );
+  }
+  if (world.config.balanceTargets.turnsInTier.length < tiers.length - 1) {
+    issue(
+      sources.config,
+      "balanceTargets.turnsInTier",
+      `needs a target for each of the first ${tiers.length - 1} tiers`,
+    );
   }
   if (world.config.focus.exposedCost > world.config.focus.coldLaunchCost) {
     issue(

@@ -1,17 +1,14 @@
+import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { playerFandomScore } from "./fandom";
 import { leverMultipliers, similarityEffect } from "./genome";
+import { stepLeagueQuarter } from "./leagues";
+import { yearlySnapshot } from "./records";
 import { nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { type CountryExposure, computeExposure } from "./spread";
-import {
-  type Config,
-  type CountryState,
-  type GameState,
-  PLAYER_INDEX,
-  type SportState,
-  type World,
-} from "./types";
+import type { Config, CountryState, GameState, Landmark, SportState, World } from "./types";
 
-// Quarterly fan dynamics (GDD Fan Model, Sport Genome, Spread Model). Every rate is config.
+// Quarterly simulation (GDD Fan Model, Sport Genome, Spread Model, Business Layer). Every rate is
+// config.
 //
 // Player's sport, per country, per quarter:
 //   uninterested → casual   uninterested × casualConversionRate × accessibility × affinity
@@ -22,17 +19,22 @@ import {
 // Exposure comes from src/sim/spread.ts: local word of mouth, inbound spread over the proximity,
 // language and media channels (only casual exposure crosses borders), and focus outreach.
 // Hardcore is exclusive: if the sports together would convert more people than have no hardcore
-// sport, the conversions are scaled down to fit. Hardcore fans are never lost here; the GDD's
-// demotion causes arrive with the systems that produce them.
+// sport, the conversions are scaled down to fit. Hardcore loss happens only through league
+// causes (src/sim/leagues.ts), at the end of a turn.
 //
+// After fans move, league business runs (src/sim/leagues.ts): leagues form at the hardcore
+// threshold, and existing leagues earn revenue and pay running costs. Cash never feeds PP.
 // Rivals (PLACEHOLDER until the rival AI): slow local drift, no spread. "Other" never moves.
 // PP income per quarter: scale × (player Fandom Score ^ exponent).
+// At the end of each in-game year the yearly world snapshot is recorded.
 
 /** Advances the simulation by one in-game quarter. Pure: returns a new state. */
 export function stepQuarter(state: GameState, world: World): GameState {
   const { config } = world;
   const rng = restoreRng(state.rng);
   const exposure = computeExposure(state, world);
+  const quarter = state.quarter + 1;
+  const found: Landmark[] = [];
 
   const countries = state.countries.map((countryState, index) => {
     const country = world.countries[index];
@@ -69,18 +71,33 @@ export function stepQuarter(state: GameState, world: World): GameState {
         rivalry.hardcoreFactor *
         (countryExposure.focused ? config.focus.conversionMultiplier : 1),
     };
-    return stepCountry(countryState, country.population, state.sports, playerRates, config, rng);
+    const moved = stepCountryFans(
+      countryState,
+      country.population,
+      state.sports,
+      playerRates,
+      config,
+      rng,
+    );
+    const business = stepLeagueQuarter(moved, index, world, state, quarter);
+    if (business.landmark) found.push(business.landmark);
+    return business.country;
   });
 
   const score = playerFandomScore(state.sports, countries, config.fandomScore.casualWeight);
   const ppIncome = config.ppIncome.scale * score ** config.ppIncome.exponent;
+  const yearEnded = quarter % QUARTERS_PER_YEAR === 0;
 
   return {
     ...state,
     rng: saveRng(rng),
-    quarter: state.quarter + 1,
+    quarter,
     pp: state.pp + ppIncome,
     countries,
+    landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
+    yearly: yearEnded
+      ? [...state.yearly, yearlySnapshot({ countries }, yearOfQuarter(quarter - 1, config))]
+      : state.yearly,
   };
 }
 
@@ -99,7 +116,7 @@ interface Flows {
 
 const NO_FLOWS: Flows = { casualGain: 0, casualChurn: 0, hardcoreGain: 0 };
 
-function stepCountry(
+function stepCountryFans(
   countryState: CountryState,
   population: number,
   sports: readonly SportState[],
@@ -151,7 +168,7 @@ function stepCountry(
   let remaining = unattached;
 
   return {
-    countryId: countryState.countryId,
+    ...countryState,
     fans: countryState.fans.map((fans, index) => {
       const flow = flows[index] ?? NO_FLOWS;
       const hardcoreGain = Math.min(remaining, Math.floor(flow.hardcoreGain * scale));
@@ -181,4 +198,3 @@ function drawFlow(rng: Rng, pool: number, rate: number, noise: number): number {
 }
 
 export type { CountryExposure };
-export { PLAYER_INDEX };

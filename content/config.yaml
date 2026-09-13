@@ -24,36 +24,67 @@ ppIncome:
   scale: 0.05
   exponent: 0.5
 
-# PP tier table. Turn length is in quarters (1 = quarter, 2 = half-year, 4 = year).
-# focusSlots: how many focus slots the player holds at that tier (GDD Global PP Tier Track).
-# costMultiplier: scales PP costs at that tier ("growing pains").
-# PLACEHOLDER promotion rule: Fandom Score threshold only (the GDD breadth conditions come later).
+# PP tier table (GDD Global PP Tier Track). Turn length is in quarters (1 = quarter, 2 = half-year,
+# 4 = year).
+#   fandomScoreRequired    Fandom Score needed to tier up into this tier
+#   breadth                the tier's breadth condition, also what demotion is judged on:
+#                            anchorLeagueTier     the anchor's league has reached leagueTier
+#                            anchorHardcoreShare  the player's hardcore share of the anchor population
+#                            leaguesOnContinents  leagues at leagueTier or above on this many continents
+#                            globalRank           the player's sport ranks this high by Fandom Score
+#                                                 among modeled sports (player + rivals)
+#   focusSlots             focus slots held at this tier
+#   costMultiplier         scales PP costs ("growing pains"); the highest tier ever reached applies
+#   mediaRevenueMultiplier PP tier caps the size of media and sponsor deals (GDD Business Layer)
 ppTiers:
   - tier: 1
     fandomScoreRequired: 0
+    breadth: { type: none }
     turnLengthQuarters: 1
     focusSlots: 1
     costMultiplier: 1
+    mediaRevenueMultiplier: 1
   - tier: 2
-    fandomScoreRequired: 25000
+    fandomScoreRequired: 10000
+    breadth: { type: anchorLeagueTier, leagueTier: semi-pro }
     turnLengthQuarters: 1
     focusSlots: 2
     costMultiplier: 1.5
+    mediaRevenueMultiplier: 1.25
   - tier: 3
     fandomScoreRequired: 1500000
+    breadth: { type: anchorHardcoreShare, share: 0.01 }
     turnLengthQuarters: 2
     focusSlots: 3
     costMultiplier: 2.5
+    mediaRevenueMultiplier: 1.5
   - tier: 4
     fandomScoreRequired: 15000000
+    breadth: { type: leaguesOnContinents, leagueTier: professional, continents: 3 }
     turnLengthQuarters: 2
     focusSlots: 4
     costMultiplier: 4
+    mediaRevenueMultiplier: 2
   - tier: 5
     fandomScoreRequired: 80000000
+    breadth: { type: globalRank, rank: 3 }
     turnLengthQuarters: 4
     focusSlots: 5
     costMultiplier: 6
+    mediaRevenueMultiplier: 2.5
+
+# Tier-ups, demotion and cooldowns (GDD Global PP Tier Track).
+tierTrack:
+  # A tier-up is announced this many turns before it happens ("Approaching National Pastime") and
+  # then happens regardless: tier-ups cannot be delayed or dodged.
+  telegraphTurns: 1
+  # At risk when the current tier's breadth progress, or Fandom Score relative to its threshold,
+  # is below this share.
+  demotionLine: 0.5
+  # Demoted after this many consecutive turns at risk.
+  demotionTurns: 4
+  # No tier-up announcement, tier-up or demotion for this many turns after any tier change.
+  cooldownTurns: 6
 
 # Curves turning raw country figures into 0–1 scores (GDD Country attributes).
 #   log:    score = (ln(x) − ln(low)) / (ln(high) − ln(low)), clamped to 0–1
@@ -168,3 +199,92 @@ hints:
   plusPlus: 0.2
   plus: 0.05
   minus: -0.05
+
+# Leagues (GDD League tiers, Business Layer Phase 0 subset, League Health Ladder). Cash is per
+# country and never produces PP.
+leagues:
+  # Per tier: runningCost per quarter (before the wealth and size factors below), revenue
+  # multiplier, and promotion INTO this tier: hardcore share of the population needed, cash
+  # reserve needed and cash cost, both in quarters of this tier's running cost.
+  tiers:
+    amateur:
+      runningCost: 0.4
+      revenueMultiplier: 1
+      promotion: null
+    semi-pro:
+      runningCost: 6
+      revenueMultiplier: 1.5
+      promotion: { hardcoreShare: 0.0004, reserveQuarters: 2.5, costQuarters: 2 }
+    professional:
+      runningCost: 40
+      revenueMultiplier: 2
+      promotion: { hardcoreShare: 0.003, reserveQuarters: 2.5, costQuarters: 2 }
+    elite:
+      runningCost: 90
+      revenueMultiplier: 2.5
+      promotion: { hardcoreShare: 0.02, reserveQuarters: 2.5, costQuarters: 2 }
+  formation:
+    # An Amateur league forms once player hardcore fans reach max(minHardcore, share × population).
+    minHardcore: 300
+    hardcoreShare: 0.0005
+    # A new league starts with this many quarters of Amateur running cost in cash.
+    startingCashQuarters: 40
+    # After a league folds, a new one cannot form for this many quarters.
+    reformCooldownQuarters: 8
+  # Running cost per quarter = tier runningCost × (wealthFloor + (1 − wealthFloor) × wealth score)
+  #   × (population ÷ referencePopulation) ^ populationExponent
+  costs:
+    wealthFloor: 0.3
+    referencePopulation: 1000000
+    populationExponent: 1
+  # Revenue per quarter, × the league tier's revenueMultiplier:
+  #   gate  = hardcore × gatePerHardcore × (wealthFloor + (1 − wealthFloor) × wealth score)
+  #   media = casual × mediaPerCasual × (mediaMarketFloor + (1 − floor) × media market score)
+  #           × the PP tier's mediaRevenueMultiplier
+  revenue:
+    gatePerHardcore: 0.001
+    mediaPerCasual: 0.00005
+    wealthFloor: 0.3
+    mediaMarketFloor: 0.3
+  # Health is evaluated once per turn and moves at most one step. The target rung comes from:
+  #   cash below zero                          → collapse (needs a full turn at Near-Collapse first)
+  #   losing cash with runway < near-collapse  → Near-Collapse
+  #   losing cash with runway < struggling     → Struggling
+  #   losing cash and the loss is growing      → one rung worse
+  #   hardcore fans falling faster than rate   → one rung worse (per quarter, relative)
+  # Runway = cash ÷ cash lost per quarter. Each step down demotes this share of hardcore to casual.
+  health:
+    strugglingRunwayQuarters: 12
+    nearCollapseRunwayQuarters: 4
+    hardcoreFallingRate: 0.002
+    demotionShare:
+      struggling: 0.02
+      near-collapse: 0.05
+      collapsed: 0.25
+  # Voluntary step-down at Near-Collapse: one tier down, reset to Struggling, demote this share.
+  stepDown:
+    hardcoreDemotionShare: 0.05
+  # PP bailout: costs ppCost × the PP cost multiplier, grants cashQuarters of the league's running
+  # cost, then cannot be used on that league again for cooldownQuarters.
+  bailout:
+    ppCost: 25
+    cashQuarters: 8
+    cooldownQuarters: 16
+
+# League business happens in one seasonal window per in-game year (GDD Time advancement rules). The
+# window is open for a turn whose quarters include this quarter of the year.
+seasonalWindow:
+  quarterOfYear: 3
+
+# Headless balance targets (tech plan 2.1 exit criteria). Read by the runner only.
+balanceTargets:
+  # Contrasting genomes share fewer than this share of their top-N countries by population share.
+  differentiationTopN: 10
+  differentiationSharedShare: 0.5
+  # No single trait option appears in more than this share of top-quartile runs.
+  dominanceLimit: 0.4
+  # Turns spent in each PP tier (GDD campaign length table), and the allowed deviation.
+  turnsInTier: [20, 30, 40, 40]
+  pacingTolerance: 0.3
+  # The naive strategy for the "no safe anchor" criterion.
+  naiveBot: greedy-spread
