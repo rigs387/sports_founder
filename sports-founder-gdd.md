@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.2 | September 13, 2026 — all core and Phase 2 design decisions made*
+*Version 1.3 | September 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed*
 
 ---
 
@@ -236,32 +236,106 @@ sport, your sport and rivals alike.
 summed across all countries. The casual weight (e.g., 0.3) is a config value. Casuals count, but
 breadth alone cannot win — depth is required.
 
-**Sport Genome:** The sport is defined by ~10 trait axes (Phase 0), each with 3–4 discrete
-options. Example axes: equipment (ball only / sticks / protective gear), surface (grass field /
-indoor court / ice / water / street), contact (none / incidental / full), team size, match length,
-scoring frequency, rules complexity, physical profile (speed / strength / precision / endurance).
+**Sport Genome:** The sport is defined by 10 trait axes (Phase 0), each with 3–4 discrete options
+(decided 2026-09-13):
+
+| Axis | Options | Kind |
+|---|---|---|
+| Surface | Grass field / Indoor court / Street / Ice | Identity |
+| Equipment | Ball only / Ball + stick or bat / Protective gear | Identity |
+| Physical profile | Speed / Strength / Precision / Endurance | Identity |
+| Field footprint | Small / Medium / Large | Identity |
+| Contact | None / Incidental / Full | Rule |
+| Team size | Small (2–5) / Medium (6–9) / Large (10–15) | Rule |
+| Match length | Short / Standard / Long (multi-hour or multi-session) | Rule |
+| Scoring frequency | Low / Medium / High | Rule |
+| Rules complexity | Simple / Moderate / Intricate | Rule |
+| Play structure | Continuous / Stop-start / Innings | Rule |
+
+Water as a surface option is parked for later.
 
 - **Affinity = genome traits × country attributes.** Phase 0 country attributes: climate, wealth,
   urban density, existing sport culture (also the source of rival strength), media market size,
   language group.
-- **Two conversion levers.** *Accessibility* traits (cost, simplicity, where it can be played)
-  mainly accelerate uninterested → casual. *Depth* traits (strategy, skill ceiling, drama) mainly
-  accelerate casual → hardcore. Wide-and-shallow vs. narrow-and-deep is a real strategic identity.
+- **Two conversion levers.** *Accessibility* (cost, simplicity, where it can be played) mainly
+  accelerates uninterested → casual. *Depth* (strategy, skill ceiling, drama) mainly accelerates
+  casual → hardcore. Wide-and-shallow vs. narrow-and-deep is a real strategic identity.
+- **Levers attach to options, not whole axes.** Each option carries its own accessibility and
+  depth modifiers, plus conditions on country attributes. Examples: Street is +accessibility in
+  dense, lower-income countries; Ice is +affinity in cold countries and −affinity in hot ones;
+  Intricate rules are +depth and −accessibility. All modifiers live in config.
 - **Rival similarity.** Resembling a country's dominant rival makes casual conversion easier
-  (familiar) and hardcore conversion harder (they already have that sport).
+  (familiar) and hardcore conversion harder (they already have that sport). Similarity is the
+  weighted share of axes on which two genomes choose the same option (0–1), with per-axis weights
+  in config. Every rival has its own genome in content.
 - **No universal best option.** Design rule: every trait option helps in some countries and hurts
   in others. Verified in balance runs by the genome diversity of winning campaigns.
-- **Identity vs. rule traits.** Identity traits (e.g., surface) are locked at creation and keep the
-  sport recognizable. Rule traits (e.g., match length, contact) can change later through rules
-  evolution, at a cost to hardcore purists.
+- **Identity vs. rule traits.** Identity traits (surface, equipment, physical profile, field
+  footprint) are locked at creation and keep the sport recognizable. Rule traits (contact, team
+  size, match length, scoring frequency, rules complexity, play structure) can change later
+  through rules evolution, at a cost to hardcore purists.
+- **All combinations are legal.** Odd pairings (ice with innings) earn deadpan rulebook lines;
+  affinity handles the balance.
+
+**Country attributes (Phase 0, decided 2026-09-13):** What affinity and spread read from each
+market. All stored in content; every conversion curve and weight lives in config.
+
+| Attribute | Values | Source |
+|---|---|---|
+| Climate | Tropical / Arid / Temperate / Cold | Main climate zones (Köppen groups) |
+| Wealth | Real income per person → 0–1 score via config curve | Real-world data |
+| Urban density | Real % urban population → 0–1 score via config curve | Real-world data |
+| Existing sport culture | Share of population already hardcore about any sport (rivals + "other") | Derived from starting fan data |
+| Media market size | Population × wealth score, shape set in config | Derived |
+| Language group | One primary media sphere (~15 broad spheres) plus an optional secondary one | Content |
+| Neighbors | Land borders plus hand-listed sea links (so islands have proximity spread) | Natural Earth + content |
+| Continent | Africa / Asia / Europe / North America / South America / Oceania | Content |
+
+- The secondary language sphere counts toward the language channel at a config weight (e.g.,
+  India: Hindi-Urdu + English; Canada: English + French).
+- Continent is what the tier-4 condition "pro leagues on N continents" counts.
+
+**Real-world data (Phase 0, decided 2026-09-13):**
+- **Markets:** FIFA member associations plus any cricket country missing from FIFA, limited to
+  places with real sports salience (see Map and markets). Every addition or omission is noted with
+  its reason.
+- **Attributes:** population, income per person, and % urban from World Bank data, using one data
+  year for all markets; national statistics offices fill gaps (UK home nations, some
+  territories). Climate is the main zone where most people live, not most land (Australia is
+  Temperate). Every field records its source and year.
+- **Starting fan buckets (soccer, cricket):** published survey figures on sports interest where
+  they exist ("very interested" → hardcore, "interested" → casual). Countries without surveys copy
+  a similar neighbor. Every value is tagged with its source or "estimate: modeled on X".
+- **"Other sports" bucket:** a default hardcore share per continent, overridden per country where
+  another sport clearly dominates (e.g., the US, where Phase 0's "other" holds American football,
+  basketball, and baseball).
+- **Rival genomes:**
+
+| Axis | Soccer | Cricket |
+|---|---|---|
+| Surface | Grass field | Grass field |
+| Equipment | Ball only | Ball + stick or bat |
+| Physical profile | Endurance | Precision |
+| Field footprint | Large | Large |
+| Contact | Incidental | None |
+| Team size | Large | Large |
+| Match length | Standard | Long |
+| Scoring frequency | Low | High |
+| Rules complexity | Simple | Intricate |
+| Play structure | Continuous | Innings |
+
+- **Compilation:** an AI research session builds the dataset as YAML plus a sources file, with
+  estimates tagged. The developer spot-checks ~10 key markets (recommended starts, the biggest
+  soccer and cricket countries) before the data is used for balance runs.
 
 **Spread Model:** How the sport moves between countries.
 
 - **Only casual exposure crosses borders.** Hardcore fans are always built locally (leagues,
   attendance, stories). A country's outbound spread strength = its hardcore + weighted casual fans
   (same formula as the Fandom Score), so hardcore fans are stronger evangelists.
-- **Phase 0 channels:** *proximity* (neighboring countries), *language group* (shared media and
-  social feeds), *media reach* (long jumps between large media markets). Diaspora and trade ties
+- **Phase 0 channels:** *proximity* (neighbors: land borders plus hand-listed sea links),
+  *language group* (shared primary or secondary media sphere), *media reach* (long jumps between
+  large media markets). Diaspora and trade ties
   are later additions (they require per-country-pair data). PP growth nodes strengthen specific
   channels (e.g., media node → media reach, grassroots node → proximity).
 - **Focus slots.** Pushing into a market means assigning it a focus slot, which boosts inbound
@@ -500,7 +574,8 @@ snowballing. Works alongside tier-scaled costs, tier-scaled negative events, and
   - Each rival has its own genome (driving the similarity rule), home regions, and fan buckets in
     every country.
 - **Starting fan data:** as realistic to the current world as possible, researched from public
-  sources, with sources noted alongside the data.
+  sources, with sources noted alongside the data. Method and rival genomes: see Real-world data
+  under Progression & Economy.
 - **Naming boundary:** real sport names are used. Real leagues, governing bodies, tournaments,
   teams, and players are not — they use generic or fictional names (e.g., "the soccer
   establishment"). **All real-world-facing names live in a single data file**, so players can mod
@@ -589,11 +664,12 @@ depth, persistent entity management), Capitalism Lab (business/tycoon layer).
   starting from presets.
 - **Save as image (Phase 2):** rulebook, field diagram, and logo exportable at 9x16.
 
-**Map and markets:** The market list follows international sports-body conventions — territories
-with their own sporting federations (e.g., Taiwan, Hong Kong, Kosovo, Palestine) are separate
-markets, and England, Scotland, Wales, and Northern Ireland are separate markets. The map uses
-Natural Earth de facto boundaries; contested areas are drawn with neutral hatching and belong to
-no market.
+**Map and markets:** The market list starts from FIFA's member associations, so England,
+Scotland, Wales, and Northern Ireland are separate markets, as are sports territories such as
+Chinese Taipei and Hong Kong. Only places with real sports salience are included; entries without
+it (e.g., Kosovo, Palestine) are left out (decided 2026-09-13). Tuvalu stays as the signature hard
+anchor. The map uses Natural Earth de facto boundaries; contested areas and land outside any
+market are drawn with neutral hatching and belong to no market.
 
 **Onboarding:**
 - **Guided first campaign:** a dismissible "Founder's Notebook" shows short tips the first time
@@ -692,3 +768,4 @@ Items flagged during the interview that need further discussion in future sessio
 - Commercial decisions — deferred by choice (2026-09-13): price, Early Access timing, demo scope,
   DLC, Steam page timing, platforms. Tech plan §11 holds the current thinking.
 - Competitor analysis: a thorough Steam tag sweep (research task, not a design decision).
+- Water as a genome surface option (parked 2026-09-13).

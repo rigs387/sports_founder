@@ -20,8 +20,22 @@ anchor collapse no longer ends the run, and a Retire option plays a final retros
 **Fan Model:** Per country, per sport: Uninterested → Casual (non-exclusive, churns) → Hardcore
 (exclusive, sticky; lost only by demotion to casual through specific causes).
 
-**Genome:** ~10 discrete trait axes × 6 country attributes = affinity. Accessibility traits win
-casuals; depth traits win hardcores. Identity traits locked; rule traits evolvable.
+**Genome:** 10 discrete trait axes × 6 country attributes = affinity. Identity (locked): surface,
+equipment, physical profile, field footprint. Rule (evolvable): contact, team size, match length,
+scoring frequency, rules complexity, play structure. Each option carries its own accessibility
+(wins casuals) and depth (wins hardcores) modifiers, conditioned on country attributes. Rival
+similarity = weighted share of matching options. Every combination is legal.
+
+**Countries:** Climate (Tropical / Arid / Temperate / Cold), wealth and urban density (real data →
+0–1 via config curves), sport culture (derived from starting fans), media market (population ×
+wealth), language (primary + optional secondary sphere), neighbors (land borders + sea links),
+continent (6).
+
+**Real-world data:** World Bank attributes (one year, sources noted); soccer/cricket fan buckets
+from interest surveys ("very interested" → hardcore), gaps modeled on neighbors and tagged;
+"other" bucket per-continent default with overrides. Soccer: grass, ball only, endurance, large,
+incidental, large team, standard, low scoring, simple, continuous. Cricket: grass, bat, precision,
+large, no contact, large team, long, high scoring, intricate, innings.
 
 **Spread:** Casual exposure crosses borders via proximity, language, and media; hardcore is built
 locally. Player pushes markets with limited focus slots (more at higher tiers).
@@ -103,8 +117,9 @@ controller from day one. Accessibility baseline (colorblind-safe patterns, scali
 reduced motion). English for EA; 1.0 languages by wishlist geography. Music postponed; SFX late.
 
 **Showing the Sport:** Genome-generated rulebook with dated amendments (Phase 0), field diagram
-(Phase 1), player-made logo/ball/kit + 9x16 image export (Phase 2). Markets follow sports-body
-conventions (e.g., UK home nations separate); contested areas neutral.
+(Phase 1), player-made logo/ball/kit + 9x16 image export (Phase 2). Markets: FIFA associations
+with real sports salience (UK home nations separate; no Kosovo/Palestine; Tuvalu kept);
+contested and unlisted land neutral.
 
 **References:** Plague Inc. × Football Manager × Capitalism Lab.
 

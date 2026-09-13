@@ -33,6 +33,9 @@ surface before playtesting or during it.
 | 2026-09-12 | Electron/Steam version policy per Section 8 | Decided |
 | 2026-09-13 | GDD design questions resolved through Phase 2 systems (GDD v1.1+) | Decided |
 | 2026-09-13 | Steam integration deferred until the game is playable | Decided |
+| 2026-09-13 | Genome trait list, option-level lever modifiers, identity/rule split, similarity measure (GDD v1.3) | Decided |
+| 2026-09-13 | Country attribute definitions, neighbors, continents (GDD v1.3) | Decided |
+| 2026-09-13 | Real-world data: salient FIFA markets, World Bank sources, survey-based fan buckets, rival genomes (GDD v1.3) | Decided |
 
 ---
 
@@ -576,6 +579,9 @@ To be copied into `CLAUDE.md` when the repository is created:
    game is playable.
 5. Build the headless runner and seeded RNG before any UI polish.
 6. Stand up the Steam page once Phase 0 has a presentable map.
+7. Compile the real-world dataset (AI research session, sources file, tagged estimates) alongside
+   the genome and spread work, which proceeds on invented placeholder countries. The developer
+   spot-checks ~10 key markets before the data feeds balance runs.
 
 ---
 
