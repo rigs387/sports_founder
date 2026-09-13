@@ -115,22 +115,25 @@ These come from the GDD review. Items 1–4 must be specified before Phase 0 imp
 
 | # | Gap | Why it blocks | Suggested direction |
 |---|---|---|---|
-| 1 | **Genome mechanics** | If genome choices don't change outcomes, the game is a reskinned Plague Inc | **Genome traits × country attributes = affinity.** Country attributes: climate, wealth, urban density, existing sport culture, media market, language/diaspora ties. E.g., a cheap ball-only sport spreads through poorer regions; equipment-heavy indoor sports suit wealthy cold countries |
-| 2 | **PP income source** | The GDD defines PP spending but not earning; the economy can't be built | Define per-turn PP generation (e.g., from global fandom, tier, story beats) |
-| 3 | **Spread model** | This is the heatmap's engine | Define country-to-country flow: borders, shared language, trade/historical ties, broadcast reach, diaspora |
-| 4 | **Story → mechanics link** | North star requires growth to be *earned* by story | Stories apply concrete effects: temporary growth multipliers, local unlocks, rival setbacks |
-| 5 | **Fandom share definition** | Win condition is ambiguous | Per-country zero-sum "sports attention pie"; rivals hold slices, so defense emerges from the model |
-| 6 | **Rules-evolution trade-offs** | System has no defined tension | Purist vs. casual fan segments: TV-friendly changes attract casuals and alienate purists |
-| 7 | **Turn anatomy** | No definition of what a player does per turn | Write out: first 10 minutes, a mid-game turn, a late-game turn; count decisions per turn |
-| 8 | **Campaign length & replay** | Single long campaign conflicts with the Plague Inc replay model | Set a target campaign length; make anchor-country choice and genome the replay/difficulty levers |
-| 9 | **Late-game pressure** | Only loss condition is anchor collapse; mature anchors become unloseable | Add a global pressure source: rival alliances, scandals scaling with tier, anchor decline as the sport globalizes |
-| 10 | **Delegation** | Per-country cash management doesn't scale past ~30 markets | Hireable country commissioners with traits (also feeds the story generator) |
-| 11 | **Showing the sport** | Players will want to *see* their invented sport | Procedural rulebook page, field diagram, ball/logo — cheap and shareable |
-| 12 | **Real vs. fictional world** | Trademark and sensitivity exposure | Use fictional names for "World Cup"/"Olympics" equivalents and league brands; decide disputed-border handling for the real-world map |
+| 1 | ~~**Genome mechanics**~~ | **Resolved 2026-09-12** — see GDD Sport Genome | ~10 discrete trait axes; accessibility traits drive casual conversion, depth traits drive hardcore; rival similarity eases casual, hinders hardcore; identity vs. rule traits |
+| 2 | ~~**PP income source**~~ | **Resolved 2026-09-12** — see GDD PP Income | Base income from Fandom Score (diminishing returns) + moment bonuses as clickable map pickups; tier-scaled costs; quarterly sim step; turn length set by PP tier |
+| 3 | ~~**Spread model**~~ | **Resolved 2026-09-12** — see GDD Spread Model | Only casual exposure crosses borders; proximity/language/media channels; focus slots; cold launches cost more; country-level granularity |
+| 4 | ~~**Story → mechanics link**~~ | **Resolved 2026-09-12** — see GDD Event System | Moments + decision cards from recorded facts; closed effect vocabulary; decisions capped per turn; pickups auto-collect; negative events scale with tier |
+| 5 | ~~**Fandom share definition**~~ | **Resolved 2026-09-12** — see GDD Fan Model | Three buckets (uninterested / casual / hardcore); hardcore exclusive and sticky; Fandom Score = hardcore + weighted casual |
+| 6 | ~~**Rules-evolution trade-offs**~~ | **Resolved 2026-09-12** — see GDD Rules Evolution | PP cost, seasonal window, 1/year; backlash scales with hardcore base and rule age; global rules; proposals from player, broadcasters, sponsors, commissioners |
+| 7 | ~~**Turn anatomy**~~ | **Resolved 2026-09-12** — see GDD Turn anatomy | 5-step turn; per-tier targets for markets, slots, pickups, cards, real time; anchor starts with founding amateur league; league attention via map signals + seasonal windows + crisis cards (no inbox) |
+| 8 | ~~**Campaign length & replay**~~ | **Resolved 2026-09-12** — see GDD Campaign length | ~10–15 hr to first win; anchor country + genome as replay levers; anchor difficulty rating + Easy/Normal/Hard; multiple save slots, no ironman |
+| 9 | ~~**Late-game pressure**~~ | **Resolved 2026-09-12** — see GDD Late-Game Pressure | Anchor resentment; generational hardcore turnover; rising running costs by league tier; rivals defend hardest near #1 |
+| 9b | ~~**Rival AI**~~ | **Resolved 2026-09-12** — see GDD Rival AI | Real-world sports as rivals (present-day start; 7 sports + combat sports bucket + passive "other"); defense budgets; per-country escalation ladder; closed countermove list; rival-vs-rival later |
+| 10 | ~~**Delegation**~~ | **Resolved 2026-09-12** — see GDD Delegation | Standing policies with per-country overrides; window business surfaces only in focus countries; trait-driven commissioners in Phase 1; player can always intervene |
+| 11 | ~~**Showing the sport**~~ | **Resolved 2026-09-12** — see GDD Showing the sport | Rulebook page with dated amendments (Phase 0); field diagram (Phase 1); player-made logo/ball/kit + 9x16 image export (Phase 2) |
+| 12 | ~~**Real vs. fictional world**~~ | **Resolved 2026-09-12** — see GDD Rival AI and Map and markets | Real sport names; generic/fictional leagues, governing bodies, tournaments, teams, players; all real-world-facing names in one moddable data file. Markets follow sports-body conventions; Natural Earth de facto boundaries with neutral hatching for contested areas. Get a legal check before the Steam page |
 | 13 | **Standard production gaps** | Needed before Early Access | Onboarding/tutorial, UI information architecture, difficulty, audio, accessibility, localization, price/DLC, target audience, competitor analysis, playtest plan with success metrics |
 
-Existing GDD parking-lot items also remain open: PP tier names/thresholds, rival AI triggers,
-scenario/leaderboard format, tiered simulation depth thresholds.
+As of 2026-09-12, items 1–12 are resolved in the GDD (v1.1), along with the original parking-lot
+items for PP tiers, rival AI triggers, and tiered simulation depth. Still open: item 13 (production
+gaps), scenario/leaderboard format and integrity (Phase 2), and confirming the win-hold measure in
+balance runs.
 
 ---
 
@@ -544,8 +547,7 @@ To be copied into `CLAUDE.md` when the repository is created:
 
 ## 13. Next Steps
 
-1. **Resolve design prerequisites 1–4** (genome affinity, PP income, spread model, story →
-   mechanics) in the GDD.
+1. ~~**Resolve design prerequisites 1–4**~~ — done 2026-09-12 (GDD v1.1), along with items 5–12.
 2. Define Phase 0 exit criteria in measurable terms.
 3. Create the repository: Git, electron-vite + React + TypeScript strict, Biome, Vitest, and
    `CLAUDE.md` from Section 10.
