@@ -1,0 +1,72 @@
+# PLACEHOLDER countries. Invented: no real-world data yet.
+#
+# Attribute indices run from 0 (low) to 1 (high). Climate categories are provisional until the
+# genome × country affinity model is built.
+# startingRivalFans: fraction of the population that is casual / hardcore about each rival.
+# Display names live in names.yaml.
+
+countries:
+  - id: valdoria
+    population: 9000000
+    attributes:
+      climate: temperate
+      wealth: 0.7
+      urbanDensity: 0.6
+      sportCulture: 0.8
+      mediaMarket: 0.5
+      languageGroup: valdic
+    startingRivalFans:
+      fieldball: { casual: 0.35, hardcore: 0.12 }
+      longbat: { casual: 0.05, hardcore: 0.01 }
+
+  - id: kestmark
+    population: 22000000
+    attributes:
+      climate: cold
+      wealth: 0.85
+      urbanDensity: 0.7
+      sportCulture: 0.6
+      mediaMarket: 0.7
+      languageGroup: nordel
+    startingRivalFans:
+      fieldball: { casual: 0.25, hardcore: 0.08 }
+      longbat: { casual: 0.02, hardcore: 0.005 }
+
+  - id: oruna
+    population: 120000000
+    attributes:
+      climate: tropical
+      wealth: 0.3
+      urbanDensity: 0.4
+      sportCulture: 0.9
+      mediaMarket: 0.8
+      languageGroup: oruni
+    startingRivalFans:
+      fieldball: { casual: 0.15, hardcore: 0.04 }
+      longbat: { casual: 0.4, hardcore: 0.18 }
+
+  - id: sallavi-isles
+    population: 400000
+    attributes:
+      climate: tropical
+      wealth: 0.5
+      urbanDensity: 0.2
+      sportCulture: 0.4
+      mediaMarket: 0.1
+      languageGroup: valdic
+    startingRivalFans:
+      fieldball: { casual: 0.3, hardcore: 0.1 }
+      longbat: { casual: 0.1, hardcore: 0.03 }
+
+  - id: brenholt
+    population: 48000000
+    attributes:
+      climate: arid
+      wealth: 0.55
+      urbanDensity: 0.8
+      sportCulture: 0.7
+      mediaMarket: 0.9
+      languageGroup: nordel
+    startingRivalFans:
+      fieldball: { casual: 0.45, hardcore: 0.15 }
+      longbat: { casual: 0.08, hardcore: 0.02 }

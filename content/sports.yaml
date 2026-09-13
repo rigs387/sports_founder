@@ -1,0 +1,9 @@
+# PLACEHOLDER rival sports. Invented: no real-world sports yet.
+# Genomes and home regions arrive with the genome and rival AI systems.
+# Display names live in names.yaml. The id "player" is reserved for the player's sport.
+
+rivals:
+  # Global giant.
+  - id: fieldball
+  # Regional stronghold.
+  - id: longbat

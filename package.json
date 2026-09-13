@@ -1,0 +1,48 @@
+{
+  "name": "sports-founder",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Sports Founder: invent a sport and grow it into a global phenomenon.",
+  "type": "module",
+  "main": "./out/main/index.js",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "npm run check:purity && electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc -p tsconfig.pure.json && tsc -p tsconfig.node.json && tsc -p tsconfig.web.json",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "check:purity": "tsx scripts/check-purity.ts",
+    "test": "vitest run",
+    "sim": "tsx src/runner/cli.ts",
+    "smoke": "npm run build && tsx scripts/smoke.ts",
+    "check": "npm run typecheck && npm run lint && npm run check:purity && npm run test"
+  },
+  "dependencies": {
+    "comlink": "4.4.2",
+    "i18next": "26.4.2",
+    "pure-rand": "8.4.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-i18next": "17.0.14",
+    "yaml": "2.9.1",
+    "zod": "4.6.4",
+    "zustand": "5.0.15"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.13",
+    "@types/node": "24.13.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "5.2.0",
+    "electron": "44.3.0",
+    "electron-vite": "5.0.0",
+    "tsx": "4.23.13",
+    "typescript": "5.9.3",
+    "vite": "7.3.6",
+    "vitest": "5.0.0"
+  }
+}

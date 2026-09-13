@@ -1,0 +1,9 @@
+{
+  "//": "Simulation core + content schemas. No DOM and no Node types: using a browser or Node global here is a type error.",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": []
+  },
+  "include": ["src/sim/**/*.ts", "src/content/**/*.ts"]
+}

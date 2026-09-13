@@ -1,0 +1,13 @@
+# Display names for every country and rival sport, in one moddable file (GDD Rival AI naming
+# boundary). PLACEHOLDER: all invented.
+
+countries:
+  valdoria: Valdoria
+  kestmark: Kestmark
+  oruna: Oruna
+  sallavi-isles: Sallavi Isles
+  brenholt: Brenholt
+
+sports:
+  fieldball: Fieldball
+  longbat: Longbat

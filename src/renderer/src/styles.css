@@ -1,0 +1,92 @@
+:root {
+  color-scheme: light;
+  font-family: Georgia, "Times New Roman", serif;
+  color: #2b2620;
+  background: #f3eee2;
+}
+
+body {
+  margin: 0;
+}
+
+.screen {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2.2rem;
+}
+
+.subtitle,
+.meta {
+  margin: 4px 0 0;
+  color: #6b6153;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 24px 0 8px;
+}
+
+.stat {
+  padding: 8px 12px;
+  border: 1px solid #cfc4ad;
+  background: #fbf8f1;
+}
+
+.stat-turn {
+  font-weight: bold;
+}
+
+.fans {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+}
+
+.fans caption {
+  text-align: left;
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.fans th,
+.fans td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #ddd3bf;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.fans th[scope="row"],
+.fans th[scope="col"]:first-child {
+  text-align: left;
+}
+
+.fans tr.player th[scope="row"] {
+  color: #9a3b1e;
+}
+
+.end-turn {
+  font: inherit;
+  font-size: 1.1rem;
+  padding: 10px 28px;
+  border: 2px solid #2b2620;
+  background: #2b2620;
+  color: #f3eee2;
+  cursor: pointer;
+}
+
+.end-turn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.error {
+  color: #9a1e1e;
+}

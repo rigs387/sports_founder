@@ -1,0 +1,45 @@
+{
+  "app": {
+    "title": "Sports Founder",
+    "subtitle": "Foundation build: placeholder simulation, no map yet."
+  },
+  "status": {
+    "loading": "Setting up the backyard…",
+    "simulating": "Simulating…",
+    "error": "The simulation stopped: {{message}}"
+  },
+  "turn": {
+    "heading": "Current turn",
+    "label": "Turn {{turn, number}}",
+    "date": "Q{{quarter}} {{year}}",
+    "tier": "PP tier {{tier}}: {{name}}",
+    "pp": "{{pp, number(maximumFractionDigits: 0)}} PP",
+    "length_one": "Turn length: {{count}} quarter",
+    "length_other": "Turn length: {{count}} quarters"
+  },
+  "tiers": {
+    "1": "Backyard Game",
+    "2": "Local Curiosity",
+    "3": "National Pastime",
+    "4": "International Sport",
+    "5": "Global Religion"
+  },
+  "campaign": {
+    "meta": "Seed {{seed}} · Anchor country: {{country}}"
+  },
+  "fans": {
+    "heading": "World fans",
+    "sport": "Sport",
+    "uninterested": "Uninterested",
+    "casual": "Casual",
+    "hardcore": "Hardcore",
+    "score": "Fandom Score",
+    "yourSport": "Your sport"
+  },
+  "format": {
+    "count": "{{value, number(maximumFractionDigits: 0)}}"
+  },
+  "actions": {
+    "endTurn": "End Turn"
+  }
+}

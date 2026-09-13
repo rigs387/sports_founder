@@ -1,0 +1,60 @@
+# Balance config. Every tunable number lives in content files like this one, never in code.
+#
+# PLACEHOLDER VALUES: these drive the Phase 0 skeleton's stand-in dynamics only. The real fan,
+# spread, PP, and tier models (GDD Progression & Economy) replace them later.
+
+calendar:
+  # Present-day start (GDD Rival AI).
+  startYear: 2026
+
+start:
+  # The founder's friends and family (GDD Starting state).
+  anchorHardcoreFans: 40
+  anchorCasualFans: 400
+  startingPP: 10
+  startingTier: 1
+
+fandomScore:
+  # Fandom Score = hardcore + casual × casualWeight.
+  casualWeight: 0.3
+
+ppIncome:
+  # PP earned per quarter = scale × (player Fandom Score ^ exponent).
+  # An exponent below 1 gives diminishing returns.
+  scale: 0.05
+  exponent: 0.5
+
+# PP tier table. Turn length is in quarters (1 = quarter, 2 = half-year, 4 = year).
+# PLACEHOLDER promotion rule: Fandom Score threshold only (the GDD breadth conditions come later).
+ppTiers:
+  - tier: 1
+    fandomScoreRequired: 0
+    turnLengthQuarters: 1
+  - tier: 2
+    fandomScoreRequired: 20000
+    turnLengthQuarters: 1
+  - tier: 3
+    fandomScoreRequired: 250000
+    turnLengthQuarters: 2
+  - tier: 4
+    fandomScoreRequired: 1500000
+    turnLengthQuarters: 2
+  - tier: 5
+    fandomScoreRequired: 4000000
+    turnLengthQuarters: 4
+
+# PLACEHOLDER quarterly fan dynamics, per sport kind. Rates are fractions per quarter.
+dynamics:
+  # Each flow is multiplied by a random factor in [1 - noise, 1 + noise].
+  noise: 0.2
+  player:
+    # Uninterested → casual, scaled by the sport's local reach (word of mouth).
+    casualConversionRate: 0.35
+    # Casual → uninterested.
+    casualChurnRate: 0.08
+    # Casual → hardcore, scaled by the share of people with no hardcore sport yet.
+    hardcoreConversionRate: 0.02
+  rival:
+    casualConversionRate: 0.02
+    casualChurnRate: 0.01
+    hardcoreConversionRate: 0.001
