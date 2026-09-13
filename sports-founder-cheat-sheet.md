@@ -29,6 +29,14 @@ locally. Player pushes markets with limited focus slots (more at higher tiers).
 **PP Income:** Base income from Fandom Score (diminishing returns) + story/milestone bonuses
 collected as clickable map pickups. Costs rise per tier. All numbers in config.
 
+**Business Layer:** Per-country cash. Gate (hardcore × wealth, venue-capped), TV (casual ×
+media market), sponsors (reach × wealth); multi-year deals in seasonal windows, some with demands.
+Costs: payroll, operations, venues. Cash builds local hardcore via venues/youth, never PP. No
+cross-country transfers; PP-funded bailouts. Phase 0: gate + one media/sponsor line.
+
+**Growth Tree:** Branching tree per category (~8–12 nodes), global nodes conditioned on country
+attributes, exclusive forks, no refunds, cost = base × current tier multiplier.
+
 **Events:** Moments (auto) + decision cards (capped per turn), built only from recorded sim facts,
 using a closed list of effect types. Negative events grow with tier.
 
@@ -57,6 +65,10 @@ crises arrive as decision cards.
 
 **Loss Condition:** Your starting/anchor country's league fully collapses.
 
+**Setup:** Pick any anchor country (auto 1–5 star difficulty with deadpan reasons) → design
+genome with anchor-only hints → name sport and founding club, preset, optional seed. Focus slot
+starts on anchor.
+
 **Campaign:** ~10–15 hours to first win (~120 in-game years; you're the founding family).
 Replay via anchor country + genome; anchor difficulty rating + Easy/Normal/Hard. Multiple save
 slots.
@@ -66,8 +78,14 @@ tree, persistent league/team/player sim, event/storytelling generator, rival-spo
 business layer (sponsors/TV/Cash), rules-evolution system.
 
 **Phase 2 Systems (later, same build):** Venue growth, Hall of Fame, press coverage,
-World Cup/Olympics (scripted, every 4 years), national teams, awards, custom
-scenarios + Steam leaderboards, 9x16 camera-friendly design pass.
+World Championship (player-founded and named, every 4 years, player picks host), national teams
+(best players by nationality), awards, scenarios (YAML data files, scenario-only leaderboards, suspend-save ranked runs with fixed seeds,
+Weekly Challenge, ~6–10 at launch incl. 1900 start), 9x16 camera-friendly design pass.
+
+**Legacy & Flavor:** Hall of Fame (auto classes from records; inductees add hardcore stickiness at
+home), awards (Player of the Season/Year), press (presentation only, fictional outlets, front
+pages). Lightweight versions in Phase 1. Venues and youth programs are league-level 1–5 ratings
+bought with cash.
 
 **Economy:** PP (global, sport traits/nodes) → unlocks better Cash opportunities (per-country,
 league business). One-directional. 5 PP tiers = "growing pains" tension: Backyard Game → Local
@@ -77,6 +95,12 @@ failure (wide gap, N-turn countdown, cooldown). League
 Health Ladder per country: Healthy → Struggling → Near-Collapse → Collapsed.
 
 **Tone:** Dry sports humor, deadpan, almanac-with-a-wink.
+
+**UI & Onboarding:** Map is home; panels overlay it; every screen one click away. Six map
+lenses (fandom, rivals, league health, finances, spread, affinity). Guided first campaign with
+Founder's Notebook tips; quick-start genome templates; plain-language tooltips. Steam Deck and
+controller from day one. Accessibility baseline (colorblind-safe patterns, scaling, rebinding,
+reduced motion). English for EA; 1.0 languages by wishlist geography. Music postponed; SFX late.
 
 **Showing the Sport:** Genome-generated rulebook with dated amendments (Phase 0), field diagram
 (Phase 1), player-made logo/ball/kit + 9x16 image export (Phase 2). Markets follow sports-body
@@ -91,3 +115,4 @@ conventions (e.g., UK home nations separate); contested areas neutral.
 - The heatmap must be *earned* by story — never let growth feel like a bare number climbing.
 - Rival sports are the antidote, not the villain — they defend turf, they don't hunt you.
 - Every system serves the inventor→operator arc; if it doesn't, question why it's there.
+- Force hard decisions — no refunds, no delaying tier-ups, no dodging growing pains.

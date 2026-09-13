@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.1 | September 12, 2026 — design prerequisites resolved*
+*Version 1.2 | September 13, 2026 — all core and Phase 2 design decisions made*
 
 ---
 
@@ -63,9 +63,22 @@ turn. Longer turns change how often the player decides, not the economy's math.
 | Decision cards | 0–1 | 2 | 2–3 |
 | Target real time per turn | ~1 min | ~3–5 min | ~5–8 min |
 
-Opening: design the sport (genome), name it, choose the anchor country. The anchor country starts
-with a tiny founding amateur league on turn 1, so the loss condition is live from the start; early
-tuning keeps early collapse very unlikely.
+**Campaign setup:**
+1. **Choose the anchor country** — every market is selectable (yes, Tuvalu). Each shows an
+   automatic 1–5 star difficulty rating with short deadpan reasons ("Isolated: few neighbors."
+   "Cricket is not a hobby here."), computed from population, wealth, rival hardcore saturation,
+   neighbor/language connectivity, and media market size (weights in config). A few recommended
+   starts are highlighted for first-time players.
+2. **Design the genome** — with qualitative hints (+ / ++ / −) for the anchor country only. No
+   world affinity preview; where the sport catches on abroad is discovered in play.
+3. **Name the sport and the founding club** (generated default, editable); choose difficulty preset
+   (Easy / Normal / Hard); optional visible, shareable seed.
+
+**Starting state:** the anchor country has a tiny founding Amateur league, a tiny hardcore base
+(the founder's friends and family), and a small casual base. The player has a small PP stash. The
+single focus slot starts on the anchor but can be moved, so attention tension begins on turn 1.
+The loss condition is live from the start; early tuning keeps early collapse very unlikely. All
+starting values in config.
 
 **League attention (no inbox):** League operator decisions surface through three mechanisms, with
 no list or inbox anywhere:
@@ -172,16 +185,22 @@ Systems 9–16 are real, planned, later-phase work in the same continuous build.
 7. Sponsor/TV/advertiser business layer — the operator-phase engine.
 8. Rules-evolution system — the inventor identity's ongoing hook, available post-creation.
 
+**Phase 1 additions (decided 2026-09-13):** lightweight versions of Hall of Fame, awards, and press
+coverage move into Phase 1 — they are how stories reach the player, so the event generator can't
+be judged without them. A simple venue capacity level is also needed in Phase 1 because gate
+revenue is capped by it. Fuller versions remain in Phase 2.
+
 **Phase 2 — Depth & richness (later-phase, same continuous build):**
 9. Venue growth (mechanical — attendance accelerates casual → hardcore conversion; built
    alongside the business layer, not standalone).
 10. Hall of Fame — a global "shrine," a persistent visible store of accumulated legacy/popularity
     over time.
 11. Press coverage — flavor layer riding on top of the event generator.
-12. World Cup / Olympics — scripted, single-elimination tournament, every 4 years, using existing
-    team-strength ratings (not a full qualification simulation).
+12. World Championship — the sport's own World Cup-style tournament: scripted, single-elimination,
+    every 4 years, using existing team-strength ratings (not a full qualification simulation). No
+    multi-sport Games/Olympics equivalent.
 13. National teams — lightweight roster-pull from top club players, built to support the
-    World Cup/Olympics event.
+    World Championship.
 14. Awards (e.g., league MVP) — pure content flavor.
 15. Custom scenarios/challenges + Steam leaderboards — replayability layer, depends on a complete,
     tunable core loop. Planned scenario: a historical start (~1900) where the player's sport
@@ -290,6 +309,66 @@ scoring frequency, rules complexity, physical profile (speed / strength / precis
 - **Negative events** (scandals, star injuries, rival coups) occur throughout and grow more
   frequent at higher PP tiers, reinforcing growing pains and feeding late-game pressure.
 
+**PP Growth Tree:**
+- **Structure:** a small branching tree per category (~8–12 nodes each) with prerequisites inside
+  the category. Phase 0 builds Grassroots and Media only (~15–20 nodes).
+- **Closed effect vocabulary:** spread channel strength, casual conversion, hardcore conversion,
+  churn reduction, league formation threshold, cold-launch cost, PP income, cash opportunity
+  unlocks, running cost reduction, backlash resistance, rival countermove resistance. Validated at
+  load.
+- **Global but conditional.** Every node applies worldwide, but many are conditioned on country
+  attributes (e.g., "Street courts: +casual conversion in dense, lower-income countries"), so
+  builds synergize with the genome and target map.
+- **Category roles:**
+
+| Category | Unlocks at tier | Role |
+|---|---|---|
+| Grassroots | 1 | Proximity spread, casual conversion, league formation, churn |
+| Media | 2 | Media reach and language channels, casual reach, TV cash unlocks |
+| Infrastructure | 3 | Hardcore conversion (venues, academies), running costs, promotion eligibility |
+| Culture | 4 | Hardcore stickiness, rule-change backlash and anchor resentment resistance, generational turnover |
+| Global | 5 | Cold launches, rival defense budget reduction, flagship bonuses, holding #1 |
+
+- **Exclusive forks:** 1–2 per category; choosing one locks out the other (e.g., Pay-TV exclusivity:
+  +cash, −casual reach vs. Free-to-air: +casual reach, −cash).
+- **No refunds.** Purchased nodes are permanent — choices must hurt.
+- **Cost:** base cost × current PP tier multiplier. Buying before a tier-up is cheaper, rewarding
+  preparation for growing pains.
+
+**World Championship & National Teams (Phase 2):**
+- **Founding:** the player founds and names the World Championship (default name provided) once
+  enough countries have leagues. Held every 4 years. The multi-sport Games route is not used.
+- **Effects:** a casual conversion burst in every participating country plus PP pickups.
+  **Hosting:** countries bid in the seasonal window and the player picks the host, which gains a
+  large hardcore conversion and cash boost — a strategic tool for cracking a target market.
+- **Field:** countries with a league at Semi-Pro or above, plus the host; 16 or 32 teams depending
+  on eligibility; seeded by strength. No qualification simulation.
+- **National team strength:** built from the best players of that nationality wherever they play
+  club football — a country without a pro league can field a strong team from stars abroad.
+- **Upsets:** matches are simulated with genuine upset chances; an underdog's deep run gives a
+  large boost in that country ("Tuvalu reaches the semifinal").
+
+**Hall of Fame:** Annual classes selected automatically from retained records (career thresholds in
+config). Wings: players, commissioners, founding-family members, and a Moments wing for landmark
+events. Each induction is a 9x16 key moment. Mechanical effect: each inductee adds permanent
+hardcore stickiness in their home country.
+
+**Awards:** Player of the Season per league and a global Player of the Year. Mostly flavor — they
+feed Hall of Fame eligibility, raise star power (affecting transfers toward the flagship), and name
+names in stories.
+
+**Press coverage:** Presentation only; no press sentiment system. Fictional outlets per country
+(in the names data file); headlines built from record-backed Moments, with English-only flavor
+variety. Big turns can show a newspaper-style front page in the recap (a 9x16 candidate).
+
+**Venues & youth programs:** Each league has a venue capacity level (1–5) and a youth program level
+(1–5) — no individual stadiums or academies.
+- *Venues:* bought with cash in the seasonal window; take multiple turns to build; raise the gate
+  revenue cap, add hardcore conversion, add upkeep.
+- *Youth programs:* bought with cash; upkeep; accelerate hardcore conversion and improve homegrown
+  player quality (stronger national teams).
+- Simple version in Phase 1; Phase 2 adds depth (e.g., a named stadium for the flagship league).
+
 **Config rule:** Every tunable number — conversion rates, weights, costs, curves, thresholds, turn
 lengths — lives in config files. No balance values in code.
 
@@ -335,9 +414,30 @@ is how popularity reaches the business layer without Cash feeding PP.
   independently per country's top-flight league (not pooled globally).
 
 **Currency relationship:** One-directional. Higher PP tier unlocks better Cash opportunities
-(sponsors take a maturing sport seriously). Cash does not feed back into PP.
+(sponsors take a maturing sport seriously), and PP can fund emergency league bailouts. Cash never
+produces PP; it can only build fans locally through venues and youth programs.
 
 **Cash sources:** Gate revenue (attendance × venue size), TV deals, sponsorships.
+
+**Business Layer (per country league):**
+- **Revenue:** *gate* = hardcore fans × country wealth, capped by venue capacity; *TV* = casual
+  reach × media market size; *sponsors* = total reach × wealth. PP tier caps the size of TV and
+  sponsor deals on offer.
+- **Costs:** payroll (from contracts; scales with player quality and league tier), operations
+  (base cost by league tier), venue upkeep, commissioner salary (Phase 1).
+- **Deals:** TV and sponsor deals are multi-year contracts offered in the seasonal window — length,
+  annual value, and sometimes a demand (rule-change proposal, exclusivity, "stay Professional or
+  above"). Standing policy accepts or rejects outside focus countries. Long deals trade security
+  for locked terms.
+- **Cash can build fans locally and indirectly.** Cash funds venues and youth programs that
+  accelerate casual → hardcore conversion in that country. Cash never produces PP directly.
+- **No transfers between countries.** A league in trouble can receive an **emergency bailout paid
+  in PP** — expensive, with a cooldown (PP → Cash is the permitted direction).
+- **League health** is evaluated each turn from cash runway (turns of losses reserves can cover),
+  cash flow trend, and the country's hardcore fan trend; it moves at most one step per turn.
+- **Phase 0 subset:** gate revenue plus one combined "media & sponsor" revenue line; running cost =
+  league tier × country wealth; League Health Ladder, league promotion, and PP bailout included.
+  No individual deals, payroll detail, or venues.
 
 **Global PP Tier Track:** 5 qualitative tiers, from minor sport to global phenomenon. Crossing a
 tier unlocks new growth nodes/abilities but raises expectations and requirements — the "growing
@@ -429,8 +529,19 @@ ground you'd invested in, or worst of all, warning signs appearing in your ancho
 your attention is elsewhere.
 
 **Run structure:** Single continuous campaign toward global #1. Custom scenarios/challenges
-(Phase 2, Steam leaderboard support) are expected to use a separate, shorter run structure distinct
-from the main campaign — exact format TBD when that system is scoped.
+(Phase 2) use a separate, shorter run structure:
+
+- **Scenario = data file** (same YAML/Zod pipeline, moddable): start state (anchor, era, rival
+  strength, optional preset genome), modifiers (e.g., no Media tree, rules locked, rivals start
+  Entrenched), goal (e.g., overtake cricket in India), and turn limit.
+- **Leaderboards are scenario-only.** The main campaign has no leaderboard.
+- **Scoring** is defined per scenario; default is fewest turns to goal, tie-break final Fandom Score.
+- **Ranked integrity:** ranked runs use a single suspend save (quit and resume, no reloading) and a
+  fixed seed per scenario so everyone plays the same world. Unranked scenario play allows normal
+  saves. File-copy cheating is accepted for casual leaderboards.
+- **Weekly Challenge:** rotating seed plus random modifier set, one ranked attempt per week.
+- **Launch content:** ~6–10 hand-made scenarios at Phase 2 launch, including the ~1900 historical
+  start. Steam Workshop support is post-launch; files are moddable from day one.
 
 **Campaign length:** Target ~10–15 hours to the first win (~180 turns, ~120 in-game years).
 Starting budget, all values in config and tuned by balance runs:
@@ -484,6 +595,53 @@ markets, and England, Scotland, Wales, and Northern Ireland are separate markets
 Natural Earth de facto boundaries; contested areas are drawn with neutral hatching and belong to
 no market.
 
+**Onboarding:**
+- **Guided first campaign:** a dismissible "Founder's Notebook" shows short tips the first time
+  each system appears. Tier-gated unlocks provide progressive disclosure, so the tier structure
+  does most of the teaching. No separate tutorial scenario.
+- **Quick start:** preset genome templates (e.g., "Backyard Kickball," "Ice Paddle") plus a
+  highlighted easy anchor. Custom genome design remains the default.
+- **Explanatory tooltips:** hovering a number gives a short plain-language explanation of its main
+  drivers (e.g., "Growing fast: your focus here, strong climate fit, Street Courts") — not literal
+  formulas. Nested tooltips supported. (A formula breakdown may exist in a developer-only mode for
+  balance work.)
+
+**Screen structure (map-centric):** The world map is home and always underneath; every screen is
+one click away, and panels overlay the map rather than replacing it.
+
+| Screen | Form |
+|---|---|
+| World map | Home |
+| Country panel | Slide-out over map: fans, league, rivals, finances, policies |
+| Sport | Genome, rulebook, rules evolution |
+| Growth tree | Full screen |
+| Leagues overview | Sortable table the player opens on demand (pull, not push — not an inbox) |
+| Almanac | History, Hall of Fame, records |
+| Recap / decision cards | Turn-start overlays |
+
+**Map lenses:** your fandom (hardcore/casual), rival dominance, league health, finances, spread
+channels, and affinity (shown only for countries with existing exposure, preserving discovery).
+
+**Steam Deck / controller:** designed in from the start — full controller navigation, readable at
+1280×800.
+
+**Audio:** Music is postponed — not a design priority (players commonly bring their own). Sound
+effects come very late in production; direction then: crowd murmur scaled to fandom when hovering
+a country, a distinctive pickup sound, no voice acting.
+
+**Accessibility baseline (from the start):** colorblind-safe heatmaps (patterns and alternate
+palettes, not color alone), UI and text scaling, rebindable controls, reduced-motion option for
+key moments. Turn-based play means no time pressure.
+
+**Localization:**
+- English only for Early Access; 1.0 languages chosen from wishlist geography (likely French,
+  German, Spanish, Brazilian Portuguese, Simplified Chinese).
+- Event templates are written translation-ready from the start: short lines, no concatenated
+  sentence fragments, names and numbers as variables. Grammar-assembled flavor text stays
+  English-only.
+- Territory names follow international sports-body naming (e.g., "Chinese Taipei"), set in the
+  moddable names data file.
+
 **Camera-friendly design constraint:** Key moments — tier-ups, championships, storyline beats,
 Hall of Fame inductions — should render as visually clean, high-contrast, single-focal-point
 screens, filmable in vertical (9x16) video without a dedicated export mode. This is a standing
@@ -528,11 +686,9 @@ deadline forcing exclusions. Instead:
 
 Items flagged during the interview that need further discussion in future sessions:
 
-- Custom scenario/challenge run structure and Steam leaderboard scoring metric.
-- Leaderboard integrity: with normal saves and reloading allowed, how scenario/leaderboard runs
-  prevent save-scumming (e.g., scenario-only restrictions).
 - Win hold duration (likely resolved): the win almost certainly occurs at PP tier 5, where turns
   are years, so "X turns" ≈ X years. Confirm in balance runs.
-- Production gaps (tech plan §3, item 13): onboarding/tutorial, UI information architecture,
-  audio, accessibility, localization, price/DLC, target audience, competitor analysis, playtest
-  plan with success metrics.
+- Music direction: postponed by choice; revisit late in production if ever.
+- Commercial decisions — deferred by choice (2026-09-13): price, Early Access timing, demo scope,
+  DLC, Steam page timing, platforms. Tech plan §11 holds the current thinking.
+- Competitor analysis: a thorough Steam tag sweep (research task, not a design decision).

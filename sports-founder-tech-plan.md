@@ -31,6 +31,7 @@ surface before playtesting or during it.
 | 2026-09-12 | Add a **Phase 0 vertical slice** ahead of GDD Phase 1 | Recommended |
 | 2026-09-12 | Supporting libraries per Section 6 | Recommended; confirm at project setup |
 | 2026-09-12 | Electron/Steam version policy per Section 8 | Decided |
+| 2026-09-13 | GDD design questions resolved through Phase 2 systems (GDD v1.1+) | Decided |
 
 ---
 
@@ -55,8 +56,27 @@ answers "is the spreading heatmap fun?" in under a year.
 
 **Estimate:** ~300–500 hours. At 10 hrs/week, roughly 8–12 months.
 
-**Exit criteria:** Playtesters voluntarily replay; genome choices produce visibly different spread
-patterns; headless runs show no dominant strategy and no trivially safe anchor country.
+**Exit criteria (decided 2026-09-13):** The developer playtests extensively; there are no formal
+external human playtest gates. Phase 0 exits when heavy headless balancing meets the following
+starting targets (thresholds adjustable as data arrives):
+
+- **Genome differentiation:** with anchor and seeds held constant, contrasting genomes share fewer
+  than half of their top-10 fandom countries, verified across many seeds.
+- **No dominant genome:** no single trait option appears in more than 40% of top-quartile runs.
+- **No safe anchor:** every anchor country has a nonzero collapse rate under a naive strategy.
+- **Hard anchors are winnable:** the best bot wins from Tuvalu some of the time.
+- **Pacing:** time to each PP tier falls within ±30% of the GDD campaign budget table.
+- **Rivals persist:** no rival is ever fully eliminated.
+- **Determinism:** identical seed and inputs produce identical complete state, including after a
+  mid-campaign save/load.
+- **Performance:** a 120-year headless campaign completes within a set time budget; the 120-year
+  save size benchmark is recorded.
+- **Steam:** test achievement unlocks in a packaged build.
+
+**Bot playtesters:** strategy bots act only through the same legal actions as the player. Starting
+set: random, greedy-spread, anchor-turtle, media-rush. Every outcome is reported, including losses
+— never silently counted as a pass. Candidate addition: AI-agent playtesters that play through the
+real UI and report confusion or unexplained outcomes.
 
 Phase 0 work is not throwaway — it becomes the foundation of Phase 1.
 
@@ -102,7 +122,7 @@ The GDD defers black-hole analysis until after Phase 1. This plan names the obvi
 
 ### 2.5 Recommended Phase 1 Adjustments
 
-- Pull **lightweight press coverage, awards, and Hall of Fame** into Phase 1. They are how stories
+- **Decided 2026-09-13:** Pull **lightweight press coverage, awards, and Hall of Fame** into Phase 1. They are how stories
   reach the player, so the story generator's value is hard to judge without them.
 - Keep **rival AI** and **rules evolution** deliberately simple in Phase 1; deepen in Phase 2.
 - National teams and the World Cup/Olympics equivalent stay in Phase 2.
@@ -130,10 +150,9 @@ These come from the GDD review. Items 1–4 must be specified before Phase 0 imp
 | 12 | ~~**Real vs. fictional world**~~ | **Resolved 2026-09-12** — see GDD Rival AI and Map and markets | Real sport names; generic/fictional leagues, governing bodies, tournaments, teams, players; all real-world-facing names in one moddable data file. Markets follow sports-body conventions; Natural Earth de facto boundaries with neutral hatching for contested areas. Get a legal check before the Steam page |
 | 13 | **Standard production gaps** | Needed before Early Access | Onboarding/tutorial, UI information architecture, difficulty, audio, accessibility, localization, price/DLC, target audience, competitor analysis, playtest plan with success metrics |
 
-As of 2026-09-12, items 1–12 are resolved in the GDD (v1.1), along with the original parking-lot
-items for PP tiers, rival AI triggers, and tiered simulation depth. Still open: item 13 (production
-gaps), scenario/leaderboard format and integrity (Phase 2), and confirming the win-hold measure in
-balance runs.
+As of 2026-09-13, items 1–12 are resolved in the GDD, along with all original parking-lot items.
+Item 13 is resolved except commercial decisions (deferred by choice), competitor analysis
+(research), and music (postponed). The win-hold measure is to be confirmed in balance runs.
 
 ---
 
@@ -431,7 +450,8 @@ All YAML content is validated by Zod schemas. Invalid content fails loudly with 
 field.
 
 ### 9.3 Balance Workflow
-1. Headless Node runner executes N seeded campaigns with configurable strategies.
+1. Headless Node runner executes N seeded campaigns with strategy bots that use only legal player
+   actions (Section 2.1).
 2. Results written to CSV/JSON.
 3. Analyzed with Python + pandas (notebooks) or DuckDB.
 4. Target metrics tracked per build, for example: anchor collapse rate, time to each PP tier,
@@ -548,7 +568,7 @@ To be copied into `CLAUDE.md` when the repository is created:
 ## 13. Next Steps
 
 1. ~~**Resolve design prerequisites 1–4**~~ — done 2026-09-12 (GDD v1.1), along with items 5–12.
-2. Define Phase 0 exit criteria in measurable terms.
+2. ~~Define Phase 0 exit criteria in measurable terms.~~ — done 2026-09-13 (Section 2.1).
 3. Create the repository: Git, electron-vite + React + TypeScript strict, Biome, Vitest, and
    `CLAUDE.md` from Section 10.
 4. First technical proof: steamworks.js test achievement + Steam overlay working in a packaged
