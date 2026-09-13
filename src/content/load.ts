@@ -1,21 +1,22 @@
 import { parse } from "yaml";
 import type { ZodType } from "zod";
+import { deriveWorld, startingRivalFanCounts, startingSportCulture, type World } from "./derive";
+import { optionDeltaRange } from "./genome";
+import { AXIS_IDS, GENOME_AXES } from "./genome-axes";
 import {
-  type Config,
-  type Country,
   configFileSchema,
   countriesFileSchema,
-  type FanShares,
-  type Names,
+  genomeFileSchema,
+  LEVERS,
   namesFileSchema,
-  PLAYER_SPORT_ID,
-  type RivalSport,
+  RESERVED_SPORT_IDS,
   sportsFileSchema,
 } from "./schemas";
 
 export const CONTENT_FILES = {
   countries: "countries.yaml",
   sports: "sports.yaml",
+  genome: "genome.yaml",
   names: "names.yaml",
   config: "config.yaml",
 } as const;
@@ -27,14 +28,6 @@ export interface ContentSource {
 }
 
 export type ContentSources = Record<keyof typeof CONTENT_FILES, ContentSource>;
-
-/** Validated, static game content. The simulation reads it; it never changes during a campaign. */
-export interface World {
-  countries: Country[];
-  rivals: RivalSport[];
-  names: Names;
-  config: Config;
-}
 
 export interface ContentIssue {
   file: string;
@@ -61,18 +54,6 @@ export function formatPath(path: readonly PropertyKey[]): string {
     else out += out === "" ? String(key) : `.${String(key)}`;
   }
   return out === "" ? "(root)" : out;
-}
-
-/** Starting rival fan counts for a country. Shared by validation and campaign setup. */
-export function startingRivalFanCounts(
-  population: number,
-  shares: FanShares | undefined,
-): { casual: number; hardcore: number } {
-  if (!shares) return { casual: 0, hardcore: 0 };
-  return {
-    casual: Math.floor(population * shares.casual),
-    hardcore: Math.floor(population * shares.hardcore),
-  };
 }
 
 function parseSource<T>(
@@ -109,18 +90,21 @@ export function loadWorld(sources: ContentSources): World {
   const issues: ContentIssue[] = [];
   const countriesFile = parseSource(sources.countries, countriesFileSchema, issues);
   const sportsFile = parseSource(sources.sports, sportsFileSchema, issues);
+  const genome = parseSource(sources.genome, genomeFileSchema, issues);
   const names = parseSource(sources.names, namesFileSchema, issues);
   const config = parseSource(sources.config, configFileSchema, issues);
-  if (!countriesFile || !sportsFile || !names || !config) {
+  if (!countriesFile || !sportsFile || !genome || !names || !config) {
     throw new ContentValidationError(issues);
   }
 
-  const world: World = {
+  const world = deriveWorld({
     countries: countriesFile.countries,
     rivals: sportsFile.rivals,
+    otherSports: sportsFile.otherSports,
+    genome,
     names,
     config,
-  };
+  });
   checkCrossReferences(world, sources, issues);
   if (issues.length > 0) throw new ContentValidationError(issues);
   return world;
@@ -130,27 +114,47 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
   const issue = (source: ContentSource, field: string, message: string) =>
     issues.push({ file: source.path, field, message });
 
+  // ---- Sports ------------------------------------------------------------------------------
   const rivalIds = new Set<string>();
   world.rivals.forEach((rival, i) => {
-    if (rival.id === PLAYER_SPORT_ID) {
-      issue(
-        sources.sports,
-        `rivals[${i}].id`,
-        `"${PLAYER_SPORT_ID}" is reserved for the player's sport`,
-      );
+    if (RESERVED_SPORT_IDS.includes(rival.id)) {
+      issue(sources.sports, `rivals[${i}].id`, `"${rival.id}" is a reserved sport id`);
     }
     if (rivalIds.has(rival.id))
       issue(sources.sports, `rivals[${i}].id`, `duplicate id "${rival.id}"`);
     rivalIds.add(rival.id);
   });
 
-  const countryIds = new Set<string>();
+  // ---- Countries ---------------------------------------------------------------------------
+  const countryIds = new Set(world.countries.map((country) => country.id));
+  const seen = new Set<string>();
   const { start } = world.config;
   world.countries.forEach((country, i) => {
     const at = `countries[${i}]`;
-    if (countryIds.has(country.id))
-      issue(sources.countries, `${at}.id`, `duplicate id "${country.id}"`);
-    countryIds.add(country.id);
+    if (seen.has(country.id)) issue(sources.countries, `${at}.id`, `duplicate id "${country.id}"`);
+    seen.add(country.id);
+
+    const linked = new Set<string>();
+    for (const list of ["neighbors", "seaLinks"] as const) {
+      country[list].forEach((otherId, j) => {
+        const field = `${at}.${list}[${j}]`;
+        if (!countryIds.has(otherId)) {
+          issue(sources.countries, field, `unknown country "${otherId}"`);
+        } else if (otherId === country.id) {
+          issue(sources.countries, field, "a country cannot link to itself");
+        } else if (linked.has(otherId)) {
+          issue(sources.countries, field, `"${otherId}" is linked more than once`);
+        }
+        linked.add(otherId);
+      });
+    }
+    if (country.languages.secondary === country.languages.primary) {
+      issue(
+        sources.countries,
+        `${at}.languages.secondary`,
+        "secondary language sphere must differ from the primary",
+      );
+    }
 
     let rivalHardcore = 0;
     for (const [sportId, shares] of Object.entries(country.startingRivalFans)) {
@@ -163,13 +167,17 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
       }
       rivalHardcore += startingRivalFanCounts(country.population, shares).hardcore;
     }
-    if (rivalHardcore > country.population) {
+    const sportCulture = startingSportCulture(country, world.otherSports);
+    if (sportCulture > 1) {
       issue(
         sources.countries,
         `${at}.startingRivalFans`,
-        "hardcore shares across rivals exceed 1 (a person is hardcore about at most one sport)",
+        `hardcore shares across rivals and other sports total ${sportCulture.toFixed(3)}, above 1 (a person is hardcore about at most one sport)`,
       );
     }
+    const otherHardcore = Math.floor(
+      country.population * (world.derived[i]?.otherHardcoreShare ?? 0),
+    );
 
     // Every country is a selectable anchor, so the starting fan base must fit in each one.
     if (start.anchorCasualFans + start.anchorHardcoreFans > country.population) {
@@ -179,11 +187,11 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
         `starting anchor fans exceed the population of "${country.id}"`,
       );
     }
-    if (start.anchorHardcoreFans > country.population - rivalHardcore) {
+    if (start.anchorHardcoreFans > country.population - rivalHardcore - otherHardcore) {
       issue(
         sources.config,
         "start.anchorHardcoreFans",
-        `does not fit in "${country.id}" alongside rival hardcore fans`,
+        `does not fit in "${country.id}" alongside rival and other hardcore fans`,
       );
     }
 
@@ -192,6 +200,7 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
     }
   });
 
+  // ---- Names -------------------------------------------------------------------------------
   for (const nameId of Object.keys(world.names.countries)) {
     if (!countryIds.has(nameId)) issue(sources.names, `countries.${nameId}`, "unknown country id");
   }
@@ -204,6 +213,41 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
     if (!rivalIds.has(nameId)) issue(sources.names, `sports.${nameId}`, "unknown sport id");
   }
 
+  // ---- Genome ------------------------------------------------------------------------------
+  // Design rule (GDD "No universal best option"): every option helps somewhere and hurts
+  // somewhere. Checked over the whole attribute space, lever by lever.
+  for (const axis of AXIS_IDS) {
+    for (const option of GENOME_AXES[axis].options) {
+      const modifiers = world.genome.options[axis][option];
+      if (!modifiers) continue;
+      const ranges = optionDeltaRange(modifiers);
+      const hasDownside = LEVERS.some((lever) => ranges[lever].min < 0);
+      const hasUpside = LEVERS.some((lever) => ranges[lever].max > 0);
+      const field = `options.${axis}.${option}`;
+      if (!hasDownside) {
+        issue(
+          sources.genome,
+          field,
+          "has no downside anywhere: no lever ever goes negative for any country attributes (every option must hurt somewhere)",
+        );
+      }
+      if (!hasUpside) {
+        issue(
+          sources.genome,
+          field,
+          "has no upside anywhere: no lever ever goes positive for any country attributes",
+        );
+      }
+    }
+  }
+  const presetIds = new Set<string>();
+  world.genome.presets.forEach((preset, i) => {
+    if (presetIds.has(preset.id))
+      issue(sources.genome, `presets[${i}].id`, `duplicate id "${preset.id}"`);
+    presetIds.add(preset.id);
+  });
+
+  // ---- Config ------------------------------------------------------------------------------
   const tiers = world.config.ppTiers;
   tiers.forEach((tier, i) => {
     if (tier.tier !== i + 1) {
@@ -221,8 +265,29 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
         "must not be lower than the previous tier's",
       );
     }
+    if (previous && tier.focusSlots < previous.focusSlots) {
+      issue(
+        sources.config,
+        `ppTiers[${i}].focusSlots`,
+        "must not be lower than the previous tier's",
+      );
+    }
   });
   if (start.startingTier > tiers.length) {
     issue(sources.config, "start.startingTier", `no tier ${start.startingTier} in ppTiers`);
+  }
+  const weightTotal = AXIS_IDS.reduce(
+    (sum, axis) => sum + world.config.similarity.axisWeights[axis],
+    0,
+  );
+  if (weightTotal <= 0) {
+    issue(sources.config, "similarity.axisWeights", "at least one axis weight must be positive");
+  }
+  if (world.config.focus.exposedCost > world.config.focus.coldLaunchCost) {
+    issue(
+      sources.config,
+      "focus.exposedCost",
+      "must not exceed coldLaunchCost (existing exposure makes a push cheaper)",
+    );
   }
 }

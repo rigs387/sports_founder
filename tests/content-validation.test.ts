@@ -105,6 +105,115 @@ describe("content validation", () => {
     expect(error.message).toContain("countries.yaml at countries[1].startingRivalFans.hockey");
   });
 
+  it("a neighbor link to an unknown country names the file and field", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "countries.yaml", ["countries", 0, "neighbors", 0], setValue("atlantis"));
+    const error = loadError(dir);
+    expect(error.message).toContain("countries.yaml at countries[0].neighbors[0]");
+    expect(error.message).toContain('unknown country "atlantis"');
+  });
+
+  it("a sea link to itself and a duplicated link are rejected", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "countries.yaml", ["countries", 0, "seaLinks"], setValue([firstAnchor]));
+    expect(loadError(dir).message).toContain(
+      "countries[0].seaLinks[0]: a country cannot link to itself",
+    );
+
+    const dir2 = copyOfContent();
+    editYaml(dir2, "countries.yaml", ["countries", 0, "seaLinks"], setValue(["kestmark"]));
+    expect(loadError(dir2).message).toMatch(
+      /countries\[0\]\.seaLinks\[0\]: "kestmark" is linked more than once/,
+    );
+  });
+
+  it("a genome option outside the GDD table is rejected in a preset and in a rival", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "genome.yaml", ["presets", 0, "genome", "surface"], setValue("water"));
+    expect(loadError(dir).message).toContain("genome.yaml at presets[0].genome.surface");
+
+    const dir2 = copyOfContent();
+    editYaml(dir2, "sports.yaml", ["rivals", 1, "genome", "structure"], setValue("sets"));
+    expect(loadError(dir2).message).toContain("sports.yaml at rivals[1].genome.structure");
+  });
+
+  it("a missing or extra option modifier entry is rejected", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "genome.yaml", ["options", "surface", "ice"], remove);
+    expect(loadError(dir).message).toContain("genome.yaml at options.surface.ice");
+
+    const dir2 = copyOfContent();
+    editYaml(dir2, "genome.yaml", ["options", "surface", "water"], setValue({ base: {} }));
+    expect(loadError(dir2).message).toContain("genome.yaml at options.surface");
+  });
+
+  it("a modifier on an unknown lever, attribute or climate is rejected", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "genome.yaml", ["options", "surface", "ice", "base", "charm"], setValue(0.5));
+    expect(loadError(dir).message).toContain("genome.yaml at options.surface.ice.base");
+
+    const dir2 = copyOfContent();
+    editYaml(
+      dir2,
+      "genome.yaml",
+      ["options", "surface", "ice", "conditions", "affinity", "altitude"],
+      setValue(0.5),
+    );
+    expect(loadError(dir2).message).toContain("options.surface.ice.conditions.affinity");
+
+    const dir3 = copyOfContent();
+    editYaml(
+      dir3,
+      "genome.yaml",
+      ["options", "surface", "ice", "conditions", "affinity", "climate", "monsoon"],
+      setValue(0.5),
+    );
+    expect(loadError(dir3).message).toContain("options.surface.ice.conditions.affinity.climate");
+  });
+
+  it("an option with no downside anywhere is flagged (every option must hurt somewhere)", () => {
+    const dir = copyOfContent();
+    editYaml(
+      dir,
+      "genome.yaml",
+      ["options", "complexity", "simple"],
+      setValue({ base: { accessibility: 0.2 }, conditions: { affinity: { wealth: 0 } } }),
+    );
+    const error = loadError(dir);
+    expect(error.message).toContain("genome.yaml at options.complexity.simple");
+    expect(error.message).toContain("no downside anywhere");
+  });
+
+  it("an option that never helps is flagged too", () => {
+    const dir = copyOfContent();
+    editYaml(
+      dir,
+      "genome.yaml",
+      ["options", "scoring", "medium"],
+      setValue({ base: { depth: -0.1 } }),
+    );
+    const error = loadError(dir);
+    expect(error.message).toContain("genome.yaml at options.scoring.medium");
+    expect(error.message).toContain("no upside anywhere");
+  });
+
+  it("hardcore shares across rivals and other sports above 1 are rejected", () => {
+    const dir = copyOfContent();
+    editYaml(
+      dir,
+      "countries.yaml",
+      ["countries", 0, "startingRivalFans", "fieldball"],
+      setValue({ casual: 0.0, hardcore: 0.99 }),
+    );
+    expect(loadError(dir).message).toContain("countries[0].startingRivalFans");
+  });
+
+  it("a missing continent in the other-sports table is rejected", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "sports.yaml", ["otherSports", "hardcoreShareByContinent", "oceania"], remove);
+    expect(loadError(dir).message).toContain("sports.yaml at otherSports.hardcoreShareByContinent");
+  });
+
   it("a missing display name names the file and field", () => {
     const dir = copyOfContent();
     editYaml(dir, "names.yaml", ["countries", firstAnchor], remove);
@@ -114,9 +223,9 @@ describe("content validation", () => {
 
   it("a YAML syntax error names the file and line", () => {
     const dir = copyOfContent();
-    writeFileSync(join(dir, "sports.yaml"), "rivals:\n  - id: fieldball\n  - id: [longbat\n");
+    writeFileSync(join(dir, "names.yaml"), "countries:\n  valdoria: Valdoria\n  kestmark: [Kest\n");
     const error = loadError(dir);
-    expect(error.message).toContain("sports.yaml");
+    expect(error.message).toContain("names.yaml");
     expect(error.message).toMatch(/line \d+/);
   });
 
@@ -131,9 +240,9 @@ describe("content validation", () => {
 
   it("a missing file is named", () => {
     const dir = copyOfContent();
-    rmSync(join(dir, "names.yaml"));
+    rmSync(join(dir, "genome.yaml"));
     const error = loadError(dir);
-    expect(error.message).toContain("names.yaml");
+    expect(error.message).toContain("genome.yaml");
     expect(error.message).toContain("could not be read");
   });
 });

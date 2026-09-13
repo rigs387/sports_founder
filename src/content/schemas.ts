@@ -1,24 +1,32 @@
 import { z } from "zod";
+import { AXIS_IDS, type AxisId, GENOME_AXES, type Genome } from "./genome-axes";
 
 /** Reserved sport id for the player's own sport. Rivals may not use it. */
 export const PLAYER_SPORT_ID = "player";
+/** Reserved sport id for the passive "other sports" hardcore bucket. */
+export const OTHER_SPORT_ID = "other";
+export const RESERVED_SPORT_IDS: readonly string[] = [PLAYER_SPORT_ID, OTHER_SPORT_ID];
 
 const id = z
   .string()
   .regex(/^[a-z][a-z0-9-]*$/, "must be a lowercase id (letters, digits, hyphens)");
 const unitInterval = z.number().min(0).max(1);
+const delta = z.number().min(-2).max(2);
 
-// Provisional categories until the genome × country affinity model is designed in detail.
-export const climateSchema = z.enum(["cold", "temperate", "tropical", "arid"]);
+// ---- Countries -----------------------------------------------------------------------------
 
-export const countryAttributesSchema = z.strictObject({
-  climate: climateSchema,
-  wealth: unitInterval,
-  urbanDensity: unitInterval,
-  sportCulture: unitInterval,
-  mediaMarket: unitInterval,
-  languageGroup: id,
-});
+export const climateSchema = z.enum(["tropical", "arid", "temperate", "cold"]);
+export const CLIMATES = climateSchema.options;
+
+export const continentSchema = z.enum([
+  "africa",
+  "asia",
+  "europe",
+  "north-america",
+  "south-america",
+  "oceania",
+]);
+export const CONTINENTS = continentSchema.options;
 
 export const fanSharesSchema = z.strictObject({
   casual: unitInterval,
@@ -27,8 +35,15 @@ export const fanSharesSchema = z.strictObject({
 
 export const countrySchema = z.strictObject({
   id,
+  continent: continentSchema,
   population: z.int().positive(),
-  attributes: countryAttributesSchema,
+  climate: climateSchema,
+  incomePerPerson: z.number().positive(),
+  urbanShare: unitInterval,
+  languages: z.strictObject({ primary: id, secondary: id.optional() }),
+  neighbors: z.array(id).default([]),
+  seaLinks: z.array(id).default([]),
+  otherHardcoreShare: unitInterval.optional(),
   startingRivalFans: z.record(z.string(), fanSharesSchema).default({}),
 });
 
@@ -36,28 +51,119 @@ export const countriesFileSchema = z.strictObject({
   countries: z.array(countrySchema).min(1),
 });
 
-export const rivalSportSchema = z.strictObject({ id });
+// ---- Genome --------------------------------------------------------------------------------
+
+/** A complete genome: exactly one option per axis, no extra axes. */
+export const genomeSchema: z.ZodType<Genome> = z.strictObject({
+  surface: z.enum(GENOME_AXES.surface.options),
+  equipment: z.enum(GENOME_AXES.equipment.options),
+  physical: z.enum(GENOME_AXES.physical.options),
+  footprint: z.enum(GENOME_AXES.footprint.options),
+  contact: z.enum(GENOME_AXES.contact.options),
+  teamSize: z.enum(GENOME_AXES.teamSize.options),
+  matchLength: z.enum(GENOME_AXES.matchLength.options),
+  scoring: z.enum(GENOME_AXES.scoring.options),
+  complexity: z.enum(GENOME_AXES.complexity.options),
+  structure: z.enum(GENOME_AXES.structure.options),
+});
+
+export const leverSchema = z.enum(["affinity", "accessibility", "depth"]);
+export const LEVERS = leverSchema.options;
+export type Lever = z.infer<typeof leverSchema>;
+
+/** Country attributes an option may condition on. */
+export const numericAttributeSchema = z.enum([
+  "wealth",
+  "urbanDensity",
+  "sportCulture",
+  "mediaMarket",
+]);
+export const NUMERIC_ATTRIBUTES = numericAttributeSchema.options;
+export type NumericAttribute = z.infer<typeof numericAttributeSchema>;
+
+const numericConditions = Object.fromEntries(
+  NUMERIC_ATTRIBUTES.map((attribute) => [attribute, delta.optional()]),
+) as { [K in NumericAttribute]: z.ZodOptional<z.ZodNumber> };
+
+/** Conditions for one lever: categorical (climate → delta) and numeric (attribute → weight). */
+export const leverConditionsSchema = z.strictObject({
+  climate: z.partialRecord(climateSchema, delta).optional(),
+  ...numericConditions,
+});
+
+export const optionModifiersSchema = z.strictObject({
+  base: z.partialRecord(leverSchema, delta).default({}),
+  conditions: z.partialRecord(leverSchema, leverConditionsSchema).default({}),
+});
+
+const optionTables = Object.fromEntries(
+  AXIS_IDS.map((axis) => [
+    axis,
+    z.strictObject(
+      Object.fromEntries(
+        GENOME_AXES[axis].options.map((option) => [option, optionModifiersSchema]),
+      ),
+    ),
+  ]),
+);
+
+export const genomePresetSchema = z.strictObject({ id, genome: genomeSchema });
+
+export const genomeFileSchema = z.strictObject({
+  options: z.strictObject(optionTables) as unknown as z.ZodType<
+    Record<AxisId, Record<string, OptionModifiers>>
+  >,
+  presets: z.array(genomePresetSchema).min(1),
+});
+
+// ---- Sports --------------------------------------------------------------------------------
+
+export const rivalSportSchema = z.strictObject({ id, genome: genomeSchema });
 
 export const sportsFileSchema = z.strictObject({
   rivals: z.array(rivalSportSchema).min(1),
+  otherSports: z.strictObject({
+    hardcoreShareByContinent: z.record(continentSchema, unitInterval),
+  }),
 });
+
+// ---- Names ---------------------------------------------------------------------------------
 
 export const namesFileSchema = z.strictObject({
   countries: z.record(z.string(), z.string().min(1)),
   sports: z.record(z.string(), z.string().min(1)),
 });
 
-const flowRatesSchema = z.strictObject({
-  casualConversionRate: unitInterval,
-  casualChurnRate: unitInterval,
-  hardcoreConversionRate: unitInterval,
-});
+// ---- Config --------------------------------------------------------------------------------
+
+const rate = unitInterval;
+
+export const curveSchema = z
+  .strictObject({
+    type: z.enum(["log", "linear"]),
+    low: z.number(),
+    high: z.number(),
+  })
+  .refine((curve) => curve.high > curve.low, { message: "high must be greater than low" })
+  .refine((curve) => curve.type !== "log" || curve.low > 0, {
+    message: "a log curve needs low > 0",
+  });
+
+const clampSchema = z
+  .strictObject({ min: z.number().min(0), max: z.number().min(0) })
+  .refine((c) => c.max >= c.min, { message: "max must be at least min" });
 
 export const ppTierSchema = z.strictObject({
   tier: z.int().min(1),
   fandomScoreRequired: z.number().min(0),
   turnLengthQuarters: z.int().min(1).max(4),
+  focusSlots: z.int().min(1),
+  costMultiplier: z.number().positive(),
 });
+
+const axisWeights = Object.fromEntries(AXIS_IDS.map((axis) => [axis, z.number().min(0)])) as {
+  [A in AxisId]: z.ZodNumber;
+};
 
 export const configFileSchema = z.strictObject({
   calendar: z.strictObject({ startYear: z.int() }),
@@ -73,19 +179,75 @@ export const configFileSchema = z.strictObject({
     exponent: z.number().gt(0).max(1),
   }),
   ppTiers: z.array(ppTierSchema).min(1),
+  attributeCurves: z.strictObject({
+    wealth: curveSchema,
+    urbanDensity: curveSchema,
+    mediaMarket: curveSchema,
+  }),
+  levers: z.strictObject({
+    affinity: clampSchema,
+    accessibility: clampSchema,
+    depth: clampSchema,
+  }),
+  similarity: z.strictObject({
+    axisWeights: z.strictObject(axisWeights),
+    casualFamiliarityBonus: z.number().min(0),
+    hardcoreCrowdingPenalty: unitInterval,
+    fullEffectHardcoreShare: z.number().gt(0).max(1),
+  }),
+  spread: z.strictObject({
+    proximity: z.strictObject({ weight: z.number().min(0) }),
+    language: z.strictObject({ weight: z.number().min(0), secondaryWeight: unitInterval }),
+    media: z.strictObject({ weight: z.number().min(0), minMarketScore: unitInterval }),
+  }),
+  exposure: z.strictObject({
+    localWeight: z.number().min(0),
+    cap: z.number().positive(),
+    retentionSaturation: z.number().positive(),
+  }),
+  focus: z.strictObject({
+    inboundMultiplier: z.number().min(1),
+    conversionMultiplier: z.number().min(1),
+    outreachPeople: z.number().min(0),
+    coldLaunchCost: z.number().min(0),
+    exposedCost: z.number().min(0),
+    costSaturationExposure: z.number().positive(),
+  }),
   dynamics: z.strictObject({
     noise: z.number().min(0).lt(1),
-    player: flowRatesSchema,
-    rival: flowRatesSchema,
+    player: z.strictObject({
+      casualConversionRate: z.number().min(0),
+      casualChurnRate: rate,
+      casualDecayRate: rate,
+      hardcoreConversionRate: z.number().min(0),
+    }),
+    rival: z.strictObject({
+      casualConversionRate: rate,
+      casualChurnRate: rate,
+      hardcoreConversionRate: rate,
+    }),
+  }),
+  hints: z.strictObject({
+    plusPlus: z.number(),
+    plus: z.number(),
+    minus: z.number(),
   }),
 });
 
+// ---- Types ---------------------------------------------------------------------------------
+
 export type Climate = z.infer<typeof climateSchema>;
-export type CountryAttributes = z.infer<typeof countryAttributesSchema>;
+export type Continent = z.infer<typeof continentSchema>;
 export type FanShares = z.infer<typeof fanSharesSchema>;
 export type Country = z.infer<typeof countrySchema>;
+export type LeverConditions = z.infer<typeof leverConditionsSchema>;
+export type OptionModifiers = z.infer<typeof optionModifiersSchema>;
+export type GenomePreset = z.infer<typeof genomePresetSchema>;
+export type GenomeContent = z.infer<typeof genomeFileSchema>;
 export type RivalSport = z.infer<typeof rivalSportSchema>;
+export type SportsContent = z.infer<typeof sportsFileSchema>;
 export type Names = z.infer<typeof namesFileSchema>;
+export type Curve = z.infer<typeof curveSchema>;
 export type PpTier = z.infer<typeof ppTierSchema>;
 export type Config = z.infer<typeof configFileSchema>;
-export type FlowRates = z.infer<typeof flowRatesSchema>;
+export type { AxisId, Genome } from "./genome-axes";

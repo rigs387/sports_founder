@@ -8,8 +8,17 @@ export type Rng = ReturnType<typeof xoroshiro128plus>;
 
 export const MAX_SEED = 0xffff_ffff;
 
+/**
+ * Draws discarded right after seeding. xoroshiro128plus seeds its state directly from the seed
+ * with no mixing, so the first outputs of neighbouring seeds are nearly identical; a short
+ * warm-up decorrelates campaigns run on consecutive seeds.
+ */
+export const SEED_WARM_UP_DRAWS = 32;
+
 export function createRngState(seed: number): number[] {
-  return [...xoroshiro128plus(seed).getState()];
+  const rng = xoroshiro128plus(seed);
+  for (let i = 0; i < SEED_WARM_UP_DRAWS; i += 1) rng.next();
+  return [...rng.getState()];
 }
 
 /** Rebuilds a generator from saved state. The returned generator advances as it is used. */

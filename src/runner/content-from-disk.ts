@@ -33,12 +33,9 @@ export function loadWorldFromDisk(dir: string = DEFAULT_CONTENT_DIR): World {
     }
   };
 
-  const sources: ContentSources = {
-    countries: read(CONTENT_FILES.countries),
-    sports: read(CONTENT_FILES.sports),
-    names: read(CONTENT_FILES.names),
-    config: read(CONTENT_FILES.config),
-  };
+  const sources = Object.fromEntries(
+    Object.entries(CONTENT_FILES).map(([key, file]) => [key, read(file)]),
+  ) as ContentSources;
   if (issues.length > 0) throw new ContentValidationError(issues);
   return loadWorld(sources);
 }

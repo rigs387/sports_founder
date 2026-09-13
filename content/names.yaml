@@ -4,9 +4,30 @@
 countries:
   valdoria: Valdoria
   kestmark: Kestmark
+  arvenne: Arvenne
+  teyrland: Teyrland
+  ostravik: Ostravik
   oruna: Oruna
-  sallavi-isles: Sallavi Isles
+  sindaru: Sindaru
+  mekhar: Mekhar
+  qarshan: Qarshan
   brenholt: Brenholt
+  kambeza: Kambeza
+  dorusso: Dorusso
+  nyala: Nyala
+  umbari: Umbari
+  tessaline: Tessaline
+  caldera: Caldera
+  norrland: Norrland
+  solmara: Solmara
+  isthmia: Isthmia
+  coral-keys: Coral Keys
+  verdanza: Verdanza
+  altiplano: Altiplano
+  pampara: Pampara
+  austrande: Austrande
+  sallavi-isles: Sallavi Isles
+  tavu-motu: Tavu Motu
 
 sports:
   fieldball: Fieldball

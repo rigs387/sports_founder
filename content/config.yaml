@@ -1,7 +1,7 @@
 # Balance config. Every tunable number lives in content files like this one, never in code.
 #
-# PLACEHOLDER VALUES: these drive the Phase 0 skeleton's stand-in dynamics only. The real fan,
-# spread, PP, and tier models (GDD Progression & Economy) replace them later.
+# Formula shapes and the numbers below are Phase 0 tuning defaults, chosen so the genome, affinity
+# and spread models produce explainable differences. Balance runs will move them.
 
 calendar:
   # Present-day start (GDD Rival AI).
@@ -15,46 +15,156 @@ start:
   startingTier: 1
 
 fandomScore:
-  # Fandom Score = hardcore + casual × casualWeight.
+  # Fandom Score = hardcore + casual × casualWeight. Also the outbound spread strength formula.
   casualWeight: 0.3
 
 ppIncome:
-  # PP earned per quarter = scale × (player Fandom Score ^ exponent).
-  # An exponent below 1 gives diminishing returns.
+  # Base PP per quarter = scale × (player Fandom Score ^ exponent). Exponent < 1 = diminishing
+  # returns (GDD PP Income).
   scale: 0.05
   exponent: 0.5
 
 # PP tier table. Turn length is in quarters (1 = quarter, 2 = half-year, 4 = year).
+# focusSlots: how many focus slots the player holds at that tier (GDD Global PP Tier Track).
+# costMultiplier: scales PP costs at that tier ("growing pains").
 # PLACEHOLDER promotion rule: Fandom Score threshold only (the GDD breadth conditions come later).
 ppTiers:
   - tier: 1
     fandomScoreRequired: 0
     turnLengthQuarters: 1
+    focusSlots: 1
+    costMultiplier: 1
   - tier: 2
-    fandomScoreRequired: 20000
+    fandomScoreRequired: 25000
     turnLengthQuarters: 1
+    focusSlots: 2
+    costMultiplier: 1.5
   - tier: 3
-    fandomScoreRequired: 250000
-    turnLengthQuarters: 2
-  - tier: 4
     fandomScoreRequired: 1500000
     turnLengthQuarters: 2
+    focusSlots: 3
+    costMultiplier: 2.5
+  - tier: 4
+    fandomScoreRequired: 15000000
+    turnLengthQuarters: 2
+    focusSlots: 4
+    costMultiplier: 4
   - tier: 5
-    fandomScoreRequired: 4000000
+    fandomScoreRequired: 80000000
     turnLengthQuarters: 4
+    focusSlots: 5
+    costMultiplier: 6
 
-# PLACEHOLDER quarterly fan dynamics, per sport kind. Rates are fractions per quarter.
+# Curves turning raw country figures into 0–1 scores (GDD Country attributes).
+#   log:    score = (ln(x) − ln(low)) / (ln(high) − ln(low)), clamped to 0–1
+#   linear: score = (x − low) / (high − low), clamped to 0–1
+attributeCurves:
+  # Income per person (invented currency units in the placeholder data).
+  wealth: { type: log, low: 1500, high: 60000 }
+  # Share of the population living in urban areas.
+  urbanDensity: { type: linear, low: 0.2, high: 0.95 }
+  # Media market size is the score of (population × wealth score).
+  mediaMarket: { type: log, low: 2000000, high: 200000000 }
+
+# Lever multipliers: each starts at 1, the chosen options' deltas are added, then clamped.
+levers:
+  affinity: { min: 0.2, max: 2.0 }
+  accessibility: { min: 0.3, max: 2.0 }
+  depth: { min: 0.3, max: 2.0 }
+
+# Rival similarity (GDD Sport Genome). Similarity to a country's dominant rival is the weighted
+# share of axes on which the genomes match (0–1).
+similarity:
+  axisWeights:
+    surface: 1.5
+    equipment: 1.5
+    physical: 1
+    footprint: 0.5
+    contact: 1
+    teamSize: 0.5
+    matchLength: 1
+    scoring: 0.75
+    complexity: 1
+    structure: 1.25
+  # Casual conversion × (1 + casualFamiliarityBonus × effective similarity): familiar is easier.
+  casualFamiliarityBonus: 0.3
+  # Hardcore conversion × (1 − hardcoreCrowdingPenalty × effective similarity): they already
+  # have that sport.
+  hardcoreCrowdingPenalty: 0.6
+  # A rival exerts its full similarity effect once its hardcore share of the country reaches
+  # this; below it the effect scales down linearly (a sport nobody there follows is no rival).
+  fullEffectHardcoreShare: 0.1
+
+# Cross-border spread (GDD Spread Model). Only casual exposure crosses borders. A country's
+# outbound strength is its Fandom Score (hardcore + weighted casual). Inbound exposure in the
+# target = Σ over sources and channels of channelWeight × link × source strength / target
+# population, so exposure is "the sport's following abroad, relative to your population".
+spread:
+  proximity:
+    # Per neighbor link (land border or sea link).
+    weight: 0.012
+  language:
+    # Shared primary sphere. A link through either side's secondary sphere is scaled by
+    # secondaryWeight (both secondary: squared).
+    weight: 0.006
+    secondaryWeight: 0.5
+  media:
+    # Between large media markets: weight × sourceMarket × targetMarket, only when both market
+    # scores are at least minMarketScore.
+    weight: 0.01
+    minMarketScore: 0.5
+
+# Exposure (per country, per quarter): what drives casual conversion and retention.
+exposure:
+  # Weight of the country's own following (Fandom Score / population): word of mouth.
+  localWeight: 1.0
+  # Exposure is capped here; beyond it more following does not convert faster. Together with
+  # casualChurnRate this sets where a country's casual share levels off.
+  cap: 0.06
+  # Exposure at or above this counts as full retention for casual churn (see dynamics).
+  retentionSaturation: 0.003
+
+# Focus slots (GDD Spread Model). Focus boosts inbound spread and conversion.
+focus:
+  # Inbound spread into a focused country is multiplied by this.
+  inboundMultiplier: 2.0
+  # Casual and hardcore conversion in a focused country are multiplied by this.
+  conversionMultiplier: 1.5
+  # Direct outreach: a focused country gets exposure as if this many people followed the sport,
+  # so a cold launch (zero exposure) still starts, slowly.
+  outreachPeople: 3000
+  # PP cost of assigning a slot to a country, times the tier's costMultiplier. Costs
+  # coldLaunchCost with zero exposure, falling linearly to exposedCost as the country's exposure
+  # (without focus) reaches costSaturationExposure.
+  coldLaunchCost: 30
+  exposedCost: 6
+  costSaturationExposure: 0.005
+
+# Quarterly fan dynamics. Rates are fractions per quarter.
 dynamics:
   # Each flow is multiplied by a random factor in [1 - noise, 1 + noise].
   noise: 0.2
   player:
-    # Uninterested → casual, scaled by the sport's local reach (word of mouth).
-    casualConversionRate: 0.35
-    # Casual → uninterested.
-    casualChurnRate: 0.08
-    # Casual → hardcore, scaled by the share of people with no hardcore sport yet.
-    hardcoreConversionRate: 0.02
+    # uninterested → casual: uninterested × rate × accessibility × affinity × familiarity
+    #   × exposure × focus conversion bonus
+    casualConversionRate: 0.25
+    # casual → uninterested: casual × (churn + decay × (1 − exposure level)); exposure level is
+    # exposure / exposure.retentionSaturation, capped at 1. Casuals decay without exposure.
+    casualChurnRate: 0.04
+    casualDecayRate: 0.06
+    # casual → hardcore: casual × rate × depth × affinity × crowding × share of people with no
+    # hardcore sport × focus conversion bonus
+    hardcoreConversionRate: 0.012
+  # PLACEHOLDER rival drift: rivals only drift slowly until the rival AI arrives (GDD Rival AI).
+  # No spread, no affinity.
   rival:
     casualConversionRate: 0.02
     casualChurnRate: 0.01
     hardcoreConversionRate: 0.001
+
+# Anchor genome hints (GDD Campaign setup): an option's net lever delta at the anchor country
+# (affinity + accessibility + depth) maps to ++ / + / − by these thresholds.
+hints:
+  plusPlus: 0.2
+  plus: 0.05
+  minus: -0.05

@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { AXIS_IDS } from "../../content/genome-axes";
 import { useGameStore } from "./state/game-store";
+
+const TOP_COUNTRIES = 8;
 
 export function App() {
   const { t } = useTranslation();
@@ -11,6 +14,13 @@ export function App() {
   }, [startCampaign]);
 
   const player = snapshot?.sports.find((sport) => sport.kind === "player");
+  const countryName = (id: string) => names?.countries[id] ?? id;
+  const topCountries = snapshot
+    ? [...snapshot.countries]
+        .filter((country) => country.casual + country.hardcore > 0)
+        .sort((a, b) => b.fandomScore - a.fandomScore)
+        .slice(0, TOP_COUNTRIES)
+    : [];
 
   return (
     <main
@@ -53,9 +63,28 @@ export function App() {
           <p className="meta">
             {t("campaign.meta", {
               seed: snapshot.seed,
-              country: names?.countries[snapshot.anchorCountryId] ?? snapshot.anchorCountryId,
+              country: countryName(snapshot.anchorCountryId),
             })}
           </p>
+          <p className="meta" data-testid="focus">
+            {t("campaign.focus", {
+              countries: snapshot.focus
+                .map((id) => (id === null ? t("campaign.emptySlot") : countryName(id)))
+                .join(t("campaign.listSeparator")),
+            })}
+          </p>
+
+          <section className="genome" aria-label={t("genome.heading")}>
+            <h2>{t("genome.heading")}</h2>
+            <dl className="genome-list" data-testid="genome">
+              {AXIS_IDS.map((axis) => (
+                <div key={axis} className="genome-axis">
+                  <dt>{t(`genome.axes.${axis}`)}</dt>
+                  <dd>{t(`genome.options.${axis}.${snapshot.genome[axis]}`)}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
 
           <table className="fans">
             <caption>{t("fans.heading")}</caption>
@@ -74,12 +103,46 @@ export function App() {
                   <th scope="row">
                     {sport.kind === "player"
                       ? t("fans.yourSport")
-                      : (names?.sports[sport.sportId] ?? sport.sportId)}
+                      : sport.kind === "other"
+                        ? t("fans.otherSports")
+                        : (names?.sports[sport.sportId] ?? sport.sportId)}
                   </th>
                   <td>{t("format.count", { value: sport.uninterested })}</td>
                   <td>{t("format.count", { value: sport.casual })}</td>
                   <td>{t("format.count", { value: sport.hardcore })}</td>
                   <td>{t("format.count", { value: sport.fandomScore })}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <table className="fans countries">
+            <caption>{t("countries.heading", { count: topCountries.length })}</caption>
+            <thead>
+              <tr>
+                <th scope="col">{t("countries.country")}</th>
+                <th scope="col">{t("fans.casual")}</th>
+                <th scope="col">{t("fans.hardcore")}</th>
+                <th scope="col">{t("countries.share")}</th>
+                <th scope="col">{t("countries.affinity")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {topCountries.map((country) => (
+                <tr
+                  key={country.countryId}
+                  data-testid="country-row"
+                  className={country.focused ? "focused" : undefined}
+                >
+                  <th scope="row">
+                    {country.focused
+                      ? t("countries.focusedName", { name: countryName(country.countryId) })
+                      : countryName(country.countryId)}
+                  </th>
+                  <td>{t("format.count", { value: country.casual })}</td>
+                  <td>{t("format.count", { value: country.hardcore })}</td>
+                  <td>{t("format.percent", { value: country.share })}</td>
+                  <td>{t("format.multiplier", { value: country.affinity })}</td>
                 </tr>
               ))}
             </tbody>

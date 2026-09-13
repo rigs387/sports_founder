@@ -1,4 +1,5 @@
-import { type GameState, PLAYER_SPORT_ID, type World } from "./types";
+import { genomeSchema } from "../content";
+import { type GameState, OTHER_SPORT_ID, PLAYER_SPORT_ID, type World } from "./types";
 
 /** Returns every way `state` is invalid for `world`. An empty list means the state is valid. */
 export function checkInvariants(state: GameState, world: World): string[] {
@@ -10,20 +11,46 @@ export function checkInvariants(state: GameState, world: World): string[] {
     problems.push(`quarter ${state.quarter} is invalid`);
   }
   if (!Number.isFinite(state.pp) || state.pp < 0) problems.push(`pp ${state.pp} is invalid`);
-  if (!world.config.ppTiers.some((tier) => tier.tier === state.ppTier)) {
-    problems.push(`ppTier ${state.ppTier} is not in the tier table`);
-  }
+  const tier = world.config.ppTiers.find((entry) => entry.tier === state.ppTier);
+  if (!tier) problems.push(`ppTier ${state.ppTier} is not in the tier table`);
   if (!world.countries.some((country) => country.id === state.anchorCountryId)) {
     problems.push(`anchor "${state.anchorCountryId}" is not a known country`);
   }
 
-  const expectedSports = [PLAYER_SPORT_ID, ...world.rivals.map((rival) => rival.id)];
+  const genome = genomeSchema.safeParse(state.genome);
+  if (!genome.success) {
+    for (const issue of genome.error.issues) {
+      problems.push(`genome ${issue.path.join(".")}: ${issue.message}`);
+    }
+  }
+
+  if (tier && state.focus.length !== tier.focusSlots) {
+    problems.push(
+      `${state.focus.length} focus slot(s) but tier ${tier.tier} has ${tier.focusSlots}`,
+    );
+  }
+  const focused = new Set<string>();
+  state.focus.forEach((countryId, slot) => {
+    if (countryId === null) return;
+    if (!world.countries.some((country) => country.id === countryId)) {
+      problems.push(`focus slot ${slot} points at unknown country "${countryId}"`);
+    }
+    if (focused.has(countryId)) problems.push(`"${countryId}" holds more than one focus slot`);
+    focused.add(countryId);
+  });
+
+  const expectedSports = [
+    PLAYER_SPORT_ID,
+    ...world.rivals.map((rival) => rival.id),
+    OTHER_SPORT_ID,
+  ];
   const actualSports = state.sports.map((sport) => sport.id);
   if (actualSports.join("|") !== expectedSports.join("|")) {
     problems.push(`sports [${actualSports}] do not match content [${expectedSports}]`);
   }
   state.sports.forEach((sport, index) => {
-    const expectedKind = index === 0 ? "player" : "rival";
+    const expectedKind =
+      index === 0 ? "player" : index === expectedSports.length - 1 ? "other" : "rival";
     if (sport.kind !== expectedKind) problems.push(`sport "${sport.id}" should be ${expectedKind}`);
   });
 

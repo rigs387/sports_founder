@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "Sports Founder",
-    "subtitle": "Foundation build: placeholder simulation, no map yet."
+    "subtitle": "Foundation build: genome, affinity and spread are live; no map yet."
   },
   "status": {
     "loading": "Setting up the backyard…",
@@ -25,7 +25,51 @@
     "5": "Global Religion"
   },
   "campaign": {
-    "meta": "Seed {{seed}} · Anchor country: {{country}}"
+    "meta": "Seed {{seed}} · Anchor country: {{country}}",
+    "focus": "Focus: {{countries}}",
+    "emptySlot": "(empty slot)",
+    "listSeparator": ", "
+  },
+  "genome": {
+    "heading": "Your sport's genome",
+    "axes": {
+      "surface": "Surface",
+      "equipment": "Equipment",
+      "physical": "Physical profile",
+      "footprint": "Field footprint",
+      "contact": "Contact",
+      "teamSize": "Team size",
+      "matchLength": "Match length",
+      "scoring": "Scoring frequency",
+      "complexity": "Rules complexity",
+      "structure": "Play structure"
+    },
+    "options": {
+      "surface": {
+        "grass": "Grass field",
+        "indoor": "Indoor court",
+        "street": "Street",
+        "ice": "Ice"
+      },
+      "equipment": {
+        "ball-only": "Ball only",
+        "stick-or-bat": "Ball + stick or bat",
+        "protective-gear": "Protective gear"
+      },
+      "physical": {
+        "speed": "Speed",
+        "strength": "Strength",
+        "precision": "Precision",
+        "endurance": "Endurance"
+      },
+      "footprint": { "small": "Small", "medium": "Medium", "large": "Large" },
+      "contact": { "none": "None", "incidental": "Incidental", "full": "Full" },
+      "teamSize": { "small": "Small (2–5)", "medium": "Medium (6–9)", "large": "Large (10–15)" },
+      "matchLength": { "short": "Short", "standard": "Standard", "long": "Long" },
+      "scoring": { "low": "Low", "medium": "Medium", "high": "High" },
+      "complexity": { "simple": "Simple", "moderate": "Moderate", "intricate": "Intricate" },
+      "structure": { "continuous": "Continuous", "stop-start": "Stop-start", "innings": "Innings" }
+    }
   },
   "fans": {
     "heading": "World fans",
@@ -34,10 +78,22 @@
     "casual": "Casual",
     "hardcore": "Hardcore",
     "score": "Fandom Score",
-    "yourSport": "Your sport"
+    "yourSport": "Your sport",
+    "otherSports": "Other sports"
+  },
+  "countries": {
+    "heading_zero": "Where your sport is catching on",
+    "heading_one": "Where your sport is catching on (top {{count}} country)",
+    "heading_other": "Where your sport is catching on (top {{count}} countries)",
+    "country": "Country",
+    "share": "Share",
+    "affinity": "Affinity",
+    "focusedName": "{{name}} ★"
   },
   "format": {
-    "count": "{{value, number(maximumFractionDigits: 0)}}"
+    "count": "{{value, number(maximumFractionDigits: 0)}}",
+    "percent": "{{value, number(style: percent; maximumFractionDigits: 2)}}",
+    "multiplier": "{{value, number(maximumFractionDigits: 2)}}×"
   },
   "actions": {
     "endTurn": "End Turn"

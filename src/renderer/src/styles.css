@@ -90,3 +90,28 @@ body {
 .error {
   color: #9a1e1e;
 }
+
+.genome h2 {
+  font-size: 1.2rem;
+  margin: 24px 0 8px;
+}
+
+.genome-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px 16px;
+  margin: 0;
+}
+
+.genome-axis dt {
+  font-size: 0.8rem;
+  color: #6b6153;
+}
+
+.genome-axis dd {
+  margin: 0;
+}
+
+.countries tr.focused th[scope="row"] {
+  font-weight: bold;
+}

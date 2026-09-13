@@ -1,72 +1,365 @@
-# PLACEHOLDER countries. Invented: no real-world data yet.
+# PLACEHOLDER countries. Invented: no real-world data. The real dataset (GDD Real-world data) is a
+# separate research task and replaces this file with the same shape.
 #
-# Attribute indices run from 0 (low) to 1 (high). Climate categories are provisional until the
-# genome × country affinity model is built.
-# startingRivalFans: fraction of the population that is casual / hardcore about each rival.
-# Display names live in names.yaml.
+# Attributes (GDD Country attributes):
+#   continent          africa / asia / europe / north-america / south-america / oceania
+#   climate            tropical / arid / temperate / cold (the zone where most people live)
+#   incomePerPerson    raw figure → wealth score 0–1 via config attributeCurves.wealth
+#   urbanShare         raw share of population living in urban areas → urban density score
+#   languages          primary media sphere plus an optional secondary one
+#   neighbors          land borders. Links are undirected: listing a link on either side is enough.
+#   seaLinks           hand-listed sea links, so islands have proximity spread
+#   startingRivalFans  share of the population casual / hardcore about each rival
+#   otherHardcoreShare optional override of the continent default for the "other sports" bucket
+# Derived at load: sport culture (all starting hardcore shares) and media market (population ×
+# wealth score). Display names live in names.yaml.
 
 countries:
+  # ---- Europe ----------------------------------------------------------------------------
   - id: valdoria
+    continent: europe
     population: 9000000
-    attributes:
-      climate: temperate
-      wealth: 0.7
-      urbanDensity: 0.6
-      sportCulture: 0.8
-      mediaMarket: 0.5
-      languageGroup: valdic
+    climate: temperate
+    incomePerPerson: 34000
+    urbanShare: 0.74
+    languages: { primary: valdic, secondary: nordel }
+    neighbors: [kestmark, arvenne, teyrland]
+    seaLinks: []
     startingRivalFans:
       fieldball: { casual: 0.35, hardcore: 0.12 }
-      longbat: { casual: 0.05, hardcore: 0.01 }
+      longbat: { casual: 0.03, hardcore: 0.005 }
 
   - id: kestmark
+    continent: europe
     population: 22000000
-    attributes:
-      climate: cold
-      wealth: 0.85
-      urbanDensity: 0.7
-      sportCulture: 0.6
-      mediaMarket: 0.7
-      languageGroup: nordel
+    climate: cold
+    incomePerPerson: 42000
+    urbanShare: 0.8
+    languages: { primary: nordel }
+    neighbors: [valdoria, ostravik]
+    seaLinks: []
     startingRivalFans:
       fieldball: { casual: 0.25, hardcore: 0.08 }
-      longbat: { casual: 0.02, hardcore: 0.005 }
+      longbat: { casual: 0.02, hardcore: 0.004 }
 
+  - id: arvenne
+    continent: europe
+    population: 38000000
+    climate: temperate
+    incomePerPerson: 30000
+    urbanShare: 0.78
+    languages: { primary: arvennic, secondary: valdic }
+    neighbors: [valdoria, teyrland]
+    seaLinks: [tessaline]
+    startingRivalFans:
+      fieldball: { casual: 0.4, hardcore: 0.15 }
+      longbat: { casual: 0.01, hardcore: 0.002 }
+
+  - id: teyrland
+    continent: europe
+    population: 14000000
+    climate: temperate
+    incomePerPerson: 25000
+    urbanShare: 0.65
+    languages: { primary: teyric, secondary: arvennic }
+    neighbors: [valdoria, arvenne, ostravik]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.38, hardcore: 0.14 }
+      longbat: { casual: 0.01, hardcore: 0.002 }
+
+  - id: ostravik
+    continent: europe
+    population: 30000000
+    climate: cold
+    incomePerPerson: 14000
+    urbanShare: 0.6
+    languages: { primary: ostric, secondary: nordel }
+    neighbors: [kestmark, teyrland, qarshan]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.3, hardcore: 0.1 }
+      longbat: { casual: 0.005, hardcore: 0.001 }
+
+  # ---- Asia ------------------------------------------------------------------------------
   - id: oruna
+    continent: asia
     population: 120000000
-    attributes:
-      climate: tropical
-      wealth: 0.3
-      urbanDensity: 0.4
-      sportCulture: 0.9
-      mediaMarket: 0.8
-      languageGroup: oruni
+    climate: tropical
+    incomePerPerson: 6000
+    urbanShare: 0.45
+    languages: { primary: oruni }
+    neighbors: [sindaru, mekhar]
+    seaLinks: [sallavi-isles]
     startingRivalFans:
       fieldball: { casual: 0.15, hardcore: 0.04 }
       longbat: { casual: 0.4, hardcore: 0.18 }
 
+  - id: sindaru
+    continent: asia
+    population: 150000000
+    climate: tropical
+    incomePerPerson: 4500
+    urbanShare: 0.38
+    languages: { primary: oruni, secondary: sindar }
+    neighbors: [oruna, mekhar]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.2, hardcore: 0.05 }
+      longbat: { casual: 0.35, hardcore: 0.15 }
+
+  - id: mekhar
+    continent: asia
+    population: 80000000
+    climate: temperate
+    incomePerPerson: 12000
+    urbanShare: 0.58
+    languages: { primary: mekhari }
+    neighbors: [qarshan, oruna, sindaru, brenholt]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.25, hardcore: 0.07 }
+      longbat: { casual: 0.05, hardcore: 0.01 }
+
+  - id: qarshan
+    continent: asia
+    population: 45000000
+    climate: arid
+    incomePerPerson: 9000
+    urbanShare: 0.55
+    languages: { primary: qarshi, secondary: ostric }
+    neighbors: [ostravik, mekhar, brenholt]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.3, hardcore: 0.09 }
+      longbat: { casual: 0.02, hardcore: 0.004 }
+
+  - id: brenholt
+    continent: asia
+    population: 48000000
+    climate: arid
+    incomePerPerson: 22000
+    urbanShare: 0.85
+    languages: { primary: brennic, secondary: nordel }
+    neighbors: [qarshan, mekhar]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.35, hardcore: 0.1 }
+      longbat: { casual: 0.12, hardcore: 0.04 }
+
+  # ---- Africa ----------------------------------------------------------------------------
+  - id: kambeza
+    continent: africa
+    population: 60000000
+    climate: tropical
+    incomePerPerson: 3000
+    urbanShare: 0.4
+    languages: { primary: kambe, secondary: arvennic }
+    neighbors: [dorusso, nyala]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.4, hardcore: 0.12 }
+      longbat: { casual: 0.01, hardcore: 0.001 }
+
+  - id: dorusso
+    continent: africa
+    population: 25000000
+    climate: arid
+    incomePerPerson: 5000
+    urbanShare: 0.5
+    languages: { primary: dorussi, secondary: arvennic }
+    neighbors: [kambeza, nyala, tessaline]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.35, hardcore: 0.1 }
+      longbat: { casual: 0.005, hardcore: 0.001 }
+
+  - id: nyala
+    continent: africa
+    population: 90000000
+    climate: tropical
+    incomePerPerson: 2500
+    urbanShare: 0.35
+    languages: { primary: nyalan, secondary: teyric }
+    neighbors: [kambeza, dorusso, umbari]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.38, hardcore: 0.11 }
+      longbat: { casual: 0.02, hardcore: 0.003 }
+
+  - id: umbari
+    continent: africa
+    population: 12000000
+    climate: temperate
+    incomePerPerson: 11000
+    urbanShare: 0.62
+    languages: { primary: umbaric, secondary: teyric }
+    neighbors: [nyala]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.3, hardcore: 0.08 }
+      longbat: { casual: 0.2, hardcore: 0.07 }
+
+  - id: tessaline
+    continent: africa
+    population: 8000000
+    climate: arid
+    incomePerPerson: 15000
+    urbanShare: 0.72
+    languages: { primary: dorussi, secondary: arvennic }
+    neighbors: [dorusso]
+    seaLinks: [arvenne]
+    startingRivalFans:
+      fieldball: { casual: 0.4, hardcore: 0.13 }
+      longbat: { casual: 0.005, hardcore: 0.001 }
+
+  # ---- North America ---------------------------------------------------------------------
+  - id: caldera
+    continent: north-america
+    population: 200000000
+    climate: temperate
+    incomePerPerson: 55000
+    urbanShare: 0.83
+    languages: { primary: calderan, secondary: solari }
+    neighbors: [norrland, solmara]
+    seaLinks: [coral-keys]
+    otherHardcoreShare: 0.35
+    startingRivalFans:
+      fieldball: { casual: 0.12, hardcore: 0.02 }
+      longbat: { casual: 0.005, hardcore: 0.001 }
+
+  - id: norrland
+    continent: north-america
+    population: 30000000
+    climate: cold
+    incomePerPerson: 46000
+    urbanShare: 0.8
+    languages: { primary: calderan, secondary: arvennic }
+    neighbors: [caldera]
+    seaLinks: []
+    otherHardcoreShare: 0.25
+    startingRivalFans:
+      fieldball: { casual: 0.15, hardcore: 0.03 }
+      longbat: { casual: 0.02, hardcore: 0.005 }
+
+  - id: solmara
+    continent: north-america
+    population: 100000000
+    climate: arid
+    incomePerPerson: 10000
+    urbanShare: 0.78
+    languages: { primary: solari }
+    neighbors: [caldera, isthmia]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.4, hardcore: 0.14 }
+      longbat: { casual: 0.002, hardcore: 0.0005 }
+
+  - id: isthmia
+    continent: north-america
+    population: 6000000
+    climate: tropical
+    incomePerPerson: 8000
+    urbanShare: 0.6
+    languages: { primary: solari }
+    neighbors: [solmara, verdanza]
+    seaLinks: [coral-keys]
+    startingRivalFans:
+      fieldball: { casual: 0.35, hardcore: 0.1 }
+      longbat: { casual: 0.002, hardcore: 0.0005 }
+
+  - id: coral-keys
+    continent: north-america
+    population: 900000
+    climate: tropical
+    incomePerPerson: 18000
+    urbanShare: 0.55
+    languages: { primary: keysian, secondary: calderan }
+    neighbors: []
+    seaLinks: [isthmia, caldera]
+    startingRivalFans:
+      fieldball: { casual: 0.2, hardcore: 0.05 }
+      longbat: { casual: 0.15, hardcore: 0.06 }
+
+  # ---- South America ---------------------------------------------------------------------
+  - id: verdanza
+    continent: south-america
+    population: 45000000
+    climate: tropical
+    incomePerPerson: 9000
+    urbanShare: 0.75
+    languages: { primary: solari }
+    neighbors: [isthmia, altiplano]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.45, hardcore: 0.18 }
+      longbat: { casual: 0.002, hardcore: 0.0005 }
+
+  - id: altiplano
+    continent: south-america
+    population: 20000000
+    climate: arid
+    incomePerPerson: 6000
+    urbanShare: 0.55
+    languages: { primary: solari }
+    neighbors: [verdanza, pampara]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.4, hardcore: 0.15 }
+      longbat: { casual: 0.001, hardcore: 0.0002 }
+
+  - id: pampara
+    continent: south-america
+    population: 50000000
+    climate: temperate
+    incomePerPerson: 13000
+    urbanShare: 0.88
+    languages: { primary: pamparan, secondary: solari }
+    neighbors: [altiplano]
+    seaLinks: []
+    startingRivalFans:
+      fieldball: { casual: 0.42, hardcore: 0.2 }
+      longbat: { casual: 0.002, hardcore: 0.0005 }
+
+  # ---- Oceania ---------------------------------------------------------------------------
+  - id: austrande
+    continent: oceania
+    population: 25000000
+    climate: temperate
+    incomePerPerson: 48000
+    urbanShare: 0.86
+    languages: { primary: calderan }
+    neighbors: []
+    seaLinks: [tavu-motu, sallavi-isles]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      fieldball: { casual: 0.18, hardcore: 0.04 }
+      longbat: { casual: 0.3, hardcore: 0.12 }
+
+  # Island reachable only by sea, with its own language sphere and a tiny media market.
   - id: sallavi-isles
+    continent: oceania
     population: 400000
-    attributes:
-      climate: tropical
-      wealth: 0.5
-      urbanDensity: 0.2
-      sportCulture: 0.4
-      mediaMarket: 0.1
-      languageGroup: valdic
+    climate: tropical
+    incomePerPerson: 6500
+    urbanShare: 0.25
+    languages: { primary: sallavic }
+    neighbors: []
+    seaLinks: [oruna, tavu-motu, austrande]
     startingRivalFans:
       fieldball: { casual: 0.3, hardcore: 0.1 }
       longbat: { casual: 0.1, hardcore: 0.03 }
 
-  - id: brenholt
-    population: 48000000
-    attributes:
-      climate: arid
-      wealth: 0.55
-      urbanDensity: 0.8
-      sportCulture: 0.7
-      mediaMarket: 0.9
-      languageGroup: nordel
+  # The signature hard anchor: tiny, remote, reachable only by sea.
+  - id: tavu-motu
+    continent: oceania
+    population: 120000
+    climate: tropical
+    incomePerPerson: 4000
+    urbanShare: 0.3
+    languages: { primary: tavuan }
+    neighbors: []
+    seaLinks: [austrande, sallavi-isles]
     startingRivalFans:
-      fieldball: { casual: 0.45, hardcore: 0.15 }
-      longbat: { casual: 0.08, hardcore: 0.02 }
+      fieldball: { casual: 0.25, hardcore: 0.08 }
+      longbat: { casual: 0.2, hardcore: 0.08 }

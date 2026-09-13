@@ -1,6 +1,13 @@
 import { expose } from "comlink";
 import type { Names } from "../../../content";
-import { createCampaign, endTurn, type GameState, snapshot, type TurnSnapshot } from "../../../sim";
+import {
+  createCampaign,
+  defaultGenome,
+  endTurn,
+  type GameState,
+  snapshot,
+  type TurnSnapshot,
+} from "../../../sim";
 import { loadBundledWorld } from "./bundled-content";
 
 // The simulation runs here, off the UI thread. The UI calls these functions through Comlink and
@@ -13,7 +20,12 @@ const api = {
   newCampaign(seed: number): TurnSnapshot {
     const anchor = world.countries[0];
     if (!anchor) throw new Error("Content has no countries");
-    state = createCampaign(world, { seed, anchorCountryId: anchor.id });
+    // Genome design has no screen yet: campaigns use the first quick-start preset.
+    state = createCampaign(world, {
+      seed,
+      anchorCountryId: anchor.id,
+      genome: defaultGenome(world),
+    });
     return snapshot(state, world);
   },
 

@@ -19,7 +19,8 @@
     "test": "vitest run",
     "sim": "tsx src/runner/cli.ts",
     "smoke": "npm run build && tsx scripts/smoke.ts",
-    "check": "npm run typecheck && npm run lint && npm run check:purity && npm run test"
+    "check": "npm run typecheck && npm run lint && npm run check:purity && npm run test",
+    "postinstall": "install-electron"
   },
   "dependencies": {
     "comlink": "4.4.2",

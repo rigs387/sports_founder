@@ -1,0 +1,296 @@
+# Sport genome content (GDD Sport Genome). The axes and options themselves are fixed by design and
+# declared in src/content/genome-axes.ts; this file must list every one of them, and carries every
+# tunable number: each option's lever modifiers and its conditions on country attributes.
+#
+# Three levers per option, each a delta added to a multiplier that starts at 1 (see config.yaml
+# `levers` for the clamps):
+#   affinity       multiplies both casual and hardcore conversion ("does this sport fit here?")
+#   accessibility  multiplies casual conversion (uninterested → casual)
+#   depth          multiplies hardcore conversion (casual → hardcore)
+#
+# Each option has `base` deltas (apply everywhere) and `conditions` on country attributes:
+#   climate: { cold: +0.4, tropical: -0.45 }     categorical: the listed delta applies in that zone
+#   wealth: +0.1                                  numeric 0–1 score: +0.1 at score 1, −0.1 at score 0,
+#                                                 nothing at 0.5 (linear in between)
+# Numeric attributes: wealth, urbanDensity, sportCulture, mediaMarket (all 0–1 scores).
+#
+# Design rule (GDD "No universal best option"): every option must have a downside somewhere in
+# attribute space and an upside somewhere. Content validation refuses an option that never hurts
+# or never helps.
+
+options:
+  surface:
+    grass:
+      base: {}
+      conditions:
+        affinity:
+          climate: { temperate: 0.15, tropical: 0.05, cold: -0.15, arid: -0.2 }
+        accessibility:
+          urbanDensity: -0.15
+    indoor:
+      base: { depth: 0.03 }
+      conditions:
+        affinity:
+          climate: { cold: 0.2, arid: 0.1, tropical: 0.05, temperate: -0.05 }
+        accessibility:
+          wealth: 0.2
+          urbanDensity: 0.1
+    street:
+      base: { accessibility: 0.05, depth: -0.08 }
+      conditions:
+        affinity:
+          climate: { cold: -0.15, arid: -0.05 }
+        accessibility:
+          urbanDensity: 0.25
+          wealth: -0.2
+    ice:
+      base: { depth: 0.08 }
+      conditions:
+        affinity:
+          climate: { cold: 0.45, temperate: -0.1, arid: -0.4, tropical: -0.5 }
+        accessibility:
+          wealth: 0.15
+
+  equipment:
+    ball-only:
+      base: { accessibility: 0.05, depth: -0.08 }
+      conditions:
+        accessibility:
+          wealth: -0.15
+        affinity:
+          sportCulture: -0.05
+    stick-or-bat:
+      base: { accessibility: -0.03, depth: 0.08 }
+      conditions:
+        accessibility:
+          wealth: 0.15
+    protective-gear:
+      base: { accessibility: -0.05, depth: 0.08 }
+      conditions:
+        accessibility:
+          wealth: 0.25
+        affinity:
+          sportCulture: 0.15
+
+  physical:
+    speed:
+      base: { accessibility: 0.03, depth: -0.04 }
+      conditions:
+        affinity:
+          climate: { tropical: 0.15, arid: 0.05, cold: -0.1 }
+        accessibility:
+          urbanDensity: 0.05
+    strength:
+      base: { depth: 0.04 }
+      conditions:
+        affinity:
+          climate: { cold: 0.15, temperate: 0.05, tropical: -0.15, arid: -0.05 }
+        accessibility:
+          sportCulture: 0.15
+    precision:
+      base: { accessibility: -0.02, depth: 0.08 }
+      conditions:
+        affinity:
+          wealth: 0.15
+          climate: { arid: 0.1 }
+    endurance:
+      base: { accessibility: 0.03, depth: -0.04 }
+      conditions:
+        affinity:
+          climate: { temperate: 0.15, cold: 0.05, tropical: -0.2, arid: -0.15 }
+          wealth: -0.1
+
+  footprint:
+    small:
+      base: { accessibility: 0.03, depth: -0.08 }
+      conditions:
+        accessibility:
+          urbanDensity: 0.2
+    medium:
+      base: {}
+      conditions:
+        accessibility:
+          urbanDensity: -0.05
+        depth:
+          wealth: 0.1
+    large:
+      base: { accessibility: -0.02, depth: 0.08 }
+      conditions:
+        accessibility:
+          urbanDensity: -0.25
+        affinity:
+          climate: { temperate: 0.05, arid: -0.05 }
+
+  contact:
+    none:
+      base: { accessibility: 0.03, depth: -0.08 }
+      conditions:
+        accessibility:
+          wealth: 0.1
+        affinity:
+          sportCulture: -0.1
+    incidental:
+      base: { accessibility: 0.01, depth: 0.02 }
+      conditions:
+        affinity:
+          sportCulture: 0.05
+    full:
+      base: { accessibility: -0.03, depth: 0.1 }
+      conditions:
+        accessibility:
+          wealth: -0.2
+        affinity:
+          sportCulture: 0.15
+
+  teamSize:
+    small:
+      base: { accessibility: 0.03, depth: -0.08 }
+      conditions:
+        affinity:
+          sportCulture: -0.1
+        accessibility:
+          mediaMarket: -0.05
+    medium:
+      base: { depth: 0.03 }
+      conditions:
+        accessibility:
+          urbanDensity: 0.1
+    large:
+      base: { accessibility: -0.02, depth: 0.08 }
+      conditions:
+        accessibility:
+          urbanDensity: 0.15
+        affinity:
+          sportCulture: 0.1
+
+  matchLength:
+    short:
+      base: { accessibility: 0.03, depth: -0.08 }
+      conditions:
+        accessibility:
+          mediaMarket: 0.15
+    standard:
+      base: { depth: 0.02 }
+      conditions:
+        depth:
+          sportCulture: 0.05
+        accessibility:
+          mediaMarket: -0.03
+    long:
+      base: { accessibility: -0.05, depth: 0.1 }
+      conditions:
+        affinity:
+          wealth: 0.15
+          climate: { tropical: -0.1, arid: -0.1 }
+
+  scoring:
+    low:
+      base: { accessibility: -0.03, depth: 0.08 }
+      conditions:
+        affinity:
+          sportCulture: 0.15
+    medium:
+      base: { depth: 0.02 }
+      conditions:
+        accessibility:
+          sportCulture: -0.05
+    high:
+      base: { accessibility: 0.03, depth: -0.04 }
+      conditions:
+        accessibility:
+          mediaMarket: 0.15
+        affinity:
+          sportCulture: -0.15
+
+  complexity:
+    simple:
+      base: { accessibility: 0.08, depth: -0.1 }
+      conditions:
+        affinity:
+          wealth: -0.1
+    moderate:
+      base: { depth: 0.02 }
+      conditions:
+        accessibility:
+          wealth: 0.05
+    intricate:
+      base: { accessibility: -0.06, depth: 0.15 }
+      conditions:
+        affinity:
+          wealth: 0.1
+          sportCulture: 0.1
+
+  structure:
+    continuous:
+      base: { accessibility: 0.03 }
+      conditions:
+        affinity:
+          climate: { tropical: -0.1, cold: 0.05 }
+        accessibility:
+          mediaMarket: -0.1
+    stop-start:
+      base: { accessibility: -0.02, depth: 0.04 }
+      conditions:
+        accessibility:
+          mediaMarket: 0.15
+        affinity:
+          climate: { tropical: 0.05 }
+    innings:
+      base: { accessibility: -0.03, depth: 0.08 }
+      conditions:
+        affinity:
+          climate: { tropical: 0.1, arid: 0.1, cold: -0.15, temperate: -0.05 }
+          wealth: 0.1
+
+# Quick-start genome templates (GDD Onboarding). The first preset is the default genome when a
+# host does not choose one (the worker-backed screen, the runner). The runner's differentiation
+# experiment runs contrasting pairs of these.
+presets:
+  - id: backyard-kickball
+    genome:
+      surface: grass
+      equipment: ball-only
+      physical: speed
+      footprint: small
+      contact: incidental
+      teamSize: small
+      matchLength: short
+      scoring: high
+      complexity: simple
+      structure: continuous
+  - id: ice-paddle
+    genome:
+      surface: ice
+      equipment: stick-or-bat
+      physical: strength
+      footprint: medium
+      contact: full
+      teamSize: medium
+      matchLength: standard
+      scoring: medium
+      complexity: moderate
+      structure: stop-start
+  - id: street-court
+    genome:
+      surface: street
+      equipment: ball-only
+      physical: precision
+      footprint: small
+      contact: none
+      teamSize: small
+      matchLength: short
+      scoring: medium
+      complexity: moderate
+      structure: stop-start
+  - id: long-innings
+    genome:
+      surface: grass
+      equipment: stick-or-bat
+      physical: precision
+      footprint: large
+      contact: none
+      teamSize: large
+      matchLength: long
+      scoring: high
+      complexity: intricate
+      structure: innings

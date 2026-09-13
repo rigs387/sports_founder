@@ -1,15 +1,23 @@
+import type { Genome } from "../content";
+
 export type {
+  AxisId,
   Climate,
   Config,
+  Continent,
   Country,
-  CountryAttributes,
+  CountryDerived,
+  Genome,
   Names,
+  PpTier,
   RivalSport,
+  SpreadLink,
   World,
 } from "../content";
-export { PLAYER_SPORT_ID } from "../content";
+export { OTHER_SPORT_ID, PLAYER_SPORT_ID } from "../content";
 
-export type SportKind = "player" | "rival";
+/** "other" is the passive bucket of every unmodeled sport's hardcore fans (GDD Rival AI). */
+export type SportKind = "player" | "rival" | "other";
 
 export interface SportState {
   id: string;
@@ -40,13 +48,17 @@ export interface GameState {
   /** Seeded generator state; part of the save so a resumed game rolls identically. */
   rng: number[];
   anchorCountryId: string;
+  /** The player's sport genome (GDD Sport Genome). Identity axes never change. */
+  genome: Genome;
   /** The turn the player is on. Starts at 1. */
   turn: number;
   /** Quarters simulated since the campaign began. */
   quarter: number;
   pp: number;
   ppTier: number;
-  /** The player's sport first, then rivals in content order. */
+  /** Focus slots: the country each slot is on, or null if unassigned. Length = the tier's slots. */
+  focus: (string | null)[];
+  /** The player's sport first, then rivals in content order, then the "other" bucket. */
   sports: SportState[];
   /** Same order as World.countries. */
   countries: CountryState[];
@@ -55,4 +67,8 @@ export interface GameState {
 export interface CampaignSetup {
   seed: number;
   anchorCountryId: string;
+  genome: Genome;
 }
+
+/** Index of the player's sport in GameState.sports and CountryState.fans. */
+export const PLAYER_INDEX = 0;
