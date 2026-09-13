@@ -32,6 +32,7 @@ surface before playtesting or during it.
 | 2026-09-12 | Supporting libraries per Section 6 | Recommended; confirm at project setup |
 | 2026-09-12 | Electron/Steam version policy per Section 8 | Decided |
 | 2026-09-13 | GDD design questions resolved through Phase 2 systems (GDD v1.1+) | Decided |
+| 2026-09-13 | Steam integration deferred until the game is playable | Decided |
 
 ---
 
@@ -52,7 +53,7 @@ answers "is the spreading heatmap fun?" in under a year.
 - Abstract leagues (health ladder and numbers only; no individual players)
 - Anchor-country collapse loss condition
 - Headless sim runner + seeded RNG
-- One Steam test achievement (proves the riskiest integration early)
+- ~~One Steam test achievement~~ — deferred 2026-09-13: no Steam work until the game itself exists
 
 **Estimate:** ~300–500 hours. At 10 hrs/week, roughly 8–12 months.
 
@@ -71,7 +72,6 @@ starting targets (thresholds adjustable as data arrives):
   mid-campaign save/load.
 - **Performance:** a 120-year headless campaign completes within a set time budget; the 120-year
   save size benchmark is recorded.
-- **Steam:** test achievement unlocks in a packaged build.
 
 **Bot playtesters:** strategy bots act only through the same legal actions as the player. Starting
 set: random, greedy-spread, anchor-turtle, media-rush. Every outcome is reported, including losses
@@ -334,7 +334,8 @@ fill gaps.
 
 | When | Add |
 |---|---|
-| **Phase 0 (day one)** | electron-vite, React, TypeScript strict, Biome, Git, PixiJS + d3-geo + world-atlas, Zustand, Web Worker + Comlink, Zod + YAML, pure-rand, Vitest, i18next, steamworks.js with one test achievement |
+| **Phase 0 (day one)** | electron-vite, React, TypeScript strict, Biome, Git, PixiJS + d3-geo + world-atlas, Zustand, Web Worker + Comlink, Zod + YAML, pure-rand, Vitest, i18next |
+| **Once the game is playable** | steamworks.js with a test achievement, Steam overlay in a packaged build |
 | **As matching systems are built** | TanStack Table/Virtual (league sim), Radix + Floating UI (business layer), D3 charts, Faker names, GSAP key moments, save versioning/migrations |
 | **Before Early Access** | Playwright smoke tests, Sentry, Howler audio, electron-builder packaging for Steam |
 | **Optional / later** | Motion, Rive or Lottie (with an artist), Three.js globe moments, Ink, DuckDB balance analysis |
@@ -571,8 +572,8 @@ To be copied into `CLAUDE.md` when the repository is created:
 2. ~~Define Phase 0 exit criteria in measurable terms.~~ — done 2026-09-13 (Section 2.1).
 3. Create the repository: Git, electron-vite + React + TypeScript strict, Biome, Vitest, and
    `CLAUDE.md` from Section 10.
-4. First technical proof: steamworks.js test achievement + Steam overlay working in a packaged
-   build.
+4. ~~First technical proof: Steam test achievement + overlay~~ — deferred 2026-09-13 until the
+   game is playable.
 5. Build the headless runner and seeded RNG before any UI polish.
 6. Stand up the Steam page once Phase 0 has a presentable map.
 
