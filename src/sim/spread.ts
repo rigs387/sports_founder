@@ -1,3 +1,4 @@
+import { mediaReachBlocked } from "./countermoves";
 import { fandomScore } from "./fandom";
 import { type GameState, PLAYER_INDEX, type World } from "./types";
 
@@ -5,12 +6,13 @@ import { type GameState, PLAYER_INDEX, type World } from "./types";
 // country's outbound strength is its player Fandom Score (hardcore + weighted casual), and the
 // exposure it creates in a target is that strength × channel link ÷ target population, summed over
 // every source and the three channels (proximity, language, media reach). Local word of mouth
-// adds the country's own following share, and a focus slot adds direct outreach.
+// adds the country's own following share, and a focus slot adds direct outreach. A rival's
+// exclusive broadcast deal blocks the media reach channel into a country (GDD Rival AI).
 
 export interface CountryExposure {
   /** Word of mouth: localWeight × player Fandom Score ÷ population. */
   local: number;
-  /** Inbound spread by channel, after the focus inbound multiplier. */
+  /** Inbound spread by channel, after the focus inbound multiplier and any broadcast deal. */
   proximity: number;
   language: number;
   media: number;
@@ -24,7 +26,7 @@ export interface CountryExposure {
 }
 
 /** Player outbound spread strength per country: the Fandom Score formula on raw counts. */
-export function outboundStrengths(state: GameState, world: World): number[] {
+export function outboundStrengths(state: Pick<GameState, "countries">, world: World): number[] {
   const { casualWeight } = world.config.fandomScore;
   return state.countries.map((countryState) => {
     const fans = countryState.fans[PLAYER_INDEX];
@@ -32,19 +34,41 @@ export function outboundStrengths(state: GameState, world: World): number[] {
   });
 }
 
+/**
+ * Media reach exposure into a country as if no broadcast deal were in effect: what a deal there
+ * would block. `strengths` comes from outboundStrengths.
+ */
+export function unblockedMediaReach(
+  world: World,
+  strengths: readonly number[],
+  target: number,
+): number {
+  const population = world.countries[target]?.population ?? 1;
+  let media = 0;
+  for (const link of world.inbound[target] ?? []) {
+    const strength = strengths[link.source] ?? 0;
+    if (strength > 0) media += (link.media * strength) / population;
+  }
+  return media;
+}
+
 /** Exposure to the player's sport in every country at the current state. */
-export function computeExposure(state: GameState, world: World): CountryExposure[] {
+export function computeExposure(
+  state: Pick<GameState, "countries" | "focus">,
+  world: World,
+): CountryExposure[] {
   const { exposure: settings, focus: focusSettings } = world.config;
   const strengths = outboundStrengths(state, world);
   const focused = new Set(state.focus.filter((id): id is string => id !== null));
 
-  return state.countries.map((_countryState, target) => {
+  return state.countries.map((countryState, target) => {
     const country = world.countries[target];
     const links = world.inbound[target] ?? [];
     if (!country) throw new Error(`No country #${target} in content`);
     const population = country.population;
     const isFocused = focused.has(country.id);
     const inboundMultiplier = isFocused ? focusSettings.inboundMultiplier : 1;
+    const mediaOpen = !mediaReachBlocked(countryState);
 
     let proximity = 0;
     let language = 0;
@@ -55,7 +79,7 @@ export function computeExposure(state: GameState, world: World): CountryExposure
       const perCapita = strength / population;
       proximity += link.proximity * perCapita;
       language += link.language * perCapita;
-      media += link.media * perCapita;
+      if (mediaOpen) media += link.media * perCapita;
     }
     const local = (settings.localWeight * (strengths[target] ?? 0)) / population;
     const organic = local + proximity + language + media;

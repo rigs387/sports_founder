@@ -1,4 +1,12 @@
-import type { GameState, Landmark, LeagueTierId, YearlySnapshot } from "./types";
+import type {
+  AxisId,
+  EscalationLevel,
+  GameState,
+  Landmark,
+  LeagueTierId,
+  TimedCountermoveKind,
+  YearlySnapshot,
+} from "./types";
 
 // History records (GDD History & Records). Landmarks are the permanent layer: plain facts the
 // simulation actually produced, with no text. Stories later read these; they never invent.
@@ -57,6 +65,47 @@ export const landmarks = {
     from,
     to,
   }),
+  rivalEscalated: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    sportId: string,
+    from: EscalationLevel,
+    to: EscalationLevel,
+  ): Landmark => ({ kind: "rivalEscalated", turn, quarter, countryId, sportId, from, to }),
+  rivalDeescalated: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    sportId: string,
+    from: EscalationLevel,
+    to: EscalationLevel,
+  ): Landmark => ({ kind: "rivalDeescalated", turn, quarter, countryId, sportId, from, to }),
+  rivalCountermove: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    sportId: string,
+    move: TimedCountermoveKind,
+    endQuarter: number,
+  ): Landmark => ({
+    kind: "rivalCountermove",
+    turn,
+    quarter,
+    countryId,
+    sportId,
+    move,
+    endQuarter,
+  }),
+  rivalRuleCopied: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    sportId: string,
+    axis: AxisId,
+    from: string,
+    to: string,
+  ): Landmark => ({ kind: "rivalRuleCopied", turn, quarter, countryId, sportId, axis, from, to }),
 };
 
 /**

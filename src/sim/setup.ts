@@ -2,6 +2,7 @@ import { genomeSchema, startingRivalFanCounts } from "../content";
 import { tierEntry } from "./calendar";
 import { newLeague } from "./leagues";
 import { landmarks } from "./records";
+import { newFront, newRivalState } from "./rivals";
 import { createRngState, MAX_SEED } from "./rng";
 import {
   type CampaignSetup,
@@ -65,6 +66,9 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
       league: isAnchor ? newLeague(world, index, 0, start.anchorHardcoreFans) : null,
       leaguesFolded: 0,
       formationReadyQuarter: 0,
+      // No rival is paying attention yet, and no countermove is in effect.
+      defense: world.rivals.map((rival) => newFront(rival.id)),
+      countermoves: [],
     };
   });
 
@@ -93,6 +97,8 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     focus,
     outcome: null,
     sports,
+    // Rival genomes start from content and become campaign state (rule copying changes them).
+    rivals: world.rivals.map((rival) => newRivalState(rival.id, rival.genome)),
     countries,
     landmarks: [landmarks.leagueFormed(1, 0, setup.anchorCountryId, false)],
     yearly: [],

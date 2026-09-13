@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "Sports Founder",
-    "subtitle": "Foundation build: genome, spread, leagues and the tier track are live; no map yet."
+    "subtitle": "Foundation build: genome, spread, leagues, the tier track and rival defense are live; no map yet."
   },
   "status": {
     "loading": "Setting up the backyard…",
@@ -55,6 +55,22 @@
       "near-collapse": "Near-Collapse"
     },
     "notYetMeasured": "Not measured yet"
+  },
+  "rivals": {
+    "heading": "Rivals in your birthplace",
+    "levels": {
+      "none": "Not watching",
+      "watching": "Watching",
+      "defending": "Defending",
+      "entrenched": "Entrenched"
+    },
+    "levelWithMoves": "{{level}}: {{moves}}",
+    "moves": {
+      "mediaBlitz": "media blitz",
+      "youthPrograms": "youth programs",
+      "broadcastDeal": "exclusive broadcast deal",
+      "sponsorLockout": "sponsor lockout"
+    }
   },
   "genome": {
     "heading": "Your sport's genome",

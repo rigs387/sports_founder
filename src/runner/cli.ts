@@ -14,11 +14,14 @@ import {
   type HardAnchorReport,
   type OptionsReport,
   type PacingReport,
+  type RivalLowPoint,
+  type RivalsPersistReport,
   runBenchmark,
   runCollapse,
   runHardAnchor,
   runOptions,
   runPacing,
+  runRivalsPersist,
 } from "./experiments";
 import { formatGenome, parseGenomeArg, randomGenome } from "./genome-arg";
 import { BOT_IDS, type BotId, isBotId } from "./policy";
@@ -40,6 +43,7 @@ const EXPERIMENTS = [
   "hard-anchor",
   "pacing",
   "options",
+  "rivals",
   "benchmark",
 ] as const;
 type ExperimentId = (typeof EXPERIMENTS)[number];
@@ -65,10 +69,14 @@ Usage: npm run sim -- [options]
                        hard-anchor      outcomes from the hardest anchor, per bot
                        pacing           turns to each PP tier against the GDD budget table
                        options          per-option outcomes from random genomes, per anchor
+                       rivals           rivals persist: no rival's hardcore fans ever reach zero in
+                                        any country or worldwide, for every anchor × bot (random
+                                        genomes); reports the lowest rival share seen and where
                        benchmark        a 120-year campaign: time, save size, load time
-  --anchors <ids>    anchors for collapse (default: all) and for pacing and options (default: the
-                     first country of each climate)
+  --anchors <ids>    anchors for collapse and rivals (default: all) and for pacing and options
+                     (default: the first country of each climate)
   --bots <ids>       bots for collapse and hard-anchor (default: greedy-spread,anchor-turtle,random)
+                     and rivals (default: greedy-spread,builder,anchor-turtle,random)
   --hard-anchor <id> anchor for hard-anchor (default: the smallest country)
   --presets <ids>    presets for differentiation (default: all)
   --content <dir>    content directory (default: ./content)
@@ -201,6 +209,65 @@ function printOptions(report: OptionsReport): void {
   const combined =
     report.combined.aboveLimit.length === 0 ? "none" : report.combined.aboveLimit.join(", ");
   console.log(`  ${"all anchors".padEnd(14)} above limit: ${combined}`);
+}
+
+const lowPoint = (low: RivalLowPoint | null, asShare: boolean) =>
+  low === null
+    ? "-"
+    : `${asShare ? `${(low.value * 100).toFixed(3)}% of the population` : `${(low.value * 100).toFixed(1)}% of its starting hardcore`} (${low.sportId} in ${low.countryId}, turn ${low.turn}; anchor ${low.anchor}, ${low.bot}, seed ${low.seed})`;
+
+function printRivalsPersist(report: RivalsPersistReport): void {
+  console.log(
+    `\nRivals persist: ${report.anchors.length} anchor(s) × bots ${report.bots.join(", ")} × ${report.seeds.length} seed(s), random genomes, up to ${report.turns} turns (${report.campaigns} campaigns)`,
+  );
+  console.log(
+    `  Lowest rival hardcore share in any country: ${lowPoint(report.lowestShare, true)}`,
+  );
+  console.log(
+    `  Lowest rival hardcore vs its start there: ${lowPoint(report.lowestRetained, false)}`,
+  );
+  const global = report.lowestGlobalShare;
+  console.log(
+    `  Lowest rival world hardcore share: ${global === null ? "-" : `${(global.value * 100).toFixed(2)}% (${global.sportId}; anchor ${global.anchor}, ${global.bot}, seed ${global.seed})`}`,
+  );
+  const worst = [...report.cells]
+    .filter((cell) => cell.lowestRetained !== null)
+    .sort((a, b) => (a.lowestRetained?.value ?? 1) - (b.lowestRetained?.value ?? 1))
+    .slice(0, 5);
+  console.log("  Cells where rivals kept the least of their starting base:");
+  for (const cell of worst) {
+    console.log(`    ${cell.anchor} / ${cell.bot}: ${lowPoint(cell.lowestRetained, false)}`);
+  }
+  console.log(
+    `  Eliminations: ${report.eliminations.length}${
+      report.eliminations.length > 0
+        ? ` (${report.eliminations
+            .slice(0, 10)
+            .map((e) => `${e.sportId} in ${e.countryId}, ${e.anchor}/${e.bot}/seed ${e.seed}`)
+            .join("; ")})`
+        : ""
+    }`,
+  );
+  console.log(`  Rivals persist criterion: ${report.passed ? "PASSED" : "FAILED"}`);
+}
+
+function printRivalActivity(agg: ReturnType<typeof aggregate>): void {
+  const peak = agg.peakPlayerHardcoreShare;
+  const share = (value: number | null) => (value === null ? "-" : pct(value));
+  console.log(
+    `  Peak player hardcore share of any country (per campaign): min ${share(peak.min)}, p10 ${share(peak.p10)}, median ${share(peak.median)}, p90 ${share(peak.p90)}, max ${share(peak.max)}; above 25% in ${peak.above25Percent}/${agg.campaigns}, above 50% in ${peak.above50Percent}/${agg.campaigns}`,
+  );
+  const overtake = agg.anchorOvertakeYears;
+  console.log(
+    `  Years until the player's hardcore fans outnumber every rival's in the anchor: overtook in ${overtake.overtook}/${overtake.of}; median ${overtake.median === null ? "-" : overtake.median.toFixed(1)}, p10 ${overtake.p10 === null ? "-" : overtake.p10.toFixed(1)}, p90 ${overtake.p90 === null ? "-" : overtake.p90.toFixed(1)}`,
+  );
+  for (const rival of agg.rivals) {
+    const m = rival.medianPerCampaign as Record<string, number | null>;
+    const n = (key: string) => fmt(m[key] ?? null);
+    console.log(
+      `  ${rival.sportId} (median per campaign): budget spent ${n("budgetSpent")}; escalations ${n("escalations")}, de-escalations ${n("deescalations")}; countermoves ${n("countermoves")} (media blitz ${n("mediaBlitz")}, youth programs ${n("youthPrograms")}, broadcast deal ${n("broadcastDeal")}, sponsor lockout ${n("sponsorLockout")}, rule copying ${n("ruleCopying")}); anchor hardcore share ${share(m.anchorHardcoreShareStart ?? null)} → ${share(m.anchorHardcoreShareEnd ?? null)}; peak anchor level ${JSON.stringify(rival.peakAnchorLevels)}; campaigns with an elimination ${rival.campaignsWithEliminations}`,
+    );
+  }
 }
 
 function printBenchmark(report: BenchmarkReport): void {
@@ -373,6 +440,20 @@ function main(): number {
         printOptions(report);
         break;
       }
+      case "rivals": {
+        const anchors = checkAnchors(world, listedAnchors ?? world.countries.map((c) => c.id));
+        const rivalBots = checkBots(
+          listOf(values.bots) ?? ["greedy-spread", "builder", "anchor-turtle", "random"],
+        );
+        const report = runRivalsPersist(
+          world,
+          { anchors, bots: rivalBots, seeds, turns },
+          collect(false),
+        );
+        writeReport("rivals", report);
+        printRivalsPersist(report);
+        break;
+      }
       case "benchmark": {
         const report = runBenchmark(world, { anchor, bot, firstSeed, years: 120, maxAttempts: 10 });
         writeReport("benchmark", report);
@@ -426,6 +507,10 @@ function main(): number {
       );
     }
     console.log(`  leagues at end (median): ${agg.leaguesAtEnd.median ?? "-"}`);
+  }
+  if (results.length > 0) {
+    console.log(`  Rival activity and player hardcore across all ${results.length} campaign(s):`);
+    printRivalActivity(agg);
   }
   console.log(`  invalid campaigns: ${agg.campaignsWithInvariantViolations}`);
 

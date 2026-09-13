@@ -1,4 +1,11 @@
-import type { Genome, HealthLevel, LeagueTierId } from "../content";
+import type {
+  AxisId,
+  EscalationLevel,
+  Genome,
+  HealthLevel,
+  LeagueTierId,
+  TimedCountermoveKind,
+} from "../content";
 
 export type {
   AxisId,
@@ -6,8 +13,10 @@ export type {
   Climate,
   Config,
   Continent,
+  CountermoveKind,
   Country,
   CountryDerived,
+  EscalationLevel,
   Genome,
   HealthLevel,
   LeagueTierId,
@@ -15,9 +24,17 @@ export type {
   PpTier,
   RivalSport,
   SpreadLink,
+  TimedCountermoveKind,
   World,
 } from "../content";
-export { HEALTH_LEVELS, LEAGUE_TIERS, OTHER_SPORT_ID, PLAYER_SPORT_ID } from "../content";
+export {
+  COUNTERMOVES,
+  ESCALATION_LEVELS,
+  HEALTH_LEVELS,
+  LEAGUE_TIERS,
+  OTHER_SPORT_ID,
+  PLAYER_SPORT_ID,
+} from "../content";
 
 /** "other" is the passive bucket of every unmodeled sport's hardcore fans (GDD Rival AI). */
 export type SportKind = "player" | "rival" | "other";
@@ -54,6 +71,39 @@ export interface LeagueState {
   bailoutReadyQuarter: number;
 }
 
+/** One rival's defense posture in one country (GDD Rival AI escalation ladder). */
+export interface RivalFront {
+  sportId: string;
+  level: EscalationLevel;
+  /** The player's hardcore gains here as a share of the population per year, smoothed. */
+  pressure: number;
+  /** Quarters at the current level. */
+  quartersAtLevel: number;
+  /** Consecutive quarters calm enough to count toward de-escalation. */
+  calmQuarters: number;
+}
+
+/** A rival countermove with a lasting effect in one country. */
+export interface ActiveCountermove {
+  kind: TimedCountermoveKind;
+  sportId: string;
+  /** The last quarter the effect applies to. */
+  endQuarter: number;
+}
+
+/** A rival sport's campaign state (GDD Rival AI). */
+export interface RivalState {
+  sportId: string;
+  /** Starts from content; rule copying changes its rule traits. Identity traits never change. */
+  genome: Genome;
+  /** Unspent defense budget. Hidden from the player (GDD: budgets are hidden). */
+  budget: number;
+  /** Budget spent so far, for balance reports. */
+  budgetSpent: number;
+  /** Earliest quarter the rival may copy another rule. */
+  ruleCopyReadyQuarter: number;
+}
+
 export interface CountryState {
   countryId: string;
   /** Same order as GameState.sports. */
@@ -63,6 +113,10 @@ export interface CountryState {
   leaguesFolded: number;
   /** Earliest quarter a league may form (after a fold). */
   formationReadyQuarter: number;
+  /** Each rival's escalation here, same order as GameState.rivals. */
+  defense: RivalFront[];
+  /** Rival countermoves in effect here. */
+  countermoves: ActiveCountermove[];
 }
 
 export interface PendingTierUp {
@@ -102,7 +156,35 @@ export type Landmark =
       countryId: string;
       leagueTier: LeagueTierId;
     }
-  | { kind: "ppTierUp" | "ppTierDown"; turn: number; quarter: number; from: number; to: number };
+  | { kind: "ppTierUp" | "ppTierDown"; turn: number; quarter: number; from: number; to: number }
+  | {
+      kind: "rivalEscalated" | "rivalDeescalated";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      sportId: string;
+      from: EscalationLevel;
+      to: EscalationLevel;
+    }
+  | {
+      kind: "rivalCountermove";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      sportId: string;
+      move: TimedCountermoveKind;
+      endQuarter: number;
+    }
+  | {
+      kind: "rivalRuleCopied";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      sportId: string;
+      axis: AxisId;
+      from: string;
+      to: string;
+    };
 
 export interface YearlySnapshot {
   year: number;
@@ -139,6 +221,8 @@ export interface GameState {
   outcome: GameOutcome | null;
   /** The player's sport first, then rivals in content order, then the "other" bucket. */
   sports: SportState[];
+  /** Rivals in content order (GameState.sports without the player and "other"). */
+  rivals: RivalState[];
   /** Same order as World.countries. */
   countries: CountryState[];
   landmarks: Landmark[];

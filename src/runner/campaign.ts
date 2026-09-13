@@ -1,16 +1,27 @@
 import {
   type Action,
+  COUNTERMOVES,
+  type CountermoveKind,
   checkInvariants,
   createCampaign,
+  ESCALATION_LEVELS,
   endTurn,
+  escalationIndex,
   type GameState,
   type Genome,
   PLAYER_INDEX,
+  QUARTERS_PER_YEAR,
   snapshot,
   type World,
 } from "../sim";
 import { type BotId, runBot } from "./policy";
-import type { CampaignResult, CountryRow, TurnRow } from "./report";
+import type {
+  CampaignResult,
+  CountryRow,
+  RivalCampaignReport,
+  TurnRow,
+  WhereAndWhen,
+} from "./report";
 
 export interface CampaignPlan {
   seed: number;
@@ -29,6 +40,17 @@ export interface PlayedCampaign {
   finalState: GameState;
 }
 
+/** Lowest points one rival reached over a campaign, observed after every turn. */
+interface RivalLows {
+  lowestHardcoreShare: WhereAndWhen;
+  lowestRetained: WhereAndWhen;
+  lowestGlobalHardcoreShare: number;
+  eliminatedFrom: Set<string>;
+  peakAnchorLevel: number;
+}
+
+const lowest = (value: number): WhereAndWhen => ({ value, countryId: "", turn: 0 });
+
 /** Plays one campaign: the bot acts, then the turn ends, until the turn limit or the end. */
 export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   let state = createCampaign(world, {
@@ -37,10 +59,75 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     genome: plan.genome,
   });
   const anchorIndex = world.countries.findIndex((c) => c.id === plan.anchorCountryId);
+  const anchorPopulation = world.countries[anchorIndex]?.population ?? 1;
+  const worldPopulation = world.countries.reduce((sum, country) => sum + country.population, 0);
   const tierReached: CampaignResult["tierReached"] = {};
   const violations = new Set<string>();
   const turnRows: TurnRow[] = [];
   const actions: Action[] = [];
+
+  const rivalSports = state.sports.flatMap((sport, index) =>
+    sport.kind === "rival" ? [{ id: sport.id, index }] : [],
+  );
+  const startHardcore = state.countries.map((country) => country.fans.map((fans) => fans.hardcore));
+  const lows: RivalLows[] = rivalSports.map(() => ({
+    lowestHardcoreShare: lowest(1),
+    lowestRetained: lowest(1),
+    lowestGlobalHardcoreShare: 1,
+    eliminatedFrom: new Set<string>(),
+    peakAnchorLevel: 0,
+  }));
+  let peakPlayerShare = lowest(0);
+  let anchorOvertakeYears: number | null = null;
+
+  /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
+  const observe = (current: GameState, turn: number) => {
+    const rivalWorldHardcore = rivalSports.map(() => 0);
+    current.countries.forEach((country, i) => {
+      const population = world.countries[i]?.population ?? 1;
+      const playerShare = (country.fans[PLAYER_INDEX]?.hardcore ?? 0) / population;
+      if (playerShare > peakPlayerShare.value) {
+        peakPlayerShare = { value: playerShare, countryId: country.countryId, turn };
+      }
+      rivalSports.forEach((sport, r) => {
+        const low = lows[r];
+        const hardcore = country.fans[sport.index]?.hardcore ?? 0;
+        if (!low) return;
+        rivalWorldHardcore[r] = (rivalWorldHardcore[r] ?? 0) + hardcore;
+        const share = hardcore / population;
+        if (share < low.lowestHardcoreShare.value) {
+          low.lowestHardcoreShare = { value: share, countryId: country.countryId, turn };
+        }
+        const started = startHardcore[i]?.[sport.index] ?? 0;
+        if (started > 0) {
+          const retained = hardcore / started;
+          if (retained < low.lowestRetained.value) {
+            low.lowestRetained = { value: retained, countryId: country.countryId, turn };
+          }
+          if (hardcore === 0) low.eliminatedFrom.add(country.countryId);
+        }
+        if (i === anchorIndex) {
+          const level = escalationIndex(country.defense[r]?.level ?? "none");
+          low.peakAnchorLevel = Math.max(low.peakAnchorLevel, level);
+        }
+      });
+    });
+    rivalSports.forEach((_sport, r) => {
+      const low = lows[r];
+      if (low) {
+        low.lowestGlobalHardcoreShare = Math.min(
+          low.lowestGlobalHardcoreShare,
+          (rivalWorldHardcore[r] ?? 0) / worldPopulation,
+        );
+      }
+    });
+    const anchorFans = current.countries[anchorIndex]?.fans ?? [];
+    const leadingRival = Math.max(0, ...rivalSports.map((s) => anchorFans[s.index]?.hardcore ?? 0));
+    if (anchorOvertakeYears === null && (anchorFans[PLAYER_INDEX]?.hardcore ?? 0) > leadingRival) {
+      anchorOvertakeYears = current.quarter / QUARTERS_PER_YEAR;
+    }
+  };
+  observe(state, 0);
 
   for (let t = 0; t < plan.turns && state.outcome === null; t += 1) {
     const step = runBot(plan.bot, state, world);
@@ -51,11 +138,13 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       tierReached[state.ppTier] = { turnsCompleted: t + 1, quartersElapsed: state.quarter };
     }
     for (const problem of checkInvariants(state, world)) violations.add(problem);
+    observe(state, t + 1);
 
     const snap = snapshot(state, world);
     const player = snap.sports.find((sport) => sport.kind === "player");
     if (!player) throw new Error("Snapshot has no player sport");
-    const anchorLeague = snap.countries[anchorIndex]?.league ?? null;
+    const anchorSnap = snap.countries[anchorIndex];
+    const anchorLeague = anchorSnap?.league ?? null;
     turnRows.push({
       seed: plan.seed,
       genome: plan.genomeLabel,
@@ -74,6 +163,13 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       playerCasual: player.casual,
       playerHardcore: player.hardcore,
       playerFandomScore: player.fandomScore,
+      anchorPlayerHardcoreShare: (anchorSnap?.hardcore ?? 0) / anchorPopulation,
+      rivals: rivalSports.map((sport, r) => ({
+        sportId: sport.id,
+        anchorHardcoreShare:
+          (state.countries[anchorIndex]?.fans[sport.index]?.hardcore ?? 0) / anchorPopulation,
+        anchorLevel: anchorSnap?.rivals[r]?.level ?? "none",
+      })),
     });
   }
 
@@ -109,9 +205,48 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       leagueHealth: c.league?.health ?? "",
       leagueCash: c.league?.cash ?? 0,
       leaguesFolded: state.countries[snap.countries.indexOf(c)]?.leaguesFolded ?? 0,
+      rivalLevels: c.rivals.map((rival) => rival.level).join("|"),
+      rivalCountermoves: c.rivals.flatMap((rival) => rival.countermoves).join("|"),
     }),
   );
   const count = (kind: string) => state.landmarks.filter((l) => l.kind === kind).length;
+
+  const rivalReports = rivalSports.map((sport, r): RivalCampaignReport => {
+    const rival = state.rivals[r];
+    const low = lows[r];
+    const mine = state.landmarks.filter((l) => "sportId" in l && l.sportId === sport.id);
+    const countermoves = Object.fromEntries(COUNTERMOVES.map((kind) => [kind, 0])) as Record<
+      CountermoveKind,
+      number
+    >;
+    for (const landmark of mine) {
+      if (landmark.kind === "rivalCountermove") countermoves[landmark.move] += 1;
+      if (landmark.kind === "rivalRuleCopied") countermoves.ruleCopying += 1;
+    }
+    return {
+      sportId: sport.id,
+      budgetSpent: rival?.budgetSpent ?? 0,
+      budgetLeft: rival?.budget ?? 0,
+      escalations: mine.filter((l) => l.kind === "rivalEscalated").length,
+      deescalations: mine.filter((l) => l.kind === "rivalDeescalated").length,
+      countermoves,
+      countermovesTotal: Object.values(countermoves).reduce((sum, n) => sum + n, 0),
+      finalGenomeChanges: rival
+        ? Object.entries(rival.genome).filter(
+            ([axis, option]) =>
+              world.rivals[r]?.genome[axis as keyof Genome] !== (option as string),
+          ).length
+        : 0,
+      peakAnchorLevel: ESCALATION_LEVELS[low?.peakAnchorLevel ?? 0] ?? "none",
+      anchorHardcoreShareStart: (startHardcore[anchorIndex]?.[sport.index] ?? 0) / anchorPopulation,
+      anchorHardcoreShareEnd:
+        (state.countries[anchorIndex]?.fans[sport.index]?.hardcore ?? 0) / anchorPopulation,
+      lowestHardcoreShare: low?.lowestHardcoreShare ?? lowest(0),
+      lowestRetained: low?.lowestRetained ?? lowest(0),
+      lowestGlobalHardcoreShare: low?.lowestGlobalHardcoreShare ?? 0,
+      eliminatedFrom: [...(low?.eliminatedFrom ?? [])],
+    };
+  });
 
   return {
     result: {
@@ -144,8 +279,11 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       topCountries: byScore.slice(0, 10).map((c) => c.countryId),
       topCountriesByShare: byShare.slice(0, 10).map((c) => c.countryId),
       anchorHardcoreShare:
-        (state.countries[anchorIndex]?.fans[PLAYER_INDEX]?.hardcore ?? 0) /
-        (world.countries[anchorIndex]?.population ?? 1),
+        (state.countries[anchorIndex]?.fans[PLAYER_INDEX]?.hardcore ?? 0) / anchorPopulation,
+      peakPlayerHardcoreShare: peakPlayerShare,
+      anchorOvertakeYears,
+      rivalReports,
+      landmarks: state.landmarks.length,
       tierReached,
       invariantViolations: [...violations],
     },

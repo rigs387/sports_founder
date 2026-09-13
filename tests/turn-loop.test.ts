@@ -155,26 +155,43 @@ describe("state stays valid", () => {
     expect(fullest).toBeGreaterThan(0.99);
   });
 
-  it("hardcore fans fall only in a country whose league worsened, stepped down or folded that turn", () => {
-    const rank = (health: string | undefined) =>
-      health === undefined ? 3 : ["healthy", "struggling", "near-collapse"].indexOf(health);
-    let previous = createCampaign(world, setupFor(21, "oruna", presetGenome("ice-paddle")));
-    let lost = 0;
-    for (let turn = 0; turn < 120 && previous.outcome === null; turn += 1) {
-      const next = endTurn(builder(previous, world).state, world);
+  it("hardcore fans never go straight to uninterested: every hardcore loss becomes casual", () => {
+    // With casual churn and decay switched off, a sport's casual + hardcore in a country can only
+    // fall if hardcore fans skipped casual. Poaching, league health, step-downs and folds all run.
+    const noChurn = withConfig(world, (config) => {
+      config.dynamics.player.casualChurnRate = 0;
+      config.dynamics.player.casualDecayRate = 0;
+      config.dynamics.rival.casualChurnRate = 0;
+    });
+    // After turn 80 the player stops converting new hardcore fans, so its losses to rival poaching
+    // show up as falling hardcore counts instead of hiding under growth.
+    const noNewHardcore = withConfig(noChurn, (config) => {
+      config.dynamics.player.hardcoreConversionRate = 0;
+    });
+    let previous = createCampaign(noChurn, setupFor(21, "valdoria", presetGenome("ice-paddle")));
+    const problems: string[] = [];
+    const losses = { player: 0, rivals: 0 };
+    for (let turn = 0; turn < 140 && previous.outcome === null; turn += 1) {
+      const w = turn < 80 ? noChurn : noNewHardcore;
+      const next = endTurn(builder(previous, w).state, w);
       next.countries.forEach((country, i) => {
-        const before = previous.countries[i];
-        const fell = (country.fans[0]?.hardcore ?? 0) < (before?.fans[0]?.hardcore ?? 0);
-        if (!fell) return;
-        lost += 1;
-        const worsened = rank(country.league?.health) > rank(before?.league?.health);
-        const steppedDown = next.landmarks
-          .slice(previous.landmarks.length)
-          .some((l) => l.kind === "leagueSteppedDown" && l.countryId === country.countryId);
-        expect(worsened || steppedDown, `${country.countryId} on turn ${next.turn - 1}`).toBe(true);
+        country.fans.forEach((fans, s) => {
+          const before = previous.countries[i]?.fans[s];
+          if (!before) return;
+          if (fans.hardcore < before.hardcore) {
+            if (s === 0) losses.player += 1;
+            else losses.rivals += 1;
+          }
+          if (fans.casual + fans.hardcore < before.casual + before.hardcore) {
+            problems.push(`${country.countryId}/${fans.sportId} on turn ${turn + 1}`);
+          }
+        });
       });
       previous = next;
     }
-    expect(lost).toBeGreaterThanOrEqual(0);
+    expect(problems).toEqual([]);
+    // Hardcore losses really happened on both sides, or the check proves nothing.
+    expect(losses.player).toBeGreaterThan(0);
+    expect(losses.rivals).toBeGreaterThan(0);
   });
 });

@@ -1,14 +1,17 @@
 import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
+import { rivalConversionBoosts } from "./countermoves";
 import { playerFandomScore } from "./fandom";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { stepLeagueQuarter } from "./leagues";
+import { poachableHardcore, poachingRates } from "./poaching";
 import { yearlySnapshot } from "./records";
+import { stepRivals } from "./rivals";
 import { nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { type CountryExposure, computeExposure } from "./spread";
 import type { Config, CountryState, GameState, Landmark, SportState, World } from "./types";
 
-// Quarterly simulation (GDD Fan Model, Sport Genome, Spread Model, Business Layer). Every rate is
-// config.
+// Quarterly simulation (GDD Fan Model, Sport Genome, Spread Model, Rival AI, Business Layer). Every
+// rate is config.
 //
 // Player's sport, per country, per quarter:
 //   uninterested → casual   uninterested × casualConversionRate × accessibility × affinity
@@ -18,13 +21,17 @@ import type { Config, CountryState, GameState, Landmark, SportState, World } fro
 //                           similarity) × share of people with no hardcore sport × focus bonus
 // Exposure comes from src/sim/spread.ts: local word of mouth, inbound spread over the proximity,
 // language and media channels (only casual exposure crosses borders), and focus outreach.
+// Rivals: slow local drift with no spread and no affinity, boosted where that rival's media blitz
+// or youth programs are in effect (src/sim/countermoves.ts). "Other" never converts anyone.
+// Hardcore poaching (src/sim/poaching.ts): every sport's hardcore fans demote to casual about the
+// same sport at a rate set by the sports pulling on them. Hardcore fans never go straight to
+// uninterested; the only other hardcore loss is the league causes at the end of a turn.
 // Hardcore is exclusive: if the sports together would convert more people than have no hardcore
-// sport, the conversions are scaled down to fit. Hardcore loss happens only through league
-// causes (src/sim/leagues.ts), at the end of a turn.
+// sport, the conversions are scaled down to fit.
 //
 // After fans move, league business runs (src/sim/leagues.ts): leagues form at the hardcore
 // threshold, and existing leagues earn revenue and pay running costs. Cash never feeds PP.
-// Rivals (PLACEHOLDER until the rival AI): slow local drift, no spread. "Other" never moves.
+// Then the rival AI runs (src/sim/rivals.ts): budgets, escalation and countermoves.
 // PP income per quarter: scale × (player Fandom Score ^ exponent).
 // At the end of each in-game year the yearly world snapshot is recorded.
 
@@ -36,7 +43,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
   const quarter = state.quarter + 1;
   const found: Landmark[] = [];
 
-  const countries = state.countries.map((countryState, index) => {
+  const afterBusiness = state.countries.map((countryState, index) => {
     const country = world.countries[index];
     const countryExposure = exposure[index];
     if (!country || country.id !== countryState.countryId || !countryExposure) {
@@ -51,6 +58,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
       countryState,
       state.sports,
       country.population,
+      state.rivals,
     );
     const playerRates: PlayerRates = {
       casualConversion:
@@ -84,6 +92,9 @@ export function stepQuarter(state: GameState, world: World): GameState {
     return business.country;
   });
 
+  const defended = stepRivals(state, afterBusiness, quarter, world);
+  found.push(...defended.landmarks);
+  const countries = defended.countries;
   const score = playerFandomScore(state.sports, countries, config.fandomScore.casualWeight);
   const ppIncome = config.ppIncome.scale * score ** config.ppIncome.exponent;
   const yearEnded = quarter % QUARTERS_PER_YEAR === 0;
@@ -93,6 +104,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
     rng: saveRng(rng),
     quarter,
     pp: state.pp + ppIncome,
+    rivals: defended.rivals,
     countries,
     landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
     yearly: yearEnded
@@ -112,9 +124,9 @@ interface Flows {
   casualGain: number;
   casualChurn: number;
   hardcoreGain: number;
+  /** Hardcore fans poached this quarter: they demote to casual about the same sport. */
+  hardcoreLoss: number;
 }
-
-const NO_FLOWS: Flows = { casualGain: 0, casualChurn: 0, hardcoreGain: 0 };
 
 function stepCountryFans(
   countryState: CountryState,
@@ -128,14 +140,23 @@ function stepCountryFans(
   const totalHardcore = countryState.fans.reduce((sum, fans) => sum + fans.hardcore, 0);
   const unattached = population - totalHardcore;
   const unattachedShare = unattached / population;
+  const poaching = poachingRates(countryState, sports, population, config);
 
   // All flows are computed from the start-of-quarter snapshot, so sport order does not matter.
+  // Each sport kind draws the same rolls every quarter whatever the config, so the random
+  // sequence stays aligned when rates change.
   const flows: Flows[] = countryState.fans.map((fans, index) => {
     const sport = sports[index];
     if (!sport || sport.id !== fans.sportId) {
       throw new Error(`Sport order mismatch in "${countryState.countryId}" at #${index}`);
     }
     const uninterested = population - fans.casual - fans.hardcore;
+    const hardcoreLoss = drawFlow(
+      rng,
+      poachableHardcore(fans.hardcore, population, config),
+      poaching[index] ?? 0,
+      noise,
+    );
     if (sport.kind === "player") {
       const casualGain = drawFlow(rng, uninterested, playerRates.casualConversion, noise);
       const casualChurn = drawFlow(rng, fans.casual, playerRates.casualChurn, noise);
@@ -145,22 +166,28 @@ function stepCountryFans(
         playerRates.hardcoreConversion * unattachedShare,
         noise,
       );
-      return { casualGain, casualChurn, hardcoreGain };
+      return { casualGain, casualChurn, hardcoreGain, hardcoreLoss };
     }
     if (sport.kind === "rival") {
       const rates = config.dynamics.rival;
+      const boosts = rivalConversionBoosts(countryState, sport.id, config);
       const reach = (fans.casual + fans.hardcore) / population;
-      const casualGain = drawFlow(rng, uninterested, rates.casualConversionRate * reach, noise);
+      const casualGain = drawFlow(
+        rng,
+        uninterested,
+        rates.casualConversionRate * reach * boosts.casual,
+        noise,
+      );
       const casualChurn = drawFlow(rng, fans.casual, rates.casualChurnRate, noise);
       const hardcoreGain = drawFlow(
         rng,
         fans.casual - casualChurn,
-        rates.hardcoreConversionRate * unattachedShare,
+        rates.hardcoreConversionRate * unattachedShare * boosts.hardcore,
         noise,
       );
-      return { casualGain, casualChurn, hardcoreGain };
+      return { casualGain, casualChurn, hardcoreGain, hardcoreLoss };
     }
-    return NO_FLOWS;
+    return { casualGain: 0, casualChurn: 0, hardcoreGain: 0, hardcoreLoss };
   });
 
   const requested = flows.reduce((sum, flow) => sum + flow.hardcoreGain, 0);
@@ -170,13 +197,14 @@ function stepCountryFans(
   return {
     ...countryState,
     fans: countryState.fans.map((fans, index) => {
-      const flow = flows[index] ?? NO_FLOWS;
+      const flow = flows[index];
+      if (!flow) throw new Error(`No flows for sport #${index}`);
       const hardcoreGain = Math.min(remaining, Math.floor(flow.hardcoreGain * scale));
       remaining -= hardcoreGain;
       return {
         sportId: fans.sportId,
-        casual: fans.casual + flow.casualGain - flow.casualChurn - hardcoreGain,
-        hardcore: fans.hardcore + hardcoreGain,
+        casual: fans.casual + flow.casualGain - flow.casualChurn - hardcoreGain + flow.hardcoreLoss,
+        hardcore: fans.hardcore + hardcoreGain - flow.hardcoreLoss,
       };
     }),
   };

@@ -74,9 +74,35 @@ describe("save and resume", () => {
     expect(JSON.parse(text).formatVersion).toBe(SAVE_FORMAT_VERSION);
   });
 
+  it("resumes identically from a turn with escalated rivals, spent budgets and countermoves in effect", () => {
+    const setup = setupFor(4471, firstAnchor, presetGenome("long-innings"));
+    const rivalsActive = (state: GameState) =>
+      state.countries.some((c) => c.countermoves.length > 0) &&
+      state.countries.some((c) => c.defense.some((front) => front.level !== "none")) &&
+      state.rivals.some((rival) => rival.budgetSpent > 0);
+    let midway = createCampaign(world, setup);
+    let saveAfter = 0;
+    while (saveAfter < 150 && midway.outcome === null && !rivalsActive(midway)) {
+      midway = playWithPolicy(midway, 1);
+      saveAfter += 1;
+    }
+    expect(rivalsActive(midway)).toBe(true);
+
+    const uninterrupted = playWithPolicy(createCampaign(world, setup), saveAfter + 40);
+    const resumed = playWithPolicy(deserializeSave(serializeSave(midway), world), 40);
+    expect(resumed).toStrictEqual(uninterrupted);
+    expect(serializeSave(resumed)).toBe(serializeSave(uninterrupted));
+    // The continuation kept the rival AI busy, so resumed rival state was really exercised.
+    expect(
+      uninterrupted.landmarks
+        .slice(midway.landmarks.length)
+        .some((l) => l.kind === "rivalCountermove"),
+    ).toBe(true);
+  });
+
   /** A saved state reduced to the version 2 shape: no leagues, tier track, outcome or history. */
   function asVersion2(state: GameState) {
-    const { tierTrack: _t, outcome: _o, landmarks: _l, yearly: _y, ...rest } = state;
+    const { tierTrack: _t, outcome: _o, landmarks: _l, yearly: _y, rivals: _r, ...rest } = state;
     return {
       ...rest,
       countries: state.countries.map((country) => ({
@@ -85,6 +111,61 @@ describe("save and resume", () => {
       })),
     };
   }
+
+  /** A saved state reduced to the version 3 shape: no rival state, fronts or countermoves. */
+  function asVersion3(state: GameState) {
+    const { rivals: _r, ...rest } = state;
+    return {
+      ...rest,
+      countries: state.countries.map(({ defense: _d, countermoves: _c, ...country }) => country),
+    };
+  }
+
+  it("migrates a version 3 save: rival genomes come from content, budgets start empty, nobody is watching", () => {
+    const current = playWithPolicy(
+      createCampaign(world, setupFor(8, firstAnchor, presetGenome("long-innings"))),
+      70,
+    );
+    expect(current.landmarks.some((l) => l.kind === "rivalEscalated")).toBe(true);
+    const v3 = JSON.stringify({ formatVersion: 3, state: asVersion3(current) });
+    const loaded = deserializeSave(v3, world);
+    expect(loaded.rivals).toStrictEqual(
+      world.rivals.map((rival) => ({
+        sportId: rival.id,
+        genome: rival.genome,
+        budget: 0,
+        budgetSpent: 0,
+        ruleCopyReadyQuarter: 0,
+      })),
+    );
+    for (const country of loaded.countries) {
+      expect(country.defense.map((front) => front.level)).toEqual(world.rivals.map(() => "none"));
+      expect(country.countermoves).toEqual([]);
+    }
+    expect(loaded.countries.map((c) => c.fans)).toStrictEqual(current.countries.map((c) => c.fans));
+    expect(loaded.countries.map((c) => c.league)).toStrictEqual(
+      current.countries.map((c) => c.league),
+    );
+    expect(loaded.landmarks).toStrictEqual(current.landmarks);
+    expect(loaded.tierTrack).toStrictEqual(current.tierTrack);
+    expect(loaded.rng).toStrictEqual(current.rng);
+    // A migrated campaign keeps playing, and re-saves in the current format.
+    const later = playWithPolicy(loaded, 6);
+    expect(JSON.parse(serializeSave(later)).formatVersion).toBe(SAVE_FORMAT_VERSION);
+  });
+
+  it("rejects a save with an unknown escalation level or a countermove by a sport that is not a rival", () => {
+    const save = JSON.parse(serializeSave(createCampaign(world, setupFor(3))));
+    save.state.countries[0].defense[0].level = "furious";
+    expect(() => deserializeSave(JSON.stringify(save), world)).toThrow(
+      /state\.countries\[0\]\.defense\[0\]\.level/,
+    );
+    const save2 = JSON.parse(serializeSave(createCampaign(world, setupFor(3))));
+    save2.state.countries[0].countermoves = [
+      { kind: "mediaBlitz", sportId: "curling", endQuarter: 9 },
+    ];
+    expect(() => deserializeSave(JSON.stringify(save2), world)).toThrow(/curling/);
+  });
 
   it("migrates a version 1 save (no genome, no focus, no leagues) to the current format", () => {
     const current = runTurns(createCampaign(world, setupFor(5)), world, 10);

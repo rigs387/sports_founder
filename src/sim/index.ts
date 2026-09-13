@@ -1,12 +1,15 @@
 export * from "./actions";
 export * from "./calendar";
+export * from "./countermoves";
 export * from "./fandom";
 export * from "./genome";
 export * from "./hints";
 export * from "./invariants";
 export * from "./leagues";
+export * from "./poaching";
 export * from "./quarter";
 export * from "./records";
+export * from "./rivals";
 export { MAX_SEED, SEED_WARM_UP_DRAWS } from "./rng";
 export * from "./save";
 export * from "./setup";

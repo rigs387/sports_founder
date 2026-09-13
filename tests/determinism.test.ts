@@ -46,6 +46,10 @@ describe("determinism", () => {
     expect(a.focus.filter((id) => id !== null && id !== firstAnchor).length).toBeGreaterThan(0);
     expect(a.landmarks.some((l) => l.kind === "leaguePromoted")).toBe(true);
     expect(a.yearly.length).toBe(Math.floor(a.quarter / 4));
+    // The rival AI must have escalated and spent, or its determinism is not really covered.
+    expect(a.landmarks.some((l) => l.kind === "rivalEscalated")).toBe(true);
+    expect(a.landmarks.some((l) => l.kind === "rivalCountermove")).toBe(true);
+    expect(a.rivals.some((rival) => rival.budgetSpent > 0)).toBe(true);
   });
 
   it("is deterministic under the random bot, whose dice never touch the simulation's RNG", () => {

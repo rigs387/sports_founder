@@ -1,20 +1,31 @@
 import { z } from "zod";
-import { formatPath, genomeSchema, healthLevelSchema, leagueTierSchema } from "../content";
+import {
+  AXIS_IDS,
+  type AxisId,
+  escalationLevelSchema,
+  formatPath,
+  genomeSchema,
+  healthLevelSchema,
+  leagueTierSchema,
+  timedCountermoveSchema,
+} from "../content";
 import { tierEntry } from "./calendar";
 import { invariantsOf } from "./invariants";
 import { newLeague } from "./leagues";
+import { newFront, newRivalState } from "./rivals";
 import { MAX_SEED } from "./rng";
 import { defaultGenome } from "./setup";
 import type { GameState, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 3;
+export const SAVE_FORMAT_VERSION = 4;
 
 export class SaveError extends Error {
   override name = "SaveError";
 }
 
 const count = z.int().min(0);
+const axisSchema = z.enum(AXIS_IDS as [AxisId, ...AxisId[]]);
 
 // Key order matches createCampaign and every state update, so a loaded state re-serializes
 // byte-identically.
@@ -58,6 +69,34 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     from: z.int().min(1),
     to: z.int().min(1),
   }),
+  z.strictObject({
+    kind: z.enum(["rivalEscalated", "rivalDeescalated"]),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    sportId: z.string().min(1),
+    from: escalationLevelSchema,
+    to: escalationLevelSchema,
+  }),
+  z.strictObject({
+    kind: z.literal("rivalCountermove"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    sportId: z.string().min(1),
+    move: timedCountermoveSchema,
+    endQuarter: count,
+  }),
+  z.strictObject({
+    kind: z.literal("rivalRuleCopied"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    sportId: z.string().min(1),
+    axis: axisSchema,
+    from: z.string().min(1),
+    to: z.string().min(1),
+  }),
 ]);
 
 const gameStateSchema = z.strictObject({
@@ -88,6 +127,15 @@ const gameStateSchema = z.strictObject({
   sports: z.array(
     z.strictObject({ id: z.string().min(1), kind: z.enum(["player", "rival", "other"]) }),
   ),
+  rivals: z.array(
+    z.strictObject({
+      sportId: z.string().min(1),
+      genome: genomeSchema,
+      budget: z.number().min(0),
+      budgetSpent: z.number().min(0),
+      ruleCopyReadyQuarter: count,
+    }),
+  ),
   countries: z.array(
     z.strictObject({
       countryId: z.string().min(1),
@@ -95,6 +143,22 @@ const gameStateSchema = z.strictObject({
       league: leagueSchema.nullable(),
       leaguesFolded: count,
       formationReadyQuarter: count,
+      defense: z.array(
+        z.strictObject({
+          sportId: z.string().min(1),
+          level: escalationLevelSchema,
+          pressure: z.number().min(0),
+          quartersAtLevel: count,
+          calmQuarters: count,
+        }),
+      ),
+      countermoves: z.array(
+        z.strictObject({
+          kind: timedCountermoveSchema,
+          sportId: z.string().min(1),
+          endQuarter: count,
+        }),
+      ),
     }),
   ),
   landmarks: z.array(landmarkSchema),
@@ -108,6 +172,9 @@ const saveFileSchema = z.strictObject({
 
 type RawSave = { formatVersion: number; state: Record<string, unknown> };
 type RawCountry = Record<string, unknown>;
+
+const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
+  Array.isArray(state.countries) ? (state.countries as RawCountry[]) : [];
 
 /**
  * Migrations from each older format version to the next. A save at version N is passed through
@@ -144,9 +211,6 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
   2: (save, world) => {
     const { seed, rng, anchorCountryId, genome, turn, quarter, pp, ppTier, focus, sports } =
       save.state;
-    const rawCountries = Array.isArray(save.state.countries)
-      ? (save.state.countries as RawCountry[])
-      : [];
     const anchorIndex = world.countries.findIndex((country) => country.id === anchorCountryId);
     const tier = typeof ppTier === "number" ? ppTier : 1;
     const slots = world.config.ppTiers.some((entry) => entry.tier === tier)
@@ -174,7 +238,7 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
         focus,
         outcome: null,
         sports,
-        countries: rawCountries.map((country, index) => {
+        countries: rawCountries(save.state).map((country, index) => {
           const fans = Array.isArray(country.fans) ? country.fans : [];
           const hardcore = Number((fans[0] as { hardcore?: unknown } | undefined)?.hardcore ?? 0);
           return {
@@ -190,6 +254,57 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
         }),
         landmarks: [],
         yearly: [],
+      },
+    };
+  },
+
+  // 3 → 4: rival defense arrived. Rival genomes become campaign state, starting from content;
+  // budgets start empty, no rival is paying attention anywhere yet, and no countermove is in
+  // effect. The next quarters rebuild pressure from the player's hardcore gains.
+  3: (save, world) => {
+    const {
+      seed,
+      rng,
+      anchorCountryId,
+      genome,
+      turn,
+      quarter,
+      pp,
+      ppTier,
+      tierTrack,
+      focus,
+      outcome,
+      sports,
+      landmarks,
+      yearly,
+    } = save.state;
+    return {
+      formatVersion: 4,
+      state: {
+        seed,
+        rng,
+        anchorCountryId,
+        genome,
+        turn,
+        quarter,
+        pp,
+        ppTier,
+        tierTrack,
+        focus,
+        outcome,
+        sports,
+        rivals: world.rivals.map((rival) => newRivalState(rival.id, rival.genome)),
+        countries: rawCountries(save.state).map((country) => ({
+          countryId: country.countryId,
+          fans: country.fans,
+          league: country.league,
+          leaguesFolded: country.leaguesFolded,
+          formationReadyQuarter: country.formationReadyQuarter,
+          defense: world.rivals.map((rival) => newFront(rival.id)),
+          countermoves: [],
+        })),
+        landmarks,
+        yearly,
       },
     };
   },

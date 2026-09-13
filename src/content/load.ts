@@ -4,8 +4,10 @@ import { deriveWorld, startingRivalFanCounts, startingSportCulture, type World }
 import { optionDeltaRange } from "./genome";
 import { AXIS_IDS, GENOME_AXES } from "./genome-axes";
 import {
+  COUNTERMOVES,
   configFileSchema,
   countriesFileSchema,
+  ESCALATION_LEVELS,
   genomeFileSchema,
   LEAGUE_TIERS,
   LEVERS,
@@ -339,6 +341,63 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
       "balanceTargets.turnsInTier",
       `needs a target for each of the first ${tiers.length - 1} tiers`,
     );
+  }
+  LEAGUE_TIERS.forEach((leagueTier, i) => {
+    const lower = LEAGUE_TIERS[i - 1];
+    const promotion = leagues.tiers[leagueTier].promotion;
+    const lowerPromotion = lower === undefined ? null : leagues.tiers[lower].promotion;
+    if (promotion && lowerPromotion && promotion.minHardcore < lowerPromotion.minHardcore) {
+      issue(
+        sources.config,
+        `leagues.tiers.${leagueTier}.promotion.minHardcore`,
+        `must not be lower than the ${lower} tier's`,
+      );
+    }
+  });
+
+  // ---- Poaching and rival AI ---------------------------------------------------------------
+  const { rivalAI, poaching } = world.config;
+  const resistance = poaching.defenseResistance;
+  ESCALATION_LEVELS.forEach((level, i) => {
+    const lower = ESCALATION_LEVELS[i - 1];
+    if (lower !== undefined && resistance[level] > resistance[lower]) {
+      issue(
+        sources.config,
+        `poaching.defenseResistance.${level}`,
+        `must not be above the ${lower} level's (higher escalation defends at least as hard)`,
+      );
+    }
+  });
+  const thresholds = rivalAI.escalation.thresholds;
+  if (thresholds.defending <= thresholds.watching) {
+    issue(
+      sources.config,
+      "rivalAI.escalation.thresholds.defending",
+      "must be above the watching threshold",
+    );
+  }
+  if (thresholds.entrenched <= thresholds.defending) {
+    issue(
+      sources.config,
+      "rivalAI.escalation.thresholds.entrenched",
+      "must be above the defending threshold",
+    );
+  }
+  const listed = new Set<string>();
+  rivalAI.preference.forEach((move, i) => {
+    if (listed.has(move)) {
+      issue(sources.config, `rivalAI.preference[${i}]`, `"${move}" is listed more than once`);
+    }
+    listed.add(move);
+  });
+  for (const move of COUNTERMOVES) {
+    if (!listed.has(move)) {
+      issue(
+        sources.config,
+        "rivalAI.preference",
+        `must list every countermove; "${move}" is missing`,
+      );
+    }
   }
   if (world.config.focus.exposedCost > world.config.focus.coldLaunchCost) {
     issue(

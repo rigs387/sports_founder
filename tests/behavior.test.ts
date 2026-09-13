@@ -125,8 +125,17 @@ describe("Similarity to the dominant rival eases casual conversion and slows har
     const state = createCampaign(world, setupFor(1, "valdoria"));
     const country = state.countries[countryIndex(world, "valdoria")];
     if (!country) throw new Error("no valdoria");
-    const same = similarityEffect(twin, baseGenome, country, state.sports, 9_000_000);
-    const diff = similarityEffect(opposite, baseGenome, country, state.sports, 9_000_000);
+    const twinRivals = createCampaign(twin, setupFor(1, "valdoria")).rivals;
+    const oppositeRivals = createCampaign(opposite, setupFor(1, "valdoria")).rivals;
+    const same = similarityEffect(twin, baseGenome, country, state.sports, 9_000_000, twinRivals);
+    const diff = similarityEffect(
+      opposite,
+      baseGenome,
+      country,
+      state.sports,
+      9_000_000,
+      oppositeRivals,
+    );
     expect(same.similarity).toBe(1);
     expect(same.casualFactor).toBeGreaterThan(1);
     expect(same.hardcoreFactor).toBeLessThan(1);

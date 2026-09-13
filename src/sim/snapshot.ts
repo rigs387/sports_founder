@@ -1,10 +1,12 @@
 import { seasonalWindowOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
+import { mediaRevenueFactor } from "./countermoves";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
 import { computeExposure } from "./spread";
 import { tierStatus } from "./tiers";
 import {
+  type EscalationLevel,
   type GameOutcome,
   type GameState,
   type Genome,
@@ -12,6 +14,7 @@ import {
   type LeagueTierId,
   type PendingTierUp,
   PLAYER_INDEX,
+  type TimedCountermoveKind,
   type World,
 } from "./types";
 
@@ -43,6 +46,15 @@ export interface CountrySnapshot {
   /** Similarity to the country's dominant rival, 0–1. */
   rivalSimilarity: number;
   league: LeagueSnapshot | null;
+  /** Each rival's escalation here and its countermoves in effect. Budgets stay hidden. */
+  rivals: RivalDefenseSnapshot[];
+}
+
+/** What the map shows of one rival in one country (GDD Rival AI: budgets are hidden). */
+export interface RivalDefenseSnapshot {
+  sportId: string;
+  level: EscalationLevel;
+  countermoves: TimedCountermoveKind[];
 }
 
 export interface TierTrackSnapshot {
@@ -105,18 +117,32 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
         countryState,
         state.sports,
         country.population,
+        state.rivals,
       ).similarity,
       league: league
         ? {
             tier: league.tier,
             health: league.health,
             cash: league.cash,
-            revenuePerQuarter: revenuePerQuarter(world, index, league.tier, fans, state.ppTier)
-              .total,
+            revenuePerQuarter: revenuePerQuarter(
+              world,
+              index,
+              league.tier,
+              fans,
+              state.ppTier,
+              mediaRevenueFactor(countryState, world.config),
+            ).total,
             runningCostPerQuarter: runningCostPerQuarter(world, index, league.tier),
             lastFlowPerQuarter: league.lastFlowPerQuarter,
           }
         : null,
+      rivals: countryState.defense.map((front) => ({
+        sportId: front.sportId,
+        level: front.level,
+        countermoves: countryState.countermoves
+          .filter((move) => move.sportId === front.sportId)
+          .map((move) => move.kind),
+      })),
     };
   });
   const track = state.tierTrack;

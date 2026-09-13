@@ -195,11 +195,50 @@ const leagueTierConfigSchema = z.strictObject({
   promotion: z
     .strictObject({
       hardcoreShare: unitInterval,
+      minHardcore: z.int().min(0),
       reserveQuarters: z.number().min(0),
       costQuarters: z.number().min(0),
     })
     .nullable(),
 });
+
+// ---- Rivals (GDD Rival AI) -----------------------------------------------------------------
+
+/** A rival's per-country escalation ladder, lowest first. "none" means not yet paying attention. */
+export const escalationLevelSchema = z.enum(["none", "watching", "defending", "entrenched"]);
+export const ESCALATION_LEVELS = escalationLevelSchema.options;
+export type EscalationLevel = z.infer<typeof escalationLevelSchema>;
+
+/** The closed countermove list (GDD Rival AI). */
+export const countermoveSchema = z.enum([
+  "mediaBlitz",
+  "youthPrograms",
+  "broadcastDeal",
+  "sponsorLockout",
+  "ruleCopying",
+]);
+export const COUNTERMOVES = countermoveSchema.options;
+export type CountermoveKind = z.infer<typeof countermoveSchema>;
+
+/** Countermoves with an effect that lasts for a period; rule copying is instant and permanent. */
+export const timedCountermoveSchema = z.enum([
+  "mediaBlitz",
+  "youthPrograms",
+  "broadcastDeal",
+  "sponsorLockout",
+]);
+export type TimedCountermoveKind = z.infer<typeof timedCountermoveSchema>;
+
+const escalatedLevelSchema = z.enum(["watching", "defending", "entrenched"]);
+
+const timedMoveBase = {
+  minLevel: escalatedLevelSchema,
+  baseCost: z.number().min(0),
+  durationQuarters: z.int().min(1),
+};
+
+const perLevel = <T extends z.ZodType>(value: T) =>
+  z.strictObject({ none: value, watching: value, defending: value, entrenched: value });
 
 const axisWeights = Object.fromEntries(AXIS_IDS.map((axis) => [axis, z.number().min(0)])) as {
   [A in AxisId]: z.ZodNumber;
@@ -265,6 +304,52 @@ export const configFileSchema = z.strictObject({
       casualConversionRate: rate,
       casualChurnRate: rate,
       hardcoreConversionRate: rate,
+    }),
+  }),
+  poaching: z.strictObject({
+    rate: rate,
+    referenceShare: z.number().gt(0).max(1),
+    maxStrength: z.number().min(0),
+    floorShare: z.number().min(0).lt(1),
+    defenseResistance: perLevel(unitInterval),
+  }),
+  rivalAI: z.strictObject({
+    meaningfulHardcoreShare: z.number().gt(0).max(1),
+    pressureSmoothing: z.number().gt(0).max(1),
+    escalation: z.strictObject({
+      thresholds: z.strictObject({
+        watching: z.number().gt(0),
+        defending: z.number().gt(0),
+        entrenched: z.number().gt(0),
+      }),
+      minQuartersAtLevel: z.int().min(0),
+      deescalationRatio: z.number().gt(0).max(1),
+      deescalationQuarters: z.int().min(1),
+    }),
+    nearTop: z.strictObject({
+      startRatio: z.number().min(0).lt(1),
+      maxIntensity: z.number().min(1),
+    }),
+    budget: z.strictObject({
+      incomePerFandomScore: z.number().min(0),
+      capQuarters: z.number().positive(),
+    }),
+    movesPerQuarter: z.int().min(0),
+    costPopulationExponent: z.number().min(0).max(1),
+    preference: z.array(countermoveSchema),
+    countermoves: z.strictObject({
+      mediaBlitz: z.strictObject({ ...timedMoveBase, casualConversionBoost: z.number().min(0) }),
+      youthPrograms: z.strictObject({
+        ...timedMoveBase,
+        hardcoreConversionBoost: z.number().min(0),
+      }),
+      broadcastDeal: z.strictObject(timedMoveBase),
+      sponsorLockout: z.strictObject({ ...timedMoveBase, mediaRevenueCut: unitInterval }),
+      ruleCopying: z.strictObject({
+        minLevel: escalatedLevelSchema,
+        cost: z.number().min(0),
+        cooldownQuarters: z.int().min(0),
+      }),
     }),
   }),
   hints: z.strictObject({

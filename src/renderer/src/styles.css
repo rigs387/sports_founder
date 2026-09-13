@@ -147,3 +147,17 @@ body {
   color: #9a1e1e;
   font-weight: bold;
 }
+
+.rivals h2 {
+  font-size: 1.2rem;
+  margin: 24px 0 8px;
+}
+
+.escalation-defending {
+  color: #8a5a00;
+}
+
+.escalation-entrenched {
+  color: #9a1e1e;
+  font-weight: bold;
+}

@@ -186,12 +186,94 @@ dynamics:
     # casual → hardcore: casual × rate × depth × affinity × crowding × share of people with no
     # hardcore sport × focus conversion bonus
     hardcoreConversionRate: 0.012
-  # PLACEHOLDER rival drift: rivals only drift slowly until the rival AI arrives (GDD Rival AI).
-  # No spread, no affinity.
+  # Rivals drift slowly on their own; they have no spread and no affinity. Rival defense
+  # countermoves (rivalAI below) boost these rates where a rival defends.
+  #   uninterested → casual   uninterested × casualConversionRate × reach (casual + hardcore share)
+  #                           × (1 + media blitz boost)
+  #   casual → uninterested   casual × casualChurnRate
+  #   casual → hardcore       casual × hardcoreConversionRate × share of people with no hardcore
+  #                           sport × (1 + youth programs boost)
   rival:
     casualConversionRate: 0.02
     casualChurnRate: 0.01
     hardcoreConversionRate: 0.001
+
+# Hardcore poaching between sports (GDD Fan Model, v1.4: "Winning over rival hardcore fans is slow").
+# One rule both ways. Each quarter, in each country, a sport's hardcore fans above the floor demote
+# to casual about that same sport at
+#   rate × Σ over pulling sports (strength × defense resistance)
+#   strength = min(maxStrength, puller hardcore share of the population ÷ referenceShare)
+# The player's sport pulls from every rival and from the "other sports" bucket; each rival pulls
+# from the player's sport. Rivals do not pull from each other, and "other" never pulls. Demoted fans
+# can then become hardcore about any sport through normal conversion. Hardcore fans never go
+# straight to uninterested.
+poaching:
+  rate: 0.002
+  referenceShare: 0.1
+  maxStrength: 2
+  # Poaching never takes a sport below this share of the country's population.
+  floorShare: 0.0001
+  # Multiplies the player's pull on a rival by the rival's escalation level in that country ("rival
+  # defense slows the pull further"). The "other" bucket never defends: it always takes the full pull.
+  defenseResistance: { none: 1, watching: 1, defending: 0.75, entrenched: 0.5 }
+
+# Rival defense (GDD Rival AI, Late-Game Pressure). Rivals defend; they don't hunt. Runs once per
+# quarter, deterministic, no randomness.
+rivalAI:
+  # A rival escalates in a country only while it holds at least this hardcore share there.
+  meaningfulHardcoreShare: 0.02
+  # Pressure per rival per country = the player's hardcore gains there, as a share of the population
+  # per year, smoothed: pressure ← pressure + smoothing × (annual gain share − pressure).
+  pressureSmoothing: 0.25
+  escalation:
+    # Escalate one level when pressure reaches the next level's threshold ÷ intensity, after at
+    # least minQuartersAtLevel at the current level.
+    thresholds: { watching: 0.0005, defending: 0.002, entrenched: 0.006 }
+    minQuartersAtLevel: 4
+    # De-escalate one level after deescalationQuarters in a row with pressure below
+    # (current level's threshold ÷ intensity) × deescalationRatio, or with the rival below the
+    # meaningful share.
+    deescalationRatio: 0.5
+    deescalationQuarters: 8
+  # All rivals defend harder as the player approaches global #1 (defending their position, not
+  # hunting). ratio = player Fandom Score ÷ the best rival's; intensity rises linearly from 1 at
+  # startRatio to maxIntensity at 1 (and stays there once the player leads). Intensity divides the
+  # escalation thresholds and multiplies budget income.
+  nearTop:
+    startRatio: 0.5
+    maxIntensity: 2
+  # Hidden defense budget per rival: income per quarter = incomePerFandomScore × the rival's world
+  # Fandom Score × intensity. Unspent budget is capped at capQuarters of income.
+  budget:
+    incomePerFandomScore: 0.000008
+    capQuarters: 40
+  # At most this many countermoves per rival per quarter, bought round-robin across the rival's
+  # escalated countries (highest level first, then the rival's biggest hardcore base), trying
+  # countermoves in preference order. A rival cannot spend more than its budget.
+  movesPerQuarter: 1
+  # Timed countermoves cost baseCost × (country population in millions) ^ costPopulationExponent:
+  # bigger countries cost more to defend, but less than in proportion, so a rival can afford its
+  # populous heartlands.
+  costPopulationExponent: 0.5
+  preference: [youthPrograms, mediaBlitz, sponsorLockout, broadcastDeal, ruleCopying]
+  # Closed countermove list. A countermove needs the rival to be at minLevel or above in that
+  # country. Timed countermoves last durationQuarters and are not bought again while in effect there.
+  countermoves:
+    # Rival casual conversion × (1 + casualConversionBoost) in that country.
+    mediaBlitz: { minLevel: defending, baseCost: 1800, durationQuarters: 12, casualConversionBoost: 0.5 }
+    # Rival hardcore conversion × (1 + hardcoreConversionBoost) in that country.
+    youthPrograms: { minLevel: defending, baseCost: 3000, durationQuarters: 20, hardcoreConversionBoost: 1.0 }
+    # Blocks the player's media reach spread channel into that country. Bought only while the
+    # player has media reach exposure there, and never on top of another rival's deal.
+    broadcastDeal: { minLevel: defending, baseCost: 3200, durationQuarters: 16 }
+    # The player's league media and sponsor revenue there × (1 − mediaRevenueCut). Bought only
+    # where the player has a league, and never on top of another rival's lockout.
+    sponsorLockout: { minLevel: defending, baseCost: 1600, durationQuarters: 16, mediaRevenueCut: 0.5 }
+    # The rival adopts one of the player's rule traits that is popular in that country: the rule
+    # axis where the player's option has the highest positive net lever delta there (affinity +
+    # accessibility + depth) above the rival's own option. Changes the rival's genome everywhere.
+    # Costs a flat amount (it is one global rulebook change).
+    ruleCopying: { minLevel: entrenched, cost: 30000, cooldownQuarters: 40 }
 
 # Anchor genome hints (GDD Campaign setup): an option's net lever delta at the anchor country
 # (affinity + accessibility + depth) maps to ++ / + / − by these thresholds.
@@ -204,8 +286,10 @@ hints:
 # country and never produces PP.
 leagues:
   # Per tier: runningCost per quarter (before the wealth and size factors below), revenue
-  # multiplier, and promotion INTO this tier: hardcore share of the population needed, cash
-  # reserve needed and cash cost, both in quarters of this tier's running cost.
+  # multiplier, and promotion INTO this tier: hardcore fans needed = max(minHardcore, hardcoreShare
+  # × population), cash reserve needed and cash cost, both in quarters of this tier's running cost.
+  # minHardcore keeps the fixed starting fan base from qualifying a tiny country for promotion
+  # straight away (GDD: early collapse very unlikely).
   tiers:
     amateur:
       runningCost: 0.4
@@ -214,15 +298,15 @@ leagues:
     semi-pro:
       runningCost: 6
       revenueMultiplier: 1.5
-      promotion: { hardcoreShare: 0.0004, reserveQuarters: 2.5, costQuarters: 2 }
+      promotion: { hardcoreShare: 0.0004, minHardcore: 1500, reserveQuarters: 2.5, costQuarters: 2 }
     professional:
       runningCost: 40
       revenueMultiplier: 2
-      promotion: { hardcoreShare: 0.003, reserveQuarters: 2.5, costQuarters: 2 }
+      promotion: { hardcoreShare: 0.003, minHardcore: 3000, reserveQuarters: 2.5, costQuarters: 2 }
     elite:
       runningCost: 90
       revenueMultiplier: 2.5
-      promotion: { hardcoreShare: 0.02, reserveQuarters: 2.5, costQuarters: 2 }
+      promotion: { hardcoreShare: 0.02, minHardcore: 15000, reserveQuarters: 2.5, costQuarters: 2 }
   formation:
     # An Amateur league forms once player hardcore fans reach max(minHardcore, share × population).
     minHardcore: 300

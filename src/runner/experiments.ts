@@ -262,6 +262,116 @@ export function runOptions(
   };
 }
 
+// ---- Rivals persist ------------------------------------------------------------------------
+
+/** One observation of a rival at its lowest, with the campaign it came from. */
+export interface RivalLowPoint {
+  value: number;
+  sportId: string;
+  countryId: string;
+  turn: number;
+  anchor: string;
+  bot: BotId;
+  seed: number;
+}
+
+export interface RivalsPersistCell {
+  anchor: string;
+  bot: BotId;
+  campaigns: number;
+  collapses: number;
+  /** Lowest rival hardcore share of a country's population seen in this cell. */
+  lowestShare: RivalLowPoint | null;
+  /** Lowest rival hardcore count relative to its starting count in that country. */
+  lowestRetained: RivalLowPoint | null;
+  eliminations: number;
+}
+
+export interface RivalsPersistReport {
+  anchors: string[];
+  bots: BotId[];
+  seeds: number[];
+  turns: number;
+  campaigns: number;
+  cells: RivalsPersistCell[];
+  lowestShare: RivalLowPoint | null;
+  lowestRetained: RivalLowPoint | null;
+  /** Lowest world hardcore share any rival fell to. */
+  lowestGlobalShare: Omit<RivalLowPoint, "countryId" | "turn"> | null;
+  /** Every country where a rival's hardcore fans reached zero. The criterion fails if any. */
+  eliminations: Omit<RivalLowPoint, "value" | "turn">[];
+  passed: boolean;
+}
+
+const lower = <T extends { value: number }>(best: T | null, candidate: T): T =>
+  best === null || candidate.value < best.value ? candidate : best;
+
+/**
+ * Tech plan 2.1 "Rivals persist": no rival is ever fully eliminated from any country or globally,
+ * across anchors, bots and seeds. Rival fans are observed after every turn.
+ */
+export function runRivalsPersist(
+  world: World,
+  settings: { anchors: string[]; bots: BotId[]; seeds: number[]; turns: number },
+  onCampaign?: OnCampaign,
+): RivalsPersistReport {
+  const cells: RivalsPersistCell[] = [];
+  const eliminations: RivalsPersistReport["eliminations"] = [];
+  let lowestShare: RivalLowPoint | null = null;
+  let lowestRetained: RivalLowPoint | null = null;
+  let lowestGlobalShare: RivalsPersistReport["lowestGlobalShare"] = null;
+  for (const anchor of settings.anchors) {
+    for (const bot of settings.bots) {
+      const cell: RivalsPersistCell = {
+        anchor,
+        bot,
+        campaigns: 0,
+        collapses: 0,
+        lowestShare: null,
+        lowestRetained: null,
+        eliminations: 0,
+      };
+      for (const seed of settings.seeds) {
+        const played = randomGenomeCampaign(world, seed, anchor, bot, settings.turns);
+        onCampaign?.(played);
+        cell.campaigns += 1;
+        if (played.result.collapsed) cell.collapses += 1;
+        for (const rival of played.result.rivalReports) {
+          const at = { sportId: rival.sportId, anchor, bot, seed };
+          const share = { ...at, ...rival.lowestHardcoreShare };
+          const retained = { ...at, ...rival.lowestRetained };
+          cell.lowestShare = lower(cell.lowestShare, share);
+          cell.lowestRetained = lower(cell.lowestRetained, retained);
+          lowestShare = lower(lowestShare, share);
+          lowestRetained = lower(lowestRetained, retained);
+          lowestGlobalShare = lower(lowestGlobalShare, {
+            ...at,
+            value: rival.lowestGlobalHardcoreShare,
+          });
+          for (const countryId of rival.eliminatedFrom) {
+            eliminations.push({ ...at, countryId });
+            cell.eliminations += 1;
+          }
+        }
+      }
+      cells.push(cell);
+    }
+  }
+  return {
+    anchors: settings.anchors,
+    bots: settings.bots,
+    seeds: settings.seeds,
+    turns: settings.turns,
+    campaigns: cells.reduce((sum, cell) => sum + cell.campaigns, 0),
+    cells,
+    lowestShare,
+    lowestRetained,
+    lowestGlobalShare,
+    eliminations,
+    passed: eliminations.length === 0 && lowestGlobalShare !== null && lowestGlobalShare.value > 0,
+  };
+}
+
 /** The first country of each climate zone: a spread of contrasting default anchors. */
 export function contrastingAnchors(world: World): string[] {
   return CLIMATES.map((climate) => world.countries.find((c) => c.climate === climate)?.id).filter(

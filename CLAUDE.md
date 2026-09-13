@@ -30,8 +30,9 @@ runs/                 Runner and smoke-test output (git-ignored)
 - `npm run sim -- --campaigns 20 --turns 100`: headless runner, which writes to `runs/latest/`.
   `--help` lists the options, bots (greedy-spread, builder, anchor-turtle, random) and experiments.
 - `npm run sim -- --experiment all --campaigns 10 --turns 200`: every balance experiment for the
-  tech plan exit criteria (differentiation, collapse, hard-anchor, pacing, options, benchmark).
-  Misses are reported, never counted as passes.
+  tech plan exit criteria (differentiation, collapse, hard-anchor, pacing, options, rivals,
+  benchmark). Misses are reported, never counted as passes. Every run also prints rival activity,
+  the peak player hardcore share and the years to overtake the anchor's leading rival.
 - `npm run dev`: launch the app with hot reload.
 - `npm run smoke`: build the app, launch it, click End Turn, and save screenshots and a report to
   `runs/smoke/`.
@@ -51,8 +52,11 @@ runs/                 Runner and smoke-test output (git-ignored)
   DOM or Node types.
 - The simulation advances in quarters (`stepQuarter`); a turn is N quarters, with N set by the PP
   tier table in config (`endTurn`). The UI updates once per turn from a `TurnSnapshot`.
-- The genome, affinity, spread, league, cash, health and PP tier models follow the GDD; their
-  numbers are tuning. Rival behavior is still a placeholder drift (see `src/sim/quarter.ts`).
+- The genome, affinity, spread, league, cash, health, PP tier, poaching and rival defense models
+  follow the GDD; their numbers are tuning. Hardcore poaching is in `src/sim/poaching.ts`; the rival
+  AI (budgets, escalation, countermoves) runs once per quarter in `src/sim/rivals.ts`, uses no
+  randomness, and records every escalation change and countermove as a landmark. Rival genomes are
+  campaign state. Budgets never appear in the `TurnSnapshot`.
 - Every player action goes through `applyAction` in `src/sim/actions.ts`; bots use the same path.
 - An anchor league collapse sets `outcome` and ends the campaign; `endTurn` refuses to continue.
 

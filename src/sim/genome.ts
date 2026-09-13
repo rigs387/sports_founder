@@ -109,9 +109,15 @@ export function dominantRival(
   return best;
 }
 
-export function rivalGenome(world: World, sportIndex: number): Genome {
-  const rival = world.rivals[sportIndex - 1];
-  if (!rival) throw new Error(`Sport #${sportIndex} is not a rival`);
+/** A rival's genome as the campaign has it (rule copying can change it), by sport id. */
+export interface RivalGenome {
+  sportId: string;
+  genome: Genome;
+}
+
+export function rivalGenome(rivals: readonly RivalGenome[], sportId: string): Genome {
+  const rival = rivals.find((candidate) => candidate.sportId === sportId);
+  if (!rival) throw new Error(`"${sportId}" is not a rival`);
   return rival.genome;
 }
 
@@ -127,7 +133,8 @@ export interface SimilarityEffect {
 /**
  * GDD Rival similarity: resembling the dominant rival makes casual conversion easier (familiar)
  * and hardcore conversion harder (they already have that sport). The effect scales with the
- * rival's hardcore share, up to config.similarity.fullEffectHardcoreShare.
+ * rival's hardcore share, up to config.similarity.fullEffectHardcoreShare. `rivals` carries each
+ * rival's current genome (GameState.rivals).
  */
 export function similarityEffect(
   world: World,
@@ -135,13 +142,15 @@ export function similarityEffect(
   countryState: CountryState,
   sports: readonly SportState[],
   population: number,
+  rivals: readonly RivalGenome[],
 ): SimilarityEffect {
   const { similarity: settings } = world.config;
   const dominant = dominantRival(countryState, sports, population);
-  if (dominant.sportIndex < 0) {
+  const dominantId = sports[dominant.sportIndex]?.id;
+  if (dominant.sportIndex < 0 || dominantId === undefined) {
     return { similarity: 0, effective: 0, casualFactor: 1, hardcoreFactor: 1 };
   }
-  const raw = similarity(genome, rivalGenome(world, dominant.sportIndex), world.config);
+  const raw = similarity(genome, rivalGenome(rivals, dominantId), world.config);
   const establishment = Math.min(1, dominant.hardcoreShare / settings.fullEffectHardcoreShare);
   const effective = raw * establishment;
   return {

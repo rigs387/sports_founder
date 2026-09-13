@@ -246,6 +246,7 @@ describe("content validation", () => {
       ["leagues", "tiers", "amateur", "promotion"],
       setValue({
         hardcoreShare: 0.001,
+        minHardcore: 0,
         reserveQuarters: 1,
         costQuarters: 1,
       }),
@@ -291,6 +292,60 @@ describe("content validation", () => {
     const dir3 = copyOfContent();
     editYaml(dir3, "config.yaml", ["seasonalWindow", "quarterOfYear"], setValue(5));
     expect(loadError(dir3).message).toContain("config.yaml at seasonalWindow.quarterOfYear");
+  });
+
+  it("bad poaching, rival AI and promotion minimum config names the file and field", () => {
+    const cases: [Key[], unknown, string][] = [
+      [["poaching", "rate"], 1.5, "config.yaml at poaching.rate"],
+      [["poaching", "floorShare"], -0.1, "config.yaml at poaching.floorShare"],
+      [
+        ["poaching", "defenseResistance", "entrenched"],
+        1,
+        "config.yaml at poaching.defenseResistance.entrenched: must not be above the defending level's",
+      ],
+      [
+        ["poaching", "defenseResistance", "watching"],
+        undefined,
+        "poaching.defenseResistance.watching",
+      ],
+      [
+        ["rivalAI", "escalation", "thresholds", "defending"],
+        0.0001,
+        "config.yaml at rivalAI.escalation.thresholds.defending: must be above the watching threshold",
+      ],
+      [
+        ["rivalAI", "preference"],
+        ["mediaBlitz", "youthPrograms"],
+        'config.yaml at rivalAI.preference: must list every countermove; "broadcastDeal" is missing',
+      ],
+      [["rivalAI", "preference", 0], "bribery", "config.yaml at rivalAI.preference[0]"],
+      [
+        ["rivalAI", "countermoves", "broadcastDeal", "minLevel"],
+        "none",
+        "config.yaml at rivalAI.countermoves.broadcastDeal.minLevel",
+      ],
+      [
+        ["rivalAI", "countermoves", "sponsorLockout", "mediaRevenueCut"],
+        2,
+        "config.yaml at rivalAI.countermoves.sponsorLockout.mediaRevenueCut",
+      ],
+      [
+        ["rivalAI", "countermoves", "hostileTakeover"],
+        { minLevel: "watching" },
+        "config.yaml at rivalAI.countermoves",
+      ],
+      [["rivalAI", "nearTop", "startRatio"], 1, "config.yaml at rivalAI.nearTop.startRatio"],
+      [
+        ["leagues", "tiers", "elite", "promotion", "minHardcore"],
+        10,
+        "config.yaml at leagues.tiers.elite.promotion.minHardcore: must not be lower than the professional tier's",
+      ],
+    ];
+    for (const [path, value, expected] of cases) {
+      const dir = copyOfContent();
+      editYaml(dir, "config.yaml", path, value === undefined ? remove : setValue(value));
+      expect(loadError(dir).message, path.join(".")).toContain(expected);
+    }
   });
 
   it("a missing file is named", () => {

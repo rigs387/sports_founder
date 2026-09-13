@@ -7,6 +7,7 @@ import {
   checkAction,
   computeExposure,
   type GameState,
+  mediaRevenueFactor,
   PLAYER_INDEX,
   promotionTerms,
   revenuePerQuarter,
@@ -145,7 +146,14 @@ export function builder(state: GameState, world: World): BotStep {
     if (!league || !fans || league.health !== "healthy") continue;
     const terms = promotionTerms(world, index, league.tier);
     if (!terms) continue;
-    const revenue = revenuePerQuarter(world, index, terms.to, fans, step.state.ppTier).total;
+    const revenue = revenuePerQuarter(
+      world,
+      index,
+      terms.to,
+      fans,
+      step.state.ppTier,
+      mediaRevenueFactor(current, world.config),
+    ).total;
     const cost = runningCostPerQuarter(world, index, terms.to);
     if (revenue < cost * BUILDER_MARGIN) continue;
     if (league.cash < terms.reserveNeeded + terms.cost) continue;

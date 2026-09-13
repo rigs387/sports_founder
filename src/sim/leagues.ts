@@ -1,4 +1,5 @@
 import { costMultiplier, tierEntry } from "./calendar";
+import { mediaRevenueFactor } from "./countermoves";
 import { landmarks } from "./records";
 import {
   type Config,
@@ -51,13 +52,17 @@ export interface Revenue {
   total: number;
 }
 
-/** League revenue per quarter from the player's fans in that country. */
+/**
+ * League revenue per quarter from the player's fans in that country. `mediaFactor` scales the
+ * media and sponsor line (a rival's sponsor lockout; see mediaRevenueFactor).
+ */
 export function revenuePerQuarter(
   world: World,
   countryIndex: number,
   tier: LeagueTierId,
   fans: SportFans,
   ppTier: number,
+  mediaFactor = 1,
 ): Revenue {
   const { revenue, tiers } = world.config.leagues;
   const { derived } = countryAt(world, countryIndex);
@@ -71,7 +76,8 @@ export function revenuePerQuarter(
     revenue.mediaPerCasual *
     marketFactor *
     multiplier *
-    tierEntry(ppTier, world.config).mediaRevenueMultiplier;
+    tierEntry(ppTier, world.config).mediaRevenueMultiplier *
+    mediaFactor;
   return { gate, media, total: gate + media };
 }
 
@@ -131,7 +137,10 @@ export function promotionTerms(
   const cost = runningCostPerQuarter(world, countryIndex, to);
   return {
     to,
-    hardcoreNeeded: Math.ceil(promotion.hardcoreShare * country.population),
+    hardcoreNeeded: Math.max(
+      promotion.minHardcore,
+      Math.ceil(promotion.hardcoreShare * country.population),
+    ),
     reserveNeeded: promotion.reserveQuarters * cost,
     cost: promotion.costQuarters * cost,
   };
@@ -190,7 +199,14 @@ export function stepLeagueQuarter(
   }
 
   const league = country.league;
-  const income = revenuePerQuarter(world, countryIndex, league.tier, fans, state.ppTier).total;
+  const income = revenuePerQuarter(
+    world,
+    countryIndex,
+    league.tier,
+    fans,
+    state.ppTier,
+    mediaRevenueFactor(country, world.config),
+  ).total;
   const cost = runningCostPerQuarter(world, countryIndex, league.tier);
   return {
     country: { ...country, league: { ...league, cash: league.cash + income - cost } },
@@ -319,6 +335,8 @@ export function evaluateLeagues(
         league: null,
         leaguesFolded: country.leaguesFolded + 1,
         formationReadyQuarter: end.quarter + formation.reformCooldownQuarters,
+        defense: country.defense,
+        countermoves: country.countermoves,
       };
     }
 

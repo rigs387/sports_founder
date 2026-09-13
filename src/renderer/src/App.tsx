@@ -14,9 +14,11 @@ export function App() {
   }, [startCampaign]);
 
   const player = snapshot?.sports.find((sport) => sport.kind === "player");
-  const anchorLeague =
-    snapshot?.countries.find((country) => country.countryId === snapshot.anchorCountryId)?.league ??
-    null;
+  const anchor = snapshot?.countries.find(
+    (country) => country.countryId === snapshot.anchorCountryId,
+  );
+  const anchorLeague = anchor?.league ?? null;
+  const anchorRivals = anchor?.rivals ?? [];
   const countryName = (id: string) => names?.countries[id] ?? id;
   const topCountries = snapshot
     ? [...snapshot.countries]
@@ -133,6 +135,27 @@ export function App() {
             ) : (
               <p>{t("league.none")}</p>
             )}
+          </section>
+
+          <section className="rivals" aria-label={t("rivals.heading")} data-testid="anchor-rivals">
+            <h2>{t("rivals.heading")}</h2>
+            <dl className="league-list">
+              {anchorRivals.map((rival) => (
+                <div key={rival.sportId} data-testid="anchor-rival" data-level={rival.level}>
+                  <dt>{names?.sports[rival.sportId] ?? rival.sportId}</dt>
+                  <dd className={`escalation-${rival.level}`}>
+                    {rival.countermoves.length === 0
+                      ? t(`rivals.levels.${rival.level}`)
+                      : t("rivals.levelWithMoves", {
+                          level: t(`rivals.levels.${rival.level}`),
+                          moves: rival.countermoves
+                            .map((move) => t(`rivals.moves.${move}`))
+                            .join(t("campaign.listSeparator")),
+                        })}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </section>
 
           <section className="genome" aria-label={t("genome.heading")}>

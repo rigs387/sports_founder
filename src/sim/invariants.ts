@@ -1,6 +1,7 @@
-import { genomeSchema } from "../content";
+import { genomeSchema, IDENTITY_AXES } from "../content";
 import { QUARTERS_PER_YEAR } from "./calendar";
 import {
+  ESCALATION_LEVELS,
   type GameState,
   HEALTH_LEVELS,
   LEAGUE_TIERS,
@@ -74,6 +75,32 @@ export function invariantsOf(state: GameState, world: World): string[] {
     if (sport.kind !== expectedKind) problems.push(`sport "${sport.id}" should be ${expectedKind}`);
   });
 
+  const rivalIds = world.rivals.map((rival) => rival.id);
+  const stateRivalIds = state.rivals.map((rival) => rival.sportId);
+  if (stateRivalIds.join("|") !== rivalIds.join("|")) {
+    problems.push(`rivals [${stateRivalIds}] do not match content [${rivalIds}]`);
+  }
+  state.rivals.forEach((rival, i) => {
+    const where = `rival "${rival.sportId}"`;
+    const parsed = genomeSchema.safeParse(rival.genome);
+    if (!parsed.success) {
+      problems.push(`${where}: invalid genome`);
+    } else {
+      // Rule copying changes rule traits only; identity traits keep a sport recognizable.
+      const content = world.rivals[i]?.genome;
+      for (const axis of IDENTITY_AXES) {
+        if (content && rival.genome[axis] !== content[axis]) {
+          problems.push(`${where}: identity trait ${axis} changed`);
+        }
+      }
+    }
+    for (const field of ["budget", "budgetSpent"] as const) {
+      if (!Number.isFinite(rival[field]) || rival[field] < 0) {
+        problems.push(`${where}: ${field} ${rival[field]} is invalid`);
+      }
+    }
+  });
+
   if (state.countries.length !== world.countries.length) {
     problems.push(
       `state has ${state.countries.length} countries but content has ${world.countries.length}`,
@@ -118,6 +145,33 @@ export function invariantsOf(state: GameState, world: World): string[] {
     }
     if (index === anchorIndex && state.outcome === null && league === null) {
       problems.push(`the anchor has no league but the campaign has not ended`);
+    }
+
+    const fronts = countryState.defense.map((front) => front.sportId);
+    if (fronts.join("|") !== rivalIds.join("|")) {
+      problems.push(`${country.id}: defense fronts [${fronts}] do not match rivals [${rivalIds}]`);
+    }
+    for (const front of countryState.defense) {
+      const where = `${country.id}/${front.sportId}`;
+      if (!ESCALATION_LEVELS.includes(front.level)) problems.push(`${where}: bad escalation level`);
+      if (!Number.isFinite(front.pressure) || front.pressure < 0) {
+        problems.push(`${where}: pressure ${front.pressure} is invalid`);
+      }
+    }
+    const inEffect = new Set<string>();
+    for (const move of countryState.countermoves) {
+      const where = `${country.id}: ${move.kind} by "${move.sportId}"`;
+      if (!rivalIds.includes(move.sportId)) problems.push(`${where}: not a rival`);
+      if (move.endQuarter <= state.quarter) {
+        problems.push(`${where} ended at quarter ${move.endQuarter} but is still in effect`);
+      }
+      // A rival's own boosts are per rival; a block on the player is never doubled up.
+      const key =
+        move.kind === "broadcastDeal" || move.kind === "sponsorLockout"
+          ? move.kind
+          : `${move.kind}/${move.sportId}`;
+      if (inEffect.has(key)) problems.push(`${where}: already in effect there`);
+      inEffect.add(key);
     }
   });
 

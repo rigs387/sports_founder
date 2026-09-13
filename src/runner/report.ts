@@ -1,6 +1,45 @@
-import { AXIS_IDS, type AxisId, GENOME_AXES, type Genome, type LeagueTierId } from "../content";
+import {
+  AXIS_IDS,
+  type AxisId,
+  COUNTERMOVES,
+  type CountermoveKind,
+  type EscalationLevel,
+  GENOME_AXES,
+  type Genome,
+  type LeagueTierId,
+} from "../content";
 import type { SportTotals } from "../sim";
 import type { BotId } from "./policy";
+
+/** A value with the country and turn where it was seen. */
+export interface WhereAndWhen {
+  value: number;
+  countryId: string;
+  turn: number;
+}
+
+/** What one rival did and how it held up over a campaign (GDD Rival AI; tech plan 2.1). */
+export interface RivalCampaignReport {
+  sportId: string;
+  budgetSpent: number;
+  budgetLeft: number;
+  escalations: number;
+  deescalations: number;
+  countermoves: Record<CountermoveKind, number>;
+  countermovesTotal: number;
+  /** Genome axes that differ from the rival's content genome at the end (rule copying). */
+  finalGenomeChanges: number;
+  peakAnchorLevel: EscalationLevel;
+  anchorHardcoreShareStart: number;
+  anchorHardcoreShareEnd: number;
+  /** Lowest hardcore share of any country's population, observed after every turn. */
+  lowestHardcoreShare: WhereAndWhen;
+  /** Lowest hardcore count relative to the rival's starting count in that country. */
+  lowestRetained: WhereAndWhen;
+  lowestGlobalHardcoreShare: number;
+  /** Countries where the rival's hardcore fans reached zero. */
+  eliminatedFrom: string[];
+}
 
 export interface CampaignResult {
   seed: number;
@@ -36,6 +75,12 @@ export interface CampaignResult {
   /** Country ids by Fandom Score ÷ population, best first. */
   topCountriesByShare: string[];
   anchorHardcoreShare: number;
+  /** The player's highest hardcore share of any country's population, observed after every turn. */
+  peakPlayerHardcoreShare: WhereAndWhen;
+  /** In-game years until the player's hardcore fans outnumbered every rival's in the anchor. */
+  anchorOvertakeYears: number | null;
+  rivalReports: RivalCampaignReport[];
+  landmarks: number;
   /** First time each tier was reached: turns completed and quarters elapsed at that moment. */
   tierReached: Record<string, { turnsCompleted: number; quartersElapsed: number }>;
   invariantViolations: string[];
@@ -59,6 +104,9 @@ export interface TurnRow {
   playerCasual: number;
   playerHardcore: number;
   playerFandomScore: number;
+  anchorPlayerHardcoreShare: number;
+  /** Each rival's hardcore share and escalation level in the anchor. */
+  rivals: { sportId: string; anchorHardcoreShare: number; anchorLevel: EscalationLevel }[];
 }
 
 export interface CountryRow {
@@ -82,6 +130,10 @@ export interface CountryRow {
   leagueHealth: string;
   leagueCash: number;
   leaguesFolded: number;
+  /** Each rival's escalation level here at the end, "|"-separated in rival order. */
+  rivalLevels: string;
+  /** Countermoves in effect here at the end. */
+  rivalCountermoves: string;
 }
 
 export function median(values: number[]): number | null {
@@ -97,10 +149,86 @@ export function mean(values: number[]): number | null {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
+/** The value at quantile `q` (nearest rank), or null for no values. */
+export function quantile(values: number[], q: number): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.min(sorted.length - 1, Math.max(0, Math.ceil(q * sorted.length) - 1))] ?? null;
+}
+
+export function distribution(values: number[]) {
+  return {
+    min: quantile(values, 0),
+    p10: quantile(values, 0.1),
+    median: median(values),
+    p90: quantile(values, 0.9),
+    max: values.length > 0 ? Math.max(...values) : null,
+  };
+}
+
 export function countBy(values: (number | string)[]): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const value of values) counts[value] = (counts[value] ?? 0) + 1;
   return counts;
+}
+
+/** Rival activity across campaigns: medians per campaign, and the lowest points seen anywhere. */
+export function rivalAggregate(results: CampaignResult[]) {
+  const ids = [...new Set(results.flatMap((r) => r.rivalReports.map((rival) => rival.sportId)))];
+  return ids.map((sportId) => {
+    const reports = results.flatMap((result) =>
+      result.rivalReports
+        .filter((rival) => rival.sportId === sportId)
+        .map((rival) => ({ result, rival })),
+    );
+    const of = (pick: (rival: RivalCampaignReport) => number) =>
+      median(reports.map(({ rival }) => pick(rival)));
+    const lowestShare = reports.reduce<(typeof reports)[number] | null>(
+      (best, entry) =>
+        best === null ||
+        entry.rival.lowestHardcoreShare.value < best.rival.lowestHardcoreShare.value
+          ? entry
+          : best,
+      null,
+    );
+    const lowestRetained = reports.reduce<(typeof reports)[number] | null>(
+      (best, entry) =>
+        best === null || entry.rival.lowestRetained.value < best.rival.lowestRetained.value
+          ? entry
+          : best,
+      null,
+    );
+    const where = (
+      entry: (typeof reports)[number] | null,
+      pick: "lowestHardcoreShare" | "lowestRetained",
+    ) =>
+      entry === null
+        ? null
+        : {
+            ...entry.rival[pick],
+            anchor: entry.result.anchorCountryId,
+            bot: entry.result.bot,
+            seed: entry.result.seed,
+          };
+    return {
+      sportId,
+      campaigns: reports.length,
+      medianPerCampaign: {
+        budgetSpent: of((r) => r.budgetSpent),
+        escalations: of((r) => r.escalations),
+        deescalations: of((r) => r.deescalations),
+        countermoves: of((r) => r.countermovesTotal),
+        ...Object.fromEntries(COUNTERMOVES.map((kind) => [kind, of((r) => r.countermoves[kind])])),
+        anchorHardcoreShareStart: of((r) => r.anchorHardcoreShareStart),
+        anchorHardcoreShareEnd: of((r) => r.anchorHardcoreShareEnd),
+      },
+      peakAnchorLevels: countBy(reports.map(({ rival }) => rival.peakAnchorLevel)),
+      lowestHardcoreShare: where(lowestShare, "lowestHardcoreShare"),
+      lowestRetained: where(lowestRetained, "lowestRetained"),
+      campaignsWithEliminations: reports.filter(({ rival }) => rival.eliminatedFrom.length > 0)
+        .length,
+    };
+  });
 }
 
 export function aggregate(results: CampaignResult[], tierCount: number) {
@@ -113,6 +241,10 @@ export function aggregate(results: CampaignResult[], tierCount: number) {
       .filter((value): value is number => value !== undefined);
     turnsToTier[tier] = { reached: turns.length, of: results.length, medianTurns: median(turns) };
   }
+  const peaks = results.map((r) => r.peakPlayerHardcoreShare.value);
+  const overtakes = results
+    .map((r) => r.anchorOvertakeYears)
+    .filter((years): years is number => years !== null);
   return {
     campaigns: results.length,
     collapsed: results.filter((r) => r.collapsed).length,
@@ -126,6 +258,19 @@ export function aggregate(results: CampaignResult[], tierCount: number) {
     countriesWithFans: { median: median(results.map((r) => r.countriesWithFans)) },
     leaguesAtEnd: { median: median(results.map((r) => r.leaguesAtEnd)) },
     turnsToTier,
+    peakPlayerHardcoreShare: {
+      ...distribution(peaks),
+      above25Percent: peaks.filter((p) => p > 0.25).length,
+      above50Percent: peaks.filter((p) => p > 0.5).length,
+      countries: countBy(results.map((r) => r.peakPlayerHardcoreShare.countryId)),
+    },
+    anchorOvertakeYears: {
+      overtook: overtakes.length,
+      of: results.length,
+      ...distribution(overtakes),
+    },
+    landmarks: distribution(results.map((r) => r.landmarks)),
+    rivals: rivalAggregate(results),
     campaignsWithInvariantViolations: results.filter((r) => r.invariantViolations.length > 0)
       .length,
   };
@@ -180,8 +325,27 @@ export function toCsv(header: string[], rows: Cell[][]): string {
 
 const round = (value: number, digits: number) => Number(value.toFixed(digits));
 
+const snake = (text: string) => text.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+
 export function campaignsCsv(results: CampaignResult[], tierCount: number): string {
   const tiers = Array.from({ length: tierCount - 1 }, (_, i) => i + 2);
+  const rivalIds = results[0]?.rivalReports.map((rival) => rival.sportId) ?? [];
+  const rivalColumns = rivalIds.flatMap((id) => [
+    `${id}_budget_spent`,
+    `${id}_escalations`,
+    `${id}_deescalations`,
+    `${id}_countermoves`,
+    ...COUNTERMOVES.map((kind) => `${id}_${snake(kind)}`),
+    `${id}_genome_changes`,
+    `${id}_peak_anchor_level`,
+    `${id}_anchor_share_start`,
+    `${id}_anchor_share_end`,
+    `${id}_lowest_share`,
+    `${id}_lowest_share_country`,
+    `${id}_lowest_retained`,
+    `${id}_lowest_retained_country`,
+    `${id}_eliminated_from`,
+  ]);
   const header = [
     "seed",
     "anchor",
@@ -210,9 +374,15 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     "player_hardcore",
     "player_fandom_score",
     "player_rank",
+    "peak_player_hardcore_share",
+    "peak_player_hardcore_country",
+    "peak_player_hardcore_turn",
+    "anchor_overtake_years",
+    "landmarks",
     "top_countries_by_share",
     ...AXIS_IDS,
     ...tiers.map((tier) => `turns_to_tier_${tier}`),
+    ...rivalColumns,
     "invariant_violations",
   ];
   const rows = results.map((r) => [
@@ -243,15 +413,41 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     r.player.hardcore,
     Math.round(r.player.fandomScore),
     r.player.rank,
+    round(r.peakPlayerHardcoreShare.value, 5),
+    r.peakPlayerHardcoreShare.countryId,
+    r.peakPlayerHardcoreShare.turn,
+    r.anchorOvertakeYears,
+    r.landmarks,
     r.topCountriesByShare.join("|"),
     ...AXIS_IDS.map((axis) => r.genome[axis]),
     ...tiers.map((tier) => r.tierReached[tier]?.turnsCompleted ?? null),
+    ...rivalIds.flatMap((id) => {
+      const rival = r.rivalReports.find((report) => report.sportId === id);
+      if (!rival) return rivalColumns.slice(0, 0);
+      return [
+        Math.round(rival.budgetSpent),
+        rival.escalations,
+        rival.deescalations,
+        rival.countermovesTotal,
+        ...COUNTERMOVES.map((kind) => rival.countermoves[kind]),
+        rival.finalGenomeChanges,
+        rival.peakAnchorLevel,
+        round(rival.anchorHardcoreShareStart, 5),
+        round(rival.anchorHardcoreShareEnd, 5),
+        round(rival.lowestHardcoreShare.value, 6),
+        rival.lowestHardcoreShare.countryId,
+        round(rival.lowestRetained.value, 4),
+        rival.lowestRetained.countryId,
+        rival.eliminatedFrom.join("|"),
+      ];
+    }),
     r.invariantViolations.length,
   ]);
   return toCsv(header, rows);
 }
 
 export function turnsCsv(rows: TurnRow[]): string {
+  const rivalIds = rows[0]?.rivals.map((rival) => rival.sportId) ?? [];
   const header = [
     "seed",
     "genome",
@@ -270,6 +466,8 @@ export function turnsCsv(rows: TurnRow[]): string {
     "player_casual",
     "player_hardcore",
     "player_fandom_score",
+    "anchor_player_hardcore_share",
+    ...rivalIds.flatMap((id) => [`${id}_anchor_hardcore_share`, `${id}_anchor_level`]),
   ];
   return toCsv(
     header,
@@ -291,6 +489,11 @@ export function turnsCsv(rows: TurnRow[]): string {
       r.playerCasual,
       r.playerHardcore,
       Math.round(r.playerFandomScore),
+      round(r.anchorPlayerHardcoreShare, 5),
+      ...rivalIds.flatMap((id) => {
+        const rival = r.rivals.find((entry) => entry.sportId === id);
+        return [round(rival?.anchorHardcoreShare ?? 0, 5), rival?.anchorLevel ?? ""];
+      }),
     ]),
   );
 }
@@ -317,6 +520,8 @@ export function countriesCsv(rows: CountryRow[]): string {
     "league_health",
     "league_cash",
     "leagues_folded",
+    "rival_levels",
+    "rival_countermoves",
   ];
   return toCsv(
     header,
@@ -341,6 +546,8 @@ export function countriesCsv(rows: CountryRow[]): string {
       r.leagueHealth,
       round(r.leagueCash, 1),
       r.leaguesFolded,
+      r.rivalLevels,
+      r.rivalCountermoves,
     ]),
   );
 }
