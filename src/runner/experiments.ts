@@ -63,6 +63,8 @@ export interface CollapseCell {
 
 export interface CollapseReport {
   seeds: number[];
+  /** Seeds the naive bot played per anchor (more than the other bots: the criterion rides on it). */
+  naiveSeeds: number[];
   turns: number;
   naiveBot: BotId;
   earlyCollapseTurn: number;
@@ -76,7 +78,14 @@ export interface CollapseReport {
 
 export function runCollapse(
   world: World,
-  settings: { anchors: string[]; bots: BotId[]; naiveBot: BotId; seeds: number[]; turns: number },
+  settings: {
+    anchors: string[];
+    bots: BotId[];
+    naiveBot: BotId;
+    seeds: number[];
+    naiveSeeds: number[];
+    turns: number;
+  },
   onCampaign?: OnCampaign,
 ): CollapseReport {
   const bots = settings.bots.includes(settings.naiveBot)
@@ -85,7 +94,8 @@ export function runCollapse(
   const cells: CollapseCell[] = [];
   for (const anchor of settings.anchors) {
     for (const bot of bots) {
-      const results = settings.seeds.map((seed) => {
+      const seeds = bot === settings.naiveBot ? settings.naiveSeeds : settings.seeds;
+      const results = seeds.map((seed) => {
         const played = randomGenomeCampaign(world, seed, anchor, bot, settings.turns);
         onCampaign?.(played);
         return played.result;
@@ -114,6 +124,7 @@ export function runCollapse(
     .map((cell) => cell.anchor);
   return {
     seeds: settings.seeds,
+    naiveSeeds: settings.naiveSeeds,
     turns: settings.turns,
     naiveBot: settings.naiveBot,
     earlyCollapseTurn: world.config.balanceTargets.earlyCollapseTurn,

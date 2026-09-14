@@ -67,7 +67,9 @@ Usage: npm run sim -- [options]
                                         than half their top-10 countries by population share
                        collapse         anchor collapse rate for every anchor × bot (random
                                         genomes); every anchor must sometimes collapse under the
-                                        naive bot named in config
+                                        naive bot named in config, which plays
+                                        balanceTargets.naiveBotCollapseSeeds seeds per anchor (or
+                                        --campaigns if higher)
                        hard-anchor      outcomes from the hardest anchor, per bot
                        pacing           turns to each PP tier against the GDD budget table
                        options          per-option and per-growth-node outcomes from random
@@ -163,7 +165,7 @@ function printDifferentiation(report: DifferentiationReport): void {
 
 function printCollapse(report: CollapseReport): void {
   console.log(
-    `\nCollapse: ${report.seeds.length} seed(s) per anchor × bot, random genomes, up to ${report.turns} turns. Naive bot: ${report.naiveBot}`,
+    `\nCollapse: ${report.seeds.length} seed(s) per anchor × bot (${report.naiveSeeds.length} for the naive bot, ${report.naiveBot}), random genomes, up to ${report.turns} turns`,
   );
   const bots = [...new Set(report.cells.map((cell) => cell.bot))];
   console.log(`  ${"anchor".padEnd(14)}${bots.map((bot) => bot.padStart(16)).join("")}`);
@@ -476,9 +478,11 @@ function main(): number {
       }
       case "collapse": {
         const anchors = checkAnchors(world, listedAnchors ?? world.countries.map((c) => c.id));
+        const naiveCount = Math.max(campaigns, world.config.balanceTargets.naiveBotCollapseSeeds);
+        const naiveSeeds = Array.from({ length: naiveCount }, (_, i) => firstSeed + i);
         const report = runCollapse(
           world,
-          { anchors, bots, naiveBot: naiveBotId, seeds, turns },
+          { anchors, bots, naiveBot: naiveBotId, seeds, naiveSeeds, turns },
           collect(false),
         );
         writeReport("collapse", report);

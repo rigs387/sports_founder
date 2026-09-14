@@ -12,6 +12,7 @@ import {
   type GameState,
   growthFactorsAt,
   growthNode,
+  leverMultipliers,
   mediaRevenueFactor,
   nodeCost,
   PLAYER_INDEX,
@@ -27,7 +28,10 @@ import {
 //   greedy-spread  moves focus to the most exposed markets, promotes every league the moment it is
 //                  legal, never steps down or bails out. Nodes: buys every node it can afford,
 //                  cheapest first (ties in content order), keeping no PP back. The naive strategy.
-//   builder        greedy-spread's focus, but promotes a league only when its current fans would
+//   builder        plays to its genome: moves focus like greedy-spread, but ranks markets by
+//                  exposure × genome fit² (fit: affinity × mean of accessibility and depth there),
+//                  so it pushes where the sport both is spreading and suits the country. Promotes a
+//                  league only when its current fans would
 //                  already pay the new tier's running cost and the cash covers reserve plus cost;
 //                  rescues any league in trouble with a bailout, or a step-down at Near-Collapse.
 //                  Nodes: keeps one bailout's PP in reserve, then buys the node with the best value
@@ -218,9 +222,29 @@ export function greedySpread(state: GameState, world: World): BotStep {
   return step;
 }
 
-/** Greedy-spread's focus handling, shared with the builder bot. */
+/** Greedy-spread's focus handling: the most exposed markets first. */
 function greedySpreadFocus(state: GameState, world: World): BotStep {
   return spreadFocus(state, world, countriesByExposure(state, world));
+}
+
+/**
+ * How well the sport's genome fits a country: affinity × the mean of accessibility and depth (the
+ * genome's lever multipliers there). A bot heuristic, not game balance.
+ */
+export function genomeFit(state: GameState, world: World, countryIndex: number): number {
+  const levers = leverMultipliers(world, state.genome, countryIndex);
+  return (levers.affinity * (levers.accessibility + levers.depth)) / 2;
+}
+
+/**
+ * Focus candidates for a bot that plays to its genome: exposure × fit², so a well-suited market
+ * with some spread beats a poorly suited one with a little more. Chosen over ranking by fit alone
+ * (cold launches into well-suited but unreached markets differentiated less; 2026-09-13).
+ */
+function countriesByFit(state: GameState, world: World) {
+  return countriesByExposure(state, world)
+    .map((c) => ({ ...c, score: c.exposure * genomeFit(state, world, c.index) ** 2 }))
+    .sort((a, b) => b.score - a.score || b.population - a.population);
 }
 
 /** Moves saturated or empty slots onto the first affordable candidates, in the given order. */
@@ -285,7 +309,7 @@ function manageLeagues(step: BotStep, world: World): void {
 }
 
 export function builder(state: GameState, world: World): BotStep {
-  const spread = greedySpreadFocus(state, world);
+  const spread = spreadFocus(state, world, countriesByFit(state, world));
   const step: BotStep = { state: spread.state, actions: [...spread.actions] };
   manageLeagues(step, world);
   buyNodes(

@@ -396,3 +396,6 @@ balanceTargets:
   earlyCollapseTurn: 20
   # The naive strategy for the "no safe anchor" criterion.
   naiveBot: greedy-spread
+  # Seeds per anchor for the naive bot in the collapse experiment (or --campaigns if higher). Rare
+  # collapses need many seeds: an anchor collapsing 12% of the time shows 0/10 about 28% of the time.
+  naiveBotCollapseSeeds: 50

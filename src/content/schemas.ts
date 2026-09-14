@@ -490,6 +490,7 @@ export const configFileSchema = z.strictObject({
     earlyCollapseTurn: z.int().min(1),
     turnsInTier: z.array(z.int().min(1)).min(1),
     naiveBot: z.string().min(1),
+    naiveBotCollapseSeeds: z.int().min(1),
   }),
 });
 
