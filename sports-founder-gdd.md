@@ -688,6 +688,11 @@ Starting budget, all values in config and tuned by balance runs:
 | 4 | ~40 | 5 | 3.3 hr | ~30 |
 | 5 | ~50 | 6 | 5 hr | ~50 |
 
+**Pacing is for a typical anchor (decided 2026-09-13).** The turn budget above describes a
+typical-size anchor country. Anchor size is the main difficulty lever: a huge anchor needs far more
+hardcore fans and cash before its league can go Semi-Pro, so it reaches Local Curiosity much later,
+and a tiny anchor is fragile. Leagues are not made cheaper to hide that.
+
 **Replay levers:** Anchor country choice and sport genome. Scenarios (Phase 2) provide further
 variety.
 

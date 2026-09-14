@@ -41,6 +41,8 @@ surface before playtesting or during it.
 | 2026-09-13 | Phase 0 growth tree: 20 Grassroots/Media nodes, 4 forks, buying by current tier, conditions never flip sign (GDD v1.5) | Decided |
 | 2026-09-13 | Generational turnover: player and rivals age out to casual, rivals recruit replacements, "other sports" exempt; minimum league running cost per tier (GDD v1.5) | Decided |
 | 2026-09-13 | Holistic design rule "choose pain": the harsher answer wins open design questions (GDD v1.5) | Decided |
+| 2026-09-13 | Pacing targets apply to typical-size anchors; big anchors are slower by design (GDD v1.5) | Decided |
+| 2026-09-13 | Differentiation overlap on the placeholder world accepted; re-judge on real data | Decided |
 
 ---
 
@@ -72,11 +74,15 @@ starting targets (thresholds adjustable as data arrives):
 - **Genome differentiation:** with anchor and seeds held constant, contrasting genomes share fewer
   than half of their top-10 fandom countries, verified across many seeds. Countries are ranked by
   Fandom Score ÷ population, so the measure shows where the sport caught on rather than which
-  countries are largest (decided 2026-09-13; the raw-score ranking is still reported).
+  countries are largest (decided 2026-09-13; the raw-score ranking is still reported). On the
+  26-country placeholder world, overlap between presets that both favor its small cold/temperate
+  bloc is accepted; the criterion is judged for real on the real-world dataset (decided 2026-09-13).
 - **No dominant genome:** no single trait option appears in more than 40% of top-quartile runs.
 - **No safe anchor:** every anchor country has a nonzero collapse rate under a naive strategy.
 - **Hard anchors are winnable:** the best bot wins from Tuvalu some of the time.
-- **Pacing:** time to each PP tier falls within ±30% of the GDD campaign budget table.
+- **Pacing:** time to each PP tier falls within ±30% of the GDD campaign budget table, measured on
+  typical-size anchors (the middle half of countries by population); tiny and huge anchors are
+  harder by design (decided 2026-09-13).
 - **Rivals persist:** no rival is ever fully eliminated.
 - **Determinism:** identical seed and inputs produce identical complete state, including after a
   mid-campaign save/load.

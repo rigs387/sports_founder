@@ -22,6 +22,7 @@ import {
   runOptions,
   runPacing,
   runRivalsPersist,
+  typicalAnchors,
 } from "./experiments";
 import { formatGenome, parseGenomeArg, randomGenome } from "./genome-arg";
 import { BOT_IDS, type BotId, isBotId } from "./policy";
@@ -79,7 +80,8 @@ Usage: npm run sim -- [options]
                                         any country or worldwide, for every anchor × bot (random
                                         genomes); reports the lowest rival share seen and where
                        benchmark        a 120-year campaign: time, save size, load time
-  --anchors <ids>    anchors for collapse and rivals (default: all) and for pacing and options
+  --anchors <ids>    anchors for collapse and rivals (default: all), pacing (default: typical-size
+                     countries, config balanceTargets.pacingAnchorPopulationQuantiles) and options
                      (default: the first country of each climate)
   --bots <ids>       bots for collapse and hard-anchor (default:
                      greedy-spread,anchor-turtle,media-rush,random) and rivals (default:
@@ -500,7 +502,7 @@ function main(): number {
         break;
       }
       case "pacing": {
-        const anchors = checkAnchors(world, listedAnchors ?? contrastingAnchors(world));
+        const anchors = checkAnchors(world, listedAnchors ?? typicalAnchors(world));
         const report = runPacing(world, { anchors, bot, seeds, turns }, collect(false));
         writeReport("pacing", report);
         printPacing(report);

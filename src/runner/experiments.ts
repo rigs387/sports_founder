@@ -425,6 +425,20 @@ export function runRivalsPersist(
   };
 }
 
+/**
+ * Typical-size anchors for pacing (decided 2026-09-13): every country whose population lies between
+ * the configured quantiles of all countries' populations (nearest rank), in content order.
+ */
+export function typicalAnchors(world: World): string[] {
+  const [low, high] = world.config.balanceTargets.pacingAnchorPopulationQuantiles;
+  const sorted = world.countries.map((c) => c.population).sort((a, b) => a - b);
+  const at = (q: number) =>
+    sorted[Math.min(sorted.length - 1, Math.max(0, Math.ceil(q * sorted.length) - 1))] ?? 0;
+  const min = at(low);
+  const max = at(high);
+  return world.countries.filter((c) => c.population >= min && c.population <= max).map((c) => c.id);
+}
+
 /** The first country of each climate zone: a spread of contrasting default anchors. */
 export function contrastingAnchors(world: World): string[] {
   return CLIMATES.map((climate) => world.countries.find((c) => c.climate === climate)?.id).filter(

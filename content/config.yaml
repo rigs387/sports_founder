@@ -392,6 +392,10 @@ balanceTargets:
   # Turns spent in each PP tier (GDD campaign length table), and the allowed deviation.
   turnsInTier: [20, 30, 40, 40]
   pacingTolerance: 0.3
+  # Pacing targets are for a typical anchor (decided 2026-09-13): the pacing experiment's default
+  # anchors are the countries whose population lies between these quantiles of all countries. Tiny
+  # and huge anchors are harder by design (anchor size is the main difficulty lever).
+  pacingAnchorPopulationQuantiles: [0.25, 0.75]
   # Collapses on or before this turn are reported separately: they should be very rare.
   earlyCollapseTurn: 20
   # The naive strategy for the "no safe anchor" criterion.

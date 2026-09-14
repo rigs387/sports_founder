@@ -487,6 +487,7 @@ export const configFileSchema = z.strictObject({
     differentiationSharedShare: unitInterval,
     dominanceLimit: unitInterval,
     pacingTolerance: unitInterval,
+    pacingAnchorPopulationQuantiles: z.tuple([unitInterval, unitInterval]),
     earlyCollapseTurn: z.int().min(1),
     turnsInTier: z.array(z.int().min(1)).min(1),
     naiveBot: z.string().min(1),
