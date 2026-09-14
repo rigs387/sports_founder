@@ -51,7 +51,10 @@ Costs: payroll, operations, venues. Cash builds local hardcore via venues/youth,
 cross-country transfers; PP-funded bailouts. Phase 0: gate + one media/sponsor line.
 
 **Growth Tree:** Branching tree per category (~8–12 nodes), global nodes conditioned on country
-attributes, exclusive forks, no refunds, cost = base × current tier multiplier.
+attributes, exclusive forks, no refunds, cost = base × current tier multiplier. Phase 0: 20
+Grassroots and Media nodes, 4 forks (where to play, roots, TV deal, coverage); a category is
+buyable only while the current tier unlocks it (demotion keeps nodes, blocks new buys); conditions
+never turn a bonus into a penalty.
 
 **Events:** Moments (auto) + decision cards (capped per turn), built only from recorded sim facts,
 using a closed list of effect types. Negative events grow with tier.
@@ -70,7 +73,9 @@ fan snapshots; match detail pruned per season. Headlines may only claim what rec
 Almanac screen in Phase 2.
 
 **Late-Game Pressure:** Anchor purists resent neglect and TV-friendly rule changes; hardcore fans
-age out; pro leagues cost more and fall faster; rivals defend hardest when you near #1.
+age out (yours and rivals', demoting to casual; rivals recruit replacements, you don't; "other"
+is exempt); pro leagues cost more and fall faster, with a minimum cost even in tiny countries;
+rivals defend hardest when you near #1.
 
 **Leagues:** One top league per country, forming at a hardcore threshold and rising through
 Amateur → Semi-Pro → Professional → Elite (player-chosen promotion). One player-assigned flagship
@@ -133,3 +138,4 @@ contested and unlisted land neutral.
 - Rival sports are the antidote, not the villain — they defend turf, they don't hunt you.
 - Every system serves the inventor→operator arc; if it doesn't, question why it's there.
 - Force hard decisions — no refunds, no delaying tier-ups, no dodging growing pains.
+- Choose pain — when a design question has an easier and a harsher answer, pick the harsher one.

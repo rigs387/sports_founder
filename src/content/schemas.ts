@@ -381,6 +381,7 @@ export const configFileSchema = z.strictObject({
   turnover: z.strictObject({
     annualRate: rate,
     floorShare: z.number().min(0).lt(1),
+    rivalReplacement: z.number().min(0).max(1),
   }),
   poaching: z.strictObject({
     rate: rate,

@@ -64,7 +64,9 @@ runs/                 Runner and smoke-test output (git-ignored)
   current PP tier, prerequisites owned, no fork sibling owned, price = base cost × the peak tier's
   cost multiplier. No refunds. Purchases are landmarks; the snapshot lists every node's status.
 - Generational turnover runs each quarter in `src/sim/quarter.ts`: every sport's hardcore fans above
-  a floor age out at an annual rate and demote to casual about the same sport. Hardcore poaching is in `src/sim/poaching.ts`; the rival
+  a floor age out at an annual rate and demote to casual about the same sport. The player and the
+  rivals age out; the "other sports" bucket does not. Rivals recruit replacements for their aging
+  fans from their own casual fans, so they hold their ground unless the player wins fans from them. Hardcore poaching is in `src/sim/poaching.ts`; the rival
   AI (budgets, escalation, countermoves) runs once per quarter in `src/sim/rivals.ts`, uses no
   randomness, and records every escalation change and countermove as a landmark. Rival genomes are
   campaign state. Budgets never appear in the `TurnSnapshot`.

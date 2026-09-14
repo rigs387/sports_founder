@@ -217,15 +217,21 @@ poaching:
   # defense slows the pull further"). The "other" bucket never defends: it always takes the full pull.
   defenseResistance: { none: 1, watching: 1, defending: 0.75, entrenched: 0.5 }
 
-# Generational turnover (GDD Late-Game Pressure): every year a small share of every sport's hardcore
-# fans ages out, in every country, for the player, the rivals and the "other sports" bucket alike.
+# Generational turnover (GDD Late-Game Pressure): every year a small share of the player's and every
+# rival's hardcore fans ages out, in every country. The "other sports" bucket is exempt: it stands for
+# unmodeled sports, never recruits, and would only erode (decided 2026-09-13).
 # They demote to casual about the same sport (hardcore loss is demotion; nobody skips a bucket), and
 # from there churn and decay carry them to uninterested unless exposure keeps them. Applied each
 # quarter at 1 − (1 − annualRate)^(1/4), so a year compounds to annualRate. Turnover never takes a
 # sport below floorShare of a country's population.
+#
+# rivalReplacement: each quarter a rival recruits this share of its aging hardcore fans back from its
+# own casual fans, so an incumbent holds its ground unless the player wins fans from it (1 = every
+# aging fan replaced). Poached fans are not replaced. The player gets no replacement.
 turnover:
   annualRate: 0.04
   floorShare: 0.0001
+  rivalReplacement: 1
 
 # Rival defense (GDD Rival AI, Late-Game Pressure). Rivals defend; they don't hunt. Runs once per
 # quarter, deterministic, no randomness.

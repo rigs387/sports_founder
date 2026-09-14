@@ -38,6 +38,9 @@ surface before playtesting or during it.
 | 2026-09-13 | Real-world data: salient FIFA markets, World Bank sources, survey-based fan buckets, rival genomes (GDD v1.3) | Decided |
 | 2026-09-13 | Differentiation exit criterion ranks top-10 countries by Fandom Score ÷ population | Decided |
 | 2026-09-13 | Hardcore poaching between sports: slow, two-way demotion to casual, then normal conversion (GDD v1.4) | Decided |
+| 2026-09-13 | Phase 0 growth tree: 20 Grassroots/Media nodes, 4 forks, buying by current tier, conditions never flip sign (GDD v1.5) | Decided |
+| 2026-09-13 | Generational turnover: player and rivals age out to casual, rivals recruit replacements, "other sports" exempt; minimum league running cost per tier (GDD v1.5) | Decided |
+| 2026-09-13 | Holistic design rule "choose pain": the harsher answer wins open design questions (GDD v1.5) | Decided |
 
 ---
 

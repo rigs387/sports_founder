@@ -20,6 +20,7 @@ const ANCHOR = "valdoria";
 function onlyTurnover(base: World, annualRate = base.config.turnover.annualRate): World {
   return withConfig(base, (config) => {
     config.turnover.annualRate = annualRate;
+    config.turnover.rivalReplacement = 0;
     config.dynamics.noise = 0;
     config.dynamics.player = {
       casualConversionRate: 0,
@@ -63,7 +64,7 @@ function quarters(state: GameState, w: World, n: number): GameState {
 }
 
 describe("generational turnover", () => {
-  it("compounds to the configured annual rate, on fans above the floor, for every sport in every country", () => {
+  it("compounds to the configured annual rate, on fans above the floor, for the player and every rival", () => {
     const w = onlyTurnover(world);
     const rate = w.config.turnover.annualRate;
     expect(rate).toBeGreaterThan(0);
@@ -76,6 +77,10 @@ describe("generational turnover", () => {
       country.fans.forEach((before, s) => {
         const after = year.countries[c]?.fans[s];
         if (!after || before.hardcore < 200_000) return;
+        if (start.sports[s]?.kind === "other") {
+          expect(after.hardcore, `${country.countryId}/other`).toBe(before.hardcore);
+          return;
+        }
         const population = w.countries[c]?.population ?? 0;
         const floor = Math.ceil(w.config.turnover.floorShare * population);
         const expected = floor + (before.hardcore - floor) * (1 - rate);
@@ -88,7 +93,7 @@ describe("generational turnover", () => {
       });
     });
     expect(checked).toBeGreaterThan(20);
-    expect([...kinds].sort()).toStrictEqual(["other", "player", "rival"]);
+    expect([...kinds].sort()).toStrictEqual(["player", "rival"]);
   });
 
   it("aged-out hardcore fans become casual about the same sport: nobody skips a bucket", () => {
@@ -111,6 +116,39 @@ describe("generational turnover", () => {
     expect(moved).toBeGreaterThan(100_000);
   });
 
+  it("rivals recruit replacements for their aging fans from their casual fans; the player does not", () => {
+    const aging = onlyTurnover(world);
+    const replacing = withConfig(aging, (config) => {
+      config.turnover.rivalReplacement = 1;
+    });
+    const start = startWithPlayerFans(aging);
+    const without = quarters(start, aging, 4);
+    const withReplacement = quarters(start, replacing, 4);
+    let checked = 0;
+    start.countries.forEach((country, c) => {
+      country.fans.forEach((before, s) => {
+        const kind = start.sports[s]?.kind;
+        const aged = without.countries[c]?.fans[s];
+        const replaced = withReplacement.countries[c]?.fans[s];
+        if (!aged || !replaced || before.hardcore < 200_000) return;
+        const lost = before.hardcore - aged.hardcore;
+        if (kind === "rival") {
+          // Every aging fan is replaced, so the hardcore base holds; the casual pool pays for it.
+          expect(lost, country.countryId).toBeGreaterThan(1000);
+          expect(
+            Math.abs(replaced.hardcore - before.hardcore),
+            country.countryId,
+          ).toBeLessThanOrEqual(4);
+          expect(replaced.casual + replaced.hardcore).toBe(before.casual + before.hardcore);
+          checked += 1;
+        } else {
+          expect(replaced, `${country.countryId}/${before.sportId}`).toStrictEqual(aged);
+        }
+      });
+    });
+    expect(checked).toBeGreaterThan(10);
+  });
+
   it("with a zero rate nothing moves", () => {
     const w = onlyTurnover(world, 0);
     const start = startWithPlayerFans(w);
@@ -127,7 +165,9 @@ describe("generational turnover", () => {
       const population = w.countries[c]?.population ?? 0;
       const floor = Math.ceil(w.config.turnover.floorShare * population);
       country.fans.forEach((before, s) => {
-        expect(next.countries[c]?.fans[s]?.hardcore).toBe(Math.min(before.hardcore, floor));
+        const expected =
+          start.sports[s]?.kind === "other" ? before.hardcore : Math.min(before.hardcore, floor);
+        expect(next.countries[c]?.fans[s]?.hardcore).toBe(expected);
       });
     });
   });

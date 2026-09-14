@@ -36,8 +36,12 @@ import {
 // or youth programs are in effect (src/sim/countermoves.ts). "Other" never converts anyone.
 // Hardcore poaching (src/sim/poaching.ts): every sport's hardcore fans demote to casual about the
 // same sport at a rate set by the sports pulling on them.
-// Generational turnover (GDD Late-Game Pressure): every sport's hardcore fans above a floor age out
-// at a small annual rate and demote to casual about the same sport. Hardcore fans never go straight
+// Generational turnover (GDD Late-Game Pressure): the player's and every rival's hardcore fans above
+// a floor age out at a small annual rate and demote to casual about the same sport. The "other
+// sports" bucket is exempt: it is a fixed backdrop that never recruits, so aging would only erode it.
+// Rivals recruit replacements for their aging fans from their own casual fans (rivalReplacement), so
+// an incumbent holds its ground unless the player actually wins fans from it; the player gets no
+// replacement and must keep converting. Hardcore fans never go straight
 // to uninterested; the only other hardcore loss is the league causes at the end of a turn.
 // Hardcore is exclusive: if the sports together would convert more people than have no hardcore
 // sport, the conversions are scaled down to fit.
@@ -209,7 +213,7 @@ function stepCountryFans(
     const agedOut = drawFlow(
       rng,
       Math.max(0, fans.hardcore - poached - turnoverFloor),
-      turnoverRate,
+      sport.kind === "other" ? 0 : turnoverRate,
       noise,
     );
     const hardcoreLoss = poached + agedOut;
@@ -240,13 +244,19 @@ function stepCountryFans(
         noise,
       );
       const casualChurn = drawFlow(rng, fans.casual, rates.casualChurnRate, noise);
-      const hardcoreGain = drawFlow(
+      const casualLeft = fans.casual - casualChurn;
+      const converted = drawFlow(
         rng,
-        fans.casual - casualChurn,
+        casualLeft,
         rates.hardcoreConversionRate * unattachedShare * boosts.hardcore,
         noise,
       );
-      return { casualGain, casualChurn, hardcoreGain, hardcoreLoss };
+      // Replacements for this quarter's aging fans: no extra rolls, so the sequence stays aligned.
+      const replaced = Math.min(
+        casualLeft - converted,
+        Math.round(agedOut * config.turnover.rivalReplacement),
+      );
+      return { casualGain, casualChurn, hardcoreGain: converted + replaced, hardcoreLoss };
     }
     return { casualGain: 0, casualChurn: 0, hardcoreGain: 0, hardcoreLoss };
   });

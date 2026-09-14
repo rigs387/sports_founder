@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.4 | September 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports)*
+*Version 1.5 | September 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain")*
 
 ---
 
@@ -14,6 +14,10 @@ incumbents actively defending their turf as your creation encroaches.
 
 **North star sentence:** *An underdog visionary turns a backyard game into a global religion, one
 earned story at a time.*
+
+**Holistic design rule: choose pain (decided 2026-09-13).** When a design question has an easier and
+a harsher answer and nothing else settles it, choose the harsher one: rivals stay entrenched,
+setbacks stick, shortcuts cost. The game is about earning a global sport against real resistance.
 
 ---
 
@@ -415,6 +419,45 @@ market. All stored in content; every conversion curve and weight lives in config
 - **No refunds.** Purchased nodes are permanent — choices must hurt.
 - **Cost:** base cost × current PP tier multiplier. Buying before a tier-up is cheaper, rewarding
   preparation for growing pains.
+- **Buying rules (decided 2026-09-13):** a category can be bought from only while the sport's
+  *current* PP tier unlocks it. After a demotion the sport keeps every node but cannot buy from a
+  category above its current tier until it climbs back. The multiplier is the highest tier reached.
+- **How effects apply (decided 2026-09-13):** each effect acts in the country where it lands (the
+  target country for spread and cold launches, the league's country for running costs). A condition
+  on country attributes can shrink an effect to nothing but never turns a bonus into a penalty;
+  penalties exist only as a fork's explicit downside. Cold-launch nodes cut only the cold-launch
+  surcharge. PP income nodes pay according to where the player's fans are. Countermove resistance
+  shrinks every rival countermove's effect on the player in that country. Stacked effects have a
+  floor, so nothing becomes free.
+- **Phase 0 vocabulary:** the build applies spread channel strength, casual conversion, hardcore
+  conversion, churn reduction, league formation threshold, cold-launch cost, PP income, running cost
+  reduction and rival countermove resistance. Cash opportunity unlocks and backlash resistance are
+  rejected at load until the systems they act on exist.
+- **Phase 0 node list (decided 2026-09-13).** Twenty nodes, four forks (a fork's sides lock each
+  other out). Numbers are tuning and live in `content/growth-tree.yaml`.
+
+| Category | Node | Needs | Effects |
+|---|---|---|---|
+| Grassroots | Backyard Clinics | — | + casual conversion |
+| Grassroots | Word of Mouth | Backyard Clinics | + proximity spread |
+| Grassroots | Weekend Leagues | Backyard Clinics | − league formation threshold |
+| Grassroots | **Street Courts** (fork: where to play) | Backyard Clinics | ++ casual conversion in dense, lower-income countries; − hardcore conversion |
+| Grassroots | **Club Grounds** (fork: where to play) | Backyard Clinics | + hardcore conversion (more in wealthy countries), − churn; − casual conversion in poorer countries |
+| Grassroots | Fan Meetups | Word of Mouth | − churn |
+| Grassroots | Volunteer Organisers | Weekend Leagues | − running cost (more in lower-income countries) |
+| Grassroots | Border Tournaments | Word of Mouth | ++ proximity spread; − cold-launch cost |
+| Grassroots | **Community Ownership** (fork: roots) | Fan Meetups + Volunteer Organisers | − churn; + countermove resistance; + cold-launch cost |
+| Grassroots | **Barnstorming Tours** (fork: roots) | Fan Meetups + Volunteer Organisers | −− cold-launch cost; − formation threshold; + churn |
+| Media | Local Radio | — | + language spread |
+| Media | Newspaper Columns | Local Radio | + casual conversion (more in wealthy countries) |
+| Media | Highlight Reels | Local Radio | ++ media reach spread |
+| Media | Dubbed Broadcasts | Local Radio | ++ language spread; − cold-launch cost |
+| Media | **Pay-TV Exclusivity** (fork: TV deal) | Highlight Reels | − running cost (more in large media markets); − casual conversion |
+| Media | **Free-to-Air** (fork: TV deal) | Highlight Reels | + casual conversion (more in large media markets), + media reach; + running cost |
+| Media | Star Profiles | Newspaper Columns | + hardcore conversion; − churn |
+| Media | **Sponsor Showcase** (fork: coverage) | Star Profiles | ++ countermove resistance, + PP income; − casual conversion |
+| Media | **Tabloid Buzz** (fork: coverage) | Star Profiles | ++ casual conversion (more in dense countries); + churn |
+| Media | Satellite Feed | Highlight Reels + Dubbed Broadcasts | +++ media reach spread; + PP income |
 
 **World Championship & National Teams (Phase 2):**
 - **Founding:** the player founds and names the World Championship (default name provided) once
@@ -517,7 +560,9 @@ produces PP; it can only build fans locally through venues and youth programs.
 - **League health** is evaluated each turn from cash runway (turns of losses reserves can cover),
   cash flow trend, and the country's hardcore fan trend; it moves at most one step per turn.
 - **Phase 0 subset:** gate revenue plus one combined "media & sponsor" revenue line; running cost =
-  league tier × country wealth; League Health Ladder, league promotion, and PP bailout included.
+  league tier × country wealth, with a minimum per league tier so a tiny country's professional
+  league cannot run for almost nothing (decided 2026-09-13); League Health Ladder, league
+  promotion, and PP bailout included.
   No individual deals, payroll detail, or venues.
 
 **Global PP Tier Track:** 5 qualitative tiers, from minor sport to global phenomenon. Crossing a
@@ -547,8 +592,9 @@ inherently destabilizing if you're not ready for it.
     risk" warning with a countdown appears the first turn below the line.
   - *Cooldown:* no promotion or demotion for M turns after any tier change.
   - *Consequences:* lose a focus slot (the player chooses which market to drop); turn length
-    reverts to the lower tier's; purchased nodes are kept; cost multipliers stay at the higher
-    level until re-promotion. Demotion surfaces as a major Moment.
+    reverts to the lower tier's; purchased nodes are kept, but no new nodes can be bought from a
+    category the lower tier does not unlock; cost multipliers stay at the higher level until
+    re-promotion. Demotion surfaces as a major Moment.
 
 **League Health Ladder (per country):** Healthy → Struggling → Near-Collapse → Collapsed. Demotion
 is driven by negative cash flow and falling local popularity. Local and largely reversible — except
@@ -562,6 +608,12 @@ snowballing. Works alongside tier-scaled costs, tier-scaled negative events, and
   changes. Expressed as hardcore demotion and league health drag at home.
 - **Generational turnover.** A small annual share of hardcore fans ages out everywhere (low rate,
   config). Mature markets must keep converting new fans; no base lasts forever without upkeep.
+  Rules (decided 2026-09-13): aging fans demote to casual about the same sport (hardcore loss is
+  demotion, never a skip to uninterested). Turnover applies to the player's sport and every rival.
+  The "other sports" bucket is exempt: it is a fixed backdrop that never recruits. Rivals recruit
+  replacements for their aging fans from their own casual fans, so an incumbent holds its ground
+  unless the player actually wins fans from it; the player gets no replacement. A tiny floor share
+  per country keeps a sport from vanishing through aging alone.
 - **Professionalization raises running costs.** Higher league tiers cost more to run, so a pro
   league whose fans slip descends the League Health Ladder faster than an amateur one. Moving up a
   tier is both progress and exposure.
