@@ -682,8 +682,8 @@ Starting budget, all values in config and tuned by balance runs:
 
 | PP tier | Turns | Min/turn | Real time | In-game years |
 |---|---|---|---|---|
-| 1 | ~20 | 1 | 20 min | 5 |
-| 2 | ~30 | 2 | 1 hr | ~15 |
+| 1 | ~40 | 1 | 40 min | ~10 |
+| 2 | ~10 | 2 | 20 min | ~2.5 |
 | 3 | ~40 | 4 | 2.7 hr | ~20 |
 | 4 | ~40 | 5 | 3.3 hr | ~30 |
 | 5 | ~50 | 6 | 5 hr | ~50 |
@@ -692,6 +692,12 @@ Starting budget, all values in config and tuned by balance runs:
 typical-size anchor country. Anchor size is the main difficulty lever: a huge anchor needs far more
 hardcore fans and cash before its league can go Semi-Pro, so it reaches Local Curiosity much later,
 and a tiny anchor is fragile. Leagues are not made cheaper to hide that.
+
+**Long backyard era (decided 2026-09-14).** Backyard Game lasts about 40 turns (~10 in-game years)
+and Local Curiosity about 10. Reaching Local Curiosity needs a Semi-Pro anchor league, and an
+amateur league cannot afford that until its fans pay for it — roughly a decade of scrappy growth on a
+typical anchor. Once it can, National Pastime follows quickly. The campaign total (~180 turns,
+~12 hours) is unchanged.
 
 **Replay levers:** Anchor country choice and sport genome. Scenarios (Phase 2) provide further
 variety.

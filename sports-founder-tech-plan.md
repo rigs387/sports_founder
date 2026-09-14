@@ -43,6 +43,7 @@ surface before playtesting or during it.
 | 2026-09-13 | Holistic design rule "choose pain": the harsher answer wins open design questions (GDD v1.5) | Decided |
 | 2026-09-13 | Pacing targets apply to typical-size anchors; big anchors are slower by design (GDD v1.5) | Decided |
 | 2026-09-13 | Differentiation overlap on the placeholder world accepted; re-judge on real data | Decided |
+| 2026-09-14 | Campaign turn budget: Backyard Game ~40 turns, Local Curiosity ~10 (GDD v1.5) | Decided |
 
 ---
 

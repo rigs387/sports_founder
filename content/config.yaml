@@ -390,7 +390,8 @@ balanceTargets:
   # No single trait option appears in more than this share of top-quartile runs.
   dominanceLimit: 0.4
   # Turns spent in each PP tier (GDD campaign length table), and the allowed deviation.
-  turnsInTier: [20, 30, 40, 40]
+  # Backyard Game ~40 turns and Local Curiosity ~10 (decided 2026-09-14).
+  turnsInTier: [40, 10, 40, 40]
   pacingTolerance: 0.3
   # Pacing targets are for a typical anchor (decided 2026-09-13): the pacing experiment's default
   # anchors are the countries whose population lies between these quantiles of all countries. Tiny
