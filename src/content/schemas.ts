@@ -434,6 +434,11 @@ export const configFileSchema = z.strictObject({
     plus: z.number(),
     minus: z.number(),
   }),
+  genomeBalance: z.strictObject({
+    minHelpShare: unitInterval,
+    minHurtShare: unitInterval,
+    neutralDelta: z.number().min(0),
+  }),
   leagues: z.strictObject({
     tiers: z.strictObject({
       amateur: leagueTierConfigSchema,
@@ -486,6 +491,8 @@ export const configFileSchema = z.strictObject({
     differentiationTopN: z.int().min(1),
     differentiationSharedShare: unitInterval,
     dominanceLimit: unitInterval,
+    dominanceZ: z.number().min(0),
+    optionsGenomesPerAnchor: z.int().min(1),
     pacingTolerance: unitInterval,
     pacingAnchorPopulationQuantiles: z.tuple([unitInterval, unitInterval]),
     earlyCollapseTurn: z.int().min(1),

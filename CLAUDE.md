@@ -36,7 +36,10 @@ runs/                 Runner and smoke-test output (git-ignored)
   benchmark). Misses are reported, never counted as passes. Every run also prints rival activity,
   the peak player hardcore share, the years to overtake the anchor's leading rival, and the growth
   tree report (nodes bought, fork choices, PP banked vs spent). The options experiment also checks
-  that no growth node is owned in more than 40% of top-quartile runs.
+  that no growth node is owned in more than 40% of top-quartile runs. The options experiment plays
+  balanceTargets.optionsGenomesPerAnchor (250) random genomes per anchor and flags an option or node
+  only when its share is above the limit beyond sampling noise; collapse gives the naive bot
+  naiveBotCollapseSeeds (50) seeds. Pacing uses typical-size anchors by default.
 - `npm run dev`: launch the app with hot reload.
 - `npm run smoke`: build the app, launch it, click End Turn, and save screenshots and a report to
   `runs/smoke/`.
@@ -66,10 +69,15 @@ runs/                 Runner and smoke-test output (git-ignored)
 - Generational turnover runs each quarter in `src/sim/quarter.ts`: every sport's hardcore fans above
   a floor age out at an annual rate and demote to casual about the same sport. The player and the
   rivals age out; the "other sports" bucket does not. Rivals recruit replacements for their aging
-  fans from their own casual fans, so they hold their ground unless the player wins fans from them. Hardcore poaching is in `src/sim/poaching.ts`; the rival
-  AI (budgets, escalation, countermoves) runs once per quarter in `src/sim/rivals.ts`, uses no
-  randomness, and records every escalation change and countermove as a landmark. Rival genomes are
-  campaign state. Budgets never appear in the `TurnSnapshot`.
+  fans from their own casual fans, so they hold their ground unless the player wins fans from them.
+- Numeric conditions on country attributes (genome options and growth nodes) are relative to the
+  world: `CountryDerived.position` is 0 at the population-weighted average country and ±1 at the
+  most extreme one. Content validation requires every genome option to help in, and hurt in, a
+  configured share of the real countries (`config.genomeBalance`).
+- Hardcore poaching is in `src/sim/poaching.ts`; the rival AI (budgets, escalation, countermoves)
+  runs once per quarter in `src/sim/rivals.ts`, uses no randomness, and records every escalation
+  change and countermove as a landmark. Rival genomes are campaign state. Budgets never appear in
+  the `TurnSnapshot`.
 - Every player action goes through `applyAction` in `src/sim/actions.ts`; bots use the same path.
 - An anchor league collapse sets `outcome` and ends the campaign; `endTurn` refuses to continue.
 

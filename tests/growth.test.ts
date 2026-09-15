@@ -217,8 +217,8 @@ describe("each growth node effect changes what it names by the configured amount
     expect(plain).toBeGreaterThan(0);
     expect(boosted / plain).toBeCloseTo(1.08, 12);
 
-    // 0.05 + 0.1 × (2 × wealth − 1) is zero below wealth 0.25: the rich anchor's fans count, poor
-    // Kambeza's do not.
+    // 0.05 + 0.1 × wealth position is zero well below the world average: the rich anchor's fans
+    // count, poor Kambeza's do not.
     const rich = treeWorld([{ type: "ppIncome", amount: 0.05, conditions: { wealth: 0.1 } }]);
     const factors = growthFactors(rich, [TEST_NODE]);
     const casualWeight = rich.config.fandomScore.casualWeight;
@@ -348,16 +348,14 @@ describe("conditions apply only where the country attribute matches", () => {
     const factors = growthFactors(w, [TEST_NODE]);
     w.derived.forEach((attributes, i) => {
       const id = w.countries[i]?.id;
-      // 0.1 + 0.1 × (2 × wealth − 1) = 0.2 × wealth
-      expect(factors[i]?.runningCost, id).toBeCloseTo(1 - 0.2 * attributes.wealth, 12);
-      // −0.1 − 0.3 × (2 × wealth − 1) = 0.2 − 0.6 × wealth, which may not turn into a bonus
-      expect(factors[i]?.casualConversion, id).toBeCloseTo(
-        1 + Math.min(0, 0.2 - 0.6 * attributes.wealth),
-        12,
-      );
+      const at = attributes.position.wealth;
+      // 0.1 + 0.1 × wealth position, never below zero
+      expect(factors[i]?.runningCost, id).toBeCloseTo(1 - Math.max(0, 0.1 + 0.1 * at), 12);
+      // −0.1 − 0.3 × wealth position, which may not turn into a bonus
+      expect(factors[i]?.casualConversion, id).toBeCloseTo(1 + Math.min(0, -0.1 - 0.3 * at), 12);
     });
-    const poor = w.derived.findIndex((a) => a.wealth < 1 / 3);
-    const rich = w.derived.findIndex((a) => a.wealth > 0.6);
+    const poor = w.derived.findIndex((a) => a.position.wealth < -1 / 3);
+    const rich = w.derived.findIndex((a) => a.position.wealth > 0);
     expect(factors[poor]?.casualConversion).toBe(1);
     expect(factors[rich]?.casualConversion).toBeLessThan(1);
   });

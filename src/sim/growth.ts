@@ -89,7 +89,9 @@ export function effectValue(effect: NodeEffect, attributes: AffinityAttributes):
     value += conditions.climate?.[attributes.climate] ?? 0;
     for (const attribute of NUMERIC_ATTRIBUTES) {
       const weight = conditions[attribute];
-      if (weight !== undefined) value += numericConditionDelta(weight, attributes[attribute]);
+      if (weight !== undefined) {
+        value += numericConditionDelta(weight, attributes.position[attribute]);
+      }
     }
   }
   return effect.amount > 0 ? Math.max(0, value) : Math.min(0, value);

@@ -288,6 +288,20 @@ export function growthAggregate(
   };
 }
 
+/**
+ * One-sided lower confidence bound (Wilson score) of a share observed as `hits` out of `n`; z = 1.645
+ * is 95%. An option or node counts as dominant only when even this bound is above the limit, so
+ * sampling noise alone cannot fail the no-dominant-genome check (decided 2026-09-14).
+ */
+export function shareLowerBound(hits: number, n: number, z: number): number {
+  if (n <= 0) return 0;
+  const p = hits / n;
+  const z2 = z * z;
+  const centre = p + z2 / (2 * n);
+  const spread = z * Math.sqrt((p * (1 - p)) / n + z2 / (4 * n * n));
+  return Math.max(0, (centre - spread) / (1 + z2 / n));
+}
+
 /** Per-node ownership among top-quartile campaigns, to spot a dominant node. */
 export interface NodeOutcome {
   nodeId: string;
@@ -296,6 +310,9 @@ export interface NodeOutcome {
   ownedShare: number | null;
   /** Share of top-quartile campaigns (by Fandom Score) that own it. */
   topQuartileShare: number | null;
+  /** Lower confidence bound of that share (see shareLowerBound). */
+  topQuartileLowerBound: number | null;
+  /** The lower bound is above the dominance limit. */
   exceedsDominanceLimit: boolean;
 }
 
@@ -303,6 +320,7 @@ export function nodeOutcomes(
   results: CampaignResult[],
   nodeIds: string[],
   dominanceLimit: number,
+  z: number,
 ): NodeOutcome[] {
   const sorted = [...results].sort((a, b) => b.player.fandomScore - a.player.fandomScore);
   const topQuartile = sorted.slice(0, Math.max(1, Math.floor(sorted.length / 4)));
@@ -310,16 +328,18 @@ export function nodeOutcomes(
     result.nodesBought.some((bought) => bought.nodeId === nodeId);
   return nodeIds.map((nodeId) => {
     const campaigns = results.filter((result) => owns(result, nodeId)).length;
-    const topQuartileShare =
-      results.length > 0
-        ? topQuartile.filter((result) => owns(result, nodeId)).length / topQuartile.length
-        : null;
+    const inTop = topQuartile.filter((result) => owns(result, nodeId)).length;
+    const topQuartileShare = results.length > 0 ? inTop / topQuartile.length : null;
+    const topQuartileLowerBound =
+      results.length > 0 ? shareLowerBound(inTop, topQuartile.length, z) : null;
     return {
       nodeId,
       campaigns,
       ownedShare: results.length > 0 ? campaigns / results.length : null,
       topQuartileShare,
-      exceedsDominanceLimit: topQuartileShare !== null && topQuartileShare > dominanceLimit,
+      topQuartileLowerBound,
+      exceedsDominanceLimit:
+        topQuartileLowerBound !== null && topQuartileLowerBound > dominanceLimit,
     };
   });
 }
@@ -332,6 +352,7 @@ export function nodeOutcomesCsv(anchor: string, outcomes: NodeOutcome[]): string
       "campaigns_owning",
       "owned_share",
       "top_quartile_share",
+      "top_quartile_lower_bound",
       "exceeds_dominance_limit",
     ],
     outcomes.map((o) => [
@@ -340,6 +361,7 @@ export function nodeOutcomesCsv(anchor: string, outcomes: NodeOutcome[]): string
       o.campaigns,
       o.ownedShare === null ? null : round(o.ownedShare, 3),
       o.topQuartileShare === null ? null : round(o.topQuartileShare, 3),
+      o.topQuartileLowerBound === null ? null : round(o.topQuartileLowerBound, 3),
       o.exceedsDominanceLimit,
     ]),
   );
@@ -398,10 +420,17 @@ export interface OptionOutcome {
   medianFandomScore: number | null;
   /** Share of top-quartile campaigns (by Fandom Score) that use this option. */
   topQuartileShare: number | null;
+  /** Lower confidence bound of that share (see shareLowerBound). */
+  topQuartileLowerBound: number | null;
+  /** The lower bound is above the dominance limit. */
   exceedsDominanceLimit: boolean;
 }
 
-export function optionOutcomes(results: CampaignResult[], dominanceLimit: number): OptionOutcome[] {
+export function optionOutcomes(
+  results: CampaignResult[],
+  dominanceLimit: number,
+  z: number,
+): OptionOutcome[] {
   const sorted = [...results].sort((a, b) => b.player.fandomScore - a.player.fandomScore);
   const quartileSize = Math.max(1, Math.floor(sorted.length / 4));
   const topQuartile = sorted.slice(0, quartileSize);
@@ -411,13 +440,17 @@ export function optionOutcomes(results: CampaignResult[], dominanceLimit: number
       const using = results.filter((result) => result.genome[axis] === option);
       const inTop = topQuartile.filter((result) => result.genome[axis] === option).length;
       const topQuartileShare = results.length > 0 ? inTop / topQuartile.length : null;
+      const topQuartileLowerBound =
+        results.length > 0 ? shareLowerBound(inTop, topQuartile.length, z) : null;
       out.push({
         axis,
         option,
         campaigns: using.length,
         medianFandomScore: median(using.map((result) => result.player.fandomScore)),
         topQuartileShare,
-        exceedsDominanceLimit: topQuartileShare !== null && topQuartileShare > dominanceLimit,
+        topQuartileLowerBound,
+        exceedsDominanceLimit:
+          topQuartileLowerBound !== null && topQuartileLowerBound > dominanceLimit,
       });
     }
   }
@@ -687,6 +720,7 @@ export function optionOutcomesCsv(anchor: string, outcomes: OptionOutcome[]): st
     "campaigns",
     "median_fandom_score",
     "top_quartile_share",
+    "top_quartile_lower_bound",
     "exceeds_dominance_limit",
   ];
   return toCsv(
@@ -698,6 +732,7 @@ export function optionOutcomesCsv(anchor: string, outcomes: OptionOutcome[]): st
       o.campaigns,
       o.medianFandomScore === null ? null : Math.round(o.medianFandomScore),
       o.topQuartileShare === null ? null : round(o.topQuartileShare, 3),
+      o.topQuartileLowerBound === null ? null : round(o.topQuartileLowerBound, 3),
       o.exceedsDominanceLimit,
     ]),
   );

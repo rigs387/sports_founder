@@ -1,7 +1,7 @@
 import { parse } from "yaml";
 import type { ZodType } from "zod";
 import { deriveWorld, startingRivalFanCounts, startingSportCulture, type World } from "./derive";
-import { optionDeltaRange } from "./genome";
+import { optionNetDeltaAt } from "./genome";
 import { AXIS_IDS, GENOME_AXES } from "./genome-axes";
 import {
   COUNTERMOVES,
@@ -11,7 +11,6 @@ import {
   genomeFileSchema,
   growthTreeFileSchema,
   LEAGUE_TIERS,
-  LEVERS,
   namesFileSchema,
   RESERVED_SPORT_IDS,
   sportsFileSchema,
@@ -221,28 +220,32 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
   }
 
   // ---- Genome ------------------------------------------------------------------------------
-  // Design rule (GDD "No universal best option"): every option helps somewhere and hurts
-  // somewhere. Checked over the whole attribute space, lever by lever.
+  // Design rule (GDD "No universal best option"): every option helps in a real share of the
+  // actual countries and hurts in a real share of them (net lever delta: affinity + accessibility +
+  // depth), so every choice is a trade-off on this map (decided 2026-09-14).
+  const balance = world.config.genomeBalance;
+  const countryCount = world.derived.length;
   for (const axis of AXIS_IDS) {
     for (const option of GENOME_AXES[axis].options) {
       const modifiers = world.genome.options[axis][option];
-      if (!modifiers) continue;
-      const ranges = optionDeltaRange(modifiers);
-      const hasDownside = LEVERS.some((lever) => ranges[lever].min < 0);
-      const hasUpside = LEVERS.some((lever) => ranges[lever].max > 0);
+      if (!modifiers || countryCount === 0) continue;
+      const nets = world.derived.map((attributes) => optionNetDeltaAt(modifiers, attributes));
+      const helps = nets.filter((net) => net > balance.neutralDelta).length;
+      const hurts = nets.filter((net) => net < -balance.neutralDelta).length;
       const field = `options.${axis}.${option}`;
-      if (!hasDownside) {
+      const percent = (share: number) => `${Math.round(share * 100)}%`;
+      if (helps / countryCount < balance.minHelpShare) {
         issue(
           sources.genome,
           field,
-          "has no downside anywhere: no lever ever goes negative for any country attributes (every option must hurt somewhere)",
+          `helps in only ${helps} of ${countryCount} countries; every option must help in at least ${percent(balance.minHelpShare)} of them (no universal worst option)`,
         );
       }
-      if (!hasUpside) {
+      if (hurts / countryCount < balance.minHurtShare) {
         issue(
           sources.genome,
           field,
-          "has no upside anywhere: no lever ever goes positive for any country attributes",
+          `hurts in only ${hurts} of ${countryCount} countries; every option must hurt in at least ${percent(balance.minHurtShare)} of them (no universal best option)`,
         );
       }
     }

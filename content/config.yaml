@@ -118,10 +118,10 @@ similarity:
     complexity: 1
     structure: 1.25
   # Casual conversion × (1 + casualFamiliarityBonus × effective similarity): familiar is easier.
-  casualFamiliarityBonus: 0.3
+  casualFamiliarityBonus: 0.4
   # Hardcore conversion × (1 − hardcoreCrowdingPenalty × effective similarity): they already
   # have that sport.
-  hardcoreCrowdingPenalty: 0.6
+  hardcoreCrowdingPenalty: 0.45
   # A rival exerts its full similarity effect once its hardcore share of the country reaches
   # this; below it the effect scales down linearly (a sport nobody there follows is no rival).
   fullEffectHardcoreShare: 0.1
@@ -298,6 +298,15 @@ hints:
   plus: 0.05
   minus: -0.05
 
+# No universal best option (GDD Sport Genome), checked against the real countries at load
+# (decided 2026-09-14): each option's net lever delta (affinity + accessibility + depth) must be
+# above neutralDelta in at least minHelpShare of countries and below −neutralDelta in at least
+# minHurtShare of them. Not a literal law of design, a guard so every choice stays a trade-off.
+genomeBalance:
+  minHelpShare: 0.15
+  minHurtShare: 0.15
+  neutralDelta: 0.005
+
 # Leagues (GDD League tiers, Business Layer Phase 0 subset, League Health Ladder). Cash is per
 # country and never produces PP.
 leagues:
@@ -389,14 +398,20 @@ balanceTargets:
   differentiationSharedShare: 0.5
   # No single trait option appears in more than this share of top-quartile runs.
   dominanceLimit: 0.4
+  # Beyond sampling noise (decided 2026-09-14): an option or growth node fails only when the one-sided
+  # lower confidence bound of its top-quartile share (Wilson, z 1.645 = 95%) is above the limit, and
+  # the options experiment plays this many random genomes per anchor (or --campaigns if higher). With
+  # 10 per anchor a perfectly balanced genome shows ~6 options above 40% by chance.
+  dominanceZ: 1.645
+  optionsGenomesPerAnchor: 250
   # Turns spent in each PP tier (GDD campaign length table), and the allowed deviation.
   # Backyard Game ~40 turns and Local Curiosity ~10 (decided 2026-09-14).
-  turnsInTier: [40, 10, 40, 40]
+  turnsInTier: [ 40, 10, 40, 40 ]
   pacingTolerance: 0.3
   # Pacing targets are for a typical anchor (decided 2026-09-13): the pacing experiment's default
   # anchors are the countries whose population lies between these quantiles of all countries. Tiny
   # and huge anchors are harder by design (anchor size is the main difficulty lever).
-  pacingAnchorPopulationQuantiles: [0.25, 0.75]
+  pacingAnchorPopulationQuantiles: [ 0.25, 0.75 ]
   # Collapses on or before this turn are reported separately: they should be very rare.
   earlyCollapseTurn: 20
   # The naive strategy for the "no safe anchor" criterion.

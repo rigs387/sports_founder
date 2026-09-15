@@ -25,7 +25,9 @@ quarter and can then convert. The "other" bucket loses fans this way but never d
 **Genome:** 10 discrete trait axes × 6 country attributes = affinity. Identity (locked): surface,
 equipment, physical profile, field footprint. Rule (evolvable): contact, team size, match length,
 scoring frequency, rules complexity, play structure. Each option carries its own accessibility
-(wins casuals) and depth (wins hardcores) modifiers, conditioned on country attributes. Rival
+(wins casuals) and depth (wins hardcores) modifiers, conditioned on country attributes (numeric
+conditions relative to the world's average country; every option must help and hurt in real
+countries). Rival
 similarity = weighted share of matching options. Every combination is legal.
 
 **Countries:** Climate (Tropical / Arid / Temperate / Cold), wealth and urban density (real data →

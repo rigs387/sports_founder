@@ -10,6 +10,7 @@ import type {
   RivalSport,
   SportsContent,
 } from "./schemas";
+import { NUMERIC_ATTRIBUTES, type NumericAttribute } from "./schemas";
 
 // Derives what the simulation reads from raw country content (GDD Country attributes): 0–1
 // attribute scores via config curves, sport culture from starting fans, media market size, the
@@ -92,7 +93,7 @@ function deriveCountry(
   country: Country,
   content: WorldContent,
   indexOf: Map<string, number>,
-): CountryDerived {
+): Omit<CountryDerived, "position"> {
   const { attributeCurves } = content.config;
   const wealth = applyCurve(attributeCurves.wealth, country.incomePerPerson);
   const links = new Set<number>();
@@ -109,6 +110,34 @@ function deriveCountry(
     otherHardcoreShare: otherHardcoreShare(country, content.otherSports),
     proximity: [...links].sort((a, b) => a - b),
   };
+}
+
+const zeroPositions = (): Record<NumericAttribute, number> =>
+  Object.fromEntries(NUMERIC_ATTRIBUTES.map((a) => [a, 0])) as Record<NumericAttribute, number>;
+
+/**
+ * Each country's position on every numeric attribute relative to the world (decided 2026-09-14):
+ * (score − population-weighted world average) ÷ the largest distance from that average to any
+ * country, so 0 is the average country and ±1 the most extreme. Numeric conditions are neutral at
+ * the world's average country rather than at a fixed score.
+ */
+export function attributePositions(
+  countries: readonly Record<NumericAttribute, number>[],
+  populations: readonly number[],
+): Record<NumericAttribute, number>[] {
+  const total = populations.reduce((sum, p) => sum + p, 0);
+  const out = countries.map(() => zeroPositions());
+  for (const attribute of NUMERIC_ATTRIBUTES) {
+    const scores = countries.map((c) => c[attribute]);
+    const centre =
+      total > 0 ? scores.reduce((sum, s, i) => sum + s * (populations[i] ?? 0), 0) / total : 0.5;
+    const spread = Math.max(0, ...scores.map((s) => Math.abs(s - centre)));
+    scores.forEach((s, i) => {
+      const position = out[i];
+      if (position) position[attribute] = spread > 0 ? (s - centre) / spread : 0;
+    });
+  }
+  return out;
 }
 
 /** Language channel link factor: 1 for shared primary spheres, scaled for secondary ones. */
@@ -167,7 +196,17 @@ function buildInboundLinks(content: WorldContent, derived: CountryDerived[]): Sp
 /** Computes every derived value. Call again after changing config or countries. */
 export function deriveWorld(content: WorldContent): World {
   const indexOf = new Map(content.countries.map((country, index) => [country.id, index]));
-  const derived = content.countries.map((country) => deriveCountry(country, content, indexOf));
+  const raw = content.countries.map((country) => deriveCountry(country, content, indexOf));
+  const positions = attributePositions(
+    raw,
+    content.countries.map((country) => country.population),
+  );
+  const derived = raw.map(
+    (country, i): CountryDerived => ({
+      ...country,
+      position: positions[i] ?? zeroPositions(),
+    }),
+  );
   const base: WorldContent = {
     countries: content.countries,
     rivals: content.rivals,

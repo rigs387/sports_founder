@@ -171,7 +171,7 @@ describe("content validation", () => {
     expect(loadError(dir3).message).toContain("options.surface.ice.conditions.affinity.climate");
   });
 
-  it("an option with no downside anywhere is flagged (every option must hurt somewhere)", () => {
+  it("an option that hurts in too few real countries is flagged (no universal best option)", () => {
     const dir = copyOfContent();
     editYaml(
       dir,
@@ -181,10 +181,10 @@ describe("content validation", () => {
     );
     const error = loadError(dir);
     expect(error.message).toContain("genome.yaml at options.complexity.simple");
-    expect(error.message).toContain("no downside anywhere");
+    expect(error.message).toContain("hurts in only 0 of 26 countries");
   });
 
-  it("an option that never helps is flagged too", () => {
+  it("an option that helps in too few real countries is flagged too", () => {
     const dir = copyOfContent();
     editYaml(
       dir,
@@ -194,7 +194,7 @@ describe("content validation", () => {
     );
     const error = loadError(dir);
     expect(error.message).toContain("genome.yaml at options.scoring.medium");
-    expect(error.message).toContain("no upside anywhere");
+    expect(error.message).toContain("helps in only 0 of 26 countries");
   });
 
   it("hardcore shares across rivals and other sports above 1 are rejected", () => {

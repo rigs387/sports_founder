@@ -281,6 +281,15 @@ Water as a surface option is parked for later.
   in config. Every rival has its own genome in content.
 - **No universal best option.** Design rule: every trait option helps in some countries and hurts
   in others. Verified in balance runs by the genome diversity of winning campaigns.
+  - *Checked against the real countries (decided 2026-09-14):* content validation requires each
+    option to help in, and hurt in, a real share of the actual countries. It is a guard so every
+    choice stays a trade-off, not a literal law.
+  - *Numeric conditions are relative to the world (decided 2026-09-14):* wealth, urban density,
+    sport culture and media market conditions are neutral at the world's population-weighted
+    average country and apply in full at the most extreme country. An option conditioned on wealth
+    helps in richer-than-average countries and hurts in poorer ones, whatever the data's scale.
+  - *Judged globally (decided 2026-09-14):* the no-dominant-genome check ranks campaigns by global
+    Fandom Score, so a niche option must pay off enough in its niche to reach the top campaigns.
 - **Identity vs. rule traits.** Identity traits (surface, equipment, physical profile, field
   footprint) are locked at creation and keep the sport recognizable. Rule traits (contact, team
   size, match length, scoring frequency, rules complexity, play structure) can change later

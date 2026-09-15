@@ -4,7 +4,8 @@ import {
   GENOME_AXES,
   type Genome,
   IDENTITY_AXES,
-  optionDeltaRange,
+  NUMERIC_ATTRIBUTES,
+  optionNetDeltaAt,
   RULE_AXES,
 } from "../src/content";
 import { anchorGenomeHints, leverMultipliers, similarity } from "../src/sim";
@@ -58,18 +59,53 @@ describe("genome axes match the GDD table", () => {
     });
   });
 
-  it("every shipped option has an upside and a downside somewhere", () => {
+  it("every shipped option helps in a real share of countries and hurts in a real share", () => {
+    const { minHelpShare, minHurtShare, neutralDelta } = world.config.genomeBalance;
+    expect(minHelpShare).toBeGreaterThan(0);
+    expect(minHurtShare).toBeGreaterThan(0);
+    const n = world.derived.length;
     for (const axis of AXIS_IDS) {
       for (const option of GENOME_AXES[axis].options) {
-        const ranges = optionDeltaRange(
-          world.genome.options[axis][option] ?? { base: {}, conditions: {} },
-        );
-        const min = Math.min(...Object.values(ranges).map((r) => r.min));
-        const max = Math.max(...Object.values(ranges).map((r) => r.max));
-        expect(min, `${axis}=${option}`).toBeLessThan(0);
-        expect(max, `${axis}=${option}`).toBeGreaterThan(0);
+        const modifiers = world.genome.options[axis][option] ?? { base: {}, conditions: {} };
+        const nets = world.derived.map((attributes) => optionNetDeltaAt(modifiers, attributes));
+        const helps = nets.filter((net) => net > neutralDelta).length;
+        const hurts = nets.filter((net) => net < -neutralDelta).length;
+        expect(helps / n, `${axis}=${option} helps`).toBeGreaterThanOrEqual(minHelpShare);
+        expect(hurts / n, `${axis}=${option} hurts`).toBeGreaterThanOrEqual(minHurtShare);
       }
     }
+  });
+});
+
+describe("numeric conditions are relative to the world", () => {
+  it("positions are 0 at the population-weighted average, ±1 at the most extreme country, in score order", () => {
+    const total = world.countries.reduce((sum, c) => sum + c.population, 0);
+    for (const attribute of NUMERIC_ATTRIBUTES) {
+      const positions = world.derived.map((d) => d.position[attribute]);
+      const weightedMean = positions.reduce(
+        (sum, p, i) => sum + p * (world.countries[i]?.population ?? 0),
+        0,
+      );
+      expect(weightedMean / total, attribute).toBeCloseTo(0, 12);
+      expect(Math.max(...positions.map((p) => Math.abs(p))), attribute).toBeCloseTo(1, 12);
+      const byScore = [...world.derived].sort((a, b) => a[attribute] - b[attribute]);
+      for (let i = 1; i < byScore.length; i += 1) {
+        expect(byScore[i]?.position[attribute]).toBeGreaterThanOrEqual(
+          byScore[i - 1]?.position[attribute] ?? Number.NEGATIVE_INFINITY,
+        );
+      }
+    }
+  });
+
+  it("a +wealth condition helps richer-than-average countries and hurts poorer ones", () => {
+    const modifiers = { base: {}, conditions: { accessibility: { wealth: 0.1 } } };
+    world.derived.forEach((attributes, i) => {
+      const net = optionNetDeltaAt(modifiers, attributes);
+      const id = world.countries[i]?.id;
+      expect(net, id).toBeCloseTo(0.1 * attributes.position.wealth, 12);
+      if (attributes.position.wealth > 0) expect(net, id).toBeGreaterThan(0);
+      if (attributes.position.wealth < 0) expect(net, id).toBeLessThan(0);
+    });
   });
 });
 

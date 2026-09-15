@@ -263,6 +263,8 @@ export interface OptionsReport {
   seeds: number[];
   turns: number;
   dominanceLimit: number;
+  /** z of the one-sided lower bound a share must clear the limit by (see shareLowerBound). */
+  dominanceZ: number;
   byAnchor: { anchor: string; outcomes: OptionOutcome[]; aboveLimit: string[] }[];
   combined: { outcomes: OptionOutcome[]; aboveLimit: string[] };
   /** The same question for growth tree nodes: owned in more than the limit of top-quartile runs. */
@@ -278,6 +280,7 @@ export function runOptions(
   onCampaign?: OnCampaign,
 ): OptionsReport {
   const limit = world.config.balanceTargets.dominanceLimit;
+  const z = world.config.balanceTargets.dominanceZ;
   const above = (outcomes: OptionOutcome[]) =>
     outcomes.filter((o) => o.exceedsDominanceLimit).map((o) => `${o.axis}=${o.option}`);
   const all: PlayedCampaign["result"][] = [];
@@ -293,19 +296,20 @@ export function runOptions(
       return played.result;
     });
     all.push(...results);
-    const outcomes = optionOutcomes(results, limit);
+    const outcomes = optionOutcomes(results, limit, z);
     byAnchor.push({ anchor, outcomes, aboveLimit: above(outcomes) });
-    const nodes = nodeOutcomes(results, nodeIds, limit);
+    const nodes = nodeOutcomes(results, nodeIds, limit, z);
     nodesByAnchor.push({ anchor, outcomes: nodes, aboveLimit: nodesAbove(nodes) });
   }
-  const combined = optionOutcomes(all, limit);
-  const combinedNodes = nodeOutcomes(all, nodeIds, limit);
+  const combined = optionOutcomes(all, limit, z);
+  const combinedNodes = nodeOutcomes(all, nodeIds, limit, z);
   return {
     anchors: settings.anchors,
     bot: settings.bot,
     seeds: settings.seeds,
     turns: settings.turns,
     dominanceLimit: limit,
+    dominanceZ: z,
     byAnchor,
     combined: { outcomes: combined, aboveLimit: above(combined) },
     nodes: {

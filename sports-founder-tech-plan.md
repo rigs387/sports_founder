@@ -44,6 +44,8 @@ surface before playtesting or during it.
 | 2026-09-13 | Pacing targets apply to typical-size anchors; big anchors are slower by design (GDD v1.5) | Decided |
 | 2026-09-13 | Differentiation overlap on the placeholder world accepted; re-judge on real data | Decided |
 | 2026-09-14 | Campaign turn budget: Backyard Game ~40 turns, Local Curiosity ~10 (GDD v1.5) | Decided |
+| 2026-09-14 | Genome balance: options checked against real countries; numeric conditions relative to the world's average country; dominance judged on global Fandom Score (GDD v1.5) | Decided |
+| 2026-09-14 | No-dominant-genome check: 250 genomes per anchor, flagged only beyond sampling noise | Decided |
 
 ---
 
@@ -78,7 +80,9 @@ starting targets (thresholds adjustable as data arrives):
   countries are largest (decided 2026-09-13; the raw-score ranking is still reported). On the
   26-country placeholder world, overlap between presets that both favor its small cold/temperate
   bloc is accepted; the criterion is judged for real on the real-world dataset (decided 2026-09-13).
-- **No dominant genome:** no single trait option appears in more than 40% of top-quartile runs.
+- **No dominant genome:** no single trait option appears in more than 40% of top-quartile runs,
+  judged on 250 random genomes per anchor, and only beyond sampling noise (the 95% lower bound of
+  its share must exceed 40%) (decided 2026-09-14).
 - **No safe anchor:** every anchor country has a nonzero collapse rate under a naive strategy.
 - **Hard anchors are winnable:** the best bot wins from Tuvalu some of the time.
 - **Pacing:** time to each PP tier falls within ±30% of the GDD campaign budget table, measured on

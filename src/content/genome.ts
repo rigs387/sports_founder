@@ -1,6 +1,5 @@
 import { AXIS_IDS, type AxisId, type Genome } from "./genome-axes";
 import {
-  CLIMATES,
   type Climate,
   type GenomeContent,
   LEVERS,
@@ -22,6 +21,12 @@ export interface AffinityAttributes {
   urbanDensity: number;
   sportCulture: number;
   mediaMarket: number;
+  /**
+   * Where the country sits on each numeric attribute relative to the world (decided 2026-09-14):
+   * 0 at the population-weighted world average, +1 at the most extreme country above it, −1 at the
+   * most extreme country below it, linear in between. Numeric conditions read this, not the score.
+   */
+  position: Record<NumericAttribute, number>;
 }
 
 export type LeverDeltas = Record<Lever, number>;
@@ -36,11 +41,12 @@ export interface DeltaContribution {
 export const zeroDeltas = (): LeverDeltas => ({ affinity: 0, accessibility: 0, depth: 0 });
 
 /**
- * A numeric condition's delta: the weight applies in full at score 1, its negative at score 0,
- * nothing at 0.5, linearly in between.
+ * A numeric condition's delta: the weight applies in full in the most extreme country above the
+ * world average, its negative in the most extreme country below it, nothing at the average
+ * (`position` from AffinityAttributes).
  */
-export function numericConditionDelta(weight: number, score: number): number {
-  return weight * (2 * score - 1);
+export function numericConditionDelta(weight: number, position: number): number {
+  return weight * position;
 }
 
 function leverContributions(
@@ -60,7 +66,7 @@ function leverContributions(
     out.push({
       lever,
       source: attribute,
-      delta: numericConditionDelta(weight, attributes[attribute]),
+      delta: numericConditionDelta(weight, attributes.position[attribute]),
     });
   }
   return out;
@@ -116,36 +122,13 @@ export function optionModifiers(
   return modifiers;
 }
 
-export interface DeltaRange {
-  min: number;
-  max: number;
-}
-
-/**
- * The lowest and highest delta each lever can reach for an option anywhere in attribute space.
- * Conditions are additive and separable, so the extremes are the sum of per-attribute extremes:
- * the worst/best climate, and each numeric weight at score 0 or 1.
- */
-export function optionDeltaRange(modifiers: OptionModifiers): Record<Lever, DeltaRange> {
-  const ranges = {} as Record<Lever, DeltaRange>;
-  for (const lever of LEVERS) {
-    const base = modifiers.base[lever] ?? 0;
-    let min = base;
-    let max = base;
-    const conditions = modifiers.conditions[lever];
-    if (conditions) {
-      const climateDeltas = CLIMATES.map((climate) => conditions.climate?.[climate] ?? 0);
-      min += Math.min(...climateDeltas);
-      max += Math.max(...climateDeltas);
-      for (const attribute of NUMERIC_ATTRIBUTES) {
-        const weight = conditions[attribute] ?? 0;
-        min -= Math.abs(weight);
-        max += Math.abs(weight);
-      }
-    }
-    ranges[lever] = { min, max };
-  }
-  return ranges;
+/** An option's net lever delta in one country: affinity + accessibility + depth. */
+export function optionNetDeltaAt(
+  modifiers: OptionModifiers,
+  attributes: AffinityAttributes,
+): number {
+  const deltas = optionDeltas(modifiers, attributes);
+  return LEVERS.reduce((sum, lever) => sum + deltas[lever], 0);
 }
 
 export type { NumericAttribute };

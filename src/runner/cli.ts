@@ -228,7 +228,7 @@ function printPacing(report: PacingReport): void {
 
 function printOptions(report: OptionsReport): void {
   console.log(
-    `\nOptions: ${report.seeds.length} random genome(s) per anchor, bot ${report.bot}, up to ${report.turns} turns. Limit: no option in more than ${pct(report.dominanceLimit)} of top-quartile runs`,
+    `\nOptions: ${report.seeds.length} random genome(s) per anchor, bot ${report.bot}, up to ${report.turns} turns. Limit: an option fails when its top-quartile share is above ${pct(report.dominanceLimit)} beyond sampling noise (lower bound at z ${report.dominanceZ})`,
   );
   for (const entry of report.byAnchor) {
     const above = entry.aboveLimit.length === 0 ? "none" : entry.aboveLimit.join(", ");
@@ -510,7 +510,16 @@ function main(): number {
       }
       case "options": {
         const anchors = checkAnchors(world, listedAnchors ?? contrastingAnchors(world));
-        const report = runOptions(world, { anchors, bot, seeds, turns }, collect(false));
+        const genomesPerAnchor = Math.max(
+          campaigns,
+          world.config.balanceTargets.optionsGenomesPerAnchor,
+        );
+        const optionSeeds = Array.from({ length: genomesPerAnchor }, (_, i) => firstSeed + i);
+        const report = runOptions(
+          world,
+          { anchors, bot, seeds: optionSeeds, turns },
+          collect(false),
+        );
         writeReport("options", report);
         optionsCsv = report.byAnchor
           .map((entry, i) => {
