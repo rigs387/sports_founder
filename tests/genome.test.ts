@@ -31,8 +31,8 @@ describe("genome axes match the GDD table", () => {
   });
 
   it("the rivals carry the GDD's soccer and cricket genomes", () => {
-    const soccer = world.rivals.find((r) => r.id === "fieldball")?.genome;
-    const cricket = world.rivals.find((r) => r.id === "longbat")?.genome;
+    const soccer = world.rivals.find((r) => r.id === "soccer")?.genome;
+    const cricket = world.rivals.find((r) => r.id === "cricket")?.genome;
     expect(soccer).toStrictEqual({
       surface: "grass",
       equipment: "ball-only",
@@ -145,7 +145,7 @@ describe("rival similarity", () => {
 
 describe("anchor genome hints", () => {
   it("cover every axis and option with ++, +, − or nothing", () => {
-    const hints = anchorGenomeHints(world, "valdoria");
+    const hints = anchorGenomeHints(world, "austria");
     for (const axis of AXIS_IDS) {
       for (const option of GENOME_AXES[axis].options) {
         expect(["++", "+", "-", null]).toContain(hints[axis][option]);
@@ -154,12 +154,12 @@ describe("anchor genome hints", () => {
   });
 
   it("recommend ice in a cold anchor and warn against it in a tropical one", () => {
-    expect(anchorGenomeHints(world, "kestmark").surface.ice).toBe("++");
-    expect(anchorGenomeHints(world, "oruna").surface.ice).toBe("-");
+    expect(anchorGenomeHints(world, "czechia").surface.ice).toBe("++");
+    expect(anchorGenomeHints(world, "bangladesh").surface.ice).toBe("-");
   });
 
   it("agree with the affinity lever's direction", () => {
-    const index = countryIndex(world, "kestmark");
+    const index = countryIndex(world, "czechia");
     const ice = leverMultipliers(world, presetGenome("ice-paddle"), index).affinity;
     const grass = leverMultipliers(
       world,

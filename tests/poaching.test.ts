@@ -16,8 +16,9 @@ import { countryIndex, setupFor, withConfig, withWorld, world } from "./helpers"
 // Hardcore poaching (GDD Fan Model v1.4, "Winning over rival hardcore fans is slow") tested through
 // its consequences: who loses fans, where they go, how the pull scales, and how slow it is.
 
-const COUNTRY = "valdoria";
-const RIVAL = "fieldball";
+// England: both modeled rivals hold fans here, so poaching can be watched on both.
+const COUNTRY = "england";
+const RIVAL = "soccer";
 
 /** No conversion, churn or noise anywhere, and no countermoves: only poaching moves fans. */
 function onlyPoaching(base: World): World {

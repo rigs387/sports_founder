@@ -8,11 +8,14 @@ import {
   configFileSchema,
   countriesFileSchema,
   ESCALATION_LEVELS,
+  FAN_FIELD_PREFIX,
   genomeFileSchema,
   growthTreeFileSchema,
   LEAGUE_TIERS,
   namesFileSchema,
   RESERVED_SPORT_IDS,
+  SOURCED_FIELDS,
+  sourcesFileSchema,
   sportsFileSchema,
 } from "./schemas";
 
@@ -22,6 +25,7 @@ export const CONTENT_FILES = {
   genome: "genome.yaml",
   growthTree: "growth-tree.yaml",
   names: "names.yaml",
+  sources: "sources.yaml",
   config: "config.yaml",
 } as const;
 
@@ -97,8 +101,17 @@ export function loadWorld(sources: ContentSources): World {
   const genome = parseSource(sources.genome, genomeFileSchema, issues);
   const growthTree = parseSource(sources.growthTree, growthTreeFileSchema, issues);
   const names = parseSource(sources.names, namesFileSchema, issues);
+  const sourcesFile = parseSource(sources.sources, sourcesFileSchema, issues);
   const config = parseSource(sources.config, configFileSchema, issues);
-  if (!countriesFile || !sportsFile || !genome || !growthTree || !names || !config) {
+  if (
+    !countriesFile ||
+    !sportsFile ||
+    !genome ||
+    !growthTree ||
+    !names ||
+    !sourcesFile ||
+    !config
+  ) {
     throw new ContentValidationError(issues);
   }
 
@@ -109,6 +122,7 @@ export function loadWorld(sources: ContentSources): World {
     genome,
     growthTree,
     names,
+    sources: sourcesFile,
     config,
   });
   checkCrossReferences(world, sources, issues);
@@ -179,6 +193,14 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
         sources.countries,
         `${at}.startingRivalFans`,
         `hardcore shares across rivals and other sports total ${sportCulture.toFixed(3)}, above 1 (a person is hardcore about at most one sport)`,
+      );
+    } else if (sportCulture > world.config.worldChecks.maxSportCulture) {
+      // A data sanity guard: a country where nearly everyone is already hardcore about something
+      // leaves the player no room, and is far more likely to be a bad figure than a real market.
+      issue(
+        sources.countries,
+        `${at}.startingRivalFans`,
+        `hardcore shares across rivals and other sports total ${sportCulture.toFixed(3)}, above config worldChecks.maxSportCulture (${world.config.worldChecks.maxSportCulture})`,
       );
     }
     const otherHardcore = Math.floor(
@@ -421,7 +443,72 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
     );
   }
 
+  checkSources(world, sources, issues);
   checkGrowthTree(world, sources, issues);
+}
+
+/**
+ * The sources file (GDD "Real-world data": every field records its source and year). Every market
+ * needs a source for every sourced field and for every rival fan bucket it lists, either from
+ * `defaults` or from its own entry, and every entry must name a listed dataset or say what its
+ * estimate was modeled on.
+ */
+function checkSources(world: World, sources: ContentSources, issues: ContentIssue[]): void {
+  const file = sources.sources;
+  const issue = (field: string, message: string) =>
+    issues.push({ file: file.path, field, message });
+  const { datasets, defaults, countries, markets } = world.sources;
+  const datasetIds = new Set(Object.keys(datasets));
+  const countryIds = new Set(world.countries.map((country) => country.id));
+  const rivalIds = new Set(world.rivals.map((rival) => rival.id));
+  const fanField = (rivalId: string) => `${FAN_FIELD_PREFIX}${rivalId}`;
+  const knownField = (name: string) =>
+    (SOURCED_FIELDS as readonly string[]).includes(name) ||
+    (name.startsWith(FAN_FIELD_PREFIX) && rivalIds.has(name.slice(FAN_FIELD_PREFIX.length)));
+
+  const checkEntry = (field: string, entry: { dataset?: string }) => {
+    if (entry.dataset !== undefined && !datasetIds.has(entry.dataset)) {
+      issue(field, `unknown dataset "${entry.dataset}" (not listed under datasets)`);
+    }
+  };
+
+  for (const [name, entry] of Object.entries(defaults)) {
+    if (!knownField(name)) issue(`defaults.${name}`, `"${name}" is not a sourced country field`);
+    checkEntry(`defaults.${name}`, entry);
+  }
+  for (const field of SOURCED_FIELDS) {
+    if (defaults[field] === undefined) {
+      issue("defaults", `every sourced field needs a default; "${field}" is missing`);
+    }
+  }
+  for (const [countryId, fields] of Object.entries(countries)) {
+    if (!countryIds.has(countryId)) {
+      issue(`countries.${countryId}`, `unknown country "${countryId}"`);
+      continue;
+    }
+    for (const [name, entry] of Object.entries(fields)) {
+      if (!knownField(name)) {
+        issue(`countries.${countryId}.${name}`, `"${name}" is not a sourced country field`);
+      }
+      checkEntry(`countries.${countryId}.${name}`, entry);
+    }
+  }
+  // Fan buckets are researched per market, so every one a market lists needs its own entry.
+  for (const country of world.countries) {
+    for (const rivalId of Object.keys(country.startingRivalFans)) {
+      const field = fanField(rivalId);
+      if (defaults[field] !== undefined || countries[country.id]?.[field] !== undefined) continue;
+      issue(
+        `countries.${country.id}.${field}`,
+        `no source for the ${rivalId} fan figures in countries.yaml (a survey dataset or an estimate saying what it was modeled on)`,
+      );
+    }
+  }
+  for (const addedId of Object.keys(markets.added)) {
+    if (!countryIds.has(addedId)) {
+      issue(`markets.added.${addedId}`, `unknown country "${addedId}"`);
+    }
+  }
 }
 
 /** Growth tree cross-references: categories, prerequisites (no cycles), effects and forks. */

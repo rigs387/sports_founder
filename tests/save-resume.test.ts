@@ -58,13 +58,13 @@ describe("save and resume", () => {
     state = applyAction({ ...state, pp: 500 }, world, {
       type: "assignFocus",
       slot: 0,
-      countryId: "kestmark",
+      countryId: "czechia",
     });
     const text = serializeSave(state);
     const loaded = deserializeSave(text, world);
     expect(loaded.rng).toStrictEqual(state.rng);
     expect(loaded.genome).toStrictEqual(state.genome);
-    expect(loaded.focus[0]).toBe("kestmark");
+    expect(loaded.focus[0]).toBe("czechia");
     expect(loaded.focus).toStrictEqual(state.focus);
     expect(serializeSave(loaded)).toBe(text);
   });

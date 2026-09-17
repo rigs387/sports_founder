@@ -14,7 +14,7 @@ import { countryIndex, setupFor, withConfig, world } from "./helpers";
 // Generational turnover (GDD Late-Game Pressure) tested through consequences: the measured annual
 // loss, where the fans go, the floor, and that rivals still persist in a long campaign.
 
-const ANCHOR = "valdoria";
+const ANCHOR = "austria";
 
 /** Only turnover moves fans: no conversion, churn, poaching, countermoves, noise or tier-ups. */
 function onlyTurnover(base: World, annualRate = base.config.turnover.annualRate): World {

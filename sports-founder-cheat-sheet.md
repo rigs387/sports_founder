@@ -35,9 +35,13 @@ similarity = weighted share of matching options. Every combination is legal.
 wealth), language (primary + optional secondary sphere), neighbors (land borders + sea links),
 continent (6).
 
-**Real-world data:** World Bank attributes (one year, sources noted); soccer/cricket fan buckets
-from interest surveys ("very interested" → hardcore), gaps modeled on neighbors and tagged;
-"other" bucket per-continent default with overrides. Soccer: grass, ball only, endurance, large,
+**Real-world data (built 2026-09-15):** 213 markets — FIFA's members minus Kosovo and Palestine,
+plus Tuvalu, Jersey, Guernsey and the Isle of Man; the UK's four home nations, not the UK. World
+Bank 2024 population, GNI per capita (Atlas) and urban share, national statistics offices filling
+gaps; GeoNames land borders plus hand-listed sea links; 15 broad language spheres. Soccer/cricket
+fan buckets from interest surveys ("very interested" → hardcore), gaps modeled on a named neighbour
+and tagged; "other" bucket per-continent default with overrides. `content/sources.yaml` carries
+every source and year and is validated at load. Soccer: grass, ball only, endurance, large,
 incidental, large team, standard, low scoring, simple, continuous. Cricket: grass, bat, precision,
 large, no contact, large team, long, high scoring, intricate, innings.
 

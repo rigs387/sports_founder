@@ -168,7 +168,7 @@ describe("state stays valid", () => {
     const noNewHardcore = withConfig(noChurn, (config) => {
       config.dynamics.player.hardcoreConversionRate = 0;
     });
-    let previous = createCampaign(noChurn, setupFor(21, "valdoria", presetGenome("ice-paddle")));
+    let previous = createCampaign(noChurn, setupFor(21, "austria", presetGenome("ice-paddle")));
     const problems: string[] = [];
     const losses = { player: 0, rivals: 0 };
     for (let turn = 0; turn < 140 && previous.outcome === null; turn += 1) {

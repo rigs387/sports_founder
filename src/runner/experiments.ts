@@ -430,8 +430,40 @@ export function runRivalsPersist(
 }
 
 /**
+ * Thins a list of anchors down to `count` by taking evenly spaced entries, keeping the first and
+ * the last (decided 2026-09-15). The list comes in sorted by population, so a sample spans the
+ * whole range. Deterministic: the same world always gives the same sample.
+ */
+function evenlySpaced(ids: readonly string[], count: number): string[] {
+  if (ids.length <= count) return [...ids];
+  if (count === 1) return [ids[0] as string];
+  const out: string[] = [];
+  for (let i = 0; i < count; i += 1) {
+    const id = ids[Math.round((i * (ids.length - 1)) / (count - 1))];
+    if (id !== undefined && !out.includes(id)) out.push(id);
+  }
+  return out;
+}
+
+/** Every country, smallest population first. */
+function byPopulation(world: World): string[] {
+  return [...world.countries].sort((a, b) => a.population - b.population).map((c) => c.id);
+}
+
+/**
+ * The default anchors for experiments that sweep the whole world (decided 2026-09-15): a sample of
+ * balanceTargets.experimentAnchors markets spread evenly across the population range, from the
+ * smallest market to the largest. Playing all 213 is hours of simulation; `--anchors all` still
+ * does it.
+ */
+export function sampledAnchors(world: World): string[] {
+  return evenlySpaced(byPopulation(world), world.config.balanceTargets.experimentAnchors);
+}
+
+/**
  * Typical-size anchors for pacing (decided 2026-09-13): every country whose population lies between
- * the configured quantiles of all countries' populations (nearest rank), in content order.
+ * the configured quantiles of all countries' populations (nearest rank), sampled down to
+ * balanceTargets.experimentAnchors.
  */
 export function typicalAnchors(world: World): string[] {
   const [low, high] = world.config.balanceTargets.pacingAnchorPopulationQuantiles;
@@ -440,14 +472,24 @@ export function typicalAnchors(world: World): string[] {
     sorted[Math.min(sorted.length - 1, Math.max(0, Math.ceil(q * sorted.length) - 1))] ?? 0;
   const min = at(low);
   const max = at(high);
-  return world.countries.filter((c) => c.population >= min && c.population <= max).map((c) => c.id);
+  const typical = byPopulation(world).filter((id) => {
+    const population = world.countries.find((c) => c.id === id)?.population ?? 0;
+    return population >= min && population <= max;
+  });
+  return evenlySpaced(typical, world.config.balanceTargets.experimentAnchors);
 }
 
-/** The first country of each climate zone: a spread of contrasting default anchors. */
+/**
+ * One anchor per climate zone, each the median-population country of its zone: a spread of
+ * contrasting but unremarkable default anchors.
+ */
 export function contrastingAnchors(world: World): string[] {
-  return CLIMATES.map((climate) => world.countries.find((c) => c.climate === climate)?.id).filter(
-    (id): id is string => id !== undefined,
-  );
+  return CLIMATES.map((climate) => {
+    const inZone = [...world.countries]
+      .filter((c) => c.climate === climate)
+      .sort((a, b) => a.population - b.population);
+    return inZone[Math.floor(inZone.length / 2)]?.id;
+  }).filter((id): id is string => id !== undefined);
 }
 
 // ---- 120-year benchmark --------------------------------------------------------------------

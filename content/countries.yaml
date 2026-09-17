@@ -1,365 +1,2857 @@
-# PLACEHOLDER countries. Invented: no real-world data. The real dataset (GDD Real-world data) is a
-# separate research task and replaces this file with the same shape.
+# Real-world markets (GDD "Real-world data", decided 2026-09-13). Generated from a World Bank and
+# GeoNames snapshot plus the hand-authored calls listed in sources.yaml; every field's source and
+# year lives there. Do not hand-edit population, incomePerPerson or urbanShare without updating
+# sources.yaml to match: content validation requires a source entry for every field.
+#
+# Markets: FIFA's 211 member associations, minus Kosovo and Palestine, plus Tuvalu (the GDD's
+# signature hard anchor, an OFC associate) and the three ICC members outside FIFA (Jersey,
+# Guernsey, Isle of Man). 213 in all. The United Kingdom is not a market: England, Scotland, Wales
+# and Northern Ireland are, as FIFA counts them. See sources.yaml `markets` for every addition and
+# omission with its reason.
 #
 # Attributes (GDD Country attributes):
 #   continent          africa / asia / europe / north-america / south-america / oceania
-#   climate            tropical / arid / temperate / cold (the zone where most people live)
-#   incomePerPerson    raw figure → wealth score 0–1 via config attributeCurves.wealth
-#   urbanShare         raw share of population living in urban areas → urban density score
+#   climate            tropical / arid / temperate / cold (the Koppen group where most people live)
+#   incomePerPerson    GNI per person, Atlas method, current US$ -> wealth score via config
+#   urbanShare         share of the population living in urban areas -> urban density score
 #   languages          primary media sphere plus an optional secondary one
 #   neighbors          land borders. Links are undirected: listing a link on either side is enough.
 #   seaLinks           hand-listed sea links, so islands have proximity spread
 #   startingRivalFans  share of the population casual / hardcore about each rival
 #   otherHardcoreShare optional override of the continent default for the "other sports" bucket
-# Derived at load: sport culture (all starting hardcore shares) and media market (population ×
+# Derived at load: sport culture (all starting hardcore shares) and media market (population x
 # wealth score). Display names live in names.yaml.
 
 countries:
-  # ---- Europe ----------------------------------------------------------------------------
-  - id: valdoria
+  # ---- Europe ----------------------------------------------------------------------
+  - id: albania
     continent: europe
-    population: 9000000
+    population: 2377128
     climate: temperate
-    incomePerPerson: 34000
-    urbanShare: 0.74
-    languages: { primary: valdic, secondary: nordel }
-    neighbors: [kestmark, arvenne, teyrland]
+    incomePerPerson: 9910
+    urbanShare: 0.585
+    languages: { primary: albanian }
+    neighbors: [north-macedonia, greece, montenegro, serbia]
+    seaLinks: [italy]
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.2 }
+
+  - id: andorra
+    continent: europe
+    population: 81938
+    climate: temperate
+    incomePerPerson: 47740
+    urbanShare: 0.889
+    languages: { primary: spanish, secondary: french }
+    neighbors: [spain, france]
     seaLinks: []
     startingRivalFans:
-      fieldball: { casual: 0.35, hardcore: 0.12 }
-      longbat: { casual: 0.03, hardcore: 0.005 }
+      soccer: { casual: 0.35, hardcore: 0.14 }
 
-  - id: kestmark
+  - id: austria
     continent: europe
-    population: 22000000
+    population: 9177982
+    climate: temperate
+    incomePerPerson: 54760
+    urbanShare: 0.695
+    languages: { primary: german }
+    neighbors: [switzerland, germany, hungary, slovakia, czechia, italy, slovenia, liechtenstein]
+    seaLinks: []
+    otherHardcoreShare: 0.16
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+
+  - id: belarus
+    continent: europe
+    population: 9132629
     climate: cold
-    incomePerPerson: 42000
-    urbanShare: 0.8
-    languages: { primary: nordel }
-    neighbors: [valdoria, ostravik]
+    incomePerPerson: 8380
+    urbanShare: 0.792
+    languages: { primary: russian }
+    neighbors: [poland, lithuania, ukraine, russia, latvia]
     seaLinks: []
+    otherHardcoreShare: 0.14
     startingRivalFans:
-      fieldball: { casual: 0.25, hardcore: 0.08 }
-      longbat: { casual: 0.02, hardcore: 0.004 }
+      soccer: { casual: 0.28, hardcore: 0.1 }
 
-  - id: arvenne
+  - id: belgium
     continent: europe
-    population: 38000000
+    population: 11858610
     climate: temperate
-    incomePerPerson: 30000
-    urbanShare: 0.78
-    languages: { primary: arvennic, secondary: valdic }
-    neighbors: [valdoria, teyrland]
-    seaLinks: [tessaline]
-    startingRivalFans:
-      fieldball: { casual: 0.4, hardcore: 0.15 }
-      longbat: { casual: 0.01, hardcore: 0.002 }
-
-  - id: teyrland
-    continent: europe
-    population: 14000000
-    climate: temperate
-    incomePerPerson: 25000
-    urbanShare: 0.65
-    languages: { primary: teyric, secondary: arvennic }
-    neighbors: [valdoria, arvenne, ostravik]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.38, hardcore: 0.14 }
-      longbat: { casual: 0.01, hardcore: 0.002 }
-
-  - id: ostravik
-    continent: europe
-    population: 30000000
-    climate: cold
-    incomePerPerson: 14000
-    urbanShare: 0.6
-    languages: { primary: ostric, secondary: nordel }
-    neighbors: [kestmark, teyrland, qarshan]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.3, hardcore: 0.1 }
-      longbat: { casual: 0.005, hardcore: 0.001 }
-
-  # ---- Asia ------------------------------------------------------------------------------
-  - id: oruna
-    continent: asia
-    population: 120000000
-    climate: tropical
-    incomePerPerson: 6000
-    urbanShare: 0.45
-    languages: { primary: oruni }
-    neighbors: [sindaru, mekhar]
-    seaLinks: [sallavi-isles]
-    startingRivalFans:
-      fieldball: { casual: 0.15, hardcore: 0.04 }
-      longbat: { casual: 0.4, hardcore: 0.18 }
-
-  - id: sindaru
-    continent: asia
-    population: 150000000
-    climate: tropical
-    incomePerPerson: 4500
-    urbanShare: 0.38
-    languages: { primary: oruni, secondary: sindar }
-    neighbors: [oruna, mekhar]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.2, hardcore: 0.05 }
-      longbat: { casual: 0.35, hardcore: 0.15 }
-
-  - id: mekhar
-    continent: asia
-    population: 80000000
-    climate: temperate
-    incomePerPerson: 12000
-    urbanShare: 0.58
-    languages: { primary: mekhari }
-    neighbors: [qarshan, oruna, sindaru, brenholt]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.25, hardcore: 0.07 }
-      longbat: { casual: 0.05, hardcore: 0.01 }
-
-  - id: qarshan
-    continent: asia
-    population: 45000000
-    climate: arid
-    incomePerPerson: 9000
-    urbanShare: 0.55
-    languages: { primary: qarshi, secondary: ostric }
-    neighbors: [ostravik, mekhar, brenholt]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.3, hardcore: 0.09 }
-      longbat: { casual: 0.02, hardcore: 0.004 }
-
-  - id: brenholt
-    continent: asia
-    population: 48000000
-    climate: arid
-    incomePerPerson: 22000
-    urbanShare: 0.85
-    languages: { primary: brennic, secondary: nordel }
-    neighbors: [qarshan, mekhar]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.35, hardcore: 0.1 }
-      longbat: { casual: 0.12, hardcore: 0.04 }
-
-  # ---- Africa ----------------------------------------------------------------------------
-  - id: kambeza
-    continent: africa
-    population: 60000000
-    climate: tropical
-    incomePerPerson: 3000
-    urbanShare: 0.4
-    languages: { primary: kambe, secondary: arvennic }
-    neighbors: [dorusso, nyala]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.4, hardcore: 0.12 }
-      longbat: { casual: 0.01, hardcore: 0.001 }
-
-  - id: dorusso
-    continent: africa
-    population: 25000000
-    climate: arid
-    incomePerPerson: 5000
-    urbanShare: 0.5
-    languages: { primary: dorussi, secondary: arvennic }
-    neighbors: [kambeza, nyala, tessaline]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.35, hardcore: 0.1 }
-      longbat: { casual: 0.005, hardcore: 0.001 }
-
-  - id: nyala
-    continent: africa
-    population: 90000000
-    climate: tropical
-    incomePerPerson: 2500
-    urbanShare: 0.35
-    languages: { primary: nyalan, secondary: teyric }
-    neighbors: [kambeza, dorusso, umbari]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.38, hardcore: 0.11 }
-      longbat: { casual: 0.02, hardcore: 0.003 }
-
-  - id: umbari
-    continent: africa
-    population: 12000000
-    climate: temperate
-    incomePerPerson: 11000
-    urbanShare: 0.62
-    languages: { primary: umbaric, secondary: teyric }
-    neighbors: [nyala]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.3, hardcore: 0.08 }
-      longbat: { casual: 0.2, hardcore: 0.07 }
-
-  - id: tessaline
-    continent: africa
-    population: 8000000
-    climate: arid
-    incomePerPerson: 15000
-    urbanShare: 0.72
-    languages: { primary: dorussi, secondary: arvennic }
-    neighbors: [dorusso]
-    seaLinks: [arvenne]
-    startingRivalFans:
-      fieldball: { casual: 0.4, hardcore: 0.13 }
-      longbat: { casual: 0.005, hardcore: 0.001 }
-
-  # ---- North America ---------------------------------------------------------------------
-  - id: caldera
-    continent: north-america
-    population: 200000000
-    climate: temperate
-    incomePerPerson: 55000
-    urbanShare: 0.83
-    languages: { primary: calderan, secondary: solari }
-    neighbors: [norrland, solmara]
-    seaLinks: [coral-keys]
-    otherHardcoreShare: 0.35
-    startingRivalFans:
-      fieldball: { casual: 0.12, hardcore: 0.02 }
-      longbat: { casual: 0.005, hardcore: 0.001 }
-
-  - id: norrland
-    continent: north-america
-    population: 30000000
-    climate: cold
-    incomePerPerson: 46000
-    urbanShare: 0.8
-    languages: { primary: calderan, secondary: arvennic }
-    neighbors: [caldera]
-    seaLinks: []
-    otherHardcoreShare: 0.25
-    startingRivalFans:
-      fieldball: { casual: 0.15, hardcore: 0.03 }
-      longbat: { casual: 0.02, hardcore: 0.005 }
-
-  - id: solmara
-    continent: north-america
-    population: 100000000
-    climate: arid
-    incomePerPerson: 10000
-    urbanShare: 0.78
-    languages: { primary: solari }
-    neighbors: [caldera, isthmia]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.4, hardcore: 0.14 }
-      longbat: { casual: 0.002, hardcore: 0.0005 }
-
-  - id: isthmia
-    continent: north-america
-    population: 6000000
-    climate: tropical
-    incomePerPerson: 8000
-    urbanShare: 0.6
-    languages: { primary: solari }
-    neighbors: [solmara, verdanza]
-    seaLinks: [coral-keys]
-    startingRivalFans:
-      fieldball: { casual: 0.35, hardcore: 0.1 }
-      longbat: { casual: 0.002, hardcore: 0.0005 }
-
-  - id: coral-keys
-    continent: north-america
-    population: 900000
-    climate: tropical
-    incomePerPerson: 18000
-    urbanShare: 0.55
-    languages: { primary: keysian, secondary: calderan }
-    neighbors: []
-    seaLinks: [isthmia, caldera]
-    startingRivalFans:
-      fieldball: { casual: 0.2, hardcore: 0.05 }
-      longbat: { casual: 0.15, hardcore: 0.06 }
-
-  # ---- South America ---------------------------------------------------------------------
-  - id: verdanza
-    continent: south-america
-    population: 45000000
-    climate: tropical
-    incomePerPerson: 9000
-    urbanShare: 0.75
-    languages: { primary: solari }
-    neighbors: [isthmia, altiplano]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.45, hardcore: 0.18 }
-      longbat: { casual: 0.002, hardcore: 0.0005 }
-
-  - id: altiplano
-    continent: south-america
-    population: 20000000
-    climate: arid
-    incomePerPerson: 6000
-    urbanShare: 0.55
-    languages: { primary: solari }
-    neighbors: [verdanza, pampara]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.4, hardcore: 0.15 }
-      longbat: { casual: 0.001, hardcore: 0.0002 }
-
-  - id: pampara
-    continent: south-america
-    population: 50000000
-    climate: temperate
-    incomePerPerson: 13000
-    urbanShare: 0.88
-    languages: { primary: pamparan, secondary: solari }
-    neighbors: [altiplano]
-    seaLinks: []
-    startingRivalFans:
-      fieldball: { casual: 0.42, hardcore: 0.2 }
-      longbat: { casual: 0.002, hardcore: 0.0005 }
-
-  # ---- Oceania ---------------------------------------------------------------------------
-  - id: austrande
-    continent: oceania
-    population: 25000000
-    climate: temperate
-    incomePerPerson: 48000
-    urbanShare: 0.86
-    languages: { primary: calderan }
-    neighbors: []
-    seaLinks: [tavu-motu, sallavi-isles]
+    incomePerPerson: 55290
+    urbanShare: 0.876
+    languages: { primary: dutch, secondary: french }
+    neighbors: [germany, netherlands, luxembourg, france]
+    seaLinks: [england]
     otherHardcoreShare: 0.12
     startingRivalFans:
-      fieldball: { casual: 0.18, hardcore: 0.04 }
-      longbat: { casual: 0.3, hardcore: 0.12 }
+      soccer: { casual: 0.4, hardcore: 0.18 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
 
-  # Island reachable only by sea, with its own language sphere and a tiny media market.
-  - id: sallavi-isles
-    continent: oceania
-    population: 400000
-    climate: tropical
-    incomePerPerson: 6500
-    urbanShare: 0.25
-    languages: { primary: sallavic }
-    neighbors: []
-    seaLinks: [oruna, tavu-motu, austrande]
+  - id: bosnia-and-herzegovina
+    continent: europe
+    population: 3164253
+    climate: temperate
+    incomePerPerson: 8810
+    urbanShare: 0.521
+    languages: { primary: serbo-croatian }
+    neighbors: [croatia, montenegro, serbia]
+    seaLinks: []
+    otherHardcoreShare: 0.10
     startingRivalFans:
-      fieldball: { casual: 0.3, hardcore: 0.1 }
-      longbat: { casual: 0.1, hardcore: 0.03 }
+      soccer: { casual: 0.42, hardcore: 0.2 }
 
-  # The signature hard anchor: tiny, remote, reachable only by sea.
-  - id: tavu-motu
-    continent: oceania
-    population: 120000
-    climate: tropical
-    incomePerPerson: 4000
-    urbanShare: 0.3
-    languages: { primary: tavuan }
-    neighbors: []
-    seaLinks: [austrande, sallavi-isles]
+  - id: bulgaria
+    continent: europe
+    population: 6441421
+    climate: temperate
+    incomePerPerson: 15370
+    urbanShare: 0.739
+    languages: { primary: bulgarian, secondary: russian }
+    neighbors: [north-macedonia, greece, romania, turkey, serbia]
+    seaLinks: []
+    otherHardcoreShare: 0.10
     startingRivalFans:
-      fieldball: { casual: 0.25, hardcore: 0.08 }
-      longbat: { casual: 0.2, hardcore: 0.08 }
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: croatia
+    continent: europe
+    population: 3866200
+    climate: temperate
+    incomePerPerson: 22230
+    urbanShare: 0.575
+    languages: { primary: serbo-croatian }
+    neighbors: [hungary, slovenia, bosnia-and-herzegovina, montenegro, serbia]
+    seaLinks: [italy]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.22 }
+
+  - id: cyprus
+    continent: europe
+    population: 1358282
+    climate: temperate
+    incomePerPerson: 32870
+    urbanShare: 0.667
+    languages: { primary: greek, secondary: english }
+    neighbors: []
+    seaLinks: [egypt, greece, israel, lebanon, syria, turkey]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.18 }
+      cricket: { casual: 0.04, hardcore: 0.01 }
+
+  - id: czechia
+    continent: europe
+    population: 10905028
+    climate: cold
+    incomePerPerson: 29570
+    urbanShare: 0.728
+    languages: { primary: czech-slovak, secondary: german }
+    neighbors: [poland, germany, slovakia, austria]
+    seaLinks: []
+    otherHardcoreShare: 0.16
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.15 }
+
+  - id: denmark
+    continent: europe
+    population: 5976992
+    climate: temperate
+    incomePerPerson: 72540
+    urbanShare: 0.887
+    languages: { primary: scandinavian, secondary: english }
+    neighbors: [germany]
+    seaLinks: [england, faroe-islands, netherlands, norway, poland, sweden]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: england
+    continent: europe
+    population: 57690300
+    climate: temperate
+    incomePerPerson: 56500
+    urbanShare: 0.83
+    languages: { primary: english }
+    neighbors: [scotland, wales]
+    seaLinks: [belgium, denmark, france, germany, guernsey, isle-of-man, jersey, netherlands, northern-ireland, republic-of-ireland]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.22 }
+      cricket: { casual: 0.25, hardcore: 0.08 }
+
+  - id: estonia
+    continent: europe
+    population: 1372341
+    climate: cold
+    incomePerPerson: 28880
+    urbanShare: 0.707
+    languages: { primary: estonian, secondary: russian }
+    neighbors: [russia, latvia]
+    seaLinks: [finland, sweden]
+    otherHardcoreShare: 0.15
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+
+  - id: faroe-islands
+    continent: europe
+    population: 54640
+    climate: cold
+    incomePerPerson: 73120
+    urbanShare: 0.394
+    languages: { primary: scandinavian, secondary: english }
+    neighbors: []
+    seaLinks: [denmark, iceland, norway, scotland]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: finland
+    continent: europe
+    population: 5619911
+    climate: cold
+    incomePerPerson: 51710
+    urbanShare: 0.743
+    languages: { primary: finnish, secondary: scandinavian }
+    neighbors: [norway, russia, sweden]
+    seaLinks: [estonia]
+    otherHardcoreShare: 0.22
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+
+  - id: france
+    continent: europe
+    population: 68551653
+    climate: temperate
+    incomePerPerson: 45160
+    urbanShare: 0.788
+    languages: { primary: french }
+    neighbors: [switzerland, germany, belgium, luxembourg, italy, andorra, spain]
+    seaLinks: [algeria, england, guernsey, jersey, republic-of-ireland]
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.18 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: germany
+    continent: europe
+    population: 83516593
+    climate: temperate
+    incomePerPerson: 55090
+    urbanShare: 0.82
+    languages: { primary: german, secondary: english }
+    neighbors: [switzerland, poland, netherlands, denmark, belgium, czechia, luxembourg, france, austria]
+    seaLinks: [england, sweden]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.22 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: gibraltar
+    continent: europe
+    population: 39329
+    climate: temperate
+    incomePerPerson: 55000
+    urbanShare: 1
+    languages: { primary: english, secondary: spanish }
+    neighbors: [spain]
+    seaLinks: [morocco]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.18 }
+      cricket: { casual: 0.03, hardcore: 0.01 }
+
+  - id: greece
+    continent: europe
+    population: 10405134
+    climate: temperate
+    incomePerPerson: 22730
+    urbanShare: 0.79
+    languages: { primary: greek }
+    neighbors: [albania, north-macedonia, turkey, bulgaria]
+    seaLinks: [cyprus, egypt, israel, italy]
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.2 }
+
+  - id: guernsey
+    continent: europe
+    population: 64800
+    climate: temperate
+    incomePerPerson: 55000
+    urbanShare: 0.31
+    languages: { primary: english, secondary: french }
+    neighbors: []
+    seaLinks: [england, france, jersey]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.18, hardcore: 0.05 }
+
+  - id: hungary
+    continent: europe
+    population: 9562065
+    climate: temperate
+    incomePerPerson: 20800
+    urbanShare: 0.705
+    languages: { primary: hungarian, secondary: german }
+    neighbors: [slovakia, slovenia, romania, ukraine, croatia, austria, serbia]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: iceland
+    continent: europe
+    population: 386506
+    climate: cold
+    incomePerPerson: 80910
+    urbanShare: 0.942
+    languages: { primary: scandinavian, secondary: english }
+    neighbors: []
+    seaLinks: [faroe-islands, norway, scotland]
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: isle-of-man
+    continent: europe
+    population: 84160
+    climate: temperate
+    incomePerPerson: 55000
+    urbanShare: 0.522
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [england, northern-ireland, republic-of-ireland, scotland]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.15, hardcore: 0.04 }
+
+  - id: italy
+    continent: europe
+    population: 58952704
+    climate: temperate
+    incomePerPerson: 38640
+    urbanShare: 0.696
+    languages: { primary: italian }
+    neighbors: [switzerland, slovenia, san-marino, france, austria]
+    seaLinks: [albania, algeria, croatia, egypt, greece, libya, malta, montenegro, spain, tunisia]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.24 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: jersey
+    continent: europe
+    population: 103300
+    climate: temperate
+    incomePerPerson: 62000
+    urbanShare: 0.35
+    languages: { primary: english, secondary: french }
+    neighbors: []
+    seaLinks: [england, france, guernsey]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.18, hardcore: 0.05 }
+
+  - id: latvia
+    continent: europe
+    population: 1866124
+    climate: cold
+    incomePerPerson: 21520
+    urbanShare: 0.685
+    languages: { primary: latvian, secondary: russian }
+    neighbors: [lithuania, estonia, belarus, russia]
+    seaLinks: [sweden]
+    otherHardcoreShare: 0.20
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+
+  - id: liechtenstein
+    continent: europe
+    population: 40450
+    climate: temperate
+    incomePerPerson: 130000
+    urbanShare: 0.147
+    languages: { primary: german }
+    neighbors: [switzerland, austria]
+    seaLinks: []
+    otherHardcoreShare: 0.16
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+
+  - id: lithuania
+    continent: europe
+    population: 2888278
+    climate: cold
+    incomePerPerson: 27110
+    urbanShare: 0.688
+    languages: { primary: lithuanian, secondary: russian }
+    neighbors: [poland, belarus, russia, latvia]
+    seaLinks: [sweden]
+    otherHardcoreShare: 0.25
+    startingRivalFans:
+      soccer: { casual: 0.22, hardcore: 0.07 }
+
+  - id: luxembourg
+    continent: europe
+    population: 677012
+    climate: temperate
+    incomePerPerson: 84650
+    urbanShare: 0.948
+    languages: { primary: french, secondary: german }
+    neighbors: [germany, belgium, france]
+    seaLinks: []
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: malta
+    continent: europe
+    population: 568847
+    climate: temperate
+    incomePerPerson: 36540
+    urbanShare: 0.957
+    languages: { primary: maltese, secondary: english }
+    neighbors: []
+    seaLinks: [italy, libya, tunisia]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.18 }
+      cricket: { casual: 0.02, hardcore: 0.005 }
+
+  - id: moldova
+    continent: europe
+    population: 2402306
+    climate: temperate
+    incomePerPerson: 6890
+    urbanShare: 0.435
+    languages: { primary: romanian, secondary: russian }
+    neighbors: [romania, ukraine]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+
+  - id: montenegro
+    continent: europe
+    population: 623525
+    climate: temperate
+    incomePerPerson: 12210
+    urbanShare: 0.655
+    languages: { primary: serbo-croatian }
+    neighbors: [albania, croatia, bosnia-and-herzegovina, serbia]
+    seaLinks: [italy]
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.18 }
+
+  - id: netherlands
+    continent: europe
+    population: 17993485
+    climate: temperate
+    incomePerPerson: 62500
+    urbanShare: 0.956
+    languages: { primary: dutch, secondary: english }
+    neighbors: [germany, belgium]
+    seaLinks: [denmark, england]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.2 }
+      cricket: { casual: 0.05, hardcore: 0.01 }
+
+  - id: north-macedonia
+    continent: europe
+    population: 1824359
+    climate: temperate
+    incomePerPerson: 8300
+    urbanShare: 0.626
+    languages: { primary: macedonian, secondary: albanian }
+    neighbors: [albania, greece, bulgaria, serbia]
+    seaLinks: []
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+
+  - id: northern-ireland
+    continent: europe
+    population: 1920400
+    climate: temperate
+    incomePerPerson: 43000
+    urbanShare: 0.64
+    languages: { primary: english }
+    neighbors: [republic-of-ireland]
+    seaLinks: [england, isle-of-man, scotland]
+    otherHardcoreShare: 0.18
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+      cricket: { casual: 0.12, hardcore: 0.03 }
+
+  - id: norway
+    continent: europe
+    population: 5572279
+    climate: cold
+    incomePerPerson: 100030
+    urbanShare: 0.833
+    languages: { primary: scandinavian, secondary: english }
+    neighbors: [finland, russia, sweden]
+    seaLinks: [denmark, faroe-islands, iceland, scotland]
+    otherHardcoreShare: 0.18
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: poland
+    continent: europe
+    population: 36559233
+    climate: cold
+    incomePerPerson: 21590
+    urbanShare: 0.6
+    languages: { primary: polish, secondary: german }
+    neighbors: [germany, lithuania, slovakia, czechia, belarus, ukraine, russia]
+    seaLinks: [denmark, sweden]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+
+  - id: portugal
+    continent: europe
+    population: 10694681
+    climate: temperate
+    incomePerPerson: 26940
+    urbanShare: 0.613
+    languages: { primary: portuguese }
+    neighbors: [spain]
+    seaLinks: [morocco]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.48, hardcore: 0.26 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: republic-of-ireland
+    continent: europe
+    population: 5395790
+    climate: temperate
+    incomePerPerson: 80650
+    urbanShare: 0.643
+    languages: { primary: english }
+    neighbors: [northern-ireland]
+    seaLinks: [england, france, isle-of-man, scotland, wales]
+    otherHardcoreShare: 0.22
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.1, hardcore: 0.02 }
+
+  - id: romania
+    continent: europe
+    population: 19051804
+    climate: temperate
+    incomePerPerson: 17600
+    urbanShare: 0.522
+    languages: { primary: romanian }
+    neighbors: [moldova, hungary, ukraine, bulgaria, serbia]
+    seaLinks: [turkey]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.15 }
+
+  - id: russia
+    continent: europe
+    population: 143669648
+    climate: cold
+    incomePerPerson: 15330
+    urbanShare: 0.751
+    languages: { primary: russian }
+    neighbors: [georgia, china, belarus, ukraine, kazakhstan, latvia, poland, estonia, lithuania, finland, mongolia, norway, azerbaijan, north-korea]
+    seaLinks: [japan, south-korea, turkey]
+    otherHardcoreShare: 0.18
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+
+  - id: san-marino
+    continent: europe
+    population: 33977
+    climate: temperate
+    incomePerPerson: 53910
+    urbanShare: 0.972
+    languages: { primary: italian }
+    neighbors: [italy]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+
+  - id: scotland
+    continent: europe
+    population: 5490100
+    climate: temperate
+    incomePerPerson: 51000
+    urbanShare: 0.7
+    languages: { primary: english }
+    neighbors: [england]
+    seaLinks: [faroe-islands, iceland, isle-of-man, northern-ireland, norway, republic-of-ireland]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.22 }
+      cricket: { casual: 0.1, hardcore: 0.02 }
+
+  - id: serbia
+    continent: europe
+    population: 6586476
+    climate: temperate
+    incomePerPerson: 11610
+    urbanShare: 0.624
+    languages: { primary: serbo-croatian }
+    neighbors: [albania, hungary, north-macedonia, romania, croatia, bosnia-and-herzegovina, bulgaria, montenegro]
+    seaLinks: []
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.2 }
+
+  - id: slovakia
+    continent: europe
+    population: 5422069
+    climate: cold
+    incomePerPerson: 23560
+    urbanShare: 0.532
+    languages: { primary: czech-slovak, secondary: hungarian }
+    neighbors: [poland, hungary, czechia, ukraine, austria]
+    seaLinks: []
+    otherHardcoreShare: 0.15
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: slovenia
+    continent: europe
+    population: 2127400
+    climate: temperate
+    incomePerPerson: 31790
+    urbanShare: 0.558
+    languages: { primary: slovene, secondary: serbo-croatian }
+    neighbors: [hungary, italy, croatia, austria]
+    seaLinks: []
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: spain
+    continent: europe
+    population: 48848840
+    climate: temperate
+    incomePerPerson: 33550
+    urbanShare: 0.803
+    languages: { primary: spanish }
+    neighbors: [andorra, portugal, gibraltar, france, morocco]
+    seaLinks: [algeria, italy]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.25 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: sweden
+    continent: europe
+    population: 10569709
+    climate: cold
+    incomePerPerson: 58510
+    urbanShare: 0.889
+    languages: { primary: scandinavian, secondary: english }
+    neighbors: [norway, finland]
+    seaLinks: [denmark, estonia, germany, latvia, lithuania, poland]
+    otherHardcoreShare: 0.18
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: switzerland
+    continent: europe
+    population: 9005582
+    climate: temperate
+    incomePerPerson: 99920
+    urbanShare: 0.855
+    languages: { primary: german, secondary: french }
+    neighbors: [germany, italy, liechtenstein, france, austria]
+    seaLinks: []
+    otherHardcoreShare: 0.16
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+
+  - id: turkey
+    continent: europe
+    population: 85518661
+    climate: temperate
+    incomePerPerson: 13430
+    urbanShare: 0.893
+    languages: { primary: turkic }
+    neighbors: [syria, georgia, iraq, iran, greece, armenia, azerbaijan, bulgaria]
+    seaLinks: [cyprus, egypt, israel, romania, russia, ukraine]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.24 }
+
+  - id: ukraine
+    continent: europe
+    population: 37860221
+    climate: cold
+    incomePerPerson: 5230
+    urbanShare: 0.695
+    languages: { primary: ukrainian, secondary: russian }
+    neighbors: [poland, moldova, hungary, slovakia, belarus, romania, russia]
+    seaLinks: [turkey]
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.13 }
+
+  - id: wales
+    continent: europe
+    population: 3164400
+    climate: temperate
+    incomePerPerson: 42500
+    urbanShare: 0.67
+    languages: { primary: english }
+    neighbors: [england]
+    seaLinks: [republic-of-ireland]
+    otherHardcoreShare: 0.15
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.18 }
+      cricket: { casual: 0.18, hardcore: 0.05 }
+
+  # ---- Africa ----------------------------------------------------------------------
+  - id: algeria
+    continent: africa
+    population: 46814308
+    climate: temperate
+    incomePerPerson: 5370
+    urbanShare: 0.753
+    languages: { primary: arabic, secondary: french }
+    neighbors: [niger, libya, mauritania, tunisia, morocco, mali]
+    seaLinks: [france, italy, spain]
+    otherHardcoreShare: 0.07
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.22 }
+
+  - id: angola
+    continent: africa
+    population: 37885849
+    climate: tropical
+    incomePerPerson: 2850
+    urbanShare: 0.707
+    languages: { primary: portuguese }
+    neighbors: [dr-congo, namibia, zambia, congo]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+
+  - id: benin
+    continent: africa
+    population: 14462724
+    climate: tropical
+    incomePerPerson: 1430
+    urbanShare: 0.525
+    languages: { primary: french }
+    neighbors: [niger, togo, burkina-faso, nigeria]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+
+  - id: botswana
+    continent: africa
+    population: 2521139
+    climate: arid
+    incomePerPerson: 7610
+    urbanShare: 0.675
+    languages: { primary: english }
+    neighbors: [zimbabwe, south-africa, namibia]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+      cricket: { casual: 0.03, hardcore: 0.008 }
+
+  - id: burkina-faso
+    continent: africa
+    population: 23548781
+    climate: arid
+    incomePerPerson: 850
+    urbanShare: 0.283
+    languages: { primary: french }
+    neighbors: [niger, benin, ghana, ivory-coast, togo, mali]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+
+  - id: burundi
+    continent: africa
+    population: 14047786
+    climate: tropical
+    incomePerPerson: 250
+    urbanShare: 0.248
+    languages: { primary: french, secondary: swahili }
+    neighbors: [tanzania, dr-congo, rwanda]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: cabo-verde
+    continent: africa
+    population: 524877
+    climate: arid
+    incomePerPerson: 4940
+    urbanShare: 0.768
+    languages: { primary: portuguese }
+    neighbors: []
+    seaLinks: [gambia, guinea-bissau, senegal]
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.18 }
+
+  - id: cameroon
+    continent: africa
+    population: 29123744
+    climate: tropical
+    incomePerPerson: 1690
+    urbanShare: 0.554
+    languages: { primary: french, secondary: english }
+    neighbors: [chad, central-african-republic, gabon, equatorial-guinea, congo, nigeria]
+    seaLinks: [sao-tome-and-principe]
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+
+  - id: central-african-republic
+    continent: africa
+    population: 5330690
+    climate: tropical
+    incomePerPerson: 510
+    urbanShare: 0.441
+    languages: { primary: french }
+    neighbors: [chad, sudan, dr-congo, south-sudan, cameroon, congo]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: chad
+    continent: africa
+    population: 20299123
+    climate: arid
+    incomePerPerson: 930
+    urbanShare: 0.269
+    languages: { primary: french, secondary: arabic }
+    neighbors: [niger, libya, central-african-republic, sudan, cameroon, nigeria]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: comoros
+    continent: africa
+    population: 866628
+    climate: tropical
+    incomePerPerson: 1730
+    urbanShare: 0.335
+    languages: { primary: arabic, secondary: french }
+    neighbors: []
+    seaLinks: [madagascar, mozambique, tanzania]
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: congo
+    continent: africa
+    population: 6332961
+    climate: tropical
+    incomePerPerson: 2270
+    urbanShare: 0.639
+    languages: { primary: french }
+    neighbors: [central-african-republic, gabon, dr-congo, cameroon, angola]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+
+  - id: djibouti
+    continent: africa
+    population: 1168722
+    climate: arid
+    incomePerPerson: 3640
+    urbanShare: 0.729
+    languages: { primary: arabic, secondary: french }
+    neighbors: [eritrea, ethiopia, somalia]
+    seaLinks: [yemen]
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+
+  - id: dr-congo
+    continent: africa
+    population: 109276265
+    climate: tropical
+    incomePerPerson: 680
+    urbanShare: 0.447
+    languages: { primary: french, secondary: swahili }
+    neighbors: [tanzania, central-african-republic, south-sudan, rwanda, zambia, burundi, uganda, congo, angola]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.18 }
+
+  - id: egypt
+    continent: africa
+    population: 116538258
+    climate: arid
+    incomePerPerson: 3510
+    urbanShare: 0.428
+    languages: { primary: arabic, secondary: english }
+    neighbors: [libya, sudan, israel]
+    seaLinks: [cyprus, greece, italy, saudi-arabia, turkey]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.48, hardcore: 0.24 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: equatorial-guinea
+    continent: africa
+    population: 1892516
+    climate: tropical
+    incomePerPerson: 6050
+    urbanShare: 0.714
+    languages: { primary: spanish, secondary: french }
+    neighbors: [gabon, cameroon]
+    seaLinks: [sao-tome-and-principe]
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+
+  - id: eritrea
+    continent: africa
+    population: 3535603
+    climate: arid
+    incomePerPerson: 700
+    urbanShare: 0.345
+    languages: { primary: arabic, secondary: english }
+    neighbors: [ethiopia, sudan, djibouti]
+    seaLinks: [saudi-arabia, yemen]
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+
+  - id: eswatini
+    continent: africa
+    population: 1242822
+    climate: temperate
+    incomePerPerson: 3440
+    urbanShare: 0.262
+    languages: { primary: english }
+    neighbors: [south-africa, mozambique]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: ethiopia
+    continent: africa
+    population: 132059767
+    climate: temperate
+    incomePerPerson: 1100
+    urbanShare: 0.236
+    languages: { primary: amharic, secondary: english }
+    neighbors: [eritrea, kenya, sudan, south-sudan, somalia, djibouti]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+
+  - id: gabon
+    continent: africa
+    population: 2538952
+    climate: tropical
+    incomePerPerson: 7870
+    urbanShare: 0.919
+    languages: { primary: french }
+    neighbors: [cameroon, equatorial-guinea, congo]
+    seaLinks: [sao-tome-and-principe]
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+
+  - id: gambia
+    continent: africa
+    population: 2759988
+    climate: tropical
+    incomePerPerson: 880
+    urbanShare: 0.643
+    languages: { primary: english, secondary: french }
+    neighbors: [senegal]
+    seaLinks: [cabo-verde]
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+      cricket: { casual: 0.02, hardcore: 0.004 }
+
+  - id: ghana
+    continent: africa
+    population: 34427414
+    climate: tropical
+    incomePerPerson: 2260
+    urbanShare: 0.584
+    languages: { primary: english }
+    neighbors: [ivory-coast, togo, burkina-faso]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: guinea
+    continent: africa
+    population: 14754785
+    climate: tropical
+    incomePerPerson: 1440
+    urbanShare: 0.381
+    languages: { primary: french }
+    neighbors: [liberia, senegal, sierra-leone, ivory-coast, guinea-bissau, mali]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.18 }
+
+  - id: guinea-bissau
+    continent: africa
+    population: 2201352
+    climate: tropical
+    incomePerPerson: 980
+    urbanShare: 0.461
+    languages: { primary: portuguese, secondary: french }
+    neighbors: [senegal, guinea]
+    seaLinks: [cabo-verde]
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+
+  - id: ivory-coast
+    continent: africa
+    population: 31934230
+    climate: tropical
+    incomePerPerson: 2520
+    urbanShare: 0.54
+    languages: { primary: french }
+    neighbors: [liberia, ghana, guinea, burkina-faso, mali]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+
+  - id: kenya
+    continent: africa
+    population: 56432944
+    climate: tropical
+    incomePerPerson: 2070
+    urbanShare: 0.319
+    languages: { primary: swahili, secondary: english }
+    neighbors: [ethiopia, tanzania, south-sudan, somalia, uganda]
+    seaLinks: [seychelles]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.12 }
+      cricket: { casual: 0.08, hardcore: 0.02 }
+
+  - id: lesotho
+    continent: africa
+    population: 2337423
+    climate: temperate
+    incomePerPerson: 1240
+    urbanShare: 0.437
+    languages: { primary: english }
+    neighbors: [south-africa]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: liberia
+    continent: africa
+    population: 5612817
+    climate: tropical
+    incomePerPerson: 750
+    urbanShare: 0.555
+    languages: { primary: english }
+    neighbors: [sierra-leone, ivory-coast, guinea]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+
+  - id: libya
+    continent: africa
+    population: 7381023
+    climate: arid
+    incomePerPerson: 6790
+    urbanShare: 0.879
+    languages: { primary: arabic }
+    neighbors: [chad, niger, algeria, sudan, tunisia, egypt]
+    seaLinks: [italy, malta]
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.18 }
+
+  - id: madagascar
+    continent: africa
+    population: 31964956
+    climate: tropical
+    incomePerPerson: 520
+    urbanShare: 0.324
+    languages: { primary: malagasy, secondary: french }
+    neighbors: []
+    seaLinks: [comoros, mauritius, mozambique, seychelles, south-africa]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: malawi
+    continent: africa
+    population: 21655286
+    climate: tropical
+    incomePerPerson: 570
+    urbanShare: 0.173
+    languages: { primary: english, secondary: swahili }
+    neighbors: [tanzania, mozambique, zambia]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.02, hardcore: 0.004 }
+
+  - id: mali
+    continent: africa
+    population: 24478595
+    climate: arid
+    incomePerPerson: 1030
+    urbanShare: 0.316
+    languages: { primary: french }
+    neighbors: [senegal, niger, algeria, ivory-coast, guinea, mauritania, burkina-faso]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.18 }
+
+  - id: mauritania
+    continent: africa
+    population: 5169395
+    climate: arid
+    incomePerPerson: 2110
+    urbanShare: 0.606
+    languages: { primary: arabic, secondary: french }
+    neighbors: [senegal, algeria, mali]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: mauritius
+    continent: africa
+    population: 1245779
+    climate: tropical
+    incomePerPerson: 12960
+    urbanShare: 0.39
+    languages: { primary: french, secondary: english }
+    neighbors: []
+    seaLinks: [madagascar, seychelles, south-africa]
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+      cricket: { casual: 0.04, hardcore: 0.01 }
+
+  - id: morocco
+    continent: africa
+    population: 38081173
+    climate: temperate
+    incomePerPerson: 3840
+    urbanShare: 0.628
+    languages: { primary: arabic, secondary: french }
+    neighbors: [algeria, spain]
+    seaLinks: [gibraltar, portugal]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.48, hardcore: 0.24 }
+      cricket: { casual: 0.003, hardcore: 0.0005 }
+
+  - id: mozambique
+    continent: africa
+    population: 34631766
+    climate: tropical
+    incomePerPerson: 550
+    urbanShare: 0.364
+    languages: { primary: portuguese }
+    neighbors: [zimbabwe, tanzania, eswatini, south-africa, zambia, malawi]
+    seaLinks: [comoros, madagascar]
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: namibia
+    continent: africa
+    population: 3030131
+    climate: arid
+    incomePerPerson: 4290
+    urbanShare: 0.504
+    languages: { primary: english, secondary: german }
+    neighbors: [south-africa, botswana, zambia, angola]
+    seaLinks: []
+    otherHardcoreShare: 0.16
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+      cricket: { casual: 0.08, hardcore: 0.02 }
+
+  - id: niger
+    continent: africa
+    population: 27032412
+    climate: arid
+    incomePerPerson: 670
+    urbanShare: 0.18
+    languages: { primary: french }
+    neighbors: [chad, benin, algeria, libya, burkina-faso, nigeria, mali]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: nigeria
+    continent: africa
+    population: 232679478
+    climate: tropical
+    incomePerPerson: 1710
+    urbanShare: 0.63
+    languages: { primary: english }
+    neighbors: [chad, niger, benin, cameroon]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+      cricket: { casual: 0.02, hardcore: 0.004 }
+
+  - id: rwanda
+    continent: africa
+    population: 14256567
+    climate: tropical
+    incomePerPerson: 1070
+    urbanShare: 0.299
+    languages: { primary: french, secondary: swahili }
+    neighbors: [tanzania, dr-congo, burundi, uganda]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.02, hardcore: 0.004 }
+
+  - id: sao-tome-and-principe
+    continent: africa
+    population: 235536
+    climate: tropical
+    incomePerPerson: 2910
+    urbanShare: 0.689
+    languages: { primary: portuguese }
+    neighbors: []
+    seaLinks: [cameroon, equatorial-guinea, gabon]
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+
+  - id: senegal
+    continent: africa
+    population: 18501984
+    climate: arid
+    incomePerPerson: 1630
+    urbanShare: 0.552
+    languages: { primary: french, secondary: arabic }
+    neighbors: [guinea, mauritania, guinea-bissau, gambia, mali]
+    seaLinks: [cabo-verde]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+
+  - id: seychelles
+    continent: africa
+    population: 121354
+    climate: tropical
+    incomePerPerson: 17700
+    urbanShare: 0.453
+    languages: { primary: french, secondary: english }
+    neighbors: []
+    seaLinks: [kenya, madagascar, mauritius, tanzania]
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+      cricket: { casual: 0.02, hardcore: 0.005 }
+
+  - id: sierra-leone
+    continent: africa
+    population: 8642022
+    climate: tropical
+    incomePerPerson: 820
+    urbanShare: 0.454
+    languages: { primary: english }
+    neighbors: [liberia, guinea]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+      cricket: { casual: 0.02, hardcore: 0.004 }
+
+  - id: somalia
+    continent: africa
+    population: 19009151
+    climate: arid
+    incomePerPerson: 620
+    urbanShare: 0.546
+    languages: { primary: somali, secondary: arabic }
+    neighbors: [ethiopia, kenya, djibouti]
+    seaLinks: [yemen]
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+
+  - id: south-africa
+    continent: africa
+    population: 64007187
+    climate: temperate
+    incomePerPerson: 6110
+    urbanShare: 0.637
+    languages: { primary: english }
+    neighbors: [zimbabwe, eswatini, mozambique, botswana, namibia, lesotho]
+    seaLinks: [madagascar, mauritius]
+    otherHardcoreShare: 0.18
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.2, hardcore: 0.07 }
+
+  - id: south-sudan
+    continent: africa
+    population: 11943408
+    climate: tropical
+    incomePerPerson: 900
+    urbanShare: 0.214
+    languages: { primary: english, secondary: arabic }
+    neighbors: [dr-congo, central-african-republic, ethiopia, kenya, sudan, uganda]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+
+  - id: sudan
+    continent: africa
+    population: 50448963
+    climate: arid
+    incomePerPerson: 710
+    urbanShare: 0.349
+    languages: { primary: arabic, secondary: english }
+    neighbors: [south-sudan, chad, egypt, ethiopia, eritrea, libya, central-african-republic]
+    seaLinks: [saudi-arabia]
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+
+  - id: tanzania
+    continent: africa
+    population: 68560157
+    climate: tropical
+    incomePerPerson: 1210
+    urbanShare: 0.362
+    languages: { primary: swahili, secondary: english }
+    neighbors: [mozambique, kenya, dr-congo, rwanda, zambia, burundi, uganda, malawi]
+    seaLinks: [comoros, seychelles]
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.03, hardcore: 0.005 }
+
+  - id: togo
+    continent: africa
+    population: 8406558
+    climate: tropical
+    incomePerPerson: 1220
+    urbanShare: 0.438
+    languages: { primary: french }
+    neighbors: [benin, ghana, burkina-faso]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.16 }
+
+  - id: tunisia
+    continent: africa
+    population: 12277109
+    climate: temperate
+    incomePerPerson: 3880
+    urbanShare: 0.704
+    languages: { primary: arabic, secondary: french }
+    neighbors: [algeria, libya]
+    seaLinks: [italy, malta]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.22 }
+
+  - id: uganda
+    continent: africa
+    population: 50015092
+    climate: tropical
+    incomePerPerson: 1010
+    urbanShare: 0.313
+    languages: { primary: english, secondary: swahili }
+    neighbors: [tanzania, kenya, south-sudan, dr-congo, rwanda]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.05, hardcore: 0.01 }
+
+  - id: zambia
+    continent: africa
+    population: 21314956
+    climate: tropical
+    incomePerPerson: 1190
+    urbanShare: 0.455
+    languages: { primary: english }
+    neighbors: [zimbabwe, tanzania, mozambique, dr-congo, namibia, malawi, angola]
+    seaLinks: []
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+      cricket: { casual: 0.02, hardcore: 0.004 }
+
+  - id: zimbabwe
+    continent: africa
+    population: 16634373
+    climate: temperate
+    incomePerPerson: 2400
+    urbanShare: 0.399
+    languages: { primary: english }
+    neighbors: [south-africa, mozambique, botswana, zambia]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.12, hardcore: 0.04 }
+
+  # ---- Asia ------------------------------------------------------------------------
+  - id: afghanistan
+    continent: asia
+    population: 42647492
+    climate: arid
+    incomePerPerson: 390
+    urbanShare: 0.257
+    languages: { primary: persian, secondary: turkic }
+    neighbors: [turkmenistan, china, iran, tajikistan, pakistan, uzbekistan]
+    seaLinks: []
+    otherHardcoreShare: 0.03
+    startingRivalFans:
+      soccer: { casual: 0.2, hardcore: 0.06 }
+      cricket: { casual: 0.4, hardcore: 0.25 }
+
+  - id: armenia
+    continent: asia
+    population: 3033500
+    climate: temperate
+    incomePerPerson: 7810
+    urbanShare: 0.658
+    languages: { primary: armenian, secondary: russian }
+    neighbors: [georgia, iran, azerbaijan, turkey]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+
+  - id: azerbaijan
+    continent: asia
+    population: 10202830
+    climate: arid
+    incomePerPerson: 7340
+    urbanShare: 0.586
+    languages: { primary: turkic, secondary: russian }
+    neighbors: [georgia, iran, armenia, turkey, russia]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: bahrain
+    continent: asia
+    population: 1588670
+    climate: arid
+    incomePerPerson: 28170
+    urbanShare: 1
+    languages: { primary: arabic, secondary: english }
+    neighbors: []
+    seaLinks: [iran, kuwait, qatar, saudi-arabia]
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+      cricket: { casual: 0.18, hardcore: 0.06 }
+
+  - id: bangladesh
+    continent: asia
+    population: 173562364
+    climate: tropical
+    incomePerPerson: 2820
+    urbanShare: 0.327
+    languages: { primary: bengali, secondary: english }
+    neighbors: [myanmar, india]
+    seaLinks: []
+    otherHardcoreShare: 0.02
+    startingRivalFans:
+      soccer: { casual: 0.18, hardcore: 0.05 }
+      cricket: { casual: 0.45, hardcore: 0.3 }
+
+  - id: bhutan
+    continent: asia
+    population: 791524
+    climate: temperate
+    incomePerPerson: 3910
+    urbanShare: 0.426
+    languages: { primary: dzongkha, secondary: english }
+    neighbors: [china, india]
+    seaLinks: []
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.12, hardcore: 0.03 }
+
+  - id: brunei
+    continent: asia
+    population: 462721
+    climate: tropical
+    incomePerPerson: 36020
+    urbanShare: 0.749
+    languages: { primary: malay-indonesian, secondary: english }
+    neighbors: [malaysia]
+    seaLinks: [indonesia, philippines]
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+      cricket: { casual: 0.05, hardcore: 0.01 }
+
+  - id: cambodia
+    continent: asia
+    population: 17638801
+    climate: tropical
+    incomePerPerson: 2550
+    urbanShare: 0.409
+    languages: { primary: khmer }
+    neighbors: [laos, thailand, vietnam]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+
+  - id: china
+    continent: asia
+    population: 1408975000
+    climate: temperate
+    incomePerPerson: 13660
+    urbanShare: 0.659
+    languages: { primary: chinese }
+    neighbors: [laos, bhutan, tajikistan, kazakhstan, mongolia, afghanistan, nepal, myanmar, kyrgyzstan, pakistan, north-korea, russia, vietnam, india]
+    seaLinks: [chinese-taipei, japan, philippines, south-korea]
+    otherHardcoreShare: 0.16
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.07 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: chinese-taipei
+    continent: asia
+    population: 23400000
+    climate: temperate
+    incomePerPerson: 35000
+    urbanShare: 0.8
+    languages: { primary: chinese, secondary: english }
+    neighbors: []
+    seaLinks: [china, guam, hong-kong, japan, philippines]
+    otherHardcoreShare: 0.22
+    startingRivalFans:
+      soccer: { casual: 0.12, hardcore: 0.03 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: georgia
+    continent: asia
+    population: 3812518
+    climate: temperate
+    incomePerPerson: 7870
+    urbanShare: 0.611
+    languages: { primary: georgian, secondary: russian }
+    neighbors: [armenia, azerbaijan, turkey, russia]
+    seaLinks: []
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: hong-kong
+    continent: asia
+    population: 7524100
+    climate: temperate
+    incomePerPerson: 57410
+    urbanShare: 1
+    languages: { primary: chinese, secondary: english }
+    neighbors: []
+    seaLinks: [chinese-taipei, macau, philippines]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.05, hardcore: 0.01 }
+
+  - id: india
+    continent: asia
+    population: 1450935791
+    climate: tropical
+    incomePerPerson: 2550
+    urbanShare: 0.354
+    languages: { primary: hindi-urdu, secondary: english }
+    neighbors: [china, nepal, myanmar, bhutan, pakistan, bangladesh]
+    seaLinks: [maldives, sri-lanka, united-arab-emirates]
+    otherHardcoreShare: 0.02
+    startingRivalFans:
+      soccer: { casual: 0.18, hardcore: 0.04 }
+      cricket: { casual: 0.45, hardcore: 0.3 }
+
+  - id: indonesia
+    continent: asia
+    population: 283487931
+    climate: tropical
+    incomePerPerson: 4920
+    urbanShare: 0.588
+    languages: { primary: malay-indonesian, secondary: english }
+    neighbors: [papua-new-guinea, timor-leste, malaysia]
+    seaLinks: [australia, brunei, philippines, singapore]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.2 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: iran
+    continent: asia
+    population: 91567738
+    climate: arid
+    incomePerPerson: 5130
+    urbanShare: 0.77
+    languages: { primary: persian }
+    neighbors: [turkmenistan, afghanistan, iraq, armenia, pakistan, azerbaijan, turkey]
+    seaLinks: [bahrain, kuwait, oman, qatar, united-arab-emirates]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.2 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: iraq
+    continent: asia
+    population: 46042015
+    climate: arid
+    incomePerPerson: 6030
+    urbanShare: 0.699
+    languages: { primary: arabic, secondary: persian }
+    neighbors: [syria, saudi-arabia, iran, jordan, turkey, kuwait]
+    seaLinks: []
+    otherHardcoreShare: 0.06
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+
+  - id: israel
+    continent: asia
+    population: 10002200
+    climate: temperate
+    incomePerPerson: 53090
+    urbanShare: 0.915
+    languages: { primary: hebrew, secondary: english }
+    neighbors: [syria, jordan, lebanon, egypt]
+    seaLinks: [cyprus, greece, turkey]
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.15 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: japan
+    continent: asia
+    population: 123975371
+    climate: temperate
+    incomePerPerson: 37170
+    urbanShare: 0.922
+    languages: { primary: japanese, secondary: english }
+    neighbors: []
+    seaLinks: [china, chinese-taipei, guam, north-korea, russia, south-korea]
+    otherHardcoreShare: 0.22
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: jordan
+    continent: asia
+    population: 11552876
+    climate: arid
+    incomePerPerson: 4880
+    urbanShare: 0.93
+    languages: { primary: arabic, secondary: english }
+    neighbors: [syria, saudi-arabia, iraq, israel]
+    seaLinks: []
+    otherHardcoreShare: 0.06
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+      cricket: { casual: 0.02, hardcore: 0.004 }
+
+  - id: kazakhstan
+    continent: asia
+    population: 20592571
+    climate: arid
+    incomePerPerson: 12100
+    urbanShare: 0.621
+    languages: { primary: turkic, secondary: russian }
+    neighbors: [turkmenistan, china, kyrgyzstan, uzbekistan, russia]
+    seaLinks: []
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+
+  - id: kuwait
+    continent: asia
+    population: 4897263
+    climate: arid
+    incomePerPerson: 41110
+    urbanShare: 1
+    languages: { primary: arabic, secondary: english }
+    neighbors: [saudi-arabia, iraq]
+    seaLinks: [bahrain, iran]
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+      cricket: { casual: 0.15, hardcore: 0.05 }
+
+  - id: kyrgyzstan
+    continent: asia
+    population: 7221868
+    climate: cold
+    incomePerPerson: 2260
+    urbanShare: 0.347
+    languages: { primary: turkic, secondary: russian }
+    neighbors: [china, tajikistan, uzbekistan, kazakhstan]
+    seaLinks: []
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+
+  - id: laos
+    continent: asia
+    population: 7769819
+    climate: tropical
+    incomePerPerson: 2000
+    urbanShare: 0.396
+    languages: { primary: lao }
+    neighbors: [china, myanmar, cambodia, thailand, vietnam]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+
+  - id: lebanon
+    continent: asia
+    population: 5805962
+    climate: temperate
+    incomePerPerson: 3560
+    urbanShare: 0.907
+    languages: { primary: arabic, secondary: french }
+    neighbors: [syria, israel]
+    seaLinks: [cyprus]
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: macau
+    continent: asia
+    population: 687000
+    climate: temperate
+    incomePerPerson: 69920
+    urbanShare: 1
+    languages: { primary: chinese, secondary: portuguese }
+    neighbors: []
+    seaLinks: [hong-kong]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.22, hardcore: 0.07 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: malaysia
+    continent: asia
+    population: 35557673
+    climate: tropical
+    incomePerPerson: 11650
+    urbanShare: 0.769
+    languages: { primary: malay-indonesian, secondary: english }
+    neighbors: [brunei, thailand, indonesia]
+    seaLinks: [philippines, singapore]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+      cricket: { casual: 0.05, hardcore: 0.01 }
+
+  - id: maldives
+    continent: asia
+    population: 527799
+    climate: tropical
+    incomePerPerson: 11540
+    urbanShare: 0.42
+    languages: { primary: dhivehi, secondary: english }
+    neighbors: []
+    seaLinks: [india, sri-lanka]
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.15, hardcore: 0.04 }
+
+  - id: mongolia
+    continent: asia
+    population: 3524788
+    climate: cold
+    incomePerPerson: 5380
+    urbanShare: 0.71
+    languages: { primary: mongolian, secondary: russian }
+    neighbors: [china, russia]
+    seaLinks: []
+    otherHardcoreShare: 0.20
+    startingRivalFans:
+      soccer: { casual: 0.18, hardcore: 0.05 }
+
+  - id: myanmar
+    continent: asia
+    population: 54500091
+    climate: tropical
+    incomePerPerson: 1210
+    urbanShare: 0.304
+    languages: { primary: burmese, secondary: english }
+    neighbors: [china, laos, thailand, bangladesh, india]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: nepal
+    continent: asia
+    population: 29651054
+    climate: temperate
+    incomePerPerson: 1480
+    urbanShare: 0.668
+    languages: { primary: nepali, secondary: hindi-urdu }
+    neighbors: [china, india]
+    seaLinks: []
+    otherHardcoreShare: 0.03
+    startingRivalFans:
+      soccer: { casual: 0.22, hardcore: 0.07 }
+      cricket: { casual: 0.32, hardcore: 0.15 }
+
+  - id: north-korea
+    continent: asia
+    population: 26498823
+    climate: cold
+    incomePerPerson: 1300
+    urbanShare: 0.639
+    languages: { primary: korean }
+    neighbors: [china, south-korea, russia]
+    seaLinks: [japan]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.09 }
+
+  - id: oman
+    continent: asia
+    population: 5281538
+    climate: arid
+    incomePerPerson: 19520
+    urbanShare: 0.794
+    languages: { primary: arabic, secondary: english }
+    neighbors: [saudi-arabia, yemen, united-arab-emirates]
+    seaLinks: [iran, pakistan]
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.2, hardcore: 0.07 }
+
+  - id: pakistan
+    continent: asia
+    population: 251269164
+    climate: arid
+    incomePerPerson: 1430
+    urbanShare: 0.392
+    languages: { primary: hindi-urdu, secondary: english }
+    neighbors: [china, afghanistan, iran, india]
+    seaLinks: [oman]
+    otherHardcoreShare: 0.03
+    startingRivalFans:
+      soccer: { casual: 0.12, hardcore: 0.03 }
+      cricket: { casual: 0.45, hardcore: 0.32 }
+
+  - id: philippines
+    continent: asia
+    population: 115843670
+    climate: tropical
+    incomePerPerson: 4470
+    urbanShare: 0.555
+    languages: { primary: filipino, secondary: english }
+    neighbors: []
+    seaLinks: [brunei, china, chinese-taipei, guam, hong-kong, indonesia, malaysia, vietnam]
+    otherHardcoreShare: 0.25
+    startingRivalFans:
+      soccer: { casual: 0.15, hardcore: 0.04 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: qatar
+    continent: asia
+    population: 2857822
+    climate: arid
+    incomePerPerson: 76570
+    urbanShare: 0.993
+    languages: { primary: arabic, secondary: english }
+    neighbors: [saudi-arabia]
+    seaLinks: [bahrain, iran, united-arab-emirates]
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.22, hardcore: 0.07 }
+
+  - id: saudi-arabia
+    continent: asia
+    population: 35300280
+    climate: arid
+    incomePerPerson: 35990
+    urbanShare: 0.845
+    languages: { primary: arabic, secondary: english }
+    neighbors: [qatar, oman, iraq, yemen, jordan, united-arab-emirates, kuwait]
+    seaLinks: [bahrain, egypt, eritrea, sudan]
+    otherHardcoreShare: 0.06
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+      cricket: { casual: 0.08, hardcore: 0.02 }
+
+  - id: singapore
+    continent: asia
+    population: 6036860
+    climate: tropical
+    incomePerPerson: 75820
+    urbanShare: 1
+    languages: { primary: english, secondary: chinese }
+    neighbors: []
+    seaLinks: [indonesia, malaysia]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+      cricket: { casual: 0.06, hardcore: 0.015 }
+
+  - id: south-korea
+    continent: asia
+    population: 51751065
+    climate: temperate
+    incomePerPerson: 36750
+    urbanShare: 0.812
+    languages: { primary: korean, secondary: english }
+    neighbors: [north-korea]
+    seaLinks: [china, japan, russia]
+    otherHardcoreShare: 0.20
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: sri-lanka
+    continent: asia
+    population: 21916000
+    climate: tropical
+    incomePerPerson: 3870
+    urbanShare: 0.203
+    languages: { primary: sinhala, secondary: english }
+    neighbors: []
+    seaLinks: [india, maldives]
+    otherHardcoreShare: 0.03
+    startingRivalFans:
+      soccer: { casual: 0.1, hardcore: 0.02 }
+      cricket: { casual: 0.48, hardcore: 0.32 }
+
+  - id: syria
+    continent: asia
+    population: 24672760
+    climate: arid
+    incomePerPerson: 720
+    urbanShare: 0.721
+    languages: { primary: arabic }
+    neighbors: [iraq, jordan, israel, turkey, lebanon]
+    seaLinks: [cyprus]
+    otherHardcoreShare: 0.06
+    startingRivalFans:
+      soccer: { casual: 0.38, hardcore: 0.16 }
+
+  - id: tajikistan
+    continent: asia
+    population: 10590927
+    climate: temperate
+    incomePerPerson: 1650
+    urbanShare: 0.262
+    languages: { primary: persian, secondary: russian }
+    neighbors: [china, afghanistan, kyrgyzstan, uzbekistan]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+
+  - id: thailand
+    continent: asia
+    population: 71668011
+    climate: tropical
+    incomePerPerson: 7130
+    urbanShare: 0.619
+    languages: { primary: thai, secondary: english }
+    neighbors: [laos, myanmar, cambodia, malaysia]
+    seaLinks: []
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.15 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: timor-leste
+    continent: asia
+    population: 1400638
+    climate: tropical
+    incomePerPerson: 1650
+    urbanShare: 0.287
+    languages: { primary: tetum, secondary: portuguese }
+    neighbors: [indonesia]
+    seaLinks: [australia]
+    otherHardcoreShare: 0.06
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+
+  - id: turkmenistan
+    continent: asia
+    population: 7494498
+    climate: arid
+    incomePerPerson: 5640
+    urbanShare: 0.471
+    languages: { primary: turkic, secondary: russian }
+    neighbors: [afghanistan, iran, uzbekistan, kazakhstan]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+
+  - id: united-arab-emirates
+    continent: asia
+    population: 10986400
+    climate: arid
+    incomePerPerson: 51550
+    urbanShare: 0.858
+    languages: { primary: arabic, secondary: english }
+    neighbors: [saudi-arabia, oman]
+    seaLinks: [india, iran, qatar]
+    otherHardcoreShare: 0.06
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.25, hardcore: 0.08 }
+
+  - id: uzbekistan
+    continent: asia
+    population: 36361859
+    climate: arid
+    incomePerPerson: 3170
+    urbanShare: 0.51
+    languages: { primary: turkic, secondary: russian }
+    neighbors: [turkmenistan, afghanistan, kyrgyzstan, tajikistan, kazakhstan]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: vietnam
+    continent: asia
+    population: 100987686
+    climate: tropical
+    incomePerPerson: 4490
+    urbanShare: 0.385
+    languages: { primary: vietnamese, secondary: english }
+    neighbors: [china, laos, cambodia]
+    seaLinks: [philippines]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.18 }
+
+  - id: yemen
+    continent: asia
+    population: 40583164
+    climate: arid
+    incomePerPerson: 740
+    urbanShare: 0.368
+    languages: { primary: arabic }
+    neighbors: [saudi-arabia, oman]
+    seaLinks: [djibouti, eritrea, somalia]
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.03, hardcore: 0.005 }
+
+  # ---- North America ---------------------------------------------------------------
+  - id: anguilla
+    continent: north-america
+    population: 16000
+    climate: tropical
+    incomePerPerson: 22000
+    urbanShare: 0.6
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [antigua-and-barbuda, british-virgin-islands, saint-kitts-and-nevis, us-virgin-islands]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+      cricket: { casual: 0.25, hardcore: 0.08 }
+
+  - id: antigua-and-barbuda
+    continent: north-america
+    population: 93772
+    climate: tropical
+    incomePerPerson: 21200
+    urbanShare: 0.244
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [anguilla, dominica, montserrat, saint-kitts-and-nevis]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.38, hardcore: 0.16 }
+
+  - id: aruba
+    continent: north-america
+    population: 107995
+    climate: arid
+    incomePerPerson: 35200
+    urbanShare: 0.618
+    languages: { primary: dutch, secondary: spanish }
+    neighbors: []
+    seaLinks: [curacao, venezuela]
+    otherHardcoreShare: 0.25
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+
+  - id: bahamas
+    continent: north-america
+    population: 401283
+    climate: tropical
+    incomePerPerson: 37020
+    urbanShare: 0.813
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [cuba, haiti, turks-and-caicos-islands, united-states]
+    otherHardcoreShare: 0.25
+    startingRivalFans:
+      soccer: { casual: 0.2, hardcore: 0.06 }
+      cricket: { casual: 0.05, hardcore: 0.01 }
+
+  - id: barbados
+    continent: north-america
+    population: 282467
+    climate: tropical
+    incomePerPerson: 25360
+    urbanShare: 0.595
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [grenada, guyana, saint-lucia, saint-vincent-and-the-grenadines, trinidad-and-tobago]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.4, hardcore: 0.18 }
+
+  - id: belize
+    continent: north-america
+    population: 417072
+    climate: tropical
+    incomePerPerson: 7150
+    urbanShare: 0.418
+    languages: { primary: english, secondary: spanish }
+    neighbors: [guatemala, mexico]
+    seaLinks: [honduras, jamaica]
+    otherHardcoreShare: 0.15
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+      cricket: { casual: 0.05, hardcore: 0.01 }
+
+  - id: bermuda
+    continent: north-america
+    population: 64636
+    climate: temperate
+    incomePerPerson: 139370
+    urbanShare: 1
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [united-states]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+      cricket: { casual: 0.3, hardcore: 0.12 }
+
+  - id: british-virgin-islands
+    continent: north-america
+    population: 39471
+    climate: tropical
+    incomePerPerson: 40000
+    urbanShare: 0.565
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [anguilla, puerto-rico, us-virgin-islands]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+      cricket: { casual: 0.25, hardcore: 0.08 }
+
+  - id: canada
+    continent: north-america
+    population: 41262329
+    climate: cold
+    incomePerPerson: 54110
+    urbanShare: 0.827
+    languages: { primary: english, secondary: french }
+    neighbors: [united-states]
+    seaLinks: []
+    otherHardcoreShare: 0.28
+    startingRivalFans:
+      soccer: { casual: 0.22, hardcore: 0.07 }
+      cricket: { casual: 0.05, hardcore: 0.01 }
+
+  - id: cayman-islands
+    continent: north-america
+    population: 74457
+    climate: tropical
+    incomePerPerson: 81920
+    urbanShare: 1
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [cuba, honduras, jamaica]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+      cricket: { casual: 0.22, hardcore: 0.07 }
+
+  - id: costa-rica
+    continent: north-america
+    population: 5129910
+    climate: tropical
+    incomePerPerson: 15710
+    urbanShare: 0.793
+    languages: { primary: spanish }
+    neighbors: [panama, nicaragua]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+
+  - id: cuba
+    continent: north-america
+    population: 10979783
+    climate: tropical
+    incomePerPerson: 9010
+    urbanShare: 0.772
+    languages: { primary: spanish }
+    neighbors: [united-states]
+    seaLinks: [bahamas, cayman-islands, dominican-republic, haiti, jamaica, mexico]
+    otherHardcoreShare: 0.30
+    startingRivalFans:
+      soccer: { casual: 0.2, hardcore: 0.06 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: curacao
+    continent: north-america
+    population: 155967
+    climate: arid
+    incomePerPerson: 22570
+    urbanShare: 0.914
+    languages: { primary: dutch, secondary: spanish }
+    neighbors: []
+    seaLinks: [aruba, venezuela]
+    otherHardcoreShare: 0.25
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+
+  - id: dominica
+    continent: north-america
+    population: 66205
+    climate: tropical
+    incomePerPerson: 9930
+    urbanShare: 0.735
+    languages: { primary: english, secondary: french }
+    neighbors: []
+    seaLinks: [antigua-and-barbuda, montserrat, saint-lucia]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.35, hardcore: 0.15 }
+
+  - id: dominican-republic
+    continent: north-america
+    population: 11427557
+    climate: tropical
+    incomePerPerson: 10310
+    urbanShare: 0.724
+    languages: { primary: spanish }
+    neighbors: [haiti]
+    seaLinks: [cuba, puerto-rico, turks-and-caicos-islands]
+    otherHardcoreShare: 0.32
+    startingRivalFans:
+      soccer: { casual: 0.18, hardcore: 0.05 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: el-salvador
+    continent: north-america
+    population: 6338193
+    climate: tropical
+    incomePerPerson: 5070
+    urbanShare: 0.751
+    languages: { primary: spanish }
+    neighbors: [guatemala, honduras]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.18 }
+
+  - id: grenada
+    continent: north-america
+    population: 117207
+    climate: tropical
+    incomePerPerson: 10790
+    urbanShare: 0.366
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [barbados, saint-vincent-and-the-grenadines, trinidad-and-tobago]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.35, hardcore: 0.15 }
+
+  - id: guatemala
+    continent: north-america
+    population: 18406359
+    climate: tropical
+    incomePerPerson: 5780
+    urbanShare: 0.56
+    languages: { primary: spanish }
+    neighbors: [mexico, honduras, belize, el-salvador]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.18 }
+
+  - id: haiti
+    continent: north-america
+    population: 11772557
+    climate: tropical
+    incomePerPerson: 1730
+    urbanShare: 0.55
+    languages: { primary: french }
+    neighbors: [dominican-republic]
+    seaLinks: [bahamas, cuba, jamaica, turks-and-caicos-islands]
+    otherHardcoreShare: 0.05
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+
+  - id: honduras
+    continent: north-america
+    population: 10825703
+    climate: tropical
+    incomePerPerson: 3020
+    urbanShare: 0.588
+    languages: { primary: spanish }
+    neighbors: [guatemala, nicaragua, el-salvador]
+    seaLinks: [belize, cayman-islands]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+
+  - id: jamaica
+    continent: north-america
+    population: 2839175
+    climate: tropical
+    incomePerPerson: 7190
+    urbanShare: 0.589
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [belize, cayman-islands, cuba, haiti]
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.3, hardcore: 0.12 }
+
+  - id: mexico
+    continent: north-america
+    population: 130861007
+    climate: temperate
+    incomePerPerson: 12760
+    urbanShare: 0.798
+    languages: { primary: spanish }
+    neighbors: [guatemala, united-states, belize]
+    seaLinks: [cuba]
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.22 }
+
+  - id: montserrat
+    continent: north-america
+    population: 4400
+    climate: tropical
+    incomePerPerson: 14000
+    urbanShare: 0.5
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [antigua-and-barbuda, dominica, saint-kitts-and-nevis]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+      cricket: { casual: 0.28, hardcore: 0.1 }
+
+  - id: nicaragua
+    continent: north-america
+    population: 6916140
+    climate: tropical
+    incomePerPerson: 2510
+    urbanShare: 0.593
+    languages: { primary: spanish }
+    neighbors: [costa-rica, honduras]
+    seaLinks: []
+    otherHardcoreShare: 0.20
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+
+  - id: panama
+    continent: north-america
+    population: 4515577
+    climate: tropical
+    incomePerPerson: 17950
+    urbanShare: 0.66
+    languages: { primary: spanish }
+    neighbors: [costa-rica, colombia]
+    seaLinks: []
+    otherHardcoreShare: 0.20
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: puerto-rico
+    continent: north-america
+    population: 3202521
+    climate: tropical
+    incomePerPerson: 25870
+    urbanShare: 0.943
+    languages: { primary: spanish, secondary: english }
+    neighbors: []
+    seaLinks: [british-virgin-islands, dominican-republic, us-virgin-islands]
+    otherHardcoreShare: 0.30
+    startingRivalFans:
+      soccer: { casual: 0.15, hardcore: 0.04 }
+      cricket: { casual: 0.01, hardcore: 0.002 }
+
+  - id: saint-kitts-and-nevis
+    continent: north-america
+    population: 46843
+    climate: tropical
+    incomePerPerson: 21960
+    urbanShare: 0.318
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [anguilla, antigua-and-barbuda, montserrat]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.35, hardcore: 0.15 }
+
+  - id: saint-lucia
+    continent: north-america
+    population: 179744
+    climate: tropical
+    incomePerPerson: 12840
+    urbanShare: 0.291
+    languages: { primary: english, secondary: french }
+    neighbors: []
+    seaLinks: [barbados, dominica, saint-vincent-and-the-grenadines]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.35, hardcore: 0.15 }
+
+  - id: saint-vincent-and-the-grenadines
+    continent: north-america
+    population: 100616
+    climate: tropical
+    incomePerPerson: 11210
+    urbanShare: 0.478
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [barbados, grenada, saint-lucia]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.35, hardcore: 0.15 }
+
+  - id: trinidad-and-tobago
+    continent: north-america
+    population: 1368333
+    climate: tropical
+    incomePerPerson: 19290
+    urbanShare: 0.54
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [barbados, grenada, guyana, suriname, venezuela]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.32, hardcore: 0.12 }
+      cricket: { casual: 0.32, hardcore: 0.13 }
+
+  - id: turks-and-caicos-islands
+    continent: north-america
+    population: 46535
+    climate: tropical
+    incomePerPerson: 36760
+    urbanShare: 0.942
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [bahamas, dominican-republic, haiti]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.28, hardcore: 0.1 }
+      cricket: { casual: 0.2, hardcore: 0.06 }
+
+  - id: united-states
+    continent: north-america
+    population: 340003797
+    climate: temperate
+    incomePerPerson: 82910
+    urbanShare: 0.801
+    languages: { primary: english, secondary: spanish }
+    neighbors: [canada, mexico, cuba]
+    seaLinks: [bahamas, bermuda]
+    otherHardcoreShare: 0.34
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.03, hardcore: 0.005 }
+
+  - id: us-virgin-islands
+    continent: north-america
+    population: 104377
+    climate: tropical
+    incomePerPerson: 42000
+    urbanShare: 0.953
+    languages: { primary: english, secondary: spanish }
+    neighbors: []
+    seaLinks: [anguilla, british-virgin-islands, puerto-rico]
+    otherHardcoreShare: 0.28
+    startingRivalFans:
+      soccer: { casual: 0.15, hardcore: 0.04 }
+      cricket: { casual: 0.1, hardcore: 0.03 }
+
+  # ---- South America ---------------------------------------------------------------
+  - id: argentina
+    continent: south-america
+    population: 45696159
+    climate: temperate
+    incomePerPerson: 13530
+    urbanShare: 0.923
+    languages: { primary: spanish }
+    neighbors: [chile, bolivia, uruguay, paraguay, brazil]
+    seaLinks: []
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.48, hardcore: 0.26 }
+      cricket: { casual: 0.005, hardcore: 0.001 }
+
+  - id: bolivia
+    continent: south-america
+    population: 12413315
+    climate: temperate
+    incomePerPerson: 4160
+    urbanShare: 0.712
+    languages: { primary: spanish }
+    neighbors: [peru, chile, paraguay, brazil, argentina]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.18 }
+
+  - id: brazil
+    continent: south-america
+    population: 211998573
+    climate: tropical
+    incomePerPerson: 9930
+    urbanShare: 0.879
+    languages: { primary: portuguese }
+    neighbors: [suriname, peru, bolivia, uruguay, guyana, paraguay, venezuela, colombia, argentina]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.48, hardcore: 0.26 }
+      cricket: { casual: 0.002, hardcore: 0.0005 }
+
+  - id: chile
+    continent: south-america
+    population: 19764771
+    climate: temperate
+    incomePerPerson: 15840
+    urbanShare: 0.89
+    languages: { primary: spanish }
+    neighbors: [peru, bolivia, argentina]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.2 }
+      cricket: { casual: 0.002, hardcore: 0.0005 }
+
+  - id: colombia
+    continent: south-america
+    population: 52886363
+    climate: tropical
+    incomePerPerson: 7090
+    urbanShare: 0.785
+    languages: { primary: spanish }
+    neighbors: [ecuador, peru, panama, brazil, venezuela]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.22 }
+
+  - id: ecuador
+    continent: south-america
+    population: 18135478
+    climate: tropical
+    incomePerPerson: 6400
+    urbanShare: 0.632
+    languages: { primary: spanish }
+    neighbors: [peru, colombia]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.22 }
+
+  - id: guyana
+    continent: south-america
+    population: 831087
+    climate: tropical
+    incomePerPerson: 26400
+    urbanShare: 0.265
+    languages: { primary: english }
+    neighbors: [suriname, brazil, venezuela]
+    seaLinks: [barbados, trinidad-and-tobago]
+    otherHardcoreShare: 0.06
+    startingRivalFans:
+      soccer: { casual: 0.22, hardcore: 0.07 }
+      cricket: { casual: 0.4, hardcore: 0.18 }
+
+  - id: paraguay
+    continent: south-america
+    population: 6929153
+    climate: temperate
+    incomePerPerson: 6290
+    urbanShare: 0.699
+    languages: { primary: spanish }
+    neighbors: [bolivia, brazil, argentina]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.45, hardcore: 0.2 }
+
+  - id: peru
+    continent: south-america
+    population: 34217848
+    climate: arid
+    incomePerPerson: 7530
+    urbanShare: 0.852
+    languages: { primary: spanish }
+    neighbors: [ecuador, chile, bolivia, brazil, colombia]
+    seaLinks: []
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.42, hardcore: 0.2 }
+
+  - id: suriname
+    continent: south-america
+    population: 634431
+    climate: tropical
+    incomePerPerson: 5690
+    urbanShare: 0.658
+    languages: { primary: dutch, secondary: english }
+    neighbors: [guyana, brazil]
+    seaLinks: [trinidad-and-tobago]
+    otherHardcoreShare: 0.06
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+      cricket: { casual: 0.05, hardcore: 0.01 }
+
+  - id: uruguay
+    continent: south-america
+    population: 3386588
+    climate: temperate
+    incomePerPerson: 22000
+    urbanShare: 0.956
+    languages: { primary: spanish }
+    neighbors: [brazil, argentina]
+    seaLinks: []
+    otherHardcoreShare: 0.10
+    startingRivalFans:
+      soccer: { casual: 0.48, hardcore: 0.26 }
+
+  - id: venezuela
+    continent: south-america
+    population: 28405543
+    climate: tropical
+    incomePerPerson: 3840
+    urbanShare: 0.893
+    languages: { primary: spanish }
+    neighbors: [guyana, brazil, colombia]
+    seaLinks: [aruba, curacao, trinidad-and-tobago]
+    otherHardcoreShare: 0.25
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  # ---- Oceania ---------------------------------------------------------------------
+  - id: american-samoa
+    continent: oceania
+    population: 46765
+    climate: tropical
+    incomePerPerson: 14000
+    urbanShare: 0.809
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [cook-islands, samoa, tonga]
+    otherHardcoreShare: 0.32
+    startingRivalFans:
+      soccer: { casual: 0.15, hardcore: 0.04 }
+
+  - id: australia
+    continent: oceania
+    population: 27194286
+    climate: temperate
+    incomePerPerson: 62680
+    urbanShare: 0.876
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [fiji, indonesia, new-caledonia, new-zealand, papua-new-guinea, timor-leste]
+    otherHardcoreShare: 0.22
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.35, hardcore: 0.14 }
+
+  - id: cook-islands
+    continent: oceania
+    population: 15000
+    climate: tropical
+    incomePerPerson: 22000
+    urbanShare: 0.76
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [american-samoa, new-zealand, samoa, tahiti]
+    otherHardcoreShare: 0.25
+    startingRivalFans:
+      soccer: { casual: 0.22, hardcore: 0.07 }
+      cricket: { casual: 0.1, hardcore: 0.03 }
+
+  - id: fiji
+    continent: oceania
+    population: 928784
+    climate: tropical
+    incomePerPerson: 5820
+    urbanShare: 0.591
+    languages: { primary: english, secondary: hindi-urdu }
+    neighbors: []
+    seaLinks: [australia, new-caledonia, new-zealand, samoa, tonga, tuvalu, vanuatu]
+    otherHardcoreShare: 0.28
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+      cricket: { casual: 0.08, hardcore: 0.02 }
+
+  - id: guam
+    continent: oceania
+    population: 167777
+    climate: tropical
+    incomePerPerson: 35000
+    urbanShare: 0.942
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [chinese-taipei, japan, philippines]
+    otherHardcoreShare: 0.22
+    startingRivalFans:
+      soccer: { casual: 0.15, hardcore: 0.04 }
+
+  - id: new-caledonia
+    continent: oceania
+    population: 292639
+    climate: tropical
+    incomePerPerson: 30070
+    urbanShare: 0.68
+    languages: { primary: french }
+    neighbors: []
+    seaLinks: [australia, fiji, solomon-islands, tahiti, vanuatu]
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: new-zealand
+    continent: oceania
+    population: 5290000
+    climate: temperate
+    incomePerPerson: 47070
+    urbanShare: 0.839
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [australia, cook-islands, fiji, samoa, tonga]
+    otherHardcoreShare: 0.30
+    startingRivalFans:
+      soccer: { casual: 0.22, hardcore: 0.07 }
+      cricket: { casual: 0.32, hardcore: 0.13 }
+
+  - id: papua-new-guinea
+    continent: oceania
+    population: 10576502
+    climate: tropical
+    incomePerPerson: 2860
+    urbanShare: 0.154
+    languages: { primary: english }
+    neighbors: [indonesia]
+    seaLinks: [australia, solomon-islands]
+    otherHardcoreShare: 0.30
+    startingRivalFans:
+      soccer: { casual: 0.22, hardcore: 0.07 }
+      cricket: { casual: 0.15, hardcore: 0.05 }
+
+  - id: samoa
+    continent: oceania
+    population: 218019
+    climate: tropical
+    incomePerPerson: 5040
+    urbanShare: 0.175
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [american-samoa, cook-islands, fiji, new-zealand, tahiti, tonga, tuvalu]
+    otherHardcoreShare: 0.32
+    startingRivalFans:
+      soccer: { casual: 0.18, hardcore: 0.05 }
+      cricket: { casual: 0.05, hardcore: 0.01 }
+
+  - id: solomon-islands
+    continent: oceania
+    population: 819198
+    climate: tropical
+    incomePerPerson: 1910
+    urbanShare: 0.307
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [new-caledonia, papua-new-guinea, vanuatu]
+    otherHardcoreShare: 0.08
+    startingRivalFans:
+      soccer: { casual: 0.4, hardcore: 0.18 }
+
+  - id: tahiti
+    continent: oceania
+    population: 281807
+    climate: tropical
+    incomePerPerson: 24100
+    urbanShare: 0.617
+    languages: { primary: french }
+    neighbors: []
+    seaLinks: [cook-islands, new-caledonia, samoa]
+    otherHardcoreShare: 0.14
+    startingRivalFans:
+      soccer: { casual: 0.35, hardcore: 0.14 }
+
+  - id: tonga
+    continent: oceania
+    population: 104175
+    climate: tropical
+    incomePerPerson: 6270
+    urbanShare: 0.212
+    languages: { primary: english }
+    neighbors: []
+    seaLinks: [american-samoa, fiji, new-zealand, samoa]
+    otherHardcoreShare: 0.32
+    startingRivalFans:
+      soccer: { casual: 0.18, hardcore: 0.05 }
+
+  - id: tuvalu
+    continent: oceania
+    population: 9646
+    climate: tropical
+    incomePerPerson: 7970
+    urbanShare: 0.647
+    languages: { primary: tuvaluan, secondary: english }
+    neighbors: []
+    seaLinks: [fiji, samoa]
+    otherHardcoreShare: 0.20
+    startingRivalFans:
+      soccer: { casual: 0.25, hardcore: 0.08 }
+      cricket: { casual: 0.02, hardcore: 0.005 }
+
+  - id: vanuatu
+    continent: oceania
+    population: 327777
+    climate: tropical
+    incomePerPerson: 4130
+    urbanShare: 0.223
+    languages: { primary: english, secondary: french }
+    neighbors: []
+    seaLinks: [fiji, new-caledonia, solomon-islands]
+    otherHardcoreShare: 0.12
+    startingRivalFans:
+      soccer: { casual: 0.3, hardcore: 0.12 }
+      cricket: { casual: 0.1, hardcore: 0.03 }

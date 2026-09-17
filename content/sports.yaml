@@ -1,10 +1,11 @@
-# PLACEHOLDER rival sports. Invented names; the genomes are the GDD's soccer (fieldball) and
-# cricket (longbat) genomes as stand-ins until the real-world dataset arrives.
-# Display names live in names.yaml. The ids "player" and "other" are reserved.
+# Rival sports (GDD Rival AI). Phase 0 models soccer (the global giant) and cricket (the regional
+# stronghold); every other sport's hardcore share sits in the passive "other sports" bucket. Genomes
+# are the GDD's rival genome table. Real sport names are used; display names live in names.yaml.
+# The ids "player" and "other" are reserved.
 
 rivals:
-  # Global giant (soccer stand-in).
-  - id: fieldball
+  # The global giant.
+  - id: soccer
     genome:
       surface: grass
       equipment: ball-only
@@ -16,8 +17,8 @@ rivals:
       scoring: low
       complexity: simple
       structure: continuous
-  # Regional stronghold (cricket stand-in).
-  - id: longbat
+  # The regional stronghold.
+  - id: cricket
     genome:
       surface: grass
       equipment: stick-or-bat
@@ -31,13 +32,15 @@ rivals:
       structure: innings
 
 # The "other sports" bucket (GDD Real-world data): the hardcore share held by every sport that is
-# not modeled. It occupies part of each country's exclusive hardcore pie and never defends.
-# A country may override its share in countries.yaml (`otherHardcoreShare`).
+# not modeled - basketball, American football, baseball, ice hockey, rugby, combat sports and the
+# rest. It occupies part of each country's exclusive hardcore pie and never defends. A country
+# overrides its share in countries.yaml (`otherHardcoreShare`) wherever another sport clearly
+# dominates; these are the per-continent defaults for everywhere else.
 otherSports:
   hardcoreShareByContinent:
-    africa: 0.03
-    asia: 0.04
-    europe: 0.06
-    north-america: 0.1
-    south-america: 0.05
-    oceania: 0.06
+    africa: 0.05
+    asia: 0.06
+    europe: 0.1
+    north-america: 0.15
+    south-america: 0.07
+    oceania: 0.14

@@ -33,6 +33,7 @@ export function withWorld(base: World, edit: (content: WorldContent) => void): W
     genome: base.genome,
     growthTree: base.growthTree,
     names: base.names,
+    sources: base.sources,
     config: base.config,
   });
   edit(copy);

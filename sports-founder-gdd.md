@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.5 | September 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain")*
+*Version 1.6 | September 16, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built)*
 
 ---
 
@@ -347,6 +347,16 @@ market. All stored in content; every conversion curve and weight lives in config
 - **Compilation:** an AI research session builds the dataset as YAML plus a sources file, with
   estimates tagged. The developer spot-checks ~10 key markets (recommended starts, the biggest
   soccer and cricket countries) before the data is used for balance runs.
+- **Built 2026-09-15 — 213 markets.** FIFA's 211 member associations minus Kosovo and Palestine,
+  plus Tuvalu (an OFC associate, kept as the signature hard anchor) and the three ICC members
+  outside FIFA (Jersey, Guernsey, Isle of Man). Saint Helena is left out: inactive ICC membership,
+  about 4,000 people. The United Kingdom is not a market; its four home nations are. Population,
+  income per person (GNI per capita, Atlas method) and urban share are World Bank 2024 figures,
+  with national statistics offices filling the gaps; land borders come from GeoNames; climate,
+  language spheres, sea links and the fan buckets are hand calls. `content/sources.yaml` records
+  the source and year of every field, tags every estimate with what it was modeled on, and lists
+  every addition and omission with its reason; content validation rejects a market missing any of
+  it. A country's hardcore shares across all sports may not exceed `worldChecks.maxSportCulture`.
 
 **Spread Model:** How the sport moves between countries.
 

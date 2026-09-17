@@ -30,8 +30,8 @@ import { countryIndex, setupFor, withConfig, withWorld, world } from "./helpers"
 // refunds, cost multiplier) hold.
 
 const TEST_NODE = "test-node";
-const ANCHOR = "valdoria";
-const RIVAL = "fieldball";
+const ANCHOR = "austria";
+const RIVAL = "soccer";
 
 /** The shipped world with a one-node tree carrying exactly these effects. */
 function treeWorld(effects: NodeEffect[], base: World = world): World {
@@ -109,7 +109,7 @@ describe("each growth node effect changes what it names by the configured amount
   it("spread channel: a proximity node raises inbound proximity exposure and nothing else", () => {
     const w = treeWorld([{ type: "spreadChannel", channel: "proximity", amount: 0.2 }]);
     const state = withPlayerFans(createCampaign(w, setupFor(1, ANCHOR)), w, ANCHOR, 2e6, 2e5);
-    const target = countryIndex(w, "kestmark");
+    const target = countryIndex(w, "czechia");
     const plain = computeExposure(state, w)[target];
     const boosted = computeExposure(owning(state), w)[target];
     if (!plain || !boosted) throw new Error("no exposure");
@@ -171,7 +171,7 @@ describe("each growth node effect changes what it names by the configured amount
 
   it("formation threshold: the hardcore fans a league needs shrink by the amount", () => {
     const w = treeWorld([{ type: "formationThresholdReduction", amount: 0.3 }]);
-    const index = countryIndex(w, "caldera");
+    const index = countryIndex(w, "united-states");
     const plain = formationThreshold(w, index, []);
     expect(plain).toBeGreaterThan(10_000);
     expect(formationThreshold(w, index, [TEST_NODE])).toBe(Math.ceil(plain * 0.7));
@@ -179,9 +179,9 @@ describe("each growth node effect changes what it names by the configured amount
 
   it("formation threshold: a league forms earlier with the node, with everything else equal", () => {
     const w = quiet(treeWorld([{ type: "formationThresholdReduction", amount: 0.5 }]), "none");
-    const index = countryIndex(w, "kestmark");
+    const index = countryIndex(w, "czechia");
     const between = Math.ceil(formationThreshold(w, index, []) * 0.75);
-    const state = withPlayerFans(createCampaign(w, setupFor(1, ANCHOR)), w, "kestmark", 0, between);
+    const state = withPlayerFans(createCampaign(w, setupFor(1, ANCHOR)), w, "czechia", 0, between);
     expect(stepQuarter(state, w).countries[index]?.league).toBeNull();
     expect(stepQuarter(owning(state), w).countries[index]?.league?.tier).toBe("amateur");
   });
@@ -190,10 +190,10 @@ describe("each growth node effect changes what it names by the configured amount
     const w = treeWorld([{ type: "coldLaunchCostReduction", amount: 0.5 }]);
     const state = createCampaign(w, setupFor(1, ANCHOR));
     const { coldLaunchCost, exposedCost } = w.config.focus;
-    // Far-off Tavu Motu has only a trickle of exposure: its push is all but a cold launch.
-    const plain = focusCost(state, w, "tavu-motu");
+    // Far-off Tuvalu has only a trickle of exposure: its push is all but a cold launch.
+    const plain = focusCost(state, w, "tuvalu");
     expect(plain).toBeGreaterThan(coldLaunchCost * 0.99);
-    expect(focusCost(owning(state), w, "tavu-motu")).toBeCloseTo(
+    expect(focusCost(owning(state), w, "tuvalu")).toBeCloseTo(
       exposedCost + (plain - exposedCost) * 0.5,
       9,
     );
@@ -208,7 +208,7 @@ describe("each growth node effect changes what it names by the configured amount
     const state = withPlayerFans(
       createCampaign(flat, setupFor(1, ANCHOR)),
       flat,
-      "kambeza",
+      "dr-congo",
       1e6,
       1e5,
     );
@@ -218,7 +218,7 @@ describe("each growth node effect changes what it names by the configured amount
     expect(boosted / plain).toBeCloseTo(1.08, 12);
 
     // 0.05 + 0.1 × wealth position is zero well below the world average: the rich anchor's fans
-    // count, poor Kambeza's do not.
+    // count, poor DR Congo's do not.
     const rich = treeWorld([{ type: "ppIncome", amount: 0.05, conditions: { wealth: 0.1 } }]);
     const factors = growthFactors(rich, [TEST_NODE]);
     const casualWeight = rich.config.fandomScore.casualWeight;
@@ -234,7 +234,7 @@ describe("each growth node effect changes what it names by the configured amount
       weighted / score,
       12,
     );
-    expect(factors[countryIndex(rich, "kambeza")]?.ppIncome).toBe(1);
+    expect(factors[countryIndex(rich, "dr-congo")]?.ppIncome).toBe(1);
   });
 
   it("running cost: every tier's running cost shrinks by the amount, down to the floor", () => {
@@ -324,11 +324,11 @@ describe("conditions apply only where the country attribute matches", () => {
         12,
       );
     });
-    // Measured on exposure: cold Kestmark gains, temperate Arvenne does not (both border the anchor).
+    // Measured on exposure: cold Czechia gains, temperate Italy does not (both border the anchor).
     const state = withPlayerFans(createCampaign(w, setupFor(1, ANCHOR)), w, ANCHOR, 2e6, 2e5);
     for (const [id, expected] of [
-      ["kestmark", 1.1],
-      ["arvenne", 1],
+      ["czechia", 1.1],
+      ["italy", 1],
     ] as const) {
       const i = countryIndex(w, id);
       const plain = computeExposure(state, w)[i]?.proximity ?? 0;

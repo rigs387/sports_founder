@@ -17,7 +17,7 @@ import { countryIndex, setupFor, withConfig, world } from "./helpers";
 // PP tier track promises (GDD Global PP Tier Track): tier-ups need the breadth condition, are
 // telegraphed and then unavoidable; demotion needs a wide gap, sustained, outside the cooldown.
 
-const ANCHOR = "valdoria";
+const ANCHOR = "austria";
 
 function withAnchor(state: GameState, w: World, change: { hardcore?: number; tier?: string }) {
   const index = countryIndex(w, ANCHOR);
@@ -119,7 +119,7 @@ describe("demotion", () => {
       turn: 100,
       ppTier: 3,
       tierTrack: { ...base.tierTrack, peakTier: 3, lastChangeTurn },
-      focus: [ANCHOR, "kestmark", "arvenne"].slice(0, slots),
+      focus: [ANCHOR, "czechia", "italy"].slice(0, slots),
     };
     // Enough casual fans elsewhere to keep the score above tier 3's threshold.
     const scoreFill = (tier3?.fandomScoreRequired ?? 0) * 2;
@@ -128,7 +128,7 @@ describe("demotion", () => {
       countries: withAnchor(state, world, {
         hardcore: Math.floor(hardcoreShare * population),
       }).countries.map((country) =>
-        country.countryId === "caldera"
+        country.countryId === "united-states"
           ? {
               ...country,
               fans: country.fans.map((sport, s) =>

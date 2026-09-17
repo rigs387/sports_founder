@@ -22,6 +22,7 @@ import {
   runOptions,
   runPacing,
   runRivalsPersist,
+  sampledAnchors,
   typicalAnchors,
 } from "./experiments";
 import { formatGenome, parseGenomeArg, randomGenome } from "./genome-arg";
@@ -80,13 +81,15 @@ Usage: npm run sim -- [options]
                                         any country or worldwide, for every anchor × bot (random
                                         genomes); reports the lowest rival share seen and where
                        benchmark        a 120-year campaign: time, save size, load time
-  --anchors <ids>    anchors for collapse and rivals (default: all), pacing (default: typical-size
-                     countries, config balanceTargets.pacingAnchorPopulationQuantiles) and options
-                     (default: the first country of each climate)
+  --anchors <ids>    anchors for collapse, rivals and pacing, or "all" for every market. Defaults:
+                     collapse and rivals, a sample of balanceTargets.experimentAnchors markets
+                     spread across the population range; pacing, the same sample drawn from
+                     typical-size markets (balanceTargets.pacingAnchorPopulationQuantiles);
+                     options, the median-population country of each climate
   --bots <ids>       bots for collapse and hard-anchor (default:
                      greedy-spread,anchor-turtle,media-rush,random) and rivals (default:
                      greedy-spread,builder,anchor-turtle,media-rush,random)
-  --hard-anchor <id> anchor for hard-anchor (default: the smallest country)
+  --hard-anchor <id> anchor for hard-anchor (default: config balanceTargets.hardAnchor)
   --presets <ids>    presets for differentiation (default: all)
   --content <dir>    content directory (default: ./content)
   --out <dir>        output directory (default: runs/latest)
@@ -415,9 +418,17 @@ function main(): number {
   const bots = checkBots(
     listOf(values.bots) ?? ["greedy-spread", "anchor-turtle", "media-rush", "random"],
   );
-  const smallest = [...world.countries].sort((a, b) => a.population - b.population)[0]?.id ?? "";
-  const hardAnchor = checkAnchors(world, [values["hard-anchor"] ?? smallest])[0] ?? smallest;
+  const configuredHardAnchor = world.config.balanceTargets.hardAnchor;
+  const hardAnchor =
+    checkAnchors(world, [values["hard-anchor"] ?? configuredHardAnchor])[0] ?? configuredHardAnchor;
   const listedAnchors = listOf(values.anchors);
+  // "--anchors all" plays every market; otherwise the listed anchors, else the experiment default.
+  const anchorsOr = (fallback: string[]): string[] =>
+    listedAnchors === undefined
+      ? fallback
+      : listedAnchors.length === 1 && listedAnchors[0] === "all"
+        ? world.countries.map((c) => c.id)
+        : listedAnchors;
 
   const outDir = resolve(values.out);
   mkdirSync(outDir, { recursive: true });
@@ -479,7 +490,7 @@ function main(): number {
         break;
       }
       case "collapse": {
-        const anchors = checkAnchors(world, listedAnchors ?? world.countries.map((c) => c.id));
+        const anchors = checkAnchors(world, anchorsOr(sampledAnchors(world)));
         const naiveCount = Math.max(campaigns, world.config.balanceTargets.naiveBotCollapseSeeds);
         const naiveSeeds = Array.from({ length: naiveCount }, (_, i) => firstSeed + i);
         const report = runCollapse(
@@ -502,14 +513,14 @@ function main(): number {
         break;
       }
       case "pacing": {
-        const anchors = checkAnchors(world, listedAnchors ?? typicalAnchors(world));
+        const anchors = checkAnchors(world, anchorsOr(typicalAnchors(world)));
         const report = runPacing(world, { anchors, bot, seeds, turns }, collect(false));
         writeReport("pacing", report);
         printPacing(report);
         break;
       }
       case "options": {
-        const anchors = checkAnchors(world, listedAnchors ?? contrastingAnchors(world));
+        const anchors = checkAnchors(world, anchorsOr(contrastingAnchors(world)));
         const genomesPerAnchor = Math.max(
           campaigns,
           world.config.balanceTargets.optionsGenomesPerAnchor,
@@ -534,7 +545,7 @@ function main(): number {
         break;
       }
       case "rivals": {
-        const anchors = checkAnchors(world, listedAnchors ?? world.countries.map((c) => c.id));
+        const anchors = checkAnchors(world, anchorsOr(sampledAnchors(world)));
         const rivalBots = checkBots(
           listOf(values.bots) ?? [
             "greedy-spread",

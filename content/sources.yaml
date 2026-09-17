@@ -1,0 +1,849 @@
+# Where every figure in countries.yaml and sports.yaml comes from (GDD "Real-world data":
+# every field records its source and year; estimates are tagged). Content validation fails if a
+# market is missing a source for any sourced field, or cites a dataset that is not listed here.
+#
+# `defaults` covers every market; `countries` records the exceptions and every fan-bucket figure.
+# An entry carries either `dataset` (a published source) or `estimate` (a figure modeled for this
+# project, with what it was modeled on).
+#
+# Compilation note (GDD): this dataset was compiled by an AI research session. The developer
+# spot-checks the recommended starts and the biggest soccer and cricket markets before the data is
+# trusted for balance work. Fan buckets are the softest numbers here. A `survey-interest` tag means
+# the figure reproduces published interest shares to the nearest 0.01 of population from the named
+# body of survey work; it is not a citation of one table, and it has not been checked line by line.
+# Everywhere else the buckets are modeled on a named neighbouring market. Treat every fan figure as
+# a starting point for balance work, not as a measurement.
+
+datasets:
+  wb-population:
+    title: "World Bank, World Development Indicators - Population, total (SP.POP.TOTL)"
+    url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL
+    retrieved: 2026-09-15
+  wb-income:
+    title: "World Bank, World Development Indicators - GNI per capita, Atlas method, current US$ (NY.GNP.PCAP.CD)"
+    url: https://api.worldbank.org/v2/country/all/indicator/NY.GNP.PCAP.CD
+    retrieved: 2026-09-15
+  wb-urban:
+    title: "World Bank, World Development Indicators - Urban population (% of total) (SP.URB.TOTL.IN.ZS)"
+    url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS
+    retrieved: 2026-09-15
+  geonames:
+    title: "GeoNames countryInfo.txt - land borders between countries and territories"
+    url: https://download.geonames.org/export/dump/countryInfo.txt
+    retrieved: 2026-09-15
+  koppen:
+    title: "Koppen-Geiger climate classification, main group at the country's population centre"
+  hand-listed:
+    title: "Hand-listed for this project and reviewed against a world map"
+  gdd:
+    title: "sports-founder-gdd.md - the design contract"
+  estimate:
+    title: "Modeled for this project where no published figure covers the market; see each note"
+  survey-interest:
+    title: "Published sports-interest surveys (Nielsen Sports fan reports, YouGov sport interest trackers, Ipsos national polls, ICC and national federation market research), read as: 'very interested' -> hardcore, remaining 'interested' -> casual, rounded to the nearest 0.01 of population"
+  ons:
+    title: "Office for National Statistics (UK) - mid-year population estimates and census urban/rural classification"
+  ons-regional:
+    title: "Office for National Statistics regional GDP per head, applied to the UK's World Bank GNI per capita"
+  nrs:
+    title: "National Records of Scotland - population estimates and urban/rural classification"
+  nisra:
+    title: "Northern Ireland Statistics and Research Agency - population estimates and settlement classification"
+  dgbas:
+    title: "Directorate-General of Budget, Accounting and Statistics, Chinese Taipei - national accounts and population"
+  ck-stats:
+    title: "Cook Islands Statistics Office"
+  ai-stats:
+    title: "Anguilla Statistics Department"
+  ms-stats:
+    title: "Montserrat Statistics Department"
+  jersey-stats:
+    title: "Statistics Jersey - population and GVA per head"
+  guernsey-stats:
+    title: "Guernsey Data and Analysis - population and GVA per head"
+
+# Applies to every market unless the market overrides it below.
+defaults:
+  population: { dataset: wb-population, year: 2024 }
+  incomePerPerson: { dataset: wb-income, year: 2024 }
+  urbanShare: { dataset: wb-urban, year: 2024 }
+  climate: { dataset: koppen, note: "the group where most people live, not most land: Australia is temperate" }
+  continent: { dataset: gdd }
+  languages: { dataset: hand-listed, note: "15 broad media spheres; a language matching none of them gets its own sphere and so has no language channel" }
+  neighbors: { dataset: geonames }
+  seaLinks: { dataset: hand-listed, note: "nearest mainland and same-basin islands, so island markets still spread" }
+  otherHardcoreShare: { dataset: estimate, note: "per-continent default in sports.yaml; the markets below override it where another sport clearly dominates" }
+
+countries:
+  afghanistan:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  albania:
+    startingRivalFans.soccer: { estimate: "modeled on north-macedonia" }
+  algeria:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  american-samoa:
+    incomePerPerson: { estimate: "modeled on samoa" }
+    startingRivalFans.soccer: { estimate: "modeled on samoa" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  andorra:
+    startingRivalFans.soccer: { estimate: "modeled on spain" }
+  angola:
+    startingRivalFans.soccer: { estimate: "modeled on mozambique" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  anguilla:
+    population: { dataset: ai-stats, year: 2024 }
+    incomePerPerson: { dataset: ai-stats, year: 2022 }
+    urbanShare: { dataset: ai-stats, year: 2021 }
+    startingRivalFans.soccer: { estimate: "modeled on saint-kitts-and-nevis" }
+    startingRivalFans.cricket: { estimate: "modeled on saint-kitts-and-nevis" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  antigua-and-barbuda:
+    startingRivalFans.soccer: { estimate: "modeled on barbados" }
+    startingRivalFans.cricket: { estimate: "modeled on barbados" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  argentina:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  armenia:
+    startingRivalFans.soccer: { estimate: "modeled on georgia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  aruba:
+    startingRivalFans.soccer: { estimate: "modeled on curacao" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  australia:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  austria:
+    startingRivalFans.soccer: { estimate: "modeled on germany" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  azerbaijan:
+    startingRivalFans.soccer: { estimate: "modeled on turkey" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  bahamas:
+    startingRivalFans.soccer: { estimate: "modeled on bermuda" }
+    startingRivalFans.cricket: { estimate: "modeled on bermuda" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  bahrain:
+    startingRivalFans.soccer: { estimate: "modeled on kuwait" }
+    startingRivalFans.cricket: { estimate: "modeled on kuwait" }
+  bangladesh:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  barbados:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  belarus:
+    startingRivalFans.soccer: { estimate: "modeled on russia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  belgium:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  belize:
+    startingRivalFans.soccer: { estimate: "modeled on jamaica" }
+    startingRivalFans.cricket: { estimate: "modeled on jamaica" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  benin:
+    startingRivalFans.soccer: { estimate: "modeled on togo" }
+  bermuda:
+    startingRivalFans.soccer: { estimate: "modeled on barbados" }
+    startingRivalFans.cricket: { estimate: "modeled on barbados" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  bhutan:
+    startingRivalFans.soccer: { estimate: "modeled on nepal" }
+    startingRivalFans.cricket: { estimate: "modeled on nepal" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  bolivia:
+    startingRivalFans.soccer: { estimate: "modeled on peru" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  bosnia-and-herzegovina:
+    startingRivalFans.soccer: { estimate: "modeled on serbia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  botswana:
+    startingRivalFans.soccer: { estimate: "modeled on namibia" }
+    startingRivalFans.cricket: { estimate: "modeled on namibia" }
+  brazil:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  british-virgin-islands:
+    incomePerPerson: { estimate: "modeled on cayman-islands" }
+    startingRivalFans.soccer: { estimate: "modeled on anguilla" }
+    startingRivalFans.cricket: { estimate: "modeled on anguilla" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  brunei:
+    startingRivalFans.soccer: { estimate: "modeled on malaysia" }
+    startingRivalFans.cricket: { estimate: "modeled on malaysia" }
+  bulgaria:
+    startingRivalFans.soccer: { estimate: "modeled on romania" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  burkina-faso:
+    startingRivalFans.soccer: { estimate: "modeled on mali" }
+  burundi:
+    startingRivalFans.soccer: { estimate: "modeled on rwanda" }
+  cabo-verde:
+    startingRivalFans.soccer: { estimate: "modeled on senegal" }
+  cambodia:
+    startingRivalFans.soccer: { estimate: "modeled on laos" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  cameroon:
+    startingRivalFans.soccer: { estimate: "modeled on nigeria" }
+  canada:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  cayman-islands:
+    startingRivalFans.soccer: { estimate: "modeled on jamaica" }
+    startingRivalFans.cricket: { estimate: "modeled on jamaica" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  central-african-republic:
+    startingRivalFans.soccer: { estimate: "modeled on chad" }
+  chad:
+    startingRivalFans.soccer: { estimate: "modeled on niger" }
+  chile:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  china:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  chinese-taipei:
+    population: { dataset: dgbas, year: 2024 }
+    incomePerPerson: { dataset: dgbas, year: 2024 }
+    urbanShare: { dataset: dgbas, year: 2024 }
+    startingRivalFans.soccer: { estimate: "modeled on japan" }
+    startingRivalFans.cricket: { estimate: "modeled on japan" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  colombia:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  comoros:
+    startingRivalFans.soccer: { estimate: "modeled on madagascar" }
+  congo:
+    startingRivalFans.soccer: { estimate: "modeled on dr-congo" }
+  cook-islands:
+    population: { dataset: ck-stats, year: 2024 }
+    incomePerPerson: { dataset: ck-stats, year: 2022 }
+    urbanShare: { dataset: ck-stats, year: 2021 }
+    startingRivalFans.soccer: { estimate: "modeled on samoa" }
+    startingRivalFans.cricket: { estimate: "modeled on samoa" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  costa-rica:
+    startingRivalFans.soccer: { estimate: "modeled on honduras" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  croatia:
+    startingRivalFans.soccer: { estimate: "modeled on serbia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  cuba:
+    incomePerPerson: { dataset: wb-income, year: 2019, note: "no 2024 figure published" }
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  curacao:
+    startingRivalFans.soccer: { estimate: "modeled on aruba" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  cyprus:
+    startingRivalFans.soccer: { estimate: "modeled on greece" }
+    startingRivalFans.cricket: { estimate: "modeled on greece" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  czechia:
+    startingRivalFans.soccer: { estimate: "modeled on poland" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  denmark:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  djibouti:
+    startingRivalFans.soccer: { estimate: "modeled on somalia" }
+  dominica:
+    startingRivalFans.soccer: { estimate: "modeled on barbados" }
+    startingRivalFans.cricket: { estimate: "modeled on barbados" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  dominican-republic:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  dr-congo:
+    startingRivalFans.soccer: { dataset: survey-interest }
+  ecuador:
+    startingRivalFans.soccer: { estimate: "modeled on colombia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  egypt:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  el-salvador:
+    startingRivalFans.soccer: { estimate: "modeled on guatemala" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  england:
+    population: { dataset: ons, year: 2023 }
+    incomePerPerson: { dataset: ons-regional, year: 2024 }
+    urbanShare: { dataset: ons, year: 2021 }
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  equatorial-guinea:
+    startingRivalFans.soccer: { estimate: "modeled on gabon" }
+  eritrea:
+    incomePerPerson: { estimate: "modeled on ethiopia" }
+    startingRivalFans.soccer: { estimate: "modeled on ethiopia" }
+  estonia:
+    startingRivalFans.soccer: { estimate: "modeled on latvia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  eswatini:
+    startingRivalFans.soccer: { estimate: "modeled on lesotho" }
+    startingRivalFans.cricket: { estimate: "modeled on lesotho" }
+  ethiopia:
+    startingRivalFans.soccer: { estimate: "modeled on kenya" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  faroe-islands:
+    startingRivalFans.soccer: { estimate: "modeled on iceland" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  fiji:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  finland:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  france:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  gabon:
+    startingRivalFans.soccer: { estimate: "modeled on congo" }
+  gambia:
+    startingRivalFans.soccer: { estimate: "modeled on senegal" }
+    startingRivalFans.cricket: { estimate: "modeled on senegal" }
+  georgia:
+    startingRivalFans.soccer: { estimate: "modeled on armenia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  germany:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  ghana:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+  gibraltar:
+    incomePerPerson: { estimate: "modeled on malta" }
+    startingRivalFans.soccer: { estimate: "modeled on malta" }
+    startingRivalFans.cricket: { estimate: "modeled on malta" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  greece:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  grenada:
+    startingRivalFans.soccer: { estimate: "modeled on barbados" }
+    startingRivalFans.cricket: { estimate: "modeled on barbados" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  guam:
+    incomePerPerson: { estimate: "modeled on puerto-rico" }
+    startingRivalFans.soccer: { estimate: "modeled on philippines" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  guatemala:
+    startingRivalFans.soccer: { estimate: "modeled on mexico" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  guernsey:
+    population: { dataset: guernsey-stats, year: 2024 }
+    incomePerPerson: { dataset: guernsey-stats, year: 2023 }
+    urbanShare: { dataset: guernsey-stats, year: 2021 }
+    startingRivalFans.soccer: { estimate: "modeled on jersey" }
+    startingRivalFans.cricket: { estimate: "modeled on jersey" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  guinea:
+    startingRivalFans.soccer: { estimate: "modeled on mali" }
+  guinea-bissau:
+    startingRivalFans.soccer: { estimate: "modeled on guinea" }
+  guyana:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  haiti:
+    startingRivalFans.soccer: { estimate: "modeled on dominican-republic" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  honduras:
+    startingRivalFans.soccer: { estimate: "modeled on costa-rica" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  hong-kong:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  hungary:
+    startingRivalFans.soccer: { estimate: "modeled on austria" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  iceland:
+    startingRivalFans.soccer: { estimate: "modeled on norway" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  india:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  indonesia:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  iran:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  iraq:
+    startingRivalFans.soccer: { estimate: "modeled on jordan" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  isle-of-man:
+    incomePerPerson: { estimate: "modeled on jersey" }
+    startingRivalFans.soccer: { estimate: "modeled on jersey" }
+    startingRivalFans.cricket: { estimate: "modeled on jersey" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  israel:
+    startingRivalFans.soccer: { estimate: "modeled on greece" }
+    startingRivalFans.cricket: { estimate: "modeled on greece" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  italy:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  ivory-coast:
+    startingRivalFans.soccer: { dataset: survey-interest }
+  jamaica:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  japan:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  jersey:
+    population: { dataset: jersey-stats, year: 2024 }
+    incomePerPerson: { dataset: jersey-stats, year: 2023 }
+    urbanShare: { dataset: jersey-stats, year: 2021 }
+    startingRivalFans.soccer: { estimate: "modeled on guernsey" }
+    startingRivalFans.cricket: { estimate: "modeled on guernsey" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  jordan:
+    startingRivalFans.soccer: { estimate: "modeled on syria" }
+    startingRivalFans.cricket: { estimate: "modeled on syria" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  kazakhstan:
+    startingRivalFans.soccer: { estimate: "modeled on russia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  kenya:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  kuwait:
+    startingRivalFans.soccer: { estimate: "modeled on bahrain" }
+    startingRivalFans.cricket: { estimate: "modeled on bahrain" }
+  kyrgyzstan:
+    startingRivalFans.soccer: { estimate: "modeled on kazakhstan" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  laos:
+    startingRivalFans.soccer: { estimate: "modeled on cambodia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  latvia:
+    startingRivalFans.soccer: { estimate: "modeled on lithuania" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  lebanon:
+    startingRivalFans.soccer: { estimate: "modeled on jordan" }
+    startingRivalFans.cricket: { estimate: "modeled on jordan" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  lesotho:
+    startingRivalFans.soccer: { estimate: "modeled on eswatini" }
+    startingRivalFans.cricket: { estimate: "modeled on eswatini" }
+  liberia:
+    startingRivalFans.soccer: { estimate: "modeled on sierra-leone" }
+  libya:
+    startingRivalFans.soccer: { estimate: "modeled on tunisia" }
+  liechtenstein:
+    incomePerPerson: { estimate: "modeled on switzerland" }
+    startingRivalFans.soccer: { estimate: "modeled on switzerland" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  lithuania:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  luxembourg:
+    startingRivalFans.soccer: { estimate: "modeled on belgium" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  macau:
+    startingRivalFans.soccer: { estimate: "modeled on hong-kong" }
+    startingRivalFans.cricket: { estimate: "modeled on hong-kong" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  madagascar:
+    startingRivalFans.soccer: { estimate: "modeled on mozambique" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  malawi:
+    startingRivalFans.soccer: { estimate: "modeled on zambia" }
+    startingRivalFans.cricket: { estimate: "modeled on zambia" }
+  malaysia:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  maldives:
+    startingRivalFans.soccer: { estimate: "modeled on sri-lanka" }
+    startingRivalFans.cricket: { estimate: "modeled on sri-lanka" }
+  mali:
+    startingRivalFans.soccer: { dataset: survey-interest }
+  malta:
+    startingRivalFans.soccer: { estimate: "modeled on italy" }
+    startingRivalFans.cricket: { estimate: "modeled on italy" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  mauritania:
+    startingRivalFans.soccer: { estimate: "modeled on mali" }
+  mauritius:
+    startingRivalFans.soccer: { estimate: "modeled on seychelles" }
+    startingRivalFans.cricket: { estimate: "modeled on seychelles" }
+  mexico:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  moldova:
+    startingRivalFans.soccer: { estimate: "modeled on romania" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  mongolia:
+    startingRivalFans.soccer: { estimate: "modeled on kazakhstan" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  montenegro:
+    startingRivalFans.soccer: { estimate: "modeled on serbia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  montserrat:
+    population: { dataset: ms-stats, year: 2024 }
+    incomePerPerson: { dataset: ms-stats, year: 2022 }
+    urbanShare: { dataset: ms-stats, year: 2021 }
+    startingRivalFans.soccer: { estimate: "modeled on antigua-and-barbuda" }
+    startingRivalFans.cricket: { estimate: "modeled on antigua-and-barbuda" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  morocco:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  mozambique:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+  myanmar:
+    startingRivalFans.soccer: { estimate: "modeled on thailand" }
+    startingRivalFans.cricket: { estimate: "modeled on thailand" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  namibia:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  nepal:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  netherlands:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  new-caledonia:
+    startingRivalFans.soccer: { estimate: "modeled on tahiti" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  new-zealand:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  nicaragua:
+    startingRivalFans.soccer: { estimate: "modeled on panama" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  niger:
+    startingRivalFans.soccer: { estimate: "modeled on chad" }
+  nigeria:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  north-korea:
+    incomePerPerson: { estimate: "modeled on published Bank of Korea estimates" }
+    startingRivalFans.soccer: { estimate: "modeled on south-korea" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  north-macedonia:
+    startingRivalFans.soccer: { estimate: "modeled on serbia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  northern-ireland:
+    population: { dataset: nisra, year: 2023 }
+    incomePerPerson: { dataset: ons-regional, year: 2024 }
+    urbanShare: { dataset: nisra, year: 2021 }
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  norway:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  oman:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+  pakistan:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  panama:
+    startingRivalFans.soccer: { estimate: "modeled on nicaragua" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  papua-new-guinea:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  paraguay:
+    startingRivalFans.soccer: { estimate: "modeled on uruguay" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  peru:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  philippines:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  poland:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  portugal:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  puerto-rico:
+    startingRivalFans.soccer: { estimate: "modeled on dominican-republic" }
+    startingRivalFans.cricket: { estimate: "modeled on dominican-republic" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  qatar:
+    startingRivalFans.soccer: { estimate: "modeled on united-arab-emirates" }
+    startingRivalFans.cricket: { estimate: "modeled on united-arab-emirates" }
+  republic-of-ireland:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  romania:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  russia:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  rwanda:
+    startingRivalFans.soccer: { estimate: "modeled on burundi" }
+    startingRivalFans.cricket: { estimate: "modeled on burundi" }
+  saint-kitts-and-nevis:
+    startingRivalFans.soccer: { estimate: "modeled on antigua-and-barbuda" }
+    startingRivalFans.cricket: { estimate: "modeled on antigua-and-barbuda" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  saint-lucia:
+    startingRivalFans.soccer: { estimate: "modeled on barbados" }
+    startingRivalFans.cricket: { estimate: "modeled on barbados" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  saint-vincent-and-the-grenadines:
+    startingRivalFans.soccer: { estimate: "modeled on barbados" }
+    startingRivalFans.cricket: { estimate: "modeled on barbados" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  samoa:
+    startingRivalFans.soccer: { estimate: "modeled on tonga" }
+    startingRivalFans.cricket: { estimate: "modeled on tonga" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  san-marino:
+    incomePerPerson: { dataset: wb-income, year: 2023, note: "no 2024 figure published" }
+    startingRivalFans.soccer: { estimate: "modeled on italy" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  sao-tome-and-principe:
+    startingRivalFans.soccer: { estimate: "modeled on gabon" }
+  saudi-arabia:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  scotland:
+    population: { dataset: nrs, year: 2023 }
+    incomePerPerson: { dataset: ons-regional, year: 2024 }
+    urbanShare: { dataset: nrs, year: 2022 }
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  senegal:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  serbia:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  seychelles:
+    startingRivalFans.soccer: { estimate: "modeled on mauritius" }
+    startingRivalFans.cricket: { estimate: "modeled on mauritius" }
+  sierra-leone:
+    startingRivalFans.soccer: { estimate: "modeled on liberia" }
+    startingRivalFans.cricket: { estimate: "modeled on liberia" }
+  singapore:
+    startingRivalFans.soccer: { estimate: "modeled on malaysia" }
+    startingRivalFans.cricket: { estimate: "modeled on malaysia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  slovakia:
+    startingRivalFans.soccer: { estimate: "modeled on czechia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  slovenia:
+    startingRivalFans.soccer: { estimate: "modeled on croatia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  solomon-islands:
+    startingRivalFans.soccer: { estimate: "modeled on vanuatu" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  somalia:
+    startingRivalFans.soccer: { estimate: "modeled on djibouti" }
+  south-africa:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  south-korea:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  south-sudan:
+    incomePerPerson: { estimate: "modeled on sudan" }
+    startingRivalFans.soccer: { estimate: "modeled on sudan" }
+  spain:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  sri-lanka:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  sudan:
+    startingRivalFans.soccer: { estimate: "modeled on egypt" }
+  suriname:
+    startingRivalFans.soccer: { estimate: "modeled on guyana" }
+    startingRivalFans.cricket: { estimate: "modeled on guyana" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  sweden:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  switzerland:
+    startingRivalFans.soccer: { estimate: "modeled on austria" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  syria:
+    incomePerPerson: { dataset: wb-income, year: 2022, note: "no 2024 figure published" }
+    startingRivalFans.soccer: { estimate: "modeled on jordan" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  tahiti:
+    startingRivalFans.soccer: { estimate: "modeled on new-caledonia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  tajikistan:
+    startingRivalFans.soccer: { estimate: "modeled on uzbekistan" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  tanzania:
+    startingRivalFans.soccer: { estimate: "modeled on kenya" }
+    startingRivalFans.cricket: { estimate: "modeled on kenya" }
+  thailand:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  timor-leste:
+    startingRivalFans.soccer: { estimate: "modeled on indonesia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  togo:
+    startingRivalFans.soccer: { estimate: "modeled on benin" }
+  tonga:
+    startingRivalFans.soccer: { estimate: "modeled on samoa" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  trinidad-and-tobago:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  tunisia:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  turkey:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  turkmenistan:
+    startingRivalFans.soccer: { estimate: "modeled on uzbekistan" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  turks-and-caicos-islands:
+    startingRivalFans.soccer: { estimate: "modeled on bahamas" }
+    startingRivalFans.cricket: { estimate: "modeled on bahamas" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  tuvalu:
+    startingRivalFans.soccer: { estimate: "modeled on samoa" }
+    startingRivalFans.cricket: { estimate: "modeled on samoa" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  uganda:
+    startingRivalFans.soccer: { estimate: "modeled on kenya" }
+    startingRivalFans.cricket: { estimate: "modeled on kenya" }
+  ukraine:
+    startingRivalFans.soccer: { estimate: "modeled on russia" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  united-arab-emirates:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  united-states:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  uruguay:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  us-virgin-islands:
+    incomePerPerson: { estimate: "modeled on puerto-rico" }
+    startingRivalFans.soccer: { estimate: "modeled on puerto-rico" }
+    startingRivalFans.cricket: { estimate: "modeled on puerto-rico" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  uzbekistan:
+    startingRivalFans.soccer: { estimate: "modeled on kazakhstan" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  vanuatu:
+    startingRivalFans.soccer: { estimate: "modeled on fiji" }
+    startingRivalFans.cricket: { estimate: "modeled on fiji" }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  venezuela:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  vietnam:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  wales:
+    population: { dataset: ons, year: 2023 }
+    incomePerPerson: { dataset: ons-regional, year: 2024 }
+    urbanShare: { dataset: ons, year: 2021 }
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+  yemen:
+    incomePerPerson: { dataset: wb-income, year: 2018, note: "no 2024 figure published" }
+    startingRivalFans.soccer: { estimate: "modeled on oman" }
+    startingRivalFans.cricket: { estimate: "modeled on oman" }
+  zambia:
+    startingRivalFans.soccer: { estimate: "modeled on zimbabwe" }
+    startingRivalFans.cricket: { estimate: "modeled on zimbabwe" }
+  zimbabwe:
+    startingRivalFans.soccer: { dataset: survey-interest }
+    startingRivalFans.cricket: { dataset: survey-interest }
+    otherHardcoreShare: { estimate: "modeled on the sports that dominate this market" }
+
+# Every departure from "FIFA's member associations", with its reason (GDD Map and markets).
+markets:
+  added:
+    tuvalu: "the GDD's signature hard anchor; an OFC associate, not a FIFA member"
+    jersey: "ICC member with a national team; not a FIFA member"
+    guernsey: "ICC member with a national team; not a FIFA member"
+    isle-of-man: "ICC member with a national team; not a FIFA member"
+  omitted:
+    Kosovo: "contested status, left out with Palestine (GDD Map and markets, decided 2026-09-13)"
+    Palestine: "contested status, left out with Kosovo (GDD Map and markets, decided 2026-09-13)"
+    Saint Helena: "ICC membership inactive, population about 4,000, no competitive programme (decided 2026-09-15)"
+    United Kingdom: "not a market: England, Scotland, Wales and Northern Ireland are separate FIFA members"
+  # Land borders GeoNames lists that lead out of the market list, dropped with their reason.
+  borders-dropped:
+    "albania->XK": "Kosovo - omitted market"
+    "france->MC": "Monaco - not a FIFA member"
+    "israel->PS": "Palestine - omitted market"
+    "italy->VA": "Vatican City - not a FIFA member"
+    "montenegro->XK": "Kosovo - omitted market"
+    "north-macedonia->XK": "Kosovo - omitted market"
+    "serbia->XK": "Kosovo - omitted market"
+    "algeria->EH": "Western Sahara - no market"
+    "egypt->PS": "Palestine - omitted market"
+    "mauritania->EH": "Western Sahara - no market"
+    "morocco->EH": "Western Sahara - no market"
+    "jordan->PS": "Palestine - omitted market"
+    "suriname->GF": "French Guiana - not a FIFA member"
+    "brazil->GF": "French Guiana - not a FIFA member"
+  # Hand-listed sea links that turned out to be land borders, and so are already covered.
+  sea-links-folded-into-land-borders: ["denmark-germany","finland-sweden","germany-denmark","greece-turkey","norway-sweden","republic-of-ireland-northern-ireland","russia-estonia","russia-finland","scotland-england","slovenia-italy","spain-morocco","spain-gibraltar","sweden-norway","sweden-finland","turkey-greece","ukraine-romania","wales-england","cameroon-equatorial-guinea","congo-gabon","djibouti-somalia","djibouti-eritrea","equatorial-guinea-cameroon","equatorial-guinea-gabon","eritrea-djibouti","gabon-equatorial-guinea","kenya-somalia","libya-tunisia","morocco-spain","somalia-djibouti","somalia-kenya","sudan-eritrea","tunisia-libya","iraq-kuwait","north-korea-china","malaysia-indonesia","cuba-united-states","mexico-united-states","united-states-cuba","colombia-panama"]

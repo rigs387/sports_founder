@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { parse, stringify } from "yaml";
 import { ContentValidationError } from "../src/content";
 import { DEFAULT_CONTENT_DIR, loadWorldFromDisk } from "../src/runner/content-from-disk";
-import { firstAnchor } from "./helpers";
+import { firstAnchor, world } from "./helpers";
 
 type Key = string | number;
 type Container = Record<Key, unknown>;
@@ -121,9 +121,10 @@ describe("content validation", () => {
     );
 
     const dir2 = copyOfContent();
-    editYaml(dir2, "countries.yaml", ["countries", 0, "seaLinks"], setValue(["kestmark"]));
+    const neighbour = world.countries[0]?.neighbors[0] ?? "";
+    editYaml(dir2, "countries.yaml", ["countries", 0, "seaLinks"], setValue([neighbour]));
     expect(loadError(dir2).message).toMatch(
-      /countries\[0\]\.seaLinks\[0\]: "kestmark" is linked more than once/,
+      new RegExp(`countries\\[0\\]\\.seaLinks\\[0\\]: "${neighbour}" is linked more than once`),
     );
   });
 
@@ -181,7 +182,7 @@ describe("content validation", () => {
     );
     const error = loadError(dir);
     expect(error.message).toContain("genome.yaml at options.complexity.simple");
-    expect(error.message).toContain("hurts in only 0 of 26 countries");
+    expect(error.message).toContain(`hurts in only 0 of ${world.countries.length} countries`);
   });
 
   it("an option that helps in too few real countries is flagged too", () => {
@@ -194,7 +195,7 @@ describe("content validation", () => {
     );
     const error = loadError(dir);
     expect(error.message).toContain("genome.yaml at options.scoring.medium");
-    expect(error.message).toContain("helps in only 0 of 26 countries");
+    expect(error.message).toContain(`helps in only 0 of ${world.countries.length} countries`);
   });
 
   it("hardcore shares across rivals and other sports above 1 are rejected", () => {
@@ -202,7 +203,7 @@ describe("content validation", () => {
     editYaml(
       dir,
       "countries.yaml",
-      ["countries", 0, "startingRivalFans", "fieldball"],
+      ["countries", 0, "startingRivalFans", "soccer"],
       setValue({ casual: 0.0, hardcore: 0.99 }),
     );
     expect(loadError(dir).message).toContain("countries[0].startingRivalFans");
@@ -223,7 +224,7 @@ describe("content validation", () => {
 
   it("a YAML syntax error names the file and line", () => {
     const dir = copyOfContent();
-    writeFileSync(join(dir, "names.yaml"), "countries:\n  valdoria: Valdoria\n  kestmark: [Kest\n");
+    writeFileSync(join(dir, "names.yaml"), "countries:\n  valdoria: Austria\n  kestmark: [Kest\n");
     const error = loadError(dir);
     expect(error.message).toContain("names.yaml");
     expect(error.message).toMatch(/line \d+/);

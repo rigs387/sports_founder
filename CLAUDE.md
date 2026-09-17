@@ -8,11 +8,12 @@ Mistakes to avoid: `sports-founder-technical-lessons.md`. Summary: `sports-found
 ```
 content/              Game content and balance config (YAML data only; validated by Zod at load)
   config.yaml         Every tunable number: rates, weights, PP tier table, leagues, balance targets
-  countries.yaml      Countries and their attributes (placeholder, invented)
+  countries.yaml      The 213 real markets and their attributes (World Bank, GeoNames, hand calls)
   genome.yaml         Genome option modifiers and quick-start presets
   growth-tree.yaml    PP growth tree: categories and unlock tiers, nodes, effects, forks
-  sports.yaml         Rival sports and the "other sports" bucket (placeholder, invented)
+  sports.yaml         Rival sports (soccer, cricket) and the "other sports" bucket
   names.yaml          All display names for countries and sports (the one moddable names file)
+  sources.yaml        Where every country figure comes from: dataset and year, estimates tagged
 src/content/          Zod schemas + YAML loader. Pure: may import only zod and yaml
 src/sim/              Simulation core. Pure and deterministic: may import only src/content,
                       pure-rand, and zod
@@ -51,6 +52,11 @@ runs/                 Runner and smoke-test output (git-ignored)
 - All balance numbers live in content/config files, never hardcoded in logic.
 - Every tunable number lives in config (`content/config.yaml` or another content file).
 - All game content is YAML validated by Zod schemas.
+- The world is real (GDD "Real-world data"): FIFA's member associations minus Kosovo and Palestine,
+  plus Tuvalu and the three ICC members outside FIFA, 213 markets. Population, income per person and
+  urban share are World Bank 2024 figures; land borders are GeoNames; climate, language spheres, sea
+  links and fan buckets are hand calls. Every field has an entry in `content/sources.yaml`, and
+  content validation fails if one is missing or cites an unlisted dataset.
 - All player-facing strings go through i18next. Never concatenate sentence fragments.
 - All Steam calls go through the single Steam adapter file.
 - The purity check (`npm run check:purity`, also run by `build` and the tests) fails if src/sim or

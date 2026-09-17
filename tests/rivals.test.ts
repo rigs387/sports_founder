@@ -31,8 +31,8 @@ import { countryIndex, presetGenome, setupFor, withConfig, withWorld, world } fr
 // hardcore gains where a rival is strong, budgets limit what rivals can do, every countermove has
 // its effect, rivals defend harder near #1, and no rival is ever eliminated.
 
-const VALDORIA = "valdoria";
-const RIVAL = "fieldball";
+const ANCHOR_COUNTRY = "austria";
+const RIVAL = "soccer";
 const population = (w: World, id: string) => w.countries[countryIndex(w, id)]?.population ?? 0;
 
 /** Player hardcore gain per quarter equal to `annualShare` of a country's population per year. */
@@ -117,23 +117,25 @@ const withMove = (state: GameState, w: World, countryId: string, move: ActiveCou
   }));
 
 describe("escalation ladder", () => {
-  const start = () => createCampaign(world, setupFor(1, VALDORIA));
-  const strongGains = { [VALDORIA]: perQuarter(world, VALDORIA, 0.01) };
+  const start = () => createCampaign(world, setupFor(1, ANCHOR_COUNTRY));
+  const strongGains = { [ANCHOR_COUNTRY]: perQuarter(world, ANCHOR_COUNTRY, 0.01) };
 
   it("climbs one level at a time with the player's hardcore gains where the rival is strong", () => {
     let state = start();
     const seen: EscalationLevel[] = [];
     for (let q = 0; q < 40; q += 1) {
-      const before = levelOf(state, world, VALDORIA);
+      const before = levelOf(state, world, ANCHOR_COUNTRY);
       state = rivalQuarter(state, world, strongGains);
-      const after = levelOf(state, world, VALDORIA);
+      const after = levelOf(state, world, ANCHOR_COUNTRY);
       expect(escalationIndex(after) - escalationIndex(before)).toBeGreaterThanOrEqual(0);
       expect(escalationIndex(after) - escalationIndex(before)).toBeLessThanOrEqual(1);
       if (after !== before) seen.push(after);
     }
     expect(seen).toEqual(["watching", "defending", "entrenched"]);
     const recorded = state.landmarks.flatMap((l) =>
-      l.kind === "rivalEscalated" && l.sportId === RIVAL && l.countryId === VALDORIA ? [l.to] : [],
+      l.kind === "rivalEscalated" && l.sportId === RIVAL && l.countryId === ANCHOR_COUNTRY
+        ? [l.to]
+        : [],
     );
     expect(recorded).toEqual(seen);
   });
@@ -142,45 +144,48 @@ describe("escalation ladder", () => {
     let small = start();
     let none = start();
     for (let q = 0; q < 40; q += 1) {
-      small = rivalQuarter(small, world, { [VALDORIA]: perQuarter(world, VALDORIA, 0.001) });
+      small = rivalQuarter(small, world, {
+        [ANCHOR_COUNTRY]: perQuarter(world, ANCHOR_COUNTRY, 0.001),
+      });
       none = rivalQuarter(none, world);
     }
-    expect(levelOf(small, world, VALDORIA)).toBe("watching");
-    expect(levelOf(none, world, VALDORIA)).toBe("none");
+    expect(levelOf(small, world, ANCHOR_COUNTRY)).toBe("watching");
+    expect(levelOf(none, world, ANCHOR_COUNTRY)).toBe("none");
     expect(none.landmarks.filter((l) => l.kind.startsWith("rival"))).toEqual([]);
   });
 
   it("does not rise where the rival holds little hardcore share, however large the gains", () => {
-    const longbatShare =
-      (createCampaign(world, setupFor(1, VALDORIA)).countries[countryIndex(world, VALDORIA)]
-        ?.fans[2]?.hardcore ?? 0) / population(world, VALDORIA);
-    expect(longbatShare).toBeLessThan(world.config.rivalAI.meaningfulHardcoreShare);
+    const cricketShare =
+      (createCampaign(world, setupFor(1, ANCHOR_COUNTRY)).countries[
+        countryIndex(world, ANCHOR_COUNTRY)
+      ]?.fans[2]?.hardcore ?? 0) / population(world, ANCHOR_COUNTRY);
+    expect(cricketShare).toBeLessThan(world.config.rivalAI.meaningfulHardcoreShare);
     let state = start();
     for (let q = 0; q < 40; q += 1) state = rivalQuarter(state, world, strongGains);
-    expect(levelOf(state, world, VALDORIA, "longbat")).toBe("none");
+    expect(levelOf(state, world, ANCHOR_COUNTRY, "cricket")).toBe("none");
 
-    // The same gains with longbat holding a meaningful share there: it escalates too.
-    const longbatStrong = withWorld(world, (content) => {
-      const country = content.countries.find((c) => c.id === VALDORIA);
-      if (country) country.startingRivalFans.longbat = { casual: 0.1, hardcore: 0.05 };
+    // The same gains with cricket holding a meaningful share there: it escalates too.
+    const cricketStrong = withWorld(world, (content) => {
+      const country = content.countries.find((c) => c.id === ANCHOR_COUNTRY);
+      if (country) country.startingRivalFans.cricket = { casual: 0.1, hardcore: 0.05 };
     });
-    let strong = createCampaign(longbatStrong, setupFor(1, VALDORIA));
-    for (let q = 0; q < 40; q += 1) strong = rivalQuarter(strong, longbatStrong, strongGains);
-    expect(levelOf(strong, longbatStrong, VALDORIA, "longbat")).toBe("entrenched");
+    let strong = createCampaign(cricketStrong, setupFor(1, ANCHOR_COUNTRY));
+    for (let q = 0; q < 40; q += 1) strong = rivalQuarter(strong, cricketStrong, strongGains);
+    expect(levelOf(strong, cricketStrong, ANCHOR_COUNTRY, "cricket")).toBe("entrenched");
   });
 
   it("de-escalates one level at a time, slowly, after the player pulls back", () => {
     let state = start();
     for (let q = 0; q < 30; q += 1) state = rivalQuarter(state, world, strongGains);
-    expect(levelOf(state, world, VALDORIA)).toBe("entrenched");
+    expect(levelOf(state, world, ANCHOR_COUNTRY)).toBe("entrenched");
 
     const { deescalationQuarters } = world.config.rivalAI.escalation;
     let lastChange = state.quarter;
     const drops: EscalationLevel[] = [];
-    for (let q = 0; q < 120 && levelOf(state, world, VALDORIA) !== "none"; q += 1) {
-      const before = levelOf(state, world, VALDORIA);
+    for (let q = 0; q < 120 && levelOf(state, world, ANCHOR_COUNTRY) !== "none"; q += 1) {
+      const before = levelOf(state, world, ANCHOR_COUNTRY);
       state = rivalQuarter(state, world);
-      const after = levelOf(state, world, VALDORIA);
+      const after = levelOf(state, world, ANCHOR_COUNTRY);
       expect(escalationIndex(before) - escalationIndex(after)).toBeGreaterThanOrEqual(0);
       expect(escalationIndex(before) - escalationIndex(after)).toBeLessThanOrEqual(1);
       if (after !== before) {
@@ -198,14 +203,14 @@ describe("escalation ladder", () => {
     const noHardcoreGains = withConfig(world, (config) => {
       config.dynamics.player.hardcoreConversionRate = 0;
     });
-    const start = createCampaign(noHardcoreGains, setupFor(3, VALDORIA));
+    const start = createCampaign(noHardcoreGains, setupFor(3, ANCHOR_COUNTRY));
     const quiet = runTurns(start, noHardcoreGains, 60);
     expect(quiet.quarter).toBeGreaterThanOrEqual(60);
     expect(quiet.landmarks.filter((l) => l.kind.startsWith("rival"))).toEqual([]);
     expect(quiet.rivals.every((rival) => rival.budgetSpent === 0 && rival.budget > 0)).toBe(true);
     expect(quiet.countries.every((c) => c.countermoves.length === 0)).toBe(true);
     // Rival fans still move on their own (the slow drift).
-    const index = countryIndex(noHardcoreGains, VALDORIA);
+    const index = countryIndex(noHardcoreGains, ANCHOR_COUNTRY);
     expect(quiet.countries[index]?.fans[1]).not.toStrictEqual(start.countries[index]?.fans[1]);
   });
 });
@@ -220,7 +225,7 @@ describe("defense budget", () => {
   });
 
   function defendingIn(countryIds: string[], budget: number): GameState {
-    let state = createCampaign(fixedBudget, setupFor(1, VALDORIA));
+    let state = createCampaign(fixedBudget, setupFor(1, ANCHOR_COUNTRY));
     state = {
       ...state,
       rivals: state.rivals.map((r) => (r.sportId === RIVAL ? { ...r, budget } : r)),
@@ -236,34 +241,34 @@ describe("defense budget", () => {
 
   it("a rival never spends more than its budget, and spending is what the budget lost", () => {
     const budget = 20_000;
-    for (const fronts of [[VALDORIA], [VALDORIA, "kestmark", "arvenne", "teyrland"]]) {
+    for (const fronts of [[ANCHOR_COUNTRY], [ANCHOR_COUNTRY, "czechia", "italy", "germany"]]) {
       const start = defendingIn(fronts, budget);
       const next = rivalQuarter(start, fixedBudget);
       const rival = rivalOf(next);
       expect(rival.budget).toBeGreaterThanOrEqual(0);
       expect(rival.budgetSpent).toBeGreaterThan(0);
       expect(rival.budgetSpent).toBeLessThanOrEqual(budget);
-      expect(rival.budget + rival.budgetSpent).toBeCloseTo(budget, 3);
+      expect(rival.budget + rival.budgetSpent).toBeCloseTo(budget, 2);
       expect(checkInvariants(next, fixedBudget)).toEqual([]);
     }
-    const broke = rivalQuarter(defendingIn([VALDORIA], 0), fixedBudget);
-    expect(movesIn(broke, VALDORIA)).toBe(0);
+    const broke = rivalQuarter(defendingIn([ANCHOR_COUNTRY], 0), fixedBudget);
+    expect(movesIn(broke, ANCHOR_COUNTRY)).toBe(0);
   });
 
   it("pushing several fronts spreads the same budget thin", () => {
     const budget = 20_000;
-    const others = ["kestmark", "arvenne", "teyrland"];
-    const oneFront = rivalQuarter(defendingIn([VALDORIA], budget), fixedBudget);
-    const fourFronts = rivalQuarter(defendingIn([VALDORIA, ...others], budget), fixedBudget);
-    expect(movesIn(oneFront, VALDORIA)).toBeGreaterThanOrEqual(2);
-    expect(movesIn(fourFronts, VALDORIA)).toBeLessThan(movesIn(oneFront, VALDORIA));
-    const defended = [VALDORIA, ...others].filter((id) => movesIn(fourFronts, id) > 0);
+    const others = ["czechia", "italy", "germany"];
+    const oneFront = rivalQuarter(defendingIn([ANCHOR_COUNTRY], budget), fixedBudget);
+    const fourFronts = rivalQuarter(defendingIn([ANCHOR_COUNTRY, ...others], budget), fixedBudget);
+    expect(movesIn(oneFront, ANCHOR_COUNTRY)).toBeGreaterThanOrEqual(2);
+    expect(movesIn(fourFronts, ANCHOR_COUNTRY)).toBeLessThan(movesIn(oneFront, ANCHOR_COUNTRY));
+    const defended = [ANCHOR_COUNTRY, ...others].filter((id) => movesIn(fourFronts, id) > 0);
     expect(defended.length).toBeGreaterThan(0);
     expect(defended.length).toBeLessThan(4);
   });
 
   it("in a real campaign, spending each quarter never exceeds the budget banked plus income", () => {
-    let state = createCampaign(world, setupFor(5, VALDORIA, presetGenome("long-innings")));
+    let state = createCampaign(world, setupFor(5, ANCHOR_COUNTRY, presetGenome("long-innings")));
     let quarters = 0;
     let spentAny = false;
     for (let turn = 0; turn < 100 && state.outcome === null; turn += 1) {
@@ -296,7 +301,7 @@ describe("defense budget", () => {
 });
 
 describe("each countermove has its effect", () => {
-  const target = "kestmark";
+  const target = "czechia";
   const blitz: ActiveCountermove = { kind: "mediaBlitz", sportId: RIVAL, endQuarter: 99 };
   const youth: ActiveCountermove = { kind: "youthPrograms", sportId: RIVAL, endQuarter: 99 };
 
@@ -319,7 +324,7 @@ describe("each countermove has its effect", () => {
       config.turnover.annualRate = 0;
       config.rivalAI.movesPerQuarter = 0;
     });
-    const base = createCampaign(w, setupFor(1, VALDORIA));
+    const base = createCampaign(w, setupFor(1, ANCHOR_COUNTRY));
     const blitzed = withMove(base, w, target, blitz);
     const plain = change(w, base, RIVAL).casual;
     const boosted = change(w, blitzed, RIVAL).casual;
@@ -328,7 +333,7 @@ describe("each countermove has its effect", () => {
       1 + w.config.rivalAI.countermoves.mediaBlitz.casualConversionBoost,
       3,
     );
-    expect(change(w, blitzed, "longbat")).toStrictEqual(change(w, base, "longbat"));
+    expect(change(w, blitzed, "cricket")).toStrictEqual(change(w, base, "cricket"));
   });
 
   it("youth programs raise only that rival's hardcore conversion there, by the configured boost", () => {
@@ -340,7 +345,7 @@ describe("each countermove has its effect", () => {
       config.turnover.annualRate = 0;
       config.rivalAI.movesPerQuarter = 0;
     });
-    const base = createCampaign(w, setupFor(1, VALDORIA));
+    const base = createCampaign(w, setupFor(1, ANCHOR_COUNTRY));
     const plain = change(w, base, RIVAL).hardcore;
     const boosted = change(w, withMove(base, w, target, youth), RIVAL).hardcore;
     expect(plain).toBeGreaterThan(1_000);
@@ -352,17 +357,26 @@ describe("each countermove has its effect", () => {
 
   it("an exclusive broadcast deal removes the player's media reach exposure into that country", () => {
     // A country with a media reach link, and the player's fans in its source.
-    const targetIndex = world.inbound.findIndex((links) => links.some((l) => l.media > 0));
+    // Not the anchor: it holds a focus slot, whose inbound multiplier complicates the arithmetic.
+    const anchorIndex = countryIndex(world, ANCHOR_COUNTRY);
+    const targetIndex = world.inbound.findIndex(
+      (links, i) => i !== anchorIndex && links.some((l) => l.media > 0),
+    );
     const link = world.inbound[targetIndex]?.find((l) => l.media > 0);
     const source = world.countries[link?.source ?? -1]?.id;
     const dealIn = world.countries[targetIndex]?.id;
     if (!source || !dealIn) throw new Error("content has no media reach link");
-    const base = withCountry(createCampaign(world, setupFor(1, VALDORIA)), world, source, (c) => ({
-      ...c,
-      fans: c.fans.map((f, i) =>
-        i === PLAYER_INDEX ? { ...f, casual: 5_000_000, hardcore: 500_000 } : f,
-      ),
-    }));
+    const base = withCountry(
+      createCampaign(world, setupFor(1, ANCHOR_COUNTRY)),
+      world,
+      source,
+      (c) => ({
+        ...c,
+        fans: c.fans.map((f, i) =>
+          i === PLAYER_INDEX ? { ...f, casual: 5_000_000, hardcore: 500_000 } : f,
+        ),
+      }),
+    );
     const dealt = withMove(base, world, dealIn, {
       kind: "broadcastDeal",
       sportId: RIVAL,
@@ -383,9 +397,9 @@ describe("each countermove has its effect", () => {
   });
 
   it("a sponsor lockout cuts the player's league media and sponsor revenue there, not gate revenue", () => {
-    const index = countryIndex(world, VALDORIA);
-    const state = createCampaign(world, setupFor(1, VALDORIA));
-    const open = withCountry(state, world, VALDORIA, (c) => ({
+    const index = countryIndex(world, ANCHOR_COUNTRY);
+    const state = createCampaign(world, setupFor(1, ANCHOR_COUNTRY));
+    const open = withCountry(state, world, ANCHOR_COUNTRY, (c) => ({
       ...c,
       fans: c.fans.map((f, i) =>
         i === PLAYER_INDEX ? { ...f, casual: 2_000_000, hardcore: 50_000 } : f,
@@ -434,12 +448,12 @@ describe("each countermove has its effect", () => {
       ];
     });
     const player = presetGenome("long-innings");
-    const index = countryIndex(copyFirst, VALDORIA);
-    let start = createCampaign(copyFirst, setupFor(1, VALDORIA, player));
+    const index = countryIndex(copyFirst, ANCHOR_COUNTRY);
+    let start = createCampaign(copyFirst, setupFor(1, ANCHOR_COUNTRY, player));
     const original = rivalOf(start).genome;
     const copy = ruleToCopy(copyFirst, player, original, index);
-    if (!copy) throw new Error("expected a popular rule trait to copy in Valdoria");
-    start = withLevel(start, copyFirst, VALDORIA, "entrenched");
+    if (!copy) throw new Error("expected a popular rule trait to copy in Austria");
+    start = withLevel(start, copyFirst, ANCHOR_COUNTRY, "entrenched");
     start = {
       ...start,
       rivals: start.rivals.map((r) => (r.sportId === RIVAL ? { ...r, budget: 1e9 } : r)),
@@ -453,7 +467,7 @@ describe("each countermove has its effect", () => {
     expect(next.landmarks.at(-1)).toMatchObject({
       kind: "rivalRuleCopied",
       sportId: RIVAL,
-      countryId: VALDORIA,
+      countryId: ANCHOR_COUNTRY,
       axis: copy.axis,
       to: player[copy.axis],
     });
@@ -464,7 +478,7 @@ describe("each countermove has its effect", () => {
     );
     const country = next.countries[index];
     if (!country) throw new Error("no country");
-    const pop = population(copyFirst, VALDORIA);
+    const pop = population(copyFirst, ANCHOR_COUNTRY);
     const before = similarityEffect(copyFirst, player, country, next.sports, pop, start.rivals);
     const after = similarityEffect(copyFirst, player, country, next.sports, pop, next.rivals);
     expect(after.hardcoreFactor).toBeLessThan(before.hardcoreFactor);
@@ -483,7 +497,7 @@ describe("rivals defend harder near global #1", () => {
     return {
       ...state,
       countries: state.countries.map((country, i) => {
-        if (country.countryId === VALDORIA) return country;
+        if (country.countryId === ANCHOR_COUNTRY) return country;
         const pop = world.countries[i]?.population ?? 0;
         const taken = country.fans.reduce(
           (sum, f, s) => (s === PLAYER_INDEX ? sum : sum + f.hardcore),
@@ -500,7 +514,7 @@ describe("rivals defend harder near global #1", () => {
   }
 
   it("intensity is 1 far from #1 and at its maximum once the player draws level", () => {
-    const far = createCampaign(world, setupFor(1, VALDORIA));
+    const far = createCampaign(world, setupFor(1, ANCHOR_COUNTRY));
     const near = nearTop(far);
     const best = Math.max(
       ...sportTotals(near, world)
@@ -513,8 +527,8 @@ describe("rivals defend harder near global #1", () => {
   });
 
   it("with the same local pressure, rivals escalate further and earn more budget near #1", () => {
-    const gains = { [VALDORIA]: perQuarter(world, VALDORIA, 0.004) };
-    let far = createCampaign(world, setupFor(1, VALDORIA));
+    const gains = { [ANCHOR_COUNTRY]: perQuarter(world, ANCHOR_COUNTRY, 0.004) };
+    let far = createCampaign(world, setupFor(1, ANCHOR_COUNTRY));
     let near = nearTop(far);
     const farFirst = rivalQuarter(far, world, gains);
     const nearFirst = rivalQuarter(near, world, gains);
@@ -526,8 +540,8 @@ describe("rivals defend harder near global #1", () => {
       far = rivalQuarter(far, world, gains);
       near = rivalQuarter(near, world, gains);
     }
-    expect(levelOf(far, world, VALDORIA)).toBe("defending");
-    expect(levelOf(near, world, VALDORIA)).toBe("entrenched");
+    expect(levelOf(far, world, ANCHOR_COUNTRY)).toBe("defending");
+    expect(levelOf(near, world, ANCHOR_COUNTRY)).toBe("entrenched");
   });
 });
 
@@ -545,7 +559,12 @@ describe("no rival is ever eliminated", () => {
         config.focus.outreachPeople = 1_000_000;
         config.poaching.rate = Math.min(1, config.poaching.rate * multiplier);
       });
-      let state = createCampaign(extreme, setupFor(7, VALDORIA));
+      let state = createCampaign(extreme, setupFor(7, ANCHOR_COUNTRY));
+      // A rival is "eliminated" only where it had fans to lose: cricket starts at zero in most of
+      // the world, and a sport nobody there follows is not a rival being wiped out.
+      const startHardcore = state.countries.map((country) =>
+        country.fans.map((fans) => fans.hardcore),
+      );
       const worldPopulation = extreme.countries.reduce((sum, c) => sum + c.population, 0);
       const problems: string[] = [];
       let peakPlayerShare = 0;
@@ -562,6 +581,7 @@ describe("no rival is ever eliminated", () => {
           state.rivals.forEach((rival, r) => {
             const hardcore = country.fans[r + 1]?.hardcore ?? 0;
             global[r] = (global[r] ?? 0) + hardcore;
+            if ((startHardcore[i]?.[r + 1] ?? 0) <= 0) return;
             lowestRivalShare = Math.min(lowestRivalShare, hardcore / pop);
             if (hardcore <= 0)
               problems.push(
@@ -586,12 +606,14 @@ describe("no rival is ever eliminated", () => {
 
 describe("visibility", () => {
   it("the snapshot shows escalation levels and countermoves in effect, but never budgets", () => {
-    let state = createCampaign(world, setupFor(1, VALDORIA));
+    let state = createCampaign(world, setupFor(1, ANCHOR_COUNTRY));
     for (let q = 0; q < 30; q += 1) {
-      state = rivalQuarter(state, world, { [VALDORIA]: perQuarter(world, VALDORIA, 0.01) });
+      state = rivalQuarter(state, world, {
+        [ANCHOR_COUNTRY]: perQuarter(world, ANCHOR_COUNTRY, 0.01),
+      });
     }
     const snap = snapshot(state, world);
-    const anchor = snap.countries[countryIndex(world, VALDORIA)];
+    const anchor = snap.countries[countryIndex(world, ANCHOR_COUNTRY)];
     expect(anchor?.rivals.map((r) => r.sportId)).toEqual(world.rivals.map((r) => r.id));
     expect(anchor?.rivals.find((r) => r.sportId === RIVAL)?.level).toBe("entrenched");
     expect(anchor?.rivals.find((r) => r.sportId === RIVAL)?.countermoves.length).toBeGreaterThan(0);

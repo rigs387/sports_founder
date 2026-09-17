@@ -46,6 +46,11 @@ surface before playtesting or during it.
 | 2026-09-14 | Campaign turn budget: Backyard Game ~40 turns, Local Curiosity ~10 (GDD v1.5) | Decided |
 | 2026-09-14 | Genome balance: options checked against real countries; numeric conditions relative to the world's average country; dominance judged on global Fandom Score (GDD v1.5) | Decided |
 | 2026-09-14 | No-dominant-genome check: 250 genomes per anchor, flagged only beyond sampling noise | Decided |
+| 2026-09-15 | Real-world dataset: 213 markets (FIFA members minus Kosovo and Palestine, plus Tuvalu, Jersey, Guernsey and the Isle of Man); World Bank 2024 population, GNI per capita (Atlas) and urban share; GeoNames land borders; `content/sources.yaml` validated at load | Decided |
+| 2026-09-15 | Experiments that sweep anchors use a deterministic sample of `balanceTargets.experimentAnchors` markets (12) spread across the population range; `--anchors all` still plays every market | Decided |
+| 2026-09-15 | The hard-anchor criterion runs on `balanceTargets.hardAnchor` (Tuvalu), not the smallest market | Decided |
+| 2026-09-15 | Content validation rejects a market whose hardcore shares exceed `worldChecks.maxSportCulture` (0.75) | Decided |
+| 2026-09-16 | Rebalanced for the real world: language and media spread weights cut (65 language links per market against 5 neighbours), tier 4 and tier 5 Fandom Score thresholds raised to the GDD turn budget | Decided |
 
 ---
 
@@ -83,8 +88,10 @@ starting targets (thresholds adjustable as data arrives):
 - **No dominant genome:** no single trait option appears in more than 40% of top-quartile runs,
   judged on 250 random genomes per anchor, and only beyond sampling noise (the 95% lower bound of
   its share must exceed 40%) (decided 2026-09-14).
-- **No safe anchor:** every anchor country has a nonzero collapse rate under a naive strategy.
-- **Hard anchors are winnable:** the best bot wins from Tuvalu some of the time.
+- **No safe anchor:** every anchor country has a nonzero collapse rate under a naive strategy,
+  judged on the sampled anchors (decided 2026-09-15).
+- **Hard anchors are winnable:** the best bot wins from Tuvalu (config
+  `balanceTargets.hardAnchor`) some of the time.
 - **Pacing:** time to each PP tier falls within ±30% of the GDD campaign budget table, measured on
   typical-size anchors (the middle half of countries by population); tiny and huge anchors are
   harder by design (decided 2026-09-13).

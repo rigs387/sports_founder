@@ -59,14 +59,14 @@ ppTiers:
     costMultiplier: 2.5
     mediaRevenueMultiplier: 1.5
   - tier: 4
-    fandomScoreRequired: 15000000
+    fandomScoreRequired: 170000000
     breadth: { type: leaguesOnContinents, leagueTier: professional, continents: 3 }
     turnLengthQuarters: 2
     focusSlots: 4
     costMultiplier: 4
     mediaRevenueMultiplier: 2
   - tier: 5
-    fandomScoreRequired: 80000000
+    fandomScoreRequired: 1600000000
     breadth: { type: globalRank, rank: 3 }
     turnLengthQuarters: 4
     focusSlots: 5
@@ -90,12 +90,14 @@ tierTrack:
 #   log:    score = (ln(x) − ln(low)) / (ln(high) − ln(low)), clamped to 0–1
 #   linear: score = (x − low) / (high − low), clamped to 0–1
 attributeCurves:
-  # Income per person (invented currency units in the placeholder data).
-  wealth: { type: log, low: 1500, high: 60000 }
-  # Share of the population living in urban areas.
-  urbanDensity: { type: linear, low: 0.2, high: 0.95 }
-  # Media market size is the score of (population × wealth score).
-  mediaMarket: { type: log, low: 2000000, high: 200000000 }
+  # GNI per person, Atlas method, current US$ (World Bank). The real range runs from about 250
+  # (Burundi) to about 140,000 (Bermuda); the curve saturates at both ends so the middle spreads.
+  wealth: { type: log, low: 700, high: 80000 }
+  # Share of the population living in urban areas. The real range runs from 0.15 to 1.
+  urbanDensity: { type: linear, low: 0.15, high: 1.0 }
+  # Media market size is the score of (population × wealth score). The real range runs from a few
+  # thousand (Montserrat) to a few hundred million (United States, China, India).
+  mediaMarket: { type: log, low: 200000, high: 200000000 }
 
 # Lever multipliers: each starts at 1, the chosen options' deltas are added, then clamped.
 levers:
@@ -133,16 +135,19 @@ similarity:
 spread:
   proximity:
     # Per neighbor link (land border or sea link).
-    weight: 0.012
+    weight: 0.0085
   language:
     # Shared primary sphere. A link through either side's secondary sphere is scaled by
-    # secondaryWeight (both secondary: squared).
-    weight: 0.006
+    # secondaryWeight (both secondary: squared). The real world's media spheres are wide - about 65
+    # inbound language links per market, against 5 land or sea neighbours - so the per-link weight
+    # is far below a neighbour's (retuned for the real dataset, 2026-09-16).
+    weight: 0.00085
     secondaryWeight: 0.5
   media:
     # Between large media markets: weight × sourceMarket × targetMarket, only when both market
-    # scores are at least minMarketScore.
-    weight: 0.01
+    # scores are at least minMarketScore. 64 of the 213 real markets clear the threshold, so each
+    # link is worth much less than on the placeholder world (retuned 2026-09-16).
+    weight: 0.0018
     minMarketScore: 0.5
 
 # Exposure (per country, per quarter): what drives casual conversion and retention.
@@ -307,6 +312,14 @@ genomeBalance:
   minHurtShare: 0.15
   neutralDelta: 0.005
 
+# Data sanity checks on the world, applied at load.
+worldChecks:
+  # A country's hardcore shares across every sport (rivals plus the "other sports" bucket) may not
+  # exceed this. Hardcore is exclusive, so the remainder is the people with no hardcore sport: the
+  # pool the player converts from. A market above this line is far more likely to be a bad figure
+  # than a real place (decided 2026-09-15).
+  maxSportCulture: 0.75
+
 # Leagues (GDD League tiers, Business Layer Phase 0 subset, League Health Ladder). Cash is per
 # country and never produces PP.
 leagues:
@@ -315,26 +328,33 @@ leagues:
   # multiplier, and promotion INTO this tier: hardcore fans needed = max(minHardcore, hardcoreShare
   # × population), cash reserve needed and cash cost, both in quarters of this tier's running cost.
   # minHardcore keeps the fixed starting fan base from qualifying a tiny country for promotion
-  # straight away (GDD: early collapse very unlikely).
+  # straight away (GDD: early collapse very unlikely). The shares were raised for the real dataset
+  # (2026-09-16) to sit near the fans a tier's running cost actually needs: promotion is still a
+  # stretch that can sink a league, but no longer one a league qualifies for at a sixth of the
+  # revenue it will owe. The minRunningCost floors are what make a micro-market's professional
+  # league unaffordable however saturated it is (GDD: a tiny anchor is fragile).
   tiers:
     amateur:
       runningCost: 0.4
-      minRunningCost: 0
+      # Even a micro-market league has fixed overhead: without a floor, a 4,000-person market's
+      # league costs almost nothing and can never fail (GDD: a minimum per league tier, and a tiny
+      # anchor is fragile). Retuned for the real dataset, 2026-09-16.
+      minRunningCost: 0.5
       revenueMultiplier: 1
       promotion: null
     semi-pro:
       runningCost: 6
-      minRunningCost: 1.5
+      minRunningCost: 3
       revenueMultiplier: 1.5
-      promotion: { hardcoreShare: 0.0004, minHardcore: 1500, reserveQuarters: 2.5, costQuarters: 2 }
+      promotion: { hardcoreShare: 0.0012, minHardcore: 1500, reserveQuarters: 2.5, costQuarters: 2 }
     professional:
       runningCost: 40
-      minRunningCost: 6
+      minRunningCost: 20
       revenueMultiplier: 2
-      promotion: { hardcoreShare: 0.003, minHardcore: 3000, reserveQuarters: 2.5, costQuarters: 2 }
+      promotion: { hardcoreShare: 0.006, minHardcore: 3000, reserveQuarters: 2.5, costQuarters: 2 }
     elite:
       runningCost: 90
-      minRunningCost: 15
+      minRunningCost: 60
       revenueMultiplier: 2.5
       promotion: { hardcoreShare: 0.02, minHardcore: 15000, reserveQuarters: 2.5, costQuarters: 2 }
   formation:
@@ -342,7 +362,7 @@ leagues:
     minHardcore: 300
     hardcoreShare: 0.0005
     # A new league starts with this many quarters of Amateur running cost in cash.
-    startingCashQuarters: 40
+    startingCashQuarters: 60
     # After a league folds, a new one cannot form for this many quarters.
     reformCooldownQuarters: 8
   # Running cost per quarter = max(tier minRunningCost, tier runningCost × (wealthFloor + (1 −
@@ -414,6 +434,13 @@ balanceTargets:
   pacingAnchorPopulationQuantiles: [ 0.25, 0.75 ]
   # Collapses on or before this turn are reported separately: they should be very rare.
   earlyCollapseTurn: 20
+  # Experiments that sweep anchors use a deterministic sample of this many markets, spread evenly
+  # across the population range, instead of all 213 (decided 2026-09-15): the full sweep is hours of
+  # simulation, and the criteria read the same on a representative spread. `--anchors all` still
+  # plays every market.
+  experimentAnchors: 12
+  # The signature hard anchor for the "hard anchors are winnable" criterion (GDD Map and markets).
+  hardAnchor: tuvalu
   # The naive strategy for the "no safe anchor" criterion.
   naiveBot: greedy-spread
   # Seeds per anchor for the naive bot in the collapse experiment (or --campaigns if higher). Rare

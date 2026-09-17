@@ -176,13 +176,13 @@ options:
         affinity:
           urbanDensity: 0.2
     standard:
-      base: { depth: 0.03 }
+      base: { depth: 0.0 }
       conditions:
         depth:
-          sportCulture: 0.05
+          sportCulture: 0.06
         accessibility:
-          mediaMarket: -0.08
-          wealth: -0.08
+          mediaMarket: -0.1
+          wealth: -0.12
     long:
       base: { accessibility: 0, depth: 0.12 }
       conditions:
@@ -202,16 +202,17 @@ options:
         accessibility:
           sportCulture: -0.1
     high:
-      base: { accessibility: 0.03, depth: -0.04 }
+      base: { accessibility: 0.1, depth: -0.05 }
       conditions:
         accessibility:
-          mediaMarket: 0.15
+          mediaMarket: 0.1
+          urbanDensity: 0.1
         affinity:
           sportCulture: -0.15
 
   complexity:
     simple:
-      base: { accessibility: 0.1, depth: -0.08 }
+      base: { accessibility: 0.13, depth: -0.08 }
       conditions:
         affinity:
           wealth: -0.1
@@ -223,7 +224,7 @@ options:
         affinity:
           urbanDensity: -0.05
     intricate:
-      base: { accessibility: -0.08, depth: 0.08 }
+      base: { accessibility: -0.11, depth: 0.1 }
       conditions:
         affinity:
           wealth: 0.1
@@ -240,13 +241,13 @@ options:
           mediaMarket: -0.05
           wealth: -0.05
     stop-start:
-      base: { accessibility: 0, depth: -0.07 }
+      base: { accessibility: 0.08, depth: -0.05 }
       conditions:
         accessibility:
-          mediaMarket: 0.15
+          mediaMarket: 0.1
         affinity:
           climate: { tropical: 0 }
-          urbanDensity: 0.14
+          urbanDensity: 0.15
     innings:
       base: { accessibility: -0.04, depth: 0 }
       conditions:

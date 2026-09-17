@@ -8,6 +8,7 @@ import type {
   GrowthTreeContent,
   Names,
   RivalSport,
+  Sources,
   SportsContent,
 } from "./schemas";
 import { NUMERIC_ATTRIBUTES, type NumericAttribute } from "./schemas";
@@ -24,6 +25,7 @@ export interface WorldContent {
   genome: GenomeContent;
   growthTree: GrowthTreeContent;
   names: Names;
+  sources: Sources;
   config: Config;
 }
 
@@ -214,6 +216,7 @@ export function deriveWorld(content: WorldContent): World {
     genome: content.genome,
     growthTree: content.growthTree,
     names: content.names,
+    sources: content.sources,
     config: content.config,
   };
   return { ...base, derived, inbound: buildInboundLinks(base, derived) };

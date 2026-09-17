@@ -51,6 +51,57 @@ export const countriesFileSchema = z.strictObject({
   countries: z.array(countrySchema).min(1),
 });
 
+// ---- Sources (GDD "Real-world data": every field records its source and year) ----------------
+
+/** Country fields that must carry a source, either a default or a per-market entry. */
+export const SOURCED_FIELDS = [
+  "population",
+  "incomePerPerson",
+  "urbanShare",
+  "climate",
+  "continent",
+  "languages",
+  "neighbors",
+  "seaLinks",
+  "otherHardcoreShare",
+] as const;
+export type SourcedField = (typeof SOURCED_FIELDS)[number];
+/** Starting fan buckets are sourced per rival sport: "startingRivalFans.<rival id>". */
+export const FAN_FIELD_PREFIX = "startingRivalFans.";
+
+export const sourceEntrySchema = z
+  .strictObject({
+    /** A dataset listed under `datasets`. */
+    dataset: id.optional(),
+    year: z.int().optional(),
+    /** A figure modeled for this project: says what it was modeled on. */
+    estimate: z.string().min(1).optional(),
+    note: z.string().min(1).optional(),
+  })
+  .refine((entry) => (entry.dataset === undefined) !== (entry.estimate === undefined), {
+    message: 'needs exactly one of "dataset" (a published source) or "estimate" (a modeled figure)',
+  });
+
+export const sourcesFileSchema = z.strictObject({
+  datasets: z.record(
+    id,
+    z.strictObject({
+      title: z.string().min(1),
+      url: z.string().min(1).optional(),
+      retrieved: z.string().min(1).optional(),
+    }),
+  ),
+  /** Applies to every market unless the market overrides it. */
+  defaults: z.record(z.string(), sourceEntrySchema),
+  countries: z.record(z.string(), z.record(z.string(), sourceEntrySchema)).default({}),
+  markets: z.strictObject({
+    added: z.record(z.string(), z.string().min(1)).default({}),
+    omitted: z.record(z.string(), z.string().min(1)).default({}),
+    "borders-dropped": z.record(z.string(), z.string().min(1)).default({}),
+    "sea-links-folded-into-land-borders": z.array(z.string()).default([]),
+  }),
+});
+
 // ---- Genome --------------------------------------------------------------------------------
 
 /** A complete genome: exactly one option per axis, no extra axes. */
@@ -439,6 +490,10 @@ export const configFileSchema = z.strictObject({
     minHurtShare: unitInterval,
     neutralDelta: z.number().min(0),
   }),
+  worldChecks: z.strictObject({
+    /** A country's hardcore shares across every sport may not exceed this (data sanity). */
+    maxSportCulture: z.number().gt(0).max(1),
+  }),
   leagues: z.strictObject({
     tiers: z.strictObject({
       amateur: leagueTierConfigSchema,
@@ -499,6 +554,8 @@ export const configFileSchema = z.strictObject({
     turnsInTier: z.array(z.int().min(1)).min(1),
     naiveBot: z.string().min(1),
     naiveBotCollapseSeeds: z.int().min(1),
+    experimentAnchors: z.int().min(1),
+    hardAnchor: z.string().min(1),
   }),
 });
 
@@ -515,6 +572,8 @@ export type GenomeContent = z.infer<typeof genomeFileSchema>;
 export type RivalSport = z.infer<typeof rivalSportSchema>;
 export type SportsContent = z.infer<typeof sportsFileSchema>;
 export type Names = z.infer<typeof namesFileSchema>;
+export type SourceEntry = z.infer<typeof sourceEntrySchema>;
+export type Sources = z.infer<typeof sourcesFileSchema>;
 export type NodeEffect = z.infer<typeof nodeEffectSchema>;
 export type GrowthNode = z.infer<typeof growthNodeSchema>;
 export type GrowthTreeContent = z.infer<typeof growthTreeFileSchema>;

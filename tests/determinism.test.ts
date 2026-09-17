@@ -57,7 +57,7 @@ describe("determinism", () => {
     ["media-rush", mediaRush],
   ] as const)("is deterministic while %s buys growth nodes turn after turn", (_name, bot) => {
     // An anchor where both bots survive and keep buying nodes over many turns.
-    const setup = setupFor(31, "valdoria", presetGenome("backyard-kickball"));
+    const setup = setupFor(31, "austria", presetGenome("backyard-kickball"));
     const a = runWithPolicy(createCampaign(world, setup), 100, bot);
     const b = runWithPolicy(createCampaign(world, setup), 100, bot);
     expect(b).toStrictEqual(a);
@@ -68,7 +68,7 @@ describe("determinism", () => {
   });
 
   it("is deterministic under the random bot, whose dice never touch the simulation's RNG", () => {
-    const setup = setupFor(23, "oruna", presetGenome("ice-paddle"));
+    const setup = setupFor(23, "bangladesh", presetGenome("ice-paddle"));
     const a = runWithPolicy(createCampaign(world, setup), TURNS, randomBot);
     const b = runWithPolicy(createCampaign(world, setup), TURNS, randomBot);
     expect(b).toStrictEqual(a);
@@ -105,7 +105,7 @@ describe("determinism", () => {
     const state = { ...createCampaign(world, setupFor(7)), pp: 1000 };
     const before = structuredClone(state);
     endTurn(state, world);
-    applyAction(state, world, { type: "assignFocus", slot: 0, countryId: "kestmark" });
+    applyAction(state, world, { type: "assignFocus", slot: 0, countryId: "czechia" });
     expect(state).toStrictEqual(before);
   });
 });

@@ -21,8 +21,8 @@ import { countryIndex, setupFor, withConfig, world } from "./helpers";
 // League promises tested through their consequences (GDD League tiers, Business Layer, League
 // Health Ladder, Loss condition).
 
-const ANCHOR = "valdoria";
-const OTHER = "kestmark";
+const ANCHOR = "austria";
+const OTHER = "czechia";
 
 /** A copy of `state` with one country's league and player fans replaced. */
 function withCountry(
