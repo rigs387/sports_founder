@@ -178,7 +178,12 @@ describe("generational turnover", () => {
     for (let turn = 0; turn < 160 && state.outcome === null; turn += 1) {
       state = endTurn(builder(state, world).state, world);
     }
-    expect(state.quarter).toBeGreaterThan(400);
+    // The campaign has to be long for turnover to bite, and it has to be the whole 160 turns: an
+    // early collapse would leave the rival check below meaningless. The quarter count depends on
+    // when the PP tiers land (turn length is 1, 2 then 4 quarters), so the floor is set at 80
+    // in-game years rather than at a number that tracks tier pacing.
+    expect(state.outcome).toBeNull();
+    expect(state.quarter).toBeGreaterThan(320);
     state.sports.forEach((sport, s) => {
       if (sport.kind !== "rival") return;
       state.countries.forEach((country, c) => {

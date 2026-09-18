@@ -151,7 +151,9 @@ describe("each growth node effect changes what it names by the configured amount
 
   it("hardcore conversion: the casual → hardcore flow grows by the amount", () => {
     const w = quiet(treeWorld([{ type: "hardcoreConversion", amount: 0.15 }]), "hardcore");
-    const base = withPlayerFans(createCampaign(w, setupFor(1, ANCHOR)), w, ANCHOR, 2e6, 20_000);
+    // 3e6 casuals, not 2e6: the pool only has to be large enough that the flow is worth dividing.
+    // At 2e6 the flow sat just above the guard and the 2026-09-17 crowding change tipped it under.
+    const base = withPlayerFans(createCampaign(w, setupFor(1, ANCHOR)), w, ANCHOR, 3e6, 20_000);
     const plain = change(w, base, ANCHOR);
     const boosted = change(w, owning(base), ANCHOR);
     expect(plain.hardcore).toBeGreaterThan(10_000);

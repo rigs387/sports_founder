@@ -52,7 +52,11 @@ ppTiers:
     costMultiplier: 1.5
     mediaRevenueMultiplier: 1.25
   - tier: 3
-    fandomScoreRequired: 1500000
+    # Lowered from 1,500,000 (2026-09-17). The genome tuning in this pass cut both casual and
+    # hardcore conversion, which pushed the tier-3 median to turn 69 against the GDD budget's turn
+    # 50 (allowed 65). The score gate is what binds — the anchor-hardcore breadth gate is met at
+    # turn 44 — so this is the pacing knob, and it pulls tiers 4 and 5 back toward their targets too.
+    fandomScoreRequired: 600000
     breadth: { type: anchorHardcoreShare, share: 0.01 }
     turnLengthQuarters: 2
     focusSlots: 3
@@ -120,10 +124,13 @@ similarity:
     complexity: 1
     structure: 1.25
   # Casual conversion × (1 + casualFamiliarityBonus × effective similarity): familiar is easier.
-  casualFamiliarityBonus: 0.4
+  # Trimmed for the real world (2026-09-17): soccer holds a meaningful share of nearly every one of
+  # the 213 markets, so mimicking it paid almost everywhere and its traits (grass, simple rules) ran
+  # above the dominance limit. Familiarity is worth less, crowding costs more.
+  casualFamiliarityBonus: 0.3
   # Hardcore conversion × (1 − hardcoreCrowdingPenalty × effective similarity): they already
   # have that sport.
-  hardcoreCrowdingPenalty: 0.45
+  hardcoreCrowdingPenalty: 0.5
   # A rival exerts its full similarity effect once its hardcore share of the country reaches
   # this; below it the effect scales down linearly (a sport nobody there follows is no rival).
   fullEffectHardcoreShare: 0.1

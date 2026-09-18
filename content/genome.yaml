@@ -22,12 +22,12 @@
 options:
   surface:
     grass:
-      base: { depth: 0.03 }
+      base: { depth: 0.0 }
       conditions:
         affinity:
           climate: { temperate: 0.15, tropical: 0.05, cold: -0.15, arid: -0.2 }
         accessibility:
-          urbanDensity: -0.15
+          urbanDensity: -0.2
     indoor:
       base: { depth: 0 }
       conditions:
@@ -202,7 +202,7 @@ options:
         accessibility:
           sportCulture: -0.1
     high:
-      base: { accessibility: 0.1, depth: -0.05 }
+      base: { accessibility: 0.08, depth: -0.11 }
       conditions:
         accessibility:
           mediaMarket: 0.1
@@ -212,7 +212,7 @@ options:
 
   complexity:
     simple:
-      base: { accessibility: 0.13, depth: -0.08 }
+      base: { accessibility: 0.13, depth: -0.13 }
       conditions:
         affinity:
           wealth: -0.1
@@ -241,7 +241,7 @@ options:
           mediaMarket: -0.05
           wealth: -0.05
     stop-start:
-      base: { accessibility: 0.08, depth: -0.05 }
+      base: { accessibility: 0.06, depth: -0.1 }
       conditions:
         accessibility:
           mediaMarket: 0.1
