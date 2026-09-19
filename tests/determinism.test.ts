@@ -56,8 +56,8 @@ describe("determinism", () => {
     ["greedy-spread", greedySpread],
     ["media-rush", mediaRush],
   ] as const)("is deterministic while %s buys growth nodes turn after turn", (_name, bot) => {
-    // An anchor where both bots survive and keep buying nodes over many turns.
-    const setup = setupFor(31, "austria", presetGenome("backyard-kickball"));
+    // An anchor and genome that fit, so both bots survive and keep buying nodes over many turns.
+    const setup = setupFor(31, "austria", presetGenome("long-innings"));
     const a = runWithPolicy(createCampaign(world, setup), 100, bot);
     const b = runWithPolicy(createCampaign(world, setup), 100, bot);
     expect(b).toStrictEqual(a);

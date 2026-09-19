@@ -16,6 +16,11 @@
 #                                                 at the average (linear in between)
 # Numeric attributes: wealth, urbanDensity, sportCulture, mediaMarket.
 #
+# Every condition delta was scaled ×1.75 on 2026-09-18 (base deltas untouched). Once rivals hold
+# their ground at the real data, rival-thin rich and urban markets saturated for every genome by the
+# late game and differentiation fell to 3/6 pairs; steeper geography brings it back to 6/6 without
+# shrinking total growth (pacing still passes; first win median turn 184).
+#
 # Design rule (GDD "No universal best option"): every option must help in, and hurt in, a real share
 # of the actual countries (config genomeBalance). Content validation refuses one that does not.
 
@@ -25,234 +30,234 @@ options:
       base: { depth: 0.0 }
       conditions:
         affinity:
-          climate: { temperate: 0.15, tropical: 0.05, cold: -0.15, arid: -0.2 }
+          climate: { temperate: 0.263, tropical: 0.088, cold: -0.263, arid: -0.35 }
         accessibility:
-          urbanDensity: -0.2
+          urbanDensity: -0.35
     indoor:
       base: { depth: 0 }
       conditions:
         affinity:
-          climate: { cold: 0.1, arid: 0.05, tropical: 0, temperate: -0.1 }
+          climate: { cold: 0.175, arid: 0.088, tropical: 0, temperate: -0.175 }
         accessibility:
-          wealth: 0.05
-          urbanDensity: 0.05
+          wealth: 0.088
+          urbanDensity: 0.088
     street:
       base: { accessibility: 0.07, depth: -0.05 }
       conditions:
         affinity:
-          climate: { cold: -0.15, arid: -0.05 }
+          climate: { cold: -0.263, arid: -0.088 }
         accessibility:
-          urbanDensity: 0.25
-          wealth: -0.2
+          urbanDensity: 0.438
+          wealth: -0.35
     ice:
       base: { depth: 0.15 }
       conditions:
         affinity:
-          climate: { cold: 0.9, temperate: 0.05, arid: -0.3, tropical: -0.35 }
+          climate: { cold: 1.575, temperate: 0.088, arid: -0.525, tropical: -0.612 }
         accessibility:
-          wealth: 0.15
+          wealth: 0.263
 
   equipment:
     ball-only:
       base: { accessibility: 0.07, depth: -0.05 }
       conditions:
         accessibility:
-          wealth: -0.15
+          wealth: -0.263
         affinity:
-          sportCulture: -0.05
+          sportCulture: -0.088
     stick-or-bat:
       base: { accessibility: -0.03, depth: 0.05 }
       conditions:
         accessibility:
-          wealth: 0.15
+          wealth: 0.263
     protective-gear:
       base: { accessibility: -0.05, depth: 0.03 }
       conditions:
         accessibility:
-          wealth: 0.15
+          wealth: 0.263
         affinity:
-          sportCulture: 0.05
+          sportCulture: 0.088
 
   physical:
     speed:
       base: { accessibility: 0.03, depth: -0.04 }
       conditions:
         affinity:
-          climate: { tropical: 0.05, arid: 0.05, cold: -0.1 }
+          climate: { tropical: 0.088, arid: 0.088, cold: -0.175 }
         accessibility:
-          urbanDensity: 0.05
+          urbanDensity: 0.088
     strength:
       base: { depth: 0.07 }
       conditions:
         affinity:
-          climate: { cold: 0.25, temperate: 0.05, tropical: -0.15, arid: -0.05 }
+          climate: { cold: 0.438, temperate: 0.088, tropical: -0.263, arid: -0.088 }
         accessibility:
-          sportCulture: 0.15
+          sportCulture: 0.263
     precision:
       base: { accessibility: -0.02, depth: 0.01 }
       conditions:
         affinity:
-          wealth: 0.05
-          climate: { arid: 0.1 }
+          wealth: 0.088
+          climate: { arid: 0.175 }
     endurance:
       base: { accessibility: 0.05, depth: 0.03 }
       conditions:
         affinity:
-          climate: { temperate: 0.15, cold: 0.05, tropical: -0.1, arid: -0.05 }
-          wealth: -0.1
-          urbanDensity: -0.08
+          climate: { temperate: 0.263, cold: 0.088, tropical: -0.175, arid: -0.088 }
+          wealth: -0.175
+          urbanDensity: -0.14
 
   footprint:
     small:
       base: { accessibility: 0.03, depth: -0.05 }
       conditions:
         accessibility:
-          urbanDensity: 0.2
+          urbanDensity: 0.35
     medium:
       base: {}
       conditions:
         accessibility:
-          urbanDensity: -0.1
+          urbanDensity: -0.175
         depth:
-          wealth: 0.1
+          wealth: 0.175
     large:
       base: { accessibility: -0.02, depth: 0.03 }
       conditions:
         accessibility:
-          urbanDensity: -0.25
+          urbanDensity: -0.438
         affinity:
-          climate: { temperate: 0.05, arid: -0.05 }
+          climate: { temperate: 0.088, arid: -0.088 }
 
   contact:
     none:
       base: { accessibility: 0.03, depth: -0.03 }
       conditions:
         accessibility:
-          wealth: 0.1
+          wealth: 0.175
         affinity:
-          sportCulture: -0.1
+          sportCulture: -0.175
     incidental:
       base: { accessibility: 0, depth: 0 }
       conditions:
         affinity:
-          sportCulture: 0.05
+          sportCulture: 0.088
         accessibility:
-          wealth: -0.1
+          wealth: -0.175
     full:
       base: { accessibility: -0.03, depth: 0.05 }
       conditions:
         accessibility:
-          wealth: -0.2
+          wealth: -0.35
         affinity:
-          sportCulture: 0.15
+          sportCulture: 0.263
 
   teamSize:
     small:
       base: { accessibility: 0.03, depth: -0.05 }
       conditions:
         affinity:
-          sportCulture: -0.1
+          sportCulture: -0.175
         accessibility:
-          mediaMarket: -0.05
+          mediaMarket: -0.088
     medium:
       base: { depth: 0.03 }
       conditions:
         accessibility:
-          urbanDensity: 0.1
+          urbanDensity: 0.175
     large:
       base: { accessibility: -0.02, depth: 0.03 }
       conditions:
         accessibility:
-          urbanDensity: 0.1
+          urbanDensity: 0.175
         affinity:
-          sportCulture: 0.1
+          sportCulture: 0.175
 
   matchLength:
     short:
       base: { accessibility: 0.05, depth: -0.12 }
       conditions:
         accessibility:
-          mediaMarket: 0.05
+          mediaMarket: 0.088
         affinity:
-          urbanDensity: 0.2
+          urbanDensity: 0.35
     standard:
       base: { depth: 0.0 }
       conditions:
         depth:
-          sportCulture: 0.06
+          sportCulture: 0.105
         accessibility:
-          mediaMarket: -0.1
-          wealth: -0.12
+          mediaMarket: -0.175
+          wealth: -0.21
     long:
       base: { accessibility: 0, depth: 0.12 }
       conditions:
         affinity:
-          wealth: 0.15
-          climate: { tropical: -0.1, arid: -0.1 }
+          wealth: 0.263
+          climate: { tropical: -0.175, arid: -0.175 }
 
   scoring:
     low:
       base: { accessibility: -0.03, depth: 0.03 }
       conditions:
         affinity:
-          sportCulture: 0.15
+          sportCulture: 0.263
     medium:
       base: { depth: 0.01 }
       conditions:
         accessibility:
-          sportCulture: -0.1
+          sportCulture: -0.175
     high:
       base: { accessibility: 0.08, depth: -0.11 }
       conditions:
         accessibility:
-          mediaMarket: 0.1
-          urbanDensity: 0.1
+          mediaMarket: 0.175
+          urbanDensity: 0.175
         affinity:
-          sportCulture: -0.15
+          sportCulture: -0.263
 
   complexity:
     simple:
       base: { accessibility: 0.13, depth: -0.13 }
       conditions:
         affinity:
-          wealth: -0.1
+          wealth: -0.175
     moderate:
       base: { depth: -0.02 }
       conditions:
         accessibility:
-          wealth: -0.1
+          wealth: -0.175
         affinity:
-          urbanDensity: -0.05
+          urbanDensity: -0.088
     intricate:
       base: { accessibility: -0.11, depth: 0.1 }
       conditions:
         affinity:
-          wealth: 0.1
-          sportCulture: 0.1
+          wealth: 0.175
+          sportCulture: 0.175
 
   structure:
     continuous:
       base: { accessibility: 0.04, depth: 0.05 }
       conditions:
         affinity:
-          climate: { tropical: -0.1, cold: 0.05, arid: -0.1 }
-          urbanDensity: -0.08
+          climate: { tropical: -0.175, cold: 0.088, arid: -0.175 }
+          urbanDensity: -0.14
         accessibility:
-          mediaMarket: -0.05
-          wealth: -0.05
+          mediaMarket: -0.088
+          wealth: -0.088
     stop-start:
       base: { accessibility: 0.06, depth: -0.1 }
       conditions:
         accessibility:
-          mediaMarket: 0.1
+          mediaMarket: 0.175
         affinity:
           climate: { tropical: 0 }
-          urbanDensity: 0.15
+          urbanDensity: 0.263
     innings:
       base: { accessibility: -0.04, depth: 0 }
       conditions:
         affinity:
-          climate: { tropical: 0.05, arid: 0.05, cold: -0.1, temperate: -0.05 }
+          climate: { tropical: 0.088, arid: 0.088, cold: -0.175, temperate: -0.088 }
           wealth: 0
 
 # Quick-start genome templates (GDD Onboarding). The first preset is the default genome when a

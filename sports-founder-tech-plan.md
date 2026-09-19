@@ -54,6 +54,7 @@ surface before playtesting or during it.
 | 2026-09-18 | Win condition built: #1 held 36 turns at PP tier 5 (GDD v1.7); winning never ends a campaign; save format 6 | Decided |
 | 2026-09-18 | Rivals hold their ground: real starting shares are each rival's home level (GDD v1.7) | Decided |
 | 2026-09-18 | The hard-anchor criterion counts wins, with the builder bot in the default bot list; pacing adds the first win (target turn 180) | Decided |
+| 2026-09-18 | Genome condition deltas scaled ×1.75 (base deltas untouched): steeper geography restores differentiation to 6/6 after rivals stopped filling rival-thin markets | Tuning |
 
 ---
 
