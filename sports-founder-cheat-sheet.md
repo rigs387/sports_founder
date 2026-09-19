@@ -14,8 +14,9 @@ the top (operator era). The sim always steps quarterly underneath. Turns always 
 health moves at most one step per turn, so collapse always gets a warning turn.
 
 **Win Condition:** #1 sport by global Fandom Score (hardcore + weighted casual fans, raw
-population), held for X turns. Play continues past the win: legacy goals, rivals can retake #1,
-anchor collapse no longer ends the run, and a Retire option plays a final retrospective.
+population), held for X turns (36) at PP tier 5 — a turn below #1 or below tier 5 restarts the
+hold. Play continues past the win: legacy goals, rivals can retake #1, anchor collapse no longer
+ends the run, and a Retire option plays a final retrospective.
 
 **Fan Model:** Per country, per sport: Uninterested → Casual (non-exclusive, churns) → Hardcore
 (exclusive, sticky; lost only by demotion to casual through specific causes). Poaching is slow and
@@ -68,7 +69,9 @@ using a closed list of effect types. Negative events grow with tier.
 **Rivals:** Real-world sports, present day — soccer, cricket, basketball, American football,
 baseball, ice hockey, rugby, combat sports, plus a passive "other" bucket. Defense budgets,
 per-country escalation (Watching → Defending → Entrenched), closed countermove list. Real sport
-names; generic leagues/orgs/teams, all in one moddable names file.
+names; generic leagues/orgs/teams, all in one moddable names file. Rivals hold their ground: their
+real starting shares are home, they never spread or grow past it on their own, and they lose ground
+only to the player.
 
 **Rules Evolution:** PP cost, seasonal window only, max 1/year. Backlash scales with hardcore base
 and rule age (tradition). Global rulebook. Proposals from player, broadcasters, sponsors,

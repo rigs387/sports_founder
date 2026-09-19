@@ -167,7 +167,8 @@ export function invariantsOf(state: GameState, world: World): string[] {
         problems.push(`${country.id}: league formed in the future`);
       }
     }
-    if (index === anchorIndex && state.outcome === null && league === null) {
+    // Before the win an anchor collapse ends the campaign; after it the anchor may lose its league.
+    if (index === anchorIndex && state.outcome === null && state.win.won === null && !league) {
       problems.push(`the anchor has no league but the campaign has not ended`);
     }
 
@@ -199,6 +200,18 @@ export function invariantsOf(state: GameState, world: World): string[] {
     }
   });
 
+  if (state.win.turnsHeld > 0 && !state.win.atTop) {
+    problems.push(`the win hold is ${state.win.turnsHeld} turn(s) but the sport is not #1`);
+  }
+  const won = state.win.won;
+  if (won !== null && (won.turn >= state.turn || won.quarter > state.quarter)) {
+    problems.push(`the win is dated turn ${won.turn}, quarter ${won.quarter}, in the future`);
+  }
+  if (won !== null && state.outcome !== null) {
+    problems.push(
+      "the campaign ended after the win, but winning makes an anchor collapse survivable",
+    );
+  }
   if (state.outcome !== null && state.outcome.countryId !== state.anchorCountryId) {
     problems.push(`the campaign ended on "${state.outcome.countryId}", which is not the anchor`);
   }

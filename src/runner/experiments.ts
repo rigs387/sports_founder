@@ -145,6 +145,14 @@ export function runCollapse(
 export interface HardAnchorBotResult {
   bot: BotId;
   campaigns: number;
+  /** Campaigns that won (GDD Win condition), and the turn each win landed, in seed order. */
+  wins: number;
+  winTurns: number[];
+  medianWinTurn: number | null;
+  /** Campaigns that ended at least one turn at #1, whether or not they held it. */
+  reachedFirst: number;
+  /** The player's final rank by global Fandom Score, counted per campaign. */
+  finalRanks: Record<string, number>;
   collapses: number;
   peakTiers: Record<string, number>;
   bestPeakTier: number;
@@ -157,6 +165,9 @@ export interface HardAnchorReport {
   seeds: number[];
   turns: number;
   bots: HardAnchorBotResult[];
+  /** "Hard anchors are winnable": the best bot wins some of the time. */
+  bestBot: BotId | null;
+  passed: boolean;
 }
 
 export function runHardAnchor(
@@ -164,34 +175,47 @@ export function runHardAnchor(
   settings: { anchor: string; bots: BotId[]; seeds: number[]; turns: number },
   onCampaign?: OnCampaign,
 ): HardAnchorReport {
+  const bots = settings.bots.map((bot): HardAnchorBotResult => {
+    const results = settings.seeds.map((seed) => {
+      const played = randomGenomeCampaign(world, seed, settings.anchor, bot, settings.turns);
+      onCampaign?.(played);
+      return played.result;
+    });
+    const winTurns = results.map((r) => r.wonTurn).filter((t): t is number => t !== null);
+    return {
+      bot,
+      campaigns: results.length,
+      wins: winTurns.length,
+      winTurns,
+      medianWinTurn: median(winTurns),
+      reachedFirst: results.filter((r) => r.firstTopTurn !== null).length,
+      finalRanks: countBy(results.map((r) => r.player.rank)),
+      collapses: results.filter((r) => r.collapsed).length,
+      peakTiers: countBy(results.map((r) => r.peakTier)),
+      bestPeakTier: Math.max(0, ...results.map((r) => r.peakTier)),
+      medianTurnsSurvived: median(results.map((r) => r.turnsPlayed)),
+      survivedAllTurns: results.filter((r) => !r.collapsed).length,
+    };
+  });
+  const best = [...bots].sort(
+    (a, b) => b.wins / Math.max(1, b.campaigns) - a.wins / Math.max(1, a.campaigns),
+  )[0];
   return {
     anchor: settings.anchor,
     seeds: settings.seeds,
     turns: settings.turns,
-    bots: settings.bots.map((bot) => {
-      const results = settings.seeds.map((seed) => {
-        const played = randomGenomeCampaign(world, seed, settings.anchor, bot, settings.turns);
-        onCampaign?.(played);
-        return played.result;
-      });
-      return {
-        bot,
-        campaigns: results.length,
-        collapses: results.filter((r) => r.collapsed).length,
-        peakTiers: countBy(results.map((r) => r.peakTier)),
-        bestPeakTier: Math.max(0, ...results.map((r) => r.peakTier)),
-        medianTurnsSurvived: median(results.map((r) => r.turnsPlayed)),
-        survivedAllTurns: results.filter((r) => !r.collapsed).length,
-      };
-    }),
+    bots,
+    bestBot: best && best.wins > 0 ? best.bot : null,
+    passed: bots.some((bot) => bot.wins > 0),
   };
 }
 
 // ---- Pacing --------------------------------------------------------------------------------
 
 export interface PacingTier {
-  tier: number;
-  /** GDD campaign budget: cumulative turns to reach this tier. */
+  /** A PP tier, or "win" for the first win (GDD campaign length: ~180 turns to the first win). */
+  tier: number | "win";
+  /** GDD campaign budget: cumulative turns to reach this tier, or to win. */
   targetTurn: number;
   allowedRange: [number, number];
   reached: number;
@@ -226,11 +250,17 @@ export function runPacing(
   );
   const tiers: PacingTier[] = [];
   let cumulative = 0;
-  for (let tier = 2; tier <= world.config.ppTiers.length; tier += 1) {
-    cumulative += turnsInTier[tier - 2] ?? 0;
+  const topTier = world.config.ppTiers.length;
+  // turnsInTier holds the turns spent in tiers 1 to top − 1, then the turns in the top tier until
+  // the first win.
+  for (let step = 2; step <= topTier + 1; step += 1) {
+    const inTier = turnsInTier[step - 2];
+    if (inTier === undefined) break;
+    cumulative += inTier;
+    const tier = step <= topTier ? step : "win";
     const arrivals = results
-      .map((r) => r.tierReached[tier]?.turnsCompleted)
-      .filter((t): t is number => t !== undefined);
+      .map((r) => (tier === "win" ? r.wonTurn : r.tierReached[tier]?.turnsCompleted))
+      .filter((t): t is number => t !== undefined && t !== null);
     const low = Math.round(cumulative * (1 - pacingTolerance));
     const high = Math.round(cumulative * (1 + pacingTolerance));
     const medianTurn = arrivals.length * 2 > results.length ? median(arrivals) : null;
@@ -498,6 +528,8 @@ export interface BenchmarkReport {
   anchor: string;
   bot: BotId;
   targetYears: number;
+  /** The turn the benchmark campaign won, or null if it had not won by the end. */
+  wonTurn: number | null;
   /** Seeds tried until one campaign lasted the full span, with how each attempt ended. */
   attempts: { seed: number; yearsPlayed: number; collapsed: boolean }[];
   completed: boolean;
@@ -540,6 +572,7 @@ export function runBenchmark(
     anchor: settings.anchor,
     bot: settings.bot,
     targetYears: settings.years,
+    wonTurn: null,
     attempts,
     completed: false,
     turnsPlayed: 0,
@@ -569,6 +602,7 @@ export function runBenchmark(
     return {
       ...empty,
       completed: true,
+      wonTurn: state.win.won?.turn ?? null,
       turnsPlayed: state.turn - 1,
       yearsPlayed: years,
       simulateMs,

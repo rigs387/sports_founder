@@ -72,8 +72,10 @@ Usage: npm run sim -- [options]
                                         naive bot named in config, which plays
                                         balanceTargets.naiveBotCollapseSeeds seeds per anchor (or
                                         --campaigns if higher)
-                       hard-anchor      outcomes from the hardest anchor, per bot
-                       pacing           turns to each PP tier against the GDD budget table
+                       hard-anchor      wins from the hard anchor, per bot; the best bot must
+                                        win some of the time
+                       pacing           turns to each PP tier and to the first win against the
+                                        GDD budget table
                        options          per-option and per-growth-node outcomes from random
                                         genomes, per anchor (no option or node in more than 40%
                                         of top-quartile runs)
@@ -86,8 +88,8 @@ Usage: npm run sim -- [options]
                      spread across the population range; pacing, the same sample drawn from
                      typical-size markets (balanceTargets.pacingAnchorPopulationQuantiles);
                      options, the median-population country of each climate
-  --bots <ids>       bots for collapse and hard-anchor (default:
-                     greedy-spread,anchor-turtle,media-rush,random) and rivals (default:
+  --bots <ids>       bots for collapse (default: greedy-spread,anchor-turtle,media-rush,random),
+                     and for hard-anchor and rivals (default:
                      greedy-spread,builder,anchor-turtle,media-rush,random)
   --hard-anchor <id> anchor for hard-anchor (default: config balanceTargets.hardAnchor)
   --presets <ids>    presets for differentiation (default: all)
@@ -208,13 +210,16 @@ function printCollapse(report: CollapseReport): void {
 
 function printHardAnchor(report: HardAnchorReport): void {
   console.log(
-    `\nHard anchor ${report.anchor}: ${report.seeds.length} seed(s) per bot, random genomes, up to ${report.turns} turns. No win condition exists yet; peak PP tier stands in.`,
+    `\nHard anchor ${report.anchor}: ${report.seeds.length} seed(s) per bot, random genomes, up to ${report.turns} turns`,
   );
   for (const bot of report.bots) {
     console.log(
-      `  ${bot.bot.padEnd(14)} collapsed ${bot.collapses}/${bot.campaigns}; median turns played ${fmt(bot.medianTurnsSurvived)}; best peak tier ${bot.bestPeakTier}; peak tiers ${JSON.stringify(bot.peakTiers)}`,
+      `  ${bot.bot.padEnd(14)} won ${bot.wins}/${bot.campaigns} (median win turn ${fmt(bot.medianWinTurn)}); reached #1 in ${bot.reachedFirst}; final ranks ${JSON.stringify(bot.finalRanks)}; collapsed ${bot.collapses}/${bot.campaigns}; median turns played ${fmt(bot.medianTurnsSurvived)}; peak tiers ${JSON.stringify(bot.peakTiers)}`,
     );
   }
+  console.log(
+    `  Hard anchors are winnable: ${report.passed ? `PASSED (best bot ${report.bestBot})` : "FAILED (no bot won)"}`,
+  );
 }
 
 function printPacing(report: PacingReport): void {
@@ -223,7 +228,7 @@ function printPacing(report: PacingReport): void {
   );
   for (const tier of report.tiers) {
     console.log(
-      `  ${passFail(tier.withinTolerance)} tier ${tier.tier}: target turn ${tier.targetTurn} (allowed ${tier.allowedRange[0]}–${tier.allowedRange[1]}); median ${fmt(tier.medianTurn)}; reached ${tier.reached}/${tier.of}`,
+      `  ${passFail(tier.withinTolerance)} ${tier.tier === "win" ? "first win" : `tier ${tier.tier}`}: target turn ${tier.targetTurn} (allowed ${tier.allowedRange[0]}–${tier.allowedRange[1]}); median ${fmt(tier.medianTurn)}; reached ${tier.reached}/${tier.of}`,
     );
   }
   console.log(`  Pacing criterion: ${report.passed ? "PASSED" : "FAILED"}`);
@@ -334,6 +339,10 @@ function printRivalActivity(agg: ReturnType<typeof aggregate>): void {
   console.log(
     `  Peak player hardcore share of any country (per campaign): min ${share(peak.min)}, p10 ${share(peak.p10)}, median ${share(peak.median)}, p90 ${share(peak.p90)}, max ${share(peak.max)}; above 25% in ${peak.above25Percent}/${agg.campaigns}, above 50% in ${peak.above50Percent}/${agg.campaigns}`,
   );
+  const wins = agg.wins;
+  console.log(
+    `  Wins: ${wins.won}/${agg.campaigns}; win turn median ${fmt(wins.turn.median)} (p10 ${fmt(wins.turn.p10)}, p90 ${fmt(wins.turn.p90)}), in-game years median ${fmt(wins.years.median)}; reached #1 in ${wins.reachedFirst}/${agg.campaigns}, first at turn median ${fmt(wins.firstTopTurn.median)}; longest win hold median ${fmt(wins.longestTopStreak.median)}, max ${fmt(wins.longestTopStreak.max)} turns; #1 lost ${wins.rankOneLosses} time(s); anchor collapses after a win ${wins.birthplaceOutlived}`,
+  );
   const overtake = agg.anchorOvertakeYears;
   console.log(
     `  Years until the player's hardcore fans outnumber every rival's in the anchor: overtook in ${overtake.overtook}/${overtake.of}; median ${overtake.median === null ? "-" : overtake.median.toFixed(1)}, p10 ${overtake.p10 === null ? "-" : overtake.p10.toFixed(1)}, p90 ${overtake.p90 === null ? "-" : overtake.p90.toFixed(1)}`,
@@ -361,7 +370,7 @@ function printBenchmark(report: BenchmarkReport): void {
     return;
   }
   console.log(
-    `  ${report.turnsPlayed} turns in ${report.simulateMs.toFixed(0)} ms; save ${(report.saveBytes / 1024).toFixed(0)} KB uncompressed JSON; serialize ${report.serializeMs.toFixed(0)} ms; load ${report.loadMs.toFixed(0)} ms; ${report.landmarks} landmarks; ${report.yearlySnapshots} yearly snapshots`,
+    `  ${report.turnsPlayed} turns in ${report.simulateMs.toFixed(0)} ms; ${report.wonTurn === null ? "no win" : `won on turn ${report.wonTurn}`}; save ${(report.saveBytes / 1024).toFixed(0)} KB uncompressed JSON; serialize ${report.serializeMs.toFixed(0)} ms; load ${report.loadMs.toFixed(0)} ms; ${report.landmarks} landmarks; ${report.yearlySnapshots} yearly snapshots`,
   );
 }
 
@@ -503,9 +512,19 @@ function main(): number {
         break;
       }
       case "hard-anchor": {
+        // "The best bot wins from the hard anchor", so the competent builder bot plays too.
+        const hardAnchorBots = checkBots(
+          listOf(values.bots) ?? [
+            "greedy-spread",
+            "builder",
+            "anchor-turtle",
+            "media-rush",
+            "random",
+          ],
+        );
         const report = runHardAnchor(
           world,
-          { anchor: hardAnchor, bots, seeds, turns },
+          { anchor: hardAnchor, bots: hardAnchorBots, seeds, turns },
           collect(false),
         );
         writeReport("hard-anchor", report);

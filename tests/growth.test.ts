@@ -78,7 +78,6 @@ function quiet(w: World, keep: "casual" | "churn" | "hardcore" | "none"): World 
   return withConfig(w, (config) => {
     config.dynamics.noise = 0;
     config.dynamics.rival = {
-      casualConversionRate: 0,
       casualChurnRate: 0,
       hardcoreConversionRate: 0,
     };
@@ -259,14 +258,17 @@ describe("each growth node effect changes what it names by the configured amount
   it("countermove resistance: a rival's media blitz boost there shrinks by the amount", () => {
     const w = withConfig(treeWorld([{ type: "countermoveResistance", amount: 0.4 }]), (config) => {
       config.dynamics.noise = 0;
-      config.dynamics.rival.casualChurnRate = 0;
       config.dynamics.rival.hardcoreConversionRate = 0;
       config.poaching.rate = 0;
       config.turnover.annualRate = 0;
       config.rivalAI.movesPerQuarter = 0;
     });
     const rivalIndex = 1;
-    const base = createCampaign(w, setupFor(1, ANCHOR));
+    // The rival has lost every casual fan there, so it converts with no churn to net against.
+    const base = withCountry(createCampaign(w, setupFor(1, ANCHOR)), w, ANCHOR, (c) => ({
+      ...c,
+      fans: c.fans.map((f, i) => (i === rivalIndex ? { ...f, casual: 0 } : f)),
+    }));
     const blitz: ActiveCountermove = { kind: "mediaBlitz", sportId: RIVAL, endQuarter: 99 };
     const blitzed = withCountry(base, w, ANCHOR, (c) => ({ ...c, countermoves: [blitz] }));
     const plain = change(w, base, ANCHOR, rivalIndex).casual;

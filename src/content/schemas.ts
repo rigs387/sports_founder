@@ -424,7 +424,6 @@ export const configFileSchema = z.strictObject({
       hardcoreConversionRate: z.number().min(0),
     }),
     rival: z.strictObject({
-      casualConversionRate: rate,
       casualChurnRate: rate,
       hardcoreConversionRate: rate,
     }),
@@ -542,6 +541,7 @@ export const configFileSchema = z.strictObject({
     demotionTurns: z.int().min(1),
     cooldownTurns: z.int().min(0),
   }),
+  win: z.strictObject({ holdTurns: z.int().min(1), requiredTier: z.int().min(1) }),
   balanceTargets: z.strictObject({
     differentiationTopN: z.int().min(1),
     differentiationSharedShare: unitInterval,

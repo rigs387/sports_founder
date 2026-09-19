@@ -1,5 +1,5 @@
 import { tierEntry } from "./calendar";
-import { playerFandomScore, sportTotals } from "./fandom";
+import { playerFandomScore } from "./fandom";
 import { leagueTierIndex } from "./leagues";
 import { landmarks } from "./records";
 import {
@@ -9,6 +9,7 @@ import {
   type TierTrack,
   type World,
 } from "./types";
+import { standing } from "./win";
 
 // PP tier track (GDD Global PP Tier Track). Tier-ups need the Fandom Score threshold and the
 // tier's breadth condition; they are announced telegraphTurns ahead and then happen regardless.
@@ -17,10 +18,7 @@ import {
 
 /** The player's rank by Fandom Score among modeled sports (player + rivals), 1 = first. */
 export function playerRank(state: Pick<GameState, "sports" | "countries">, world: World): number {
-  const totals = sportTotals(state, world).filter((sport) => sport.kind !== "other");
-  const player = totals[PLAYER_INDEX];
-  if (!player) return totals.length;
-  return 1 + totals.filter((sport) => sport.fandomScore > player.fandomScore).length;
+  return standing(state, world).rank;
 }
 
 /** Progress toward a breadth condition: 1 or more means met. */

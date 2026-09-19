@@ -83,6 +83,8 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   let ppSpentOnNodes = 0;
   const ppTimeline: CampaignResult["ppTimeline"] = [];
   let anchorOvertakeYears: number | null = null;
+  let firstTopTurn: number | null = null;
+  let longestTopStreak = 0;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
   const observe = (current: GameState, turn: number) => {
@@ -156,6 +158,8 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     const snap = snapshot(state, world);
     const player = snap.sports.find((sport) => sport.kind === "player");
     if (!player) throw new Error("Snapshot has no player sport");
+    if (snap.win.rank === 1 && firstTopTurn === null) firstTopTurn = t + 1;
+    longestTopStreak = Math.max(longestTopStreak, snap.win.turnsHeld);
     const anchorSnap = snap.countries[anchorIndex];
     const anchorLeague = anchorSnap?.league ?? null;
     turnRows.push({
@@ -177,6 +181,8 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       playerHardcore: player.hardcore,
       playerFandomScore: player.fandomScore,
       anchorPlayerHardcoreShare: (anchorSnap?.hardcore ?? 0) / anchorPopulation,
+      playerRank: snap.win.rank,
+      turnsHeld: snap.win.turnsHeld,
       nodesOwned: state.growthNodes.length,
       ppSpentOnNodes,
       rivals: rivalSports.map((sport, r) => ({
@@ -275,6 +281,12 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       finalYear: snap.year,
       collapsed: state.outcome !== null,
       collapseTurn: state.outcome?.turn ?? null,
+      firstTopTurn,
+      wonTurn: state.win.won?.turn ?? null,
+      wonYears: state.win.won ? state.win.won.quarter / QUARTERS_PER_YEAR : null,
+      longestTopStreak,
+      rankOneLosses: count("rankOneLost"),
+      birthplaceOutlived: count("birthplaceOutlived"),
       ppTier: state.ppTier,
       peakTier: state.tierTrack.peakTier,
       pp: state.pp,
@@ -283,7 +295,8 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       promotions: count("leaguePromoted"),
       stepDowns: count("leagueSteppedDown"),
       leaguesFormed: count("leagueFormed"),
-      leaguesFolded: count("leagueFolded"),
+      // A post-win anchor collapse folds the anchor's league like any other.
+      leaguesFolded: count("leagueFolded") + count("birthplaceOutlived"),
       tierDemotions: count("ppTierDown"),
       leaguesAtEnd: snap.countries.filter((c) => c.league !== null).length,
       anchorLeagueTier: state.countries[anchorIndex]?.league?.tier ?? null,

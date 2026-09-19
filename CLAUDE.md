@@ -85,7 +85,15 @@ runs/                 Runner and smoke-test output (git-ignored)
   change and countermove as a landmark. Rival genomes are campaign state. Budgets never appear in
   the `TurnSnapshot`.
 - Every player action goes through `applyAction` in `src/sim/actions.ts`; bots use the same path.
-- An anchor league collapse sets `outcome` and ends the campaign; `endTurn` refuses to continue.
+- An anchor league collapse before the win sets `outcome` and ends the campaign; `endTurn` refuses
+  to continue.
+- The win lives in `GameState.win` (`src/sim/win.ts`), never in `outcome`: winning must not end a
+  campaign. Checked once per turn after the tier track: #1 by global Fandom Score held
+  `win.holdTurns` turns at PP tier `win.requiredTier`. After the win an anchor collapse folds the
+  league and records a `birthplaceOutlived` landmark instead of ending the game.
+- Rivals hold their ground: each rival's real starting shares in a country are its home level
+  (`src/sim/quarter.ts`). They never spread or grow past it on their own; only the player's
+  poaching and their own countermoves move them.
 
 ## Steam
 - Steam is deferred until the game is playable. Do not add steamworks.js, a Steam adapter, or

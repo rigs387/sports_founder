@@ -371,11 +371,14 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
       "must be shorter than strugglingRunwayQuarters",
     );
   }
-  if (world.config.balanceTargets.turnsInTier.length < tiers.length - 1) {
+  if (!tiers.some((tier) => tier.tier === world.config.win.requiredTier)) {
+    issue(sources.config, "win.requiredTier", "must be one of the PP tiers in ppTiers");
+  }
+  if (world.config.balanceTargets.turnsInTier.length !== tiers.length) {
     issue(
       sources.config,
       "balanceTargets.turnsInTier",
-      `needs a target for each of the first ${tiers.length - 1} tiers`,
+      `needs ${tiers.length} targets: turns in each of the first ${tiers.length - 1} tiers, then turns in the top tier until the first win`,
     );
   }
   LEAGUE_TIERS.forEach((leagueTier, i) => {

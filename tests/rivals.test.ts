@@ -116,6 +116,38 @@ const withMove = (state: GameState, w: World, countryId: string, move: ActiveCou
     countermoves: [...country.countermoves, move],
   }));
 
+describe("rivals hold their ground", () => {
+  it("left alone for a century, every rival stays at its real starting level", () => {
+    // The player's sport never grows, so nothing pulls on the rivals or provokes a countermove.
+    const w = withConfig(world, (config) => {
+      config.dynamics.player.casualConversionRate = 0;
+      config.dynamics.player.hardcoreConversionRate = 0;
+    });
+    const start = createCampaign(w, setupFor(1, ANCHOR_COUNTRY));
+    let state = start;
+    for (let q = 0; q < 400; q += 1) state = stepQuarter(state, w);
+    const before = sportTotals(start, w);
+    const after = sportTotals(state, w);
+    for (const [i, sport] of before.entries()) {
+      if (sport.kind !== "rival") continue;
+      const now = after[i];
+      // Rounding whole fans can land a handful above home; never more than that.
+      expect((now?.hardcore ?? 0) / sport.hardcore, sport.sportId).toBeLessThan(1.000001);
+      expect((now?.hardcore ?? 0) / sport.hardcore, sport.sportId).toBeGreaterThan(0.99);
+      expect((now?.fandomScore ?? 0) / sport.fandomScore, sport.sportId).toBeCloseTo(1, 2);
+    }
+    // No rival spreads into countries where the real data gives it nobody.
+    state.countries.forEach((country, index) => {
+      const home = w.countries[index]?.startingRivalFans ?? {};
+      for (const fans of country.fans) {
+        if (state.sports.find((s) => s.id === fans.sportId)?.kind !== "rival") continue;
+        if ((home[fans.sportId]?.casual ?? 0) + (home[fans.sportId]?.hardcore ?? 0) > 0) continue;
+        expect(fans.casual + fans.hardcore, `${fans.sportId} in ${country.countryId}`).toBe(0);
+      }
+    });
+  });
+});
+
 describe("escalation ladder", () => {
   const start = () => createCampaign(world, setupFor(1, ANCHOR_COUNTRY));
   const strongGains = { [ANCHOR_COUNTRY]: perQuarter(world, ANCHOR_COUNTRY, 0.01) };
@@ -318,13 +350,17 @@ describe("each countermove has its effect", () => {
   it("a media blitz raises only that rival's casual conversion there, by the configured boost", () => {
     const w = withConfig(world, (config) => {
       config.dynamics.noise = 0;
-      config.dynamics.rival.casualChurnRate = 0;
       config.dynamics.rival.hardcoreConversionRate = 0;
       config.poaching.rate = 0;
       config.turnover.annualRate = 0;
       config.rivalAI.movesPerQuarter = 0;
     });
-    const base = createCampaign(w, setupFor(1, ANCHOR_COUNTRY));
+    // The rival has lost every casual fan there, so it converts with no churn to net against (a
+    // rival at its home level converts exactly as many as churn away).
+    const base = withCountry(createCampaign(w, setupFor(1, ANCHOR_COUNTRY)), w, target, (c) => ({
+      ...c,
+      fans: c.fans.map((f) => (f.sportId === RIVAL ? { ...f, casual: 0 } : f)),
+    }));
     const blitzed = withMove(base, w, target, blitz);
     const plain = change(w, base, RIVAL).casual;
     const boosted = change(w, blitzed, RIVAL).casual;
@@ -339,13 +375,21 @@ describe("each countermove has its effect", () => {
   it("youth programs raise only that rival's hardcore conversion there, by the configured boost", () => {
     const w = withConfig(world, (config) => {
       config.dynamics.noise = 0;
-      config.dynamics.rival.casualConversionRate = 0;
       config.dynamics.rival.casualChurnRate = 0;
       config.poaching.rate = 0;
       config.turnover.annualRate = 0;
       config.rivalAI.movesPerQuarter = 0;
     });
-    const base = createCampaign(w, setupFor(1, ANCHOR_COUNTRY));
+    // The rival has lost half its hardcore fans there to casual: it rebuilds only below its home
+    // level.
+    const base = withCountry(createCampaign(w, setupFor(1, ANCHOR_COUNTRY)), w, target, (c) => ({
+      ...c,
+      fans: c.fans.map((f) => {
+        if (f.sportId !== RIVAL) return f;
+        const lost = Math.floor(f.hardcore / 2);
+        return { ...f, casual: f.casual + lost, hardcore: f.hardcore - lost };
+      }),
+    }));
     const plain = change(w, base, RIVAL).hardcore;
     const boosted = change(w, withMove(base, w, target, youth), RIVAL).hardcore;
     expect(plain).toBeGreaterThan(1_000);

@@ -51,6 +51,9 @@ surface before playtesting or during it.
 | 2026-09-15 | The hard-anchor criterion runs on `balanceTargets.hardAnchor` (Tuvalu), not the smallest market | Decided |
 | 2026-09-15 | Content validation rejects a market whose hardcore shares exceed `worldChecks.maxSportCulture` (0.75) | Decided |
 | 2026-09-16 | Rebalanced for the real world: language and media spread weights cut (65 language links per market against 5 neighbours), tier 4 and tier 5 Fandom Score thresholds raised to the GDD turn budget | Decided |
+| 2026-09-18 | Win condition built: #1 held 36 turns at PP tier 5 (GDD v1.7); winning never ends a campaign; save format 6 | Decided |
+| 2026-09-18 | Rivals hold their ground: real starting shares are each rival's home level (GDD v1.7) | Decided |
+| 2026-09-18 | The hard-anchor criterion counts wins, with the builder bot in the default bot list; pacing adds the first win (target turn 180) | Decided |
 
 ---
 
@@ -91,9 +94,10 @@ starting targets (thresholds adjustable as data arrives):
 - **No safe anchor:** every anchor country has a nonzero collapse rate under a naive strategy,
   judged on the sampled anchors (decided 2026-09-15).
 - **Hard anchors are winnable:** the best bot wins from Tuvalu (config
-  `balanceTargets.hardAnchor`) some of the time.
-- **Pacing:** time to each PP tier falls within ±30% of the GDD campaign budget table, measured on
-  typical-size anchors (the middle half of countries by population); tiny and huge anchors are
+  `balanceTargets.hardAnchor`) some of the time. A win is the GDD win condition: #1 held for
+  `win.holdTurns` turns at tier 5 (decided 2026-09-18).
+- **Pacing:** time to each PP tier, and to the first win (~180 turns), falls within ±30% of the GDD
+  campaign budget table, measured on typical-size anchors (the middle half of countries by population); tiny and huge anchors are
   harder by design (decided 2026-09-13).
 - **Rivals persist:** no rival is ever fully eliminated.
 - **Determinism:** identical seed and inputs produce identical complete state, including after a
@@ -180,7 +184,8 @@ These come from the GDD review. Items 1–4 must be specified before Phase 0 imp
 
 As of 2026-09-13, items 1–12 are resolved in the GDD, along with all original parking-lot items.
 Item 13 is resolved except commercial decisions (deferred by choice), competitor analysis
-(research), and music (postponed). The win-hold measure is to be confirmed in balance runs.
+(research), and music (postponed). The win-hold measure was confirmed in balance runs on
+2026-09-18: 36 turns at tier 5 (GDD v1.7).
 
 ---
 

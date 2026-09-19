@@ -19,6 +19,7 @@ import {
   type TimedCountermoveKind,
   type World,
 } from "./types";
+import { countsTowardHold, standing } from "./win";
 
 const QUARTERS_PER_YEAR = 4;
 
@@ -69,6 +70,23 @@ export interface TierTrackSnapshot {
   next: { tier: number; scoreProgress: number; breadthProgress: number } | null;
 }
 
+/** The race for #1 (GDD Win condition). */
+export interface WinSnapshot {
+  /** The player's rank by global Fandom Score among modeled sports, 1 = first. */
+  rank: number;
+  /** The rival with the highest Fandom Score. */
+  leadingRivalId: string | null;
+  /** Consecutive turns ended at #1 at the required PP tier so far: the win hold. */
+  turnsHeld: number;
+  /** Turns the hold must last to win, and the PP tier it must be held at. */
+  holdTurns: number;
+  requiredTier: number;
+  /** Whether this turn's standing counts toward the hold (#1 at the required tier). */
+  holding: boolean;
+  /** When the win landed, or null before it. Stays set if #1 is lost later. */
+  won: { turn: number; quarter: number } | null;
+}
+
 /** One growth tree node as the UI sees it (GDD PP Growth Tree). No text: the UI names it. */
 export interface GrowthNodeSnapshot {
   nodeId: string;
@@ -100,6 +118,7 @@ export interface TurnSnapshot {
   seasonalWindowOpen: boolean;
   tierTrack: TierTrackSnapshot;
   focus: (string | null)[];
+  win: WinSnapshot;
   outcome: GameOutcome | null;
   sports: SportTotals[];
   /** Same order as content. */
@@ -220,6 +239,18 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
       next: tierStatus(state, world).next,
     },
     focus: [...state.focus],
+    win: (() => {
+      const { rank, leadingRivalId } = standing(state, world);
+      return {
+        rank,
+        leadingRivalId,
+        turnsHeld: state.win.turnsHeld,
+        holdTurns: world.config.win.holdTurns,
+        requiredTier: world.config.win.requiredTier,
+        holding: countsTowardHold(rank, state.ppTier, world),
+        won: state.win.won,
+      };
+    })(),
     outcome: state.outcome,
     sports: sportTotals(state, world),
     countries,

@@ -96,6 +96,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     },
     focus,
     growthNodes: [],
+    win: { atTop: false, turnsHeld: 0, won: null },
     outcome: null,
     sports,
     // Rival genomes start from content and become campaign state (rule copying changes them).

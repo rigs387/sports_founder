@@ -134,11 +134,14 @@ describe("state stays valid", () => {
         hardcoreConversionRate: 1,
       };
       config.dynamics.rival = {
-        casualConversionRate: 1,
         casualChurnRate: 0,
         hardcoreConversionRate: 1,
       };
       config.exposure.cap = 1;
+      // Rivals only rebuild up to their home level, so the player fills the rest of the pie; with
+      // no hardcore losses it can.
+      config.turnover.annualRate = 0;
+      config.poaching.rate = 0;
     });
     const problems: string[] = [];
     const final = runTurns(createCampaign(extreme, setup), extreme, 60, (state) => {

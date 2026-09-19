@@ -51,6 +51,29 @@ export const landmarks = {
     countryId: string,
     leagueTier: LeagueTierId,
   ): Landmark => ({ kind: "anchorCollapse", turn, quarter, countryId, leagueTier }),
+  birthplaceOutlived: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    leagueTier: LeagueTierId,
+  ): Landmark => ({ kind: "birthplaceOutlived", turn, quarter, countryId, leagueTier }),
+  rankOneTaken: (turn: number, quarter: number): Landmark => ({
+    kind: "rankOneTaken",
+    turn,
+    quarter,
+  }),
+  rankOneLost: (turn: number, quarter: number, sportId: string): Landmark => ({
+    kind: "rankOneLost",
+    turn,
+    quarter,
+    sportId,
+  }),
+  won: (turn: number, quarter: number, heldTurns: number): Landmark => ({
+    kind: "won",
+    turn,
+    quarter,
+    heldTurns,
+  }),
   ppTierUp: (turn: number, quarter: number, from: number, to: number): Landmark => ({
     kind: "ppTierUp",
     turn,

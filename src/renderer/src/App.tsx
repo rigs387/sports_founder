@@ -84,6 +84,32 @@ export function App() {
             })}
           </p>
 
+          <p className="meta" data-testid="race" data-rank={snapshot.win.rank}>
+            {t(
+              snapshot.win.rank === 1
+                ? snapshot.win.won
+                  ? "win.top"
+                  : snapshot.win.holding
+                    ? "win.holding"
+                    : "win.topTooEarly"
+                : snapshot.win.won
+                  ? "win.retake"
+                  : "win.chasing",
+              {
+                count: snapshot.win.turnsHeld,
+                hold: snapshot.win.holdTurns,
+                rank: snapshot.win.rank,
+                leader: names?.sports[snapshot.win.leadingRivalId ?? ""] ?? "",
+                tier: snapshot.win.requiredTier,
+                name: t(`tiers.${snapshot.win.requiredTier}`),
+              },
+            )}
+          </p>
+          {snapshot.win.won && (
+            <p className="won" data-testid="won">
+              {t("win.won", { turn: snapshot.win.won.turn })}
+            </p>
+          )}
           {snapshot.outcome && (
             <p role="alert" className="game-over" data-testid="game-over">
               {t("campaign.over", {

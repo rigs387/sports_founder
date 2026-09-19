@@ -32,7 +32,6 @@ function onlyPoaching(base: World): World {
       hardcoreConversionRate: 0,
     };
     config.dynamics.rival = {
-      casualConversionRate: 0,
       casualChurnRate: 0,
       hardcoreConversionRate: 0,
     };

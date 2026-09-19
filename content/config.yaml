@@ -198,15 +198,17 @@ dynamics:
     # casual → hardcore: casual × rate × depth × affinity × crowding × share of people with no
     # hardcore sport × focus conversion bonus
     hardcoreConversionRate: 0.012
-  # Rivals drift slowly on their own; they have no spread and no affinity. Rival defense
-  # countermoves (rivalAI below) boost these rates where a rival defends.
-  #   uninterested → casual   uninterested × casualConversionRate × reach (casual + hardcore share)
+  # Rivals hold their ground (GDD Rival AI: rivals only drift slowly and react to the player). A
+  # rival's real starting shares in a country (content/countries.yaml) are its home level: with no
+  # spread and no affinity, its flows balance there, so left alone it stays where the data put it.
+  # Rival defense countermoves (rivalAI below) boost these flows where a rival defends.
+  #   uninterested → casual   uninterested × casualChurnRate × (home casual ÷ home uninterested)
   #                           × (1 + media blitz boost)
-  #   casual → uninterested   casual × casualChurnRate
+  #   casual → uninterested   casual × casualChurnRate (also how fast casual drifts back home)
   #   casual → hardcore       casual × hardcoreConversionRate × share of people with no hardcore
-  #                           sport × (1 + youth programs boost)
+  #                           sport × (1 − hardcore ÷ home hardcore, never below 0)
+  #                           × (1 + youth programs boost): only ground lost below home is rebuilt
   rival:
-    casualConversionRate: 0.02
     casualChurnRate: 0.01
     hardcoreConversionRate: 0.001
 
@@ -418,6 +420,19 @@ leagues:
 seasonalWindow:
   quarterOfYear: 3
 
+# Win condition (GDD Win condition, Post-win play): the player's sport wins by ending holdTurns
+# turns in a row as #1 by global Fandom Score among modeled sports (player + rivals; the "other"
+# bucket is not a sport) while at PP tier requiredTier or above (decided 2026-09-18: a Backyard Game
+# cannot be the world's sport). A turn short of either starts the hold again. Winning never ends the
+# campaign; after it, an anchor collapse is a Moment instead of the end.
+#
+# holdTurns sets when the first win lands: on typical anchors #1 arrives a few turns after tier 5,
+# and 36 puts the median first win at turn ~180 (GDD campaign length; measured 2026-09-18). Tier 5
+# turns are years, so the hold is about 36 years.
+win:
+  holdTurns: 36
+  requiredTier: 5
+
 # Headless balance targets (tech plan 2.1 exit criteria). Read by the runner only.
 balanceTargets:
   # Contrasting genomes share fewer than this share of their top-N countries by population share.
@@ -432,8 +447,9 @@ balanceTargets:
   dominanceZ: 1.645
   optionsGenomesPerAnchor: 250
   # Turns spent in each PP tier (GDD campaign length table), and the allowed deviation.
-  # Backyard Game ~40 turns and Local Curiosity ~10 (decided 2026-09-14).
-  turnsInTier: [ 40, 10, 40, 40 ]
+  # Backyard Game ~40 turns and Local Curiosity ~10 (decided 2026-09-14). The last entry is the
+  # turns spent in the top tier until the first win: ~180 turns to the first win in all.
+  turnsInTier: [ 40, 10, 40, 40, 50 ]
   pacingTolerance: 0.3
   # Pacing targets are for a typical anchor (decided 2026-09-13): the pacing experiment's default
   # anchors are the countries whose population lies between these quantiles of all countries. Tiny

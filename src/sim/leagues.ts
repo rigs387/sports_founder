@@ -339,7 +339,12 @@ export function evaluateLeagues(
 
     if (step.kind === "collapse") {
       const isAnchor = country.countryId === start.anchorCountryId;
-      if (isAnchor) {
+      if (isAnchor && start.win.won !== null) {
+        // After the win the sport has outlived its birthplace: the league folds like any other.
+        found.push(
+          landmarks.birthplaceOutlived(start.turn, end.quarter, country.countryId, league.tier),
+        );
+      } else if (isAnchor) {
         outcome = {
           kind: "anchorCollapse",
           turn: start.turn,

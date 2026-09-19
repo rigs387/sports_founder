@@ -36,6 +36,15 @@
     "atRisk_other": "Tier at risk: demotion in {{count}} turns unless it recovers",
     "over": "Campaign over: the {{country}} league collapsed on turn {{turn}}. The sport has lost its birthplace."
   },
+  "win": {
+    "chasing": "Ranked #{{rank}} worldwide, behind {{leader}}. To win, hold #1 for {{hold}} turns in a row at tier {{tier}}: {{name}}.",
+    "holding_one": "#1 worldwide for {{count}} turn as a {{name}}. Hold it for {{hold}} turns in a row to win.",
+    "holding_other": "#1 worldwide for {{count}} turns in a row as a {{name}}. Hold it for {{hold}} to win.",
+    "topTooEarly": "#1 worldwide, but the hold toward the win starts only at tier {{tier}}: {{name}}.",
+    "top": "#1 worldwide.",
+    "retake": "Ranked #{{rank}} worldwide, behind {{leader}}. #1 can be retaken.",
+    "won": "Won on turn {{turn}}: the world's #1 sport. The campaign goes on."
+  },
   "league": {
     "heading": "The founding league",
     "none": "No league",

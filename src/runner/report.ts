@@ -57,6 +57,17 @@ export interface CampaignResult {
   /** The anchor league collapsed and the campaign ended. */
   collapsed: boolean;
   collapseTurn: number | null;
+  /** The first turn that ended with the player's sport #1 by global Fandom Score. */
+  firstTopTurn: number | null;
+  /** The turn the win landed (GDD Win condition), and in-game years elapsed by then. */
+  wonTurn: number | null;
+  wonYears: number | null;
+  /** Longest win hold: consecutive turns ended at #1 at the win's required PP tier. */
+  longestTopStreak: number;
+  /** Times the player's sport fell from #1. */
+  rankOneLosses: number;
+  /** Anchor league collapses after the win (each a Moment, not the end). */
+  birthplaceOutlived: number;
   ppTier: number;
   peakTier: number;
   pp: number;
@@ -115,6 +126,9 @@ export interface TurnRow {
   playerHardcore: number;
   playerFandomScore: number;
   anchorPlayerHardcoreShare: number;
+  /** The player's rank by global Fandom Score, and the win hold so far. */
+  playerRank: number;
+  turnsHeld: number;
   nodesOwned: number;
   /** Cumulative PP spent on growth tree nodes. */
   ppSpentOnNodes: number;
@@ -381,6 +395,10 @@ export function aggregate(results: CampaignResult[], tierCount: number) {
   const overtakes = results
     .map((r) => r.anchorOvertakeYears)
     .filter((years): years is number => years !== null);
+  const present = (values: (number | null)[]) =>
+    values.filter((value): value is number => value !== null);
+  const wonTurns = present(results.map((r) => r.wonTurn));
+  const firstTopTurns = present(results.map((r) => r.firstTopTurn));
   return {
     campaigns: results.length,
     collapsed: results.filter((r) => r.collapsed).length,
@@ -394,6 +412,17 @@ export function aggregate(results: CampaignResult[], tierCount: number) {
     countriesWithFans: { median: median(results.map((r) => r.countriesWithFans)) },
     leaguesAtEnd: { median: median(results.map((r) => r.leaguesAtEnd)) },
     turnsToTier,
+    wins: {
+      won: wonTurns.length,
+      of: results.length,
+      turn: distribution(wonTurns),
+      years: distribution(present(results.map((r) => r.wonYears))),
+      reachedFirst: firstTopTurns.length,
+      firstTopTurn: distribution(firstTopTurns),
+      longestTopStreak: distribution(results.map((r) => r.longestTopStreak)),
+      rankOneLosses: results.reduce((sum, r) => sum + r.rankOneLosses, 0),
+      birthplaceOutlived: results.reduce((sum, r) => sum + r.birthplaceOutlived, 0),
+    },
     peakPlayerHardcoreShare: {
       ...distribution(peaks),
       above25Percent: peaks.filter((p) => p > 0.25).length,
@@ -504,6 +533,12 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     "final_year",
     "collapsed",
     "collapse_turn",
+    "first_top_turn",
+    "won_turn",
+    "won_years",
+    "longest_top_streak",
+    "rank_one_losses",
+    "birthplace_outlived",
     "pp_tier",
     "peak_tier",
     "pp",
@@ -547,6 +582,12 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     r.finalYear,
     r.collapsed,
     r.collapseTurn,
+    r.firstTopTurn,
+    r.wonTurn,
+    r.wonYears,
+    r.longestTopStreak,
+    r.rankOneLosses,
+    r.birthplaceOutlived,
     r.ppTier,
     r.peakTier,
     Math.round(r.pp),
@@ -623,6 +664,8 @@ export function turnsCsv(rows: TurnRow[]): string {
     "player_hardcore",
     "player_fandom_score",
     "anchor_player_hardcore_share",
+    "player_rank",
+    "turns_held",
     "nodes_owned",
     "pp_spent_on_nodes",
     ...rivalIds.flatMap((id) => [`${id}_anchor_hardcore_share`, `${id}_anchor_level`]),
@@ -648,6 +691,8 @@ export function turnsCsv(rows: TurnRow[]): string {
       r.playerHardcore,
       Math.round(r.playerFandomScore),
       round(r.anchorPlayerHardcoreShare, 5),
+      r.playerRank,
+      r.turnsHeld,
       r.nodesOwned,
       Math.round(r.ppSpentOnNodes),
       ...rivalIds.flatMap((id) => {

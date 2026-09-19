@@ -19,3 +19,4 @@ export * from "./spread";
 export * from "./tiers";
 export * from "./turn";
 export * from "./types";
+export * from "./win";

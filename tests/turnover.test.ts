@@ -29,7 +29,6 @@ function onlyTurnover(base: World, annualRate = base.config.turnover.annualRate)
       hardcoreConversionRate: 0,
     };
     config.dynamics.rival = {
-      casualConversionRate: 0,
       casualChurnRate: 0,
       hardcoreConversionRate: 0,
     };

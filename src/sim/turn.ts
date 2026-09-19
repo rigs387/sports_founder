@@ -3,6 +3,7 @@ import { evaluateLeagues } from "./leagues";
 import { stepQuarter } from "./quarter";
 import { applyDefaultSlotDrops, updateTierTrack } from "./tiers";
 import type { GameState, World } from "./types";
+import { updateWinTrack } from "./win";
 
 export class CampaignOverError extends Error {
   override name = "CampaignOverError";
@@ -13,8 +14,9 @@ export class CampaignOverError extends Error {
  * 1. focus slots still owed after a demotion are dropped by default (highest-numbered first);
  * 2. the turn's quarters are simulated, with length set by the PP tier at the start of the turn;
  * 3. every league's health is evaluated once and moves at most one rung; collapses fold leagues,
- *    and an anchor collapse ends the campaign;
- * 4. the PP tier track is checked; a tier change takes effect from the next turn.
+ *    and an anchor collapse ends the campaign unless the sport has already won;
+ * 4. the PP tier track is checked; a tier change takes effect from the next turn;
+ * 5. the win hold is checked (src/sim/win.ts). Winning never ends the campaign.
  * Turns always complete. Refuses to play a campaign that has already ended.
  */
 export function endTurn(state: GameState, world: World): GameState {
@@ -39,6 +41,7 @@ export function endTurn(state: GameState, world: World): GameState {
         : next.landmarks,
   };
   next = updateTierTrack(next, world);
+  next = updateWinTrack(next, world);
   return { ...next, turn: start.turn + 1 };
 }
 

@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.6 | September 16, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built)*
+*Version 1.7 | September 18, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground)*
 
 ---
 
@@ -155,6 +155,15 @@ session-level payoff between "spend PP this turn" and "win globally."
 for X consecutive turns (X is a config value, set during balancing). Winning does not end the
 campaign — the player can keep playing past the win.
 
+- **The hold counts only at tier 5 (decided 2026-09-18).** A turn counts toward the hold only if
+  it ends with the sport #1 *and* at PP tier 5 (Global Religion); a turn short of either starts
+  the hold again. A Backyard Game cannot be the world's sport: a tiny anchor whose league never
+  goes Semi-Pro stalls the tier track, and must not be able to win around it.
+- **X = 36 turns** (set 2026-09-18). #1 arrives a few turns after tier 5 on a typical anchor, so
+  36 puts the first win at about turn 180. Tier 5 turns are years: the hold is about 36 years.
+- Taking #1, losing it (and to which rival), and the win itself are permanent landmarks, recorded
+  at any tier.
+
 **Post-win play:**
 - **Anchor collapse no longer ends the campaign** after the win. It becomes a major Moment ("The
   sport has outlived its birthplace") recorded permanently.
@@ -167,7 +176,8 @@ campaign — the player can keep playing past the win.
   rulebook amendment history, Hall of Fame highlights) as a 9x16 key moment.
 
 **Loss condition:** Before the win, the game ends if your *starting/anchor country's* league collapses (see League
-Health Ladder below). Other countries' leagues can collapse without ending the run — losing your
+Health Ladder below). A collapse on the turn the hold would complete still ends the game: the loss
+is judged first. Other countries' leagues can collapse without ending the run — losing your
 anchor market specifically ends it, because it's the soul of the sport you built.
 
 ---
@@ -673,6 +683,12 @@ snowballing. Works alongside tier-scaled costs, tier-scaled negative events, and
 - **Visibility:** escalation level is shown on the map; rival budgets are hidden.
 - **Rival vs. rival competition:** wanted later, not in Phase 0. Until then rivals only drift slowly
   and react to the player.
+- **Rivals hold their ground (decided 2026-09-18).** Each rival's real starting fan shares in a
+  country are its home level. Left alone it stays there: it neither spreads to new countries nor
+  grows past the real data. It loses ground only to the player's poaching, drifts back toward home
+  slowly, and its countermoves push it above home for a while. It rebuilds lost hardcore fans only
+  up to its home level. (Before this, untuned drift let soccer grow ~45% and cricket double over a
+  campaign, spreading cricket to ~7% hardcore in China and Germany, and no campaign could reach #1.)
 
 **"Good run" texture:** Climbing the PP tier track while watching leagues in multiple countries
 flourish — new stars, sponsor wins, storylines.
@@ -851,8 +867,6 @@ deadline forcing exclusions. Instead:
 
 Items flagged during the interview that need further discussion in future sessions:
 
-- Win hold duration (likely resolved): the win almost certainly occurs at PP tier 5, where turns
-  are years, so "X turns" ≈ X years. Confirm in balance runs.
 - Music direction: postponed by choice; revisit late in production if ever.
 - Commercial decisions — deferred by choice (2026-09-13): price, Early Access timing, demo scope,
   DLC, Steam page timing, platforms. Tech plan §11 holds the current thinking.

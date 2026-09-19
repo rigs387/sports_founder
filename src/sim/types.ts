@@ -139,6 +139,19 @@ export interface TierTrack {
   slotsToDrop: number;
 }
 
+/**
+ * Progress toward the win (GDD Win condition, Post-win play). Deliberately separate from
+ * GameState.outcome: an outcome ends the campaign, and winning never does.
+ */
+export interface WinTrack {
+  /** The last turn ended with the player's sport #1 by global Fandom Score, at any PP tier. */
+  atTop: boolean;
+  /** Consecutive turns ended at #1 and at the win's required PP tier or above: the win hold. */
+  turnsHeld: number;
+  /** When the win landed, or null before it. Never cleared: losing #1 later does not undo it. */
+  won: { turn: number; quarter: number } | null;
+}
+
 /** A permanent history fact (GDD History & Records). Plain data: no text. */
 export type Landmark =
   | { kind: "leagueFormed"; turn: number; quarter: number; countryId: string; reformed: boolean }
@@ -151,7 +164,8 @@ export type Landmark =
       to: LeagueTierId;
     }
   | {
-      kind: "leagueFolded" | "anchorCollapse";
+      /** birthplaceOutlived: the anchor's league collapsed after the win (GDD Post-win play). */
+      kind: "leagueFolded" | "anchorCollapse" | "birthplaceOutlived";
       turn: number;
       quarter: number;
       countryId: string;
@@ -159,6 +173,12 @@ export type Landmark =
     }
   | { kind: "ppTierUp" | "ppTierDown"; turn: number; quarter: number; from: number; to: number }
   | { kind: "nodeBought"; turn: number; quarter: number; nodeId: string; cost: number }
+  /** The player's sport became #1 by global Fandom Score; the win hold starts (or #1 is regained). */
+  | { kind: "rankOneTaken"; turn: number; quarter: number }
+  /** The player's sport fell from #1; `sportId` is the rival now first. */
+  | { kind: "rankOneLost"; turn: number; quarter: number; sportId: string }
+  /** The win: #1 at the required tier held for `heldTurns` consecutive turns. Recorded once. */
+  | { kind: "won"; turn: number; quarter: number; heldTurns: number }
   | {
       kind: "rivalEscalated" | "rivalDeescalated";
       turn: number;
@@ -194,7 +214,10 @@ export interface YearlySnapshot {
   fans: number[];
 }
 
-/** How a campaign ended. Only anchor collapse exists before the win arrives. */
+/**
+ * How a campaign ended. Only an anchor collapse before the win ends one; winning is not an ending
+ * (see WinTrack).
+ */
 export interface GameOutcome {
   kind: "anchorCollapse";
   turn: number;
@@ -221,6 +244,7 @@ export interface GameState {
   focus: (string | null)[];
   /** Growth tree nodes owned, in purchase order (GDD PP Growth Tree). No refunds. */
   growthNodes: string[];
+  win: WinTrack;
   /** Set once the campaign has ended; nothing may be played after that. */
   outcome: GameOutcome | null;
   /** The player's sport first, then rivals in content order, then the "other" bucket. */

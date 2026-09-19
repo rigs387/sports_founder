@@ -271,12 +271,22 @@ describe("saves with the growth tree (format 5)", () => {
       growthNodes: [],
       landmarks: current.landmarks.filter((l) => l.kind !== "nodeBought"),
     };
-    const { growthNodes: _g, ...v4State } = withoutTree;
+    const { growthNodes: _g, win: _w, ...v4State } = withoutTree;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 4, state: v4State }), world);
     expect(loaded.growthNodes).toStrictEqual([]);
     expect(serializeSave(loaded)).toBe(serializeSave(withoutTree));
     const later = playWithPolicy(loaded, 6);
-    expect(JSON.parse(serializeSave(later)).formatVersion).toBe(5);
+    expect(JSON.parse(serializeSave(later)).formatVersion).toBe(SAVE_FORMAT_VERSION);
+  });
+
+  it("migrates a version 5 save: the win hold starts from nothing, same key order", () => {
+    const current = playWithPolicy(createCampaign(world, setup), 40);
+    expect(current.win).toStrictEqual({ atTop: false, turnsHeld: 0, won: null });
+    const { win: _w, ...v5State } = current;
+    const loaded = deserializeSave(JSON.stringify({ formatVersion: 5, state: v5State }), world);
+    expect(loaded.win).toStrictEqual({ atTop: false, turnsHeld: 0, won: null });
+    expect(serializeSave(loaded)).toBe(serializeSave(current));
+    expect(playWithPolicy(loaded, 6)).toStrictEqual(playWithPolicy(current, 6));
   });
 
   it("rejects a save with an unknown node, both sides of a fork, or a node before its prerequisite", () => {

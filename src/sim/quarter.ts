@@ -11,6 +11,7 @@ import { nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { type CountryExposure, computeExposure } from "./spread";
 import {
   type Config,
+  type Country,
   type CountryState,
   type GameState,
   type Landmark,
@@ -32,8 +33,16 @@ import {
 // language and media channels (only casual exposure crosses borders), and focus outreach.
 // Growth tree nodes (src/sim/growth.ts) multiply the player's casual conversion, churn and decay,
 // and hardcore conversion in each country, and shrink rival countermove boosts there.
-// Rivals: slow local drift with no spread and no affinity, boosted where that rival's media blitz
-// or youth programs are in effect (src/sim/countermoves.ts). "Other" never converts anyone.
+// Rivals hold their ground (GDD Rival AI: rivals only drift slowly and react to the player). Each
+// rival's real starting shares in a country are its home level, with no spread and no affinity:
+//   uninterested → casual   uninterested × casualChurnRate × (home casual ÷ home uninterested)
+//                           × (1 + media blitz boost), so casual flows balance at the home share
+//   casual → uninterested   casual × casualChurnRate
+//   casual → hardcore       casual × hardcoreConversionRate × share of people with no hardcore
+//                           sport × (1 − hardcore ÷ home hardcore, never below 0)
+//                           × (1 + youth programs boost): only ground lost below home is rebuilt
+// Left alone, a rival stays where the real data put it; it moves only when the player wins fans
+// from it or its countermoves push it. "Other" never converts anyone.
 // Hardcore poaching (src/sim/poaching.ts): every sport's hardcore fans demote to casual about the
 // same sport at a rate set by the sports pulling on them.
 // Generational turnover (GDD Late-Game Pressure): the player's and every rival's hardcore fans above
@@ -104,7 +113,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
     };
     const moved = stepCountryFans(
       countryState,
-      country.population,
+      country,
       state.sports,
       playerRates,
       factors,
@@ -180,7 +189,7 @@ interface Flows {
 
 function stepCountryFans(
   countryState: CountryState,
-  population: number,
+  country: Country,
   sports: readonly SportState[],
   playerRates: PlayerRates,
   factors: GrowthFactors,
@@ -188,6 +197,7 @@ function stepCountryFans(
   rng: Rng,
 ): CountryState {
   const { noise } = config.dynamics;
+  const population = country.population;
   const totalHardcore = countryState.fans.reduce((sum, fans) => sum + fans.hardcore, 0);
   const unattached = population - totalHardcore;
   const unattachedShare = unattached / population;
@@ -236,19 +246,26 @@ function stepCountryFans(
         config,
         factors.countermoveEffect,
       );
-      const reach = (fans.casual + fans.hardcore) / population;
+      const home = country.startingRivalFans[sport.id];
+      const homeCasual = home?.casual ?? 0;
+      const homeHardcore = home?.hardcore ?? 0;
+      const homeUninterested = 1 - homeCasual - homeHardcore;
       const casualGain = drawFlow(
         rng,
         uninterested,
-        rates.casualConversionRate * reach * boosts.casual,
+        homeUninterested > 0
+          ? rates.casualChurnRate * (homeCasual / homeUninterested) * boosts.casual
+          : 0,
         noise,
       );
       const casualChurn = drawFlow(rng, fans.casual, rates.casualChurnRate, noise);
       const casualLeft = fans.casual - casualChurn;
+      const belowHome =
+        homeHardcore > 0 ? Math.max(0, 1 - fans.hardcore / (homeHardcore * population)) : 0;
       const converted = drawFlow(
         rng,
         casualLeft,
-        rates.hardcoreConversionRate * unattachedShare * boosts.hardcore,
+        rates.hardcoreConversionRate * unattachedShare * belowHome * boosts.hardcore,
         noise,
       );
       // Replacements for this quarter's aging fans: no extra rolls, so the sequence stays aligned.

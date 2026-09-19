@@ -149,6 +149,11 @@ body {
   font-weight: bold;
 }
 
+.won {
+  color: #1f5f2a;
+  font-weight: bold;
+}
+
 .rivals h2 {
   font-size: 1.2rem;
   margin: 24px 0 8px;

@@ -18,7 +18,7 @@ import { defaultGenome } from "./setup";
 import type { GameState, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 5;
+export const SAVE_FORMAT_VERSION = 6;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -56,7 +56,7 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     to: leagueTierSchema,
   }),
   z.strictObject({
-    kind: z.enum(["leagueFolded", "anchorCollapse"]),
+    kind: z.enum(["leagueFolded", "anchorCollapse", "birthplaceOutlived"]),
     turn: z.int().min(1),
     quarter: count,
     countryId: z.string().min(1),
@@ -75,6 +75,19 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     quarter: count,
     nodeId: z.string().min(1),
     cost: z.number().min(0),
+  }),
+  z.strictObject({ kind: z.literal("rankOneTaken"), turn: z.int().min(1), quarter: count }),
+  z.strictObject({
+    kind: z.literal("rankOneLost"),
+    turn: z.int().min(1),
+    quarter: count,
+    sportId: z.string().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal("won"),
+    turn: z.int().min(1),
+    quarter: count,
+    heldTurns: z.int().min(1),
   }),
   z.strictObject({
     kind: z.enum(["rivalEscalated", "rivalDeescalated"]),
@@ -124,6 +137,11 @@ const gameStateSchema = z.strictObject({
   }),
   focus: z.array(z.string().min(1).nullable()),
   growthNodes: z.array(z.string().min(1)),
+  win: z.strictObject({
+    atTop: z.boolean(),
+    turnsHeld: count,
+    won: z.strictObject({ turn: z.int().min(1), quarter: count }).nullable(),
+  }),
   outcome: z
     .strictObject({
       kind: z.literal("anchorCollapse"),
@@ -330,6 +348,18 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
       }
     }
     return { formatVersion: 5, state };
+  },
+
+  // 5 → 6: the win condition arrived. No version 5 campaign can have won, and its standing was never
+  // recorded, so the hold starts from nothing and the next turn that ends at #1 records taking #1.
+  // No #1 landmarks exist for the past.
+  5: (save) => {
+    const state: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(save.state)) {
+      state[key] = value;
+      if (key === "growthNodes") state.win = { atTop: false, turnsHeld: 0, won: null };
+    }
+    return { formatVersion: 6, state };
   },
 };
 
