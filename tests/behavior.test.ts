@@ -63,7 +63,9 @@ describe("Ice raises affinity in Cold countries and lowers it in Tropical ones",
       const index = countryIndex(world, id);
       const ice = leverMultipliers(world, icePaddle, index).affinity;
       const grass = leverMultipliers(world, grassPaddle, index).affinity;
-      expect(ice, id).toBeLessThan(grass * 0.7);
+      // At the lever's floor ice is as low as it can go: it only has to stay below grass there.
+      if (ice > world.config.levers.affinity.min) expect(ice, id).toBeLessThan(grass * 0.7);
+      else expect(ice, id).toBeLessThan(grass);
     }
   });
 

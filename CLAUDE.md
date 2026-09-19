@@ -93,7 +93,12 @@ runs/                 Runner and smoke-test output (git-ignored)
   league and records a `birthplaceOutlived` landmark instead of ending the game.
 - Rivals hold their ground: each rival's real starting shares in a country are its home level
   (`src/sim/quarter.ts`). They never spread or grow past it on their own; only the player's
-  poaching and their own countermoves move them.
+  poaching and their own countermoves move them (youth programs lift a rival above home while
+  they run, and that ground ages away after).
+- The win hold is a contest (GDD v1.8): near #1 (`rivalAI.nearTop`) rival intensity peaks just past
+  parity, rivals defend wherever the player holds ground in their territory, and they may buy more
+  countermoves per quarter. The runner reports how many campaigns lost #1 before winning; the
+  target is about half.
 
 ## Steam
 - Steam is deferred until the game is playable. Do not add steamworks.js, a Steam adapter, or

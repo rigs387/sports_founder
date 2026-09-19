@@ -76,7 +76,10 @@ export interface LeagueState {
 export interface RivalFront {
   sportId: string;
   level: EscalationLevel;
-  /** The player's hardcore gains here as a share of the population per year, smoothed. */
+  /**
+   * The player's hardcore gains here as a share of the population per year, smoothed; near #1, at
+   * least a share of the player's hardcore share here (rivals defending their position).
+   */
   pressure: number;
   /** Quarters at the current level. */
   quartersAtLevel: number;

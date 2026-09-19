@@ -34,24 +34,25 @@ export function mediaRevenueFactor(
     : 1;
 }
 
-/** Multipliers on one rival's own conversion rates from its media blitz and youth programs. */
+/**
+ * Multipliers on one rival's own conversion rates from its media blitz and youth programs, and on
+ * the hardcore level it rebuilds toward (youth programs lift it above home while they run).
+ */
 export function rivalConversionBoosts(
   country: WithCountermoves,
   sportId: string,
   config: Config,
   effect: number,
-): { casual: number; hardcore: number } {
+): { casual: number; hardcore: number; homeLift: number } {
   const { mediaBlitz, youthPrograms } = config.rivalAI.countermoves;
+  const youth = hasCountermove(country, "youthPrograms", sportId);
   return {
+    homeLift: 1 + (youth ? youthPrograms.homeLift * effect : 0),
     casual:
       1 +
       (hasCountermove(country, "mediaBlitz", sportId)
         ? mediaBlitz.casualConversionBoost * effect
         : 0),
-    hardcore:
-      1 +
-      (hasCountermove(country, "youthPrograms", sportId)
-        ? youthPrograms.hardcoreConversionBoost * effect
-        : 0),
+    hardcore: 1 + (youth ? youthPrograms.hardcoreConversionBoost * effect : 0),
   };
 }

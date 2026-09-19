@@ -56,7 +56,9 @@ ppTiers:
     # hardcore conversion, which pushed the tier-3 median to turn 69 against the GDD budget's turn
     # 50 (allowed 65). The score gate is what binds — the anchor-hardcore breadth gate is met at
     # turn 44 — so this is the pacing knob, and it pulls tiers 4 and 5 back toward their targets too.
-    fandomScoreRequired: 600000
+    # Lowered again to 400,000 (2026-09-19): the steeper genome geography of step 7 slowed poorly
+    # fitting genomes and put the tier-3 median at turn 61 of the 65 allowed; now 58.
+    fandomScoreRequired: 400000
     breadth: { type: anchorHardcoreShare, share: 0.01 }
     turnLengthQuarters: 2
     focusSlots: 3
@@ -209,7 +211,9 @@ dynamics:
   #                           sport × (1 − hardcore ÷ home hardcore, never below 0)
   #                           × (1 + youth programs boost): only ground lost below home is rebuilt
   rival:
-    casualChurnRate: 0.01
+    # Raised from 0.01 (step 7, 2026-09-19): rival casual fans now return to home in a few years, so
+    # a media blitz is a surge that fades rather than a permanent-looking level shift.
+    casualChurnRate: 0.04
     hardcoreConversionRate: 0.001
 
 # Hardcore poaching between sports (GDD Fan Model, v1.4: "Winning over rival hardcore fans is slow").
@@ -267,11 +271,19 @@ rivalAI:
     deescalationQuarters: 8
   # All rivals defend harder as the player approaches global #1 (defending their position, not
   # hunting). ratio = player Fandom Score ÷ the best rival's; intensity rises linearly from 1 at
-  # startRatio to maxIntensity at 1 (and stays there once the player leads). Intensity divides the
-  # escalation thresholds and multiplies budget income.
+  # startRatio to maxIntensity at peakRatio and stays there beyond. peakRatio sits a little past 1
+  # (step 7, 2026-09-19): a narrow lead draws the hardest defense, so #1 is contested until the
+  # player pulls clear, instead of a flat defense the leader simply outgrows. Intensity divides the
+  # escalation thresholds and multiplies budget income and movesPerQuarter (rounded down).
   nearTop:
-    startRatio: 0.5
-    maxIntensity: 2
+    startRatio: 0.85
+    peakRatio: 1.05
+    maxIntensity: 4
+    # Near #1 rivals defend their global position, not just where the player is gaining (step 7,
+    # 2026-09-19: escalation keyed only to the player's gains fell away at the top as markets
+    # filled). Pressure in a country is at least positionPressure × progress × the player's
+    # hardcore share there, progress running from 0 at intensity 1 to 1 at maxIntensity.
+    positionPressure: 0.05
   # Hidden defense budget per rival: income per quarter = incomePerFandomScore × the rival's world
   # Fandom Score × intensity. Unspent budget is capped at capQuarters of income.
   budget:
@@ -279,7 +291,10 @@ rivalAI:
     capQuarters: 40
   # At most this many countermoves per rival per quarter, bought round-robin across the rival's
   # escalated countries (highest level first, then the rival's biggest hardcore base), trying
-  # countermoves in preference order. A rival cannot spend more than its budget.
+  # countermoves in preference order. A rival cannot spend more than its budget: when the most
+  # preferred useful countermove in a country is beyond it, the rival saves up and buys nothing
+  # more that quarter, rather than settling for a lesser one (step 7, 2026-09-19: cheap sponsor
+  # lockouts were soaking up the budget its heartlands needed).
   movesPerQuarter: 1
   # Timed countermoves cost baseCost × (country population in millions) ^ costPopulationExponent:
   # bigger countries cost more to defend, but less than in proportion, so a rival can afford its
@@ -290,9 +305,11 @@ rivalAI:
   # country. Timed countermoves last durationQuarters and are not bought again while in effect there.
   countermoves:
     # Rival casual conversion × (1 + casualConversionBoost) in that country.
-    mediaBlitz: { minLevel: defending, baseCost: 1800, durationQuarters: 12, casualConversionBoost: 0.5 }
+    mediaBlitz: { minLevel: defending, baseCost: 1800, durationQuarters: 12, casualConversionBoost: 4 }
     # Rival hardcore conversion × (1 + hardcoreConversionBoost) in that country.
-    youthPrograms: { minLevel: defending, baseCost: 3000, durationQuarters: 20, hardcoreConversionBoost: 1.0 }
+    # While they run, the rival also rebuilds toward home hardcore × (1 + homeLift): its countermoves
+    # push it above home for a while (GDD v1.7), and that ground ages away after they end.
+    youthPrograms: { minLevel: defending, baseCost: 3000, durationQuarters: 20, hardcoreConversionBoost: 10, homeLift: 0.3 }
     # Blocks the player's media reach spread channel into that country. Bought only while the
     # player has media reach exposure there, and never on top of another rival's deal.
     broadcastDeal: { minLevel: defending, baseCost: 3200, durationQuarters: 16 }
@@ -426,11 +443,14 @@ seasonalWindow:
 # cannot be the world's sport). A turn short of either starts the hold again. Winning never ends the
 # campaign; after it, an anchor collapse is a Moment instead of the end.
 #
-# holdTurns sets when the first win lands: on typical anchors #1 arrives a few turns after tier 5,
-# and 36 puts the median first win at turn ~180 (GDD campaign length; measured 2026-09-18). Tier 5
-# turns are years, so the hold is about 36 years.
+# holdTurns and the rivals' near-top defense (rivalAI.nearTop) set when the first win lands. Since
+# step 7 (2026-09-19) the hold is a contest: rivals push back hardest just past parity, and about
+# half the campaigns that take #1 lose it at least once before winning (43% of 89 on typical
+# anchors, builder). Lowered from 36 to 30 to keep the median first win near the GDD's turn 180
+# (measured 203, allowed up to 234); a shorter hold cut the contest more than it helped pacing.
+# Tier 5 turns are years, so the hold is about 30 years.
 win:
-  holdTurns: 36
+  holdTurns: 30
   requiredTier: 5
 
 # Headless balance targets (tech plan 2.1 exit criteria). Read by the runner only.

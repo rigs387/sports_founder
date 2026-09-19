@@ -55,6 +55,8 @@ surface before playtesting or during it.
 | 2026-09-18 | Rivals hold their ground: real starting shares are each rival's home level (GDD v1.7) | Decided |
 | 2026-09-18 | The hard-anchor criterion counts wins, with the builder bot in the default bot list; pacing adds the first win (target turn 180) | Decided |
 | 2026-09-18 | Genome condition deltas scaled ×1.75 (base deltas untouched): steeper geography restores differentiation to 6/6 after rivals stopped filling rival-thin markets | Tuning |
+| 2026-09-19 | The win hold is a real contest: about half the campaigns that take #1 lose it before winning (GDD v1.8); near-top rival defense rebuilt to reach it, win hold 36 → 30 turns | Decided |
+| 2026-09-19 | Genome condition deltas ×1.25 again (×2.19 in all; ice is at the lever ceiling): the contested hold's late-game defense had eroded differentiation to 5/6. Tier-3 score gate 600k → 400k; grass and moderate-rules deltas trimmed (options: stop-start and short now marginal, lower bound 42%) | Tuning |
 
 ---
 
@@ -186,7 +188,8 @@ These come from the GDD review. Items 1–4 must be specified before Phase 0 imp
 As of 2026-09-13, items 1–12 are resolved in the GDD, along with all original parking-lot items.
 Item 13 is resolved except commercial decisions (deferred by choice), competitor analysis
 (research), and music (postponed). The win-hold measure was confirmed in balance runs on
-2026-09-18: 36 turns at tier 5 (GDD v1.7).
+2026-09-18: 36 turns at tier 5 (GDD v1.7), retuned to 30 on 2026-09-19 when the hold became a
+contest (GDD v1.8).
 
 ---
 

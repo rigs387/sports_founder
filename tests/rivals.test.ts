@@ -5,6 +5,7 @@ import {
   type ActiveCountermove,
   checkInvariants,
   computeExposure,
+  countermoveCost,
   createCampaign,
   defenseIntensity,
   type EscalationLevel,
@@ -272,7 +273,8 @@ describe("defense budget", () => {
     ).length ?? 0;
 
   it("a rival never spends more than its budget, and spending is what the budget lost", () => {
-    const budget = 20_000;
+    // Enough for youth programs in its biggest front (it saves up for those) but not everywhere.
+    const budget = 60_000;
     for (const fronts of [[ANCHOR_COUNTRY], [ANCHOR_COUNTRY, "czechia", "italy", "germany"]]) {
       const start = defendingIn(fronts, budget);
       const next = rivalQuarter(start, fixedBudget);
@@ -287,8 +289,31 @@ describe("defense budget", () => {
     expect(movesIn(broke, ANCHOR_COUNTRY)).toBe(0);
   });
 
+  it("a rival saves up for the countermove it wants most rather than settling for a lesser one", () => {
+    const youthCost = countermoveCost(
+      fixedBudget,
+      countryIndex(fixedBudget, ANCHOR_COUNTRY),
+      "youthPrograms",
+    );
+    const lockoutCost = countermoveCost(
+      fixedBudget,
+      countryIndex(fixedBudget, ANCHOR_COUNTRY),
+      "sponsorLockout",
+    );
+    expect(lockoutCost).toBeLessThan(youthCost);
+    const short = rivalQuarter(
+      defendingIn([ANCHOR_COUNTRY], (lockoutCost + youthCost) / 2),
+      fixedBudget,
+    );
+    expect(movesIn(short, ANCHOR_COUNTRY)).toBe(0);
+    expect(rivalOf(short).budgetSpent).toBe(0);
+    const enough = rivalQuarter(defendingIn([ANCHOR_COUNTRY], youthCost), fixedBudget);
+    const bought = enough.countries[countryIndex(fixedBudget, ANCHOR_COUNTRY)]?.countermoves ?? [];
+    expect(bought.map((m) => m.kind)).toEqual(["youthPrograms"]);
+  });
+
   it("pushing several fronts spreads the same budget thin", () => {
-    const budget = 20_000;
+    const budget = 60_000;
     const others = ["czechia", "italy", "germany"];
     const oneFront = rivalQuarter(defendingIn([ANCHOR_COUNTRY], budget), fixedBudget);
     const fourFronts = rivalQuarter(defendingIn([ANCHOR_COUNTRY, ...others], budget), fixedBudget);
@@ -393,10 +418,41 @@ describe("each countermove has its effect", () => {
     const plain = change(w, base, RIVAL).hardcore;
     const boosted = change(w, withMove(base, w, target, youth), RIVAL).hardcore;
     expect(plain).toBeGreaterThan(1_000);
+    // The boost multiplies conversion, and the home lift raises the level it rebuilds toward.
+    const { hardcoreConversionBoost, homeLift } = w.config.rivalAI.countermoves.youthPrograms;
+    const index = countryIndex(w, target);
+    const held = base.countries[index]?.fans.find((f) => f.sportId === RIVAL)?.hardcore ?? 0;
+    const home =
+      (w.countries[index]?.startingRivalFans[RIVAL]?.hardcore ?? 0) * population(w, target);
+    const belowHome = (level: number) => 1 - held / level;
     expect(boosted / plain).toBeCloseTo(
-      1 + w.config.rivalAI.countermoves.youthPrograms.hardcoreConversionBoost,
+      ((1 + hardcoreConversionBoost) * belowHome(home * (1 + homeLift))) / belowHome(home),
       2,
     );
+  });
+
+  it("youth programs lift a rival above its home level while they run, and that ground ages away after", () => {
+    const w = withConfig(world, (config) => {
+      config.dynamics.noise = 0;
+      config.poaching.rate = 0;
+      config.rivalAI.movesPerQuarter = 0;
+    });
+    const index = countryIndex(w, target);
+    const hardcore = (state: GameState) =>
+      state.countries[index]?.fans.find((f) => f.sportId === RIVAL)?.hardcore ?? 0;
+    const home =
+      (w.countries[index]?.startingRivalFans[RIVAL]?.hardcore ?? 0) * population(w, target);
+    let state = withMove(createCampaign(w, setupFor(1, ANCHOR_COUNTRY)), w, target, {
+      ...youth,
+      endQuarter: 1_000,
+    });
+    for (let q = 0; q < 40; q += 1) state = stepQuarter(state, w);
+    const lifted = hardcore(state);
+    expect(lifted).toBeGreaterThan(home * 1.05);
+    state = withCountry(state, w, target, (c) => ({ ...c, countermoves: [] }));
+    for (let q = 0; q < 40; q += 1) state = stepQuarter(state, w);
+    expect(hardcore(state)).toBeLessThan(lifted * 0.97);
+    expect(hardcore(state)).toBeGreaterThan(home * 0.99);
   });
 
   it("an exclusive broadcast deal removes the player's media reach exposure into that country", () => {
@@ -557,7 +613,7 @@ describe("rivals defend harder near global #1", () => {
     };
   }
 
-  it("intensity is 1 far from #1 and at its maximum once the player draws level", () => {
+  it("intensity is 1 far from #1 and at its maximum once the player leads by peakRatio", () => {
     const far = createCampaign(world, setupFor(1, ANCHOR_COUNTRY));
     const near = nearTop(far);
     const best = Math.max(
@@ -586,6 +642,56 @@ describe("rivals defend harder near global #1", () => {
     }
     expect(levelOf(far, world, ANCHOR_COUNTRY)).toBe("defending");
     expect(levelOf(near, world, ANCHOR_COUNTRY)).toBe("entrenched");
+  });
+
+  it("intensity rises linearly from startRatio and peaks a little past #1, at peakRatio", () => {
+    const state = nearTop(createCampaign(world, setupFor(1, ANCHOR_COUNTRY)));
+    const totals = sportTotals(state, world);
+    const player = totals[PLAYER_INDEX]?.fandomScore ?? 0;
+    const best = Math.max(...totals.filter((t) => t.kind === "rival").map((t) => t.fandomScore));
+    const ratio = player / best;
+    const w = withConfig(world, (config) => {
+      config.rivalAI.nearTop.startRatio = ratio * 0.5;
+      config.rivalAI.nearTop.peakRatio = ratio * 1.5;
+    });
+    const { maxIntensity } = w.config.rivalAI.nearTop;
+    expect(defenseIntensity(state, w)).toBeCloseTo(1 + (maxIntensity - 1) * 0.5, 9);
+  });
+
+  it("near #1 rivals defend their position where the player holds ground, even with no new gains", () => {
+    let far = createCampaign(world, setupFor(1, ANCHOR_COUNTRY));
+    let near = nearTop(far);
+    for (let q = 0; q < 30; q += 1) {
+      far = rivalQuarter(far, world);
+      near = rivalQuarter(near, world);
+    }
+    expect(levelOf(far, world, "italy")).toBe("none");
+    expect(levelOf(near, world, "italy")).toBe("entrenched");
+  });
+
+  it("near #1 rivals may buy more countermoves each quarter", () => {
+    const w = withConfig(world, (config) => {
+      config.rivalAI.budget.incomePerFandomScore = 1e-12;
+      config.rivalAI.budget.capQuarters = 1e15;
+      config.rivalAI.movesPerQuarter = 1;
+    });
+    const fronts = ["czechia", "italy", "germany", "france", "spain", "portugal"];
+    const ready = (state: GameState) => {
+      let s: GameState = {
+        ...state,
+        rivals: state.rivals.map((r) => (r.sportId === RIVAL ? { ...r, budget: 1e9 } : r)),
+      };
+      for (const id of fronts) s = withLevel(s, w, id, "defending");
+      return s;
+    };
+    const far = ready(createCampaign(w, setupFor(1, ANCHOR_COUNTRY)));
+    const near = ready(nearTop(far));
+    const moves = (s: GameState) =>
+      s.countries.flatMap((c) => c.countermoves).filter((m) => m.sportId === RIVAL).length;
+    expect(moves(rivalQuarter(far, w))).toBe(1);
+    expect(moves(rivalQuarter(near, w))).toBe(
+      Math.floor(w.config.rivalAI.nearTop.maxIntensity * w.config.rivalAI.movesPerQuarter),
+    );
   });
 });
 

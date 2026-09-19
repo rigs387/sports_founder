@@ -32,9 +32,14 @@ import {
 //      ladder (none → Watching → Defending → Entrenched) climbs one level at a time while the
 //      rival holds a meaningful hardcore share and pressure passes the next threshold, and falls
 //      one level after a run of calm quarters. Intensity lowers the thresholds near global #1.
+//      Near #1 rivals also defend their global position, not just where the player is gaining:
+//      pressure is at least positionPressure × near-top progress × the player's hardcore share
+//      there, so a rival stays escalated wherever the player holds ground in its territory.
 //   3. Countermoves. Effects that have run their course end. Each rival then buys countermoves
 //      round-robin across its escalated countries (highest level first, then its biggest hardcore
-//      base), in preference order, while budget lasts: it cannot defend everywhere at once.
+//      base), in preference order, while budget lasts: it cannot defend everywhere at once. When
+//      the countermove it wants most in a country is beyond its budget, it saves up and buys
+//      nothing more that quarter. Near #1 intensity also multiplies how many it may buy per quarter.
 // Every escalation change and countermove is recorded as a landmark. Every number is config.
 
 export function newFront(sportId: string): RivalFront {
@@ -51,13 +56,14 @@ export function escalationIndex(level: EscalationLevel): number {
 
 /**
  * How hard every rival defends right now: 1 while the player is far from global #1, rising to
- * maxIntensity as the player's Fandom Score nears the best rival's, and staying there once ahead.
+ * maxIntensity as the player's Fandom Score passes the best rival's, reaching it at peakRatio (a
+ * little past #1, so a narrow lead draws the hardest defense) and staying there beyond.
  */
 export function defenseIntensity(
   state: Pick<GameState, "sports" | "countries">,
   world: World,
 ): number {
-  const { startRatio, maxIntensity } = world.config.rivalAI.nearTop;
+  const { startRatio, peakRatio, maxIntensity } = world.config.rivalAI.nearTop;
   const totals = sportTotals(state, world);
   const player = totals.find((sport) => sport.kind === "player")?.fandomScore ?? 0;
   const best = Math.max(
@@ -65,8 +71,17 @@ export function defenseIntensity(
     ...totals.filter((sport) => sport.kind === "rival").map((sport) => sport.fandomScore),
   );
   if (best <= 0) return maxIntensity;
-  const progress = Math.min(1, Math.max(0, (player / best - startRatio) / (1 - startRatio)));
+  const progress = Math.min(
+    1,
+    Math.max(0, (player / best - startRatio) / (peakRatio - startRatio)),
+  );
   return 1 + (maxIntensity - 1) * progress;
+}
+
+/** How far the player is along the near-top ramp: 0 at intensity 1, 1 at maxIntensity. */
+export function nearTopProgress(intensity: number, config: Config): number {
+  const { maxIntensity } = config.rivalAI.nearTop;
+  return maxIntensity > 1 ? (intensity - 1) / (maxIntensity - 1) : 1;
 }
 
 /** Budget a rival spends on a countermove in a country. */
@@ -196,6 +211,9 @@ export function stepRivals(
   const turn = before.turn;
   const current = { sports: before.sports, countries: after as CountryState[] };
   const intensity = defenseIntensity(current, world);
+  const movesAllowed = Math.floor(rivalAI.movesPerQuarter * intensity);
+  const positionWeight =
+    rivalAI.nearTop.positionPressure * nearTopProgress(intensity, world.config);
   const totals = sportTotals(current, world);
 
   const rivals = before.rivals.map((rival): RivalState => {
@@ -210,8 +228,10 @@ export function stepRivals(
     const population = world.countries[index]?.population ?? 1;
     const hardcoreBefore = before.countries[index]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
     const hardcoreNow = country.fans[PLAYER_INDEX]?.hardcore ?? 0;
-    const annualGainShare =
-      (Math.max(0, hardcoreNow - hardcoreBefore) / population) * QUARTERS_PER_YEAR;
+    const annualGainShare = Math.max(
+      (Math.max(0, hardcoreNow - hardcoreBefore) / population) * QUARTERS_PER_YEAR,
+      positionWeight * (hardcoreNow / population),
+    );
     const defense = country.defense.map((front) => {
       const rivalHardcore = country.fans[sportIndexOf.get(front.sportId) ?? -1]?.hardcore ?? 0;
       const next = updateFront(
@@ -256,20 +276,34 @@ export function stepRivals(
 
     let bought = 0;
     let boughtThisPass = true;
-    while (boughtThisPass && bought < rivalAI.movesPerQuarter) {
+    let saving = false;
+    while (boughtThisPass && !saving && bought < movesAllowed) {
       boughtThisPass = false;
       for (const front of fronts) {
-        if (bought >= rivalAI.movesPerQuarter) break;
+        if (bought >= movesAllowed || saving) break;
         const country = countries[front.index];
         if (!country) continue;
         for (const kind of rivalAI.preference) {
           if (front.level < escalationIndex(moves[kind].minLevel)) continue;
+          const copy =
+            kind === "ruleCopying" && quarter >= rival.ruleCopyReadyQuarter
+              ? ruleToCopy(world, before.genome, rival.genome, front.index)
+              : null;
+          if (
+            kind === "ruleCopying"
+              ? copy === null
+              : !countermoveUseful(kind, country, rival.sportId, world, strengths, front.index)
+          ) {
+            continue;
+          }
+          // The move the rival wants most here is beyond its budget: it saves up for it rather than
+          // settling for a lesser one, and buys nothing more this quarter.
           const cost = countermoveCost(world, front.index, kind);
-          if (cost > rival.budget) continue;
-          if (kind === "ruleCopying") {
-            if (quarter < rival.ruleCopyReadyQuarter) continue;
-            const copy = ruleToCopy(world, before.genome, rival.genome, front.index);
-            if (copy === null) continue;
+          if (cost > rival.budget) {
+            saving = true;
+            break;
+          }
+          if (kind === "ruleCopying" && copy !== null) {
             rival = {
               ...rival,
               genome: { ...rival.genome, [copy.axis]: copy.to } as Genome,
@@ -288,10 +322,7 @@ export function stepRivals(
                 copy.to,
               ),
             );
-          } else {
-            if (!countermoveUseful(kind, country, rival.sportId, world, strengths, front.index)) {
-              continue;
-            }
+          } else if (kind !== "ruleCopying") {
             const move: ActiveCountermove = {
               kind,
               sportId: rival.sportId,

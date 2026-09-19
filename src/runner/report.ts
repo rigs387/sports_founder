@@ -66,6 +66,8 @@ export interface CampaignResult {
   longestTopStreak: number;
   /** Times the player's sport fell from #1. */
   rankOneLosses: number;
+  /** The player's sport fell from #1 at least once before the win (or with no win): the hold was contested. */
+  rankOneLostBeforeWin: boolean;
   /** Anchor league collapses after the win (each a Moment, not the end). */
   birthplaceOutlived: number;
   ppTier: number;
@@ -421,6 +423,7 @@ export function aggregate(results: CampaignResult[], tierCount: number) {
       firstTopTurn: distribution(firstTopTurns),
       longestTopStreak: distribution(results.map((r) => r.longestTopStreak)),
       rankOneLosses: results.reduce((sum, r) => sum + r.rankOneLosses, 0),
+      lostBeforeWin: results.filter((r) => r.rankOneLostBeforeWin).length,
       birthplaceOutlived: results.reduce((sum, r) => sum + r.birthplaceOutlived, 0),
     },
     peakPlayerHardcoreShare: {
@@ -538,6 +541,7 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     "won_years",
     "longest_top_streak",
     "rank_one_losses",
+    "rank_one_lost_before_win",
     "birthplace_outlived",
     "pp_tier",
     "peak_tier",
@@ -587,6 +591,7 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     r.wonYears,
     r.longestTopStreak,
     r.rankOneLosses,
+    r.rankOneLostBeforeWin,
     r.birthplaceOutlived,
     r.ppTier,
     r.peakTier,

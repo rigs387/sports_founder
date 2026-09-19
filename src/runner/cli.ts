@@ -341,7 +341,7 @@ function printRivalActivity(agg: ReturnType<typeof aggregate>): void {
   );
   const wins = agg.wins;
   console.log(
-    `  Wins: ${wins.won}/${agg.campaigns}; win turn median ${fmt(wins.turn.median)} (p10 ${fmt(wins.turn.p10)}, p90 ${fmt(wins.turn.p90)}), in-game years median ${fmt(wins.years.median)}; reached #1 in ${wins.reachedFirst}/${agg.campaigns}, first at turn median ${fmt(wins.firstTopTurn.median)}; longest win hold median ${fmt(wins.longestTopStreak.median)}, max ${fmt(wins.longestTopStreak.max)} turns; #1 lost ${wins.rankOneLosses} time(s); anchor collapses after a win ${wins.birthplaceOutlived}`,
+    `  Wins: ${wins.won}/${agg.campaigns}; win turn median ${fmt(wins.turn.median)} (p10 ${fmt(wins.turn.p10)}, p90 ${fmt(wins.turn.p90)}), in-game years median ${fmt(wins.years.median)}; reached #1 in ${wins.reachedFirst}/${agg.campaigns}, first at turn median ${fmt(wins.firstTopTurn.median)}; longest win hold median ${fmt(wins.longestTopStreak.median)}, max ${fmt(wins.longestTopStreak.max)} turns; #1 lost ${wins.rankOneLosses} time(s), before the win in ${wins.lostBeforeWin}/${wins.reachedFirst} campaigns that reached #1; anchor collapses after a win ${wins.birthplaceOutlived}`,
   );
   const overtake = agg.anchorOvertakeYears;
   console.log(

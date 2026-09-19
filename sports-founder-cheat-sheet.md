@@ -14,8 +14,9 @@ the top (operator era). The sim always steps quarterly underneath. Turns always 
 health moves at most one step per turn, so collapse always gets a warning turn.
 
 **Win Condition:** #1 sport by global Fandom Score (hardcore + weighted casual fans, raw
-population), held for X turns (36) at PP tier 5 — a turn below #1 or below tier 5 restarts the
-hold. Play continues past the win: legacy goals, rivals can retake #1, anchor collapse no longer
+population), held for X turns (30) at PP tier 5 — a turn below #1 or below tier 5 restarts the
+hold. The hold is a contest: rivals defend hardest just past #1, and about half the campaigns that
+take #1 lose it at least once before winning. Play continues past the win: legacy goals, rivals can retake #1, anchor collapse no longer
 ends the run, and a Retire option plays a final retrospective.
 
 **Fan Model:** Per country, per sport: Uninterested → Casual (non-exclusive, churns) → Hardcore

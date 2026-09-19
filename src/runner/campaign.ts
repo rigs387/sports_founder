@@ -286,6 +286,10 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       wonYears: state.win.won ? state.win.won.quarter / QUARTERS_PER_YEAR : null,
       longestTopStreak,
       rankOneLosses: count("rankOneLost"),
+      rankOneLostBeforeWin: state.landmarks.some(
+        (l) =>
+          l.kind === "rankOneLost" && l.turn <= (state.win.won?.turn ?? Number.POSITIVE_INFINITY),
+      ),
       birthplaceOutlived: count("birthplaceOutlived"),
       ppTier: state.ppTier,
       peakTier: state.tierTrack.peakTier,

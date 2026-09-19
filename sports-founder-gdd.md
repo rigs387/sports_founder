@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.7 | September 18, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground)*
+*Version 1.8 | September 19, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest)*
 
 ---
 
@@ -159,8 +159,11 @@ campaign — the player can keep playing past the win.
   it ends with the sport #1 *and* at PP tier 5 (Global Religion); a turn short of either starts
   the hold again. A Backyard Game cannot be the world's sport: a tiny anchor whose league never
   goes Semi-Pro stalls the tier track, and must not be able to win around it.
-- **X = 36 turns** (set 2026-09-18). #1 arrives a few turns after tier 5 on a typical anchor, so
-  36 puts the first win at about turn 180. Tier 5 turns are years: the hold is about 36 years.
+- **X = 30 turns** (set 2026-09-18 at 36, retuned 2026-09-19 once the hold became a contest). #1
+  arrives a few turns after tier 5 on a typical anchor, and rivals then fight for it, so 30 puts
+  the first win at about turn 200 (inside the pacing tolerance of the ~180 budget). Tier 5 turns are years: the hold is about 30 years.
+- **The hold is a real contest (decided 2026-09-19).** Of the campaigns that take #1, about half
+  lose it at least once before the win. See Late-Game Pressure.
 - Taking #1, losing it (and to which rival), and the win itself are permanent landmarks, recorded
   at any tier.
 
@@ -649,6 +652,14 @@ snowballing. Works alongside tier-scaled costs, tier-scaled negative events, and
 - **Rivals defend hardest near the top.** Rival defensive intensity peaks as the player approaches
   global #1 — defending their global position, not hunting the player — making the win hold a real
   contest. Details under rival AI.
+  - *How (built 2026-09-19):* intensity peaks a little past #1, so a narrow lead draws the hardest
+    defense and the player must pull clear to hold it. Near the top a rival stays escalated wherever
+    the player holds ground in its territory, not only where the player is gaining, and may buy more
+    countermoves per quarter. Youth programs push a rival above its home level while they run, and
+    that ground ages away afterwards; a media blitz is a surge that fades. A rival saves up for the
+    countermove it wants most rather than spending on a lesser one.
+  - *Target:* about half the campaigns that take #1 lose it at least once before winning (measured
+    40–46% on typical anchors, builder bot, 2026-09-19; 43% on the final content).
 
 **Rival AI:** Rivals defend; they don't hunt.
 

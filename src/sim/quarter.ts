@@ -39,8 +39,10 @@ import {
 //                           × (1 + media blitz boost), so casual flows balance at the home share
 //   casual → uninterested   casual × casualChurnRate
 //   casual → hardcore       casual × hardcoreConversionRate × share of people with no hardcore
-//                           sport × (1 − hardcore ÷ home hardcore, never below 0)
-//                           × (1 + youth programs boost): only ground lost below home is rebuilt
+//                           sport × (1 − hardcore ÷ target, never below 0) × (1 + youth programs
+//                           boost), target = home hardcore × (1 + youth programs home lift while
+//                           they run): only ground below home is rebuilt, or below the lifted
+//                           level while youth programs run
 // Left alone, a rival stays where the real data put it; it moves only when the player wins fans
 // from it or its countermoves push it. "Other" never converts anyone.
 // Hardcore poaching (src/sim/poaching.ts): every sport's hardcore fans demote to casual about the
@@ -48,8 +50,9 @@ import {
 // Generational turnover (GDD Late-Game Pressure): the player's and every rival's hardcore fans above
 // a floor age out at a small annual rate and demote to casual about the same sport. The "other
 // sports" bucket is exempt: it is a fixed backdrop that never recruits, so aging would only erode it.
-// Rivals recruit replacements for their aging fans from their own casual fans (rivalReplacement), so
-// an incumbent holds its ground unless the player actually wins fans from it; the player gets no
+// Rivals recruit replacements for their aging fans from their own casual fans (rivalReplacement), up
+// to the same target, so an incumbent holds its ground unless the player actually wins fans from it,
+// and ground a countermove won above home ages away after it ends; the player gets no
 // replacement and must keep converting. Hardcore fans never go straight
 // to uninterested; the only other hardcore loss is the league causes at the end of a turn.
 // Hardcore is exclusive: if the sports together would convert more people than have no hardcore
@@ -260,18 +263,22 @@ function stepCountryFans(
       );
       const casualChurn = drawFlow(rng, fans.casual, rates.casualChurnRate, noise);
       const casualLeft = fans.casual - casualChurn;
-      const belowHome =
-        homeHardcore > 0 ? Math.max(0, 1 - fans.hardcore / (homeHardcore * population)) : 0;
+      // The hardcore level the rival rebuilds toward: home, lifted while youth programs run.
+      const target = homeHardcore * population * boosts.homeLift;
+      const belowHome = target > 0 ? Math.max(0, 1 - fans.hardcore / target) : 0;
       const converted = drawFlow(
         rng,
         casualLeft,
         rates.hardcoreConversionRate * unattachedShare * belowHome * boosts.hardcore,
         noise,
       );
-      // Replacements for this quarter's aging fans: no extra rolls, so the sequence stays aligned.
+      // Replacements for this quarter's aging fans, only up to the level the rival rebuilds toward:
+      // ground a countermove won above home ages away once it ends. No extra rolls, so the
+      // sequence stays aligned.
+      const replaceable = fans.hardcore > 0 ? Math.min(1, target / fans.hardcore) : 0;
       const replaced = Math.min(
         casualLeft - converted,
-        Math.round(agedOut * config.turnover.rivalReplacement),
+        Math.round(agedOut * config.turnover.rivalReplacement * replaceable),
       );
       return { casualGain, casualChurn, hardcoreGain: converted + replaced, hardcoreLoss };
     }

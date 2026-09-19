@@ -453,10 +453,16 @@ export const configFileSchema = z.strictObject({
       deescalationRatio: z.number().gt(0).max(1),
       deescalationQuarters: z.int().min(1),
     }),
-    nearTop: z.strictObject({
-      startRatio: z.number().min(0).lt(1),
-      maxIntensity: z.number().min(1),
-    }),
+    nearTop: z
+      .strictObject({
+        startRatio: z.number().min(0).lt(1),
+        peakRatio: z.number().gt(0),
+        maxIntensity: z.number().min(1),
+        positionPressure: z.number().min(0),
+      })
+      .refine((near) => near.peakRatio > near.startRatio, {
+        message: "peakRatio must be greater than startRatio",
+      }),
     budget: z.strictObject({
       incomePerFandomScore: z.number().min(0),
       capQuarters: z.number().positive(),
@@ -469,6 +475,7 @@ export const configFileSchema = z.strictObject({
       youthPrograms: z.strictObject({
         ...timedMoveBase,
         hardcoreConversionBoost: z.number().min(0),
+        homeLift: z.number().min(0),
       }),
       broadcastDeal: z.strictObject(timedMoveBase),
       sponsorLockout: z.strictObject({ ...timedMoveBase, mediaRevenueCut: unitInterval }),
