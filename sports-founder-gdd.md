@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.8 | September 19, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest)*
+*Version 1.9 | September 19, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport)*
 
 ---
 
@@ -449,8 +449,16 @@ market. All stored in content; every conversion curve and weight lives in config
 - **Exclusive forks:** 1–2 per category; choosing one locks out the other (e.g., Pay-TV exclusivity:
   +cash, −casual reach vs. Free-to-air: +casual reach, −cash).
 - **No refunds.** Purchased nodes are permanent — choices must hurt.
-- **Cost:** base cost × current PP tier multiplier. Buying before a tier-up is cheaper, rewarding
-  preparation for growing pains.
+- **Cost:** base cost × current PP tier multiplier × the sport's size factor. Buying before a
+  tier-up is cheaper, rewarding preparation for growing pains.
+- **Prices grow with the sport (decided 2026-09-19).** A node's price also scales with the sport's
+  own Fandom Score, so the tree is never bought out: a campaign ends owning about half of it, and
+  which half is the decision. Before this, PP income grew with the sport while prices did not, so
+  every campaign owned every reachable node by the middle of the game and the forks resolved the
+  same way — the tree was a formality. The scaling is deliberately steeper than the income curve, so
+  each node is dearer than the last and waiting costs you. Tuning (2026-09-19): a campaign owns a
+  median 9 of the 16 reachable nodes, and different strategies own different ones — the grassroots
+  spine, the media branch, opposite fork sides.
 - **Buying rules (decided 2026-09-13):** a category can be bought from only while the sport's
   *current* PP tier unlocks it. After a demotion the sport keeps every node but cannot buy from a
   category above its current tier until it climbs back. The multiplier is the highest tier reached.

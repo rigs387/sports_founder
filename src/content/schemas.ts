@@ -252,6 +252,11 @@ export const growthNodeSchema = z.strictObject({
 export const growthTreeFileSchema = z.strictObject({
   categories: z.partialRecord(growthCategorySchema, z.strictObject({ unlockTier: z.int().min(1) })),
   limits: z.strictObject({ minFactor: z.number().gt(0).max(1) }),
+  /** How a node's price grows with the sport's size (GDD PP Growth Tree, decided 2026-09-19). */
+  costScaling: z.strictObject({
+    referenceFandomScore: z.number().positive(),
+    exponent: z.number().min(0),
+  }),
   forks: z.array(z.strictObject({ id, nodes: z.array(id).min(2) })).default([]),
   nodes: z.array(growthNodeSchema).min(1),
 });

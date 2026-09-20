@@ -56,6 +56,7 @@ surface before playtesting or during it.
 | 2026-09-18 | The hard-anchor criterion counts wins, with the builder bot in the default bot list; pacing adds the first win (target turn 180) | Decided |
 | 2026-09-18 | Genome condition deltas scaled ×1.75 (base deltas untouched): steeper geography restores differentiation to 6/6 after rivals stopped filling rival-thin markets | Tuning |
 | 2026-09-19 | The win hold is a real contest: about half the campaigns that take #1 lose it before winning (GDD v1.8); near-top rival defense rebuilt to reach it, win hold 36 → 30 turns | Decided |
+| 2026-09-19 | Growth node prices scale with the sport's Fandom Score (GDD v1.9): a campaign owns ~half the tree (median 9 of 16) instead of all of it, and strategies own different halves. Base node costs ×0.5, effect amounts ×1.6, player casual/hardcore conversion 0.25→0.3 and 0.012→0.015 to hold the GDD turn budget | Decided |
 | 2026-09-19 | Genome condition deltas ×1.25 again (×2.19 in all; ice is at the lever ceiling): the contested hold's late-game defense had eroded differentiation to 5/6. Tier-3 score gate 600k → 400k; grass and moderate-rules deltas trimmed (options: stop-start and short now marginal, lower bound 42%) | Tuning |
 
 ---

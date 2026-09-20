@@ -248,7 +248,7 @@ describe("saves with the growth tree (format 5)", () => {
   it("resumes identically when the bot bought nodes before the save and keeps buying after", () => {
     let midway = createCampaign(world, setup);
     let saveAfter = 0;
-    while (bought(midway).length < 4 && saveAfter < 100) {
+    while (bought(midway).length < 4 && saveAfter < 160) {
       midway = playWithPolicy(midway, 1);
       saveAfter += 1;
     }

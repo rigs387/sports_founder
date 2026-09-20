@@ -57,14 +57,17 @@ describe("determinism", () => {
     ["media-rush", mediaRush],
   ] as const)("is deterministic while %s buys growth nodes turn after turn", (_name, bot) => {
     // An anchor and genome that fit, so both bots survive and keep buying nodes over many turns.
+    // Long enough that a bot buys several nodes at growth-tree prices, which rise with the sport.
     const setup = setupFor(31, "austria", presetGenome("long-innings"));
-    const a = runWithPolicy(createCampaign(world, setup), 100, bot);
-    const b = runWithPolicy(createCampaign(world, setup), 100, bot);
+    const a = runWithPolicy(createCampaign(world, setup), 160, bot);
+    const b = runWithPolicy(createCampaign(world, setup), 160, bot);
     expect(b).toStrictEqual(a);
     expect(serializeSave(b)).toBe(serializeSave(a));
+    // Several purchases spread over separate turns: enough to exercise buying repeatedly without
+    // the guard tracking what the tree happens to cost.
     const purchases = a.landmarks.filter((l) => l.kind === "nodeBought");
-    expect(purchases.length).toBeGreaterThan(5);
-    expect(new Set(purchases.map((l) => l.turn)).size).toBeGreaterThan(3);
+    expect(purchases.length).toBeGreaterThan(3);
+    expect(new Set(purchases.map((l) => l.turn)).size).toBeGreaterThan(2);
   });
 
   it("is deterministic under the random bot, whose dice never touch the simulation's RNG", () => {

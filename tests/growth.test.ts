@@ -39,6 +39,7 @@ function treeWorld(effects: NodeEffect[], base: World = world): World {
     content.growthTree = {
       categories: { grassroots: { unlockTier: 1 } },
       limits: { minFactor: 0.25 },
+      costScaling: base.growthTree.costScaling,
       forks: [],
       nodes: [{ id: TEST_NODE, category: "grassroots", cost: 10, requires: [], effects }],
     };

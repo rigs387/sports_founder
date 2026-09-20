@@ -59,7 +59,9 @@ Costs: payroll, operations, venues. Cash builds local hardcore via venues/youth,
 cross-country transfers; PP-funded bailouts. Phase 0: gate + one media/sponsor line.
 
 **Growth Tree:** Branching tree per category (~8–12 nodes), global nodes conditioned on country
-attributes, exclusive forks, no refunds, cost = base × current tier multiplier. Phase 0: 20
+attributes, exclusive forks, no refunds, cost = base × current tier multiplier × a size factor that
+grows with the sport's own Fandom Score, so a campaign owns about half the tree and which half is
+the decision. Phase 0: 20
 Grassroots and Media nodes, 4 forks (where to play, roots, TV deal, coverage); a category is
 buyable only while the current tier unlocks it (demotion keeps nodes, blocks new buys); conditions
 never turn a bonus into a penalty.

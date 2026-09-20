@@ -7,6 +7,7 @@ import {
   numericConditionDelta,
 } from "../content";
 import { costMultiplier } from "./calendar";
+import { playerFandomScore } from "./fandom";
 import { countryAttributes } from "./genome";
 import type { GameState, World } from "./types";
 
@@ -188,11 +189,36 @@ export function nodeBlocker(
   return null;
 }
 
-/** PP price of a node now: base cost × the PP cost multiplier (the highest tier reached). */
+/**
+ * How much the sport's own size raises node prices: (Fandom Score ÷ reference) ^ exponent, never
+ * below 1 (GDD PP Growth Tree, decided 2026-09-19). A bigger sport pays more for the same node, so
+ * the tree is never bought out and its branches stay a choice.
+ */
+export function nodeSizeFactor(
+  state: Pick<GameState, "sports" | "countries">,
+  world: World,
+): number {
+  const { referenceFandomScore, exponent } = world.growthTree.costScaling;
+  const score = playerFandomScore(
+    state.sports,
+    state.countries,
+    world.config.fandomScore.casualWeight,
+  );
+  return Math.max(1, score / referenceFandomScore) ** exponent;
+}
+
+/**
+ * PP price of a node now: base cost × the PP cost multiplier (the highest tier reached) × the
+ * sport's size factor.
+ */
 export function nodeCost(
-  state: Pick<GameState, "tierTrack">,
+  state: Pick<GameState, "tierTrack" | "sports" | "countries">,
   world: World,
   nodeId: string,
 ): number {
-  return growthNode(world, nodeId).cost * costMultiplier(state, world.config);
+  return (
+    growthNode(world, nodeId).cost *
+    costMultiplier(state, world.config) *
+    nodeSizeFactor(state, world)
+  );
 }

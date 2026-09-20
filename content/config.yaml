@@ -192,14 +192,17 @@ dynamics:
   player:
     # uninterested → casual: uninterested × rate × accessibility × affinity × familiarity
     #   × exposure × focus conversion bonus
-    casualConversionRate: 0.25
+    # Raised with the step 8 growth tree (2026-09-19, from 0.25 and 0.012; tuned to put the first win at the GDD's turn 180): a campaign now owns about
+    # half the tree instead of all of it, so the sport needs more of its own growth to reach the
+    # fixed bar of soccer's Fandom Score inside the GDD's turn budget.
+    casualConversionRate: 0.27
     # casual → uninterested: casual × (churn + decay × (1 − exposure level)); exposure level is
     # exposure / exposure.retentionSaturation, capped at 1. Casuals decay without exposure.
     casualChurnRate: 0.04
     casualDecayRate: 0.06
     # casual → hardcore: casual × rate × depth × affinity × crowding × share of people with no
     # hardcore sport × focus conversion bonus
-    hardcoreConversionRate: 0.012
+    hardcoreConversionRate: 0.0135
   # Rivals hold their ground (GDD Rival AI: rivals only drift slowly and react to the player). A
   # rival's real starting shares in a country (content/countries.yaml) are its home level: with no
   # spread and no affinity, its flows balance there, so left alone it stays where the data put it.
@@ -387,8 +390,10 @@ leagues:
     # An Amateur league forms once player hardcore fans reach max(minHardcore, share × population).
     minHardcore: 300
     hardcoreShare: 0.0005
-    # A new league starts with this many quarters of Amateur running cost in cash.
-    startingCashQuarters: 60
+    # A new league starts with this many quarters of Amateur running cost in cash. Cut from 60
+    # (2026-09-19): step 8's faster conversion had fans paying for the league before the grant ran
+    # out, and Hungary stopped ever collapsing under the naive bot.
+    startingCashQuarters: 48
     # After a league folds, a new one cannot form for this many quarters.
     reformCooldownQuarters: 8
   # Running cost per quarter = max(tier minRunningCost, tier runningCost × (wealthFloor + (1 −

@@ -41,193 +41,207 @@ categories:
 limits:
   minFactor: 0.25
 
+# A node's price is base cost × the peak tier's cost multiplier × (Fandom Score ÷
+# referenceFandomScore) ^ exponent, never scaled below 1 (decided 2026-09-19). PP income grows with
+# the Fandom Score, so fixed prices made the whole tree affordable by tier 3 and every campaign
+# owned all of it; prices that grow with the sport keep each branch a choice. The exponent is set
+# against the income curve (ppIncome.exponent 0.5): at 0.5 a node costs the same number of quarters
+# of income whatever the sport's size, and 0.6 makes each one dearer than the last. Base costs were
+# halved and effect amounts raised ×1.6 at the same time: a campaign now owns about half the tree
+# (median 9 of the 16 reachable nodes), each node matters more, and which half depends on the
+# strategy - builder takes the grassroots spine, media-rush the media branch, and they choose
+# different fork sides.
+costScaling:
+  referenceFandomScore: 100000
+  exponent: 0.6
+
 forks:
   - id: where-to-play
-    nodes: [street-courts, club-grounds]
+    nodes: [ street-courts, club-grounds ]
   - id: roots
-    nodes: [community-ownership, barnstorming-tours]
+    nodes: [ community-ownership, barnstorming-tours ]
   - id: tv-deal
-    nodes: [pay-tv-exclusivity, free-to-air]
+    nodes: [ pay-tv-exclusivity, free-to-air ]
   - id: coverage
-    nodes: [sponsor-showcase, tabloid-buzz]
+    nodes: [ sponsor-showcase, tabloid-buzz ]
 
 nodes:
   # ---- Grassroots (tier 1): proximity spread, casual conversion, league formation, churn ----------
   - id: backyard-clinics
     category: grassroots
-    cost: 60
+    cost: 30
     requires: []
     effects:
-      - { type: casualConversion, amount: 0.1 }
+      - { type: casualConversion, amount: 0.16 }
 
   - id: word-of-mouth
     category: grassroots
-    cost: 100
-    requires: [backyard-clinics]
+    cost: 50
+    requires: [ backyard-clinics ]
     effects:
-      - { type: spreadChannel, channel: proximity, amount: 0.3 }
+      - { type: spreadChannel, channel: proximity, amount: 0.48 }
 
   - id: weekend-leagues
     category: grassroots
-    cost: 100
-    requires: [backyard-clinics]
+    cost: 50
+    requires: [ backyard-clinics ]
     effects:
-      - { type: formationThresholdReduction, amount: 0.3 }
+      - { type: formationThresholdReduction, amount: 0.48 }
 
   # Fork "where to play": wide and cheap in dense, lower-income countries, or deep in wealthy ones.
   - id: street-courts
     category: grassroots
-    cost: 160
-    requires: [backyard-clinics]
+    cost: 80
+    requires: [ backyard-clinics ]
     effects:
       - type: casualConversion
-        amount: 0.15
+        amount: 0.24
         conditions: { urbanDensity: 0.1, wealth: -0.1 }
-      - { type: hardcoreConversion, amount: -0.1 }
+      - { type: hardcoreConversion, amount: -0.16 }
 
   - id: club-grounds
     category: grassroots
-    cost: 160
-    requires: [backyard-clinics]
+    cost: 80
+    requires: [ backyard-clinics ]
     effects:
       - type: hardcoreConversion
-        amount: 0.1
+        amount: 0.16
         conditions: { wealth: 0.1 }
-      - { type: churnReduction, amount: 0.1 }
+      - { type: churnReduction, amount: 0.16 }
       # Membership fees: fewer casual fans, but only where people are poorer.
       - type: casualConversion
-        amount: -0.05
+        amount: -0.08
         conditions: { wealth: 0.05 }
 
   - id: fan-meetups
     category: grassroots
-    cost: 160
-    requires: [word-of-mouth]
+    cost: 80
+    requires: [ word-of-mouth ]
     effects:
-      - { type: churnReduction, amount: 0.15 }
+      - { type: churnReduction, amount: 0.24 }
 
   - id: volunteer-organisers
     category: grassroots
-    cost: 200
-    requires: [weekend-leagues]
+    cost: 100
+    requires: [ weekend-leagues ]
     effects:
       - type: runningCostReduction
-        amount: 0.1
+        amount: 0.16
         conditions: { wealth: -0.1 }
 
   - id: border-tournaments
     category: grassroots
-    cost: 240
-    requires: [word-of-mouth]
+    cost: 120
+    requires: [ word-of-mouth ]
     effects:
-      - { type: spreadChannel, channel: proximity, amount: 0.4 }
-      - { type: coldLaunchCostReduction, amount: 0.25 }
+      - { type: spreadChannel, channel: proximity, amount: 0.64 }
+      - { type: coldLaunchCostReduction, amount: 0.4 }
 
   # Fork "roots": dig in at home, or tour to open new markets.
   - id: community-ownership
     category: grassroots
-    cost: 360
-    requires: [fan-meetups, volunteer-organisers]
+    cost: 180
+    requires: [ fan-meetups, volunteer-organisers ]
     effects:
-      - { type: churnReduction, amount: 0.15 }
-      - { type: countermoveResistance, amount: 0.3 }
-      - { type: coldLaunchCostReduction, amount: -0.2 }
+      - { type: churnReduction, amount: 0.24 }
+      - { type: countermoveResistance, amount: 0.48 }
+      - { type: coldLaunchCostReduction, amount: -0.32 }
 
   - id: barnstorming-tours
     category: grassroots
-    cost: 360
-    requires: [fan-meetups, volunteer-organisers]
+    cost: 180
+    requires: [ fan-meetups, volunteer-organisers ]
     effects:
-      - { type: coldLaunchCostReduction, amount: 0.4 }
-      - { type: formationThresholdReduction, amount: 0.2 }
-      - { type: churnReduction, amount: -0.1 }
+      - { type: coldLaunchCostReduction, amount: 0.64 }
+      - { type: formationThresholdReduction, amount: 0.32 }
+      - { type: churnReduction, amount: -0.16 }
 
   # ---- Media (tier 2): media reach and language channels, casual reach ---------------------------
   - id: local-radio
     category: media
-    cost: 240
+    cost: 120
     requires: []
     effects:
-      - { type: spreadChannel, channel: language, amount: 0.3 }
+      - { type: spreadChannel, channel: language, amount: 0.48 }
 
   - id: newspaper-columns
     category: media
-    cost: 320
-    requires: [local-radio]
+    cost: 160
+    requires: [ local-radio ]
     effects:
       - type: casualConversion
-        amount: 0.1
+        amount: 0.16
         conditions: { wealth: 0.05 }
 
   - id: highlight-reels
     category: media
-    cost: 320
-    requires: [local-radio]
+    cost: 160
+    requires: [ local-radio ]
     effects:
-      - { type: spreadChannel, channel: media, amount: 0.5 }
+      - { type: spreadChannel, channel: media, amount: 0.8 }
 
   - id: dubbed-broadcasts
     category: media
-    cost: 480
-    requires: [local-radio]
+    cost: 240
+    requires: [ local-radio ]
     effects:
-      - { type: spreadChannel, channel: language, amount: 0.4 }
-      - { type: coldLaunchCostReduction, amount: 0.2 }
+      - { type: spreadChannel, channel: language, amount: 0.64 }
+      - { type: coldLaunchCostReduction, amount: 0.32 }
 
   # Fork "TV deal": league cash, or casual reach.
   - id: pay-tv-exclusivity
     category: media
-    cost: 600
-    requires: [highlight-reels]
+    cost: 300
+    requires: [ highlight-reels ]
     effects:
       - type: runningCostReduction
-        amount: 0.2
+        amount: 0.32
         conditions: { mediaMarket: 0.1 }
-      - { type: casualConversion, amount: -0.1 }
+      - { type: casualConversion, amount: -0.16 }
 
   - id: free-to-air
     category: media
-    cost: 600
-    requires: [highlight-reels]
+    cost: 300
+    requires: [ highlight-reels ]
     effects:
       - type: casualConversion
-        amount: 0.1
+        amount: 0.16
         conditions: { mediaMarket: 0.1 }
-      - { type: spreadChannel, channel: media, amount: 0.25 }
-      - { type: runningCostReduction, amount: -0.1 }
+      - { type: spreadChannel, channel: media, amount: 0.4 }
+      - { type: runningCostReduction, amount: -0.16 }
 
   - id: star-profiles
     category: media
-    cost: 600
-    requires: [newspaper-columns]
+    cost: 300
+    requires: [ newspaper-columns ]
     effects:
-      - { type: hardcoreConversion, amount: 0.1 }
-      - { type: churnReduction, amount: 0.1 }
+      - { type: hardcoreConversion, amount: 0.16 }
+      - { type: churnReduction, amount: 0.16 }
 
   # Fork "coverage": protection and PP, or casual volume that comes and goes.
   - id: sponsor-showcase
     category: media
-    cost: 800
-    requires: [star-profiles]
+    cost: 400
+    requires: [ star-profiles ]
     effects:
-      - { type: countermoveResistance, amount: 0.4 }
-      - { type: ppIncome, amount: 0.08 }
-      - { type: casualConversion, amount: -0.05 }
+      - { type: countermoveResistance, amount: 0.64 }
+      - { type: ppIncome, amount: 0.128 }
+      - { type: casualConversion, amount: -0.08 }
 
   - id: tabloid-buzz
     category: media
-    cost: 800
-    requires: [star-profiles]
+    cost: 400
+    requires: [ star-profiles ]
     effects:
       - type: casualConversion
-        amount: 0.15
+        amount: 0.24
         conditions: { urbanDensity: 0.1 }
-      - { type: churnReduction, amount: -0.15 }
+      - { type: churnReduction, amount: -0.24 }
 
   - id: satellite-feed
     category: media
-    cost: 1000
-    requires: [highlight-reels, dubbed-broadcasts]
+    cost: 500
+    requires: [ highlight-reels, dubbed-broadcasts ]
     effects:
-      - { type: spreadChannel, channel: media, amount: 0.6 }
-      - { type: ppIncome, amount: 0.05 }
+      - { type: spreadChannel, channel: media, amount: 0.96 }
+      - { type: ppIncome, amount: 0.08 }
