@@ -31,6 +31,9 @@
 #   conditions optional, the genome's condition style (see genome.yaml): climate deltas and numeric
 #              weights on wealth, urbanDensity, sportCulture, mediaMarket, added to the amount in
 #              each country. A condition can shrink an effect to nothing but never flips its sign.
+#              Unlike a genome option's, a node's climate deltas are used as written, not centred on
+#              the world: a node is a thing the player buys, so a climate delta here is meant to make
+#              it worth more or less overall, not only to say where it pays best.
 #
 # Forks: exclusive choices. Owning one node of a fork locks out the others for good (no refunds).
 

@@ -297,16 +297,43 @@ export interface OptionsReport {
   dominanceZ: number;
   byAnchor: { anchor: string; outcomes: OptionOutcome[]; aboveLimit: string[] }[];
   combined: { outcomes: OptionOutcome[]; aboveLimit: string[] };
-  /** The same question for growth tree nodes: owned in more than the limit of top-quartile runs. */
+  /**
+   * The same question for growth tree nodes: owned in more than the limit of top-quartile runs.
+   * `byAnchor` and `combined` are the primary bot's; the verdict is `aboveLimitForEveryBot`.
+   */
   nodes: {
     byAnchor: { anchor: string; outcomes: NodeOutcome[]; aboveLimit: string[] }[];
     combined: { outcomes: NodeOutcome[]; aboveLimit: string[] };
+    /** Every bot the node question was asked of, the primary one first. */
+    bots: BotId[];
+    byBot: NodeDominanceByBot[];
+    /**
+     * Nodes above the limit for every bot: a node no strategy can pass up, rather than one
+     * strategy's signature (decided 2026-09-21).
+     */
+    aboveLimitForEveryBot: string[];
   };
+}
+
+/** How one bot answers the growth tree, across the same anchors. */
+export interface NodeDominanceByBot {
+  bot: BotId;
+  genomesPerAnchor: number;
+  byAnchor: { anchor: string; outcomes: NodeOutcome[]; aboveLimit: string[] }[];
+  combined: { outcomes: NodeOutcome[]; aboveLimit: string[] };
 }
 
 export function runOptions(
   world: World,
-  settings: { anchors: string[]; bot: BotId; seeds: number[]; turns: number },
+  settings: {
+    anchors: string[];
+    bot: BotId;
+    seeds: number[];
+    turns: number;
+    /** Bots the growth node question is asked of as well, each on `nodeSeeds` genomes. */
+    nodeBots?: BotId[];
+    nodeSeeds?: number[];
+  },
   onCampaign?: OnCampaign,
 ): OptionsReport {
   const limit = world.config.balanceTargets.dominanceLimit;
@@ -333,6 +360,43 @@ export function runOptions(
   }
   const combined = optionOutcomes(all, limit, z);
   const combinedNodes = nodeOutcomes(all, nodeIds, limit, z);
+
+  // The growth tree asked of every strategy, not only the primary bot: one bot answers the tree the
+  // same way every time, so the nodes it always buys read as dominant when they are only its
+  // signature. The extra campaigns stay out of `onCampaign` so the run's summary remains the
+  // primary bot's.
+  const primary: NodeDominanceByBot = {
+    bot: settings.bot,
+    genomesPerAnchor: settings.seeds.length,
+    byAnchor: nodesByAnchor,
+    combined: { outcomes: combinedNodes, aboveLimit: nodesAbove(combinedNodes) },
+  };
+  const nodeSeeds = settings.nodeSeeds ?? settings.seeds;
+  const byBot: NodeDominanceByBot[] = [primary];
+  for (const bot of settings.nodeBots ?? []) {
+    if (bot === settings.bot) continue;
+    const perAnchor: NodeDominanceByBot["byAnchor"] = [];
+    const botResults: PlayedCampaign["result"][] = [];
+    for (const anchor of settings.anchors) {
+      const results = nodeSeeds.map(
+        (seed) => randomGenomeCampaign(world, seed, anchor, bot, settings.turns).result,
+      );
+      botResults.push(...results);
+      const outcomes = nodeOutcomes(results, nodeIds, limit, z);
+      perAnchor.push({ anchor, outcomes, aboveLimit: nodesAbove(outcomes) });
+    }
+    const outcomes = nodeOutcomes(botResults, nodeIds, limit, z);
+    byBot.push({
+      bot,
+      genomesPerAnchor: nodeSeeds.length,
+      byAnchor: perAnchor,
+      combined: { outcomes, aboveLimit: nodesAbove(outcomes) },
+    });
+  }
+  const aboveLimitForEveryBot = nodeIds.filter((nodeId) =>
+    byBot.every((entry) => entry.combined.aboveLimit.includes(nodeId)),
+  );
+
   return {
     anchors: settings.anchors,
     bot: settings.bot,
@@ -345,6 +409,9 @@ export function runOptions(
     nodes: {
       byAnchor: nodesByAnchor,
       combined: { outcomes: combinedNodes, aboveLimit: nodesAbove(combinedNodes) },
+      bots: byBot.map((entry) => entry.bot),
+      byBot,
+      aboveLimitForEveryBot,
     },
   };
 }

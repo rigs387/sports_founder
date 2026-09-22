@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   AXIS_IDS,
+  CLIMATES,
+  type Climate,
+  centreClimateConditions,
   GENOME_AXES,
   type Genome,
   IDENTITY_AXES,
+  LEVERS,
   NUMERIC_ATTRIBUTES,
   optionNetDeltaAt,
   RULE_AXES,
@@ -106,6 +110,76 @@ describe("numeric conditions are relative to the world", () => {
       if (attributes.position.wealth > 0) expect(net, id).toBeGreaterThan(0);
       if (attributes.position.wealth < 0) expect(net, id).toBeLessThan(0);
     });
+  });
+});
+
+describe("climate conditions are relative to the world", () => {
+  const climateShares = () => {
+    const total = world.countries.reduce((sum, c) => sum + c.population, 0);
+    const shares: Record<string, number> = { tropical: 0, arid: 0, temperate: 0, cold: 0 };
+    for (const country of world.countries) {
+      shares[country.climate] = (shares[country.climate] ?? 0) + country.population / total;
+    }
+    return shares;
+  };
+
+  it("every option's climate map averages out to nothing across the world's people", () => {
+    const shares = climateShares();
+    for (const axis of AXIS_IDS) {
+      for (const option of GENOME_AXES[axis].options) {
+        const modifiers = world.genome.options[axis][option];
+        for (const lever of LEVERS) {
+          const climate = modifiers?.conditions[lever]?.climate;
+          if (!climate) continue;
+          const mean = CLIMATES.reduce(
+            (sum, zone) => sum + (shares[zone] ?? 0) * (climate[zone] ?? 0),
+            0,
+          );
+          expect(mean, `${axis}=${option} ${lever}`).toBeCloseTo(0, 12);
+        }
+      }
+    }
+  });
+
+  it("centring keeps the differences between zones: only the level moves", () => {
+    const countries = world.countries;
+    const raw = structuredClone(world.genome);
+    const surface = raw.options.surface;
+    surface.ice = {
+      base: {},
+      conditions: { affinity: { climate: { cold: 1, temperate: 0, arid: -0.5, tropical: -0.5 } } },
+    };
+    const centred = centreClimateConditions(raw, countries).options.surface.ice?.conditions.affinity
+      ?.climate;
+    if (!centred) throw new Error("no centred climate map");
+    const at = (zone: Climate) => centred[zone] ?? 0;
+    expect(at("cold") - at("temperate")).toBeCloseTo(1, 12);
+    expect(at("temperate") - at("tropical")).toBeCloseTo(0.5, 12);
+    // Cold holds 4% of the world's people, so a cold sport's penalty elsewhere was the whole story.
+    expect(at("cold")).toBeGreaterThan(1);
+    expect(at("tropical")).toBeGreaterThan(-0.5);
+  });
+
+  it("is idempotent: an already centred map does not move again", () => {
+    const again = centreClimateConditions(world.genome, world.countries);
+    for (const axis of AXIS_IDS) {
+      for (const option of GENOME_AXES[axis].options) {
+        for (const lever of LEVERS) {
+          const before = world.genome.options[axis][option]?.conditions[lever]?.climate;
+          const after = again.options[axis][option]?.conditions[lever]?.climate;
+          if (!before) {
+            expect(after, `${axis}=${option} ${lever}`).toBeUndefined();
+            continue;
+          }
+          for (const zone of CLIMATES) {
+            expect(after?.[zone] ?? 0, `${axis}=${option} ${lever} ${zone}`).toBeCloseTo(
+              before[zone] ?? 0,
+              12,
+            );
+          }
+        }
+      }
+    }
   });
 });
 

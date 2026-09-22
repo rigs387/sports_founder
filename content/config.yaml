@@ -489,6 +489,14 @@ balanceTargets:
   experimentAnchors: 12
   # The signature hard anchor for the "hard anchors are winnable" criterion (GDD Map and markets).
   hardAnchor: tuvalu
+  # Growth node dominance is judged strategy by strategy (decided 2026-09-21). One bot answers the
+  # tree the same way every time, so the nodes it always buys read as dominant when they are only
+  # that bot's signature: builder takes the grassroots spine, media-rush the media branch,
+  # anchor-turtle street courts and community ownership. A node fails only when every one of these
+  # bots owns it in more than dominanceLimit of its own top-quartile runs - a node no strategy can
+  # pass up. Each extra bot plays this many random genomes per anchor.
+  nodeDominanceBots: [ builder, media-rush, anchor-turtle, greedy-spread ]
+  nodeDominanceGenomesPerBot: 40
   # The naive strategy for the "no safe anchor" criterion.
   naiveBot: greedy-spread
   # Seeds per anchor for the naive bot in the collapse experiment (or --campaigns if higher). Rare

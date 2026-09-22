@@ -566,6 +566,8 @@ export const configFileSchema = z.strictObject({
     turnsInTier: z.array(z.int().min(1)).min(1),
     naiveBot: z.string().min(1),
     naiveBotCollapseSeeds: z.int().min(1),
+    nodeDominanceBots: z.array(z.string().min(1)).min(1),
+    nodeDominanceGenomesPerBot: z.int().min(1),
     experimentAnchors: z.int().min(1),
     hardAnchor: z.string().min(1),
   }),

@@ -78,7 +78,10 @@ runs/                 Runner and smoke-test output (git-ignored)
   fans from their own casual fans, so they hold their ground unless the player wins fans from them.
 - Numeric conditions on country attributes (genome options and growth nodes) are relative to the
   world: `CountryDerived.position` is 0 at the population-weighted average country and ±1 at the
-  most extreme one. Content validation requires every genome option to help in, and hurt in, a
+  most extreme one. A genome option's climate deltas are centred the same way at load
+  (`centreClimateConditions`): its climate map averages out to nothing across the world's people,
+  so geography decides where a sport catches on, never whether it can. Growth node climate deltas
+  are used as written. Content validation requires every genome option to help in, and hurt in, a
   configured share of the real countries (`config.genomeBalance`).
 - Hardcore poaching is in `src/sim/poaching.ts`; the rival AI (budgets, escalation, countermoves)
   runs once per quarter in `src/sim/rivals.ts`, uses no randomness, and records every escalation

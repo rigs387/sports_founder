@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.9 | September 19, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport)*
+*Version 1.10 | September 21, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world)*
 
 ---
 
@@ -301,6 +301,15 @@ Water as a surface option is parked for later.
     sport culture and media market conditions are neutral at the world's population-weighted
     average country and apply in full at the most extreme country. An option conditioned on wealth
     helps in richer-than-average countries and hurts in poorer ones, whatever the data's scale.
+  - *Climate conditions are relative to the world too (decided 2026-09-21):* a climate condition
+    is centred on the world's people, so an option's climate map averages out to nothing across the
+    world and says only where the sport does better or worse than its own average. Geography
+    decides *where* a sport catches on, never *whether* it can. Written literally, climate was a
+    flat handicap that numeric conditions never had: the world's people are 45% tropical and 4%
+    cold, so an option asking for cold paid its penalty across almost everyone and collected its
+    bonus almost nowhere. The four options with the largest handicaps (Ice, Strength, Long, Continuous)
+    were the four that balance runs never chose, and because an axis's top-quartile shares must add
+    up to one, their dead weight was what pushed their neighbours past the dominance limit.
   - *Judged globally (decided 2026-09-14):* the no-dominant-genome check ranks campaigns by global
     Fandom Score, so a niche option must pay off enough in its niche to reach the top campaigns.
 - **Identity vs. rule traits.** Identity traits (surface, equipment, physical profile, field

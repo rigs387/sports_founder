@@ -1,4 +1,5 @@
 import type { AffinityAttributes } from "./genome";
+import { AXIS_IDS } from "./genome-axes";
 import type {
   Config,
   Country,
@@ -7,11 +8,18 @@ import type {
   GenomeContent,
   GrowthTreeContent,
   Names,
+  OptionModifiers,
   RivalSport,
   Sources,
   SportsContent,
 } from "./schemas";
-import { NUMERIC_ATTRIBUTES, type NumericAttribute } from "./schemas";
+import {
+  CLIMATES,
+  type Climate,
+  LEVERS,
+  NUMERIC_ATTRIBUTES,
+  type NumericAttribute,
+} from "./schemas";
 
 // Derives what the simulation reads from raw country content (GDD Country attributes): 0–1
 // attribute scores via config curves, sport culture from starting fans, media market size, the
@@ -142,6 +150,53 @@ export function attributePositions(
   return out;
 }
 
+/**
+ * Every genome option's climate conditions, centred on the world's people (decided 2026-09-21):
+ * each climate delta less the population-weighted mean of that option's climate map, so the map
+ * averages zero across the world. A climate condition then says where a sport does better or worse
+ * than its own world average, never whether it thrives at all - the same thing `attributePositions`
+ * does for numeric conditions, which are neutral at the average country by construction.
+ *
+ * Without this, geography was a flat handicap: the world's people are 45% tropical and 4% cold, so
+ * an option asking for cold paid its penalty across almost everyone and collected its bonus almost
+ * nowhere. The four options with the largest handicaps were the four that balance runs never chose
+ * (ice, strength, long, continuous), and because an axis's top-quartile shares sum to one, their
+ * dead weight is what pushed their neighbours past the dominance limit.
+ */
+export function centreClimateConditions(
+  genome: GenomeContent,
+  countries: readonly Country[],
+): GenomeContent {
+  const total = countries.reduce((sum, country) => sum + country.population, 0);
+  if (total <= 0) return genome;
+  const share = {} as Record<Climate, number>;
+  for (const climate of CLIMATES) share[climate] = 0;
+  for (const country of countries) share[country.climate] += country.population / total;
+
+  const options = {} as GenomeContent["options"];
+  for (const axis of AXIS_IDS) {
+    const centred: Record<string, OptionModifiers> = {};
+    for (const [option, modifiers] of Object.entries(genome.options[axis])) {
+      const conditions = { ...modifiers.conditions };
+      for (const lever of LEVERS) {
+        const climate = conditions[lever]?.climate;
+        if (!climate) continue;
+        const mean = CLIMATES.reduce((sum, zone) => sum + share[zone] * (climate[zone] ?? 0), 0);
+        if (mean === 0) continue;
+        conditions[lever] = {
+          ...conditions[lever],
+          climate: Object.fromEntries(
+            CLIMATES.map((zone) => [zone, (climate[zone] ?? 0) - mean]),
+          ) as Record<Climate, number>,
+        };
+      }
+      centred[option] = { ...modifiers, conditions };
+    }
+    options[axis] = centred;
+  }
+  return { ...genome, options };
+}
+
 /** Language channel link factor: 1 for shared primary spheres, scaled for secondary ones. */
 export function languageLinkFactor(a: Country, b: Country, secondaryWeight: number): number {
   let best = 0;
@@ -213,7 +268,7 @@ export function deriveWorld(content: WorldContent): World {
     countries: content.countries,
     rivals: content.rivals,
     otherSports: content.otherSports,
-    genome: content.genome,
+    genome: centreClimateConditions(content.genome, content.countries),
     growthTree: content.growthTree,
     names: content.names,
     sources: content.sources,

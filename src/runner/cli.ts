@@ -245,11 +245,17 @@ function printOptions(report: OptionsReport): void {
   const combined =
     report.combined.aboveLimit.length === 0 ? "none" : report.combined.aboveLimit.join(", ");
   console.log(`  ${"all anchors".padEnd(14)} above limit: ${combined}`);
-  console.log("  Growth tree nodes owned in more than the limit of top-quartile runs:");
-  for (const entry of report.nodes.byAnchor) {
-    const above = entry.aboveLimit.length === 0 ? "none" : entry.aboveLimit.join(", ");
-    console.log(`    ${entry.anchor.padEnd(14)} ${above}`);
+  console.log(
+    "  Growth tree nodes owned in more than the limit of top-quartile runs, per strategy. A node fails only when every bot owns it past the limit: otherwise it is that bot's signature, not a dominant node.",
+  );
+  for (const entry of report.nodes.byBot) {
+    const above =
+      entry.combined.aboveLimit.length === 0 ? "none" : entry.combined.aboveLimit.join(", ");
+    console.log(`    ${entry.bot.padEnd(14)} (${entry.genomesPerAnchor} genomes/anchor) ${above}`);
   }
+  console.log(
+    `    ${"every bot".padEnd(14)} ${report.nodes.aboveLimitForEveryBot.length === 0 ? "none" : report.nodes.aboveLimitForEveryBot.join(", ")}`,
+  );
   const shares = report.nodes.combined.outcomes
     .map(
       (o) =>
@@ -257,9 +263,8 @@ function printOptions(report: OptionsReport): void {
     )
     .join("; ");
   console.log(
-    `    ${"all anchors".padEnd(14)} ${report.nodes.combined.aboveLimit.length === 0 ? "none" : report.nodes.combined.aboveLimit.join(", ")}`,
+    `    top-quartile ownership, ${report.bot} (all its campaigns in brackets): ${shares}`,
   );
-  console.log(`    top-quartile ownership (all campaigns in brackets): ${shares}`);
 }
 
 function printGrowth(growth: ReturnType<typeof growthAggregate>, campaigns: number): void {
@@ -545,9 +550,21 @@ function main(): number {
           world.config.balanceTargets.optionsGenomesPerAnchor,
         );
         const optionSeeds = Array.from({ length: genomesPerAnchor }, (_, i) => firstSeed + i);
+        const { nodeDominanceBots, nodeDominanceGenomesPerBot } = world.config.balanceTargets;
+        const nodeSeeds = Array.from(
+          { length: Math.min(nodeDominanceGenomesPerBot, optionSeeds.length) },
+          (_, i) => firstSeed + i,
+        );
         const report = runOptions(
           world,
-          { anchors, bot, seeds: optionSeeds, turns },
+          {
+            anchors,
+            bot,
+            seeds: optionSeeds,
+            turns,
+            nodeBots: checkBots(nodeDominanceBots),
+            nodeSeeds,
+          },
           collect(false),
         );
         writeReport("options", report);
