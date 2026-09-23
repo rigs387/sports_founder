@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backyard Kickball Spreads</title>
+<style>
+  :root {
+    --paper: #eff2f1;
+    --surface: #ffffff;
+    --sunken: #e4e9e7;
+    --ink: #0f1b1d;
+    --muted: #5c6f70;
+    --line: #cfd8d6;
+    --accent: #0d6b68;
+    --contested: #7b3f8f;
+    --shadow: 0 1px 2px rgba(15, 27, 29, .07);
+    --tile-none: #dde3e1;
+    --tile-edge: rgba(15, 27, 29, .10);
+    --s1: #fbe9d2;
+    --s2: #f7cf9b;
+    --s3: #f0ad64;
+    --s4: #e2843a;
+    --s5: #c65f20;
+    --s6: #97400f;
+    --display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0c1315;
+      --surface: #131d1f;
+      --sunken: #0a1012;
+      --ink: #e4ebe9;
+      --muted: #93a5a4;
+      --line: #28383a;
+      --accent: #46c7bd;
+      --contested: #c489d6;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .45);
+      --tile-none: #1d2729;
+      --tile-edge: rgba(228, 235, 233, .12);
+      --s1: #3a2a1c;
+      --s2: #5c3c20;
+      --s3: #855128;
+      --s4: #b06a2d;
+      --s5: #d98c3f;
+      --s6: #f5b463;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0c1315;
+    --surface: #131d1f;
+    --sunken: #0a1012;
+    --ink: #e4ebe9;
+    --muted: #93a5a4;
+    --line: #28383a;
+    --accent: #46c7bd;
+    --contested: #c489d6;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .45);
+    --tile-none: #1d2729;
+    --tile-edge: rgba(228, 235, 233, .12);
+    --s1: #3a2a1c;
+    --s2: #5c3c20;
+    --s3: #855128;
+    --s4: #b06a2d;
+    --s5: #d98c3f;
+    --s6: #f5b463;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 15px/1.6 var(--body);
+    padding-inline: 20px;
+    padding-block: 0 64px;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; }
+  header.masthead { padding-block: 44px 22px; border-bottom: 2px solid var(--ink); margin-bottom: 26px; }
+  .eyebrow {
+    font: 600 11px/1 var(--body); letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 16px;
+  }
+  h1 { font: 400 clamp(30px, 6vw, 46px)/1.05 var(--display); margin: 0 0 12px; text-wrap: balance; }
+  .standfirst { font-size: 17px; color: var(--muted); margin: 0 0 18px; max-width: 64ch; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 12.5px/1.4 var(--mono); color: var(--muted); }
+
+  .controls {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+    padding: 12px 16px; margin-bottom: 14px; box-shadow: var(--shadow);
+  }
+  button.play {
+    font: 600 13px var(--body); color: var(--surface); background: var(--accent);
+    border: 0; border-radius: 4px; padding: 8px 16px; cursor: pointer; min-width: 74px;
+  }
+  button.play:hover { filter: brightness(1.08); }
+  input[type="range"] { flex: 1 1 220px; min-width: 160px; accent-color: var(--accent); }
+  .frame-readout { font: 600 13px/1.3 var(--mono); color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .frame-readout span { color: var(--muted); font-weight: 500; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 11px 13px; box-shadow: var(--shadow); }
+  .tile dt { font: 600 10px/1.3 var(--body); letter-spacing: .11em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .tile dd { margin: 0; font: 600 21px/1.15 var(--body); font-variant-numeric: tabular-nums; }
+  .tile dd small { display: block; font: 500 12px/1.3 var(--body); color: var(--muted); margin-top: 3px; }
+
+  .board { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 800px) { .board { grid-template-columns: minmax(0, 1fr); } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px; box-shadow: var(--shadow); }
+  .panel h2 { font: 600 11px/1.3 var(--body); letter-spacing: .11em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  #map { width: 100%; height: auto; display: block; touch-action: manipulation; }
+  .tilerect { stroke: var(--tile-edge); stroke-width: .8; cursor: pointer; }
+  .tilerect:hover { stroke: var(--ink); stroke-width: 1.6; }
+  .tilerect.selected { stroke: var(--ink); stroke-width: 2.2; }
+  .continent-label { font: 600 5.2px var(--body); letter-spacing: .12em; text-transform: uppercase; fill: var(--muted); }
+  .mark-anchor { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+  .mark-focus { fill: var(--accent); }
+  .mark-contested { fill: var(--contested); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 18px 26px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .ramp { display: flex; flex-direction: column; gap: 5px; }
+  .ramp-swatches { display: flex; }
+  .ramp-swatches i { width: 30px; height: 12px; display: block; }
+  .ramp-ends { display: flex; justify-content: space-between; font: 500 11px var(--mono); color: var(--muted); }
+  .keys { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); align-items: center; }
+  .keys span { display: inline-flex; align-items: center; gap: 6px; }
+  .keys b { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; padding: 6px 8px 6px 0; border-bottom: 1px solid var(--line); }
+  th { font: 600 10px/1.3 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  td.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; padding-right: 0; }
+  tr.row { cursor: pointer; }
+  tr.row:hover td { background: var(--sunken); }
+  tr.row.selected td { background: var(--sunken); font-weight: 600; }
+
+  .detail dl { display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; margin: 0; font-size: 13.5px; }
+  .detail dt { color: var(--muted); }
+  .detail dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .detail .name { font: 400 22px/1.2 var(--display); margin: 0 0 10px; }
+
+  #tooltip {
+    position: fixed; pointer-events: none; z-index: 10; max-width: 240px;
+    background: var(--ink); color: var(--paper); border-radius: 5px; padding: 8px 11px;
+    font-size: 12.5px; line-height: 1.45; box-shadow: 0 4px 14px rgba(0,0,0,.28);
+  }
+  #tooltip strong { display: block; font-size: 13.5px; margin-bottom: 2px; }
+  #tooltip .t-num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  footer { margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+  footer p { margin: 0 0 10px; max-width: 78ch; }
+  code { font: 500 .9em var(--mono); background: var(--sunken); padding: 1px 5px; border-radius: 3px; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  .tilerect { transition: fill .35s ease; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Sports Founder &middot; Map mock-up</p>
+  <h1>Backyard Kickball Spreads</h1>
+  <p class="standfirst">One real campaign, played by the builder bot from Slovakia and sampled at
+  eight turns. Every number on this page came out of the simulation; nothing is illustrative.</p>
+  <div class="meta">
+    <span id="meta-anchor">Anchor: Slovakia</span>
+    <span id="meta-genome">Genome: backyard-kickball</span>
+    <span id="meta-seed">Seed: 7</span>
+    <span>Bot: builder</span>
+    <span id="meta-generated"></span>
+  </div>
+</header>
+
+<div class="controls">
+  <button class="play" id="play" type="button">Play</button>
+  <input type="range" id="scrub" min="0" max="7" value="0" step="1" aria-label="Campaign turn">
+  <p class="frame-readout" id="readout" aria-live="polite"></p>
+</div>
+
+<dl class="tiles">
+  <div class="tile"><dt>Markets following</dt><dd id="stat-markets">&mdash;</dd></div>
+  <div class="tile"><dt>Strongest market</dt><dd id="stat-best">&mdash;</dd></div>
+  <div class="tile"><dt>Global rank</dt><dd id="stat-rank">&mdash;</dd></div>
+  <div class="tile"><dt>Fandom Score</dt><dd id="stat-score">&mdash;</dd></div>
+</dl>
+
+<div class="board">
+  <section class="panel">
+    <h2>The world, one tile per market</h2>
+    <svg id="map" role="img" aria-labelledby="map-title"><title id="map-title">Tile map of 213 markets, shaded by how much of each population follows the sport</title></svg>
+    <div class="legend">
+      <div class="ramp">
+        <div class="ramp-swatches" id="ramp"></div>
+        <div class="ramp-ends"><span>none</span><span>1 in 4 people</span></div>
+      </div>
+      <div class="keys">
+        <span><b style="background: var(--accent)"></b> focus slot</span>
+        <span><b style="background: var(--contested)"></b> rival countermove running</span>
+        <span><b style="background: var(--tile-none); border: 1.5px solid var(--ink)"></b> anchor</span>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: grid; gap: 16px;">
+    <section class="panel detail" id="detail">
+      <h2>Country panel</h2>
+      <p class="name" id="d-name">Slovakia</p>
+      <dl>
+        <dt>Following</dt><dd id="d-share">&mdash;</dd>
+        <dt>Casual</dt><dd id="d-casual">&mdash;</dd>
+        <dt>Hardcore</dt><dd id="d-hardcore">&mdash;</dd>
+        <dt>League</dt><dd id="d-league">&mdash;</dd>
+        <dt>Rivals</dt><dd id="d-rival">&mdash;</dd>
+        <dt>Population</dt><dd id="d-pop">&mdash;</dd>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2>Strongest markets this turn</h2>
+      <table>
+        <caption class="visually-hidden">The ten markets where the sport has the largest following, at the selected turn</caption>
+        <thead><tr><th scope="col">Market</th><th scope="col" style="text-align:right">Following</th></tr></thead>
+        <tbody id="top-table"></tbody>
+      </table>
+    </section>
+  </div>
+</div>
+
+<footer>
+  <p><strong>What this is.</strong> A mock-up of the map screen, built to see whether watching the
+  colour bleed outward is worth building properly. The campaign is real: seed 7, the
+  <em>backyard-kickball</em> preset, anchored in Slovakia, played by the builder bot through turn
+  220 &mdash; year 2169 in game. It reaches tier 3 around turn 70, passes cricket into second place
+  by turn 110, and takes first place from soccer before turn 160.</p>
+  <p><strong>What this is not.</strong> The geography is a stand-in. Every market gets an equal
+  tile, continents sit in roughly their familiar positions, and within a continent the markets are
+  ordered breadth-first across their real borders and sea links, so neighbours land near each other.
+  No coordinates were invented for it. The real build reads Natural Earth shapes, which is the first
+  task in <code>docs/world-map-brief.html</code> &mdash; and equal tiles quietly solve a problem
+  real shapes will not: Tuvalu, 9,646 people and the game&rsquo;s signature hard anchor, is as
+  clickable here as China.</p>
+  <p>Regenerate with <code>npx tsx runs/demo-map.ts &lt;anchor&gt; &lt;seed&gt;</code>, which
+  rewrites <code>world-map-example.data.js</code> beside this file.</p>
+</footer>
+
+</div>
+
+<div id="tooltip" hidden></div>
+
+<script src="world-map-example.data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var data = window.MAP_DATA;
+  if (!data) return;
+
+  var TILE = 10, GAP = 1.6;
+  var cols = 0, rows = 0;
+  data.markets.forEach(function (m) {
+    if (m.col > cols) cols = m.col;
+    if (m.row > rows) rows = m.row;
+  });
+  cols += 1; rows += 1;
+
+  var STEPS = ["--s1", "--s2", "--s3", "--s4", "--s5", "--s6"];
+  // Thresholds on share of population, chosen so the campaign's whole range is visible: the first
+  // decades live under 1%, the endgame reaches 44%.
+  var BREAKS = [0.0005, 0.005, 0.02, 0.06, 0.12, 0.25];
+
+  function stepFor(share) {
+    if (!share || share < BREAKS[0]) return null;
+    for (var i = BREAKS.length - 1; i >= 0; i -= 1) if (share >= BREAKS[i]) return STEPS[i];
+    return STEPS[0];
+  }
+  function fillFor(share) {
+    var step = stepFor(share);
+    return step ? "var(" + step + ")" : "var(--tile-none)";
+  }
+  var fmt = new Intl.NumberFormat("en-US");
+  function people(n) {
+    if (n >= 1e9) return (n / 1e9).toFixed(2) + "bn";
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + "m";
+    if (n >= 1e3) return (n / 1e3).toFixed(0) + "k";
+    return fmt.format(n);
+  }
+  function pct(share) {
+    if (!share) return "0%";
+    if (share < 0.001) return "<0.1%";
+    return (share * 100).toFixed(1) + "%";
+  }
+
+  var byId = {};
+  data.markets.forEach(function (m) { byId[m.id] = m; });
+
+  // ---- Map ----------------------------------------------------------------------------------
+  var svg = document.getElementById("map");
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var width = cols * (TILE + GAP), height = rows * (TILE + GAP) + 6;
+  svg.setAttribute("viewBox", "0 0 " + width + " " + (height + 2));
+
+  var CONTINENT_LABELS = [
+    { text: "North America", col: 0, row: 0 },
+    { text: "Europe", col: 7, row: 0 },
+    { text: "Asia", col: 16, row: 0 },
+    { text: "South America", col: 0, row: 7 },
+    { text: "Africa", col: 7, row: 8 },
+    { text: "Oceania", col: 16, row: 8 }
+  ];
+  CONTINENT_LABELS.forEach(function (label) {
+    var t = document.createElementNS(SVGNS, "text");
+    t.setAttribute("class", "continent-label");
+    t.setAttribute("x", String(label.col * (TILE + GAP)));
+    t.setAttribute("y", String(label.row * (TILE + GAP) + 3.4));
+    t.textContent = label.text;
+    svg.appendChild(t);
+  });
+
+  var LABEL_ROOM = 5;
+  var rects = {}, marks = {};
+  data.markets.forEach(function (m) {
+    var x = m.col * (TILE + GAP);
+    var y = m.row * (TILE + GAP) + LABEL_ROOM;
+    var r = document.createElementNS(SVGNS, "rect");
+    r.setAttribute("class", "tilerect");
+    r.setAttribute("x", String(x)); r.setAttribute("y", String(y));
+    r.setAttribute("width", String(TILE)); r.setAttribute("height", String(TILE));
+    r.setAttribute("rx", "1.6");
+    r.setAttribute("data-id", m.id);
+    svg.appendChild(r);
+    rects[m.id] = r;
+
+    var g = document.createElementNS(SVGNS, "g");
+    g.setAttribute("pointer-events", "none");
+    svg.appendChild(g);
+    marks[m.id] = { g: g, x: x, y: y };
+  });
+
+  // ---- Frames -------------------------------------------------------------------------------
+  var frame = 0, selected = data.anchor, playing = false, timer = null;
+  var scrub = document.getElementById("scrub");
+  scrub.max = String(data.frames.length - 1);
+
+  function marketsOf(f) {
+    var out = {};
+    data.frames[f].markets.forEach(function (m) { out[m.id] = m; });
+    return out;
+  }
+
+  function render() {
+    var f = data.frames[frame];
+    var state = marketsOf(frame);
+
+    data.markets.forEach(function (m) {
+      var s = state[m.id];
+      rects[m.id].setAttribute("fill", fillFor(s ? s.share : 0));
+      rects[m.id].classList.toggle("selected", m.id === selected);
+
+      var holder = marks[m.id];
+      while (holder.g.firstChild) holder.g.removeChild(holder.g.firstChild);
+      if (m.id === data.anchor) {
+        var ring = document.createElementNS(SVGNS, "rect");
+        ring.setAttribute("class", "mark-anchor");
+        ring.setAttribute("x", String(holder.x - 1.1)); ring.setAttribute("y", String(holder.y - 1.1));
+        ring.setAttribute("width", String(TILE + 2.2)); ring.setAttribute("height", String(TILE + 2.2));
+        ring.setAttribute("rx", "2.4");
+        holder.g.appendChild(ring);
+      }
+      if (s && s.focused) {
+        var dot = document.createElementNS(SVGNS, "circle");
+        dot.setAttribute("class", "mark-focus");
+        dot.setAttribute("cx", String(holder.x + TILE - 2.4));
+        dot.setAttribute("cy", String(holder.y + 2.4));
+        dot.setAttribute("r", "1.5");
+        holder.g.appendChild(dot);
+      }
+      if (s && s.rival) {
+        var tri = document.createElementNS(SVGNS, "path");
+        tri.setAttribute("class", "mark-contested");
+        var bx = holder.x + 1, by = holder.y + TILE - 1;
+        tri.setAttribute("d", "M" + bx + " " + by + " l3.4 0 l0 -3.4 z");
+        holder.g.appendChild(tri);
+      }
+    });
+
+    var following = data.frames[frame].markets.filter(function (m) { return m.share >= 0.0005; });
+    var ranked = data.frames[frame].markets.slice().sort(function (a, b) { return b.share - a.share; });
+    var best = ranked[0];
+
+    document.getElementById("readout").textContent =
+      "Turn " + f.turn + "  ·  " + f.year + "  ·  tier " + f.tier;
+    document.getElementById("stat-markets").innerHTML =
+      following.length + " <small>of 213 markets</small>";
+    document.getElementById("stat-best").innerHTML =
+      pct(best.share) + " <small>" + byId[best.id].name + "</small>";
+    document.getElementById("stat-rank").innerHTML =
+      "#" + f.rank + " <small>of 4 sports worldwide</small>";
+    document.getElementById("stat-score").innerHTML =
+      people(Math.round(f.fandomScore)) + " <small>hardcore + weighted casual</small>";
+
+    var rowsHtml = "";
+    ranked.slice(0, 10).forEach(function (m) {
+      rowsHtml += '<tr class="row' + (m.id === selected ? " selected" : "") + '" data-id="' + m.id +
+        '" tabindex="0"><td>' + byId[m.id].name + "</td><td class=\"num\">" + pct(m.share) + "</td></tr>";
+    });
+    document.getElementById("top-table").innerHTML = rowsHtml;
+
+    renderDetail(state);
+    scrub.value = String(frame);
+  }
+
+  function renderDetail(state) {
+    var m = byId[selected], s = state[selected];
+    document.getElementById("d-name").textContent = m.name;
+    document.getElementById("d-share").textContent = pct(s ? s.share : 0);
+    document.getElementById("d-casual").textContent = people(s ? s.casual : 0);
+    document.getElementById("d-hardcore").textContent = people(s ? s.hardcore : 0);
+    document.getElementById("d-league").textContent = s && s.league ? s.league : "no league";
+    document.getElementById("d-rival").textContent = s && s.rival ? s.rival + ", countermove running" : "quiet";
+    document.getElementById("d-pop").textContent = people(m.population);
+  }
+
+  // ---- Interaction --------------------------------------------------------------------------
+  var tooltip = document.getElementById("tooltip");
+  function showTip(event, id) {
+    var state = marketsOf(frame), s = state[id], m = byId[id];
+    tooltip.innerHTML = "<strong>" + m.name + "</strong>" +
+      '<span class="t-num">' + pct(s ? s.share : 0) + " of " + people(m.population) + " people</span>" +
+      (s && s.league ? "<br>" + s.league + " league" : "") +
+      (s && s.rival ? "<br>contested: " + s.rival : "");
+    tooltip.hidden = false;
+    var pad = 14;
+    var x = Math.min(event.clientX + pad, window.innerWidth - tooltip.offsetWidth - 8);
+    var y = Math.min(event.clientY + pad, window.innerHeight - tooltip.offsetHeight - 8);
+    tooltip.style.left = Math.max(8, x) + "px";
+    tooltip.style.top = Math.max(8, y) + "px";
+  }
+  svg.addEventListener("mousemove", function (event) {
+    var id = event.target && event.target.getAttribute && event.target.getAttribute("data-id");
+    if (id) showTip(event, id); else tooltip.hidden = true;
+  });
+  svg.addEventListener("mouseleave", function () { tooltip.hidden = true; });
+  svg.addEventListener("click", function (event) {
+    var id = event.target && event.target.getAttribute && event.target.getAttribute("data-id");
+    if (!id) return;
+    selected = id;
+    render();
+  });
+  document.getElementById("top-table").addEventListener("click", function (event) {
+    var row = event.target.closest("tr[data-id]");
+    if (!row) return;
+    selected = row.getAttribute("data-id");
+    render();
+  });
+  document.getElementById("top-table").addEventListener("keydown", function (event) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    var row = event.target.closest("tr[data-id]");
+    if (!row) return;
+    event.preventDefault();
+    selected = row.getAttribute("data-id");
+    render();
+  });
+
+  scrub.addEventListener("input", function () {
+    stop();
+    frame = Number(scrub.value);
+    render();
+  });
+
+  var playButton = document.getElementById("play");
+  function stop() {
+    playing = false;
+    if (timer) { clearInterval(timer); timer = null; }
+    playButton.textContent = "Play";
+  }
+  playButton.addEventListener("click", function () {
+    if (playing) { stop(); return; }
+    playing = true;
+    playButton.textContent = "Pause";
+    if (frame >= data.frames.length - 1) frame = 0;
+    render();
+    timer = setInterval(function () {
+      if (frame >= data.frames.length - 1) { stop(); return; }
+      frame += 1;
+      render();
+    }, 1400);
+  });
+
+  // ---- Chrome -------------------------------------------------------------------------------
+  var ramp = document.getElementById("ramp");
+  ramp.innerHTML = '<i style="background: var(--tile-none)"></i>' +
+    STEPS.map(function (s) { return '<i style="background: var(' + s + ')"></i>'; }).join("");
+  document.getElementById("meta-anchor").textContent = "Anchor: " + data.anchorName;
+  document.getElementById("meta-genome").textContent = "Genome: " + data.genome;
+  document.getElementById("meta-seed").textContent = "Seed: " + data.seed;
+  document.getElementById("meta-generated").textContent = "Generated " + data.generated;
+
+  render();
+})();
+</script>
+</body>
+</html>
