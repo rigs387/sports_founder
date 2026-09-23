@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Spreading Heatmap</title>
+<style>
+  :root {
+    --paper: #eff2f1;
+    --surface: #ffffff;
+    --sunken: #e4e9e7;
+    --ink: #0f1b1d;
+    --muted: #5c6f70;
+    --line: #cfd8d6;
+    --accent: #0d6b68;
+    --heat: #b8530f;
+    --shadow: 0 1px 2px rgba(15, 27, 29, .06);
+    --display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0c1315;
+      --surface: #131d1f;
+      --sunken: #0a1012;
+      --ink: #e4ebe9;
+      --muted: #93a5a4;
+      --line: #28383a;
+      --accent: #46c7bd;
+      --heat: #e8974a;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0c1315;
+    --surface: #131d1f;
+    --sunken: #0a1012;
+    --ink: #e4ebe9;
+    --muted: #93a5a4;
+    --line: #28383a;
+    --accent: #46c7bd;
+    --heat: #e8974a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 16px/1.62 var(--body);
+    padding-inline: 20px;
+    padding-block: 0 72px;
+  }
+  .wrap { max-width: 78ch; margin: 0 auto; }
+  header.masthead {
+    padding-block: 56px 28px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    font: 600 11px/1 var(--body);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+  h1 {
+    font: 400 clamp(34px, 7vw, 52px)/1.04 var(--display);
+    margin: 0 0 14px;
+    text-wrap: balance;
+    letter-spacing: -.01em;
+  }
+  .standfirst { font-size: 18px; color: var(--muted); margin: 0 0 22px; max-width: 62ch; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font: 500 13px/1.4 var(--mono); color: var(--muted); }
+  h2 {
+    font: 400 26px/1.2 var(--display);
+    margin: 52px 0 6px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    text-wrap: balance;
+  }
+  h2:first-of-type { margin-top: 0; }
+  h3 { font: 600 15px/1.35 var(--body); margin: 28px 0 8px; letter-spacing: .005em; }
+  p { margin: 0 0 14px; }
+  ul, ol { margin: 0 0 16px; padding-left: 22px; }
+  li { margin-bottom: 7px; }
+  li::marker { color: var(--muted); }
+  code { font: 500 .88em var(--mono); background: var(--sunken); padding: 1px 5px; border-radius: 3px; }
+  a { color: var(--accent); }
+  blockquote {
+    margin: 0 0 20px;
+    padding: 2px 0 2px 20px;
+    border-left: 3px solid var(--accent);
+    font: italic 400 18px/1.5 var(--display);
+  }
+  blockquote cite { display: block; font: 500 12px/1.4 var(--mono); font-style: normal; color: var(--muted); margin-top: 8px; }
+  .steps { list-style: none; padding: 0; margin: 0 0 8px; counter-reset: step; }
+  .steps > li {
+    counter-increment: step;
+    position: relative;
+    padding: 18px 0 18px 54px;
+    border-bottom: 1px solid var(--line);
+    margin: 0;
+  }
+  .steps > li:last-child { border-bottom: 0; }
+  .steps > li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 18px;
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    font: 600 13px var(--mono);
+    color: var(--accent);
+    background: var(--surface);
+  }
+  .steps h3 { margin: 0 0 6px; }
+  .steps p { margin: 0 0 8px; font-size: 15px; }
+  .steps p:last-child { margin-bottom: 0; }
+  .note {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--heat);
+    border-radius: 4px;
+    padding: 16px 18px;
+    margin: 0 0 20px;
+    box-shadow: var(--shadow);
+  }
+  .note p:last-child { margin-bottom: 0; }
+  .note .tag {
+    display: block;
+    font: 600 10px/1 var(--body);
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--heat);
+    margin-bottom: 9px;
+  }
+  .scroll { overflow-x: auto; margin: 0 0 20px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { text-align: left; padding: 9px 14px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font: 600 11px/1.3 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .decisions { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  .decisions > li {
+    counter-increment: q;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .decisions > li::before {
+    content: "Decision " counter(q);
+    display: block;
+    font: 600 10px/1 var(--body);
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .decisions h3 { margin: 0 0 6px; }
+  .decisions p { font-size: 15px; margin: 0 0 8px; }
+  .decisions p:last-child { margin-bottom: 0; }
+  .rec { color: var(--ink); font-weight: 600; }
+  .done { list-style: none; padding: 0; margin: 0 0 16px; }
+  .done li { padding-left: 26px; position: relative; margin-bottom: 9px; }
+  .done li::before {
+    content: "";
+    position: absolute; left: 0; top: .45em;
+    width: 12px; height: 12px;
+    border: 1.5px solid var(--accent);
+    border-radius: 2px;
+  }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  @media (max-width: 460px) {
+    .steps > li { padding-left: 42px; }
+    .steps > li::before { width: 28px; height: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Sports Founder &middot; Phase 0 &middot; Step 10</p>
+  <h1>The Spreading Heatmap</h1>
+  <p class="standfirst">A build brief for the world map: the screen the whole game sits on, and the
+  first thing in this project a person will be able to play rather than measure.</p>
+  <div class="meta">
+    <span>Drafted 2026-09-22</span>
+    <span>Branch: phase0/world-map</span>
+    <span>Follows: 355cc71</span>
+  </div>
+</header>
+
+<h2>The question this step answers</h2>
+
+<blockquote>
+  Prove the core fantasy is fun before investing in the most expensive systems. Phase 0 answers
+  &ldquo;is the spreading heatmap fun?&rdquo; in under a year.
+  <cite>Technical &amp; Production Plan, &sect;2.1</cite>
+</blockquote>
+
+<p>Nine steps of balance work have proved the design space is not degenerate: pacing lands on
+budget, no anchor is safe, rivals persist, the tree is a real decision, and contrasting genomes
+catch on in different halves of the world. None of that is evidence of fun, and none of it can
+become evidence of fun, because nobody has seen the sport spread. The map is what makes the
+question askable.</p>
+
+<p>The GDD is unambiguous about its place: <em>&ldquo;The world map is the visual and interactive
+center of the game&rdquo;</em> &mdash; home, always underneath, with every other screen overlaying
+it rather than replacing it.</p>
+
+<h2>What already exists</h2>
+
+<p>More than you would expect, which is why this step is mostly rendering and data rather than
+plumbing.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Piece</th><th>State</th></tr></thead>
+  <tbody>
+    <tr><td>Simulation core</td><td>Complete for Phase 0, pure and deterministic, 665 tests</td></tr>
+    <tr><td>Worker pipeline</td><td><code>src/renderer/src/worker</code> &mdash; sim runs off the UI thread via Comlink</td></tr>
+    <tr><td>Store</td><td><code>state/game-store.ts</code> &mdash; Zustand, holds the snapshot</td></tr>
+    <tr><td>Per-country data</td><td><code>CountrySnapshot</code> already carries everything the map draws</td></tr>
+    <tr><td>Names</td><td><code>content/names.yaml</code> &mdash; every country and sport display name</td></tr>
+    <tr><td>Strings</td><td>i18next wired, <code>en.json</code> in place</td></tr>
+    <tr><td>The screen itself</td><td><code>App.tsx</code>, 325 lines of scaffold: headings and lists of numbers</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The snapshot needs no new fields. <code>CountrySnapshot</code> gives <code>share</code> (Fandom
+Score &divide; population), <code>casual</code>, <code>hardcore</code>, <code>focused</code>,
+<code>exposure</code>, the three lever values, <code>league</code>, and each rival&rsquo;s escalation
+level with its live countermoves. The sim stays exactly as it is.</p>
+
+<h2>The stack, already decided</h2>
+
+<p>Chosen on 2026-09-12 and recorded in the tech plan; this step is where it finally gets installed.
+All pins exact (<code>.npmrc</code> has <code>save-exact=true</code>), added on a dedicated branch,
+lockfile committed.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Package</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td><code>pixi.js</code> v8</td><td>Map and animation rendering</td></tr>
+    <tr><td><code>@pixi/react</code></td><td>Embeds the map inside React screens</td></tr>
+    <tr><td><code>pixi-viewport</code></td><td>Pan and zoom</td></tr>
+    <tr><td><code>d3-geo</code></td><td>Projection and path generation</td></tr>
+    <tr><td><code>topojson-client</code></td><td>Decoding the shape data at load</td></tr>
+    <tr><td><code>mapshaper</code> (dev)</td><td>Build-time simplification, run once, output committed</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Tailwind is in the plan for the React screens but is not needed here and should wait for the
+screen-shell step, so this branch does not drag in a styling decision alongside a rendering one.</p>
+
+<h2>The build</h2>
+
+<ol class="steps">
+  <li>
+    <h3>Market-to-shape table</h3>
+    <p>The hard part, and the part worth doing first because everything else waits on it. Each of
+    the 213 ids in <code>content/countries.yaml</code> needs geometry, and the ids follow
+    sports-body convention rather than any single cartographic source: <code>england</code>,
+    <code>scotland</code>, <code>wales</code>, <code>northern-ireland</code>,
+    <code>chinese-taipei</code>, <code>hong-kong</code>, <code>republic-of-ireland</code>.</p>
+    <p>The table is content, not code: a checked-in file mapping each market id to the Natural Earth
+    feature (or features) that draw it, hand-resolved once and then guarded by a test.</p>
+  </li>
+  <li>
+    <h3>Build-time geometry script</h3>
+    <p><code>scripts/build-map.ts</code>: take the Natural Earth source, simplify with mapshaper to
+    a size budget, project, keep only the shapes the table references, and emit one committed
+    artifact under <code>assets/map/</code>. Committed rather than fetched, so a build never needs
+    the network and the app never loads remote content.</p>
+  </li>
+  <li>
+    <h3>A test that the table is total</h3>
+    <p>Every market has geometry; every geometry belongs to a market or is explicitly marked
+    unclaimed; no market is silently missing. Content validation already fails on a missing source
+    citation, and the same standard applies here &mdash; an invisible market is a market the player
+    can never click.</p>
+  </li>
+  <li>
+    <h3>The map itself</h3>
+    <p>PixiJS canvas inside React, filled shapes, pan and zoom via pixi-viewport, hover readout and
+    click-to-select. Land outside any market drawn in neutral hatching per the GDD, belonging to
+    nobody.</p>
+  </li>
+  <li>
+    <h3>The heat</h3>
+    <p>Fill each market by how far the sport has caught on there, repainted once per turn from the
+    snapshot. This is the screen&rsquo;s whole thesis: the player should watch the colour bleed
+    outward from the anchor across a campaign.</p>
+  </li>
+  <li>
+    <h3>Click-through to a country</h3>
+    <p>A slide-out panel over the map &mdash; fans, league, rivals &mdash; populated from the
+    snapshot. A plain panel is enough here; the designed version belongs to the screen-shell step.</p>
+  </li>
+</ol>
+
+<div class="note">
+  <span class="tag">Known trap &mdash; verify before writing the script</span>
+  <p>The planned <code>world-atlas</code> package ships Natural Earth <em>admin-0 countries</em>,
+  where the United Kingdom is a single feature. This game has England, Scotland, Wales and Northern
+  Ireland as four separate markets, so admin-0 alone cannot draw them. The home nations live in
+  Natural Earth&rsquo;s <em>map units</em> layer, which means sourcing that layer and processing it
+  with mapshaper rather than taking <code>world-atlas</code> off the shelf. Confirm this first: it
+  decides the whole data pipeline, and getting it wrong is discovered late and painfully.</p>
+</div>
+
+<div class="note">
+  <span class="tag">Second trap &mdash; the signature hard anchor</span>
+  <p>Tuvalu has 9,646 people and is the anchor the balance criteria single out as the hard start. At
+  world scale it is a speck a few pixels across, and several other markets are worse. Microstates
+  need a minimum hit target and a visible marker, or the game&rsquo;s most demanding opening is on a
+  country the player cannot point at.</p>
+</div>
+
+<h2>Rules this branch inherits</h2>
+
+<ul>
+  <li><strong>The sim stays pure.</strong> Map code lives in <code>src/renderer</code> and imports
+  nothing from it; <code>npm run check:purity</code> enforces the boundary.</li>
+  <li><strong>No remote content, ever.</strong> No CDN, no remote fonts, no map tiles fetched at
+  runtime. Geometry ships with the app.</li>
+  <li><strong>Names come from content, strings from i18next.</strong> Country labels resolve through
+  <code>names.yaml</code> &mdash; the one moddable names file &mdash; never hardcoded, never
+  concatenated.</li>
+  <li><strong>Tooltips explain, they do not expose formulas.</strong> &ldquo;Growing fast: your focus
+  here, strong climate fit, Street Courts&rdquo;, not a lever breakdown.</li>
+  <li><strong>Pinned versions.</strong> Exact pins, no upgrades of anything already installed.</li>
+</ul>
+
+<h2>Done means</h2>
+
+<ul class="done">
+  <li>All 213 markets render, are hoverable and are clickable, including the microstates.</li>
+  <li>Land belonging to no market is drawn as neutral hatching.</li>
+  <li>Colour tracks the sport&rsquo;s spread and repaints once per turn.</li>
+  <li>Pan and zoom stay smooth on the full map.</li>
+  <li>Clicking a market opens a panel with that market&rsquo;s real numbers.</li>
+  <li><code>npm run check</code> green: types, Biome, purity, tests.</li>
+  <li><code>npm run smoke</code> produces a screenshot of a campaign with visible spread &mdash; the
+  first picture of this game that has ever existed.</li>
+</ul>
+
+<h2>Decisions I need from you</h2>
+
+<ol class="decisions">
+  <li>
+    <h3>What the colour means</h3>
+    <p>Options: share of a country&rsquo;s population following the sport; Fandom Score per person;
+    or raw Fandom Score, which would make big countries glow whatever their actual penetration.</p>
+    <p class="rec">Recommended: share of population &mdash; the balance work already ranks countries
+    this way, because it shows where the sport caught on rather than which country is largest.</p>
+  </li>
+  <li>
+    <h3>How rivals appear on the map</h3>
+    <p>Rival escalation and countermoves are per-country and already in the snapshot. They can share
+    the fill (hue for the leader, intensity for strength), sit as a separate mark (an outline or
+    corner flag on contested markets), or stay off the map for now.</p>
+    <p class="rec">Recommended: a separate mark. One quantity per visual channel; the fill belongs to
+    the player&rsquo;s sport, and a contested market is a different fact about a country than how far
+    it has fallen.</p>
+  </li>
+  <li>
+    <h3>Projection</h3>
+    <p>Equirectangular is trivial and looks like a spreadsheet of the world. Natural Earth is the
+    standard compromise and is what the boundary data is drawn for. Equal-area would size markets by
+    real area, which is honest but unfamiliar.</p>
+    <p class="rec">Recommended: the Natural Earth projection &mdash; it matches the source data and
+    the stylised, illustrated direction the GDD asks for.</p>
+  </li>
+  <li>
+    <h3>How far this branch goes</h3>
+    <p>It could stop at a working, unstyled map, or carry through to the art direction &mdash; the
+    almanac-with-a-wink look the GDD describes.</p>
+    <p class="rec">Recommended: stop at working. Art direction deserves its own pass with the screen
+    shell around it, and a map you can click is what unblocks everything else.</p>
+  </li>
+</ol>
+
+<h2>Not in this step</h2>
+
+<p>Event cards and decision cards; the growth tree screen; the sport and rulebook page; the almanac;
+the league table; turn recap animation; any art direction pass. The map has to exist before any of
+them has a surface to sit on.</p>
+
+<footer>
+  <p>Sources: <code>sports-founder-gdd.md</code> v1.10 (Tone &amp; Art Direction, Screen structure,
+  Map and markets) and <code>sports-founder-tech-plan.md</code> &sect;2.1, &sect;6.1. Review this,
+  change what you disagree with, and it becomes the working prompt for the branch.</p>
+</footer>
+
+</div>
+</body>
+</html>

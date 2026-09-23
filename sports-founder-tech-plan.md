@@ -95,6 +95,16 @@ starting targets (thresholds adjustable as data arrives):
 - **No dominant genome:** no single trait option appears in more than 40% of top-quartile runs,
   judged on 250 random genomes per anchor, and only beyond sampling noise (the 95% lower bound of
   its share must exceed 40%) (decided 2026-09-14).
+  - *A watch item, not an exit gate (decided 2026-09-22).* Steps 5, 7 and 9 each chased this number
+    and each found the cause was arithmetic rather than design: climate conditions that were a flat
+    global handicap, base deltas carrying free level, and a geometric tax on any option that
+    committed to a trade. Every one was a real bug worth fixing, and none of them was anything a
+    player could feel — a player plays one sport, not 250 random genomes ranked by top-quartile
+    share. The criterion measures whether the design space is degenerate, which is necessary but is
+    not evidence of fun, and it cannot become that however many campaigns are run. It stays
+    reported on every options run and stops blocking the phase. Revisit it once events and the map
+    exist and real people have played: both will move the balance anyway, so precision tuning ahead
+    of them is partly wasted.
 - **No safe anchor:** every anchor country has a nonzero collapse rate under a naive strategy,
   judged on the sampled anchors (decided 2026-09-15).
 - **Hard anchors are winnable:** the best bot wins from Tuvalu (config
@@ -113,6 +123,18 @@ starting targets (thresholds adjustable as data arrives):
 set: random, greedy-spread, anchor-turtle, media-rush. Every outcome is reported, including losses
 — never silently counted as a pass. Candidate addition: AI-agent playtesters that play through the
 real UI and report confusion or unexplained outcomes.
+
+**Carried into the next phase as named gaps (2026-09-22).** Two things the bots measure that a
+player really would feel, neither of them genome content:
+
+1. **The win hold is only half a contest.** GDD v1.8 asks that about half the campaigns that reach
+   #1 lose it before winning; the rate is 36%. Whether the endgame is a fight or a timer is a felt
+   property. The knob is `rivalAI` intensity.
+2. **Five growth nodes are automatic.** `backyard-clinics`, `word-of-mouth`, `weekend-leagues`,
+   `fan-meetups` and `local-radio` are bought past the dominance limit by every bot — builder,
+   media-rush, anchor-turtle and greedy-spread alike. GDD v1.9 exists to make the tree a decision,
+   and the first five purchases of every campaign are not one. The knob is growth tree content:
+   prices, prerequisites or forks on the early grassroots spine.
 
 Phase 0 work is not throwaway — it becomes the foundation of Phase 1.
 
