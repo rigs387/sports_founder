@@ -53,20 +53,27 @@ describe("Ice raises affinity in Cold countries and lowers it in Tropical ones",
   it("the affinity lever itself moves the right way in every cold and tropical country", () => {
     expect(cold.length).toBeGreaterThan(1);
     expect(tropical.length).toBeGreaterThan(1);
-    for (const id of cold) {
+    // How much better ice is than grass in a country, so the guard holds whatever the tuning: the
+    // ratios must separate, not reach a fixed size. A magnitude here would track balance values
+    // silently and fail the next time geography is refitted.
+    const iceOverGrass = (id: string) => {
       const index = countryIndex(world, id);
-      const ice = leverMultipliers(world, icePaddle, index).affinity;
-      const grass = leverMultipliers(world, grassPaddle, index).affinity;
-      expect(ice, id).toBeGreaterThan(grass * 1.3);
-    }
-    for (const id of tropical) {
-      const index = countryIndex(world, id);
-      const ice = leverMultipliers(world, icePaddle, index).affinity;
-      const grass = leverMultipliers(world, grassPaddle, index).affinity;
-      // At the lever's floor ice is as low as it can go: it only has to stay below grass there.
-      if (ice > world.config.levers.affinity.min) expect(ice, id).toBeLessThan(grass * 0.7);
-      else expect(ice, id).toBeLessThan(grass);
-    }
+      return (
+        leverMultipliers(world, icePaddle, index).affinity /
+        leverMultipliers(world, grassPaddle, index).affinity
+      );
+    };
+    const coldRatios = cold.map(iceOverGrass);
+    const tropicalRatios = tropical.map(iceOverGrass);
+    cold.forEach((id, i) => {
+      expect(coldRatios[i], id).toBeGreaterThan(1);
+    });
+    tropical.forEach((id, i) => {
+      expect(tropicalRatios[i], id).toBeLessThan(1);
+    });
+    // The worst cold country still favours ice more than the best tropical one does: the two
+    // climates never overlap.
+    expect(Math.min(...coldRatios)).toBeGreaterThan(Math.max(...tropicalRatios));
   });
 
   it.each(SEEDS)("seed %i: ice grows clearly more from a cold anchor than grass does", (seed) => {

@@ -8,13 +8,22 @@
 #   accessibility  multiplies casual conversion (uninterested → casual)
 #   depth          multiplies hardcore conversion (casual → hardcore)
 #
-# An option's `base` accessibility and depth deltas always sum to zero (decided 2026-09-21): base
-# says what kind of sport an option makes - wide and shallow, or narrow and deep - never how good it
-# is. Level, not geography, is what a dominance run measures, so an option that carries free level
-# wins everywhere and the tuning never converges. Most of the props removed on 2026-09-21 had been
-# propping up options that climate was crippling (ice +0.15, long +0.12, continuous +0.09), and the
+# An option's `base` accessibility and depth deltas are a trade that costs nothing (decided
+# 2026-09-21): base says what kind of sport an option makes - wide and shallow, or narrow and deep -
+# never how good it is. Level, not geography, is what a dominance run measures, so an option
+# carrying free level wins everywhere and the tuning never converges. The props removed had been
+# holding up options that climate was crippling (ice +0.15, long +0.12, continuous +0.09), and the
 # matching trims had been holding down whichever option was winning because of it (short -0.07,
-# stop-start -0.04). Use runs/level-bases.mjs after editing a base delta.
+# stop-start -0.04).
+#
+# Costing nothing means the two lever MULTIPLIERS multiply to 1, not that the deltas add to zero.
+# The funnel is multiplicative - accessibility carries casual conversion, depth carries hardcore
+# conversion, and hardcore flows out of casual - so an option's growth follows (1+acc) x (1+dep).
+# Deltas adding to zero leave that product below 1 (+0.13/-0.13 gives 0.983), a quiet tax on
+# committing to anything, and the option on each axis that commits to nothing wins: with the deltas
+# merely summed to zero, footprint=medium (no base deltas at all) took 52% of top-quartile runs and
+# complexity=moderate 47%. Run runs/level-bases.mjs after editing a base delta; it reports the tax
+# it removed.
 #
 # Each option has `base` deltas (apply everywhere) and `conditions` on country attributes:
 #   climate: { cold: +0.4, tropical: -0.45 }     categorical: the listed delta applies in that zone,
@@ -41,6 +50,16 @@
 # markets (backyard-kickball vs street-court reached 5.0 shared). ×1.25 is the most that fits: ice's
 # cold-climate affinity is at 1.97 of the lever limit of 2.
 #
+# Refitted per option on 2026-09-21, because ×2.19 had gone too far for the widest options. Growth
+# compounds, so what an option is worth over a campaign is its population-weighted GEOMETRIC mean
+# growth multiplier, not its average: ice averaged the best of any surface option (1.062) and
+# compounded the worst (0.843), since its cold bonus stood at +2.27 against a lever clamp of 2.0 -
+# half of it thrown away - while every penalty applied in full. The axis norm is about 0.985, and
+# the options below it were scaled back to reach it: ice ×0.45 (0.965, its bonus now landing exactly
+# at the clamp with nothing wasted), grass ×0.6, footprint large ×0.63, strength ×0.66, full contact
+# ×0.69, long ×0.70, short ×0.82, small ×0.87, endurance ×0.92. Run runs/probe-fit.ts before
+# steepening anything: it reports each option's geometric mean and the scale that would fix it.
+#
 # Design rule (GDD "No universal best option"): every option must help in, and hurt in, a real share
 # of the actual countries (config genomeBalance). Content validation refuses one that does not.
 
@@ -52,9 +71,9 @@ options:
         affinity:
           # Trimmed 2026-09-19 (temperate 0.329, tropical 0.11): after the step 7 steepening grass
           # helped in most of the world's population and ran at 52% of top-quartile runs.
-          climate: { temperate: 0.28, tropical: 0, cold: -0.329, arid: -0.438 }
+          climate: { temperate: 0.168, tropical: 0, cold: -0.197, arid: -0.263 }
         accessibility:
-          urbanDensity: -0.438
+          urbanDensity: -0.263
     indoor:
       base: { depth: 0 }
       conditions:
@@ -64,7 +83,7 @@ options:
           wealth: 0.11
           urbanDensity: 0.11
     street:
-      base: { accessibility: 0.06, depth: -0.06 }
+      base: { accessibility: 0.0619, depth: -0.0583 }
       conditions:
         affinity:
           climate: { cold: -0.329, arid: -0.11 }
@@ -72,28 +91,28 @@ options:
           urbanDensity: 0.548
           wealth: -0.438
     ice:
-      base: { depth: 0.075, accessibility: -0.075 }
+      base: { depth: 0.078, accessibility: -0.0724 }
       conditions:
         affinity:
-          climate: { cold: 1.969, temperate: 0.11, arid: -0.656, tropical: -0.765 }
+          climate: { cold: 0.886, temperate: 0.05, arid: -0.295, tropical: -0.344 }
         accessibility:
-          wealth: 0.329
+          wealth: 0.148
 
   equipment:
     ball-only:
-      base: { accessibility: 0.06, depth: -0.06 }
+      base: { accessibility: 0.0619, depth: -0.0583 }
       conditions:
         accessibility:
           wealth: -0.329
         affinity:
           sportCulture: -0.11
     stick-or-bat:
-      base: { accessibility: -0.04, depth: 0.04 }
+      base: { accessibility: -0.0392, depth: 0.0408 }
       conditions:
         accessibility:
           wealth: 0.329
     protective-gear:
-      base: { accessibility: -0.04, depth: 0.04 }
+      base: { accessibility: -0.0392, depth: 0.0408 }
       conditions:
         accessibility:
           wealth: 0.329
@@ -102,39 +121,39 @@ options:
 
   physical:
     speed:
-      base: { accessibility: 0.035, depth: -0.035 }
+      base: { accessibility: 0.0356, depth: -0.0344 }
       conditions:
         affinity:
           climate: { tropical: 0.11, arid: 0.11, cold: -0.219 }
         accessibility:
           urbanDensity: 0.11
     strength:
-      base: { depth: 0.035, accessibility: -0.035 }
+      base: { depth: 0.0356, accessibility: -0.0344 }
       conditions:
         affinity:
-          climate: { cold: 0.548, temperate: 0.11, tropical: -0.329, arid: -0.11 }
+          climate: { cold: 0.362, temperate: 0.073, tropical: -0.217, arid: -0.073 }
         accessibility:
-          sportCulture: 0.329
+          sportCulture: 0.217
     precision:
-      base: { accessibility: -0.015, depth: 0.015 }
+      base: { accessibility: -0.0149, depth: 0.0151 }
       conditions:
         affinity:
           wealth: 0.11
           climate: { arid: 0.219 }
     endurance:
-      base: { accessibility: 0.01, depth: -0.01 }
+      base: { accessibility: 0.0101, depth: -0.01 }
       conditions:
         affinity:
-          climate: { temperate: 0.329, cold: 0.11, tropical: -0.219, arid: -0.11 }
-          wealth: -0.219
-          urbanDensity: -0.175
+          climate: { temperate: 0.303, cold: 0.101, tropical: -0.201, arid: -0.101 }
+          wealth: -0.201
+          urbanDensity: -0.161
 
   footprint:
     small:
-      base: { accessibility: 0.04, depth: -0.04 }
+      base: { accessibility: 0.0408, depth: -0.0392 }
       conditions:
         accessibility:
-          urbanDensity: 0.438
+          urbanDensity: 0.381
     medium:
       base: {}
       conditions:
@@ -143,16 +162,16 @@ options:
         depth:
           wealth: 0.219
     large:
-      base: { accessibility: -0.025, depth: 0.025 }
+      base: { accessibility: -0.0247, depth: 0.0253 }
       conditions:
         accessibility:
-          urbanDensity: -0.548
+          urbanDensity: -0.345
         affinity:
-          climate: { temperate: 0.11, arid: -0.11 }
+          climate: { temperate: 0.069, arid: -0.069 }
 
   contact:
     none:
-      base: { accessibility: 0.03, depth: -0.03 }
+      base: { accessibility: 0.0305, depth: -0.0296 }
       conditions:
         accessibility:
           wealth: 0.219
@@ -166,28 +185,28 @@ options:
         accessibility:
           wealth: -0.219
     full:
-      base: { accessibility: -0.04, depth: 0.04 }
+      base: { accessibility: -0.0392, depth: 0.0408 }
       conditions:
         accessibility:
-          wealth: -0.438
+          wealth: -0.302
         affinity:
-          sportCulture: 0.329
+          sportCulture: 0.227
 
   teamSize:
     small:
-      base: { accessibility: 0.04, depth: -0.04 }
+      base: { accessibility: 0.0408, depth: -0.0392 }
       conditions:
         affinity:
           sportCulture: -0.219
         accessibility:
           mediaMarket: -0.11
     medium:
-      base: { depth: 0.015, accessibility: -0.015 }
+      base: { depth: 0.0151, accessibility: -0.0149 }
       conditions:
         accessibility:
           urbanDensity: 0.219
     large:
-      base: { accessibility: -0.025, depth: 0.025 }
+      base: { accessibility: -0.0247, depth: 0.0253 }
       conditions:
         accessibility:
           urbanDensity: 0.219
@@ -196,12 +215,12 @@ options:
 
   matchLength:
     short:
-      base: { accessibility: 0.085, depth: -0.085 }
+      base: { accessibility: 0.0889, depth: -0.0817 }
       conditions:
         accessibility:
-          mediaMarket: 0.11
+          mediaMarket: 0.09
         affinity:
-          urbanDensity: 0.438
+          urbanDensity: 0.359
     standard:
       base: { depth: 0.0 }
       conditions:
@@ -211,15 +230,15 @@ options:
           mediaMarket: -0.219
           wealth: -0.263
     long:
-      base: { accessibility: -0.06, depth: 0.06 }
+      base: { accessibility: -0.0583, depth: 0.0619 }
       conditions:
         affinity:
-          wealth: 0.329
-          climate: { tropical: -0.219, arid: -0.219 }
+          wealth: 0.23
+          climate: { tropical: -0.153, arid: -0.153 }
 
   scoring:
     low:
-      base: { accessibility: -0.03, depth: 0.03 }
+      base: { accessibility: -0.0296, depth: 0.0305 }
       conditions:
         affinity:
           sportCulture: 0.329
@@ -229,7 +248,7 @@ options:
         accessibility:
           sportCulture: -0.219
     high:
-      base: { accessibility: 0.095, depth: -0.095 }
+      base: { accessibility: 0.1, depth: -0.0909 }
       conditions:
         accessibility:
           mediaMarket: 0.219
@@ -239,12 +258,12 @@ options:
 
   complexity:
     simple:
-      base: { accessibility: 0.13, depth: -0.13 }
+      base: { accessibility: 0.1397, depth: -0.1226 }
       conditions:
         affinity:
           wealth: -0.219
     moderate:
-      base: { depth: -0.01, accessibility: 0.01 }
+      base: { depth: -0.01, accessibility: 0.0101 }
       conditions:
         accessibility:
           # Trimmed 2026-09-19 from -0.219: 46% of top-quartile runs after the step 7 steepening.
@@ -252,7 +271,7 @@ options:
         affinity:
           urbanDensity: -0.11
     intricate:
-      base: { accessibility: -0.105, depth: 0.105 }
+      base: { accessibility: -0.1, depth: 0.1111 }
       conditions:
         affinity:
           wealth: 0.219
@@ -269,7 +288,7 @@ options:
           mediaMarket: -0.11
           wealth: -0.11
     stop-start:
-      base: { accessibility: 0.08, depth: -0.08 }
+      base: { accessibility: 0.0835, depth: -0.077 }
       conditions:
         accessibility:
           mediaMarket: 0.219
@@ -277,7 +296,7 @@ options:
           climate: { tropical: 0 }
           urbanDensity: 0.329
     innings:
-      base: { accessibility: -0.02, depth: 0.02 }
+      base: { accessibility: -0.0198, depth: 0.0202 }
       conditions:
         affinity:
           climate: { tropical: 0.11, arid: 0.11, cold: -0.219, temperate: -0.11 }

@@ -255,8 +255,19 @@ describe("saves with the growth tree (format 5)", () => {
     expect(bought(midway).length).toBeGreaterThanOrEqual(4);
     expect(new Set(bought(midway).map((l) => l.turn)).size).toBeGreaterThan(1);
 
-    const uninterrupted = playWithPolicy(createCampaign(world, setup), saveAfter + 50);
-    const resumed = playWithPolicy(deserializeSave(serializeSave(midway), world), 50);
+    // Play on until the next node is bought rather than for a fixed number of turns: how long a
+    // fifth node takes is a balance value, and pinning it here would make this test fail whenever
+    // growth is retuned, without telling anyone what actually broke.
+    let extraTurns = 0;
+    let probe = midway;
+    while (bought(probe).length <= bought(midway).length && extraTurns < 160) {
+      probe = playWithPolicy(probe, 1);
+      extraTurns += 1;
+    }
+    expect(bought(probe).length).toBeGreaterThan(bought(midway).length);
+
+    const uninterrupted = playWithPolicy(createCampaign(world, setup), saveAfter + extraTurns);
+    const resumed = playWithPolicy(deserializeSave(serializeSave(midway), world), extraTurns);
     expect(resumed).toStrictEqual(uninterrupted);
     expect(serializeSave(resumed)).toBe(serializeSave(uninterrupted));
     expect(bought(uninterrupted).length).toBeGreaterThan(bought(midway).length);
