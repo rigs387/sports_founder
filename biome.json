@@ -32,5 +32,11 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["assets/map/*.json", "docs/world-map/assets/tiles.data.js"],
+      "formatter": { "enabled": false }
+    }
+  ]
 }

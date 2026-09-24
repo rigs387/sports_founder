@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" data-look="floodlights">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sports Founder — Visual playground</title>
+  <link rel="stylesheet" href="../assets/directions.css">
+  <script defer src="../assets/data-1.js"></script>
+  <script defer src="../assets/data-2.js"></script>
+  <script defer src="../assets/data-3.js"></script>
+  <script defer src="../assets/data-4.js"></script>
+  <script defer src="../assets/directions.js"></script>
+</head>
+<body>
+  <div class="review-toolbar">
+    <a href="directions.html">← All four directions</a>
+    <fieldset aria-label="Visual direction" id="look-buttons">
+      <button type="button" data-look-choice="floodlights">01 / Floodlights</button>
+      <button type="button" data-look-choice="clubhouse">02 / Clubhouse</button>
+      <button type="button" data-look-choice="worldtour">03 / World Tour</button>
+      <button type="button" data-look-choice="broadcast">04 / Broadcast</button>
+    </fieldset>
+    <span>VISUAL PLAYGROUND</span>
+  </div>
+
+  <main class="game-screen" id="game-screen">
+    <div class="backdrop" aria-hidden="true"></div>
+    <header class="game-topbar">
+      <div class="game-brand"><div class="brand-emblem">SF<span>★</span></div><div>SPORTS<span>FOUNDER</span></div></div>
+      <nav class="game-nav" aria-label="Game navigation visual study"><strong>World</strong><span>Your sport</span><span>Leagues</span><span>Growth</span></nav>
+      <div class="resources"><div><span class="resource-icon">✦</span><span><small>PRESTIGE</small><b id="prestige">2,815</b></span></div><div><span class="resource-icon fans-icon">◈</span><span><small>FANDOM SCORE</small><b id="fandom">18.0M</b></span></div></div>
+      <button type="button" id="recenter" class="icon-button" aria-label="Reset map view">⌖</button>
+    </header>
+
+    <div class="campaign-heading"><span class="chapter" id="chapter">YOUR NEXT BIG THING</span><h1 id="direction-headline">Make some<br><em>noise.</em></h1><p><span class="tiny-ball" aria-hidden="true"></span> Backyard Kickball <span class="campaign-level">/ National Pastime</span></p></div>
+    <div class="world-note"><span class="status-dot"></span><span id="world-note">69 markets. One growing obsession.</span></div>
+
+    <div class="map-area" id="map-area">
+      <svg id="direction-map" viewBox="0 0 1440 710" role="img" aria-label="Interactive world map. Hover for a quick stat card or click to pin a country.">
+        <title>World fandom map</title>
+        <defs>
+          <filter id="soft-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter>
+          <filter id="land-shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="7" stdDeviation="3" flood-color="#0a3146" flood-opacity=".4"/></filter>
+          <pattern id="map-dots" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".7" fill="currentColor" opacity=".22"/></pattern>
+          <pattern id="water-grid" width="36" height="32" patternUnits="userSpaceOnUse"><path d="M0 16L9 0H27L36 16L27 32H9Z" fill="none" stroke="currentColor" stroke-width=".4"/></pattern>
+        </defs>
+        <g id="world-camera">
+          <g id="geo-lines"></g><g id="land-depth"></g><g id="lands"></g><g id="land-grain" pointer-events="none"></g>
+          <g id="expansion-routes" pointer-events="none"></g><g id="market-dots"></g><g id="selected-land" pointer-events="none"></g>
+          <g id="map-labels" pointer-events="none"></g>
+        </g>
+      </svg>
+    </div>
+
+    <div class="map-tools"><button type="button" id="zoom-plus" aria-label="Zoom in">+</button><button type="button" id="zoom-minus" aria-label="Zoom out">−</button><span>DRAG TO EXPLORE</span></div>
+
+    <aside class="country-card" id="country-card" aria-labelledby="card-name">
+      <div class="card-accent" aria-hidden="true"></div>
+      <div class="card-header"><div class="country-badge" id="country-badge">SN</div><div><span class="card-kicker" id="card-kicker">WHERE IT ALL STARTED</span><h2 id="card-name">Senegal</h2><p id="card-meta">18.5M people · Africa</p></div><button type="button" class="card-close" id="card-close" aria-label="Close country card">×</button></div>
+      <div class="card-score"><div><span class="stat-label">FANDOM STRENGTH</span><div class="hero-number" id="card-share">16.2<span>%</span></div></div><span class="trend-pill" id="card-trend">↗ +0.17 pts</span></div>
+      <div class="chart-box"><svg id="card-chart" viewBox="0 0 280 54" role="img"><title>Fandom strength over the campaign so far</title><path id="chart-area"/><path id="chart-line"/><circle id="chart-dot" r="3"/></svg><div><span>FROM THE FIRST FANS</span><b id="chart-end">TURN 51</b></div></div>
+      <div class="fan-stats"><div><span class="fan-icon">◉</span><span><small>CASUAL FANS</small><strong id="card-casual">8.5M</strong></span></div><div><span class="fan-icon">★</span><span><small>HARDCORE</small><strong id="card-hardcore">453K</strong></span></div></div>
+      <div class="league-strip"><span class="league-icon" aria-hidden="true">♜</span><div><strong id="card-league">Elite league</strong><small id="card-league-note">The local game is thriving.</small></div><span class="health-pill" id="card-health">Healthy</span></div>
+      <div class="rival-strip"><span class="rival-icon" aria-hidden="true">!</span><div><strong id="card-rival">Soccer is pushing back</strong><small id="card-rival-note">Youth programs · Sponsor lockout</small></div></div>
+      <button class="card-action" type="button" id="card-action"><span>Find this market</span><b>↗</b></button>
+      <span class="card-footnote">COUNTRY INTELLIGENCE <span>● TURN SNAPSHOT</span></span>
+    </aside>
+
+    <div class="quick-stat" id="quick-stat" hidden role="tooltip"><div class="quick-heading"><span id="quick-badge">SN</span><div><strong id="quick-name">Senegal</strong><small id="quick-status">Home of your sport</small></div><b>↗</b></div><div class="quick-body"><div><b id="quick-share">16.2%</b><small>FANDOM STRENGTH</small></div><div><b id="quick-fans">8.9M</b><small>TOTAL FANS</small></div></div><div class="quick-meter"><i id="quick-meter-fill"></i></div><div class="quick-footer"><span id="quick-league">Elite league</span><b>CLICK TO PIN +</b></div></div>
+
+    <div class="objective-card"><span class="objective-icon" aria-hidden="true">✦</span><div><span class="objective-kicker">THE BIG PICTURE</span><strong id="objective-title">Your game is going places.</strong><p id="objective-note">69 markets have reached 1% fandom strength.</p></div><span class="objective-arrow" aria-hidden="true">↗</span></div>
+
+    <footer class="game-bottom"><div class="map-legend"><span>FANDOM</span><div id="direction-legend"></div><small>0</small><small>30%+</small></div><div class="replay-date"><span id="season-label">Q1 / 2040</span><b id="replay-label">TURN 51</b></div><div class="timeline-control"><label class="sr-only" for="direction-turn">Recorded turn</label><input type="range" id="direction-turn" min="0" max="100" value="50"><span>EARLY DAYS → GLOBAL STAGE</span></div><button type="button" class="advance-turn" id="advance-turn"><span>NEXT TURN</span><b>→</b></button></footer>
+    <div class="map-hover-help">HOVER FOR A QUICK LOOK · CLICK TO PIN STATS</div>
+  </main>
+  <div class="study-caption"><p><b id="look-description">Floodlights</b><span id="look-caption">A night match turned into a world map.</span></p><p>Visual study · real recorded stats · navigation shown for composition</p><a href="tiles.html">Reference example ↗</a></div>
+  <noscript>This visual playground requires JavaScript.</noscript>
+</body>
+</html>

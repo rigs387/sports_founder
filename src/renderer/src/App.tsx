@@ -1,324 +1,385 @@
-import { useEffect } from "react";
+﻿import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AXIS_IDS } from "../../content/genome-axes";
+import { CampaignOverview, type Overview } from "./components/CampaignOverview";
+import { CountryCard } from "./components/CountryCard";
+import { heatBand, mapSettings } from "./map/model";
+import { type MapCommand, type MapHover, WorldMap } from "./map/WorldMap";
 import { useGameStore } from "./state/game-store";
-
-const TOP_COUNTRIES = 8;
 
 export function App() {
   const { t } = useTranslation();
-  const { status, snapshot, names, error, startCampaign, endTurn } = useGameStore();
-
+  const {
+    status,
+    snapshot,
+    names,
+    history,
+    selectedCountryId,
+    error,
+    startCampaign,
+    endTurn,
+    selectCountry,
+  } = useGameStore();
+  const [command, setCommand] = useState<MapCommand>({ kind: "home", serial: 0 });
+  const [hover, setHover] = useState<MapHover | null>(null);
+  const [patterns, setPatterns] = useState(false);
+  const [rivals, setRivals] = useState(true);
+  const [overview, setOverview] = useState<Overview | null>(null);
   useEffect(() => {
     void startCampaign();
   }, [startCampaign]);
-
-  const player = snapshot?.sports.find((sport) => sport.kind === "player");
-  const anchor = snapshot?.countries.find(
-    (country) => country.countryId === snapshot.anchorCountryId,
-  );
-  const anchorLeague = anchor?.league ?? null;
-  const anchorRivals = anchor?.rivals ?? [];
+  const navigate = (kind: MapCommand["kind"], market?: string) =>
+    setCommand((previous) => ({ kind, market, serial: previous.serial + 1 }));
   const countryName = (id: string) => names?.countries[id] ?? id;
-  const nodeName = (id: string) => t(`growth.nodes.${id}`, { defaultValue: id });
-  const growthNodes = snapshot?.growthNodes ?? [];
-  const ownedNodes = growthNodes.filter((node) => node.status === "owned");
-  const availableNodes = growthNodes.filter((node) => node.status === "available");
-  const lockedCount = growthNodes.filter((node) => node.status === "locked").length;
-  const topCountries = snapshot
-    ? [...snapshot.countries]
-        .filter((country) => country.casual + country.hardcore > 0)
-        .sort((a, b) => b.fandomScore - a.fandomScore)
-        .slice(0, TOP_COUNTRIES)
-    : [];
+  const player = snapshot?.sports.find((sport) => sport.kind === "player");
+  const selected = snapshot?.countries.find((country) => country.countryId === selectedCountryId);
+  const hovered = hover
+    ? snapshot?.countries.find((country) => country.countryId === hover.id)
+    : null;
+  const established =
+    snapshot?.countries.filter((country) => country.share >= mapSettings.establishedThreshold)
+      .length ?? 0;
+  const compact = (value: number) => t("format.compact", { value });
+  const stateMessage = snapshot
+    ? t(
+        snapshot.win.rank === 1
+          ? snapshot.win.won
+            ? "win.top"
+            : snapshot.win.holding
+              ? "win.holding"
+              : "win.topTooEarly"
+          : snapshot.win.won
+            ? "win.retake"
+            : "win.chasing",
+        {
+          count: snapshot.win.turnsHeld,
+          hold: snapshot.win.holdTurns,
+          rank: snapshot.win.rank,
+          leader: names?.sports[snapshot.win.leadingRivalId ?? ""] ?? "",
+          tier: snapshot.win.requiredTier,
+          name: t(`tiers.${snapshot.win.requiredTier}`),
+        },
+      )
+    : "";
 
   return (
     <main
-      className="screen"
+      className="game-screen"
       data-testid="game"
       data-status={status}
       data-turn={snapshot?.turn}
       data-quarter={snapshot?.quarter}
       data-player-fandom-score={player?.fandomScore}
     >
-      <header className="header">
-        <h1>{t("app.title")}</h1>
-        <p className="subtitle">{t("app.subtitle")}</p>
-      </header>
-
-      {status === "error" && (
-        <p role="alert" className="error">
-          {t("status.error", { message: error })}
-        </p>
-      )}
-
-      {!snapshot ? (
-        status !== "error" && <p>{t("status.loading")}</p>
-      ) : (
-        <>
-          <section className="stats" aria-label={t("turn.heading")}>
-            <div className="stat stat-turn" data-testid="turn">
-              {t("turn.label", { turn: snapshot.turn })}
-            </div>
-            <div className="stat">
-              {t("turn.date", { quarter: snapshot.quarterOfYear, year: snapshot.year })}
-            </div>
-            <div className="stat">
-              {t("turn.tier", { tier: snapshot.ppTier, name: t(`tiers.${snapshot.ppTier}`) })}
-            </div>
-            <div className="stat">{t("turn.pp", { pp: snapshot.pp })}</div>
-            <div className="stat">{t("turn.length", { count: snapshot.turnLengthQuarters })}</div>
-          </section>
-
-          <p className="meta">
-            {t("campaign.meta", {
-              seed: snapshot.seed,
-              country: countryName(snapshot.anchorCountryId),
-            })}
-          </p>
-          <p className="meta" data-testid="focus">
-            {t("campaign.focus", {
-              countries: snapshot.focus
-                .map((id) => (id === null ? t("campaign.emptySlot") : countryName(id)))
-                .join(t("campaign.listSeparator")),
-            })}
-          </p>
-
-          <p className="meta" data-testid="race" data-rank={snapshot.win.rank}>
-            {t(
-              snapshot.win.rank === 1
-                ? snapshot.win.won
-                  ? "win.top"
-                  : snapshot.win.holding
-                    ? "win.holding"
-                    : "win.topTooEarly"
-                : snapshot.win.won
-                  ? "win.retake"
-                  : "win.chasing",
-              {
-                count: snapshot.win.turnsHeld,
-                hold: snapshot.win.holdTurns,
-                rank: snapshot.win.rank,
-                leader: names?.sports[snapshot.win.leadingRivalId ?? ""] ?? "",
-                tier: snapshot.win.requiredTier,
-                name: t(`tiers.${snapshot.win.requiredTier}`),
-              },
-            )}
-          </p>
-          {snapshot.win.won && (
-            <p className="won" data-testid="won">
-              {t("win.won", { turn: snapshot.win.won.turn })}
-            </p>
-          )}
-          {snapshot.outcome && (
-            <p role="alert" className="game-over" data-testid="game-over">
-              {t("campaign.over", {
-                country: countryName(snapshot.outcome.countryId),
-                turn: snapshot.outcome.turn,
-              })}
-            </p>
-          )}
-          <p className="meta" data-testid="window">
-            {snapshot.seasonalWindowOpen ? t("campaign.windowOpen") : t("campaign.windowClosed")}
-          </p>
-          {snapshot.tierTrack.pendingTierUp && (
-            <p className="meta">
-              {t("campaign.approaching", {
-                tier: snapshot.tierTrack.pendingTierUp.tier,
-                name: t(`tiers.${snapshot.tierTrack.pendingTierUp.tier}`),
-                count: snapshot.tierTrack.pendingTierUp.turnsLeft,
-              })}
-            </p>
-          )}
-          {snapshot.tierTrack.atRisk && (
-            <p className="meta warning">
-              {t("campaign.atRisk", { count: snapshot.tierTrack.atRisk.turnsUntilDemotion })}
-            </p>
-          )}
-
-          <section className="league" aria-label={t("league.heading")} data-testid="anchor-league">
-            <h2>{t("league.heading")}</h2>
-            {anchorLeague ? (
-              <dl className="league-list">
-                <div>
-                  <dt>{t("league.tier")}</dt>
-                  <dd>{t(`league.tiers.${anchorLeague.tier}`)}</dd>
-                </div>
-                <div>
-                  <dt>{t("league.health")}</dt>
-                  <dd className={`health-${anchorLeague.health}`}>
-                    {t(`league.healthLevels.${anchorLeague.health}`)}
-                  </dd>
-                </div>
-                <div>
-                  <dt>{t("league.cash")}</dt>
-                  <dd>{t("format.money", { value: anchorLeague.cash })}</dd>
-                </div>
-                <div>
-                  <dt>{t("league.flow")}</dt>
-                  <dd>
-                    {anchorLeague.lastFlowPerQuarter === null
-                      ? t("league.notYetMeasured")
-                      : t("format.money", { value: anchorLeague.lastFlowPerQuarter })}
-                  </dd>
-                </div>
-              </dl>
-            ) : (
-              <p>{t("league.none")}</p>
-            )}
-          </section>
-
-          <section className="rivals" aria-label={t("rivals.heading")} data-testid="anchor-rivals">
-            <h2>{t("rivals.heading")}</h2>
-            <dl className="league-list">
-              {anchorRivals.map((rival) => (
-                <div key={rival.sportId} data-testid="anchor-rival" data-level={rival.level}>
-                  <dt>{names?.sports[rival.sportId] ?? rival.sportId}</dt>
-                  <dd className={`escalation-${rival.level}`}>
-                    {rival.countermoves.length === 0
-                      ? t(`rivals.levels.${rival.level}`)
-                      : t("rivals.levelWithMoves", {
-                          level: t(`rivals.levels.${rival.level}`),
-                          moves: rival.countermoves
-                            .map((move) => t(`rivals.moves.${move}`))
-                            .join(t("campaign.listSeparator")),
-                        })}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-
-          <section className="growth" aria-label={t("growth.heading")} data-testid="growth-tree">
-            <h2>{t("growth.heading")}</h2>
-            <dl className="league-list">
-              <div>
-                <dt>{t("growth.owned")}</dt>
-                <dd data-testid="growth-owned">
-                  {ownedNodes.length === 0
-                    ? t("growth.noneOwned")
-                    : ownedNodes
-                        .map((node) => nodeName(node.nodeId))
-                        .join(t("campaign.listSeparator"))}
-                </dd>
-              </div>
-              <div>
-                <dt>{t("growth.available")}</dt>
-                <dd>
-                  {availableNodes.length === 0 ? (
-                    t("growth.noneAvailable")
-                  ) : (
-                    <ul className="node-list" data-testid="growth-available">
-                      {availableNodes.map((node) => (
-                        <li
-                          key={node.nodeId}
-                          className={node.affordable ? undefined : "unaffordable"}
-                        >
-                          <span>
-                            {t("growth.nodeWithCategory", {
-                              name: nodeName(node.nodeId),
-                              category: t(`growth.categories.${node.category}`),
-                            })}
-                          </span>
-                          <span className="node-cost">
-                            {node.affordable
-                              ? t("growth.cost", { cost: node.cost })
-                              : t("growth.tooExpensive", { cost: node.cost })}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </dd>
-              </div>
-            </dl>
-            <p className="meta">{t("growth.lockedCount", { count: lockedCount })}</p>
-          </section>
-
-          <section className="genome" aria-label={t("genome.heading")}>
-            <h2>{t("genome.heading")}</h2>
-            <dl className="genome-list" data-testid="genome">
-              {AXIS_IDS.map((axis) => (
-                <div key={axis} className="genome-axis">
-                  <dt>{t(`genome.axes.${axis}`)}</dt>
-                  <dd>{t(`genome.options.${axis}.${snapshot.genome[axis]}`)}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-
-          <table className="fans">
-            <caption>{t("fans.heading")}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{t("fans.sport")}</th>
-                <th scope="col">{t("fans.uninterested")}</th>
-                <th scope="col">{t("fans.casual")}</th>
-                <th scope="col">{t("fans.hardcore")}</th>
-                <th scope="col">{t("fans.score")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {snapshot.sports.map((sport) => (
-                <tr key={sport.sportId} data-testid="fan-row" className={sport.kind}>
-                  <th scope="row">
-                    {sport.kind === "player"
-                      ? t("fans.yourSport")
-                      : sport.kind === "other"
-                        ? t("fans.otherSports")
-                        : (names?.sports[sport.sportId] ?? sport.sportId)}
-                  </th>
-                  <td>{t("format.count", { value: sport.uninterested })}</td>
-                  <td>{t("format.count", { value: sport.casual })}</td>
-                  <td>{t("format.count", { value: sport.hardcore })}</td>
-                  <td>{t("format.count", { value: sport.fandomScore })}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <table className="fans countries">
-            <caption>{t("countries.heading", { count: topCountries.length })}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{t("countries.country")}</th>
-                <th scope="col">{t("fans.casual")}</th>
-                <th scope="col">{t("fans.hardcore")}</th>
-                <th scope="col">{t("countries.share")}</th>
-                <th scope="col">{t("countries.affinity")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topCountries.map((country) => (
-                <tr
-                  key={country.countryId}
-                  data-testid="country-row"
-                  className={country.focused ? "focused" : undefined}
-                >
-                  <th scope="row">
-                    {country.focused
-                      ? t("countries.focusedName", { name: countryName(country.countryId) })
-                      : countryName(country.countryId)}
-                  </th>
-                  <td>{t("format.count", { value: country.casual })}</td>
-                  <td>{t("format.count", { value: country.hardcore })}</td>
-                  <td>{t("format.percent", { value: country.share })}</td>
-                  <td>{t("format.multiplier", { value: country.affinity })}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
+      <header className="game-topbar">
+        <div className="game-brand">
+          <span className="brand-emblem" aria-hidden="true">
+            {t("map.monogram")}
+            <small>&#9733;</small>
+          </span>
+          <span>
+            {t("map.brandFirst")}
+            <strong>{t("map.brandSecond")}</strong>
+          </span>
+        </div>
+        <nav className="game-nav" aria-label={t("map.navigation")}>
           <button
             type="button"
-            className="end-turn"
-            data-testid="end-turn"
-            disabled={status !== "ready"}
-            onClick={() => void endTurn()}
+            className="active"
+            onClick={() => setOverview(null)}
+            aria-current={overview ? undefined : "page"}
           >
-            {status === "simulating" ? t("status.simulating") : t("actions.endTurn")}
+            {t("map.nav.world")}
           </button>
-        </>
+          {(["sport", "leagues", "growth"] as const).map((view) => (
+            <button type="button" key={view} disabled={!snapshot} onClick={() => setOverview(view)}>
+              {t(`map.nav.${view}`)}
+            </button>
+          ))}
+        </nav>
+        <div className="resources">
+          <div>
+            <span aria-hidden="true">&#10022;</span>
+            <div>
+              <small>{t("map.prestige")}</small>
+              <b>{compact(snapshot?.pp ?? 0)}</b>
+            </div>
+          </div>
+          <div>
+            <span aria-hidden="true">&#9672;</span>
+            <div>
+              <small>{t("fans.score")}</small>
+              <b>{compact(player?.fandomScore ?? 0)}</b>
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="icon-button"
+          title={t("map.home")}
+          aria-label={t("map.home")}
+          onClick={() => navigate("home")}
+        >
+          &#8982;
+        </button>
+      </header>
+      <section className="world-stage" aria-label={t("map.stage")}>
+        {snapshot && (
+          <WorldMap
+            countryNames={names?.countries ?? {}}
+            snapshot={snapshot}
+            selected={selectedCountryId}
+            command={command}
+            patterns={patterns}
+            rivals={rivals}
+            onSelect={selectCountry}
+            onHover={setHover}
+          />
+        )}
+        <div className="campaign-heading">
+          <span className="eyebrow">{t("map.chapter")}</span>
+          <h1>
+            {t("map.headlineFirst")}
+            <em>{t("map.headlineSecond")}</em>
+          </h1>
+          <p>
+            <span aria-hidden="true">&#9675;</span>
+            {t("map.campaignIdentity", {
+              tier: snapshot ? t(`tiers.${snapshot.ppTier}`) : t("status.loading"),
+            })}
+          </p>
+        </div>
+        <div className="world-note">
+          <i />
+          {t("map.established", {
+            count: established,
+            threshold: t("format.percent", { value: mapSettings.establishedThreshold }),
+          })}
+        </div>
+        {status === "loading" && (
+          <p className="loading-notice" role="status">
+            {t("status.loading")}
+          </p>
+        )}
+        {error && (
+          <p className="error-notice" role="alert">
+            {t("status.error", { message: error })}
+          </p>
+        )}
+        {snapshot?.outcome && (
+          <p className="outcome-notice" role="alert">
+            {t("campaign.over", {
+              country: countryName(snapshot.outcome.countryId),
+              turn: snapshot.outcome.turn,
+            })}
+          </p>
+        )}
+        <div className="map-controls">
+          <div className="zoom-controls">
+            <button
+              type="button"
+              aria-label={t("map.zoomIn")}
+              onClick={() => navigate("in")}
+              data-testid="zoom-in"
+            >
+              +
+            </button>
+            <button type="button" aria-label={t("map.zoomOut")} onClick={() => navigate("out")}>
+              &minus;
+            </button>
+            <span>{t("map.dragHint")}</span>
+          </div>
+          <label className="market-picker">
+            <span>{t("map.findCountry")}</span>
+            <select
+              value={selectedCountryId ?? ""}
+              onChange={(event) => {
+                const id = event.currentTarget.value;
+                selectCountry(id);
+                navigate("locate", id);
+              }}
+              data-testid="market-picker"
+            >
+              <option value="" disabled>
+                {t("map.chooseCountry")}
+              </option>
+              {snapshot?.countries.map((country) => (
+                <option value={country.countryId} key={country.countryId}>
+                  {countryName(country.countryId)}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {selected && names && snapshot && (
+          <CountryCard
+            country={selected}
+            names={names}
+            history={history[selected.countryId] ?? []}
+            anchor={snapshot.anchorCountryId}
+            turn={snapshot.turn}
+            onClose={() => selectCountry(null)}
+            onLocate={() => navigate("locate", selected.countryId)}
+          />
+        )}
+        {hover && hovered && hovered.countryId !== selectedCountryId && (
+          <div
+            className="quick-stat"
+            data-testid="map-tooltip"
+            role="tooltip"
+            style={{
+              left: Math.max(12, Math.min(hover.x + 18, window.innerWidth - 275)),
+              top: Math.max(140, Math.min(hover.y + 16, window.innerHeight - 310)),
+            }}
+          >
+            <div className="quick-heading">
+              <strong>{countryName(hover.id)}</strong>
+              <span aria-hidden="true">&#8599;</span>
+            </div>
+            <div className="quick-body">
+              <div>
+                <b>
+                  {t(
+                    hovered.share > 0 && hovered.share < 0.001
+                      ? "map.tinyShare"
+                      : "format.strength",
+                    { value: hovered.share },
+                  )}
+                </b>
+                <small>{t("map.strength")}</small>
+              </div>
+              <div>
+                <b>{compact(hovered.casual + hovered.hardcore)}</b>
+                <small>{t("map.totalFans")}</small>
+              </div>
+            </div>
+            <div className={`quick-meter band-${heatBand(hovered.share, mapSettings.heatBands)}`} />
+            <div className="quick-footer">
+              <span>
+                {hovered.league
+                  ? t("map.leagueName", { tier: t(`league.tiers.${hovered.league.tier}`) })
+                  : t("league.none")}
+              </span>
+              <b>{t("map.clickToPin")}</b>
+            </div>
+          </div>
+        )}
+        {snapshot && (
+          <div className="objective-card" data-testid="race" data-rank={snapshot.win.rank}>
+            <span aria-hidden="true">&#10022;</span>
+            <div>
+              <span className="eyebrow">{t("map.bigPicture")}</span>
+              <strong>
+                {t(snapshot.win.rank === 1 ? "map.objectiveLeading" : "map.objectiveChasing", {
+                  rank: snapshot.win.rank,
+                })}
+              </strong>
+              <p>{stateMessage}</p>
+              {snapshot.win.won && <p>{t("win.won", { turn: snapshot.win.won.turn })}</p>}
+              {snapshot.tierTrack.atRisk && (
+                <p className="warning">
+                  {t("campaign.atRisk", { count: snapshot.tierTrack.atRisk.turnsUntilDemotion })}
+                </p>
+              )}
+              {snapshot.tierTrack.pendingTierUp && (
+                <p>
+                  {t("campaign.approaching", {
+                    tier: snapshot.tierTrack.pendingTierUp.tier,
+                    name: t(`tiers.${snapshot.tierTrack.pendingTierUp.tier}`),
+                    count: snapshot.tierTrack.pendingTierUp.turnsLeft,
+                  })}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </section>
+      <footer className="game-bottom">
+        <div className="map-legend">
+          <span>{t("map.strength")}</span>
+          <div className="legend-swatches">
+            {[null, ...mapSettings.heatBands].map((threshold, index) => (
+              <i
+                className={`band-${index}`}
+                key={threshold === null ? "empty" : String(threshold)}
+                title={t(
+                  index === 0
+                    ? "map.bandZero"
+                    : index === mapSettings.heatBands.length
+                      ? "map.bandTop"
+                      : "map.bandRange",
+                  {
+                    lower: t("format.percent", { value: mapSettings.heatBands[index - 1] ?? 0 }),
+                    upper: t("format.percent", { value: mapSettings.heatBands[index] ?? 0 }),
+                  },
+                )}
+              />
+            ))}
+          </div>
+          <div className="legend-ends">
+            <small>{t("format.percent", { value: 0 })}</small>
+            <small>
+              {t("map.bandTop", {
+                lower: t("format.percent", { value: mapSettings.heatBands.at(-1) ?? 0 }),
+              })}
+            </small>
+          </div>
+        </div>
+        <div className="replay-date">
+          <span>
+            {snapshot
+              ? t("turn.date", { quarter: snapshot.quarterOfYear, year: snapshot.year })
+              : ""}
+          </span>
+          <b>{t("turn.label", { turn: snapshot?.turn ?? 1 })}</b>
+        </div>
+        <div className="map-options">
+          <label>
+            <input
+              type="checkbox"
+              checked={patterns}
+              onChange={(event) => setPatterns(event.currentTarget.checked)}
+            />
+            {t("map.patterns")}
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={rivals}
+              onChange={(event) => setRivals(event.currentTarget.checked)}
+            />
+            {t("map.rivals")}
+          </label>
+        </div>
+        <button
+          type="button"
+          className="advance-turn"
+          data-testid="end-turn"
+          disabled={status !== "ready" || !!snapshot?.outcome}
+          onClick={() => void endTurn()}
+        >
+          <span>{t(status === "simulating" ? "status.simulating" : "map.nextTurn")}</span>
+          <b aria-hidden="true">&#8594;</b>
+        </button>
+      </footer>
+      <div className="sr-only" role="status" aria-live="polite">
+        {snapshot
+          ? t("map.turnAnnounced", {
+              turn: snapshot.turn,
+              score: compact(player?.fandomScore ?? 0),
+            })
+          : ""}
+      </div>
+      {overview && snapshot && names && (
+        <CampaignOverview
+          view={overview}
+          snapshot={snapshot}
+          names={names}
+          onClose={() => setOverview(null)}
+          onSelect={(id) => {
+            selectCountry(id);
+            navigate("locate", id);
+          }}
+        />
       )}
     </main>
   );

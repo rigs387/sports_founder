@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { app, type BrowserWindow } from "electron";
+import { verifyMap } from "./map-smoke";
 
 // Development-only self-check, enabled by the SF_SMOKE_OUT environment variable (see
 // `npm run smoke`). It drives the real window: waits for the first campaign snapshot from the
@@ -34,21 +35,36 @@ const READ_UI_STATE = `(() => {
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function attachSmokeTest(win: BrowserWindow, outDir: string): void {
+  const errors: string[] = [];
+  const remoteRequests: string[] = [];
   win.webContents.on("console-message", (event) => {
+    if (event.level === "error") errors.push(event.message);
     console.log(`[renderer:${event.level}] ${event.message}`);
   });
+  win.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+    const remote = /^https?:/.test(details.url);
+    if (remote) remoteRequests.push(details.url);
+    callback({ cancel: remote });
+  });
   win.webContents.once("did-finish-load", () => {
-    run(win, outDir).then(
+    run(win, outDir, errors, remoteRequests).then(
       () => app.exit(0),
-      (error: unknown) => {
+      async (error: unknown) => {
         console.error("[smoke] FAILED:", error instanceof Error ? error.message : error);
+        mkdirSync(outDir, { recursive: true });
+        writeFileSync(join(outDir, "failure.png"), (await win.webContents.capturePage()).toPNG());
         app.exit(1);
       },
     );
   });
 }
 
-async function run(win: BrowserWindow, outDir: string): Promise<void> {
+async function run(
+  win: BrowserWindow,
+  outDir: string,
+  errors: string[],
+  remoteRequests: string[],
+): Promise<void> {
   mkdirSync(outDir, { recursive: true });
   const read = async (): Promise<UiState | null> =>
     (await win.webContents.executeJavaScript(READ_UI_STATE)) as UiState | null;
@@ -66,6 +82,8 @@ async function run(win: BrowserWindow, outDir: string): Promise<void> {
   };
 
   const screenshot = async (name: string) => {
+    // Hidden Chromium windows can return the last composited frame on the first capture.
+    await win.webContents.capturePage();
     await delay(300);
     const image = await win.webContents.capturePage();
     writeFileSync(join(outDir, name), image.toPNG());
@@ -91,7 +109,18 @@ async function run(win: BrowserWindow, outDir: string): Promise<void> {
     current.turn === before.turn + TURNS_TO_PLAY &&
     current.quarter > before.quarter &&
     current.playerFandomScore !== before.playerFandomScore;
-  const report = { passed, turnsPlayed: TURNS_TO_PLAY, before, after: current };
+  const map = await verifyMap(win, screenshot);
+  if (errors.length || remoteRequests.length)
+    throw new Error(JSON.stringify({ errors, remoteRequests }));
+  const report = {
+    passed,
+    turnsPlayed: TURNS_TO_PLAY,
+    before,
+    after: current,
+    map,
+    errors,
+    remoteRequests,
+  };
   writeFileSync(join(outDir, "smoke.json"), `${JSON.stringify(report, null, 2)}\n`);
   console.log(`[smoke] ${JSON.stringify(report)}`);
   if (!passed) throw new Error("The screen did not advance as expected after End Turn");

@@ -7,10 +7,13 @@ import { resolve } from "node:path";
 
 const outDir = resolve(process.argv[2] ?? "runs/smoke");
 const electronPath = createRequire(import.meta.url)("electron") as string;
+const env: NodeJS.ProcessEnv = { ...process.env, SF_SMOKE_OUT: outDir };
+delete env.ELECTRON_RUN_AS_NODE;
 
 const result = spawnSync(electronPath, ["."], {
   stdio: "inherit",
-  env: { ...process.env, SF_SMOKE_OUT: outDir },
+  windowsHide: true,
+  env,
 });
 if (result.error) {
   console.error(result.error.message);

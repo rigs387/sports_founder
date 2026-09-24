@@ -2,6 +2,8 @@ import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, shell } from "electron";
 import { attachSmokeTest } from "./smoke";
 
+if (process.env.SF_SMOKE_OUT) app.commandLine.appendSwitch("force-device-scale-factor", "1");
+
 // Security posture (tech plan 8.4): the game window never loads remote content, and external
 // links open in the system browser. Steam overlay settings are deferred with Steam integration.
 
@@ -13,17 +15,21 @@ function createWindow(): void {
   const win = new BrowserWindow({
     width: 1280,
     height: 800,
+    useContentSize: true,
     show: false,
     title: "Sports Founder",
-    backgroundColor: "#f3eee2",
+    backgroundColor: "#97dbe3",
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      backgroundThrottling: !process.env.SF_SMOKE_OUT,
     },
   });
 
-  win.once("ready-to-show", () => win.show());
+  win.once("ready-to-show", () => {
+    if (!process.env.SF_SMOKE_OUT) win.show();
+  });
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (isExternalWebUrl(url)) void shell.openExternal(url);

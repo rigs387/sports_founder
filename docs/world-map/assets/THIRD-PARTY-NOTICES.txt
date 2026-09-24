@@ -1,0 +1,33 @@
+Natural Earth geometry
+======================
+Natural Earth v5.1.2, 1:50m admin-0 map units. Public domain.
+https://www.naturalearthdata.com/about/terms-of-use/
+https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_50m_admin_0_map_units.geojson
+The geometry is projected and coordinates rounded for this documentation example.
+
+Gibraltar point
+===============
+GeoNames, feature 2411586: latitude 36.13333, longitude -5.35.
+https://www.geonames.org/2411586/gibraltar.html
+Creative Commons Attribution 4.0: https://creativecommons.org/licenses/by/4.0/
+Used as a visible point fallback because Gibraltar has no polygon in the 50m source.
+
+Natural Earth I projection polynomial
+====================================
+Adapted from d3-geo src/projection/naturalEarth1.js (forward projection only).
+https://github.com/d3/d3-geo/blob/main/src/projection/naturalEarth1.js
+ISC license:
+
+Copyright 2010-2024 Mike Bostock
+
+Permission to use, copy, modify, and/or distribute this software for any purpose
+with or without fee is hereby granted, provided that the above copyright notice
+and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
+OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+THIS SOFTWARE.

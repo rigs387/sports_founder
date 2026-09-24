@@ -240,18 +240,18 @@
   tile, continents sit in roughly their familiar positions, and within a continent the markets are
   ordered breadth-first across their real borders and sea links, so neighbours land near each other.
   No coordinates were invented for it. The real build reads Natural Earth shapes, which is the first
-  task in <code>docs/world-map-brief.html</code> &mdash; and equal tiles quietly solve a problem
+  task in <code>docs/world-map/brief.html</code> &mdash; and equal tiles quietly solve a problem
   real shapes will not: Tuvalu, 9,646 people and the game&rsquo;s signature hard anchor, is as
   clickable here as China.</p>
   <p>Regenerate with <code>npx tsx runs/demo-map.ts &lt;anchor&gt; &lt;seed&gt;</code>, which
-  rewrites <code>world-map-example.data.js</code> beside this file.</p>
+  rewrites <code>docs/world-map/assets/tiles.data.js</code>.</p>
 </footer>
 
 </div>
 
 <div id="tooltip" hidden></div>
 
-<script src="world-map-example.data.js"></script>
+<script src="../assets/tiles.data.js"></script>
 <script>
 (function () {
   "use strict";
@@ -273,7 +273,7 @@
 
   function stepFor(share) {
     if (!share || share < BREAKS[0]) return null;
-    for (var i = BREAKS.length - 1; i >= 0; i -= 1) if (share >= BREAKS[i]) return STEPS[i];
+    for (let i = BREAKS.length - 1; i >= 0; i -= 1) if (share >= BREAKS[i]) return STEPS[i];
     return STEPS[0];
   }
   function fillFor(share) {
@@ -362,7 +362,7 @@
       var holder = marks[m.id];
       while (holder.g.firstChild) holder.g.removeChild(holder.g.firstChild);
       if (m.id === data.anchor) {
-        var ring = document.createElementNS(SVGNS, "rect");
+        const ring = document.createElementNS(SVGNS, "rect");
         ring.setAttribute("class", "mark-anchor");
         ring.setAttribute("x", String(holder.x - 1.1)); ring.setAttribute("y", String(holder.y - 1.1));
         ring.setAttribute("width", String(TILE + 2.2)); ring.setAttribute("height", String(TILE + 2.2));
@@ -370,7 +370,7 @@
         holder.g.appendChild(ring);
       }
       if (s && s.focused) {
-        var dot = document.createElementNS(SVGNS, "circle");
+        const dot = document.createElementNS(SVGNS, "circle");
         dot.setAttribute("class", "mark-focus");
         dot.setAttribute("cx", String(holder.x + TILE - 2.4));
         dot.setAttribute("cy", String(holder.y + 2.4));
@@ -378,9 +378,9 @@
         holder.g.appendChild(dot);
       }
       if (s && s.rival) {
-        var tri = document.createElementNS(SVGNS, "path");
+        const tri = document.createElementNS(SVGNS, "path");
         tri.setAttribute("class", "mark-contested");
-        var bx = holder.x + 1, by = holder.y + TILE - 1;
+        const bx = holder.x + 1, by = holder.y + TILE - 1;
         tri.setAttribute("d", "M" + bx + " " + by + " l3.4 0 l0 -3.4 z");
         holder.g.appendChild(tri);
       }

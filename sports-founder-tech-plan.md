@@ -27,6 +27,7 @@ surface before playtesting or during it.
 |---|---|---|
 | 2026-09-12 | Stack: **TypeScript + Electron** | Decided |
 | 2026-09-12 | Rendering: **PixiJS v8** for the world map and animation | Decided |
+| 2026-09-23 | Pixi map reaffirmed after SVG visual studies: PixiJS + pixi-viewport + @pixi/react for the live map; React/CSS for the main screen and cards. Use Natural Earth v5.1.2 map-units with explicit sporting-market assignments instead of world-atlas's sovereign-country boundaries. Offline projected geometry is committed; session history supplies country trends. See `docs/world-map/production.md`. | Decided |
 | 2026-09-12 | Architecture: **pure, deterministic, headless simulation core** separate from the UI | Decided |
 | 2026-09-12 | Add a **Phase 0 vertical slice** ahead of GDD Phase 1 | Recommended |
 | 2026-09-12 | Supporting libraries per Section 6 | Recommended; confirm at project setup |

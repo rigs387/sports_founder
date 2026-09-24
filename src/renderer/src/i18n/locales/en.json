@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "Sports Founder",
-    "subtitle": "Foundation build: genome, spread, leagues, the tier track, rival defense and the growth tree are live; no map yet."
+    "subtitle": "Invent a sport. Grow a worldwide following."
   },
   "status": {
     "loading": "Setting up the backyard…",
@@ -214,9 +214,93 @@
     "count": "{{value, number(maximumFractionDigits: 0)}}",
     "percent": "{{value, number(style: percent; maximumFractionDigits: 2)}}",
     "multiplier": "{{value, number(maximumFractionDigits: 2)}}×",
-    "money": "{{value, number(maximumFractionDigits: 1)}}"
+    "money": "{{value, number(maximumFractionDigits: 1)}}",
+    "compact": "{{value, number(notation: compact; maximumFractionDigits: 1)}}",
+    "strength": "{{value, number(style: percent; maximumFractionDigits: 1)}}"
   },
   "actions": {
     "endTurn": "End Turn"
+  },
+  "map": {
+    "monogram": "SF",
+    "brandFirst": "SPORTS",
+    "brandSecond": "FOUNDER",
+    "navigation": "Game navigation",
+    "nav": {
+      "world": "World",
+      "sport": "Your sport",
+      "leagues": "Leagues",
+      "growth": "Growth"
+    },
+    "prestige": "Prestige",
+    "home": "World view",
+    "stage": "World campaign",
+    "description": "World fandom map. Drag to explore, scroll to zoom, and click a market to inspect it. The country selector provides keyboard access to every market.",
+    "loading": "Preparing your world...",
+    "failed": "The map could not start. Try reopening the game.",
+    "retry": "Reload",
+    "chapter": "Every obsession starts somewhere",
+    "headlineFirst": "Small sport.",
+    "headlineSecond": "Big world.",
+    "campaignIdentity": "Your sport / {{tier}}",
+    "established_zero": "A world of possibilities.",
+    "established_one": "{{count}} market at {{threshold}}+ fandom strength.",
+    "established_other": "{{count}} markets at {{threshold}}+ fandom strength.",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "dragHint": "Drag to explore",
+    "findCountry": "Find a country",
+    "chooseCountry": "Choose a country",
+    "closeCard": "Close country card",
+    "countrySeries": "SF / COUNTRY SERIES",
+    "birthplace": "Where it all started",
+    "market": "Country profile",
+    "countryMeta": "{{population}} people / {{continent}}",
+    "strength": "Fandom strength",
+    "tinyShare": "<0.1%",
+    "firstTurn": "First fans",
+    "change": "{{value, number(signDisplay: always; maximumFractionDigits: 2)}} pts",
+    "historyDescription": "Fandom strength history for {{country}}; horizontal spacing follows elapsed quarters.",
+    "historyEmpty": "History begins here",
+    "historySince": "Since turn {{turn}}",
+    "leagueName": "{{tier}} league",
+    "reserve": "{{value, number(notation: compact; maximumFractionDigits: 1)}} in reserve",
+    "noLeagueYet": "Room for the local game to grow.",
+    "rivalPressure": "{{rival}} is pushing back",
+    "noPressure": "Room to make your mark",
+    "roomToGrow": "No active rival countermoves.",
+    "findMarket": "Find this market",
+    "countryIntelligence": "Country intelligence",
+    "liveTurn": "Live campaign",
+    "totalFans": "Total fans",
+    "clickToPin": "Click to pin +",
+    "bigPicture": "The big picture",
+    "objectiveChasing": "A world to win. Ranked #{{rank}}.",
+    "objectiveLeading": "Your sport leads the world.",
+    "patterns": "Patterns",
+    "rivals": "Rival pressure",
+    "nextTurn": "Next turn",
+    "turnAnnounced": "Turn {{turn}}. Fandom Score {{score}}.",
+    "bandZero": "No fandom yet",
+    "bandTop": "{{lower}}+",
+    "bandRange": "{{lower}} to below {{upper}}",
+    "campaignOverview": "Your campaign",
+    "closeOverview": "Close campaign overview",
+    "focusHeading": "Current focus",
+    "leagueOverview": "Inspect a market to see its local following and league.",
+    "growthOverview": "Your growth nodes and their current availability.",
+    "nodeStatus": {
+      "owned": "Owned",
+      "available": "Available",
+      "locked": "Locked"
+    },
+    "continents": {
+      "africa": "Africa",
+      "asia": "Asia",
+      "europe": "Europe",
+      "north-america": "North America",
+      "south-america": "South America",
+      "oceania": "Oceania"
+    }
   }
 }

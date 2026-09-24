@@ -22,6 +22,7 @@ src/main/             Electron main process (window, security; later save file I
                       Steam adapter)
 src/renderer/         React UI. The sim runs in a Web Worker (src/renderer/src/worker) via Comlink
 scripts/              Purity check for src/sim and src/content; Electron smoke-test launcher
+docs/                 Documentation index; world-map/README.md records the current visual direction
 tests/                Vitest tests
 runs/                 Runner and smoke-test output (git-ignored)
 ```

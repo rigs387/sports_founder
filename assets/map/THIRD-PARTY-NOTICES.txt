@@ -1,0 +1,16 @@
+Natural Earth geometry
+======================
+Natural Earth v5.1.2, 1:50m admin-0 map units. Public domain.
+https://www.naturalearthdata.com/about/terms-of-use/
+https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_50m_admin_0_map_units.geojson
+Simplified, projected with d3-geo Natural Earth I, and rounded for the game.
+
+Gibraltar point
+===============
+GeoNames, feature 2411586: latitude 36.13333, longitude -5.35.
+https://www.geonames.org/2411586/gibraltar.html
+Creative Commons Attribution 4.0: https://creativecommons.org/licenses/by/4.0/
+Used as a point fallback because Gibraltar has no polygon in the 50m source.
+
+Projection and simplification are build-time uses of d3-geo (ISC) and mapshaper
+(Mozilla Public License 2.0). Their code is not included in this geometry artifact.

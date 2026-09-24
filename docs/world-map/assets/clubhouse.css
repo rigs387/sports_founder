@@ -1,0 +1,639 @@
+/* Only the interface and typography vary. Clubhouse's ocean, land, heat colours,
+   projection, extrusion, and underlying campaign are identical in every study. */
+:root[data-variant] {
+  --surface: #f9fdff;
+  --card: #ffffff;
+  --ink: #243f58;
+  --muted: #647b8c;
+  --line: #b5ced7;
+  --accent: #f57669;
+  --accent-ink: #ffffff;
+  --second: #197f86;
+  --warning: #b24e43;
+  --display: "Segoe UI", sans-serif;
+  --body: "Segoe UI", sans-serif;
+  --ui-edge: #285264;
+  --ui-shadow: #7eaeba;
+  --card-inset: #edf5f9;
+  --badge-bg: #d8edf1;
+  --badge-ink: #2c6874;
+  --button-edge: #ba554f;
+  --button-shadow: #c46359;
+  --header-bg: #ffffff;
+  --header-ink: #243f58;
+  --headline: #254d62;
+  --headline-highlight: #ffffff;
+}
+[data-variant] .review-toolbar {
+  background: #11232e;
+}
+[data-variant] .game-screen {
+  border-color: var(--ui-edge);
+}
+[data-variant] .game-topbar {
+  background: var(--header-bg);
+  color: var(--header-ink);
+  border-bottom-color: var(--ui-edge);
+}
+[data-variant] .game-brand {
+  font-family: var(--display);
+  font-weight: 850;
+  font-style: normal;
+}
+[data-variant] .game-brand :where(div:last-child) > span {
+  color: var(--second);
+}
+[data-variant] .game-nav > strong {
+  color: var(--header-ink);
+  border-color: var(--accent);
+}
+[data-variant] .game-nav > span {
+  color: color-mix(in srgb, var(--header-ink), transparent 28%);
+}
+[data-variant] .brand-emblem {
+  color: var(--accent-ink);
+  border-radius: 12px;
+  box-shadow: 0 3px var(--button-shadow);
+}
+[data-variant] .resource-icon {
+  color: var(--accent);
+}
+[data-variant] .fans-icon {
+  color: var(--second);
+}
+[data-variant] .resources small {
+  color: color-mix(in srgb, var(--header-ink), transparent 24%);
+}
+[data-variant] .icon-button {
+  color: var(--header-ink);
+  background: color-mix(in srgb, var(--header-ink), transparent 94%);
+  border-color: color-mix(in srgb, var(--header-ink), transparent 65%);
+}
+[data-variant] .campaign-heading {
+  transform: rotate(-2deg);
+}
+[data-variant] h1 {
+  color: var(--headline);
+  font-family: var(--display);
+  text-shadow: 0 3px #ebffff77;
+  font-size: 52px;
+  letter-spacing: -2.5px;
+}
+[data-variant] h1 em {
+  color: var(--headline-highlight);
+  -webkit-text-stroke: 1px var(--headline);
+  text-shadow: 2px 3px #387d8588;
+}
+[data-variant] .country-card {
+  background: var(--card);
+  border-color: var(--ui-edge);
+  border-radius: 20px;
+  padding: 25px 22px 20px;
+  box-shadow:
+    5px 6px 0 var(--ui-shadow),
+    7px 8px 0 var(--ui-edge),
+    0 16px 30px #284c5525;
+}
+[data-variant] .card-header {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 16px;
+}
+[data-variant] .card-header h2 {
+  font-family: var(--display);
+  font-size: 27px;
+}
+[data-variant] .card-kicker {
+  font-size: 7px;
+}
+[data-variant] .card-accent {
+  left: 24px;
+  top: -9px;
+  width: 97px;
+  height: 18px;
+  transform: rotate(-3deg);
+  background: var(--accent);
+  border: 1px solid var(--button-edge);
+  box-shadow: 1px 2px 0 var(--button-shadow);
+  opacity: 1;
+  border-radius: 3px;
+}
+[data-variant] .card-accent::after {
+  content: "COUNTRY COLLECTION";
+  display: block;
+  color: var(--accent-ink);
+  text-align: center;
+  font:
+    700 6px / 17px "Segoe UI",
+    sans-serif;
+  letter-spacing: 0.06em;
+}
+[data-variant] .country-badge {
+  color: var(--badge-ink);
+  background: var(--badge-bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-family: var(--display);
+  font-size: 16px;
+}
+[data-variant] .card-score {
+  padding-top: 18px;
+}
+[data-variant] .hero-number {
+  font-family: var(--display);
+  font-size: 52px;
+  font-weight: 800;
+}
+[data-variant] .trend-pill {
+  color: var(--second);
+  background: var(--badge-bg);
+  border-radius: 7px;
+}
+[data-variant] .fan-stats > div {
+  background: var(--card-inset);
+  border-radius: 11px;
+}
+[data-variant] .fan-stats strong {
+  font-family: var(--display);
+  font-weight: 750;
+  font-size: 19px;
+}
+[data-variant] .health-pill {
+  color: var(--badge-ink);
+  background: var(--badge-bg);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+[data-variant] .card-action,
+[data-variant] .advance-turn {
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-color: var(--button-edge);
+  box-shadow: 0 4px var(--button-shadow);
+  border-radius: 12px;
+}
+[data-variant] .objective-card {
+  background: var(--card);
+  border-color: var(--ui-edge);
+  box-shadow: 4px 4px var(--ui-shadow);
+}
+[data-variant] .objective-icon,
+[data-variant] .objective-arrow {
+  color: var(--second);
+}
+[data-variant] .quick-stat {
+  color: var(--ink);
+  background: var(--card);
+  border-color: var(--ui-edge);
+  box-shadow: 4px 5px var(--ui-shadow);
+  border-radius: 14px;
+}
+[data-variant] .quick-heading > span {
+  color: var(--badge-ink);
+  background: var(--badge-bg);
+  border-radius: 8px;
+}
+[data-variant] .quick-heading strong {
+  font-family: var(--display);
+}
+[data-variant] .quick-body b {
+  font-family: var(--display);
+}
+[data-variant] .quick-heading > b,
+[data-variant] .quick-footer b {
+  color: var(--second);
+}
+[data-variant] .game-bottom {
+  border-color: var(--ui-edge);
+}
+[data-variant] .map-tools button {
+  border-color: var(--ui-edge);
+  box-shadow: 0 2px var(--ui-shadow);
+}
+[data-variant] .league-icon {
+  color: var(--second);
+}
+[data-variant] .card-footnote {
+  font-size: 6px;
+}
+
+/* 01: The cleanest type, with tactile white cards and a coral accent. */
+:root[data-variant="fresh"] {
+  --display: "Segoe UI", sans-serif;
+}
+[data-variant="fresh"] .country-card {
+  transform: rotate(0.6deg);
+}
+[data-variant="fresh"] .card-header h2,
+[data-variant="matchday-fresh"] .card-header h2 {
+  letter-spacing: -0.9px;
+}
+[data-variant="fresh"] h1,
+[data-variant="matchday-fresh"] h1 {
+  font-weight: 850;
+}
+[data-variant="fresh"] .brand-emblem,
+[data-variant="matchday-fresh"] .brand-emblem {
+  transform: rotate(-4deg);
+}
+[data-variant="fresh"] .card-action,
+[data-variant="matchday-fresh"] .card-action {
+  font-weight: 750;
+}
+
+/* 02: Rounded type and translucent-blue plastic game pieces. */
+:root[data-variant="poolside"] {
+  --surface: #dff4ff;
+  --card: #eaf7ff;
+  --header-bg: #dff4ff;
+  --ink: #174875;
+  --muted: #5c7d96;
+  --line: #a4c8df;
+  --accent: #3487eb;
+  --accent-ink: #ffffff;
+  --second: #146d8c;
+  --ui-edge: #397da8;
+  --ui-shadow: #78b8cf;
+  --headline: #22688b;
+  --badge-bg: #c5e7fa;
+  --badge-ink: #216a9a;
+  --card-inset: #d1ebfc;
+  --button-edge: #2467b7;
+  --button-shadow: #3470b6;
+  --display: "Trebuchet MS", sans-serif;
+}
+[data-variant="poolside"] h1 {
+  font-size: 48px;
+  letter-spacing: -1.5px;
+  font-weight: 400;
+  text-transform: none;
+}
+[data-variant="poolside"] .game-brand {
+  font-weight: 400;
+  font-size: 16px;
+}
+[data-variant="poolside"] .country-card {
+  border-radius: 29px;
+  box-shadow:
+    5px 7px var(--ui-shadow),
+    inset 0 0 0 4px #f9ffff;
+  transform: rotate(1.4deg);
+}
+[data-variant="poolside"] .card-accent {
+  left: 104px;
+  top: -10px;
+  height: 22px;
+  width: 96px;
+  border-radius: 8px;
+  transform: rotate(-4deg);
+}
+[data-variant="poolside"] .card-accent::after {
+  line-height: 21px;
+}
+[data-variant="poolside"] .country-badge {
+  border-radius: 50%;
+  border: 2px solid #6cabd6;
+  box-shadow:
+    inset 0 1px #fff,
+    0 3px #8bc0de;
+}
+[data-variant="poolside"] .card-header h2 {
+  font-weight: 400;
+  font-size: 26px;
+}
+[data-variant="poolside"] .hero-number {
+  font-weight: 400;
+  font-size: 47px;
+  letter-spacing: -1.5px;
+}
+[data-variant="poolside"] .fan-stats > div {
+  border-radius: 16px;
+}
+[data-variant="poolside"] .fan-stats strong {
+  font-weight: 400;
+  font-size: 17px;
+}
+[data-variant="poolside"] .quick-body b {
+  font-weight: 400;
+  font-size: 22px;
+}
+[data-variant="poolside"] .card-action,
+[data-variant="poolside"] .advance-turn {
+  border-radius: 18px;
+  font-family: var(--display);
+  font-weight: 400;
+}
+[data-variant="poolside"] .quick-stat {
+  border-radius: 22px;
+  border-color: #4a8cb6;
+  box-shadow: 4px 5px #78b8cf;
+}
+[data-variant="poolside"] .objective-card {
+  background: #def4ff;
+  border-radius: 20px;
+}
+[data-variant="poolside"] .health-pill {
+  border-radius: 20px;
+}
+
+/* 03: A crisp collectible sports card, with a bold blue team stripe. */
+/* Both Matchday variants share the colours and collectible frame. */
+:root[data-variant|="matchday"] {
+  --surface: #f3f7ff;
+  --card: #ffffff;
+  --header-bg: #213e6a;
+  --header-ink: #ffffff;
+  --ink: #213d61;
+  --muted: #617995;
+  --line: #b6c8e2;
+  --accent: #3573e1;
+  --accent-ink: #ffffff;
+  --second: #3266a9;
+  --ui-edge: #2d5482;
+  --ui-shadow: #7da6bf;
+  --headline: #234a70;
+  --badge-bg: #dbeaff;
+  --badge-ink: #245db0;
+  --card-inset: #edf3ff;
+  --button-edge: #2354a2;
+  --button-shadow: #2b5494;
+}
+:root[data-variant="matchday"] {
+  --display: "Bahnschrift Condensed", "Arial Narrow", sans-serif;
+}
+[data-variant="matchday"] .game-brand {
+  font-size: 23px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.2px;
+}
+[data-variant|="matchday"] .game-brand :where(div:last-child) > span {
+  color: #99d8ee;
+}
+[data-variant="matchday"] .game-brand :where(div:last-child) > span {
+  font-size: 16px;
+}
+[data-variant|="matchday"] .resource-icon {
+  color: #86d3ec;
+}
+[data-variant|="matchday"] .fans-icon {
+  color: #a7c5ff;
+}
+[data-variant="matchday"] .game-nav {
+  font-family: var(--display);
+  font-size: 15px;
+  letter-spacing: 0.4px;
+}
+[data-variant|="matchday"] .game-nav > strong {
+  border-color: #8ed6ed;
+}
+[data-variant="matchday"] h1 {
+  font-size: 60px;
+  letter-spacing: -0.4px;
+  font-weight: 700;
+  font-style: italic;
+}
+[data-variant="matchday"] h1 em {
+  font-style: italic;
+}
+[data-variant|="matchday"] .country-card {
+  transform: rotate(-0.9deg);
+  padding-top: 87px;
+  border-radius: 14px;
+  background:
+    linear-gradient(110deg, #1e58b4 0%, #3982e3 60%, #75b8f0 100%) top / 100% 65px no-repeat,
+    #ffffff;
+  box-shadow:
+    5px 7px var(--ui-shadow),
+    inset 0 0 0 4px #edf5ff;
+}
+[data-variant|="matchday"] .card-accent {
+  left: 20px;
+  top: 15px;
+  width: calc(100% - 40px);
+  height: 32px;
+  background: transparent;
+  border: 1px solid #a0d5ff;
+  border-radius: 6px;
+  box-shadow: none;
+  transform: none;
+}
+[data-variant|="matchday"] .card-accent::after {
+  content: "S F  /  C O U N T R Y  S E R I E S";
+  font-size: 9px;
+  line-height: 31px;
+  color: #ffffff;
+}
+[data-variant|="matchday"] .card-header {
+  padding-bottom: 11px;
+}
+[data-variant|="matchday"] .country-badge {
+  border-radius: 6px;
+  color: #fff;
+  background: #285fae;
+  border: 2px solid #c5ddfa;
+  box-shadow: 2px 3px #b6c8e2;
+}
+[data-variant="matchday"] .country-badge {
+  font-size: 20px;
+}
+[data-variant="matchday"] .card-header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+[data-variant="matchday"] .hero-number {
+  font-size: 62px;
+  letter-spacing: -0.5px;
+  line-height: 1.02;
+}
+[data-variant="matchday"] .fan-stats strong {
+  font-size: 24px;
+  letter-spacing: 0.2px;
+}
+[data-variant|="matchday"] .card-score {
+  padding-top: 14px;
+}
+[data-variant|="matchday"] .fan-stats {
+  margin-top: 13px;
+}
+[data-variant|="matchday"] .league-strip {
+  margin-top: 12px;
+  padding-block: 10px;
+}
+[data-variant|="matchday"] .rival-strip {
+  margin-block: 11px 13px;
+}
+[data-variant|="matchday"] .card-action,
+[data-variant|="matchday"] .advance-turn {
+  border-radius: 8px;
+}
+[data-variant="matchday"] .card-action,
+[data-variant="matchday"] .advance-turn {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+[data-variant|="matchday"] .quick-stat {
+  border-radius: 9px;
+  border-top: 5px solid #2c70d2;
+}
+[data-variant="matchday"] .quick-heading strong {
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+[data-variant="matchday"] .quick-body b {
+  font-size: 29px;
+}
+[data-variant|="matchday"] .objective-card {
+  border-left: 6px solid #3b79d5;
+  border-radius: 9px;
+}
+
+/* 04: A sporting-club crest and double-framed mint collectible. */
+:root[data-variant="edition"] {
+  --surface: #d8f3e8;
+  --card: #edfff7;
+  --header-bg: #215d50;
+  --header-ink: #edfff8;
+  --ink: #205445;
+  --muted: #5b8075;
+  --line: #accfc1;
+  --accent: #26846a;
+  --accent-ink: #ffffff;
+  --second: #276852;
+  --ui-edge: #2d6a59;
+  --ui-shadow: #7baf9c;
+  --headline: #215b4b;
+  --badge-bg: #c9ecda;
+  --badge-ink: #246d53;
+  --card-inset: #d7f2e5;
+  --button-edge: #1f6450;
+  --button-shadow: #2b6d5a;
+  --display: Georgia, "Times New Roman", serif;
+}
+[data-variant="edition"] .game-brand {
+  font-size: 17px;
+  font-style: italic;
+  letter-spacing: -0.4px;
+}
+[data-variant="edition"] .game-brand :where(div:last-child) > span {
+  color: #b0eed2;
+  font-family: "Segoe UI", sans-serif;
+}
+[data-variant="edition"] .resource-icon,
+[data-variant="edition"] .fans-icon {
+  color: #aae4ce;
+}
+[data-variant="edition"] .game-nav > strong {
+  border-color: #a4ead0;
+}
+[data-variant="edition"] .brand-emblem {
+  background: #d0f2e2;
+  color: #225a48;
+  border-radius: 50% 50% 42% 42%;
+  box-shadow: 0 3px #193e34;
+  transform: rotate(-4deg);
+}
+[data-variant="edition"] h1 {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  text-transform: none;
+}
+[data-variant="edition"] .country-card {
+  transform: rotate(1deg);
+  border-radius: 19px;
+  border: 2px solid #285f4e;
+  outline: 1px solid #85baa2;
+  outline-offset: -7px;
+  box-shadow:
+    5px 7px #7baf9c,
+    7px 9px #2d6a59;
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff88 0 9%,
+      transparent 9% 19%,
+      #ffffff55 19% 20%,
+      transparent 20% 100%
+    ),
+    #edfff7;
+}
+[data-variant="edition"] .card-accent {
+  left: 110px;
+  top: -11px;
+  width: 84px;
+  height: 22px;
+  border-radius: 6px;
+  background: #bdebd4;
+  border-color: #4b8c71;
+  box-shadow: 1px 2px #8cbda7;
+}
+[data-variant="edition"] .card-accent::after {
+  content: "C L U B   E D I T I O N";
+  color: #255943;
+  font-size: 6px;
+  line-height: 21px;
+}
+[data-variant="edition"] .country-badge {
+  border-radius: 50% 50% 43% 43%;
+  border: 2px solid #5c9c7f;
+  background: #c6ead6;
+  outline: 1px solid #f6fff8;
+  outline-offset: -5px;
+  font-style: italic;
+  font-size: 18px;
+}
+[data-variant="edition"] .card-header h2 {
+  font-weight: 700;
+  font-size: 25px;
+  letter-spacing: -0.8px;
+}
+[data-variant="edition"] .hero-number {
+  font-size: 50px;
+  font-weight: 700;
+  letter-spacing: -2px;
+}
+[data-variant="edition"] .fan-stats strong {
+  font-size: 18px;
+}
+[data-variant="edition"] .card-action,
+[data-variant="edition"] .advance-turn {
+  border-radius: 10px;
+}
+[data-variant="edition"] .quick-stat {
+  background: #edfff7;
+  outline: 1px solid #9ccdb5;
+  outline-offset: -5px;
+  border-radius: 15px;
+}
+[data-variant="edition"] .quick-heading > span {
+  border-radius: 50%;
+  border: 1px solid #85bda1;
+  font-family: Georgia, serif;
+  font-style: italic;
+}
+[data-variant="edition"] .quick-body b {
+  font-size: 23px;
+}
+[data-variant="edition"] .objective-card {
+  background: #d7f5e6;
+}
+@media (max-width: 820px) {
+  [data-variant] h1 {
+    font-size: 36px;
+  }
+  [data-variant="matchday"] h1 {
+    font-size: 44px;
+  }
+  [data-variant|="matchday"] .country-card {
+    padding-top: 73px;
+  }
+  [data-variant|="matchday"] .card-header {
+    padding-bottom: 8px;
+  }
+}

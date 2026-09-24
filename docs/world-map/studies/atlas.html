@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" data-theme="almanac">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' file:; script-src 'self' file:; style-src 'self' file: 'unsafe-inline'; img-src 'self' file: data:; connect-src 'none'; object-src 'none'; base-uri 'none'">
+  <title>Sports Founder — The world is catching on</title>
+  <link rel="stylesheet" href="../assets/example.css">
+  <script defer src="../assets/data-1.js"></script>
+  <script defer src="../assets/data-2.js"></script>
+  <script defer src="../assets/data-3.js"></script>
+  <script defer src="../assets/data-4.js"></script>
+  <script defer src="../assets/example.js"></script>
+</head>
+<body>
+  <div class="study-bar">
+    <span><b>DESIGN STUDY 01</b><span class="study-detail"> / WORLD MAP · RUNNABLE EXAMPLE</span></span>
+    <div class="study-actions">
+      <fieldset class="segmented" aria-label="Visual treatment">
+        <button type="button" data-theme-choice="almanac" aria-pressed="true">Field almanac</button>
+        <button type="button" data-theme-choice="night" aria-pressed="false">Night edition</button>
+      </fieldset>
+      <a href="../brief.html">Read the brief ↗</a>
+    </div>
+  </div>
+
+  <main>
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">SF</span><div><h1>Sports Founder</h1><p>Every national obsession starts somewhere.</p></div></div>
+      <dl class="campaign-stats">
+        <div><dt>Worldwide fandom</dt><dd id="total-score">—</dd></div>
+        <div><dt>Markets at 1%+</dt><dd><span id="market-count">—</span><small> / 213</small></dd></div>
+        <div><dt>Prestige points</dt><dd id="pp">—</dd></div>
+      </dl>
+    </header>
+
+    <section class="atlas" aria-labelledby="atlas-title">
+      <div class="atlas-toolbar">
+        <div class="atlas-title"><span class="live-dot" aria-hidden="true"></span><h2 id="atlas-title">The world is catching on.</h2></div>
+        <div class="atlas-options">
+          <label class="scenario-label">Campaign
+            <select id="campaign"><option value="0">Senegal · the first foothold</option><option value="1">Tuvalu · the small beginning</option></select>
+          </label>
+          <label class="checkbox"><input id="rival-toggle" type="checkbox" checked> Rivals</label>
+          <label class="checkbox"><input id="pattern-toggle" type="checkbox"> Patterns</label>
+        </div>
+      </div>
+
+      <div class="map-stage" id="map-stage">
+        <div class="plate-caption"><span>PLATE 01 / WORLD FANDOM</span><p id="plate-description">Backyard Kickball · born in Senegal</p></div>
+        <svg id="world-map" viewBox="-45 -35 1620 650" role="img" aria-label="Interactive world fandom map. Use the market selector to access any country with a keyboard.">
+          <title>World fandom by sports market</title>
+          <defs>
+            <pattern id="neutral-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="5" height="5" class="neutral-base"/><path d="M0 0V5" class="neutral-line"/></pattern>
+          </defs>
+          <g id="map-camera"><g id="graticule"/><g id="countries"/><g id="market-patterns" pointer-events="none"/><g id="country-outlines" pointer-events="none"/><g id="microstates"/><g id="selection" pointer-events="none"/></g>
+          <g class="ocean-labels" aria-hidden="true"><text x="215" y="342">PACIFIC OCEAN</text><text x="425" y="285">ATLANTIC</text><text x="782" y="404">INDIAN OCEAN</text></g>
+        </svg>
+
+        <aside id="country-panel" class="country-panel" aria-labelledby="country-title">
+          <div class="panel-topline"><span id="country-type">BIRTHPLACE OF THE SPORT</span><button type="button" id="close-panel" aria-label="Close country panel">×</button></div>
+          <h3 id="country-title">Senegal</h3>
+          <p class="country-subtitle" id="country-subtitle"></p>
+          <div class="country-strength"><strong id="country-share">—</strong><span>fandom strength</span></div>
+          <p class="country-trend" id="country-trend"></p>
+          <div class="sparkline-wrap"><svg id="sparkline" viewBox="0 0 260 48" role="img"><title>Country fandom history</title><path id="sparkline-fill"/><path id="sparkline-line"/></svg><div><span>Founding</span><span>Now</span></div></div>
+          <dl class="fan-counts"><div><dt>Casual fans</dt><dd id="casual">—</dd></div><div><dt>Hardcore fans</dt><dd id="hardcore">—</dd></div></dl>
+          <section class="panel-section"><h4>The local league <span id="league-dot" aria-hidden="true">●</span></h4><p id="league-status"></p><p class="secondary" id="league-finance"></p></section>
+          <section class="panel-section"><h4>Who is pushing back</h4><div id="rival-list"></div></section>
+          <p class="focus-note" id="focus-note"></p>
+          <button type="button" class="locate-button" id="locate">Locate on map ↗</button>
+        </aside>
+
+        <div id="map-tooltip" role="tooltip" hidden></div>
+        <div class="map-navigation"><button type="button" id="zoom-in" aria-label="Zoom in">+</button><button type="button" id="zoom-out" aria-label="Zoom out">−</button><button type="button" id="reset-view">World view</button></div>
+        <div class="map-instruction">Drag to explore · scroll to zoom · click a market</div>
+        <div class="map-stamp" aria-hidden="true"><span>N</span><svg viewBox="0 0 30 45"><title>North</title><path d="M15 3L24 32L15 26L6 32Z"/><path d="M15 3V39"/></svg></div>
+      </div>
+
+      <div class="map-key">
+        <div class="heat-key"><span class="key-heading">Fandom strength</span><div id="heat-legend"></div></div>
+        <div class="symbol-key"><span><i class="rival-symbol"></i>Rival defending</span><span><i class="island-symbol"></i>Small market</span><span><i class="neutral-symbol"></i>Outside a market</span></div>
+      </div>
+
+      <div class="replay-controls">
+        <div class="date-block"><span id="turn-label">TURN 51</span><strong id="date-label">2040</strong></div>
+        <button class="play-button" type="button" id="play" aria-pressed="false">▶ Play spread</button>
+        <div class="timeline"><label for="turn-slider" class="sr-only">Campaign replay turn</label><input id="turn-slider" type="range" min="0" max="100" value="50"><div><span id="start-year">2026</span><span>Recorded simulation · builder strategy · seed 22</span><span id="end-year">2065</span></div></div>
+        <button class="next-button" type="button" id="next">Next turn →</button>
+      </div>
+    </section>
+
+    <div class="under-map">
+      <section class="field-note"><span class="eyebrow">FROM THE TOUCHLINE</span><h2 id="note-title">The neighbours have noticed.</h2><p id="field-note"></p></section>
+      <section class="market-finder"><label for="market-picker">Find any of the 213 markets</label><div><select id="market-picker" aria-describedby="finder-help"></select><button type="button" id="find-market">Locate ↗</button></div><p id="finder-help">Includes the four home nations, island markets, and Gibraltar.</p></section>
+      <section class="about-example"><span class="eyebrow">WHAT YOU ARE SEEING</span><p>A working visual prototype with real campaign numbers. Playback follows recorded turns; campaign decisions are made by the existing builder bot.</p><a href="atlas.md">Review & implementation notes ↗</a></section>
+    </div>
+
+    <footer><span>Made with Natural Earth · local assets · no network required</span><span>Two treatments. The same world, the same numbers.</span></footer>
+    <noscript>This example requires JavaScript. Open this file in a browser with JavaScript enabled.</noscript>
+  </main>
+</body>
+</html>

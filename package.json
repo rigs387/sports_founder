@@ -20,11 +20,15 @@
     "sim": "tsx src/runner/cli.ts",
     "smoke": "npm run build && tsx scripts/smoke.ts",
     "check": "npm run typecheck && npm run lint && npm run check:purity && npm run test",
-    "postinstall": "install-electron"
+    "postinstall": "install-electron",
+    "map:build": "tsx scripts/build-map.ts"
   },
   "dependencies": {
+    "@pixi/react": "8.0.5",
     "comlink": "4.4.2",
     "i18next": "26.4.2",
+    "pixi-viewport": "6.0.3",
+    "pixi.js": "8.21.0",
     "pure-rand": "8.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -35,15 +39,24 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.13",
+    "@types/d3-geo": "3.1.1",
     "@types/node": "24.13.4",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "5.2.0",
+    "d3-geo": "3.1.1",
     "electron": "44.3.0",
     "electron-vite": "5.0.0",
+    "mapshaper": "0.5.94",
     "tsx": "4.23.13",
     "typescript": "5.9.3",
     "vite": "7.3.6",
     "vitest": "5.0.0"
+  },
+  "overrides": {
+    "mapshaper": {
+      "d3-color": "3.1.0",
+      "d3-scale-chromatic": "3.1.0"
+    }
   }
 }

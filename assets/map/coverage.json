@@ -1,0 +1,1501 @@
+{
+  "source": {
+    "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_50m_admin_0_map_units.geojson",
+    "sha256": "b8d421aca6e9e08e8cdf09cc26af111cc3e0deba4fe915611d58ade71e8a4db0",
+    "version": "5.1.2"
+  },
+  "geometrySha256": "5cf9afe11f1421e2c78a5f0dec2ee256c8276be539cdd1ab5704775e167f2689",
+  "generator": {
+    "mapshaper": "0.5.94",
+    "projection": "d3-geo 3.1.1 / Natural Earth I",
+    "settings": {
+      "width": 1440,
+      "height": 710,
+      "scale": 248,
+      "translate": [
+        720,
+        355
+      ],
+      "precision": 0.3,
+      "decimals": 2,
+      "simplifyPercent": 15,
+      "maxBytes": 500000
+    }
+  },
+  "markets": [
+    {
+      "market": "albania",
+      "units": [
+        "ALB"
+      ]
+    },
+    {
+      "market": "andorra",
+      "units": [
+        "AND"
+      ]
+    },
+    {
+      "market": "austria",
+      "units": [
+        "AUT"
+      ]
+    },
+    {
+      "market": "belarus",
+      "units": [
+        "BLR"
+      ]
+    },
+    {
+      "market": "belgium",
+      "units": [
+        "BFR",
+        "BWR",
+        "BCR"
+      ]
+    },
+    {
+      "market": "bosnia-and-herzegovina",
+      "units": [
+        "BIS",
+        "BHF"
+      ]
+    },
+    {
+      "market": "bulgaria",
+      "units": [
+        "BGR"
+      ]
+    },
+    {
+      "market": "croatia",
+      "units": [
+        "HRV"
+      ]
+    },
+    {
+      "market": "cyprus",
+      "units": [
+        "CYP"
+      ]
+    },
+    {
+      "market": "czechia",
+      "units": [
+        "CZE"
+      ]
+    },
+    {
+      "market": "denmark",
+      "units": [
+        "DNK"
+      ]
+    },
+    {
+      "market": "england",
+      "units": [
+        "ENG"
+      ]
+    },
+    {
+      "market": "estonia",
+      "units": [
+        "EST"
+      ]
+    },
+    {
+      "market": "faroe-islands",
+      "units": [
+        "FRO"
+      ]
+    },
+    {
+      "market": "finland",
+      "units": [
+        "FIN"
+      ]
+    },
+    {
+      "market": "france",
+      "units": [
+        "FXX"
+      ]
+    },
+    {
+      "market": "germany",
+      "units": [
+        "DEU"
+      ]
+    },
+    {
+      "market": "gibraltar",
+      "units": [],
+      "point": [
+        -5.35,
+        36.13333
+      ]
+    },
+    {
+      "market": "greece",
+      "units": [
+        "GRC"
+      ]
+    },
+    {
+      "market": "guernsey",
+      "units": [
+        "GGY"
+      ]
+    },
+    {
+      "market": "hungary",
+      "units": [
+        "HUN"
+      ]
+    },
+    {
+      "market": "iceland",
+      "units": [
+        "ISL"
+      ]
+    },
+    {
+      "market": "isle-of-man",
+      "units": [
+        "IMN"
+      ]
+    },
+    {
+      "market": "italy",
+      "units": [
+        "ITA"
+      ]
+    },
+    {
+      "market": "jersey",
+      "units": [
+        "JEY"
+      ]
+    },
+    {
+      "market": "latvia",
+      "units": [
+        "LVA"
+      ]
+    },
+    {
+      "market": "liechtenstein",
+      "units": [
+        "LIE"
+      ]
+    },
+    {
+      "market": "lithuania",
+      "units": [
+        "LTU"
+      ]
+    },
+    {
+      "market": "luxembourg",
+      "units": [
+        "LUX"
+      ]
+    },
+    {
+      "market": "malta",
+      "units": [
+        "MLT"
+      ]
+    },
+    {
+      "market": "moldova",
+      "units": [
+        "MDA"
+      ]
+    },
+    {
+      "market": "montenegro",
+      "units": [
+        "MNE"
+      ]
+    },
+    {
+      "market": "netherlands",
+      "units": [
+        "NLD"
+      ]
+    },
+    {
+      "market": "north-macedonia",
+      "units": [
+        "MKD"
+      ]
+    },
+    {
+      "market": "northern-ireland",
+      "units": [
+        "NIR"
+      ]
+    },
+    {
+      "market": "norway",
+      "units": [
+        "NOR"
+      ]
+    },
+    {
+      "market": "poland",
+      "units": [
+        "POL"
+      ]
+    },
+    {
+      "market": "portugal",
+      "units": [
+        "PMD",
+        "PRX",
+        "PAZ"
+      ]
+    },
+    {
+      "market": "republic-of-ireland",
+      "units": [
+        "IRL"
+      ]
+    },
+    {
+      "market": "romania",
+      "units": [
+        "ROU"
+      ]
+    },
+    {
+      "market": "russia",
+      "units": [
+        "RUS"
+      ]
+    },
+    {
+      "market": "san-marino",
+      "units": [
+        "SMR"
+      ]
+    },
+    {
+      "market": "scotland",
+      "units": [
+        "SCT"
+      ]
+    },
+    {
+      "market": "serbia",
+      "units": [
+        "SRS",
+        "SRV"
+      ]
+    },
+    {
+      "market": "slovakia",
+      "units": [
+        "SVK"
+      ]
+    },
+    {
+      "market": "slovenia",
+      "units": [
+        "SVN"
+      ]
+    },
+    {
+      "market": "spain",
+      "units": [
+        "ESP"
+      ]
+    },
+    {
+      "market": "sweden",
+      "units": [
+        "SWE"
+      ]
+    },
+    {
+      "market": "switzerland",
+      "units": [
+        "CHE"
+      ]
+    },
+    {
+      "market": "turkey",
+      "units": [
+        "TUR"
+      ]
+    },
+    {
+      "market": "ukraine",
+      "units": [
+        "UKR"
+      ]
+    },
+    {
+      "market": "wales",
+      "units": [
+        "WLS"
+      ]
+    },
+    {
+      "market": "algeria",
+      "units": [
+        "DZA"
+      ]
+    },
+    {
+      "market": "angola",
+      "units": [
+        "AGO"
+      ]
+    },
+    {
+      "market": "benin",
+      "units": [
+        "BEN"
+      ]
+    },
+    {
+      "market": "botswana",
+      "units": [
+        "BWA"
+      ]
+    },
+    {
+      "market": "burkina-faso",
+      "units": [
+        "BFA"
+      ]
+    },
+    {
+      "market": "burundi",
+      "units": [
+        "BDI"
+      ]
+    },
+    {
+      "market": "cabo-verde",
+      "units": [
+        "CPV"
+      ]
+    },
+    {
+      "market": "cameroon",
+      "units": [
+        "CMR"
+      ]
+    },
+    {
+      "market": "central-african-republic",
+      "units": [
+        "CAF"
+      ]
+    },
+    {
+      "market": "chad",
+      "units": [
+        "TCD"
+      ]
+    },
+    {
+      "market": "comoros",
+      "units": [
+        "COM"
+      ]
+    },
+    {
+      "market": "congo",
+      "units": [
+        "COG"
+      ]
+    },
+    {
+      "market": "djibouti",
+      "units": [
+        "DJI"
+      ]
+    },
+    {
+      "market": "dr-congo",
+      "units": [
+        "COD"
+      ]
+    },
+    {
+      "market": "egypt",
+      "units": [
+        "EGY"
+      ]
+    },
+    {
+      "market": "equatorial-guinea",
+      "units": [
+        "GNQ"
+      ]
+    },
+    {
+      "market": "eritrea",
+      "units": [
+        "ERI"
+      ]
+    },
+    {
+      "market": "eswatini",
+      "units": [
+        "SWZ"
+      ]
+    },
+    {
+      "market": "ethiopia",
+      "units": [
+        "ETH"
+      ]
+    },
+    {
+      "market": "gabon",
+      "units": [
+        "GAB"
+      ]
+    },
+    {
+      "market": "gambia",
+      "units": [
+        "GMB"
+      ]
+    },
+    {
+      "market": "ghana",
+      "units": [
+        "GHA"
+      ]
+    },
+    {
+      "market": "guinea",
+      "units": [
+        "GIN"
+      ]
+    },
+    {
+      "market": "guinea-bissau",
+      "units": [
+        "GNB"
+      ]
+    },
+    {
+      "market": "ivory-coast",
+      "units": [
+        "CIV"
+      ]
+    },
+    {
+      "market": "kenya",
+      "units": [
+        "KEN"
+      ]
+    },
+    {
+      "market": "lesotho",
+      "units": [
+        "LSO"
+      ]
+    },
+    {
+      "market": "liberia",
+      "units": [
+        "LBR"
+      ]
+    },
+    {
+      "market": "libya",
+      "units": [
+        "LBY"
+      ]
+    },
+    {
+      "market": "madagascar",
+      "units": [
+        "MDG"
+      ]
+    },
+    {
+      "market": "malawi",
+      "units": [
+        "MWI"
+      ]
+    },
+    {
+      "market": "mali",
+      "units": [
+        "MLI"
+      ]
+    },
+    {
+      "market": "mauritania",
+      "units": [
+        "MRT"
+      ]
+    },
+    {
+      "market": "mauritius",
+      "units": [
+        "MUS"
+      ]
+    },
+    {
+      "market": "morocco",
+      "units": [
+        "MAR"
+      ]
+    },
+    {
+      "market": "mozambique",
+      "units": [
+        "MOZ"
+      ]
+    },
+    {
+      "market": "namibia",
+      "units": [
+        "NAM"
+      ]
+    },
+    {
+      "market": "niger",
+      "units": [
+        "NER"
+      ]
+    },
+    {
+      "market": "nigeria",
+      "units": [
+        "NGA"
+      ]
+    },
+    {
+      "market": "rwanda",
+      "units": [
+        "RWA"
+      ]
+    },
+    {
+      "market": "sao-tome-and-principe",
+      "units": [
+        "STP"
+      ]
+    },
+    {
+      "market": "senegal",
+      "units": [
+        "SEN"
+      ]
+    },
+    {
+      "market": "seychelles",
+      "units": [
+        "SYC"
+      ]
+    },
+    {
+      "market": "sierra-leone",
+      "units": [
+        "SLE"
+      ]
+    },
+    {
+      "market": "somalia",
+      "units": [
+        "SOM"
+      ]
+    },
+    {
+      "market": "south-africa",
+      "units": [
+        "ZAF"
+      ]
+    },
+    {
+      "market": "south-sudan",
+      "units": [
+        "SDS"
+      ]
+    },
+    {
+      "market": "sudan",
+      "units": [
+        "SDN"
+      ]
+    },
+    {
+      "market": "tanzania",
+      "units": [
+        "TZZ",
+        "TZA"
+      ]
+    },
+    {
+      "market": "togo",
+      "units": [
+        "TGO"
+      ]
+    },
+    {
+      "market": "tunisia",
+      "units": [
+        "TUN"
+      ]
+    },
+    {
+      "market": "uganda",
+      "units": [
+        "UGA"
+      ]
+    },
+    {
+      "market": "zambia",
+      "units": [
+        "ZMB"
+      ]
+    },
+    {
+      "market": "zimbabwe",
+      "units": [
+        "ZWE"
+      ]
+    },
+    {
+      "market": "afghanistan",
+      "units": [
+        "AFG"
+      ]
+    },
+    {
+      "market": "armenia",
+      "units": [
+        "ARM"
+      ]
+    },
+    {
+      "market": "azerbaijan",
+      "units": [
+        "AZE"
+      ]
+    },
+    {
+      "market": "bahrain",
+      "units": [
+        "BHR"
+      ]
+    },
+    {
+      "market": "bangladesh",
+      "units": [
+        "BGD"
+      ]
+    },
+    {
+      "market": "bhutan",
+      "units": [
+        "BTN"
+      ]
+    },
+    {
+      "market": "brunei",
+      "units": [
+        "BRN"
+      ]
+    },
+    {
+      "market": "cambodia",
+      "units": [
+        "KHM"
+      ]
+    },
+    {
+      "market": "china",
+      "units": [
+        "CHN"
+      ]
+    },
+    {
+      "market": "chinese-taipei",
+      "units": [
+        "TWN"
+      ]
+    },
+    {
+      "market": "georgia",
+      "units": [
+        "GEG"
+      ]
+    },
+    {
+      "market": "hong-kong",
+      "units": [
+        "HKG"
+      ]
+    },
+    {
+      "market": "india",
+      "units": [
+        "IND"
+      ]
+    },
+    {
+      "market": "indonesia",
+      "units": [
+        "IDN"
+      ]
+    },
+    {
+      "market": "iran",
+      "units": [
+        "IRN"
+      ]
+    },
+    {
+      "market": "iraq",
+      "units": [
+        "IRQ"
+      ]
+    },
+    {
+      "market": "israel",
+      "units": [
+        "ISR"
+      ]
+    },
+    {
+      "market": "japan",
+      "units": [
+        "JPN"
+      ]
+    },
+    {
+      "market": "jordan",
+      "units": [
+        "JOR"
+      ]
+    },
+    {
+      "market": "kazakhstan",
+      "units": [
+        "KAZ"
+      ]
+    },
+    {
+      "market": "kuwait",
+      "units": [
+        "KWT"
+      ]
+    },
+    {
+      "market": "kyrgyzstan",
+      "units": [
+        "KGZ"
+      ]
+    },
+    {
+      "market": "laos",
+      "units": [
+        "LAO"
+      ]
+    },
+    {
+      "market": "lebanon",
+      "units": [
+        "LBN"
+      ]
+    },
+    {
+      "market": "macau",
+      "units": [
+        "MAC"
+      ]
+    },
+    {
+      "market": "malaysia",
+      "units": [
+        "MYS"
+      ]
+    },
+    {
+      "market": "maldives",
+      "units": [
+        "MDV"
+      ]
+    },
+    {
+      "market": "mongolia",
+      "units": [
+        "MNG"
+      ]
+    },
+    {
+      "market": "myanmar",
+      "units": [
+        "MMR"
+      ]
+    },
+    {
+      "market": "nepal",
+      "units": [
+        "NPL"
+      ]
+    },
+    {
+      "market": "north-korea",
+      "units": [
+        "PRK"
+      ]
+    },
+    {
+      "market": "oman",
+      "units": [
+        "OMN"
+      ]
+    },
+    {
+      "market": "pakistan",
+      "units": [
+        "PAK"
+      ]
+    },
+    {
+      "market": "philippines",
+      "units": [
+        "PHL"
+      ]
+    },
+    {
+      "market": "qatar",
+      "units": [
+        "QAT"
+      ]
+    },
+    {
+      "market": "saudi-arabia",
+      "units": [
+        "SAU"
+      ]
+    },
+    {
+      "market": "singapore",
+      "units": [
+        "SGP"
+      ]
+    },
+    {
+      "market": "south-korea",
+      "units": [
+        "KOR"
+      ]
+    },
+    {
+      "market": "sri-lanka",
+      "units": [
+        "LKA"
+      ]
+    },
+    {
+      "market": "syria",
+      "units": [
+        "SYR"
+      ]
+    },
+    {
+      "market": "tajikistan",
+      "units": [
+        "TJK"
+      ]
+    },
+    {
+      "market": "thailand",
+      "units": [
+        "THA"
+      ]
+    },
+    {
+      "market": "timor-leste",
+      "units": [
+        "TLS"
+      ]
+    },
+    {
+      "market": "turkmenistan",
+      "units": [
+        "TKM"
+      ]
+    },
+    {
+      "market": "united-arab-emirates",
+      "units": [
+        "ARE"
+      ]
+    },
+    {
+      "market": "uzbekistan",
+      "units": [
+        "UZB"
+      ]
+    },
+    {
+      "market": "vietnam",
+      "units": [
+        "VNM"
+      ]
+    },
+    {
+      "market": "yemen",
+      "units": [
+        "YEM"
+      ]
+    },
+    {
+      "market": "anguilla",
+      "units": [
+        "AIA"
+      ]
+    },
+    {
+      "market": "antigua-and-barbuda",
+      "units": [
+        "ACA",
+        "ACB"
+      ]
+    },
+    {
+      "market": "aruba",
+      "units": [
+        "ABW"
+      ]
+    },
+    {
+      "market": "bahamas",
+      "units": [
+        "BHS"
+      ]
+    },
+    {
+      "market": "barbados",
+      "units": [
+        "BRB"
+      ]
+    },
+    {
+      "market": "belize",
+      "units": [
+        "BLZ"
+      ]
+    },
+    {
+      "market": "bermuda",
+      "units": [
+        "BMU"
+      ]
+    },
+    {
+      "market": "british-virgin-islands",
+      "units": [
+        "VGB"
+      ]
+    },
+    {
+      "market": "canada",
+      "units": [
+        "CAN"
+      ]
+    },
+    {
+      "market": "cayman-islands",
+      "units": [
+        "CYM"
+      ]
+    },
+    {
+      "market": "costa-rica",
+      "units": [
+        "CRI"
+      ]
+    },
+    {
+      "market": "cuba",
+      "units": [
+        "CUB"
+      ]
+    },
+    {
+      "market": "curacao",
+      "units": [
+        "CUW"
+      ]
+    },
+    {
+      "market": "dominica",
+      "units": [
+        "DMA"
+      ]
+    },
+    {
+      "market": "dominican-republic",
+      "units": [
+        "DOM"
+      ]
+    },
+    {
+      "market": "el-salvador",
+      "units": [
+        "SLV"
+      ]
+    },
+    {
+      "market": "grenada",
+      "units": [
+        "GRD"
+      ]
+    },
+    {
+      "market": "guatemala",
+      "units": [
+        "GTM"
+      ]
+    },
+    {
+      "market": "haiti",
+      "units": [
+        "HTI"
+      ]
+    },
+    {
+      "market": "honduras",
+      "units": [
+        "HND"
+      ]
+    },
+    {
+      "market": "jamaica",
+      "units": [
+        "JAM"
+      ]
+    },
+    {
+      "market": "mexico",
+      "units": [
+        "MEX"
+      ]
+    },
+    {
+      "market": "montserrat",
+      "units": [
+        "MSR"
+      ]
+    },
+    {
+      "market": "nicaragua",
+      "units": [
+        "NIC"
+      ]
+    },
+    {
+      "market": "panama",
+      "units": [
+        "PAN"
+      ]
+    },
+    {
+      "market": "puerto-rico",
+      "units": [
+        "PRI"
+      ]
+    },
+    {
+      "market": "saint-kitts-and-nevis",
+      "units": [
+        "KNA"
+      ]
+    },
+    {
+      "market": "saint-lucia",
+      "units": [
+        "LCA"
+      ]
+    },
+    {
+      "market": "saint-vincent-and-the-grenadines",
+      "units": [
+        "VCT"
+      ]
+    },
+    {
+      "market": "trinidad-and-tobago",
+      "units": [
+        "TTO"
+      ]
+    },
+    {
+      "market": "turks-and-caicos-islands",
+      "units": [
+        "TCA"
+      ]
+    },
+    {
+      "market": "united-states",
+      "units": [
+        "USA"
+      ]
+    },
+    {
+      "market": "us-virgin-islands",
+      "units": [
+        "VIR"
+      ]
+    },
+    {
+      "market": "argentina",
+      "units": [
+        "ARG"
+      ]
+    },
+    {
+      "market": "bolivia",
+      "units": [
+        "BOL"
+      ]
+    },
+    {
+      "market": "brazil",
+      "units": [
+        "BRA"
+      ]
+    },
+    {
+      "market": "chile",
+      "units": [
+        "CHL"
+      ]
+    },
+    {
+      "market": "colombia",
+      "units": [
+        "COL"
+      ]
+    },
+    {
+      "market": "ecuador",
+      "units": [
+        "ECU"
+      ]
+    },
+    {
+      "market": "guyana",
+      "units": [
+        "GUY"
+      ]
+    },
+    {
+      "market": "paraguay",
+      "units": [
+        "PRY"
+      ]
+    },
+    {
+      "market": "peru",
+      "units": [
+        "PER"
+      ]
+    },
+    {
+      "market": "suriname",
+      "units": [
+        "SUR"
+      ]
+    },
+    {
+      "market": "uruguay",
+      "units": [
+        "URY"
+      ]
+    },
+    {
+      "market": "venezuela",
+      "units": [
+        "VEN"
+      ]
+    },
+    {
+      "market": "american-samoa",
+      "units": [
+        "ASM"
+      ]
+    },
+    {
+      "market": "australia",
+      "units": [
+        "AUS"
+      ]
+    },
+    {
+      "market": "cook-islands",
+      "units": [
+        "COK"
+      ]
+    },
+    {
+      "market": "fiji",
+      "units": [
+        "FJI"
+      ]
+    },
+    {
+      "market": "guam",
+      "units": [
+        "GUM"
+      ]
+    },
+    {
+      "market": "new-caledonia",
+      "units": [
+        "NCL"
+      ]
+    },
+    {
+      "market": "new-zealand",
+      "units": [
+        "NZL"
+      ]
+    },
+    {
+      "market": "papua-new-guinea",
+      "units": [
+        "PNX",
+        "PNB"
+      ]
+    },
+    {
+      "market": "samoa",
+      "units": [
+        "WSM"
+      ]
+    },
+    {
+      "market": "solomon-islands",
+      "units": [
+        "SLB"
+      ]
+    },
+    {
+      "market": "tahiti",
+      "units": [
+        "PYF"
+      ]
+    },
+    {
+      "market": "tonga",
+      "units": [
+        "TON"
+      ]
+    },
+    {
+      "market": "tuvalu",
+      "units": [
+        "TUV"
+      ]
+    },
+    {
+      "market": "vanuatu",
+      "units": [
+        "VUT"
+      ]
+    }
+  ],
+  "neutral": [
+    {
+      "unit": "VAT",
+      "name": "Vatican"
+    },
+    {
+      "unit": "FSM",
+      "name": "Federated States of Micronesia"
+    },
+    {
+      "unit": "MHL",
+      "name": "Marshall Islands"
+    },
+    {
+      "unit": "MNP",
+      "name": "Northern Mariana Islands"
+    },
+    {
+      "unit": "SGS",
+      "name": "South Georgia and the Islands"
+    },
+    {
+      "unit": "IOT",
+      "name": "British Indian Ocean Territory"
+    },
+    {
+      "unit": "SHN",
+      "name": "Saint Helena"
+    },
+    {
+      "unit": "PCN",
+      "name": "Pitcairn Islands"
+    },
+    {
+      "unit": "FLK",
+      "name": "Falkland Islands / Malvinas"
+    },
+    {
+      "unit": "SOL",
+      "name": "Somaliland"
+    },
+    {
+      "unit": "PLW",
+      "name": "Palau"
+    },
+    {
+      "unit": "NJM",
+      "name": "Jan Mayen Island"
+    },
+    {
+      "unit": "NSV",
+      "name": "Svalbard Islands"
+    },
+    {
+      "unit": "NIU",
+      "name": "Niue"
+    },
+    {
+      "unit": "TKL",
+      "name": "Tokelau"
+    },
+    {
+      "unit": "NLY",
+      "name": "Caribbean Netherlands"
+    },
+    {
+      "unit": "NRU",
+      "name": "Nauru"
+    },
+    {
+      "unit": "SAH",
+      "name": "Western Sahara"
+    },
+    {
+      "unit": "MCO",
+      "name": "Monaco"
+    },
+    {
+      "unit": "KOS",
+      "name": "Kosovo"
+    },
+    {
+      "unit": "KIR",
+      "name": "Kiribati"
+    },
+    {
+      "unit": "GAZ",
+      "name": "Gaza"
+    },
+    {
+      "unit": "WEB",
+      "name": "West Bank"
+    },
+    {
+      "unit": "MYT",
+      "name": "Mayotte"
+    },
+    {
+      "unit": "REU",
+      "name": "Réunion"
+    },
+    {
+      "unit": "MTQ",
+      "name": "Martinique"
+    },
+    {
+      "unit": "GLP",
+      "name": "Guadeloupe"
+    },
+    {
+      "unit": "GUF",
+      "name": "French Guiana"
+    },
+    {
+      "unit": "SPM",
+      "name": "Saint Pierre and Miquelon"
+    },
+    {
+      "unit": "WLF",
+      "name": "Wallis and Futuna Islands"
+    },
+    {
+      "unit": "MAF",
+      "name": "Saint-Martin"
+    },
+    {
+      "unit": "BLM",
+      "name": "Saint-Barthélemy"
+    },
+    {
+      "unit": "ATF",
+      "name": "French Southern and Antarctic Lands"
+    },
+    {
+      "unit": "ALD",
+      "name": "Åland Islands"
+    },
+    {
+      "unit": "GRL",
+      "name": "Greenland"
+    },
+    {
+      "unit": "CYN",
+      "name": "Northern Cyprus"
+    },
+    {
+      "unit": "CXR",
+      "name": "Christmas Island"
+    },
+    {
+      "unit": "CCK",
+      "name": "Cocos Islands"
+    },
+    {
+      "unit": "HMD",
+      "name": "Heard I. and McDonald Islands"
+    },
+    {
+      "unit": "NFK",
+      "name": "Norfolk Island"
+    },
+    {
+      "unit": "ATC",
+      "name": "Ashmore and Cartier Islands"
+    },
+    {
+      "unit": "KAS",
+      "name": "Siachen Glacier"
+    },
+    {
+      "unit": "ATA",
+      "name": "Antarctica"
+    },
+    {
+      "unit": "SXM",
+      "name": "Sint Maarten"
+    }
+  ],
+  "omitted": [
+    {
+      "unit": "ATA",
+      "reason": "Antarctica is outside the playable world viewport; no sport market is assigned."
+    }
+  ],
+  "bytes": 328678
+}

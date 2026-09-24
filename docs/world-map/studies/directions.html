@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sports Founder — Four visual directions</title>
+  <style>
+    :root { color-scheme: dark; font-family: "Segoe UI", system-ui, sans-serif; color: #f2f1f7; background: #10121b; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0 4vw 55px; }
+    main { max-width: 1700px; margin: auto; }
+    a { color: inherit; text-underline-offset: 4px; }
+    a:focus-visible { outline: 3px solid #c5ff6b; outline-offset: 5px; }
+    .topline { padding: 24px 0; border-bottom: 1px solid #303342; display: flex; justify-content: space-between; gap: 20px; color: #959bac; font-size: 11px; }
+    .topline strong { color: #d8dce7; letter-spacing: .16em; font-size: 10px; }
+    header { padding: 45px 0 35px; max-width: 900px; }
+    .eyebrow { color: #c5ff6b; font-size: 10px; letter-spacing: .18em; font-weight: 750; }
+    h1 { font-size: clamp(35px, 4vw, 60px); line-height: 1.04; letter-spacing: -2.6px; margin: 13px 0 17px; }
+    header p { color: #a6acbe; font-size: 15px; line-height: 1.7; max-width: 78ch; margin: 0; }
+    .directions { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 26px; }
+    .direction { --accent: #c5ff6b; background: #181c28; border: 1px solid #303647; border-radius: 13px; overflow: hidden; }
+    .direction.clubhouse { --accent: #ffd05a; }
+    .direction.worldtour { --accent: #bca3f2; }
+    .direction.broadcast { --accent: #ff8a53; }
+    .direction-title { padding: 20px 22px 18px; display: flex; gap: 14px; align-items: center; }
+    .number { width: 37px; height: 37px; display: grid; place-items: center; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent), transparent 60%); border-radius: 9px; font-size: 12px; font-weight: 750; }
+    h2 { font-size: 22px; letter-spacing: -.5px; margin: 0; }
+    .direction-title p { margin: 3px 0 0; color: #a0a8bc; font-size: 11px; }
+    .swatches { display: flex; margin-left: auto; }
+    .swatches i { display: block; width: 14px; height: 23px; }
+    .preview { display: block; padding: 0 10px; }
+    .preview img { width: 100%; height: auto; display: block; border: 1px solid #ffffff0d; border-radius: 6px; transition: filter .15s; }
+    .preview:where(:hover) img { filter: brightness(1.08); }
+    .direction-body { padding: 19px 23px 22px; }
+    .direction-body p { color: #afb6c9; font-size: 12px; line-height: 1.65; margin: 0 0 17px; max-width: 74ch; }
+    .direction-body a { color: var(--accent); font-size: 12px; font-weight: 750; text-decoration: none; }
+    .direction-body a span { padding-left: 6px; }
+    .card-comparison { margin-top: 57px; padding-top: 28px; border-top: 1px solid #303342; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 25px; margin-bottom: 25px; }
+    .section-heading h2 { font-size: 30px; letter-spacing: -1px; margin-top: 9px; }
+    .section-heading p { max-width: 63ch; color: #a1a9bd; font-size: 12px; line-height: 1.7; margin: 0; }
+    .popup-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .popup-grid figure { margin: 0; padding: 16px 12px; border: 1px solid #303647; border-radius: 12px; background: #161b29; }
+    .popup-grid figure:nth-child(2) { background: #97dbe3; color: #214c59; }
+    .popup-grid figure:nth-child(3) { background: #b0a0de; color: #382653; }
+    .popup-grid figure:nth-child(4) { background: #252e32; }
+    .popup-grid img { display: block; width: 100%; height: auto; }
+    figcaption { font-size: 12px; font-weight: 700; text-align: center; margin: 10px 0 0; }
+    .review-note { display: flex; gap: 40px; margin-top: 36px; border-top: 1px solid #303342; padding-top: 25px; }
+    .review-note p { flex: 1; margin: 0; color: #a1a9bd; font-size: 12px; line-height: 1.8; }
+    .review-note strong { color: #d9deeb; }
+    footer { margin-top: 32px; padding-top: 20px; border-top: 1px solid #303342; display: flex; justify-content: space-between; gap: 15px; font-size: 10px; color: #788398; }
+    @media (max-width: 850px) { .directions { grid-template-columns: 1fr; } .popup-grid { grid-template-columns: 1fr 1fr; } .section-heading, .review-note { display: block; } .section-heading p, .review-note p + p { margin-top: 17px; } header { padding-top: 32px; } }
+    @media (prefers-reduced-motion: reduce) { .preview img { transition: none; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="topline"><strong>SPORTS FOUNDER / ART DIRECTION</strong><a href="tiles.html">Your reference example ↗</a></div>
+  <header><span class="eyebrow">FOUR RUNNABLE VISUAL STUDIES</span><h1>Choose your home ground.</h1><p>Four takes on the same campaign: different atmosphere, map treatment, typography, and stat cards. Click a screen to try it. Hover a country for a quick look; click to pin its stats.</p></header>
+
+  <div class="directions">
+    <article class="direction floodlights">
+      <div class="direction-title"><span class="number">01</span><div><h2>Floodlights</h2><p>Night-match energy. A world worth taking over.</p></div><div class="swatches" aria-hidden="true"><i style="background:#232a51"></i><i style="background:#ab91ff"></i><i style="background:#c5ff6b"></i></div></div>
+      <a class="preview" href="directions-playground.html?look=floodlights"><img src="../assets/previews/direction-floodlights.png" width="1468" height="860" alt="Floodlights: indigo world map with lime territory, a floating scouting panel and a compact Brazil hover card."></a>
+      <div class="direction-body"><p>Deep indigo, electric lime, glowing selection rings and a floating scouting card. The sleekest direction; strong atmosphere without making the map hard to read.</p><a href="directions-playground.html?look=floodlights">Try Floodlights <span>↗</span></a></div>
+    </article>
+    <article class="direction clubhouse">
+      <div class="direction-title"><span class="number">02</span><div><h2>Clubhouse</h2><p>A little sport in a big, playful world.</p></div><div class="swatches" aria-hidden="true"><i style="background:#97dbe3"></i><i style="background:#1c917e"></i><i style="background:#ffd05a"></i></div></div>
+      <a class="preview" href="directions-playground.html?look=clubhouse"><img src="../assets/previews/direction-clubhouse.png" width="1468" height="860" alt="Clubhouse: aqua ocean, raised green land, yellow controls and rounded cream stat cards."></a>
+      <div class="direction-body"><p>Aqua water, raised map pieces, sunny yellow controls and soft cream cards. Tactile and friendly, with the feel of a tabletop sports empire.</p><a href="directions-playground.html?look=clubhouse">Try Clubhouse <span>↗</span></a></div>
+    </article>
+    <article class="direction worldtour">
+      <div class="direction-title"><span class="number">03</span><div><h2>World Tour</h2><p>Sports posters, trading cards, global ambitions.</p></div><div class="swatches" aria-hidden="true"><i style="background:#b0a0de"></i><i style="background:#fff4d6"></i><i style="background:#ff6e42"></i></div></div>
+      <a class="preview" href="directions-playground.html?look=worldtour"><img src="../assets/previews/direction-worldtour.png" width="1468" height="860" alt="World Tour: lavender halftone world, orange fandom and bold tilted collectible-style stat cards."></a>
+      <div class="direction-body"><p>Lavender and tangerine, chunky ink outlines, halftone texture and country cards that feel collectible. The most distinctive personality of the four.</p><a href="directions-playground.html?look=worldtour">Try World Tour <span>↗</span></a></div>
+    </article>
+    <article class="direction broadcast">
+      <div class="direction-title"><span class="number">04</span><div><h2>Broadcast</h2><p>The career-mode treatment.</p></div><div class="swatches" aria-hidden="true"><i style="background:#252e32"></i><i style="background:#f5f5ef"></i><i style="background:#ff7237"></i></div></div>
+      <a class="preview" href="directions-playground.html?look=broadcast"><img src="../assets/previews/direction-broadcast.png" width="1468" height="860" alt="Broadcast: slate map, orange highlights, condensed sports typography and sharp white country cards."></a>
+      <div class="direction-body"><p>Slate and orange, oversized condensed type, sharp white scouting panels and angled buttons. A confident sports-management look with a clear emphasis on the numbers.</p><a href="directions-playground.html?look=broadcast">Try Broadcast <span>↗</span></a></div>
+    </article>
+  </div>
+
+  <section class="card-comparison">
+    <div class="section-heading"><div><span class="eyebrow">THE COUNTRY POPUP, UP CLOSE</span><h2>One glance. Then the detail.</h2></div><p>A compact hover card gives the essentials. Clicking opens the full card: fandom and trend first, fan groups next, then league health and rival pressure. The popup treatment changes with each world.</p></div>
+    <div class="popup-grid">
+      <figure><a href="directions-playground.html?look=floodlights"><img src="../assets/previews/popup-floodlights.png" alt="Floodlights stat card close-up, with lime trend line and indigo fan tiles."></a><figcaption>01 / The scouting card</figcaption></figure>
+      <figure><a href="directions-playground.html?look=clubhouse"><img src="../assets/previews/popup-clubhouse.png" alt="Clubhouse stat card close-up, with soft rounded shapes and a yellow action button."></a><figcaption>02 / The clubhouse card</figcaption></figure>
+      <figure><a href="directions-playground.html?look=worldtour"><img src="../assets/previews/popup-worldtour.png" alt="World Tour stat card close-up, with bold purple type and an offset ink shadow."></a><figcaption>03 / The collectible card</figcaption></figure>
+      <figure><a href="directions-playground.html?look=broadcast"><img src="../assets/previews/popup-broadcast.png" alt="Broadcast stat card close-up, with condensed typography and clean white surfaces."></a><figcaption>04 / The scouting report</figcaption></figure>
+    </div>
+  </section>
+
+  <div class="review-note"><p><strong>From your reference.</strong> I kept direct country hover, immediate numbers, and click-to-inspect. The simple tooltip and definition list become compact cards with a clearer reading order, small trend charts, fan tiles and distinct league/rival sections.</p><p><strong>What works here.</strong> Switch looks, hover, pin and close stats, pan, zoom, locate a market, or scrub recorded turns. These are lightweight art studies using the same Senegal campaign data. The upper navigation is shown for composition. All four looks are rendered in code and can be carried into the game.</p></div>
+  <footer><span>Local HTML / CSS / SVG · no remote assets · real recorded statistics</span><a href="atlas.html">Previous atlas study ↗</a></footer>
+</main>
+</body>
+</html>
