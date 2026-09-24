@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { CountrySnapshot } from "../../../sim";
@@ -12,8 +13,18 @@ interface Props {
   turn: number;
   onClose: () => void;
   onLocate: () => void;
+  children?: ReactNode;
 }
-export function CountryCard({ country, names, history, anchor, turn, onClose, onLocate }: Props) {
+export function CountryCard({
+  country,
+  names,
+  history,
+  anchor,
+  turn,
+  onClose,
+  onLocate,
+  children,
+}: Props) {
   const { t, i18n } = useTranslation();
   const compact = (value: number) => t("format.compact", { value });
   const name = names.countries[country.countryId] ?? country.countryId;
@@ -83,6 +94,7 @@ export function CountryCard({ country, names, history, anchor, turn, onClose, on
             {change === null ? t("map.firstTurn") : t("map.change", { value: change * 100 })}
           </span>
         </div>
+        {children}
         <svg
           className="sparkline"
           viewBox="0 0 280 58"

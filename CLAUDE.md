@@ -65,7 +65,8 @@ runs/                 Runner and smoke-test output (git-ignored)
   crypto, process, globalThis, or DOM globals. `tsconfig.pure.json` also gives those folders no
   DOM or Node types.
 - The simulation advances in quarters (`stepQuarter`); a turn is N quarters, with N set by the PP
-  tier table in config (`endTurn`). The UI updates once per turn from a `TurnSnapshot`.
+  tier table in config (`endTurn`). The UI receives a fresh `TurnSnapshot` after each action or turn.
+  Player decisions cross the worker's `applyAction` endpoint; prices and legality stay in the sim.
 - The genome, affinity, spread, league, cash, health, PP tier, poaching, rival defense, growth tree
   and generational turnover models follow the GDD; their numbers are tuning.
 - The growth tree lives in `src/sim/growth.ts`. Owned nodes (`GameState.growthNodes`, purchase

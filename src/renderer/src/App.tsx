@@ -1,7 +1,9 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ActionFeedback } from "./components/ActionFeedback";
 import { CampaignOverview, type Overview } from "./components/CampaignOverview";
 import { CountryCard } from "./components/CountryCard";
+import { FocusControls } from "./components/FocusControls";
 import { heatBand, mapSettings } from "./map/model";
 import { type MapCommand, type MapHover, WorldMap } from "./map/WorldMap";
 import { useGameStore } from "./state/game-store";
@@ -18,6 +20,7 @@ export function App() {
     startCampaign,
     endTurn,
     selectCountry,
+    dispatchAction,
   } = useGameStore();
   const [command, setCommand] = useState<MapCommand>({ kind: "home", serial: 0 });
   const [hover, setHover] = useState<MapHover | null>(null);
@@ -69,6 +72,7 @@ export function App() {
       data-turn={snapshot?.turn}
       data-quarter={snapshot?.quarter}
       data-player-fandom-score={player?.fandomScore}
+      data-pp={snapshot?.pp}
     >
       <header className="game-topbar">
         <div className="game-brand">
@@ -173,6 +177,11 @@ export function App() {
             })}
           </p>
         )}
+        {!overview && (
+          <div className="world-action-feedback">
+            <ActionFeedback />
+          </div>
+        )}
         <div className="map-controls">
           <div className="zoom-controls">
             <button
@@ -219,7 +228,15 @@ export function App() {
             turn={snapshot.turn}
             onClose={() => selectCountry(null)}
             onLocate={() => navigate("locate", selected.countryId)}
-          />
+          >
+            <FocusControls
+              country={selected}
+              snapshot={snapshot}
+              names={names}
+              busy={status !== "ready"}
+              onAction={(action) => void dispatchAction(action)}
+            />
+          </CountryCard>
         )}
         {hover && hovered && hovered.countryId !== selectedCountryId && (
           <div
@@ -279,6 +296,15 @@ export function App() {
                 <p className="warning">
                   {t("campaign.atRisk", { count: snapshot.tierTrack.atRisk.turnsUntilDemotion })}
                 </p>
+              )}
+              {snapshot.tierTrack.slotsToDrop > 0 && (
+                <button
+                  type="button"
+                  className="action-button"
+                  onClick={() => setOverview("sport")}
+                >
+                  {t("actions.chooseDrops", { count: snapshot.tierTrack.slotsToDrop })}
+                </button>
               )}
               {snapshot.tierTrack.pendingTierUp && (
                 <p>
@@ -374,6 +400,8 @@ export function App() {
           view={overview}
           snapshot={snapshot}
           names={names}
+          busy={status !== "ready"}
+          onAction={(action) => void dispatchAction(action)}
           onClose={() => setOverview(null)}
           onSelect={(id) => {
             selectCountry(id);

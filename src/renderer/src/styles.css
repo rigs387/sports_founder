@@ -194,9 +194,9 @@ button {
 }
 .campaign-heading {
   position: absolute;
-  top: 30px;
+  top: 16px;
   left: 32px;
-  transform: rotate(-2deg);
+  transform: none;
   pointer-events: none;
 }
 .eyebrow {
@@ -211,10 +211,13 @@ button {
   color: #487b9b;
 }
 h1 {
-  margin: 10px 0 14px;
-  font-size: clamp(32px, 4vw, 52px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.25em;
+  margin: 6px 0;
+  font-size: clamp(26px, 2.3vw, 34px);
   line-height: 0.99;
-  letter-spacing: -2.5px;
+  letter-spacing: -1px;
   font-weight: 900;
   text-transform: uppercase;
   color: #234a70;
@@ -808,6 +811,72 @@ h2 {
   color: var(--muted);
   margin-top: 4px;
 }
+.action-button {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+.action-feedback {
+  padding: 9px 12px;
+  margin: 8px 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12px;
+}
+.action-feedback.error,
+.fork-warning {
+  color: var(--warning);
+}
+.world-action-feedback {
+  position: absolute;
+  top: 100px;
+  left: 25px;
+  max-width: min(360px, calc(100% - 50px));
+  pointer-events: none;
+}
+.focus-controls {
+  margin: 5px 0 12px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 11px;
+}
+.focus-controls :where(p) {
+  margin: 6px 0 0;
+}
+.focus-controls :where(label, small) {
+  display: block;
+  margin-top: 7px;
+}
+.focus-controls :where(select, button) {
+  width: 100%;
+  margin-top: 6px;
+}
+.focus-controls select {
+  color: var(--ink);
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 5px;
+  min-width: 0;
+}
+.focus-list {
+  list-style: none;
+  padding: 0;
+}
+.focus-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
 .sr-only {
   position: absolute;
   width: 1px;
@@ -936,7 +1005,7 @@ h2 {
     left: 23px;
   }
   .campaign-heading h1 {
-    font-size: 35px;
+    font-size: 26px;
   }
   .objective-card {
     display: none;

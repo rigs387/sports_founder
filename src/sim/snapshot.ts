@@ -1,3 +1,4 @@
+import { focusCostFromExposure } from "./actions";
 import { seasonalWindowOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
 import { mediaRevenueFactor } from "./countermoves";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
@@ -42,6 +43,8 @@ export interface CountrySnapshot {
   /** Fandom Score ÷ population. */
   share: number;
   focused: boolean;
+  /** Current PP price of assigning a slot here, computed from organic exposure. */
+  focusCost: number;
   exposure: number;
   affinity: number;
   accessibility: number;
@@ -164,6 +167,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
       fandomScore: score,
       share: score / country.population,
       focused: exposure[index]?.focused ?? false,
+      focusCost: focusCostFromExposure(exposure[index]?.organic ?? 0, state, world, index),
       exposure: exposure[index]?.total ?? 0,
       affinity: levers.affinity,
       accessibility: levers.accessibility,

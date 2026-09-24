@@ -103,7 +103,9 @@ function MapScene(props: SceneProps) {
     const color = (name: string) => styles.getPropertyValue(name).trim();
     const palette = mapSettings.heatBands.map((_, i) => color(`--heat-${i}`));
     palette.push(color(`--heat-${mapSettings.heatBands.length}`));
-    const textures = Array.from({ length: 7 }, (_, band) => patternTexture(band));
+    const textures = new Map(
+      mapSettings.heatBands.map((_, index) => [index + 1, patternTexture(index + 1)]),
+    );
     const viewport = new Viewport({
       screenWidth: host.clientWidth,
       screenHeight: host.clientHeight,
@@ -138,7 +140,7 @@ function MapScene(props: SceneProps) {
       const face = drawShape(
         new Graphics(),
         shape.polygons,
-        shape.market ? undefined : textures[3],
+        shape.market ? undefined : textures.get(3),
       );
       face.tint = shape.market ? (palette[0] ?? "#b8d89c") : color("--neutral-land");
       lands.addChild(face);
@@ -165,14 +167,7 @@ function MapScene(props: SceneProps) {
     const labels = new Container();
     labels.eventMode = "none";
     viewport.addChild(labels);
-    const countryLabels = [
-      "united-states",
-      "brazil",
-      "france",
-      "nigeria",
-      "india",
-      "south-africa",
-    ].map((id) => {
+    const countryLabels = mapSettings.labels.map((id) => {
       const label = new Text({
         text: latest.current.countryNames[id] ?? id,
         style: {
@@ -328,7 +323,11 @@ function MapScene(props: SceneProps) {
         const bin = heatBand(country?.share ?? 0, mapSettings.heatBands);
         const pattern = current.patterns && bin > 0 ? bin : -1;
         if (entry.pattern !== pattern) {
-          drawShape(entry.face, entry.shape.polygons, pattern < 0 ? undefined : textures[pattern]);
+          drawShape(
+            entry.face,
+            entry.shape.polygons,
+            pattern < 0 ? undefined : textures.get(pattern),
+          );
           entry.pattern = pattern;
         }
         entry.face.tint = palette[bin] ?? palette[0] ?? "#b8d89c";
@@ -388,7 +387,7 @@ function MapScene(props: SceneProps) {
       controller.current = null;
       delete host.dataset.ready;
       viewport.destroy({ children: true });
-      for (const texture of textures) texture.destroy(true);
+      for (const texture of textures.values()) texture.destroy(true);
     };
   }, [app, host]);
 

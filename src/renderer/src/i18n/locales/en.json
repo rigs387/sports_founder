@@ -90,8 +90,8 @@
     "lockedCount_one": "{{count}} node still locked",
     "lockedCount_other": "{{count}} nodes still locked",
     "nodeWithCategory": "{{name}} ({{category}})",
-    "cost": "{{cost, number(maximumFractionDigits: 0)}} PP",
-    "tooExpensive": "{{cost, number(maximumFractionDigits: 0)}} PP (not enough PP)",
+    "cost": "{{cost, number(maximumFractionDigits: 1)}} PP",
+    "tooExpensive": "{{cost, number(maximumFractionDigits: 1)}} PP (not enough PP)",
     "categories": {
       "grassroots": "Grassroots",
       "media": "Media",
@@ -219,7 +219,40 @@
     "strength": "{{value, number(style: percent; maximumFractionDigits: 1)}}"
   },
   "actions": {
-    "endTurn": "End Turn"
+    "endTurn": "End Turn",
+    "working": "Applying your decision…",
+    "rejected": "That decision is no longer available. Prices and requirements have been refreshed; choose again.",
+    "unavailable": "The worker could not confirm your decision. Reload the game before making another move. This session has not been saved.",
+    "focusHeading": "Focus your effort",
+    "focusSlot": "Assign or replace a slot",
+    "occupiedSlot": "Slot {{slot}} · {{country}}",
+    "emptySlot": "Slot {{slot}} · Empty",
+    "focused": "Focused · Slot {{slot}}",
+    "focusEffect": "Boost spread and conversion here. Replacing a slot moves its focus away from the previous country.",
+    "assignFocus": "Focus here · {{cost, number(maximumFractionDigits: 1)}} PP",
+    "needPrestige": "Needs {{cost, number(maximumFractionDigits: 1)}} PP; you have {{pp, number(maximumFractionDigits: 1)}}.",
+    "focusInstructions": "Choose a country on the World map, then assign or replace a focus slot in its card. Each assignment costs Prestige.",
+    "dropHint_one": "Choose 1 slot to give up in Your sport. Otherwise, Next Turn drops the last slot automatically.",
+    "dropHint_other": "Choose {{count}} slots to give up in Your sport. Otherwise, Next Turn drops the last slots automatically.",
+    "chooseDrops_one": "Choose 1 focus slot to give up",
+    "chooseDrops_other": "Choose {{count}} focus slots to give up",
+    "dropSlot": "Give up slot {{slot}}",
+    "inspect": "Show on map",
+    "growthBudget": "{{pp, number(maximumFractionDigits: 1)}} Prestige available. Purchases are permanent; there are no refunds.",
+    "lockTier": "Requires tier {{tier}}: {{name}}.",
+    "lockPrerequisites": "Requires {{nodes}} first.",
+    "lockFork": "Locked by your choice of {{node}}.",
+    "forkWarning": "Choosing this permanently locks out {{nodes}}.",
+    "buy": "Buy",
+    "buyNamed": "Buy {{node}} for {{cost, number(maximumFractionDigits: 1)}} PP",
+    "success": {
+      "buyNode": "Purchased {{node}}.",
+      "assignFocus": "Slot {{slot}} now focuses on {{country}}.",
+      "dropFocusSlot": "Gave up focus slot {{slot}}.",
+      "promoteLeague": "Promoted the league in {{country}}.",
+      "stepDownLeague": "Restructured the league in {{country}}.",
+      "bailoutLeague": "Funded a bailout in {{country}}."
+    }
   },
   "map": {
     "monogram": "SF",

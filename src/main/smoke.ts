@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { app, type BrowserWindow } from "electron";
+import { verifyActions } from "./action-smoke";
 import { verifyMap } from "./map-smoke";
 
 // Development-only self-check, enabled by the SF_SMOKE_OUT environment variable (see
@@ -110,6 +111,7 @@ async function run(
     current.quarter > before.quarter &&
     current.playerFandomScore !== before.playerFandomScore;
   const map = await verifyMap(win, screenshot);
+  const actions = await verifyActions(win, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
   const report = {
@@ -118,6 +120,7 @@ async function run(
     before,
     after: current,
     map,
+    actions,
     errors,
     remoteRequests,
   };

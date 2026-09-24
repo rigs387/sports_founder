@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import { AXIS_IDS } from "../../../content/genome-axes";
-import type { TurnSnapshot } from "../../../sim";
+import type { Action, TurnSnapshot } from "../../../sim";
+import { ActionFeedback } from "./ActionFeedback";
 
 export type Overview = "sport" | "leagues" | "growth";
 interface Props {
@@ -11,11 +12,25 @@ interface Props {
   names: Names;
   onClose: () => void;
   onSelect: (id: string) => void;
+  onAction: (action: Action) => void;
+  busy: boolean;
 }
 
 /** The existing campaign readouts remain available while the map is the main screen. */
-export function CampaignOverview({ view, snapshot, names, onClose, onSelect }: Props) {
-  const { t } = useTranslation();
+export function CampaignOverview({
+  view,
+  snapshot,
+  names,
+  onClose,
+  onSelect,
+  onAction,
+  busy,
+}: Props) {
+  const { t, i18n } = useTranslation();
+  const nodeNames = (ids: string[]) =>
+    new Intl.ListFormat(i18n.language, { style: "long" }).format(
+      ids.map((id) => t(`growth.nodes.${id}`)),
+    );
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const element = dialog.current;
@@ -44,6 +59,7 @@ export function CampaignOverview({ view, snapshot, names, onClose, onSelect }: P
           &times;
         </button>
       </header>
+      <ActionFeedback />
       {view === "sport" && (
         <>
           <p>
@@ -59,9 +75,42 @@ export function CampaignOverview({ view, snapshot, names, onClose, onSelect }: P
             ))}
           </dl>
           <h3>{t("map.focusHeading")}</h3>
-          <ul>
+          <p>{t("actions.focusInstructions")}</p>
+          {snapshot.tierTrack.slotsToDrop > 0 && (
+            <p role="status">{t("actions.dropHint", { count: snapshot.tierTrack.slotsToDrop })}</p>
+          )}
+          <ul className="focus-list">
             {snapshot.focus.map((id, index) => (
-              <li key={id ?? `slot-${index}`}>{id ? name(id) : t("campaign.emptySlot")}</li>
+              <li key={id ?? `slot-${index}`}>
+                <span>
+                  {t(id ? "actions.occupiedSlot" : "actions.emptySlot", {
+                    slot: index + 1,
+                    country: id ? name(id) : "",
+                  })}
+                </span>
+                {id && (
+                  <button
+                    type="button"
+                    className="action-button"
+                    onClick={() => {
+                      onSelect(id);
+                      onClose();
+                    }}
+                  >
+                    {t("actions.inspect")}
+                  </button>
+                )}
+                {snapshot.tierTrack.slotsToDrop > 0 && (
+                  <button
+                    type="button"
+                    className="action-button"
+                    disabled={busy || !!snapshot.outcome}
+                    onClick={() => onAction({ type: "dropFocusSlot", slot: index })}
+                  >
+                    {t("actions.dropSlot", { slot: index + 1 })}
+                  </button>
+                )}
+              </li>
             ))}
           </ul>
         </>
@@ -94,12 +143,43 @@ export function CampaignOverview({ view, snapshot, names, onClose, onSelect }: P
       {view === "growth" && (
         <>
           <p>{t("map.growthOverview")}</p>
+          <p>{t("actions.growthBudget", { pp: snapshot.pp })}</p>
           <ul className="growth-list">
             {snapshot.growthNodes.map((node) => (
-              <li key={node.nodeId}>
+              <li
+                key={node.nodeId}
+                data-node={node.nodeId}
+                data-status={node.status}
+                data-cost={node.cost}
+              >
                 <div>
                   <strong>{t(`growth.nodes.${node.nodeId}`)}</strong>
                   <small>{t(`growth.categories.${node.category}`)}</small>
+                  {node.lock?.kind === "tier" && (
+                    <small>
+                      {t("actions.lockTier", {
+                        tier: node.lock.unlockTier,
+                        name: t(`tiers.${node.lock.unlockTier}`),
+                      })}
+                    </small>
+                  )}
+                  {node.lock?.kind === "prerequisites" && (
+                    <small>
+                      {t("actions.lockPrerequisites", { nodes: nodeNames(node.lock.missing) })}
+                    </small>
+                  )}
+                  {node.lock?.kind === "fork" && (
+                    <small>
+                      {t("actions.lockFork", { node: t(`growth.nodes.${node.lock.takenBy}`) })}
+                    </small>
+                  )}
+                  {node.status !== "owned" &&
+                    node.lock?.kind !== "fork" &&
+                    node.forkSiblings.length > 0 && (
+                      <small className="fork-warning">
+                        {t("actions.forkWarning", { nodes: nodeNames(node.forkSiblings) })}
+                      </small>
+                    )}
                 </div>
                 <span>
                   {node.status === "owned"
@@ -108,7 +188,21 @@ export function CampaignOverview({ view, snapshot, names, onClose, onSelect }: P
                         cost: node.cost,
                       })}
                 </span>
-                <b>{t(`map.nodeStatus.${node.status}`)}</b>
+                <button
+                  type="button"
+                  className="action-button"
+                  data-testid="buy-node"
+                  disabled={
+                    busy || !!snapshot.outcome || node.status !== "available" || !node.affordable
+                  }
+                  aria-label={t("actions.buyNamed", {
+                    node: t(`growth.nodes.${node.nodeId}`),
+                    cost: node.cost,
+                  })}
+                  onClick={() => onAction({ type: "buyNode", nodeId: node.nodeId })}
+                >
+                  {t(node.status === "available" ? "actions.buy" : `map.nodeStatus.${node.status}`)}
+                </button>
               </li>
             ))}
           </ul>

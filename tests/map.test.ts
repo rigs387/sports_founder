@@ -63,6 +63,7 @@ describe("committed map geometry", () => {
     ]);
   });
   it("matches its checksum and byte budget", () => {
+    for (const id of settings.labels) expect(geometry.markets[id]).toBeDefined();
     expect(createHash("sha256").update(text).digest("hex")).toBe(coverage.geometrySha256);
     expect(geometry.sourceSha256).toBe(assignments.source.sha256);
     expect(Buffer.byteLength(text)).toBeLessThanOrEqual(settings.geometry.maxBytes);

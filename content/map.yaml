@@ -2,6 +2,7 @@
 heatBands: [0, 0.001, 0.01, 0.05, 0.15, 0.3]
 establishedThreshold: 0.01
 historyLimit: 160
+labels: [united-states, brazil, france, nigeria, india, south-africa]
 camera:
   minZoom: 0.65
   maxZoom: 7

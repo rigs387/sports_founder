@@ -28,6 +28,8 @@ if (hash(source) !== assignments.source.sha256)
 const original = JSON.parse(source) as FeatureCollection;
 const world = loadWorldFromDisk();
 const marketIds = new Set(world.countries.map((country) => country.id));
+for (const id of settings.labels)
+  if (!marketIds.has(id)) throw new Error(`Unknown map label: ${id}`);
 const owners = new Map<string, string | null>();
 const mappedMarkets = new Set<string>();
 for (const entry of assignments.markets) {
@@ -145,9 +147,20 @@ function polygons(geometry: Geometry): MapPolygon[] {
   return result;
 }
 function bounds(rings: number[][]): [number, number, number, number] {
-  const xs = rings.flatMap((ring) => ring.filter((_, i) => i % 2 === 0));
-  const ys = rings.flatMap((ring) => ring.filter((_, i) => i % 2 === 1));
-  return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+  return rings.reduce<[number, number, number, number]>(
+    (result, ring) => {
+      for (let i = 0; i < ring.length; i += 2) {
+        const x = ring[i] ?? 0;
+        const y = ring[i + 1] ?? 0;
+        result[0] = Math.min(result[0], x);
+        result[1] = Math.min(result[1], y);
+        result[2] = Math.max(result[2], x);
+        result[3] = Math.max(result[3], y);
+      }
+      return result;
+    },
+    [Infinity, Infinity, -Infinity, -Infinity],
+  );
 }
 const shapes: MapGeometry["shapes"] = simplified.features
   .filter((feature) => feature.properties?.GU_A3 !== "ATA")

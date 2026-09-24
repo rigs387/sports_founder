@@ -1,5 +1,5 @@
 import { wrap } from "comlink";
-import type { SimWorkerApi } from "./sim.worker";
+import type { SimWorkerApi } from "./api";
 
 const worker = new Worker(new URL("./sim.worker.ts", import.meta.url), { type: "module" });
 

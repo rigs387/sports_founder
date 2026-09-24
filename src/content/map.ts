@@ -22,6 +22,7 @@ export const mapSettingsSchema = z.object({
     ),
   establishedThreshold: z.number().positive().max(1),
   historyLimit: z.int().min(2),
+  labels: z.array(z.string()).refine((ids) => new Set(ids).size === ids.length),
   camera: z
     .object({
       minZoom: z.number().positive(),
