@@ -78,7 +78,7 @@ only to the player.
 
 **Rules Evolution:** PP cost, seasonal window only, max 1/year. Backlash scales with hardcore base
 and rule age (tradition). Global rulebook. Proposals from player, broadcasters, sponsors,
-commissioners.
+league directors.
 
 **History:** Permanent landmarks, season summaries, career totals, records, and yearly world
 fan snapshots; match detail pruned per season. Headlines may only claim what records prove.
@@ -91,10 +91,14 @@ rivals defend hardest when you near #1.
 
 **Leagues:** One top league per country, forming at a hardcore threshold and rising through
 Amateur → Semi-Pro → Professional → Elite (player-chosen promotion). One player-assigned flagship
-league worldwide. Sim depth grows with tier: fans only → teams → stars → full rosters (contracts
-drive payroll cost, not negotiation). Delegation: standing policies everywhere; hands-on business
-only in focus countries; trait-driven commissioners (Phase 1); intervene anywhere anytime. No inbox: the map signals trouble, business happens in seasonal windows,
-crises arrive as decision cards.
+league worldwide, and the player is its commissioner: it starts at the anchor and is the only league
+with deep management (named teams, standings, stars, real sponsor and TV deals with demands).
+Moving the seat happens only in a seasonal window and costs purists in the old country, whose league
+drops to the simple model. Flagship sim depth grows with tier: teams → stars → full rosters
+(contracts drive payroll cost, not negotiation); other leagues stay simple. Delegation: standing
+policies everywhere; hands-on business only in focus countries; trait-driven league directors
+(Phase 1); intervene anywhere anytime. No inbox: the map signals trouble, business happens in
+seasonal windows, crises arrive as decision cards.
 
 **Loss Condition:** Your starting/anchor country's league fully collapses.
 

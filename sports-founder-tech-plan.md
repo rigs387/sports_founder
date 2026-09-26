@@ -59,6 +59,7 @@ surface before playtesting or during it.
 | 2026-09-19 | The win hold is a real contest: about half the campaigns that take #1 lose it before winning (GDD v1.8); near-top rival defense rebuilt to reach it, win hold 36 → 30 turns | Decided |
 | 2026-09-19 | Growth node prices scale with the sport's Fandom Score (GDD v1.9): a campaign owns ~half the tree (median 9 of 16) instead of all of it, and strategies own different halves. Base node costs ×0.5, effect amounts ×1.6, player casual/hardcore conversion 0.25→0.3 and 0.012→0.015 to hold the GDD turn budget | Decided |
 | 2026-09-19 | Genome condition deltas ×1.25 again (×2.19 in all; ice is at the lever ceiling): the contested hold's late-game defense had eroded differentiation to 5/6. Tier-3 score gate 600k → 400k; grass and moderate-rules deltas trimmed (options: stop-start and short now marginal, lower bound 42%) | Tuning |
+| 2026-09-26 | The player is commissioner of the flagship league (GDD v1.11), after playtesting found the slice thin. The seat starts at the anchor and moves only in a seasonal window at a purist cost. League and business depth (system 4 teams/standings/stars, system 7 deals with demands) is built for the flagship only; other leagues keep the Phase 0 model. Hired per-country delegates are renamed league directors | Decided |
 
 ---
 
@@ -199,12 +200,12 @@ These come from the GDD review. Items 1–4 must be specified before Phase 0 imp
 | 3 | ~~**Spread model**~~ | **Resolved 2026-09-12** — see GDD Spread Model | Only casual exposure crosses borders; proximity/language/media channels; focus slots; cold launches cost more; country-level granularity |
 | 4 | ~~**Story → mechanics link**~~ | **Resolved 2026-09-12** — see GDD Event System | Moments + decision cards from recorded facts; closed effect vocabulary; decisions capped per turn; pickups auto-collect; negative events scale with tier |
 | 5 | ~~**Fandom share definition**~~ | **Resolved 2026-09-12** — see GDD Fan Model | Three buckets (uninterested / casual / hardcore); hardcore exclusive and sticky; Fandom Score = hardcore + weighted casual |
-| 6 | ~~**Rules-evolution trade-offs**~~ | **Resolved 2026-09-12** — see GDD Rules Evolution | PP cost, seasonal window, 1/year; backlash scales with hardcore base and rule age; global rules; proposals from player, broadcasters, sponsors, commissioners |
+| 6 | ~~**Rules-evolution trade-offs**~~ | **Resolved 2026-09-12** — see GDD Rules Evolution | PP cost, seasonal window, 1/year; backlash scales with hardcore base and rule age; global rules; proposals from player, broadcasters, sponsors, league directors (renamed from commissioners in GDD v1.11) |
 | 7 | ~~**Turn anatomy**~~ | **Resolved 2026-09-12** — see GDD Turn anatomy | 5-step turn; per-tier targets for markets, slots, pickups, cards, real time; anchor starts with founding amateur league; league attention via map signals + seasonal windows + crisis cards (no inbox) |
 | 8 | ~~**Campaign length & replay**~~ | **Resolved 2026-09-12** — see GDD Campaign length | ~10–15 hr to first win; anchor country + genome as replay levers; anchor difficulty rating + Easy/Normal/Hard; multiple save slots, no ironman |
 | 9 | ~~**Late-game pressure**~~ | **Resolved 2026-09-12** — see GDD Late-Game Pressure | Anchor resentment; generational hardcore turnover; rising running costs by league tier; rivals defend hardest near #1 |
 | 9b | ~~**Rival AI**~~ | **Resolved 2026-09-12** — see GDD Rival AI | Real-world sports as rivals (present-day start; 7 sports + combat sports bucket + passive "other"); defense budgets; per-country escalation ladder; closed countermove list; rival-vs-rival later |
-| 10 | ~~**Delegation**~~ | **Resolved 2026-09-12** — see GDD Delegation | Standing policies with per-country overrides; window business surfaces only in focus countries; trait-driven commissioners in Phase 1; player can always intervene |
+| 10 | ~~**Delegation**~~ | **Resolved 2026-09-12** — see GDD Delegation | Standing policies with per-country overrides; window business surfaces only in focus countries; trait-driven commissioners in Phase 1 (renamed league directors in GDD v1.11; the player is commissioner of the flagship); player can always intervene |
 | 11 | ~~**Showing the sport**~~ | **Resolved 2026-09-12** — see GDD Showing the sport | Rulebook page with dated amendments (Phase 0); field diagram (Phase 1); player-made logo/ball/kit + 9x16 image export (Phase 2) |
 | 12 | ~~**Real vs. fictional world**~~ | **Resolved 2026-09-12** — see GDD Rival AI and Map and markets | Real sport names; generic/fictional leagues, governing bodies, tournaments, teams, players; all real-world-facing names in one moddable data file. Markets follow sports-body conventions; Natural Earth de facto boundaries with neutral hatching for contested areas. Get a legal check before the Steam page |
 | 13 | **Standard production gaps** | Needed before Early Access | Onboarding/tutorial, UI information architecture, difficulty, audio, accessibility, localization, price/DLC, target audience, competitor analysis, playtest plan with success metrics |
@@ -622,7 +623,7 @@ To be copied into `CLAUDE.md` when the repository is created:
 | Story content volume underestimated | High | High | Budget 300–800 templates; grammar variety for English flavor; time limit per phase |
 | Player sim depth becomes a time sink | High | Medium | Build only depth that stories consume |
 | Late game lacks stakes / snowballs | Medium | High | Global pressure source (Section 3, item 9); track late-game win certainty in balance runs |
-| Micromanagement at scale | Medium | Medium | Delegation via country commissioners |
+| Micromanagement at scale | Medium | Medium | Deep management only at the flagship (the player's seat); elsewhere standing policies and league directors |
 | steamworks.js stagnates | Medium | Medium | Steam adapter isolation; steamworks-ffi-node fallback |
 | Steam overlay breaks after Electron upgrade | Medium | Low–Medium | Upgrade checklist; scheduled small upgrades |
 | Architecture drift across AI sessions | High | High | `CLAUDE.md` rules; tests; headless runner; Git |

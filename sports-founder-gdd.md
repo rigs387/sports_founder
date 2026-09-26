@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.10 | September 21, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world)*
+*Version 1.11 | September 26, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league)*
 
 ---
 
@@ -101,10 +101,15 @@ no list or inbox anywhere:
 - **Focus slots define hands-on involvement.** Seasonal-window business surfaces to the player only
   in focus countries; elsewhere it resolves via policy and reports as Moments. Focus means both
   "where I push growth" and "where I personally operate," which feeds anchor-neglect pressure.
-- **Commissioners (Phase 1, not Phase 0):** hireable per country; execute policies with
-  trait-driven bias (e.g., Frugal banks cash and skips marginal sponsors; Showman pushes early
-  promotion; Scandal-prone gets results but generates story events). Paid from league cash. They
-  are also the advisor voice for league issues.
+- **The player is the commissioner of one league: the flagship (decided 2026-09-26).** Deep league
+  management (named teams, standings, stars, real sponsor and TV deals) happens there and only
+  there; see Flagship league. Every other league runs on the simple model under standing policies.
+  "Commissioner" is the player's title alone.
+- **League directors (Phase 1, not Phase 0):** hireable per country for leagues other than the
+  flagship; execute policies with trait-driven bias (e.g., Frugal banks cash and skips marginal
+  sponsors; Showman pushes early promotion; Scandal-prone gets results but generates story
+  events). Paid from league cash. They are also the advisor voice for league issues. (Named
+  "commissioners" before v1.11.)
 - **The player can always intervene** in any country directly. Delegation is a default, not a
   lock.
 
@@ -128,10 +133,25 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
 - **Flagship league:** one league worldwide is the sport's "top" league, designated by player
   assignment. The flagship attracts the best talent (stars transfer toward it), boosts the media
   reach spread channel from its country, and carries higher stakes (more revenue; its troubles
-  ripple to fans worldwide). Reassignable only during a seasonal window, at a purist cost in the
-  former flagship's country. Multiple leagues can reach Elite.
+  ripple to fans worldwide). Multiple leagues can reach Elite.
+- **The commissioner's seat (decided 2026-09-26).** The player personally runs the flagship. It
+  answers playtesting that found the game thin: one league to care about, with the planned league
+  and business depth concentrated where the player sits instead of spread thin across 30 markets.
+  The depth must feed the global spread (talent, media reach, stories), never compete with it; the
+  map stays the game.
+  - *Starts at the anchor.* The anchor league is the flagship from turn 1, which fills the long
+    Backyard Game stretch and ties the deepest league to the one whose collapse ends the run.
+  - *Moving the seat hurts (choose pain).* The flagship is reassignable only during a seasonal
+    window. The former flagship's country pays a purist cost (it feeds anchor resentment when the
+    anchor is left), and its league drops to the simple model under standing policies (or a
+    league director, once they exist).
+  - *First build of the seat's depth:* named teams, results, standings and a few named stars
+    (system 4), plus real sponsor and TV deals with length, annual value and demands (system 7).
+    Venues, youth programs, expansion teams and full rosters come later.
+  - *Every other league* stays on the simple model: fan buckets, one cash line, the League Health
+    Ladder, promotion and bailouts.
 
-**Simulation depth by league tier:**
+**Simulation depth by league tier** (the flagship; other leagues stay on the simple model):
 
 | Stage | Simulated |
 |---|---|
@@ -522,7 +542,7 @@ market. All stored in content; every conversion curve and weight lives in config
   large boost in that country ("Tuvalu reaches the semifinal").
 
 **Hall of Fame:** Annual classes selected automatically from retained records (career thresholds in
-config). Wings: players, commissioners, founding-family members, and a Moments wing for landmark
+config). Wings: players, league directors, founding-family members, and a Moments wing for landmark
 events. Each induction is a 9x16 key moment. Mechanical effect: each inductee adds permanent
 hardcore stickiness in their home country.
 
@@ -554,7 +574,7 @@ lengths — lives in config files. No balance values in code.
 - **Rules are global.** One sport, one rulebook. Genome affinity makes the same change help some
   markets and hurt others, so the player weighs the whole map. No regional variants.
 - **Proposals come from the player and the world.** The player can change any rule trait in the
-  window. Broadcasters, sponsors, and commissioners also propose changes via decision cards
+  window. Broadcasters, sponsors, and league directors also propose changes via decision cards
   (accepted proposals count toward the yearly limit). Rival rule copying keeps it two-sided.
 
 **History & Records:** Stories and retrospectives may only claim what the simulation retained.
@@ -592,12 +612,14 @@ produces PP; it can only build fans locally through venues and youth programs.
 
 **Cash sources:** Gate revenue (attendance × venue size), TV deals, sponsorships.
 
-**Business Layer (per country league):**
+**Business Layer (per country league):** the full layer below runs at the flagship, where the
+player is commissioner (v1.11). Other leagues keep the Phase 0 subset (one combined revenue line)
+under standing policies; whether they later gain individual deals is open.
 - **Revenue:** *gate* = hardcore fans × country wealth, capped by venue capacity; *TV* = casual
   reach × media market size; *sponsors* = total reach × wealth. PP tier caps the size of TV and
   sponsor deals on offer.
 - **Costs:** payroll (from contracts; scales with player quality and league tier), operations
-  (base cost by league tier), venue upkeep, commissioner salary (Phase 1).
+  (base cost by league tier), venue upkeep, league director salary (Phase 1; none at the flagship).
 - **Deals:** TV and sponsor deals are multi-year contracts offered in the seasonal window — length,
   annual value, and sometimes a demand (rule-change proposal, exclusivity, "stay Professional or
   above"). Standing policy accepts or rejects outside focus countries. Long deals trade security
@@ -900,3 +922,9 @@ Items flagged during the interview that need further discussion in future sessio
   DLC, Steam page timing, platforms. Tech plan §11 holds the current thinking.
 - Competitor analysis: a thorough Steam tag sweep (research task, not a design decision).
 - Water as a genome surface option (parked 2026-09-13).
+- Commissioner's seat follow-ups (parked 2026-09-26): which leagues can take the seat (any active
+  league, or a minimum tier); what happens to the seat when a non-anchor flagship folds; where
+  stars transferring to the flagship, and national-team players, come from while other leagues
+  have no players; whether other leagues ever get individual deals; and whether playtest thinness
+  was too few decisions per turn or nothing to get attached to (the seat answers the second
+  directly, the first only at the flagship).
