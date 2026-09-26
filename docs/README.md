@@ -8,6 +8,7 @@ Start with the [world map's current direction](world-map/README.md): **Matchday 
 - [Clubhouse growth board: live screen and choices](growth-tree/production.md)
 - [League management: promotion, restructuring and bailouts](league-management/README.md)
 - [Save/load: campaign files, history and resume verification](save-load/README.md)
+- [Events: the Clubhouse story board, decisions and moments](events/README.md)
 - [Growth tree visual studies](growth-tree/README.md)
 - [World map implementation brief](world-map/brief.html)
 - [Earlier visual studies](world-map/README.md#earlier-studies)

@@ -1,4 +1,5 @@
 import { costMultiplier } from "./calendar";
+import { eventBlocker, resolveEvent } from "./events";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
 import { leagueActionReason, leagueActions } from "./league-actions";
 import {
@@ -22,6 +23,8 @@ import { type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } from "./types"
 //   buyNode         buy a growth tree node (GDD PP Growth Tree); permanent, no refunds
 
 export type Action =
+  | { type: "collectMoment"; eventId: number }
+  | { type: "chooseEvent"; eventId: number; choiceId: string }
   | { type: "buyNode"; nodeId: string }
   | { type: "assignFocus"; slot: number; countryId: string }
   | { type: "dropFocusSlot"; slot: number }
@@ -76,6 +79,13 @@ const money = (value: number) => value.toFixed(1);
 /** Returns why an action is illegal, or null if it is legal. */
 export function checkAction(state: GameState, world: World, action: Action): string | null {
   if (state.outcome !== null) return "the campaign has ended";
+  if (action.type === "collectMoment" || action.type === "chooseEvent")
+    return eventBlocker(
+      state,
+      world,
+      action.eventId,
+      action.type === "chooseEvent" ? action.choiceId : null,
+    );
 
   if (action.type === "buyNode") {
     if (!world.growthTree.nodes.some((node) => node.id === action.nodeId)) {
@@ -146,6 +156,10 @@ export function applyAction(state: GameState, world: World, action: Action): Gam
   if (reason !== null) throw new IllegalActionError(action, reason);
 
   switch (action.type) {
+    case "collectMoment":
+      return resolveEvent(state, world, action.eventId, null);
+    case "chooseEvent":
+      return resolveEvent(state, world, action.eventId, action.choiceId);
     case "buyNode": {
       const cost = nodeCost(state, world, action.nodeId);
       return {

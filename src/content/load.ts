@@ -1,6 +1,7 @@
 import { parse } from "yaml";
 import type { ZodType } from "zod";
 import { deriveWorld, startingRivalFanCounts, startingSportCulture, type World } from "./derive";
+import { eventsFileSchema } from "./events";
 import { optionNetDeltaAt } from "./genome";
 import { AXIS_IDS, GENOME_AXES } from "./genome-axes";
 import {
@@ -24,6 +25,7 @@ export const CONTENT_FILES = {
   sports: "sports.yaml",
   genome: "genome.yaml",
   growthTree: "growth-tree.yaml",
+  events: "events.yaml",
   names: "names.yaml",
   sources: "sources.yaml",
   config: "config.yaml",
@@ -100,6 +102,7 @@ export function loadWorld(sources: ContentSources): World {
   const sportsFile = parseSource(sources.sports, sportsFileSchema, issues);
   const genome = parseSource(sources.genome, genomeFileSchema, issues);
   const growthTree = parseSource(sources.growthTree, growthTreeFileSchema, issues);
+  const events = parseSource(sources.events, eventsFileSchema, issues);
   const names = parseSource(sources.names, namesFileSchema, issues);
   const sourcesFile = parseSource(sources.sources, sourcesFileSchema, issues);
   const config = parseSource(sources.config, configFileSchema, issues);
@@ -108,6 +111,7 @@ export function loadWorld(sources: ContentSources): World {
     !sportsFile ||
     !genome ||
     !growthTree ||
+    !events ||
     !names ||
     !sourcesFile ||
     !config
@@ -121,6 +125,7 @@ export function loadWorld(sources: ContentSources): World {
     otherSports: sportsFile.otherSports,
     genome,
     growthTree,
+    events,
     names,
     sources: sourcesFile,
     config,
@@ -448,6 +453,10 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
 
   checkSources(world, sources, issues);
   checkGrowthTree(world, sources, issues);
+  world.events.cards.forEach((card, index) => {
+    if (!world.config.ppTiers.some((tier) => tier.tier === card.minTier))
+      issue(sources.events, `cards[${index}].minTier`, "unknown PP tier");
+  });
 }
 
 /**

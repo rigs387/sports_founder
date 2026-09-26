@@ -1,5 +1,6 @@
 import configText from "../../../../content/config.yaml?raw";
 import countriesText from "../../../../content/countries.yaml?raw";
+import eventsText from "../../../../content/events.yaml?raw";
 import genomeText from "../../../../content/genome.yaml?raw";
 import growthTreeText from "../../../../content/growth-tree.yaml?raw";
 import namesText from "../../../../content/names.yaml?raw";
@@ -14,6 +15,7 @@ export function loadBundledWorld(): World {
     sports: { path: "content/sports.yaml", text: sportsText },
     genome: { path: "content/genome.yaml", text: genomeText },
     growthTree: { path: "content/growth-tree.yaml", text: growthTreeText },
+    events: { path: "content/events.yaml", text: eventsText },
     names: { path: "content/names.yaml", text: namesText },
     sources: { path: "content/sources.yaml", text: sourcesText },
     config: { path: "content/config.yaml", text: configText },

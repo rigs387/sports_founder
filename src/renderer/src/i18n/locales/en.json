@@ -1,4 +1,128 @@
 {
+  "events": {
+    "launcher": "Around the grounds",
+    "defaultHint_one": "1 choice defaults next turn",
+    "defaultHint_other": "{{count}} choices default next turn",
+    "momentHint_one": "1 new moment",
+    "momentHint_other": "{{count}} new moments",
+    "eyebrow": "The Clubhouse board",
+    "heading": "A sport. A story.",
+    "close": "Close the story board",
+    "sections": "Campaign stories",
+    "pending": "This turn · {{count}}",
+    "history": "Recent",
+    "recordedTurn": "Recorded on turn {{turn}}",
+    "moment": "Campaign moment",
+    "decision": "Your call",
+    "record": "In the record book",
+    "empty": "All caught up. Your next turn may bring a new story.",
+    "select": "Choose a card to read its story.",
+    "inboxNote": "Every card starts with something that happened in your campaign. Open a moment to collect its reward.",
+    "edition": "No. {{turn}}",
+    "fans": "{{count, number}} fans at the time",
+    "hardcore": "{{count, number}} hardcore",
+    "cost": "{{amount, number(maximumFractionDigits: 1)}} PP",
+    "free": "No PP cost",
+    "noChange": "Keep the current approach. No cost or added effect.",
+    "review": "Review choice",
+    "default": "If left unresolved, Next Turn chooses “{{choice}}” for free, with no added effect.",
+    "confirmHeading": "Confirm your decision",
+    "confirm": "Choose “{{choice}}” in {{country}} for {{amount, number(maximumFractionDigits: 1)}} PP?",
+    "confirmChoice": "Make the call",
+    "cancel": "Keep thinking",
+    "collect": "Collect moment",
+    "collected": "Moment collected",
+    "manualResolution": "Resolved on turn {{turn}}. {{cost, number(maximumFractionDigits: 1)}} PP spent; {{gained, number(maximumFractionDigits: 1)}} PP gained.",
+    "autoResolution": "Settled automatically before advancing turn {{turn}}. {{gained, number(maximumFractionDigits: 1)}} PP collected; no decision cost.",
+    "active": "Local effects in play · {{count}}",
+    "footer": "Next Turn collects unopened rewards and takes the neutral option on unanswered decisions. Effects stay local unless stated otherwise.",
+    "back": "Back to the world",
+    "targets": {
+      "casual": "casual",
+      "hardcore": "hardcore",
+      "media": "media",
+      "language": "language",
+      "proximity": "neighbouring-market"
+    },
+    "effects": {
+      "conversion": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} {{target}} conversion for {{quarters}} quarters.",
+      "spread": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} incoming {{target}} spread for {{quarters}} quarters.",
+      "pp": "Gain {{amount, number(maximumFractionDigits: 1)}} PP.",
+      "uninterestedToCasual": "{{share, number(style: percent; maximumFractionDigits: 3)}} of locally uninterested people become casual fans, rounded down.",
+      "casualToHardcore": "Up to {{share, number(style: percent; maximumFractionDigits: 1)}} of local casual fans become hardcore, limited by people without a hardcore sport.",
+      "hardcoreDemotion": "{{share, number(style: percent; maximumFractionDigits: 1)}} of local hardcore fans become casual, rounded down.",
+      "rivalSetback": "{{share, number(style: percent; maximumFractionDigits: 1)}} of the named rival's local hardcore fans become casual. They do not become your fans.",
+      "healthUp": "Improve league health by one rung, up to Healthy. No cash added; health is evaluated again next turn.",
+      "healthDown": "Lower league health by one rung, down to Near-Collapse. Health is evaluated again next turn."
+    },
+    "blockers": {
+      "missing": "This story has already been resolved.",
+      "choice": "This choice is unavailable.",
+      "prestige": "Not enough Prestige for this choice.",
+      "league": "There is no longer a league here.",
+      "rival": "The named rival is no longer available.",
+      "ended": "This campaign has ended."
+    },
+    "cards": {
+      "open-doors": {
+        "title": "The first regulars",
+        "body": "Your sport now has {{fans, number}} fans in {{country}}, including {{hardcore, number}} hardcore followers. Decide what to build around: a welcoming first experience, or a stronger routine for the regulars.",
+        "choices": {
+          "welcome": "Open the doors",
+          "regulars": "Back the regulars",
+          "hold": "Keep the current approach"
+        }
+      },
+      "first-following": {
+        "title": "A following of your own",
+        "body": "{{country}} has reached the first audience milestone: {{fans, number}} people follow your sport. It is a small foothold, but it belongs to you."
+      },
+      "league-arrival": {
+        "title": "Put it on the fixture list",
+        "body": "A league formed in {{country}} during the last turn. There are {{hardcore, number}} hardcore fans here now. Another place where your sport has a home."
+      },
+      "moving-up": {
+        "title": "A bigger stage",
+        "body": "You promoted the league in {{country}}. Its current level is {{tier}}, backed by {{hardcore, number}} hardcore fans. That step is now part of your sport's story."
+      },
+      "local-airtime": {
+        "title": "An audience worth reaching",
+        "body": "{{country}} now has {{fans, number}} fans. You have enough of a following to decide how to reach more people: invest in incoming media exposure or build connections with neighbouring markets.",
+        "choices": {
+          "broadcast": "Buy local airtime",
+          "neighbourhood": "Work the neighbourhood",
+          "hold": "Stay with organic growth"
+        }
+      },
+      "crowded-sidelines": {
+        "title": "Bring them into the club",
+        "body": "{{fans, number}} people follow the sport in {{country}}, but only {{hardcore, number}} are hardcore. Turn some of that interest into commitment, or devote the attention to fundraising at the cost of new casual recruitment.",
+        "choices": {
+          "recruit": "Run a recruitment drive",
+          "fundraise": "Fund the next step",
+          "hold": "Let the following develop"
+        }
+      },
+      "league-under-strain": {
+        "title": "A league under strain",
+        "body": "The league in {{country}} was rated {{health}} at the end of the turn. You can regroup at the cost of some hardcore commitment, invest in reaching new fans, or manage the underlying finances from Leagues.",
+        "choices": {
+          "regroup": "Regroup the league",
+          "outreach": "Bring new people in",
+          "hold": "Manage it through Leagues"
+        }
+      },
+      "rival-pushback": {
+        "title": "They have noticed",
+        "body": "{{rival}} increased its defensive attention in {{country}} during the last turn. Your sport has {{hardcore, number}} hardcore fans here. Challenge that rival's grip, or strengthen your own following.",
+        "choices": {
+          "challenge": "Challenge their grip",
+          "build": "Build our own base",
+          "hold": "Keep our current course"
+        }
+      }
+    }
+  },
   "saves": {
     "menu": "Campaign",
     "eyebrow": "Your sporting world",
@@ -473,6 +597,8 @@
     "buy": "Buy",
     "buyNamed": "Buy {{node}} for {{cost, number(maximumFractionDigits: 1)}} PP",
     "success": {
+      "collectMoment": "Moment collected. Its reward is now part of your campaign.",
+      "chooseEvent": "Decision made. Your campaign has been updated.",
       "buyNode": "Purchased {{node}}.",
       "assignFocus": "Slot {{slot}} now focuses on {{country}}.",
       "dropFocusSlot": "Gave up focus slot {{slot}}.",

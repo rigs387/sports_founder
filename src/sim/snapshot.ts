@@ -2,6 +2,8 @@ import type { NodeEffect } from "../content";
 import { focusCostFromExposure } from "./actions";
 import { seasonalWindowOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
 import { mediaRevenueFactor } from "./countermoves";
+import { type EventSnapshot, eventSnapshots } from "./events";
+import type { EventState } from "./events-state";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { growthFactorsAt, type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
@@ -135,6 +137,9 @@ export interface TurnSnapshot {
   /** Every growth tree node in content order, with its status and current price. */
   growthNodes: GrowthNodeSnapshot[];
   landmarkCount: number;
+  events: EventSnapshot[];
+  eventHistory: EventState["history"];
+  eventModifiers: EventState["modifiers"];
 }
 
 export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeSnapshot[] {
@@ -228,6 +233,9 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
   const { demotionTurns } = world.config.tierTrack;
   return {
     seed: state.seed,
+    events: eventSnapshots(state, world),
+    eventHistory: state.events.history,
+    eventModifiers: state.events.modifiers,
     anchorCountryId: state.anchorCountryId,
     genome: state.genome,
     turn: state.turn,

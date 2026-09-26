@@ -29,7 +29,9 @@ Run `npm.cmd run dev` from the project root to play it. The game opens on
 - **Leagues** and country cards now offer [league management](../league-management/README.md):
   promotion, restructuring and bailouts with current terms and eligibility.
 - **Campaign** now offers [save/load](../save-load/README.md), including country history and
-  unsaved-progress protection. Existing campaigns can also be loaded from setup. Events remain later work.
+  unsaved-progress protection. Existing campaigns can also be loaded from setup.
+- **Around the grounds** opens the [Clubhouse story board](../events/README.md): eight fact-based
+  moments and decisions, local trade-offs, reward collection and a recent journal.
 
 ![Tuvalu selected through its expanded target.](assets/previews/pixi-tuvalu.png)
 
@@ -52,7 +54,7 @@ Visual tokens remain in `src/renderer/src/styles.css`; this direction remains re
 Heat thresholds, label markets, camera settings and history retention live in `content/map.yaml`,
 validated through Zod. History is bounded to 160 snapshots per country and is preserved in
 campaign files. There is no recorded replay slider in the live game.
-Simulation rules and the version 6 simulation save format are unchanged; the UI session has
+The simulation now includes event effects and uses save format 7; the UI session retains
 its own versioned wrapper. Country snapshots carry the actual
 focus price, calculated by the simulation from organic exposure and owned growth nodes.
 

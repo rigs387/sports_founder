@@ -1,3 +1,4 @@
+import type { EventsContent } from "./events";
 import type { AffinityAttributes } from "./genome";
 import { AXIS_IDS } from "./genome-axes";
 import type {
@@ -32,6 +33,7 @@ export interface WorldContent {
   otherSports: SportsContent["otherSports"];
   genome: GenomeContent;
   growthTree: GrowthTreeContent;
+  events: EventsContent;
   names: Names;
   sources: Sources;
   config: Config;
@@ -270,6 +272,7 @@ export function deriveWorld(content: WorldContent): World {
     otherSports: content.otherSports,
     genome: centreClimateConditions(content.genome, content.countries),
     growthTree: content.growthTree,
+    events: content.events,
     names: content.names,
     sources: content.sources,
     config: content.config,

@@ -1,5 +1,6 @@
 import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { rivalConversionBoosts } from "./countermoves";
+import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { type GrowthFactors, growthFactors } from "./growth";
@@ -84,6 +85,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
       );
     }
     const levers = leverMultipliers(world, state.genome, index);
+    const eventRates = eventFactors(state, world, country.id);
     const rivalry = similarityEffect(
       world,
       state.genome,
@@ -100,7 +102,8 @@ export function stepQuarter(state: GameState, world: World): GameState {
         rivalry.casualFactor *
         countryExposure.total *
         (countryExposure.focused ? config.focus.conversionMultiplier : 1) *
-        factors.casualConversion,
+        factors.casualConversion *
+        eventRates.casual,
       casualChurn:
         (config.dynamics.player.casualChurnRate +
           config.dynamics.player.casualDecayRate *
@@ -112,7 +115,8 @@ export function stepQuarter(state: GameState, world: World): GameState {
         levers.affinity *
         rivalry.hardcoreFactor *
         (countryExposure.focused ? config.focus.conversionMultiplier : 1) *
-        factors.hardcoreConversion,
+        factors.hardcoreConversion *
+        eventRates.hardcore,
     };
     const moved = stepCountryFans(
       countryState,
@@ -138,6 +142,10 @@ export function stepQuarter(state: GameState, world: World): GameState {
     ...state,
     rng: saveRng(rng),
     quarter,
+    events: {
+      ...state.events,
+      modifiers: state.events.modifiers.filter((m) => m.endQuarter > quarter),
+    },
     pp: state.pp + ppIncome,
     rivals: defended.rivals,
     countries,

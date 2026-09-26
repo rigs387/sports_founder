@@ -10,6 +10,7 @@ import {
   timedCountermoveSchema,
 } from "../content";
 import { tierEntry } from "./calendar";
+import { emptyEvents, eventStateSchema } from "./events-state";
 import { invariantsOf } from "./invariants";
 import { newLeague } from "./leagues";
 import { newFront, newRivalState } from "./rivals";
@@ -18,7 +19,7 @@ import { defaultGenome } from "./setup";
 import type { GameState, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 6;
+export const SAVE_FORMAT_VERSION = 7;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -189,6 +190,7 @@ const gameStateSchema = z.strictObject({
   ),
   landmarks: z.array(landmarkSchema),
   yearly: z.array(z.strictObject({ year: z.int(), fans: z.array(count) })),
+  events: eventStateSchema,
 });
 
 const saveFileSchema = z.strictObject({
@@ -207,6 +209,14 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 6 → 7: no retroactive rewards for old landmarks; future turns start the event deck.
+  6: (save) => ({
+    formatVersion: 7,
+    state: {
+      ...save.state,
+      events: emptyEvents(Array.isArray(save.state.landmarks) ? save.state.landmarks.length : 0),
+    },
+  }),
   // 1 → 2: the genome, focus slots and the "other sports" bucket arrived. Version 1 saves came
   // from the pre-genome foundation build; they get the default genome and a focus slot on the
   // anchor. Their sports and countries must still match the current content to load.

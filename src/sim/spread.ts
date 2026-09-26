@@ -1,4 +1,5 @@
 import { mediaReachBlocked } from "./countermoves";
+import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
 import { growthFactors } from "./growth";
 import { type GameState, PLAYER_INDEX, type World } from "./types";
@@ -60,7 +61,7 @@ export function unblockedMediaReach(
 
 /** Exposure to the player's sport in every country at the current state. */
 export function computeExposure(
-  state: Pick<GameState, "countries" | "focus" | "growthNodes">,
+  state: Pick<GameState, "countries" | "focus" | "growthNodes" | "events" | "quarter">,
   world: World,
 ): CountryExposure[] {
   const { exposure: settings, focus: focusSettings } = world.config;
@@ -76,6 +77,7 @@ export function computeExposure(
     const isFocused = focused.has(country.id);
     const inboundMultiplier = isFocused ? focusSettings.inboundMultiplier : 1;
     const factors = growth[target];
+    const eventRates = eventFactors(state, world, country.id);
     if (!factors) throw new Error(`No growth factors for country #${target}`);
 
     let proximity = 0;
@@ -89,9 +91,9 @@ export function computeExposure(
       language += link.language * perCapita;
       media += link.media * perCapita;
     }
-    proximity *= factors.proximity;
-    language *= factors.language;
-    media *= factors.media;
+    proximity *= factors.proximity * eventRates.proximity;
+    language *= factors.language * eventRates.language;
+    media *= factors.media * eventRates.media;
     if (mediaReachBlocked(countryState)) media *= 1 - factors.countermoveEffect;
     const local = (settings.localWeight * (strengths[target] ?? 0)) / population;
     const organic = local + proximity + language + media;

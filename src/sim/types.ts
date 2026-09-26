@@ -6,6 +6,7 @@ import type {
   LeagueTierId,
   TimedCountermoveKind,
 } from "../content";
+import type { EventState } from "./events-state";
 
 export type {
   AxisId,
@@ -258,6 +259,7 @@ export interface GameState {
   countries: CountryState[];
   landmarks: Landmark[];
   yearly: YearlySnapshot[];
+  events: EventState;
 }
 
 export interface CampaignSetup {

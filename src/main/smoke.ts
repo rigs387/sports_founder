@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { app, type BrowserWindow } from "electron";
 import { verifyActions } from "./action-smoke";
+import { verifyEvents } from "./event-smoke";
 import { verifyLeagues } from "./league-smoke";
 import { verifyMap } from "./map-smoke";
 import type { FilePrompts } from "./save-files";
@@ -100,6 +101,7 @@ async function run(
   };
 
   const setup = await verifySetup(win, screenshot);
+  const events = await verifyEvents(win, outDir, filePrompts, screenshot);
   const before = await waitFor((s) => s.status === "ready" && s.endTurnEnabled, "first snapshot");
   await screenshot("01-start.png");
 
@@ -133,6 +135,7 @@ async function run(
     after: current,
     map,
     setup,
+    events,
     actions,
     leagues,
     saves,

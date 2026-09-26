@@ -4,6 +4,7 @@ import { ActionFeedback } from "./components/ActionFeedback";
 import { CampaignOverview, type Overview } from "./components/CampaignOverview";
 import { CampaignSetupScreen } from "./components/CampaignSetupScreen";
 import { CountryCard } from "./components/CountryCard";
+import { EventBoard } from "./components/EventBoard";
 import { FocusControls } from "./components/FocusControls";
 import { LeagueControls } from "./components/LeagueControls";
 import { SaveLoadControls } from "./components/SaveLoadControls";
@@ -430,6 +431,7 @@ export function App() {
             {t("map.rivals")}
           </label>
         </div>
+        <EventBoard key={campaignRevision} />
         <button
           type="button"
           className="advance-turn"

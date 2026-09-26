@@ -32,6 +32,7 @@ export function withWorld(base: World, edit: (content: WorldContent) => void): W
     otherSports: base.otherSports,
     genome: base.genome,
     growthTree: base.growthTree,
+    events: base.events,
     names: base.names,
     sources: base.sources,
     config: base.config,

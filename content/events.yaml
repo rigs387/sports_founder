@@ -1,0 +1,191 @@
+# First playable deck. All triggers reference actual campaign facts; prose lives in en.json.
+settings:
+  baseMoments: 1
+  momentsPerQuarter: 1
+  marketsPerExtraMoment: 40
+  maxMoments: 6
+  maxDecisions: 2
+  activeFans: 1000
+  historyLimit: 60
+  minFactor: 0.25
+  maxFactor: 3
+cards:
+  - id: open-doors
+    kind: decision
+    tone: positive
+    priority: 100
+    trigger: audience
+    minQuarter: 1
+    minFans: 100
+    minHardcore: 10
+    minTier: 1
+    anchorOnly: true
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    defaultChoice: hold
+    choices:
+      - id: welcome
+        cost: 8
+        effects:
+          - { type: conversion, target: casual, factor: 1.35, quarters: 4 }
+          - { type: conversion, target: hardcore, factor: 0.85, quarters: 4 }
+      - id: regulars
+        cost: 0
+        effects:
+          - { type: conversion, target: hardcore, factor: 1.2, quarters: 4 }
+          - { type: conversion, target: casual, factor: 0.85, quarters: 4 }
+      - { id: hold, cost: 0, effects: [] }
+  - id: first-following
+    kind: moment
+    tone: positive
+    priority: 60
+    trigger: audience
+    minQuarter: 1
+    minFans: 1000
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: country
+    cooldownTurns: null
+    health: []
+    effects: [{ type: pp, amount: 5 }]
+    choices: []
+    defaultChoice: null
+  - id: league-arrival
+    kind: moment
+    tone: positive
+    priority: 80
+    trigger: leagueFormed
+    minQuarter: 1
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: country
+    cooldownTurns: null
+    health: []
+    effects: [{ type: pp, amount: 10 }]
+    choices: []
+    defaultChoice: null
+  - id: moving-up
+    kind: moment
+    tone: positive
+    priority: 90
+    trigger: leaguePromoted
+    minQuarter: 1
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: country
+    cooldownTurns: 8
+    health: []
+    effects: [{ type: pp, amount: 12 }]
+    choices: []
+    defaultChoice: null
+  - id: local-airtime
+    kind: decision
+    tone: positive
+    priority: 50
+    trigger: audience
+    minQuarter: 8
+    minFans: 30000
+    minHardcore: 200
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: 12
+    health: []
+    effects: []
+    defaultChoice: hold
+    choices:
+      - id: broadcast
+        cost: 35
+        effects:
+          - { type: spread, target: media, factor: 1.5, quarters: 8 }
+          - { type: conversion, target: hardcore, factor: 0.9, quarters: 8 }
+      - id: neighbourhood
+        cost: 20
+        effects:
+          - { type: spread, target: proximity, factor: 1.35, quarters: 8 }
+          - { type: fanShift, target: uninterestedToCasual, share: 0.0001 }
+      - { id: hold, cost: 0, effects: [] }
+  - id: crowded-sidelines
+    kind: decision
+    tone: positive
+    priority: 40
+    trigger: audience
+    minQuarter: 4
+    minFans: 5000
+    minHardcore: 50
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: 10
+    health: []
+    effects: []
+    defaultChoice: hold
+    choices:
+      - id: recruit
+        cost: 20
+        effects: [{ type: fanShift, target: casualToHardcore, share: 0.02 }]
+      - id: fundraise
+        cost: 0
+        effects:
+          - { type: pp, amount: 12 }
+          - { type: conversion, target: casual, factor: 0.85, quarters: 4 }
+      - { id: hold, cost: 0, effects: [] }
+  - id: league-under-strain
+    kind: decision
+    tone: pressure
+    priority: 95
+    trigger: leaguePressure
+    minQuarter: 1
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: 4
+    health: [struggling, near-collapse]
+    effects: []
+    defaultChoice: hold
+    choices:
+      - id: regroup
+        cost: 30
+        effects:
+          - { type: leagueHealth, steps: 1 }
+          - { type: hardcoreDemotion, share: 0.02 }
+      - id: outreach
+        cost: 15
+        effects:
+          - { type: conversion, target: casual, factor: 1.25, quarters: 4 }
+          - { type: conversion, target: hardcore, factor: 0.9, quarters: 4 }
+      - { id: hold, cost: 0, effects: [] }
+  - id: rival-pushback
+    kind: decision
+    tone: pressure
+    priority: 70
+    trigger: rivalEscalated
+    minQuarter: 1
+    minFans: 1000
+    minHardcore: 100
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: 8
+    health: []
+    effects: []
+    defaultChoice: hold
+    choices:
+      - id: challenge
+        cost: 25
+        effects:
+          - { type: rivalSetback, share: 0.005 }
+          - { type: conversion, target: casual, factor: 0.9, quarters: 4 }
+      - id: build
+        cost: 15
+        effects: [{ type: conversion, target: hardcore, factor: 1.2, quarters: 4 }]
+      - { id: hold, cost: 0, effects: [] }

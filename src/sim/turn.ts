@@ -1,4 +1,5 @@
 import { turnLengthQuarters } from "./calendar";
+import { offerEvents, settleEvents } from "./events";
 import { evaluateLeagues } from "./leagues";
 import { stepQuarter } from "./quarter";
 import { applyDefaultSlotDrops, updateTierTrack } from "./tiers";
@@ -25,7 +26,7 @@ export function endTurn(state: GameState, world: World): GameState {
       `The campaign ended on turn ${state.outcome.turn} (${state.outcome.kind}); no more turns can be played`,
     );
   }
-  const start = applyDefaultSlotDrops(state);
+  const start = applyDefaultSlotDrops(settleEvents(state, world));
   const quarters = turnLengthQuarters(start.ppTier, world.config);
   let next = start;
   for (let i = 0; i < quarters; i += 1) next = stepQuarter(next, world);
@@ -42,7 +43,7 @@ export function endTurn(state: GameState, world: World): GameState {
   };
   next = updateTierTrack(next, world);
   next = updateWinTrack(next, world);
-  return { ...next, turn: start.turn + 1 };
+  return offerEvents({ ...next, turn: start.turn + 1 }, world, quarters);
 }
 
 /** Plays up to `turns` turns in a row, calling `onTurn` after each; stops if the campaign ends. */

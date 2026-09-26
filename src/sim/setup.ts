@@ -1,5 +1,6 @@
 import { genomeSchema, startingRivalFanCounts } from "../content";
 import { tierEntry } from "./calendar";
+import { emptyEvents } from "./events-state";
 import { newLeague } from "./leagues";
 import { landmarks } from "./records";
 import { newFront, newRivalState } from "./rivals";
@@ -104,6 +105,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     countries,
     landmarks: [landmarks.leagueFormed(1, 0, setup.anchorCountryId, false)],
     yearly: [],
+    events: emptyEvents(1),
   };
 }
 

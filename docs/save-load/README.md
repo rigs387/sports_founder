@@ -34,7 +34,8 @@ Within a turn, actions replace the latest history point rather than adding a fic
 
 `.sfsave` is gzip-compressed JSON using Node's built-in zlib. No dependency was added.
 Session format **1** contains `campaign`, `history` and `selectedCountryId`. The campaign
-keeps the existing simulation format **6** and its migrations from formats 1–5. Future
+now uses simulation format **7** and its migrations from formats 1–6, including
+[pending event choices and temporary effects](../events/README.md). Future
 session shape changes need their own migration; unknown future versions are rejected.
 Plain JSON simulation saves remain importable; their missing presentation history starts at
 the loaded turn instead of reconstructing observations that were never recorded.
@@ -82,4 +83,5 @@ The reload check exposed a Pixi initialization race: camera reset can deliver a 
 while `Application.init()` is pending. The map now waits for the initialized context before
 creating its viewport. The existing geometry, map renderer and dependency versions are unchanged.
 
-Next Phase 0 system: events and player decision cards.
+The next system, [events and player decision cards](../events/README.md), is now playable with
+an initial eight-card deck. The screenshots and benchmark above describe the original save/load pass.

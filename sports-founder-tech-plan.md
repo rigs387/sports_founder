@@ -375,9 +375,11 @@ fill gaps.
 
 **Saves.**
 - Compressed JSON (gzip through Node's built-in zlib in the Electron main process).
-  Implemented 2026-09-26: `.sfsave` files wrap simulation format 6 in session format 1,
+  Implemented 2026-09-26: `.sfsave` files wrap simulation format 7 in session format 1,
   preserving country history and pinned country. Existing plain JSON saves still import.
   This replaces the proposed fflate dependency; a future browser port will need a browser codec.
+  Format 7 adds pending events, recent receipts, cooldowns and temporary local effects;
+  format 6 migrates without replaying old landmarks as new rewards.
 - Every save carries a format version, with migration steps so Early Access saves remain loadable.
 - Atomic writes: write to a temp file, then swap, so a crash mid-save can't corrupt a campaign.
 - Steam Cloud sync is deferred with Steam integration; current files are local.

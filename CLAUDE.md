@@ -11,6 +11,7 @@ content/              Game content and balance config (YAML data only; validated
   countries.yaml      The 213 real markets and their attributes (World Bank, GeoNames, hand calls)
   genome.yaml         Genome option modifiers and quick-start presets
   growth-tree.yaml    PP growth tree: categories and unlock tiers, nodes, effects, forks
+  events.yaml         Fact-based moments and decisions, effects, cooldowns and queue limits
   sports.yaml         Rival sports (soccer, cricket) and the "other sports" bucket
   names.yaml          All display names for countries and sports (the one moddable names file)
   sources.yaml        Where every country figure comes from: dataset and year, estimates tagged
@@ -122,6 +123,12 @@ runs/                 Runner and smoke-test output (git-ignored)
 - Open external links in the system browser.
 
 ## Saves
+- Events live in `src/sim/events.ts`. End Turn collects unopened moments and resolves unanswered
+  decisions with their content-defined free, no-effect default before simulating quarters.
+  New cards are offered after the turn from real audience, league and rival facts. Choices and
+  collections go through `applyAction`; temporary effects are local and expire by quarter.
+- Save format 7 carries pending cards, recent receipts, cooldowns and active effects. Format 6
+  migrates to an empty journal with the landmark cursor at the current end (no retroactive rewards).
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.
