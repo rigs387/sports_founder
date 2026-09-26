@@ -1,0 +1,183 @@
+.country-league-controls {
+  margin: 8px 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px;
+  background: #f1f6fd;
+}
+.country-league-controls > summary {
+  cursor: pointer;
+  color: var(--second);
+  font-size: 12px;
+  font-weight: 700;
+}
+.league-management {
+  color: var(--ink);
+}
+.leagues-dialog {
+  width: min(850px, 94vw);
+  max-height: calc(100svh - 48px);
+  padding: 20px;
+}
+.league-finances {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 15px 0 8px;
+}
+.league-finances div {
+  min-width: 0;
+}
+.league-finances dt {
+  font-size: 10px;
+  color: var(--muted);
+}
+.league-finances dd {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+.league-finances .negative {
+  color: #a63e32;
+}
+.league-finances .positive {
+  color: #236f59;
+}
+.league-overview .league-finances {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.league-management .league-finance-note {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.league-management .league-anchor-note {
+  padding: 9px;
+  border-left: 3px solid var(--accent);
+  background: #e9f0fe;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.league-action {
+  margin-top: 10px;
+  padding: 11px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.league-action > summary {
+  cursor: pointer;
+  font-size: 12px;
+}
+.league-action > summary > span {
+  float: right;
+  font-size: 10px;
+  color: var(--muted);
+}
+.league-management .league-quote,
+.league-confirm .league-quote {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.league-terms {
+  margin: 10px 0;
+  padding-left: 16px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.league-terms li {
+  margin-bottom: 5px;
+}
+.league-management .league-blocker,
+.league-confirm .league-blocker {
+  font-size: 11px;
+  color: #526c80;
+  line-height: 1.5;
+}
+.league-action .action-button {
+  width: 100%;
+  font-size: 11px;
+}
+.league-picker {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: 12px;
+}
+.league-picker select {
+  min-width: 0;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  color: var(--ink);
+}
+.league-overview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+.league-overview-heading h3 {
+  margin: 0;
+  font-size: 23px;
+}
+.league-overview-heading p {
+  margin: 4px 0;
+}
+.league-overview-heading button {
+  font-size: 11px;
+}
+.league-confirm {
+  width: min(510px, calc(100vw - 28px));
+  max-height: calc(100svh - 28px);
+  overflow: auto;
+  padding: 25px;
+  background: white;
+  color: var(--ink);
+  border: 2px solid #2d5482;
+  border-radius: 14px;
+  box-shadow: 0 20px 70px #12324d66;
+}
+.league-confirm::backdrop {
+  background: #12324da6;
+  backdrop-filter: blur(3px);
+}
+.league-confirm h2 {
+  margin: 8px 0 16px;
+}
+.league-confirm-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+.league-confirm-buttons > button:first-child {
+  border: 0;
+  padding: 8px;
+  color: var(--ink);
+  background: none;
+}
+.league-confirm-buttons .action-button {
+  font-size: 12px;
+}
+@media (max-width: 500px) {
+  .league-overview .league-finances {
+    grid-template-columns: 1fr 1fr;
+  }
+  .league-overview-heading {
+    flex-wrap: wrap;
+  }
+  .league-picker select {
+    font-size: 12px;
+  }
+  .league-confirm {
+    padding: 18px;
+  }
+}

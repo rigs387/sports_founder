@@ -6,8 +6,8 @@ the controls and country cards.** The SVG studies remain visual references.
 
 ![Live game at 1280 by 800, after three turns.](assets/previews/pixi-live.png)
 
-Run `npm.cmd run dev` from the project root to play it. The startup campaign retains the
-existing worker's default sport preset and Albania anchor.
+Run `npm.cmd run dev` from the project root to play it. The game opens on
+[campaign setup](../campaign-setup/README.md), where you choose the anchor, genome and seed.
 
 ## Working now
 
@@ -24,8 +24,11 @@ existing worker's default sport preset and Albania anchor.
 - Select a country, choose a slot in **Focus your effort**, and assign it at the displayed
   Prestige cost. Existing assignments are explicitly replaced. **Your sport** lists the
   current slots and lets you choose which to give up after a demotion.
-- **Leagues** remains an inspection view. Campaign setup, a full growth-tree layout,
-  league-management controls, save/load and events are later work.
+- **Growth** now has its own [full-screen Clubhouse board](../growth-tree/production.md), including
+  upgrade paths, effect details, and confirmation of permanent fork choices.
+- **Leagues** and country cards now offer [league management](../league-management/README.md):
+  promotion, restructuring and bailouts with current terms and eligibility. Save/load and events
+  remain later work.
 
 ![Tuvalu selected through its expanded target.](assets/previews/pixi-tuvalu.png)
 

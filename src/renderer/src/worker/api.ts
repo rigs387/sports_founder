@@ -1,12 +1,14 @@
 import type { Names, World } from "../../../content";
 import {
   type Action,
+  anchorGenomeHints,
   applyAction,
+  type CampaignSetup,
   createCampaign,
-  defaultGenome,
   endTurn,
   type GameState,
   IllegalActionError,
+  MAX_SEED,
   snapshot,
   type TurnSnapshot,
 } from "../../../sim";
@@ -19,14 +21,22 @@ export type ActionResult =
 export function createSimWorkerApi(world: World) {
   let state: GameState | null = null;
   return {
-    newCampaign(seed: number): TurnSnapshot {
-      const anchor = world.countries[0];
-      if (!anchor) throw new Error("Content has no countries");
-      state = createCampaign(world, {
-        seed,
-        anchorCountryId: anchor.id,
-        genome: defaultGenome(world),
-      });
+    setupOptions() {
+      return {
+        seedMax: MAX_SEED,
+        countries: world.countries.map(({ id, population, continent }) => ({
+          id,
+          population,
+          continent,
+        })),
+        presets: world.genome.presets.map(({ id, genome }) => ({ id, genome: { ...genome } })),
+      };
+    },
+    anchorHints(countryId: string) {
+      return anchorGenomeHints(world, countryId);
+    },
+    newCampaign(setup: CampaignSetup): TurnSnapshot {
+      state = createCampaign(world, setup);
       return snapshot(state, world);
     },
     endTurn(): TurnSnapshot {
@@ -52,3 +62,4 @@ export function createSimWorkerApi(world: World) {
 }
 
 export type SimWorkerApi = ReturnType<typeof createSimWorkerApi>;
+export type SetupOptions = ReturnType<SimWorkerApi["setupOptions"]>;

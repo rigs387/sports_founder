@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActionFeedback } from "./components/ActionFeedback";
 import { CampaignOverview, type Overview } from "./components/CampaignOverview";
+import { CampaignSetupScreen } from "./components/CampaignSetupScreen";
 import { CountryCard } from "./components/CountryCard";
 import { FocusControls } from "./components/FocusControls";
+import { LeagueControls } from "./components/LeagueControls";
+import { GrowthScreen } from "./growth/GrowthScreen";
 import { heatBand, mapSettings } from "./map/model";
 import { type MapCommand, type MapHover, WorldMap } from "./map/WorldMap";
 import { useGameStore } from "./state/game-store";
@@ -17,7 +20,7 @@ export function App() {
     history,
     selectedCountryId,
     error,
-    startCampaign,
+    loadSetup,
     endTurn,
     selectCountry,
     dispatchAction,
@@ -28,8 +31,8 @@ export function App() {
   const [rivals, setRivals] = useState(true);
   const [overview, setOverview] = useState<Overview | null>(null);
   useEffect(() => {
-    void startCampaign();
-  }, [startCampaign]);
+    void loadSetup();
+  }, [loadSetup]);
   const navigate = (kind: MapCommand["kind"], market?: string) =>
     setCommand((previous) => ({ kind, market, serial: previous.serial + 1 }));
   const countryName = (id: string) => names?.countries[id] ?? id;
@@ -64,6 +67,8 @@ export function App() {
       )
     : "";
 
+  if (!snapshot) return <CampaignSetupScreen />;
+
   return (
     <main
       className="game-screen"
@@ -73,6 +78,9 @@ export function App() {
       data-quarter={snapshot?.quarter}
       data-player-fandom-score={player?.fandomScore}
       data-pp={snapshot?.pp}
+      data-anchor={snapshot.anchorCountryId}
+      data-seed={snapshot.seed}
+      data-genome={JSON.stringify(snapshot.genome)}
     >
       <header className="game-topbar">
         <div className="game-brand">
@@ -88,14 +96,21 @@ export function App() {
         <nav className="game-nav" aria-label={t("map.navigation")}>
           <button
             type="button"
-            className="active"
+            className={overview ? undefined : "active"}
             onClick={() => setOverview(null)}
             aria-current={overview ? undefined : "page"}
           >
             {t("map.nav.world")}
           </button>
           {(["sport", "leagues", "growth"] as const).map((view) => (
-            <button type="button" key={view} disabled={!snapshot} onClick={() => setOverview(view)}>
+            <button
+              type="button"
+              key={view}
+              className={overview === view ? "active" : undefined}
+              aria-current={overview === view ? "page" : undefined}
+              disabled={!snapshot}
+              onClick={() => setOverview(view)}
+            >
               {t(`map.nav.${view}`)}
             </button>
           ))}
@@ -121,12 +136,22 @@ export function App() {
           className="icon-button"
           title={t("map.home")}
           aria-label={t("map.home")}
-          onClick={() => navigate("home")}
+          onClick={() => {
+            setOverview(null);
+            navigate("home");
+          }}
         >
           &#8982;
         </button>
       </header>
-      <section className="world-stage" aria-label={t("map.stage")}>
+      <GrowthScreen
+        snapshot={snapshot}
+        error={error}
+        active={overview === "growth"}
+        busy={status !== "ready"}
+        onAction={(action) => void dispatchAction(action)}
+      />
+      <section className="world-stage" hidden={overview === "growth"} aria-label={t("map.stage")}>
         {snapshot && (
           <WorldMap
             countryNames={names?.countries ?? {}}
@@ -228,6 +253,24 @@ export function App() {
             turn={snapshot.turn}
             onClose={() => selectCountry(null)}
             onLocate={() => navigate("locate", selected.countryId)}
+            leagueControls={
+              selected.league && (
+                <details
+                  className="country-league-controls"
+                  key={selected.countryId}
+                  data-testid="country-league-controls"
+                >
+                  <summary>{t("league.manage.heading")}</summary>
+                  <LeagueControls
+                    country={selected}
+                    countryName={countryName(selected.countryId)}
+                    snapshot={snapshot}
+                    busy={status !== "ready"}
+                    onAction={(action) => void dispatchAction(action)}
+                  />
+                </details>
+              )
+            }
           >
             <FocusControls
               country={selected}
@@ -319,8 +362,9 @@ export function App() {
           </div>
         )}
       </section>
-      <footer className="game-bottom">
-        <div className="map-legend">
+      <footer className={`game-bottom${overview === "growth" ? " is-growth" : ""}`}>
+        {overview === "growth" && <p className="growth-footer-note">{t("growth.board.footer")}</p>}
+        <div className="map-legend" hidden={overview === "growth"}>
           <span>{t("map.strength")}</span>
           <div className="legend-swatches">
             {[null, ...mapSettings.heatBands].map((threshold, index) => (
@@ -358,7 +402,7 @@ export function App() {
           </span>
           <b>{t("turn.label", { turn: snapshot?.turn ?? 1 })}</b>
         </div>
-        <div className="map-options">
+        <div className="map-options" hidden={overview === "growth"}>
           <label>
             <input
               type="checkbox"
@@ -395,8 +439,9 @@ export function App() {
             })
           : ""}
       </div>
-      {overview && snapshot && names && (
+      {overview && overview !== "growth" && snapshot && names && (
         <CampaignOverview
+          initialCountryId={selectedCountryId}
           view={overview}
           snapshot={snapshot}
           names={names}

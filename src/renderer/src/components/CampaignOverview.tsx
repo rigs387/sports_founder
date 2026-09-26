@@ -4,16 +4,18 @@ import type { Names } from "../../../content";
 import { AXIS_IDS } from "../../../content/genome-axes";
 import type { Action, TurnSnapshot } from "../../../sim";
 import { ActionFeedback } from "./ActionFeedback";
+import { LeagueOverview } from "./LeagueOverview";
 
 export type Overview = "sport" | "leagues" | "growth";
 interface Props {
-  view: Overview;
+  view: Exclude<Overview, "growth">;
   snapshot: TurnSnapshot;
   names: Names;
   onClose: () => void;
   onSelect: (id: string) => void;
   onAction: (action: Action) => void;
   busy: boolean;
+  initialCountryId: string | null;
 }
 
 /** The existing campaign readouts remain available while the map is the main screen. */
@@ -25,12 +27,9 @@ export function CampaignOverview({
   onSelect,
   onAction,
   busy,
+  initialCountryId,
 }: Props) {
-  const { t, i18n } = useTranslation();
-  const nodeNames = (ids: string[]) =>
-    new Intl.ListFormat(i18n.language, { style: "long" }).format(
-      ids.map((id) => t(`growth.nodes.${id}`)),
-    );
+  const { t } = useTranslation();
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const element = dialog.current;
@@ -41,9 +40,11 @@ export function CampaignOverview({
   return (
     <dialog
       ref={dialog}
-      className="overview-dialog"
+      className={`overview-dialog${view === "leagues" ? " leagues-dialog" : ""}`}
       aria-labelledby="overview-title"
-      onCancel={onClose}
+      onCancel={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
     >
       <header>
         <div>
@@ -59,7 +60,7 @@ export function CampaignOverview({
           &times;
         </button>
       </header>
-      <ActionFeedback />
+      {view === "sport" && <ActionFeedback />}
       {view === "sport" && (
         <>
           <p>
@@ -116,97 +117,17 @@ export function CampaignOverview({
         </>
       )}
       {view === "leagues" && (
-        <>
-          <p>{t("map.leagueOverview")}</p>
-          <div className="overview-list">
-            {snapshot.countries
-              .filter((country) => country.league)
-              .map((country) => (
-                <button
-                  type="button"
-                  className="league-row"
-                  key={country.countryId}
-                  onClick={() => {
-                    onSelect(country.countryId);
-                    onClose();
-                  }}
-                >
-                  <strong>{name(country.countryId)}</strong>
-                  <span>{t(`league.tiers.${country.league?.tier}`)}</span>
-                  <span>{t(`league.healthLevels.${country.league?.health}`)}</span>
-                  <span>{t("map.reserve", { value: country.league?.cash })}</span>
-                </button>
-              ))}
-          </div>
-        </>
-      )}
-      {view === "growth" && (
-        <>
-          <p>{t("map.growthOverview")}</p>
-          <p>{t("actions.growthBudget", { pp: snapshot.pp })}</p>
-          <ul className="growth-list">
-            {snapshot.growthNodes.map((node) => (
-              <li
-                key={node.nodeId}
-                data-node={node.nodeId}
-                data-status={node.status}
-                data-cost={node.cost}
-              >
-                <div>
-                  <strong>{t(`growth.nodes.${node.nodeId}`)}</strong>
-                  <small>{t(`growth.categories.${node.category}`)}</small>
-                  {node.lock?.kind === "tier" && (
-                    <small>
-                      {t("actions.lockTier", {
-                        tier: node.lock.unlockTier,
-                        name: t(`tiers.${node.lock.unlockTier}`),
-                      })}
-                    </small>
-                  )}
-                  {node.lock?.kind === "prerequisites" && (
-                    <small>
-                      {t("actions.lockPrerequisites", { nodes: nodeNames(node.lock.missing) })}
-                    </small>
-                  )}
-                  {node.lock?.kind === "fork" && (
-                    <small>
-                      {t("actions.lockFork", { node: t(`growth.nodes.${node.lock.takenBy}`) })}
-                    </small>
-                  )}
-                  {node.status !== "owned" &&
-                    node.lock?.kind !== "fork" &&
-                    node.forkSiblings.length > 0 && (
-                      <small className="fork-warning">
-                        {t("actions.forkWarning", { nodes: nodeNames(node.forkSiblings) })}
-                      </small>
-                    )}
-                </div>
-                <span>
-                  {node.status === "owned"
-                    ? t("growth.owned")
-                    : t(node.affordable ? "growth.cost" : "growth.tooExpensive", {
-                        cost: node.cost,
-                      })}
-                </span>
-                <button
-                  type="button"
-                  className="action-button"
-                  data-testid="buy-node"
-                  disabled={
-                    busy || !!snapshot.outcome || node.status !== "available" || !node.affordable
-                  }
-                  aria-label={t("actions.buyNamed", {
-                    node: t(`growth.nodes.${node.nodeId}`),
-                    cost: node.cost,
-                  })}
-                  onClick={() => onAction({ type: "buyNode", nodeId: node.nodeId })}
-                >
-                  {t(node.status === "available" ? "actions.buy" : `map.nodeStatus.${node.status}`)}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </>
+        <LeagueOverview
+          snapshot={snapshot}
+          names={names}
+          busy={busy}
+          initialCountryId={initialCountryId}
+          onAction={onAction}
+          onInspect={(id) => {
+            onSelect(id);
+            onClose();
+          }}
+        />
       )}
     </dialog>
   );

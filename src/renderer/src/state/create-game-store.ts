@@ -1,13 +1,14 @@
 import { create } from "zustand";
 import type { Names } from "../../../content";
-import type { Action, TurnSnapshot } from "../../../sim";
-import type { ActionResult } from "../worker/api";
+import type { Action, CampaignSetup, TurnSnapshot } from "../../../sim";
+import type { ActionResult, SetupOptions } from "../worker/api";
 import { type CountryHistory, recordHistory } from "./history";
 
-type Status = "idle" | "loading" | "ready" | "acting" | "simulating" | "error";
+type Status = "idle" | "loading" | "setup" | "ready" | "acting" | "simulating" | "error";
 
 export interface GameClient {
-  newCampaign: (seed: number) => Promise<TurnSnapshot>;
+  newCampaign: (setup: CampaignSetup) => Promise<TurnSnapshot>;
+  setupOptions: () => Promise<SetupOptions>;
   names: () => Promise<Names>;
   endTurn: () => Promise<TurnSnapshot>;
   applyAction: (action: Action) => Promise<ActionResult>;
@@ -17,13 +18,16 @@ interface GameStore {
   status: Status;
   snapshot: TurnSnapshot | null;
   names: Names | null;
+  setupOptions: SetupOptions | null;
+  setupError: "load" | "start" | null;
   error: string | null;
   actionError: "rejected" | "unavailable" | null;
   lastAction: Action | null;
   history: CountryHistory;
   selectedCountryId: string | null;
   selectCountry: (id: string | null) => void;
-  startCampaign: () => Promise<void>;
+  loadSetup: () => Promise<void>;
+  startCampaign: (setup: CampaignSetup) => Promise<void>;
   endTurn: () => Promise<void>;
   dispatchAction: (action: Action) => Promise<void>;
 }
@@ -36,6 +40,8 @@ export const createGameStore = (sim: GameClient, historyLimit: number) =>
     status: "idle",
     snapshot: null,
     names: null,
+    setupOptions: null,
+    setupError: null,
     error: null,
     actionError: null,
     lastAction: null,
@@ -47,22 +53,30 @@ export const createGameStore = (sim: GameClient, historyLimit: number) =>
       set({ selectedCountryId: id });
     },
 
-    async startCampaign() {
-      if (get().status !== "idle") return;
-      set({ status: "loading" });
+    async loadSetup() {
+      if (get().snapshot || !["idle", "error"].includes(get().status)) return;
+      set({ status: "loading", setupError: null });
       try {
-        // Seed choice happens outside the simulation; everything after it is deterministic.
-        const seed = crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
-        const [snapshot, names] = await Promise.all([sim.newCampaign(seed), sim.names()]);
+        const [setupOptions, names] = await Promise.all([sim.setupOptions(), sim.names()]);
+        set({ status: "setup", setupOptions, names });
+      } catch {
+        set({ status: "error", setupError: "load" });
+      }
+    },
+
+    async startCampaign(setup) {
+      if (get().status !== "setup") return;
+      set({ status: "loading", setupError: null });
+      try {
+        const snapshot = await sim.newCampaign(setup);
         set({
           status: "ready",
           snapshot,
-          names,
           history: recordHistory({}, snapshot, historyLimit),
           selectedCountryId: snapshot.anchorCountryId,
         });
-      } catch (error) {
-        set({ status: "error", error: messageOf(error) });
+      } catch {
+        set({ status: "setup", setupError: "start" });
       }
     },
 

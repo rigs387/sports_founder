@@ -1,5 +1,6 @@
-import { costMultiplier, seasonalWindowOpen } from "./calendar";
+import { costMultiplier } from "./calendar";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
+import { leagueActionReason, leagueActions } from "./league-actions";
 import {
   bailoutTerms,
   demoteHardcore,
@@ -134,39 +135,9 @@ export function checkAction(state: GameState, world: World, action: Action): str
   const league = country?.league ?? null;
   if (!country || league === null) return `"${action.countryId}" has no league`;
 
-  if (action.type === "promoteLeague") {
-    if (!seasonalWindowOpen(state, world.config)) {
-      return "leagues can only be promoted in the seasonal window";
-    }
-    const terms = promotionTerms(world, index, league.tier, state.growthNodes);
-    if (terms === null) return `the league is already ${league.tier}, the top tier`;
-    const hardcore = country.fans[PLAYER_INDEX]?.hardcore ?? 0;
-    if (hardcore < terms.hardcoreNeeded) {
-      return `not enough hardcore fans for ${terms.to}: needs ${terms.hardcoreNeeded}, has ${hardcore}`;
-    }
-    if (league.cash < terms.reserveNeeded) {
-      return `not enough cash reserve for ${terms.to}: needs ${money(terms.reserveNeeded)}, has ${money(league.cash)}`;
-    }
-    return null;
-  }
-
-  if (action.type === "stepDownLeague") {
-    if (league.health !== "near-collapse") {
-      return `a league can only step down at near-collapse (it is ${league.health})`;
-    }
-    if (leagueTierIndex(league.tier) === 0) return "an amateur league cannot step down further";
-    return null;
-  }
-
-  if (league.health === "healthy") return "bailouts are only for leagues in trouble";
-  if (state.quarter < league.bailoutReadyQuarter) {
-    return `bailout cooldown: available again at quarter ${league.bailoutReadyQuarter}`;
-  }
-  const terms = bailoutTerms(state, world, index);
-  if (state.pp < terms.ppCost) {
-    return `not enough PP: a bailout costs ${money(terms.ppCost)}, you have ${money(state.pp)}`;
-  }
-  return null;
+  const options = leagueActions(state, world, index);
+  if (!options) throw new Error("unreachable: league was checked");
+  return leagueActionReason(options[action.type].blocker);
 }
 
 /** Applies a legal action. Throws IllegalActionError otherwise. Pure: returns a new state. */

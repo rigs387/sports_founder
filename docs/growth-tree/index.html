@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-look="clubhouse">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sports Founder — Growth tree studies</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="data.js"></script>
+    <script defer src="study.js"></script>
+  </head>
+  <body>
+    <div class="review-bar">
+      <a href="../world-map/index.html">← World map</a>
+      <fieldset class="look-options" aria-label="Visual options">
+        <button type="button" data-look="clubhouse" aria-pressed="true">01 / Clubhouse board</button>
+        <button type="button" data-look="floodlit" aria-pressed="false">02 / Under the lights</button>
+        <button type="button" data-look="album" aria-pressed="false">03 / Club collection</button>
+      </fieldset>
+      <span>DESIGN PLAYGROUND</span>
+    </div>
+    <main class="game">
+      <header class="topbar">
+        <a class="brand" href="../world-map/index.html"><b>SF<span>★</span></b><span>SPORTS<br>FOUNDER</span></a>
+        <nav aria-label="Screen context"><a href="../world-map/index.html">World</a><span>Your sport</span><span>Leagues</span><strong>Growth</strong></nav>
+        <div class="resource"><span>✦</span><div><small>EXAMPLE PRESTIGE / PP</small><b id="budget">460</b></div></div>
+        <span class="tier">TIER 02</span>
+      </header>
+      <section class="heading">
+        <div><p class="eyebrow">THE NEXT CHAPTER / YOUR SPORT</p><h1 id="headline">Build a following.</h1></div>
+        <p class="heading-note">A bigger sport starts with a choice.<br><strong>Every purchase stays with you.</strong></p>
+      </section>
+      <div class="category-bar">
+        <fieldset class="categories" aria-label="Growth categories">
+          <button type="button" data-category="grassroots" aria-pressed="true">01 <b>Grassroots</b><span>Tier 1</span></button>
+          <button type="button" data-category="media" aria-pressed="false">02 <b>Media</b><span>Tier 2</span></button>
+        </fieldset>
+        <label class="node-selector">Find upgrade <select id="node-select" aria-label="Find any upgrade"></select></label>
+      </div>
+      <div class="workspace">
+        <section class="tree-panel" aria-label="Upgrade paths">
+          <div class="board-caption"><span id="category-description">LOCAL PEOPLE. LASTING ROOTS.</span><span id="owned-count">3 / 10 OWNED</span></div>
+          <div class="board-scroll">
+            <div class="board" id="board"><svg class="routes" viewBox="0 0 812 430" aria-hidden="true"></svg><div id="nodes"></div></div>
+          </div>
+          <div class="legend"><span><i class="owned-dot"></i>Owned</span><span><i class="ready-dot"></i>Available</span><span><i class="locked-dot"></i>Locked</span><span class="fork-key">↔ Permanent choice</span></div>
+        </section>
+        <aside id="inspector" class="inspector" aria-label="Selected upgrade"></aside>
+      </div>
+      <footer class="game-footer"><span id="status" role="status" aria-live="polite">Select an upgrade to explore its effects.</span><button type="button" id="reset">Reset example ↺</button></footer>
+    </main>
+    <div class="study-notes"><p><b id="look-name">Clubhouse board</b><span id="look-caption"></span></p><small>Interactive study · example budget & ownership · content base prices, before campaign scaling</small></div>
+    <dialog id="choice-dialog" aria-labelledby="choice-title"><form method="dialog"><button type="submit" class="dialog-close" aria-label="Cancel choice">×</button></form><p class="eyebrow">A PERMANENT DIRECTION</p><h2 id="choice-title">Choose your path.</h2><p id="choice-warning"></p><div id="comparison"></div><div class="dialog-actions"><button type="button" id="cancel-choice">Keep thinking</button><button type="button" id="confirm-choice" class="buy">Commit to this path</button></div></dialog>
+    <noscript>Enable JavaScript to explore the three offline studies.</noscript>
+  </body>
+</html>

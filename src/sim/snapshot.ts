@@ -1,9 +1,11 @@
+import type { NodeEffect } from "../content";
 import { focusCostFromExposure } from "./actions";
 import { seasonalWindowOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
 import { mediaRevenueFactor } from "./countermoves";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { growthFactorsAt, type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
+import { type LeagueActions, leagueActions } from "./league-actions";
 import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
 import { computeExposure } from "./spread";
 import { tierStatus } from "./tiers";
@@ -25,6 +27,7 @@ import { countsTowardHold, standing } from "./win";
 const QUARTERS_PER_YEAR = 4;
 
 export interface LeagueSnapshot {
+  actions: LeagueActions;
   tier: LeagueTierId;
   health: HealthLevel;
   cash: number;
@@ -104,6 +107,9 @@ export interface GrowthNodeSnapshot {
   requires: string[];
   /** Fork siblings this node would lock out, or that lock it out. */
   forkSiblings: string[];
+  /** Base modifiers; country conditions and stacking still apply in the simulation. */
+  effects: NodeEffect[];
+  unlockTier: number;
 }
 
 /** What the UI shows after a turn. Plain data, cheap to send across the worker boundary. */
@@ -145,6 +151,8 @@ export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeS
       lock: blocker === null || blocker.kind === "owned" ? null : blocker,
       requires: [...node.requires],
       forkSiblings: fork ? fork.nodes.filter((id) => id !== node.id) : [],
+      effects: node.effects,
+      unlockTier: world.growthTree.categories[node.category]?.unlockTier ?? 1,
     };
   });
 }
@@ -183,6 +191,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
       league: league
         ? {
             tier: league.tier,
+            actions: leagueActions(state, world, index) as LeagueActions,
             health: league.health,
             cash: league.cash,
             revenuePerQuarter: revenuePerQuarter(

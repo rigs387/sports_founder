@@ -4,6 +4,10 @@ Start with the [world map's current direction](world-map/README.md): **Matchday 
 
 - [Open the current interactive preview](world-map/index.html)
 - [Live Pixi game screen and screenshots](world-map/production.md)
+- [Campaign setup and screenshot](campaign-setup/README.md)
+- [Clubhouse growth board: live screen and choices](growth-tree/production.md)
+- [League management: promotion, restructuring and bailouts](league-management/README.md)
+- [Growth tree visual studies](growth-tree/README.md)
 - [World map implementation brief](world-map/brief.html)
 - [Earlier visual studies](world-map/README.md#earlier-studies)
 

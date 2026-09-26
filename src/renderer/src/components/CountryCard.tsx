@@ -14,6 +14,7 @@ interface Props {
   onClose: () => void;
   onLocate: () => void;
   children?: ReactNode;
+  leagueControls?: ReactNode;
 }
 export function CountryCard({
   country,
@@ -24,6 +25,7 @@ export function CountryCard({
   onClose,
   onLocate,
   children,
+  leagueControls,
 }: Props) {
   const { t, i18n } = useTranslation();
   const compact = (value: number) => t("format.compact", { value });
@@ -157,6 +159,7 @@ export function CountryCard({
             </span>
           )}
         </div>
+        {leagueControls}
         <div className={`rival-strip ${defending ? "contested" : ""}`}>
           <span aria-hidden="true">{defending ? "!" : "\u25c7"}</span>
           <div>

@@ -10,7 +10,7 @@ const funded = withConfig(world, (config) => {
 describe("worker action boundary", () => {
   it("buys once, rejects duplicates, and carries the purchase into the next simulated turn", () => {
     const api = createSimWorkerApi(funded);
-    const before = api.newCampaign(12);
+    const before = api.newCampaign(setupFor(12));
     const action = { type: "buyNode", nodeId: "backyard-clinics" } as const;
     const bought = api.applyAction(action);
     expect(bought.ok).toBe(true);
@@ -34,7 +34,7 @@ describe("worker action boundary", () => {
 
   it("quotes authoritative focus costs, replaces the selected slot, and rejects a duplicate", () => {
     const api = createSimWorkerApi(funded);
-    const before = api.newCampaign(12);
+    const before = api.newCampaign(setupFor(12));
     const state = createCampaign(funded, setupFor(12));
     for (const id of ["albania", "italy", "tuvalu"])
       expect(before.countries.find((country) => country.countryId === id)?.focusCost).toBe(
@@ -60,7 +60,7 @@ describe("worker action boundary", () => {
 
   it("enforces prerequisite, tier, fork and budget rules without damaging the campaign", () => {
     const api = createSimWorkerApi(funded);
-    const start = api.newCampaign(3);
+    const start = api.newCampaign(setupFor(3));
     for (const nodeId of ["word-of-mouth", "local-radio", "not-a-node"])
       expect(api.applyAction({ type: "buyNode", nodeId })).toEqual({
         ok: false,
@@ -78,7 +78,7 @@ describe("worker action boundary", () => {
         config.start.startingPP = 0;
       }),
     );
-    const empty = poor.newCampaign(4);
+    const empty = poor.newCampaign(setupFor(4));
     expect(poor.applyAction({ type: "buyNode", nodeId: "backyard-clinics" }).snapshot).toEqual(
       empty,
     );
@@ -95,7 +95,7 @@ describe("worker action boundary", () => {
       config.tierTrack.cooldownTurns = 0;
     });
     const api = createSimWorkerApi(demoting);
-    api.newCampaign(4);
+    api.newCampaign(setupFor(4));
     api.applyAction({ type: "assignFocus", slot: 1, countryId: "tuvalu" });
     const demoted = api.endTurn();
     expect(demoted.tierTrack.slotsToDrop).toBe(1);

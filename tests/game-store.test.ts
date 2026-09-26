@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createGameStore, type GameClient } from "../src/renderer/src/state/create-game-store";
 import { type ActionResult, createSimWorkerApi } from "../src/renderer/src/worker/api";
-import { withConfig, world } from "./helpers";
+import { setupFor, withConfig, world } from "./helpers";
 
 const sim = {
   newCampaign: vi.fn<GameClient["newCampaign"]>(),
   names: vi.fn<GameClient["names"]>(),
+  setupOptions: vi.fn<GameClient["setupOptions"]>(),
   endTurn: vi.fn<GameClient["endTurn"]>(),
   applyAction: vi.fn<GameClient["applyAction"]>(),
 };
@@ -22,7 +23,9 @@ beforeEach(async () => {
   vi.mocked(sim.names).mockResolvedValue(world.names);
   vi.mocked(sim.endTurn).mockImplementation(async () => api.endTurn());
   vi.mocked(sim.applyAction).mockImplementation(async (action) => api.applyAction(action));
-  await useGameStore.getState().startCampaign();
+  vi.mocked(sim.setupOptions).mockResolvedValue(api.setupOptions());
+  await useGameStore.getState().loadSetup();
+  await useGameStore.getState().startCampaign(setupFor(12));
 });
 
 describe("UI decision serialization", () => {

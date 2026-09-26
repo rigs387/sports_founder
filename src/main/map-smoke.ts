@@ -181,7 +181,7 @@ export async function verifyMap(win: BrowserWindow, screenshot: (name: string) =
   if (!layout.cardFits || layout.turn !== first.turn)
     throw new Error(`Card layout/state failed: ${JSON.stringify(layout)}`);
   await screenshot("06-world.png");
-  for (const index of [1, 2, 3]) {
+  for (const index of [1, 2]) {
     await evaluate(`document.querySelectorAll('.game-nav button')[${index}].click()`);
     await flush();
     const open = await evaluate<boolean>(`document.querySelector('dialog')?.open ?? false`);
@@ -192,6 +192,19 @@ export async function verifyMap(win: BrowserWindow, screenshot: (name: string) =
     if (await evaluate<boolean>(`!!document.querySelector('dialog[open]')`))
       throw new Error("Escape did not close the overview.");
   }
+  const cameraBeforeGrowth = (await state()).camera;
+  await evaluate(`document.querySelectorAll('.game-nav button')[3].click()`);
+  await flush();
+  if (
+    !(await evaluate<boolean>(
+      `!document.querySelector('[data-testid="growth-screen"]').hidden && !document.querySelector('dialog[open]')`,
+    ))
+  )
+    throw new Error("Growth must be a main screen, not an overview dialog.");
+  await evaluate(`document.querySelectorAll('.game-nav button')[0].click()`);
+  await flush();
+  if ((await state()).camera !== cameraBeforeGrowth)
+    throw new Error("Returning from Growth changed the map camera.");
   win.setContentSize(390, 844);
   await delay(150);
   await flush();

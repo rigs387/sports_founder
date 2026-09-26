@@ -2,7 +2,9 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { app, type BrowserWindow } from "electron";
 import { verifyActions } from "./action-smoke";
+import { verifyLeagues } from "./league-smoke";
 import { verifyMap } from "./map-smoke";
+import { verifySetup } from "./setup-smoke";
 
 // Development-only self-check, enabled by the SF_SMOKE_OUT environment variable (see
 // `npm run smoke`). It drives the real window: waits for the first campaign snapshot from the
@@ -90,6 +92,7 @@ async function run(
     writeFileSync(join(outDir, name), image.toPNG());
   };
 
+  const setup = await verifySetup(win, screenshot);
   const before = await waitFor((s) => s.status === "ready" && s.endTurnEnabled, "first snapshot");
   await screenshot("01-start.png");
 
@@ -112,6 +115,7 @@ async function run(
     current.playerFandomScore !== before.playerFandomScore;
   const map = await verifyMap(win, screenshot);
   const actions = await verifyActions(win, screenshot);
+  const leagues = await verifyLeagues(win, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
   const report = {
@@ -120,7 +124,9 @@ async function run(
     before,
     after: current,
     map,
+    setup,
     actions,
+    leagues,
     errors,
     remoteRequests,
   };

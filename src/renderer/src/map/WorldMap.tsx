@@ -268,6 +268,8 @@ function MapScene(props: SceneProps) {
       invalidate();
     };
     const resize = () => {
+      // Growth shares the main screen. Preserve the camera while the map is hidden.
+      if (host.clientWidth === 0 || host.clientHeight === 0) return;
       const oldScale = viewport.scale.x / baseScale;
       const center = viewport.center;
       app.renderer.resize(host.clientWidth, host.clientHeight);

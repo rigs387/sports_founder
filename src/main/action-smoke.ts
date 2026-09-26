@@ -1,4 +1,5 @@
 import type { BrowserWindow } from "electron";
+import { verifyGrowth } from "./growth-smoke";
 
 /** Real controls -> Comlink worker -> authoritative snapshot, without injecting simulation state. */
 export async function verifyActions(
@@ -7,6 +8,9 @@ export async function verifyActions(
 ) {
   const evaluate = <T>(code: string) => win.webContents.executeJavaScript(code) as Promise<T>;
   const delay = () => new Promise((resolve) => setTimeout(resolve, 60));
+  const anchorId = await evaluate<string>(
+    `document.querySelector('[data-testid="game"]').dataset.anchor`,
+  );
   const state = () =>
     evaluate<{ status: string; turn: number; pp: number; history: number }>(`(() => {
     const game = document.querySelector('[data-testid="game"]');
@@ -33,19 +37,22 @@ export async function verifyActions(
     return waitReady(before.turn + 1);
   };
   const openGrowth = () => evaluate(`document.querySelectorAll('.game-nav button')[3].click()`);
-  const close = () => evaluate(`document.querySelector('dialog .icon-button').click()`);
+  const close = () => evaluate(`document.querySelectorAll('.game-nav button')[0].click()`);
+  const closeDialog = () => evaluate(`document.querySelector('dialog .icon-button').click()`);
   const purchase = () =>
     evaluate<{ cost: number; disabled: boolean; owned: boolean }>(`(() => {
     const row = document.querySelector('[data-node="backyard-clinics"]');
-    return {cost:Number(row.dataset.cost),disabled:row.querySelector('button').disabled,owned:row.dataset.status==='owned'};
+    return {cost:Number(row.dataset.cost),disabled:document.querySelector('[data-testid="buy-node"]').disabled,owned:row.dataset.status==='owned'};
   })()`);
 
   await openGrowth();
   await delay();
+  await evaluate(`document.querySelector('[data-node="word-of-mouth"]').click()`);
   const locked = await evaluate<boolean>(
-    `document.querySelector('[data-node="word-of-mouth"] button').disabled && document.querySelector('[data-node="word-of-mouth"]').textContent.includes('Requires Backyard Clinics')`,
+    `document.querySelector('[data-testid="buy-node"]').disabled && document.querySelector('[data-testid="growth-reason"]').textContent.includes('Requires Backyard Clinics')`,
   );
   if (!locked) throw new Error("Growth prerequisites are not explained and disabled.");
+  await evaluate(`document.querySelector('[data-node="backyard-clinics"]').click()`);
   let earnedTurns = 0;
   while ((await purchase()).disabled && earnedTurns++ < 80) {
     await close();
@@ -57,7 +64,7 @@ export async function verifyActions(
   if (price.disabled) throw new Error("Could not earn enough Prestige for the first purchase.");
   const beforeBuy = await state();
   await evaluate(
-    `(() => { const button=document.querySelector('[data-node="backyard-clinics"] button');button.click();button.click(); })()`,
+    `(() => { const button=document.querySelector('[data-testid="buy-node"]');button.click();button.click(); })()`,
   );
   const afterBuy = await waitReady();
   if (
@@ -70,6 +77,7 @@ export async function verifyActions(
       `Purchase did not spend once without advancing time: ${JSON.stringify({ beforeBuy, afterBuy, price })}`,
     );
   await screenshot("08-growth-purchase.png");
+  const growth = await verifyGrowth(win, screenshot);
   await close();
   await evaluate(
     `(() => {const picker=document.querySelector('[data-testid="market-picker"]');picker.value='tuvalu';picker.dispatchEvent(new Event('change',{bubbles:true}));})()`,
@@ -101,9 +109,9 @@ export async function verifyActions(
   await evaluate(`document.querySelectorAll('.game-nav button')[1].click()`);
   await delay();
   const slots = await evaluate<string>(`document.querySelector('.focus-list').textContent`);
-  if (!slots.includes("Tuvalu") || slots.includes("Albania"))
+  if (!slots.includes("Tuvalu") || slots.toLowerCase().includes(anchorId))
     throw new Error("Focus assignment did not replace the old slot.");
-  await close();
+  await closeDialog();
   await advance();
   if (!(await evaluate<boolean>(`!!document.querySelector('[data-testid="focused-market"]')`)))
     throw new Error("Focus did not survive the next turn.");
@@ -117,5 +125,6 @@ export async function verifyActions(
     actionsDidNotAdvanceTime: true,
     focusPersisted: true,
     geometryValidationMs: validationMs,
+    growth,
   };
 }

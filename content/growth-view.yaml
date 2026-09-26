@@ -1,0 +1,27 @@
+# Clubhouse board presentation. Prices, effects and dependencies stay in growth-tree.yaml.
+# Coordinates are CSS pixels; the renderer scrolls the board on smaller screens.
+width: 812
+height: 430
+tileWidth: 166
+tileHeight: 76
+nodes:
+  backyard-clinics: { x: 12, y: 158, icon: ball }
+  word-of-mouth: { x: 216, y: 20, icon: voice }
+  weekend-leagues: { x: 216, y: 130, icon: trophy }
+  street-courts: { x: 216, y: 240, icon: court }
+  club-grounds: { x: 216, y: 340, icon: club }
+  fan-meetups: { x: 420, y: 20, icon: fans }
+  volunteer-organisers: { x: 420, y: 240, icon: flag }
+  border-tournaments: { x: 420, y: 130, icon: flag }
+  community-ownership: { x: 624, y: 90, icon: shield }
+  barnstorming-tours: { x: 624, y: 220, icon: flag }
+  local-radio: { x: 12, y: 158, icon: radio }
+  newspaper-columns: { x: 216, y: 20, icon: voice }
+  highlight-reels: { x: 216, y: 158, icon: screen }
+  dubbed-broadcasts: { x: 216, y: 330, icon: radio }
+  pay-tv-exclusivity: { x: 420, y: 130, icon: screen }
+  free-to-air: { x: 420, y: 230, icon: screen }
+  star-profiles: { x: 420, y: 20, icon: fans }
+  sponsor-showcase: { x: 624, y: 20, icon: shield }
+  tabloid-buzz: { x: 624, y: 130, icon: voice }
+  satellite-feed: { x: 420, y: 340, icon: radio }
