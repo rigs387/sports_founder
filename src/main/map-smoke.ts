@@ -170,10 +170,10 @@ export async function verifyMap(win: BrowserWindow, screenshot: (name: string) =
   if ((await state()).rivals !== "false") throw new Error("Rival overlay did not turn off.");
   await screenshot("05-patterns.png");
   await evaluate(
-    `document.querySelector('.map-options input').click();document.querySelectorAll('.map-options input')[1].click();document.querySelector('.game-topbar > button').click();`,
+    `document.querySelector('.map-options input').click();document.querySelectorAll('.map-options input')[1].click();document.querySelector('[data-testid="map-home"]').click();`,
   );
   await select("albania");
-  await evaluate(`document.querySelector('.game-topbar > button').click()`);
+  await evaluate(`document.querySelector('[data-testid="map-home"]').click()`);
   await flush();
   const layout = await evaluate<{ cardFits: boolean; history: number; turn: number }>(
     `(() => {const card=document.querySelector('[data-testid="country-card"]');return {cardFits:card.getBoundingClientRect().bottom<document.querySelector('.game-bottom').getBoundingClientRect().top,history:Number(card.dataset.historyPoints),turn:Number(card.dataset.turn)};})()`,
@@ -184,7 +184,9 @@ export async function verifyMap(win: BrowserWindow, screenshot: (name: string) =
   for (const index of [1, 2]) {
     await evaluate(`document.querySelectorAll('.game-nav button')[${index}].click()`);
     await flush();
-    const open = await evaluate<boolean>(`document.querySelector('dialog')?.open ?? false`);
+    const open = await evaluate<boolean>(
+      `document.querySelector('.overview-dialog')?.open ?? false`,
+    );
     if (!open) throw new Error("Campaign overview did not open.");
     win.webContents.sendInputEvent({ type: "keyDown", keyCode: "Escape" });
     win.webContents.sendInputEvent({ type: "keyUp", keyCode: "Escape" });

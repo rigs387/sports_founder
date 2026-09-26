@@ -325,7 +325,7 @@ Content (YAML: events, genome traits, countries, sponsors)
 | Localization | **i18next** | Strings in files from day one |
 | Randomness | **pure-rand** (seeded) | Deterministic simulation |
 | Player names | **Faker** locales (curated) | Country-appropriate names |
-| Saves | **JSON + fflate** | Compressed, versioned saves |
+| Saves | **JSON + Node zlib** | Compressed, versioned saves; main-process gzip, no additional dependency |
 | Audio | **Howler.js** | Music and SFX |
 | Unit tests | **Vitest** | Simulation tests |
 | End-to-end tests | **Playwright** (Electron mode) | AI drives the real game, screenshots, smoke tests |
@@ -374,10 +374,13 @@ plural/gender handling; never concatenate sentence fragments.
 fill gaps.
 
 **Saves.**
-- Compressed JSON (fflate).
+- Compressed JSON (gzip through Node's built-in zlib in the Electron main process).
+  Implemented 2026-09-26: `.sfsave` files wrap simulation format 6 in session format 1,
+  preserving country history and pinned country. Existing plain JSON saves still import.
+  This replaces the proposed fflate dependency; a future browser port will need a browser codec.
 - Every save carries a format version, with migration steps so Early Access saves remain loadable.
 - Atomic writes: write to a temp file, then swap, so a crash mid-save can't corrupt a campaign.
-- Synced via Steam Cloud.
+- Steam Cloud sync is deferred with Steam integration; current files are local.
 - Never use formats that break when code changes.
 
 ### 6.3 Avoid List

@@ -7,6 +7,8 @@ import { presetGenome, setupFor, world } from "./helpers";
 function host() {
   const api = createSimWorkerApi(world);
   const client = {
+    saveCampaign: async (...args: Parameters<typeof api.saveCampaign>) => api.saveCampaign(...args),
+    loadCampaign: async (...args: Parameters<typeof api.loadCampaign>) => api.loadCampaign(...args),
     setupOptions: vi.fn(async () => api.setupOptions()),
     names: vi.fn(async () => api.names()),
     newCampaign: vi.fn(async (setup: CampaignSetup) => api.newCampaign(setup)),

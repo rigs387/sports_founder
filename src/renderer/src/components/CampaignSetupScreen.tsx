@@ -6,6 +6,7 @@ import type { GenomeHints } from "../../../sim";
 import { useGameStore } from "../state/game-store";
 import type { SetupOptions } from "../worker/api";
 import { sim } from "../worker/client";
+import { SaveLoadControls } from "./SaveLoadControls";
 
 export function CampaignSetupScreen() {
   const { t } = useTranslation();
@@ -21,6 +22,7 @@ export function CampaignSetupScreen() {
           <h1>{t("setup.title")}</h1>
         </div>
         <p>{t("setup.tagline")}</p>
+        <SaveLoadControls />
       </header>
       {setupOptions && names ? (
         <SetupForm options={setupOptions} names={names} />

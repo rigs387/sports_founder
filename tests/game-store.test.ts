@@ -9,6 +9,8 @@ const sim = {
   setupOptions: vi.fn<GameClient["setupOptions"]>(),
   endTurn: vi.fn<GameClient["endTurn"]>(),
   applyAction: vi.fn<GameClient["applyAction"]>(),
+  saveCampaign: vi.fn<GameClient["saveCampaign"]>(),
+  loadCampaign: vi.fn<GameClient["loadCampaign"]>(),
 };
 let useGameStore = createGameStore(sim, 160);
 const funded = withConfig(world, (config) => {

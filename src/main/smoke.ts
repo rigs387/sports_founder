@@ -4,6 +4,8 @@ import { app, type BrowserWindow } from "electron";
 import { verifyActions } from "./action-smoke";
 import { verifyLeagues } from "./league-smoke";
 import { verifyMap } from "./map-smoke";
+import type { FilePrompts } from "./save-files";
+import { verifySaves } from "./save-smoke";
 import { verifySetup } from "./setup-smoke";
 
 // Development-only self-check, enabled by the SF_SMOKE_OUT environment variable (see
@@ -37,7 +39,11 @@ const READ_UI_STATE = `(() => {
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export function attachSmokeTest(win: BrowserWindow, outDir: string): void {
+export function attachSmokeTest(
+  win: BrowserWindow,
+  outDir: string,
+  filePrompts: FilePrompts,
+): void {
   const errors: string[] = [];
   const remoteRequests: string[] = [];
   win.webContents.on("console-message", (event) => {
@@ -50,7 +56,7 @@ export function attachSmokeTest(win: BrowserWindow, outDir: string): void {
     callback({ cancel: remote });
   });
   win.webContents.once("did-finish-load", () => {
-    run(win, outDir, errors, remoteRequests).then(
+    run(win, outDir, errors, remoteRequests, filePrompts).then(
       () => app.exit(0),
       async (error: unknown) => {
         console.error("[smoke] FAILED:", error instanceof Error ? error.message : error);
@@ -67,6 +73,7 @@ async function run(
   outDir: string,
   errors: string[],
   remoteRequests: string[],
+  filePrompts: FilePrompts,
 ): Promise<void> {
   mkdirSync(outDir, { recursive: true });
   const read = async (): Promise<UiState | null> =>
@@ -116,6 +123,7 @@ async function run(
   const map = await verifyMap(win, screenshot);
   const actions = await verifyActions(win, screenshot);
   const leagues = await verifyLeagues(win, screenshot);
+  const saves = await verifySaves(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
   const report = {
@@ -127,6 +135,7 @@ async function run(
     setup,
     actions,
     leagues,
+    saves,
     errors,
     remoteRequests,
   };

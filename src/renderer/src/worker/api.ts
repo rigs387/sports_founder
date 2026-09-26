@@ -12,6 +12,8 @@ import {
   snapshot,
   type TurnSnapshot,
 } from "../../../sim";
+import type { CountryHistory } from "../state/history";
+import { readSession, writeSession } from "../state/session-save";
 
 export type ActionResult =
   | { ok: true; snapshot: TurnSnapshot }
@@ -21,6 +23,25 @@ export type ActionResult =
 export function createSimWorkerApi(world: World) {
   let state: GameState | null = null;
   return {
+    saveCampaign(history: CountryHistory, selectedCountryId: string | null) {
+      if (!state) throw new Error("No campaign in progress");
+      return writeSession(state, history, selectedCountryId, world);
+    },
+    loadCampaign(text: string, historyLimit: number) {
+      try {
+        const loaded = readSession(text, world, historyLimit);
+        state = loaded.state;
+        return {
+          ok: true as const,
+          snapshot: loaded.snapshot,
+          history: loaded.history,
+          selectedCountryId: loaded.selectedCountryId,
+        };
+      } catch {
+        // All validation, migrations and snapshot construction finish before replacing the campaign.
+        return { ok: false as const };
+      }
+    },
     setupOptions() {
       return {
         seedMax: MAX_SEED,

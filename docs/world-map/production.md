@@ -27,8 +27,9 @@ Run `npm.cmd run dev` from the project root to play it. The game opens on
 - **Growth** now has its own [full-screen Clubhouse board](../growth-tree/production.md), including
   upgrade paths, effect details, and confirmation of permanent fork choices.
 - **Leagues** and country cards now offer [league management](../league-management/README.md):
-  promotion, restructuring and bailouts with current terms and eligibility. Save/load and events
-  remain later work.
+  promotion, restructuring and bailouts with current terms and eligibility.
+- **Campaign** now offers [save/load](../save-load/README.md), including country history and
+  unsaved-progress protection. Existing campaigns can also be loaded from setup. Events remain later work.
 
 ![Tuvalu selected through its expanded target.](assets/previews/pixi-tuvalu.png)
 
@@ -49,9 +50,10 @@ HTML cards into canvas. Animated recaps, particles and transitions are not imple
 Visual tokens remain in `src/renderer/src/styles.css`; this direction remains revisable.
 
 Heat thresholds, label markets, camera settings and history retention live in `content/map.yaml`,
-validated through Zod. History is bounded to 160 snapshots per country and resets with
-the session. It is not saved yet. There is no recorded replay slider in the live game.
-Simulation rules and the save format are unchanged. Country snapshots now carry the actual
+validated through Zod. History is bounded to 160 snapshots per country and is preserved in
+campaign files. There is no recorded replay slider in the live game.
+Simulation rules and the version 6 simulation save format are unchanged; the UI session has
+its own versioned wrapper. Country snapshots carry the actual
 focus price, calculated by the simulation from organic exposure and owned growth nodes.
 
 Actions use the worker's `applyAction` endpoint and return a fresh snapshot immediately.

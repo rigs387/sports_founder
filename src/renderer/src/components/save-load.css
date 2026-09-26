@@ -1,0 +1,90 @@
+.campaign-files-button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #c7d6e1;
+  border-radius: 9px;
+  background: #fff;
+  color: #193553;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.campaign-files-button i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #245fe5;
+}
+.save-dialog {
+  width: min(460px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 28px;
+  border: 1px solid #c4d9e5;
+  border-radius: 20px;
+  color: #18344d;
+  background: #f6fbfc;
+  box-shadow:
+    0 22px 80px #112a4c55,
+    inset 0 4px #fff;
+}
+.save-dialog::backdrop {
+  background: #102c4b66;
+}
+.save-dialog .eyebrow {
+  color: #526f92;
+}
+.save-dialog header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.save-dialog h2 {
+  font-size: 30px;
+  letter-spacing: -1px;
+  margin: 12px 0;
+}
+.save-dialog p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.save-file-card {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #d6e4ea;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+.save-file-card span,
+.save-hint {
+  color: #526b7d;
+  font-size: 12px;
+}
+.save-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.save-buttons .action-button {
+  min-height: 40px;
+}
+.save-buttons .save-primary {
+  background: #245fe5;
+  border-color: #245fe5;
+  color: #fff;
+}
+.save-hint {
+  display: block;
+  line-height: 1.6;
+  margin-top: 20px;
+}
+.save-replace {
+  margin-top: 20px;
+}

@@ -6,6 +6,7 @@ import { CampaignSetupScreen } from "./components/CampaignSetupScreen";
 import { CountryCard } from "./components/CountryCard";
 import { FocusControls } from "./components/FocusControls";
 import { LeagueControls } from "./components/LeagueControls";
+import { SaveLoadControls } from "./components/SaveLoadControls";
 import { GrowthScreen } from "./growth/GrowthScreen";
 import { heatBand, mapSettings } from "./map/model";
 import { type MapCommand, type MapHover, WorldMap } from "./map/WorldMap";
@@ -24,12 +25,19 @@ export function App() {
     endTurn,
     selectCountry,
     dispatchAction,
+    campaignRevision,
   } = useGameStore();
   const [command, setCommand] = useState<MapCommand>({ kind: "home", serial: 0 });
   const [hover, setHover] = useState<MapHover | null>(null);
   const [patterns, setPatterns] = useState(false);
   const [rivals, setRivals] = useState(true);
   const [overview, setOverview] = useState<Overview | null>(null);
+  useEffect(() => {
+    if (campaignRevision === 0) return;
+    setOverview(null);
+    setHover(null);
+    setCommand((previous) => ({ kind: "home", serial: previous.serial + 1 }));
+  }, [campaignRevision]);
   useEffect(() => {
     void loadSetup();
   }, [loadSetup]);
@@ -131,10 +139,12 @@ export function App() {
             </div>
           </div>
         </div>
+        <SaveLoadControls />
         <button
           type="button"
           className="icon-button"
           title={t("map.home")}
+          data-testid="map-home"
           aria-label={t("map.home")}
           onClick={() => {
             setOverview(null);

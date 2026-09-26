@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, shell } from "electron";
+import { attachSaveFiles } from "./save-files";
 import { attachSmokeTest } from "./smoke";
 
 if (process.env.SF_SMOKE_OUT) app.commandLine.appendSwitch("force-device-scale-factor", "1");
@@ -20,12 +21,15 @@ function createWindow(): void {
     title: "Sports Founder",
     backgroundColor: "#97dbe3",
     webPreferences: {
+      preload: fileURLToPath(new URL("../preload/index.cjs", import.meta.url)),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
       backgroundThrottling: !process.env.SF_SMOKE_OUT,
     },
   });
+
+  const filePrompts = attachSaveFiles(win);
 
   win.once("ready-to-show", () => {
     if (!process.env.SF_SMOKE_OUT) win.show();
@@ -43,7 +47,7 @@ function createWindow(): void {
   });
 
   const smokeOutDir = process.env.SF_SMOKE_OUT;
-  if (smokeOutDir) attachSmokeTest(win, smokeOutDir);
+  if (smokeOutDir) attachSmokeTest(win, smokeOutDir, filePrompts);
 
   const devServerUrl = process.env.ELECTRON_RENDERER_URL;
   if (!app.isPackaged && devServerUrl) {

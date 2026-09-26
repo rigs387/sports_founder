@@ -91,13 +91,16 @@ function patternTexture(band: number): Texture {
 }
 
 function MapScene(props: SceneProps) {
-  const { app } = useApplication();
+  const { app, isInitialised } = useApplication();
   const latest = useRef(props);
   latest.current = props;
   const controller = useRef<MapController | null>(null);
   const { host } = props;
 
   useEffect(() => {
+    // @pixi/react can deliver a prop update while app.init() is still awaiting the renderer.
+    // Campaign loads reset the camera immediately; wait for its initialized context delivery.
+    if (!isInitialised) return;
     const settings = mapSettings.camera;
     const styles = getComputedStyle(host);
     const color = (name: string) => styles.getPropertyValue(name).trim();
@@ -391,7 +394,7 @@ function MapScene(props: SceneProps) {
       viewport.destroy({ children: true });
       for (const texture of textures.values()) texture.destroy(true);
     };
-  }, [app, host]);
+  }, [app, host, isInitialised]);
 
   useEffect(() => {
     controller.current?.update({
