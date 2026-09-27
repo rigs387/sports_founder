@@ -100,6 +100,19 @@ policies everywhere; hands-on business only in focus countries; trait-driven lea
 (Phase 1); intervene anywhere anytime. No inbox: the map signals trouble, business happens in
 seasonal windows, crises arrive as decision cards.
 
+**Culture:** Never bought. Traditions (derbies, styles of play, nicknames, rites) emerge from real
+sim facts and are held by fans in particular countries: they make fans stickier and make them resist
+rule changes, cheapening deal demands and seat moves. The Culture tree category nurtures traditions
+that exist. Artifacts are traditions that are things: famous venues (earned from finals and
+record crowds, never bought; fans resist naming rights and moves; can be lost), the named trophy,
+chants, and a homegrown gear brand (a small, demand-free sponsor at the flagship). Founding character at creation (birthplace, ethos, colors and emblem, the sport's own
+terms) seeds which traditions form, never affinity.
+
+**Stars:** Full squads at the flagship; a few lazily named standouts in every other league. The
+player backs a few as faces of the sport (slots grow with PP tier): they drive spread and seed
+traditions. Backing takes seasons to pay off; dropping a beloved star costs goodwill; exits can be
+honored (final season, retirement, mentoring a successor).
+
 **Loss Condition:** Your starting/anchor country's league fully collapses.
 
 **Setup:** Pick any anchor country (auto 1–5 star difficulty with deadpan reasons) → design

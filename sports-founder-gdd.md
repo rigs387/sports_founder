@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.11 | September 26, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league)*
+*Version 1.12 | September 26, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues)*
 
 ---
 
@@ -77,6 +77,13 @@ turn. Longer turns change how often the player decides, not the economy's math.
    world affinity preview; where the sport catches on abroad is discovered in play.
 3. **Name the sport and the founding club** (generated default, editable); choose difficulty preset
    (Easy / Normal / Hard); optional visible, shareable seed.
+4. **Founding character (decided 2026-09-26)** — gives the sport color beyond its rules:
+   birthplace (e.g., schoolyard, factory, beach, barracks), ethos (e.g., gentleman's game,
+   working-class game, rebel game), colors and a simple emblem (pulled forward from the Phase 2
+   editor), and the sport's own terms (what a score, a match and a season are called). Birthplace
+   and ethos seed Culture (which traditions tend to form and how fans react to change). They
+   never touch affinity, so genome balance is unaffected. Terms are nouns placed into complete
+   templates, never sentence fragments.
 
 **Starting state:** the anchor country has a tiny founding Amateur league, a tiny hardcore base
 (the founder's friends and family), and a small casual base. The player has a small PP stash. The
@@ -472,7 +479,7 @@ market. All stored in content; every conversion curve and weight lives in config
 | Grassroots | 1 | Proximity spread, casual conversion, league formation, churn |
 | Media | 2 | Media reach and language channels, casual reach, TV cash unlocks |
 | Infrastructure | 3 | Hardcore conversion (venues, academies), running costs, promotion eligibility |
-| Culture | 4 | Hardcore stickiness, rule-change backlash and anchor resentment resistance, generational turnover |
+| Culture | 4 | Nurturing traditions (v1.12): strengthen, spread and protect traditions that have emerged; culture itself is never bought (see Culture) |
 | Global | 5 | Cold launches, rival defense budget reduction, flagship bonuses, holding #1 |
 
 - **Exclusive forks:** 1–2 per category; choosing one locks out the other (e.g., Pay-TV exclusivity:
@@ -553,6 +560,52 @@ names in stories.
 **Press coverage:** Presentation only; no press sentiment system. Fictional outlets per country
 (in the names data file); headlines built from record-backed Moments, with English-only flavor
 variety. Big turns can show a newspaper-style front page in the recap (a 9x16 candidate).
+
+**Culture (decided 2026-09-26, GDD v1.12):** Culture is not bought. It emerges as **traditions**
+born from recorded simulation facts, and shows up as how fans behave. Playtesting found no felt
+culture; the lesson carried over from God of Sport's v1.9 review is that names, flavor text,
+purchased traits and percentage modifiers alone do not make culture.
+- **Traditions** are entities with stable IDs, a closed type vocabulary (validated at load, like
+  growth effects), the facts that created them, and the countries whose fans hold them. Examples:
+  a derby after repeated finals between two clubs, a style of play named after a local star, a
+  national nickname for the sport, a rite from the founding club. Founding character (birthplace,
+  ethos) biases which types form.
+- **Traditions help and constrain (choose pain).** They make hardcore fans stickier where they are
+  held (slower generational turnover, harder to poach). They also make those fans resist betrayal:
+  rule changes that break them, deal demands that cheapen them, and moving the commissioner's seat
+  away from them. Purist backlash reads traditions instead of an abstract cost.
+- **Nurturing:** the growth tree's Culture category strengthens, spreads and protects traditions
+  that already exist. It cannot create one.
+- Stories and the Almanac may cite a tradition only through the facts that made it.
+- **Artifacts are traditions that are things** (decided 2026-09-26): the same entity model and the
+  same help-and-constrain rule, not a separate system. First build: famous venues, the flagship
+  trophy, chants and anthems, and homegrown gear brands. Films and books come later, as flavor.
+  - *Famous venues* are earned, never bought: the player buys capacity (the 1–5 level), but fame
+    comes from facts (hosting finals, record crowds, a legendary match). The founding club's
+    ground is the first, named at creation with founding character. A famous venue makes nearby
+    hardcore fans stickier, draws a small casual pull from abroad (pilgrimage) and raises the
+    flagship's big moments. Its fans resist naming-rights sales, relocation or modernization, and
+    moving the final elsewhere, so a naming-rights deal on a famous ground is a real dilemma. It
+    can be lost (club folds, league collapses, ground sold), which is a lasting landmark.
+  - *The trophy* is named after a founder or star; fans resist renaming it.
+  - *Chants and anthems* are born at big moments and spread with the fans who hold them.
+  - *A homegrown gear brand* appears once a country's hardcore base is large enough. At the
+    flagship it is a sponsor option: loyal and demand-free, but smaller than outside sponsors.
+  - *Fame comes only from facts.* The player can build capacity, name the trophy, and nurture an
+    existing artifact through the Culture category, but cannot buy fame.
+
+**Stars (decided 2026-09-26, GDD v1.12):** Stars are how a league becomes a sport people love.
+- **Where they come from:** the flagship carries full squads; every other league carries a few
+  lightweight named standouts, created only when they are needed (God of Sport's lazy-athlete
+  model). This answers where transfers toward the flagship and national-team players come from.
+- **Faces of the sport:** the player backs a few stars as ambassadors; slots grow with PP tier
+  (config). A backed star drives spread (media reach from their home country, casual conversion
+  where they play) and is a common seed for traditions.
+- **Commitment (from God of Sport's Champions):** a newly backed star grows into their influence
+  over several seasons; dropping one loses that progress, and dropping a beloved one costs fan
+  goodwill and can trigger a scandal. Relationships can end with honor: a promised final season,
+  retiring with honors, or mentoring a successor. The game alerts the player when a succession
+  decision is developing; there is no ritual reappointment.
 
 **Venues & youth programs:** Each league has a venue capacity level (1–5) and a youth program level
 (1–5) — no individual stadiums or academies.
@@ -923,8 +976,7 @@ Items flagged during the interview that need further discussion in future sessio
 - Competitor analysis: a thorough Steam tag sweep (research task, not a design decision).
 - Water as a genome surface option (parked 2026-09-13).
 - Commissioner's seat follow-ups (parked 2026-09-26): which leagues can take the seat (any active
-  league, or a minimum tier); what happens to the seat when a non-anchor flagship folds; where
-  stars transferring to the flagship, and national-team players, come from while other leagues
-  have no players; whether other leagues ever get individual deals; and whether playtest thinness
+  league, or a minimum tier); what happens to the seat when a non-anchor flagship folds; whether
+  other leagues ever get individual deals; and whether playtest thinness
   was too few decisions per turn or nothing to get attached to (the seat answers the second
   directly, the first only at the flagship).
