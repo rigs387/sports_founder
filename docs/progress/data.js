@@ -12,15 +12,15 @@ window.SF_PROGRESS = {
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
-    date: "2026-10-02",
-    tests: 739,
-    files: 27,
-    note: "Type checking, purity checks and all tests passed after the flagship simulation landed. Lint has existing visual-study warnings.",
+    date: "2026-10-03",
+    tests: 352,
+    files: 28,
+    note: "npm run check passed after the flagship season cards landed (type checks, Biome, purity, 352 tests in 28 files; the drop from 739 is the move to an 11-anchor sweep instead of all 213 countries). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-03",
     smoke:
-      "UI smoke passed with the flagship screen and the American format; save/resume continued identically.",
+      "UI smoke passed and now plays to a season end and opens its story card (a runaway pressure card naming real clubs); save/resume continued identically.",
   },
-  eventDeck: { current: 8, target: "40–60" },
+  eventDeck: { current: 16, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Make the flagship season matter",
-      text: "Titles and finals become event cards; then persistent stars as the league matures.",
+      text: "Season cards are in; next, persistent stars as the league matures.",
       tag: "Next build",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Built",
+      title: "The flagship season as event cards",
+      text: "Every season end brings a champion moment (PP by league tier) and at most one story card in fixed priority: foregone league or runaway (pressure, drain on arrival), dynasty, repeat final, underdog, first title, close finish. New club strength effect, season-counted cooldowns, bot weights, save format 9.",
+    },
     {
       date: "2026-10-03",
       type: "Design",
@@ -270,7 +276,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
       summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
-      next: "Feed titles and finals into events; then add a few named stars as the league matures.",
+      next: "Add a few named stars as the league matures; then decide how the flagship feeds global spread.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
@@ -284,7 +290,7 @@ window.SF_PROGRESS = {
         ["built", "Named clubs in real places, results, standings and retained season summaries"],
         ["built", "Flagship screen: table, results, champions and the seat"],
         ["built", "European or American format chosen on the creation screen"],
-        ["planned", "Season cards: champion, story and pressure cards; club strength"],
+        ["built", "Season cards: champion, story and pressure cards; club strength"],
         ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
         ["planned", "Standing policies and hired league directors"],
         ["planned", "Anchor purist resentment from neglect, rule changes and seat moves"],
@@ -302,12 +308,13 @@ window.SF_PROGRESS = {
       sources: [
         ["Event board and initial deck", "../events/README.md"],
         ["Card definitions", "../../content/events.yaml"],
+        ["Flagship season cards", "../flagship/README.md#the-season-as-cards"],
       ],
       items: [
         ["built", "Fact-based triggers and validated effect vocabulary"],
         ["built", "Decision costs, local effects, expiry and safe defaults"],
         ["built", "Reward collection, journal and saved pending cards"],
-        ["partial", "Event library: 8 of a planned 40–60 cards"],
+        ["partial", "Event library: 16 of a planned 40–60 cards (8 are flagship season cards)"],
         ["planned", "Broader tier-weighted negative events and personal stories"],
         ["built", "Bots that weigh and choose non-default options"],
       ],

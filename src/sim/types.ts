@@ -196,6 +196,12 @@ export interface MatchResult {
   decidedFor: number | null;
 }
 
+/** A club's rating at a moment in time. */
+export interface ClubRating {
+  clubId: number;
+  rating: number;
+}
+
 /** A finished flagship season (GDD History & Records: per-league season summaries). */
 export interface SeasonSummary {
   season: number;
@@ -209,6 +215,11 @@ export interface SeasonSummary {
   standings: TableRow[];
   /** American format: every playoff match in order, the final last. Empty for European. */
   playoffs: MatchResult[];
+  /**
+   * Every club's rating when the season began, by club id (underdog stories, GDD v1.15). Empty
+   * for seasons that ended before save format 9.
+   */
+  startRatings: ClubRating[];
 }
 
 /**
@@ -232,6 +243,8 @@ export interface FlagshipState {
   nextClubId: number;
   /** The current season's table, in club order (not ranked). */
   table: TableRow[];
+  /** The active clubs' ratings when the current season began, in club order. */
+  startRatings: ClubRating[];
   /** The most recent round's results (disposable: replaced every round). */
   lastRound: MatchResult[];
   seasons: SeasonSummary[];

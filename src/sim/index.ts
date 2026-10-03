@@ -17,6 +17,7 @@ export * from "./records";
 export * from "./rivals";
 export { MAX_SEED, SEED_WARM_UP_DRAWS } from "./rng";
 export * from "./save";
+export * from "./season-stories";
 export * from "./setup";
 export * from "./snapshot";
 export * from "./spread";

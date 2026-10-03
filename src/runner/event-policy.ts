@@ -1,6 +1,7 @@
 import type { EventEffect } from "../content";
 import {
   type Action,
+  activeClubs,
   applyAction,
   checkAction,
   costMultiplier,
@@ -23,6 +24,8 @@ import {
 //   hardcoreDemotion   − share of the player's hardcore lost
 //   rivalSetback       rival hardcore removed ÷ the player's hardcore there
 //   leagueHealth       rungs climbed
+//   clubRating         rating steps closed between the champion and the mean of the rest of
+//                      the field (flagship season cards: competitive balance)
 //   pp                 PP gained, at the bot's PP price
 // The price is cost × ppPrice ÷ the PP cost multiplier, because PP income grows with the sport as
 // fast as prices do.
@@ -35,6 +38,8 @@ export interface EventWeights {
   media: number;
   league: number;
   rival: number;
+  /** Competitive balance in the flagship league, per rating step closed. */
+  balance: number;
   /** Value of one PP at the starting cost multiplier. */
   ppPrice: number;
 }
@@ -49,6 +54,7 @@ export const EVENT_WEIGHTS = {
     media: 1,
     league: 1,
     rival: 1,
+    balance: 1,
     ppPrice: 0.005,
   },
   builder: {
@@ -59,6 +65,7 @@ export const EVENT_WEIGHTS = {
     media: 1,
     league: 1,
     rival: 1,
+    balance: 1,
     ppPrice: 0.01,
   },
   turtle: {
@@ -69,6 +76,7 @@ export const EVENT_WEIGHTS = {
     media: 0.3,
     league: 3,
     rival: 1,
+    balance: 1.5,
     ppPrice: 0.015,
   },
   media: {
@@ -79,6 +87,7 @@ export const EVENT_WEIGHTS = {
     media: 2,
     league: 0.5,
     rival: 0.5,
+    balance: 0.5,
     ppPrice: 0.01,
   },
 } satisfies Record<string, EventWeights>;
@@ -88,6 +97,7 @@ function effectValue(
   world: World,
   countryId: string,
   rivalId: string | null,
+  championId: number | null,
   effect: EventEffect,
   weights: EventWeights,
 ): number {
@@ -115,6 +125,16 @@ function effectValue(
       return effect.steps * weights.league;
     case "pp":
       return (effect.amount * weights.ppPrice) / costMultiplier(state, world.config);
+    case "clubRating": {
+      const clubs = activeClubs(state.flagship);
+      const champion = clubs.find((club) => club.id === championId);
+      const field = clubs.filter((club) => club.id !== championId);
+      if (!champion || field.length === 0) return 0;
+      const gap = champion.rating - field.reduce((sum, c) => sum + c.rating, 0) / field.length;
+      const step = world.config.flagship.stories.ratingStep;
+      const moved = effect.target === "champion" ? effect.steps * step : -effect.steps * step;
+      return ((Math.abs(gap) - Math.abs(gap + moved)) / step) * weights.balance;
+    }
   }
 }
 
@@ -132,7 +152,16 @@ export function choiceValue(
   if (!event || !card || !choice) return Number.NEGATIVE_INFINITY;
   const gains = choice.effects.reduce(
     (sum, effect) =>
-      sum + effectValue(state, world, event.countryId, event.facts.rivalId, effect, weights),
+      sum +
+      effectValue(
+        state,
+        world,
+        event.countryId,
+        event.facts.rivalId,
+        event.facts.season?.championId ?? null,
+        effect,
+        weights,
+      ),
     0,
   );
   const price =

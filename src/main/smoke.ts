@@ -8,6 +8,7 @@ import { verifyLeagues } from "./league-smoke";
 import { verifyMap } from "./map-smoke";
 import type { FilePrompts } from "./save-files";
 import { verifySaves } from "./save-smoke";
+import { verifySeasonCards } from "./season-smoke";
 import { verifySetup } from "./setup-smoke";
 
 // Development-only self-check, enabled by the SF_SMOKE_OUT environment variable (see
@@ -127,6 +128,7 @@ async function run(
   const actions = await verifyActions(win, screenshot);
   const leagues = await verifyLeagues(win, screenshot);
   const flagship = await verifyFlagship(win, screenshot);
+  const seasonCards = await verifySeasonCards(win, screenshot);
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
@@ -141,6 +143,7 @@ async function run(
     actions,
     leagues,
     flagship,
+    seasonCards,
     saves,
     errors,
     remoteRequests,

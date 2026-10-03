@@ -54,6 +54,14 @@ function toWindow(state: GameState): GameState {
   return current;
 }
 
+const withoutSeasonCards = {
+  ...world,
+  events: {
+    ...world.events,
+    cards: world.events.cards.filter((card) => card.trigger !== "seasonEnd"),
+  },
+};
+
 describe("the flagship at campaign start", () => {
   it("seats the anchor with eight clubs in real places of the anchor and distinct nicknames", () => {
     const state = start();
@@ -138,8 +146,10 @@ describe("a season", () => {
   });
 
   it("never touches the world: fans, rivals and the world's dice match in both formats", () => {
-    const european = runTurns(start("european"), world, 40);
-    const american = runTurns(start("american"), world, 40);
+    // Season cards (GDD v1.15) are how results reach fans; without them the matches alone
+    // must leave the world exactly as it was.
+    const european = runTurns(start("european"), withoutSeasonCards, 40);
+    const american = runTurns(start("american"), withoutSeasonCards, 40);
     expect(american.countries).toStrictEqual(european.countries);
     expect(american.rng).toStrictEqual(european.rng);
     expect(american.flagship.seasons.length).toBe(european.flagship.seasons.length);
@@ -262,7 +272,8 @@ describe("the commissioner's seat", () => {
 
 describe("saves before the flagship", () => {
   it("migrates a version 7 save: the anchor holds the seat with a season starting now", () => {
-    const played = runTurns(start(), world, 12);
+    // A version 7 campaign never saw a season card.
+    const played = runTurns(start(), withoutSeasonCards, 12);
     const { seasonFormat: _s, flagship: _f, ...v7State } = played;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 7, state: v7State }), world);
     expect(loaded.seasonFormat).toBe("european");

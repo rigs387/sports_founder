@@ -110,6 +110,11 @@ runs/                 Runner and smoke-test output (git-ignored)
   random sequence never depends on the flagship. `moveSeat` (window only, Professional or Elite
   league) moves the seat at the season's end with a purist hardcore cost; a folded flagship abroad
   sends the seat home for free.
+- Flagship seasons reach the player as event cards (GDD v1.15): `src/sim/season-stories.ts` reads
+  the recorded `SeasonSummary` (thresholds in `config.flagship.stories`), and `offerSeasonCards` in
+  `src/sim/events.ts` offers the champion moment and at most one story card before other cards.
+  The `clubRating` effect is valid only on `seasonEnd` cards; pressure cards' `arrivalEffects`
+  land on arrival and are never cancelled.
 - The win lives in `GameState.win` (`src/sim/win.ts`), never in `outcome`: winning must not end a
   campaign. Checked once per turn after the tier track: #1 by global Fandom Score held
   `win.holdTurns` turns at PP tier `win.requiredTier`. After the win an anchor collapse folds the
@@ -148,6 +153,9 @@ runs/                 Runner and smoke-test output (git-ignored)
   migrates to an empty journal with the landmark cursor at the current end (no retroactive rewards).
 - Save format 8 adds the season format and the flagship. Format 7 migrates to a European flagship
   at the anchor with fresh clubs and a season starting now (no invented past seasons).
+- Save format 9 adds season cards (GDD v1.15): each season's start ratings, season facts on event
+  records and season-counted cooldowns (`events.seasonOffered`). Format 8 migrates with today's
+  ratings as the current season's start and no season card offered.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

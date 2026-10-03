@@ -603,6 +603,27 @@ export const configFileSchema = z.strictObject({
       hardcoreDemotionShare: unitInterval,
       anchorHardcoreDemotionShare: unitInterval,
     }),
+    /** The flagship season as cards (GDD v1.15). */
+    stories: z
+      .strictObject({
+        championPP: z.strictObject({
+          amateur: z.number().min(0),
+          "semi-pro": z.number().min(0),
+          professional: z.number().min(0),
+          elite: z.number().min(0),
+        }),
+        ratingStep: z.number().positive(),
+        dynastyTitles: z.int().min(2),
+        foregoneTitles: z.int().min(3),
+        runawayShare: z.number().positive(),
+        closeFinishWins: z.number().min(0),
+        closeFinalMargin: z.int().min(0),
+        underdogDivisor: z.int().min(2),
+      })
+      .refine(
+        (s) => s.foregoneTitles > s.dynastyTitles,
+        "foregoneTitles must exceed dynastyTitles (a foregone league replaces a dynasty)",
+      ),
   }),
   tierTrack: z.strictObject({
     telegraphTurns: z.int().min(0),

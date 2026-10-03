@@ -295,6 +295,11 @@
 .event-receipt p {
   font-size: 12px;
 }
+/* A pressure card's effects that have already landed (GDD v1.15). */
+.event-receipt.event-arrived {
+  border-color: #dcb2a4;
+  background: #fbefe9;
+}
 .event-active {
   margin-top: 20px;
   color: #4b6c81;

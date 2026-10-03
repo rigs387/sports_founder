@@ -48,3 +48,34 @@ an American-format campaign, opens the screen late in the campaign and checks th
 champions, playoff line and both layouts (`runs/smoke/32-flagship.png`, `33-flagship-narrow.png`).
 The seat-move controls with eligible targets are not reached in the smoke campaign; their rules are
 covered by the simulation tests.
+
+## The season as cards
+
+![A runaway pressure card on the story board.](season-card.png)
+
+Every season end reaches the player through the story board (GDD v1.15), built only from the
+recorded season summary. The **champion moment** names the champion and runner-up and pays PP by
+the flagship league's tier (4 / 6 / 10 / 15); it always appears and never takes a moment slot. At
+most **one story card** follows, the first that qualifies in a fixed order: foregone league (a
+fourth straight title or more), runaway, dynasty (a third straight title), repeat final, underdog,
+first title, close finish. A story counts against the turn's decision cap but is offered first.
+
+- **Pressure cards** (foregone league, runaway) drain casual conversion in the flagship country the
+  moment they appear. Paying adds the fix (club strength changes); it never cancels the drain.
+- **Club strength** (`clubRating`) moves the champion's rating, or every other active club's, by
+  config steps. Only flagship season cards may use it (rejected at load otherwise). Ratings stay
+  hidden; the ratings recorded at the season's start never move.
+- **Cooldowns count in seasons.** First title and close finish wait 2 seasons; while one waits,
+  the next qualifying story is told instead. The rarer stories have no cooldown.
+- **American format:** runaway needs the playoff champion to have topped the table by the gap; a
+  close finish is the final won by one score or settled by deciders. **European:** a close finish
+  is the top two within one win.
+
+Thresholds live in `config.yaml` (`flagship.stories`); the cards and their prices in
+`content/events.yaml`; story detection in `src/sim/season-stories.ts`. Save format 9 records each
+season's start ratings and counts season-card cooldowns by season; format 8 saves migrate with
+today's ratings as the current season's start (ratings never moved mid-season before) and no
+cards offered. `tests/season-cards.test.ts` covers every story, the priority order, both formats,
+caps, cooldowns, the arrival drain, club strength, content validation, save round-trip and the
+8 → 9 migration. `npm run smoke` plays to a season end and opens its story card
+(`runs/smoke/34-season-card.png`).

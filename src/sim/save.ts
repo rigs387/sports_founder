@@ -21,7 +21,7 @@ import { defaultGenome } from "./setup";
 import type { GameState, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 8;
+export const SAVE_FORMAT_VERSION = 9;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -138,6 +138,7 @@ const landmarkSchema = z.discriminatedUnion("kind", [
   }),
 ]);
 
+const clubRatingSchema = z.strictObject({ clubId: z.int().min(1), rating: z.number() });
 const tableRowSchema = z.strictObject({
   clubId: z.int().min(1),
   played: count,
@@ -177,6 +178,7 @@ const flagshipSchema = z.strictObject({
   ),
   nextClubId: z.int().min(1),
   table: z.array(tableRowSchema),
+  startRatings: z.array(clubRatingSchema),
   lastRound: z.array(matchSchema),
   seasons: z.array(
     z.strictObject({
@@ -188,6 +190,7 @@ const flagshipSchema = z.strictObject({
       runnerUpId: z.int().min(1),
       standings: z.array(tableRowSchema),
       playoffs: z.array(matchSchema),
+      startRatings: z.array(clubRatingSchema),
     }),
   ),
 });
@@ -283,6 +286,54 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 8 → 9: the flagship season as cards (GDD v1.15). Ratings never moved mid-season before this
+  // format, so the current season's start ratings are the active clubs' ratings now. Finished
+  // seasons keep no start ratings (no underdog story is told about them). Every recorded event
+  // gets no season facts, and no season card has been offered yet.
+  8: (save) => {
+    const flagship = save.state.flagship as Record<string, unknown>;
+    const clubs = (Array.isArray(flagship.clubs) ? flagship.clubs : []) as {
+      id: number;
+      countryId: string;
+      rating: number;
+      active: boolean;
+    }[];
+    const startRatings = clubs
+      .filter((club) => club.active && club.countryId === flagship.countryId)
+      .sort((a, b) => a.id - b.id)
+      .map((club) => ({ clubId: club.id, rating: club.rating }));
+    // Key order follows the schema, so the migrated state re-serializes byte-identically.
+    const migrated: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(flagship)) {
+      migrated[key] =
+        key === "seasons" && Array.isArray(value)
+          ? value.map((summary: object) => ({ ...summary, startRatings: [] }))
+          : value;
+      if (key === "table") migrated.startRatings = startRatings;
+    }
+    const events = save.state.events as Record<string, unknown>;
+    const withSeason = (records: unknown) =>
+      (Array.isArray(records) ? records : []).map((record: { facts: object }) => ({
+        ...record,
+        facts: { ...record.facts, season: null },
+      }));
+    return {
+      formatVersion: 9,
+      state: {
+        ...save.state,
+        events: {
+          nextId: events.nextId,
+          landmarkCursor: events.landmarkCursor,
+          offered: events.offered,
+          seasonOffered: {},
+          pending: withSeason(events.pending),
+          history: withSeason(events.history),
+          modifiers: events.modifiers,
+        },
+        flagship: migrated,
+      },
+    };
+  },
   // 7 → 8: the flagship league arrived (GDD v1.11, v1.14). The anchor holds the seat with fresh
   // clubs for its league's tier and a season that starts now; no past seasons are invented. Old
   // campaigns play the European format.

@@ -495,6 +495,26 @@ flagship:
   seatMove:
     hardcoreDemotionShare: 0.03
     anchorHardcoreDemotionShare: 0.08
+  # The flagship season as cards (GDD v1.15). Read from the recorded season summary only.
+  stories:
+    # The champion moment's PP, by the flagship league's tier when the card arrives.
+    championPP: { amateur: 4, semi-pro: 6, professional: 10, elite: 15 }
+    # One step of the clubRating effect, in rating points (ratings run rating.min..rating.max).
+    ratingStep: 3
+    # Dynasty: the same club's dynastyTitles-th straight title. Foregone league: foregoneTitles or
+    # more in a row (replaces dynasty).
+    dynastyTitles: 3
+    foregoneTitles: 4
+    # Runaway: the champion tops the table by at least runawayShare × matches per club × points
+    # for a win (American format: the playoff champion also topped the table by that gap).
+    runawayShare: 0.15
+    # Close finish. European: the top two within closeFinishWins × points for a win. American: the
+    # final won by closeFinalMargin or less, or settled by deciders.
+    closeFinishWins: 1
+    closeFinalMargin: 1
+    # Underdog: the champion was among the weakest floor(clubs ÷ underdogDivisor) clubs by rating
+    # when the season began.
+    underdogDivisor: 3
 
 # Win condition (GDD Win condition, Post-win play): the player's sport wins by ending holdTurns
 # turns in a row as #1 by global Fandom Score among modeled sports (player + rivals; the "other"

@@ -1,7 +1,9 @@
 # Around the grounds
 
 The Clubhouse story board is playable from **Around the grounds** in the bottom bar on World
-or Growth. This is the first eight-card deck, not the complete planned 40–60-card library.
+or Growth. This is the first sixteen-card deck (eight general cards and eight
+[flagship season cards](../flagship/README.md#the-season-as-cards)), not the complete planned
+40–60-card library.
 
 ![A decision on the Clubhouse board.](decision.png)
 
@@ -36,6 +38,10 @@ The board works at 1280×800 and scrolls at narrow widths.
 | Bring them into the club | An audience with room for more hardcore followers | Recruitment or fundraising with slower casual recruitment |
 | A league under strain | A Struggling or Near-Collapse league | Health relief at a hardcore-fan cost, or temporary outreach |
 | They have noticed | A recorded rival escalation | A local rival setback or investment in the player's own base |
+
+The flagship's eight season cards (champion, foregone league, runaway, dynasty, repeat final,
+underdog, first title, close finish) are described with the
+[flagship league](../flagship/README.md#the-season-as-cards).
 
 Text names the actual country and rival and freezes the observed fan counts when a card is
 offered. It does not invent players, finals, injuries, sponsors or results that the simulation

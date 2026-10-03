@@ -197,6 +197,11 @@ function fitClubs(flagship: FlagshipState, world: World, rng: Rng, tier: LeagueT
   return next;
 }
 
+/** The active clubs' ratings now, in club order. */
+export function activeRatings(flagship: FlagshipState) {
+  return activeClubs(flagship).map((club) => ({ clubId: club.id, rating: club.rating }));
+}
+
 /** A fresh table for the active clubs, and the season clock from `quarter`. */
 function startSeason(flagship: FlagshipState, world: World, quarter: number): FlagshipState {
   return {
@@ -205,6 +210,7 @@ function startSeason(flagship: FlagshipState, world: World, quarter: number): Fl
     quartersPlayed: 0,
     round: 0,
     table: activeClubs(flagship).map((club) => emptyRow(club.id)),
+    startRatings: activeRatings(flagship),
     lastRound: [],
   };
 }
@@ -231,6 +237,7 @@ export function newFlagship(
     clubs: [],
     nextClubId: 1,
     table: [],
+    startRatings: [],
     lastRound: [],
     seasons: [],
   };
@@ -397,6 +404,35 @@ function driftRatings(flagship: FlagshipState, world: World, rng: Rng, league: L
   };
 }
 
+/**
+ * A season card's clubRating effect (GDD v1.15): the champion's rating, or every other active
+ * club's, moves by `steps` rating steps. The ratings recorded at the season's start stay as they were.
+ */
+export function moveClubRatings(
+  flagship: FlagshipState,
+  world: World,
+  championId: number,
+  target: "champion" | "field",
+  steps: number,
+): FlagshipState {
+  const { rating, stories } = world.config.flagship;
+  const moves = (club: Club) =>
+    target === "champion"
+      ? club.id === championId
+      : club.active && club.countryId === flagship.countryId && club.id !== championId;
+  return {
+    ...flagship,
+    clubs: flagship.clubs.map((club) =>
+      moves(club)
+        ? {
+            ...club,
+            rating: clamp(club.rating + steps * stories.ratingStep, rating.min, rating.max),
+          }
+        : club,
+    ),
+  };
+}
+
 /** Whether a country's league can take the seat (GDD v1.13): Professional or Elite. */
 export function seatEligible(league: LeagueState | null, world: World): boolean {
   return league !== null && world.config.flagship.seatEligibleTiers.includes(league.tier);
@@ -507,6 +543,7 @@ export function stepFlagshipQuarter(
         runnerUpId: playoffs.runnerUp,
         standings: ranked,
         playoffs: playoffs.matches,
+        startRatings: flagship.startRatings,
       };
       found.push(
         landmarks.seasonChampion(
@@ -724,7 +761,7 @@ export interface FlagshipSnapshot {
   /** American format: how many clubs make the playoffs. 0 in the European format. */
   playoffClubs: number;
   /** Finished seasons, newest first, without their full tables, with the year each ended. */
-  recentSeasons: (Omit<SeasonSummary, "standings"> & { year: number })[];
+  recentSeasons: (Omit<SeasonSummary, "standings" | "startRatings"> & { year: number })[];
   /** Countries whose league could take the seat in the seasonal window (GDD v1.13). */
   seatTargets: string[];
   /** Share of the seat country's hardcore fans who turn casual if the seat moves away. */
@@ -763,7 +800,7 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
     recentSeasons: flagship.seasons
       .slice(-RECENT_SEASONS)
       .reverse()
-      .map(({ standings: _standings, ...summary }) => ({
+      .map(({ standings: _standings, startRatings: _ratings, ...summary }) => ({
         ...summary,
         year: yearOfQuarter(summary.quarter - 1, world.config),
       })),

@@ -29,7 +29,26 @@ export const eventEffectSchema = z.union([
     type: z.literal("leagueHealth"),
     steps: z.union([z.literal(-1), z.literal(1)]),
   }),
+  // Flagship season cards only (GDD v1.15): the champion's rating, or every other active club's,
+  // moves by `steps` × flagship.stories.ratingStep.
+  z.strictObject({
+    type: z.literal("clubRating"),
+    target: z.enum(["champion", "field"]),
+    steps: z.int().refine((steps) => steps !== 0, "steps must not be 0"),
+  }),
 ]);
+/** The flagship season facts a card can tell (GDD v1.15), highest priority first after the champion. */
+export const SEASON_STORIES = [
+  "champion",
+  "foregone",
+  "runaway",
+  "dynasty",
+  "repeatFinal",
+  "underdog",
+  "firstTitle",
+  "closeFinish",
+] as const;
+export type SeasonStory = (typeof SEASON_STORIES)[number];
 const choice = z.strictObject({
   id: z.string().regex(/^[a-z][a-z0-9-]*$/),
   cost: z.number().nonnegative(),
@@ -47,7 +66,10 @@ const template = z
       "leaguePromoted",
       "rivalEscalated",
       "leaguePressure",
+      "seasonEnd",
     ]),
+    /** seasonEnd cards only: the season fact the card tells. */
+    story: z.enum(SEASON_STORIES).nullable().default(null),
     minQuarter: z.int().nonnegative(),
     minFans: z.int().nonnegative(),
     minHardcore: z.int().nonnegative(),
@@ -55,8 +77,12 @@ const template = z
     anchorOnly: z.boolean(),
     scope: z.enum(["campaign", "country"]),
     cooldownTurns: z.int().positive().nullable(),
+    /** seasonEnd cards count cooldowns in seasons, since turn length changes with the PP tier. */
+    cooldownSeasons: z.int().positive().nullable().default(null),
     health: z.array(healthLevelSchema),
     effects: z.array(eventEffectSchema),
+    /** Pressure season cards: effects that land when the card arrives, whatever the answer. */
+    arrivalEffects: z.array(timedEventEffectSchema).default([]),
     choices: z.array(choice),
     defaultChoice: z.string().nullable(),
   })
@@ -73,14 +99,29 @@ const template = z
       if (fallback?.cost !== 0 || fallback.effects.length)
         issue("Default choice must be a free, no-effect option");
     }
+    const season = card.trigger === "seasonEnd";
+    if (season !== (card.story !== null)) issue("Season stories need the seasonEnd trigger");
+    if (!season && card.cooldownSeasons !== null)
+      issue("Only flagship season cards count cooldowns in seasons");
+    if (season) {
+      if (card.cooldownTurns !== null) issue("Season cards count cooldowns in seasons, not turns");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("Season cards belong to the flagship: campaign scope, no anchor or health filter");
+      if ((card.story === "champion") !== (card.kind === "moment"))
+        issue("The champion card is the season's moment; every other season card is a decision");
+    }
+    if (card.arrivalEffects.length && !(season && card.tone === "pressure"))
+      issue("Arrival effects belong to pressure season cards only");
     for (const effect of [...card.effects, ...card.choices.flatMap((c) => c.effects)]) {
       if (effect.type === "rivalSetback" && card.trigger !== "rivalEscalated")
         issue("Rival setbacks require a recorded rival escalation");
       if (
         effect.type === "leagueHealth" &&
-        !["leaguePressure", "leagueFormed", "leaguePromoted"].includes(card.trigger)
+        !["leaguePressure", "leagueFormed", "leaguePromoted", "seasonEnd"].includes(card.trigger)
       )
         issue("Health effects require a league fact");
+      if (effect.type === "clubRating" && !season)
+        issue("Club rating effects belong to flagship season cards only");
     }
   });
 export const eventsFileSchema = z
@@ -103,6 +144,13 @@ export const eventsFileSchema = z
   .superRefine((data, ctx) => {
     if (new Set(data.cards.map((c) => c.id)).size !== data.cards.length)
       ctx.addIssue({ code: "custom", path: ["cards"], message: "Duplicate event id" });
+    const stories = data.cards.flatMap((c) => (c.story === null ? [] : [c.story]));
+    if (new Set(stories).size !== stories.length)
+      ctx.addIssue({
+        code: "custom",
+        path: ["cards"],
+        message: "Two cards tell the same season story",
+      });
   });
 export type EventsContent = z.infer<typeof eventsFileSchema>;
 export type EventTemplate = EventsContent["cards"][number];
