@@ -75,8 +75,8 @@ window.SF_PROGRESS = {
       system: "growth",
     },
     {
-      title: "Holding #1 got easier with season cards",
-      text: "Lead lost before the win in 9 of 47 campaigns (19%; was 36–43%); the design targets about half. Builder, 5 typical anchors, 200 turns. Season stories fire about 69 times a campaign; close finish alone 25 (market-it taken almost always). Tune season card frequency and value.",
+      title: "Holding #1 needs more resistance",
+      text: "Lead lost before the win in 20 of 56 campaigns (36%); the design targets about half. Builder, 12 typical anchors × 5 seeds, 200 turns. Season cards are neutral here (9 of 47 with and without them on a 5-anchor sample).",
       date: "2026-10-03",
       system: "rivals",
     },
@@ -92,7 +92,7 @@ window.SF_PROGRESS = {
       date: "2026-10-03",
       type: "Review",
       title: "Testing is time-boxed",
-      text: "Tests time out at 30 s (suite ~30 s). The runner states its plan, shows progress and stops early when projected past 5 minutes; experiment defaults now finish in minutes and the all-markets option is gone.",
+      text: "Tests time out at 30 s (suite ~30 s). The runner states its plan, shows progress and stops early when projected past 5 minutes; experiments keep 12 sampled anchors with 5 seeds each and the all-markets option is gone.",
     },
     {
       date: "2026-10-03",

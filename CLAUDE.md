@@ -42,7 +42,7 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   as slow (`vitest.config.ts`); a test that needs more is too big. Per-anchor sweeps run on at most
   the 11 `sweepAnchors` in `tests/helpers.ts`; new tests use two anchors or fewer and as few turns
   as prove the point.
-- `npm run sim -- --campaigns 10 --turns 100`: headless runner, which writes to `runs/latest/`.
+- `npm run sim -- --campaigns 5 --turns 100`: headless runner, which writes to `runs/latest/`.
   `--help` lists the options, bots (greedy-spread, builder, anchor-turtle, media-rush, random) and
   experiments. A 200-turn campaign takes about 2-3 s. Every run prints its plan (campaign count)
   first and progress every 15 s, and stops after its first campaign if it is projected to run past
@@ -50,10 +50,11 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   only when the user asks for a long run. Bots answer event decisions by their own weights
   (`src/runner/event-policy.ts`); the run prints how often each choice was taken, the win contest
   (#1 lost before the win), and the flagship's title spread.
-- `npm run sim -- --experiment pacing --campaigns 10 --turns 200`: one balance experiment (about
-  2 minutes). Experiments: differentiation, collapse, hard-anchor, pacing, options, rivals,
+- `npm run sim -- --experiment pacing --turns 200`: one balance experiment (12 anchors × 5 seeds,
+  about 3 minutes; it also gives the win contest). Experiments: differentiation, collapse, hard-anchor, pacing, options, rivals,
   benchmark. Misses are reported, never counted as passes. Defaults are sized to finish in minutes:
-  balanceTargets.experimentAnchors (5) sampled anchors, optionsGenomesPerAnchor (40),
+  balanceTargets.experimentAnchors (12) sampled anchors with 5 seeds each (spread beats
+  repetition: 5 anchors misread the win contest as 19% when 12 read 36%), optionsGenomesPerAnchor (40),
   nodeDominanceGenomesPerBot (15), naiveBotCollapseSeeds (15), three bots for rivals and
   hard-anchor. The options experiment flags an option or node only when its share is above the
   limit beyond sampling noise. Pacing uses typical-size anchors by default. Every run also prints

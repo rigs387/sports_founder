@@ -64,7 +64,8 @@ Every run states its plan (campaign count) first, prints progress every 15 s, an
 first campaign if it is projected to run past --max-minutes. Keep runs small enough to watch.
 
 Usage: npm run sim -- [options]
-  --campaigns <n>    campaigns (plain run) or seeds per cell (experiments) (default 10)
+  --campaigns <n>    campaigns (plain run) or seeds per cell (experiments) (default 5; more
+                     anchors beat more seeds for the same time)
   --max-minutes <n>  time budget; a run projected to take longer stops early (default 5)
   --turns <n>        maximum turns per campaign; a campaign stops early if it ends (default 100)
   --seed <n>         first seed; campaign i uses seed + i (default 1)
@@ -410,7 +411,7 @@ function printBenchmark(report: BenchmarkReport): void {
 function main(): number {
   const { values } = parseArgs({
     options: {
-      campaigns: { type: "string", default: "10" },
+      campaigns: { type: "string", default: "5" },
       "max-minutes": { type: "string", default: "5" },
       turns: { type: "string", default: "100" },
       seed: { type: "string", default: "1" },
