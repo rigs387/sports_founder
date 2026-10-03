@@ -63,6 +63,7 @@ surface before playtesting or during it.
 | 2026-09-26 | Culture, founding character and stars (GDD v1.12), drawing on God of Sport's v1.9 lesson that bought culture isn't felt. Traditions emerge from sim facts (closed type vocabulary), help and constrain; the Culture tree category nurtures them. Founding character (birthplace, ethos, colors/emblem, terms) seeds culture, not affinity. Backed stars ("faces of the sport") with Champions-style commitment; full squads at the flagship, lazy named standouts elsewhere. Suggested build order: stars, creation color, then culture | Decided |
 | 2026-09-26 | Artifacts are tradition types (GDD v1.12): famous venues (earned from facts, founding ground named at creation, help and constrain, can be lost), named trophy, chants/anthems, homegrown gear brand (small demand-free flagship sponsor); films/books later as flavor. Fame is never bought | Decided |
 | 2026-10-02 | Commissioner's seat rules (GDD v1.13): only Professional or Elite leagues can take the seat (the anchor holds it from turn 1 at any tier); a folded non-anchor flagship returns the seat to the anchor at once, free, outside the seasonal window | Decided |
+| 2026-10-02 | Flagship season (GDD v1.14): 8/12/16/20 clubs by league tier, expansion clubs on promotion; European (table) or American (playoffs) format chosen at creation; club ratings drift and pull toward league finances; moving the seat demotes hardcore fans in the country left behind, more at the anchor | Decided |
 
 ---
 

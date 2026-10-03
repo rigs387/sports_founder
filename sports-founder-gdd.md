@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.13 | October 2, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds)*
+*Version 1.14 | October 2, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat)*
 
 ---
 
@@ -76,7 +76,10 @@ turn. Longer turns change how often the player decides, not the economy's math.
 2. **Design the genome** — with qualitative hints (+ / ++ / −) for the anchor country only. No
    world affinity preview; where the sport catches on abroad is discovered in play.
 3. **Name the sport and the founding club** (generated default, editable); choose difficulty preset
-   (Easy / Normal / Hard); optional visible, shareable seed.
+   (Easy / Normal / Hard); optional visible, shareable seed. **Choose the season format (decided
+   2026-10-02):** *European* (the league table decides the champion) or *American* (the same
+   regular season, then playoffs). It is identity, not a genome trait: it never touches affinity,
+   and it applies to the flagship wherever the seat goes.
 4. **Founding character (decided 2026-09-26)** — gives the sport color beyond its rules:
    birthplace (e.g., schoolyard, factory, beach, barracks), ethos (e.g., gentleman's game,
    working-class game, rebel game), colors and a simple emblem (pulled forward from the Phase 2
@@ -163,6 +166,20 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
   - *First build of the seat's depth:* named teams, results, standings and a few named stars
     (system 4), plus real sponsor and TV deals with length, annual value and demands (system 7).
     Venues, youth programs, expansion teams and full rosters come later.
+  - *The flagship season (decided 2026-10-02).* One season per in-game year, ending in the
+    seasonal window. Every club plays every other club home and away. European format: the top
+    of the table is champion. American format: the top clubs (4 when there are 8 clubs, 8 from
+    12 up) play single-match knockout playoffs, with the higher seed at home. Club counts grow
+    with the league tier: 8 Amateur, 12 Semi-Pro, 16 Professional, 20 Elite (config); promotion
+    admits generated expansion clubs, and a step-down drops the newest. Club names are generated
+    from moddable name parts (no real places or clubs).
+  - *Club strength (decided 2026-10-02).* Each club has a rating that drifts randomly every
+    season and is pulled toward the league's financial health, so dynasties form and fade and a
+    struggling league plays worse. Stars plug into this rating when they arrive.
+  - *The purist cost of moving the seat (decided 2026-10-02).* The country the seat leaves loses
+    a config share of its player hardcore fans to casual, a larger share when it leaves the
+    anchor. Anchor resentment can replace this once it exists. The return home after a folded
+    flagship costs nothing.
   - *Every other league* stays on the simple model: fan buckets, one cash line, the League Health
     Ladder, promotion and bailouts.
 
