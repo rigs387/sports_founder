@@ -8,12 +8,28 @@ import {
   emptyEvents,
   endTurn,
   type GameState,
+  newFlagship,
   runTurns,
   SAVE_FORMAT_VERSION,
   SaveError,
   serializeSave,
 } from "../src/sim";
 import { firstAnchor, presetGenome, setupFor, world } from "./helpers";
+
+/** What a format 7 → 8 migration adds: a European flagship at the anchor, starting now. */
+function migratedFlagship(state: GameState): Pick<GameState, "seasonFormat" | "flagship"> {
+  const anchor = state.countries.find((c) => c.countryId === state.anchorCountryId);
+  return {
+    seasonFormat: "european",
+    flagship: newFlagship(
+      world,
+      state.seed,
+      state.anchorCountryId,
+      anchor?.league?.tier ?? "amateur",
+      state.quarter,
+    ),
+  };
+}
 
 const TOTAL_TURNS = 90;
 
@@ -283,11 +299,22 @@ describe("saves with the growth tree (format 5)", () => {
       growthNodes: [],
       landmarks: current.landmarks.filter((l) => l.kind !== "nodeBought"),
     };
-    const { growthNodes: _g, win: _w, events: _e, ...v4State } = withoutTree;
+    const {
+      growthNodes: _g,
+      win: _w,
+      events: _e,
+      seasonFormat: _s,
+      flagship: _f,
+      ...v4State
+    } = withoutTree;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 4, state: v4State }), world);
     expect(loaded.growthNodes).toStrictEqual([]);
     expect(serializeSave(loaded)).toBe(
-      serializeSave({ ...withoutTree, events: emptyEvents(withoutTree.landmarks.length) }),
+      serializeSave({
+        ...withoutTree,
+        events: emptyEvents(withoutTree.landmarks.length),
+        ...migratedFlagship(withoutTree),
+      }),
     );
     const later = playWithPolicy(loaded, 6);
     expect(JSON.parse(serializeSave(later)).formatVersion).toBe(SAVE_FORMAT_VERSION);
@@ -296,10 +323,14 @@ describe("saves with the growth tree (format 5)", () => {
   it("migrates a version 5 save: the win hold starts from nothing, same key order", () => {
     const current = playWithPolicy(createCampaign(world, setup), 40);
     expect(current.win).toStrictEqual({ atTop: false, turnsHeld: 0, won: null });
-    const { win: _w, events: _e, ...v5State } = current;
+    const { win: _w, events: _e, seasonFormat: _s, flagship: _f, ...v5State } = current;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 5, state: v5State }), world);
     expect(loaded.win).toStrictEqual({ atTop: false, turnsHeld: 0, won: null });
-    const migrated = { ...current, events: emptyEvents(current.landmarks.length) };
+    const migrated = {
+      ...current,
+      events: emptyEvents(current.landmarks.length),
+      ...migratedFlagship(current),
+    };
     expect(serializeSave(loaded)).toBe(serializeSave(migrated));
     expect(playWithPolicy(loaded, 6)).toStrictEqual(playWithPolicy(migrated, 6));
   });

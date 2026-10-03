@@ -4,6 +4,7 @@ export * from "./countermoves";
 export * from "./events";
 export * from "./events-state";
 export * from "./fandom";
+export * from "./flagship";
 export * from "./genome";
 export * from "./growth";
 export * from "./hints";

@@ -1,6 +1,7 @@
 import { genomeSchema, startingRivalFanCounts } from "../content";
 import { tierEntry } from "./calendar";
 import { emptyEvents } from "./events-state";
+import { newFlagship } from "./flagship";
 import { newLeague } from "./leagues";
 import { landmarks } from "./records";
 import { newFront, newRivalState } from "./rivals";
@@ -12,6 +13,7 @@ import {
   type Genome,
   OTHER_SPORT_ID,
   PLAYER_SPORT_ID,
+  SEASON_FORMATS,
   type SportState,
   type World,
 } from "./types";
@@ -28,6 +30,11 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
   if (!genome.success) {
     const details = genome.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`);
     throw new Error(`Invalid genome: ${details.join("; ")}`);
+  }
+
+  const seasonFormat = setup.seasonFormat ?? "european";
+  if (!SEASON_FORMATS.includes(seasonFormat)) {
+    throw new Error(`Unknown season format "${String(seasonFormat)}"`);
   }
 
   const { start } = world.config;
@@ -106,6 +113,9 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     landmarks: [landmarks.leagueFormed(1, 0, setup.anchorCountryId, false)],
     yearly: [],
     events: emptyEvents(1),
+    seasonFormat,
+    // The anchor's founding league is the flagship from turn 1 (GDD v1.11).
+    flagship: newFlagship(world, setup.seed, setup.anchorCountryId, "amateur", 0),
   };
 }
 

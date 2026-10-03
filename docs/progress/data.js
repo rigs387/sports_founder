@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-02",
-  design: "GDD v1.13",
+  design: "GDD v1.14",
   stage: "Phase 0 · playable slice",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-02",
-    tests: 717,
-    files: 25,
-    note: "Type checking, purity checks and all tests passed. Lint has existing visual-study warnings.",
+    tests: 739,
+    files: 27,
+    note: "Type checking, purity checks and all tests passed after the flagship simulation landed. Lint has existing visual-study warnings.",
     smokeDate: "2026-09-26",
     smoke:
       "Last recorded UI smoke passed; save/resume continued identically. Not rerun in the October 2 review.",
@@ -81,13 +81,31 @@ window.SF_PROGRESS = {
       system: "rivals",
     },
     {
-      title: "Bots skip the paid event decisions",
-      text: "Current bots use neutral defaults. Add choice policies before judging the deck's balance.",
-      date: "2026-09-26",
+      title: "Paid event choices are now played",
+      text: "Bots pay for choices by their own weights. Builder (6 campaigns): League rescue taken every time; crowded-sidelines recruit 1 in 3.",
+      date: "2026-10-02",
       system: "events",
     },
   ],
   history: [
+    {
+      date: "2026-10-02",
+      type: "Built",
+      title: "The flagship league plays its seasons",
+      text: "Clubs in real places with invented nicknames, a season a year, European or American format, champions on record, seat moves and returns. Simulation only; the screen comes next.",
+    },
+    {
+      date: "2026-10-02",
+      type: "Built",
+      title: "Bots answer event decisions",
+      text: "Each bot weighs a card's choices and pays when it is worth it; the runner reports how often each choice is taken.",
+    },
+    {
+      date: "2026-10-02",
+      type: "Design",
+      title: "The flagship season",
+      text: "Clubs grow with the league tier (8 to 20); European or American format chosen at creation; drifting club strength; a purist cost for moving the seat.",
+    },
     {
       date: "2026-10-02",
       type: "Design",
@@ -239,8 +257,8 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
-      summary: "Abstract leagues work. The player's own flagship still needs teams and seasons.",
-      next: "Start the flagship at the anchor. Simulate named teams, results, standings and champions.",
+      summary: "The flagship plays real seasons in the simulation; the player cannot see them yet.",
+      next: "Build the flagship screen and the format choice at creation; then feed titles into events.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
@@ -249,8 +267,10 @@ window.SF_PROGRESS = {
       items: [
         ["built", "Formation, Amateur-to-Elite tiers and local finances"],
         ["built", "Health ladder, promotion, restructuring and bailouts"],
-        ["planned", "Flagship seat: Professional+ moves in season windows; home on collapse"],
-        ["planned", "Named teams, results, standings and retained season summaries"],
+        ["built", "Flagship seat: Professional+ moves in season windows; home on collapse"],
+        ["built", "Named clubs in real places, results, standings and retained season summaries"],
+        ["planned", "Flagship screen: table, results, champions and the seat"],
+        ["planned", "European or American format chosen on the creation screen"],
         ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
         ["planned", "Standing policies and hired league directors"],
         ["planned", "Anchor purist resentment from neglect, rule changes and seat moves"],
@@ -275,7 +295,7 @@ window.SF_PROGRESS = {
         ["built", "Reward collection, journal and saved pending cards"],
         ["partial", "Event library: 8 of a planned 40–60 cards"],
         ["planned", "Broader tier-weighted negative events and personal stories"],
-        ["planned", "Bots that weigh and choose non-default options"],
+        ["built", "Bots that weigh and choose non-default options"],
       ],
     },
     {

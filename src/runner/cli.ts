@@ -34,6 +34,7 @@ import {
   campaignsCsv,
   countriesCsv,
   eventAggregate,
+  flagshipAggregate,
   growthAggregate,
   median,
   nodeOutcomesCsv,
@@ -633,6 +634,7 @@ function main(): number {
   const agg = aggregate(results, tierCount);
   const growth = growthAggregate(results, world.growthTree);
   const events = eventAggregate(results);
+  const flagship = flagshipAggregate(results);
   const summary = {
     settings: {
       campaigns,
@@ -649,6 +651,7 @@ function main(): number {
     aggregate: agg,
     growth,
     events,
+    flagship,
     experimentReports: written,
     campaigns: experiments.length === 0 ? results : undefined,
   };
@@ -682,6 +685,9 @@ function main(): number {
     printRivalActivity(agg);
     printGrowth(growth, results.length);
     printEvents(events);
+    console.log(
+      `  Flagship: seasons median ${fmt(flagship.seasons.median)}; different champions median ${fmt(flagship.distinctChampions.median)}; the most successful club's share of titles median ${pct(flagship.mostTitlesShare.median ?? 0)}, max ${pct(flagship.mostTitlesShare.max ?? 0)}`,
+    );
   }
   console.log(`  invalid campaigns: ${agg.campaignsWithInvariantViolations}`);
 

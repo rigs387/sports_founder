@@ -183,6 +183,21 @@ export const sportsFileSchema = z.strictObject({
 export const namesFileSchema = z.strictObject({
   countries: z.record(z.string(), z.string().min(1)),
   sports: z.record(z.string(), z.string().min(1)),
+  /**
+   * Invented flagship club nicknames (GDD v1.14). The place is real (places.yaml); the nickname is
+   * not. Needs at least as many distinct entries as the largest flagship has clubs.
+   */
+  clubNicknames: z.array(z.string().min(1)).min(1),
+});
+
+// ---- Places (GDD v1.14: clubs belong to real places) ---------------------------------------
+
+export const placeSchema = z.strictObject({
+  name: z.string().min(1),
+  population: z.int().min(0),
+});
+export const placesFileSchema = z.strictObject({
+  places: z.record(z.string(), z.array(placeSchema).min(1)),
 });
 
 // ---- Growth tree (GDD PP Growth Tree) ------------------------------------------------------
@@ -547,6 +562,48 @@ export const configFileSchema = z.strictObject({
     }),
   }),
   seasonalWindow: z.strictObject({ quarterOfYear: z.int().min(1).max(4) }),
+  flagship: z.strictObject({
+    clubs: z.strictObject({
+      amateur: z.int().min(2),
+      "semi-pro": z.int().min(2),
+      professional: z.int().min(2),
+      elite: z.int().min(2),
+    }),
+    /** American format: the playoff field for the most clubs at or above each size. */
+    playoffs: z.array(z.strictObject({ minClubs: z.int().min(2), clubs: z.int().min(2) })).min(1),
+    points: z.strictObject({ win: z.int().min(0), draw: z.int().min(0) }),
+    match: z.strictObject({
+      chances: z.int().min(1),
+      baseRate: unitInterval,
+      ratingEffect: z.number().min(0),
+      homeAdvantage: z.number().min(0),
+      minRate: unitInterval,
+      maxRate: unitInterval,
+      maxDeciders: z.int().min(1),
+    }),
+    rating: z.strictObject({
+      start: z.number(),
+      startSpread: z.number().min(0),
+      min: z.number(),
+      max: z.number(),
+      drift: z.number().min(0),
+      reversion: unitInterval,
+      financePull: unitInterval,
+      healthTarget: z.strictObject({
+        healthy: z.number(),
+        struggling: z.number(),
+        "near-collapse": z.number(),
+      }),
+      expansionPenalty: z.number().min(0),
+    }),
+    /** A new club's place is drawn with weight population ^ placeWeightExponent. */
+    placeWeightExponent: z.number().min(0),
+    seatEligibleTiers: z.array(leagueTierSchema).min(1),
+    seatMove: z.strictObject({
+      hardcoreDemotionShare: unitInterval,
+      anchorHardcoreDemotionShare: unitInterval,
+    }),
+  }),
   tierTrack: z.strictObject({
     telegraphTurns: z.int().min(0),
     demotionLine: z.number().gt(0).lt(1),
@@ -586,6 +643,8 @@ export type GenomeContent = z.infer<typeof genomeFileSchema>;
 export type RivalSport = z.infer<typeof rivalSportSchema>;
 export type SportsContent = z.infer<typeof sportsFileSchema>;
 export type Names = z.infer<typeof namesFileSchema>;
+export type Place = z.infer<typeof placeSchema>;
+export type Places = z.infer<typeof placesFileSchema>["places"];
 export type SourceEntry = z.infer<typeof sourceEntrySchema>;
 export type Sources = z.infer<typeof sourcesFileSchema>;
 export type NodeEffect = z.infer<typeof nodeEffectSchema>;

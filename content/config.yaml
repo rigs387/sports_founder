@@ -442,6 +442,60 @@ leagues:
 seasonalWindow:
   quarterOfYear: 3
 
+# The flagship league (GDD v1.11 commissioner's seat, v1.14 flagship season). The player runs one
+# league in depth: named clubs, a season a year that ends in the seasonal window, a champion. Its
+# matches roll on their own random stream, so the world's random sequence (fans, spread, rivals)
+# is the same whether or not the flagship plays.
+flagship:
+  # Clubs by the flagship league's tier. Promotion admits generated expansion clubs at the next
+  # season start; a step-down drops the newest clubs.
+  clubs: { amateur: 8, semi-pro: 12, professional: 16, elite: 20 }
+  # American format: the playoff field is the entry with the largest minClubs the league reaches.
+  # Single-match knockouts, higher seed at home.
+  playoffs:
+    - { minClubs: 8, clubs: 4 }
+    - { minClubs: 12, clubs: 8 }
+  points: { win: 3, draw: 1 }
+  # A match: each side gets `chances` scoring rolls, each scoring with probability
+  #   clamp(baseRate + ratingEffect × (own rating − opponent rating ± homeAdvantage ÷ 2),
+  #         minRate, maxRate)
+  # so a draw is possible. A drawn playoff is settled by deciders (one roll each) until one side
+  # scores alone; after maxDeciders, the higher seed goes through.
+  match:
+    chances: 6
+    baseRate: 0.3
+    ratingEffect: 0.008
+    homeAdvantage: 4
+    minRate: 0.05
+    maxRate: 0.8
+    maxDeciders: 10
+  # Club ratings. Start at start ± startSpread. At each season's end every rating moves by
+  #   uniform(−drift, drift) + reversion × (league mean − rating)
+  #   + financePull × (healthTarget[league health] − league mean)
+  # and is clamped to [min, max]: dynasties form and fade, and a struggling league plays worse.
+  # An expansion club starts expansionPenalty below the league mean.
+  rating:
+    start: 50
+    startSpread: 8
+    min: 1
+    max: 100
+    drift: 6
+    reversion: 0.15
+    financePull: 0.2
+    healthTarget: { healthy: 50, struggling: 44, near-collapse: 38 }
+    expansionPenalty: 5
+  # A new club is based in one of its market's real places (places.yaml), drawn with weight
+  # population ^ placeWeightExponent: big cities host several clubs, small towns sometimes one.
+  placeWeightExponent: 0.5
+  # The seat moves only to these league tiers (GDD v1.13); the anchor holds it from turn 1 at any
+  # tier.
+  seatEligibleTiers: [professional, elite]
+  # The purist cost of moving the seat (GDD v1.14): this share of the player's hardcore fans in
+  # the country the seat leaves demote to casual, more when it leaves the anchor.
+  seatMove:
+    hardcoreDemotionShare: 0.03
+    anchorHardcoreDemotionShare: 0.08
+
 # Win condition (GDD Win condition, Post-win play): the player's sport wins by ending holdTurns
 # turns in a row as #1 by global Fandom Score among modeled sports (player + rivals; the "other"
 # bucket is not a sport) while at PP tier requiredTier or above (decided 2026-09-18: a Backyard Game

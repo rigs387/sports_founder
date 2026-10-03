@@ -14,6 +14,7 @@ import {
   growthTreeFileSchema,
   LEAGUE_TIERS,
   namesFileSchema,
+  placesFileSchema,
   RESERVED_SPORT_IDS,
   SOURCED_FIELDS,
   sourcesFileSchema,
@@ -27,6 +28,7 @@ export const CONTENT_FILES = {
   growthTree: "growth-tree.yaml",
   events: "events.yaml",
   names: "names.yaml",
+  places: "places.yaml",
   sources: "sources.yaml",
   config: "config.yaml",
 } as const;
@@ -104,6 +106,7 @@ export function loadWorld(sources: ContentSources): World {
   const growthTree = parseSource(sources.growthTree, growthTreeFileSchema, issues);
   const events = parseSource(sources.events, eventsFileSchema, issues);
   const names = parseSource(sources.names, namesFileSchema, issues);
+  const placesFile = parseSource(sources.places, placesFileSchema, issues);
   const sourcesFile = parseSource(sources.sources, sourcesFileSchema, issues);
   const config = parseSource(sources.config, configFileSchema, issues);
   if (
@@ -113,6 +116,7 @@ export function loadWorld(sources: ContentSources): World {
     !growthTree ||
     !events ||
     !names ||
+    !placesFile ||
     !sourcesFile ||
     !config
   ) {
@@ -127,6 +131,7 @@ export function loadWorld(sources: ContentSources): World {
     growthTree,
     events,
     names,
+    places: placesFile.places,
     sources: sourcesFile,
     config,
   });
@@ -244,6 +249,43 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
   }
   for (const nameId of Object.keys(world.names.sports)) {
     if (!rivalIds.has(nameId)) issue(sources.names, `sports.${nameId}`, "unknown sport id");
+  }
+  // Every club in the largest flagship needs its own place and nickname (GDD v1.14).
+  const mostClubs = Math.max(...Object.values(world.config.flagship.clubs));
+  const nicknames = world.names.clubNicknames;
+  if (new Set(nicknames).size !== nicknames.length) {
+    issue(sources.names, "clubNicknames", "has duplicate entries");
+  }
+  if (new Set(nicknames).size < mostClubs) {
+    issue(sources.names, "clubNicknames", `needs at least ${mostClubs} distinct entries`);
+  }
+  // ---- Places: every market has at least one real place for its clubs ------------------------
+  for (const country of world.countries) {
+    if (world.places[country.id] === undefined) {
+      issue(sources.places, `places.${country.id}`, "missing: every market needs a real place");
+    }
+  }
+  for (const placeId of Object.keys(world.places)) {
+    if (!countryIds.has(placeId)) issue(sources.places, `places.${placeId}`, "unknown country id");
+  }
+  const { flagship } = world.config;
+  const tierSizes = LEAGUE_TIERS.map((tier) => flagship.clubs[tier]);
+  if (tierSizes.some((size, i) => i > 0 && size < (tierSizes[i - 1] ?? 0))) {
+    issue(sources.config, "flagship.clubs", "club counts must not shrink at higher league tiers");
+  }
+  for (const [i, entry] of flagship.playoffs.entries()) {
+    if (entry.clubs > entry.minClubs) {
+      issue(sources.config, `flagship.playoffs.${i}`, "cannot take more clubs than the league has");
+    }
+  }
+  if (!flagship.playoffs.some((entry) => entry.minClubs <= (tierSizes[0] ?? 0))) {
+    issue(sources.config, "flagship.playoffs", "needs an entry for the smallest flagship");
+  }
+  if (flagship.rating.min >= flagship.rating.max) {
+    issue(sources.config, "flagship.rating", "min must be below max");
+  }
+  if (flagship.match.minRate > flagship.match.maxRate) {
+    issue(sources.config, "flagship.match", "minRate must not exceed maxRate");
   }
 
   // ---- Genome ------------------------------------------------------------------------------

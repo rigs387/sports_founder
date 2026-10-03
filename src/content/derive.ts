@@ -10,6 +10,7 @@ import type {
   GrowthTreeContent,
   Names,
   OptionModifiers,
+  Places,
   RivalSport,
   Sources,
   SportsContent,
@@ -35,6 +36,8 @@ export interface WorldContent {
   growthTree: GrowthTreeContent;
   events: EventsContent;
   names: Names;
+  /** Real places per market, biggest first: where flagship clubs are based. */
+  places: Places;
   sources: Sources;
   config: Config;
 }
@@ -274,6 +277,7 @@ export function deriveWorld(content: WorldContent): World {
     growthTree: content.growthTree,
     events: content.events,
     names: content.names,
+    places: content.places,
     sources: content.sources,
     config: content.config,
   };

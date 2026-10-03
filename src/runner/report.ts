@@ -102,6 +102,8 @@ export interface CampaignResult {
   eventAnswers: Record<string, number>;
   /** PP paid for decision-card choices. */
   ppSpentOnEvents: number;
+  /** Flagship seasons finished, how many clubs won one, and the most titles any club won. */
+  flagship: { seasons: number; distinctChampions: number; mostTitles: number };
   /** Per fork id: the node chosen, or null if the fork was never decided. */
   forkChoices: Record<string, string | null>;
   /** PP banked and cumulative PP spent on nodes after the sampled turns that were played. */
@@ -305,6 +307,18 @@ export function growthAggregate(
     nodes,
     forks,
     timeline,
+  };
+}
+
+/** Flagship history across campaigns (GDD v1.14): how spread out the titles are. */
+export function flagshipAggregate(results: CampaignResult[]) {
+  const withSeasons = results.filter((r) => r.flagship.seasons > 0);
+  return {
+    seasons: distribution(results.map((r) => r.flagship.seasons)),
+    distinctChampions: distribution(withSeasons.map((r) => r.flagship.distinctChampions)),
+    mostTitlesShare: distribution(
+      withSeasons.map((r) => r.flagship.mostTitles / r.flagship.seasons),
+    ),
   };
 }
 

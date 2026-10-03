@@ -1,5 +1,6 @@
 import { turnLengthQuarters } from "./calendar";
 import { offerEvents, settleEvents } from "./events";
+import { returnSeatIfFolded } from "./flagship";
 import { evaluateLeagues } from "./leagues";
 import { stepQuarter } from "./quarter";
 import { applyDefaultSlotDrops, updateTierTrack } from "./tiers";
@@ -15,7 +16,8 @@ export class CampaignOverError extends Error {
  * 1. focus slots still owed after a demotion are dropped by default (highest-numbered first);
  * 2. the turn's quarters are simulated, with length set by the PP tier at the start of the turn;
  * 3. every league's health is evaluated once and moves at most one rung; collapses fold leagues,
- *    and an anchor collapse ends the campaign unless the sport has already won;
+ *    and an anchor collapse ends the campaign unless the sport has already won; a folded
+ *    flagship sends the commissioner's seat home to the anchor;
  * 4. the PP tier track is checked; a tier change takes effect from the next turn;
  * 5. the win hold is checked (src/sim/win.ts). Winning never ends the campaign.
  * Turns always complete. Refuses to play a campaign that has already ended.
@@ -41,6 +43,8 @@ export function endTurn(state: GameState, world: World): GameState {
         ? [...next.landmarks, ...evaluation.landmarks]
         : next.landmarks,
   };
+  // A folded flagship sends the seat home (GDD v1.13).
+  next = returnSeatIfFolded(next, world);
   next = updateTierTrack(next, world);
   next = updateWinTrack(next, world);
   return offerEvents({ ...next, turn: start.turn + 1 }, world, quarters);

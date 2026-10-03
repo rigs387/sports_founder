@@ -335,6 +335,17 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       ppSpentOnNodes,
       eventAnswers,
       ppSpentOnEvents,
+      flagship: (() => {
+        const titles = new Map<number, number>();
+        for (const season of state.flagship.seasons) {
+          titles.set(season.championId, (titles.get(season.championId) ?? 0) + 1);
+        }
+        return {
+          seasons: state.flagship.seasons.length,
+          distinctChampions: titles.size,
+          mostTitles: Math.max(0, ...titles.values()),
+        };
+      })(),
       forkChoices: Object.fromEntries(
         world.growthTree.forks.map((fork) => [
           fork.id,

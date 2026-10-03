@@ -5,6 +5,7 @@ import { mediaRevenueFactor } from "./countermoves";
 import { type EventSnapshot, eventSnapshots } from "./events";
 import type { EventState } from "./events-state";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
+import { type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { growthFactorsAt, type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
 import { type LeagueActions, leagueActions } from "./league-actions";
@@ -140,6 +141,8 @@ export interface TurnSnapshot {
   events: EventSnapshot[];
   eventHistory: EventState["history"];
   eventModifiers: EventState["modifiers"];
+  /** The league the player runs as commissioner (GDD v1.11, v1.14). */
+  flagship: FlagshipSnapshot;
 }
 
 export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeSnapshot[] {
@@ -277,5 +280,6 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     countries,
     growthNodes: growthNodeSnapshots(state, world),
     landmarkCount: state.landmarks.length,
+    flagship: flagshipSnapshot(state, world),
   };
 }

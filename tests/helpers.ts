@@ -34,6 +34,7 @@ export function withWorld(base: World, edit: (content: WorldContent) => void): W
     growthTree: base.growthTree,
     events: base.events,
     names: base.names,
+    places: base.places,
     sources: base.sources,
     config: base.config,
   });

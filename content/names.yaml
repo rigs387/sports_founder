@@ -220,3 +220,48 @@ countries:
 sports:
   soccer: Soccer
   cricket: Cricket
+
+# Invented flagship club nicknames (GDD v1.14). Clubs are based in real places (places.yaml); only
+# the nickname is made up, e.g. "Glasgow Comets". Needs at least as many entries as the largest
+# flagship has clubs.
+clubNicknames:
+  - Anchors
+  - Badgers
+  - Bandits
+  - Bears
+  - Blazers
+  - Bulls
+  - Comets
+  - Cyclones
+  - Dragons
+  - Eagles
+  - Falcons
+  - Foxes
+  - Giants
+  - Hawks
+  - Herons
+  - Hornets
+  - Jaguars
+  - Kestrels
+  - Lions
+  - Lynx
+  - Mariners
+  - Miners
+  - Owls
+  - Panthers
+  - Pilots
+  - Pioneers
+  - Ravens
+  - Rangers
+  - Rockets
+  - Rovers
+  - Sharks
+  - Spartans
+  - Stags
+  - Storm
+  - Swifts
+  - Thunder
+  - Titans
+  - Vikings
+  - Wanderers
+  - Wolves
