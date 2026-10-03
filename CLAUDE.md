@@ -33,6 +33,9 @@ runs/                 Runner and smoke-test output (git-ignored)
 ## Commands
 
 - `npm run check`: type check, Biome, purity check, and tests. Run this before calling anything done.
+  Per-anchor sweeps (state validity, determinism) run on 11 anchors spanning the world's extremes
+  (`sweepAnchors` in `tests/helpers.ts`). Never write or run a test that plays campaigns from all
+  213 countries; use `sweepAnchors` or a smaller sample.
 - `npm run sim -- --campaigns 20 --turns 100`: headless runner, which writes to `runs/latest/`.
   `--help` lists the options, bots (greedy-spread, builder, anchor-turtle, media-rush, random) and
   experiments. Bots answer event decisions by their own weights (`src/runner/event-policy.ts`); the
@@ -46,6 +49,9 @@ runs/                 Runner and smoke-test output (git-ignored)
   balanceTargets.optionsGenomesPerAnchor (250) random genomes per anchor and flags an option or node
   only when its share is above the limit beyond sampling noise; collapse gives the naive bot
   naiveBotCollapseSeeds (50) seeds. Pacing uses typical-size anchors by default.
+- Balance experiments are long. Run a single experiment (`--experiment pacing`, etc.) when tuning
+  the numbers it measures, and `--experiment all` only when the user asks or a phase's exit
+  criteria are being checked. Never run them as a routine check after a change.
 - `npm run dev`: launch the app with hot reload.
 - `npm run smoke`: build the app, launch it, click End Turn, and save screenshots and a report to
   `runs/smoke/`.

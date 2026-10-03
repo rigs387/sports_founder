@@ -8,7 +8,7 @@ import {
   runTurns,
   serializeSave,
 } from "../src/sim";
-import { firstAnchor, presetGenome, setupFor, world } from "./helpers";
+import { firstAnchor, presetGenome, setupFor, sweepAnchors, world } from "./helpers";
 
 const TURNS = 80;
 
@@ -77,15 +77,12 @@ describe("determinism", () => {
     expect(b).toStrictEqual(a);
   });
 
-  it.each(world.countries.map((country) => country.id))(
-    "is deterministic from anchor %s",
-    (anchor) => {
-      const setup = setupFor(99, anchor);
-      const a = runTurns(createCampaign(world, setup), world, 40);
-      const b = runTurns(createCampaign(world, setup), world, 40);
-      expect(b).toStrictEqual(a);
-    },
-  );
+  it.each(sweepAnchors)("is deterministic from anchor %s", (anchor) => {
+    const setup = setupFor(99, anchor);
+    const a = runTurns(createCampaign(world, setup), world, 40);
+    const b = runTurns(createCampaign(world, setup), world, 40);
+    expect(b).toStrictEqual(a);
+  });
 
   it("different seeds diverge, so the seeded RNG really drives outcomes", () => {
     const a = runTurns(createCampaign(world, setupFor(1)), world, 20);

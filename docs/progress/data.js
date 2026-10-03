@@ -284,7 +284,7 @@ window.SF_PROGRESS = {
         ["built", "Named clubs in real places, results, standings and retained season summaries"],
         ["built", "Flagship screen: table, results, champions and the seat"],
         ["built", "European or American format chosen on the creation screen"],
-        ["planned", "Season cards: champion moment, story decisions, pressure cards, club strength effect"],
+        ["planned", "Season cards: champion, story and pressure cards; club strength"],
         ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
         ["planned", "Standing policies and hired league directors"],
         ["planned", "Anchor purist resentment from neglect, rule changes and seat moves"],
