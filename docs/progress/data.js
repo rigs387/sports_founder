@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-03",
-  design: "GDD v1.14",
+  design: "GDD v1.15",
   stage: "Phase 0 · playable slice",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Design",
+      title: "The flagship season as event cards",
+      text: "A champion moment every season, at most one story decision (dynasty, underdog, first title, close finish, repeat final), pressure cards for runaway champions, and a club strength effect only season cards use (GDD v1.15).",
+    },
     {
       date: "2026-10-03",
       type: "Built",
@@ -278,6 +284,7 @@ window.SF_PROGRESS = {
         ["built", "Named clubs in real places, results, standings and retained season summaries"],
         ["built", "Flagship screen: table, results, champions and the seat"],
         ["built", "European or American format chosen on the creation screen"],
+        ["planned", "Season cards: champion moment, story decisions, pressure cards, club strength effect"],
         ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
         ["planned", "Standing policies and hired league directors"],
         ["planned", "Anchor purist resentment from neglect, rule changes and seat moves"],

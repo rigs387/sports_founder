@@ -68,6 +68,11 @@ never turn a bonus into a penalty.
 
 **Events:** Moments (auto) + decision cards (capped per turn), built only from recorded sim facts,
 using a closed list of effect types. Negative events grow with tier.
+Each flagship season ends in a champion moment and at most one story decision (dynasty, underdog,
+first title, close finish, repeat final); runaway champions raise pressure cards. Club strength is
+the one effect only season cards use.
+Pressure drains land on arrival (paying fixes the league, never the drain); season-card cooldowns
+count in seasons.
 
 **Rivals:** Real-world sports, present day — soccer, cricket, basketball, American football,
 baseball, ice hockey, rugby, combat sports, plus a passive "other" bucket. Defense budgets,
