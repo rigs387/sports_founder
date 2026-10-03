@@ -22,6 +22,7 @@ import {
   SEED_WARM_UP_DRAWS,
   type World,
 } from "../sim";
+import { chooseEvents, EVENT_WEIGHTS, type EventWeights } from "./event-policy";
 
 // Bot playtesters (tech plan 2.1). Bots act only through checkAction/applyAction, the same legal
 // actions as the player. The thresholds here shape bot behavior only; they are not game balance.
@@ -47,8 +48,13 @@ import {
 //                  unlocked it saves for the next Media node and buys Grassroots only when it owns
 //                  every Media node it wants. Before Media unlocks it buys Grassroots, cheapest
 //                  first.
-//   random         each turn, maybe one random legal action. Its dice are separate from the
-//                  simulation's RNG, so it never changes the world's random sequence.
+//   random         each turn, maybe one random legal action, and a random legal answer to each
+//                  decision card. Its dice are separate from the simulation's RNG, so it never
+//                  changes the world's random sequence.
+// Every bot except random and none first answers decision cards (event-policy.ts): greedy-spread
+// values any upside and spends freely, builder weighs effects evenly, anchor-turtle prizes hardcore
+// fans and league health, media-rush prizes casual fans and media and language spread. They keep
+// the same PP reserve as for growth nodes.
 //   none           does nothing.
 
 export type BotId =
@@ -86,6 +92,18 @@ const TURTLE_RESERVE_BAILOUTS = 2;
 export interface BotStep {
   state: GameState;
   actions: Action[];
+}
+
+/** Answers pending decision cards before the bot spends PP elsewhere. */
+function answerEvents(state: GameState, world: World, weights: EventWeights, reserve: number) {
+  const answered = chooseEvents(state, world, weights, reserve);
+  return { state: answered.state, actions: answered.actions } satisfies BotStep;
+}
+
+/** Runs a bot's own turn after its event answers, keeping both sets of actions. */
+function afterEvents(events: BotStep, play: (state: GameState) => BotStep): BotStep {
+  const step = play(events.state);
+  return { state: step.state, actions: [...events.actions, ...step.actions] };
 }
 
 function attempt(step: BotStep, world: World, action: Action): boolean {
@@ -213,7 +231,7 @@ function bailoutReserve(state: GameState, world: World, bailouts: number): numbe
 
 // ---- Bots -----------------------------------------------------------------------------------
 
-export function greedySpread(state: GameState, world: World): BotStep {
+function greedySpreadTurn(state: GameState, world: World): BotStep {
   const step = greedySpreadFocus(state, world);
   for (const country of world.countries) {
     attempt(step, world, { type: "promoteLeague", countryId: country.id });
@@ -308,7 +326,7 @@ function manageLeagues(step: BotStep, world: World): void {
   }
 }
 
-export function builder(state: GameState, world: World): BotStep {
+function builderTurn(state: GameState, world: World): BotStep {
   const spread = spreadFocus(state, world, countriesByFit(state, world));
   const step: BotStep = { state: spread.state, actions: [...spread.actions] };
   manageLeagues(step, world);
@@ -332,7 +350,7 @@ export function builder(state: GameState, world: World): BotStep {
   return step;
 }
 
-export function anchorTurtle(state: GameState, world: World): BotStep {
+function anchorTurtleTurn(state: GameState, world: World): BotStep {
   const step: BotStep = { state, actions: [] };
   const anchor = state.anchorCountryId;
   const anchorIndex = indexOf(world, anchor);
@@ -393,7 +411,7 @@ function reachScore(world: World, nodeId: string): number {
   }, 0);
 }
 
-export function mediaRush(state: GameState, world: World): BotStep {
+function mediaRushTurn(state: GameState, world: World): BotStep {
   const exposure = computeExposure(state, world);
   const byMarket = world.countries
     .map((country, index) => ({
@@ -439,7 +457,7 @@ function botRng(state: GameState) {
   return rng;
 }
 
-export function randomBot(state: GameState, world: World): BotStep {
+function randomBotTurn(state: GameState, world: World): BotStep {
   const step: BotStep = { state, actions: [] };
   const rng = botRng(state);
   while (step.state.tierTrack.slotsToDrop > 0) {
@@ -469,6 +487,60 @@ export function randomBot(state: GameState, world: World): BotStep {
             : { type: "buyNode", nodeId: node?.id ?? "" };
   attempt(step, world, action);
   return step;
+}
+
+export function greedySpread(state: GameState, world: World): BotStep {
+  return afterEvents(answerEvents(state, world, EVENT_WEIGHTS.greedy, 0), (s) =>
+    greedySpreadTurn(s, world),
+  );
+}
+
+export function builder(state: GameState, world: World): BotStep {
+  const reserve = bailoutReserve(state, world, BUILDER_RESERVE_BAILOUTS);
+  return afterEvents(answerEvents(state, world, EVENT_WEIGHTS.builder, reserve), (s) =>
+    builderTurn(s, world),
+  );
+}
+
+export function anchorTurtle(state: GameState, world: World): BotStep {
+  const reserve = bailoutReserve(state, world, TURTLE_RESERVE_BAILOUTS);
+  return afterEvents(answerEvents(state, world, EVENT_WEIGHTS.turtle, reserve), (s) =>
+    anchorTurtleTurn(s, world),
+  );
+}
+
+export function mediaRush(state: GameState, world: World): BotStep {
+  const reserve = bailoutReserve(state, world, BUILDER_RESERVE_BAILOUTS);
+  return afterEvents(answerEvents(state, world, EVENT_WEIGHTS.media, reserve), (s) =>
+    mediaRushTurn(s, world),
+  );
+}
+
+/** The random bot's answers: a uniformly random legal choice per decision, on separate dice. */
+function randomEvents(state: GameState, world: World): BotStep {
+  const step: BotStep = { state, actions: [] };
+  const rng = xoroshiro128plus((state.seed * 2_000_029 + state.turn * 6_007) >>> 0);
+  for (let i = 0; i < SEED_WARM_UP_DRAWS; i += 1) rng.next();
+  for (const event of state.events.pending) {
+    const card = world.events.cards.find((c) => c.id === event.templateId);
+    if (card?.kind !== "decision") continue;
+    const legal = card.choices.filter(
+      (choice) =>
+        checkAction(step.state, world, {
+          type: "chooseEvent",
+          eventId: event.id,
+          choiceId: choice.id,
+        }) === null,
+    );
+    const choice = legal[uniformInt(rng, 0, Math.max(0, legal.length - 1))];
+    if (choice)
+      attempt(step, world, { type: "chooseEvent", eventId: event.id, choiceId: choice.id });
+  }
+  return step;
+}
+
+export function randomBot(state: GameState, world: World): BotStep {
+  return afterEvents(randomEvents(state, world), (s) => randomBotTurn(s, world));
 }
 
 export function runBot(bot: BotId, state: GameState, world: World): BotStep {

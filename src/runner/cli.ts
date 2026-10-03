@@ -33,6 +33,7 @@ import {
   type CountryRow,
   campaignsCsv,
   countriesCsv,
+  eventAggregate,
   growthAggregate,
   median,
   nodeOutcomesCsv,
@@ -294,6 +295,23 @@ function printGrowth(growth: ReturnType<typeof growthAggregate>, campaigns: numb
         (point) =>
           `turn ${point.turn}: banked ${fmt(point.medianBanked)}, spent ${fmt(point.medianSpentOnNodes)} (${point.campaigns})`,
       )
+      .join("; ")}`,
+  );
+}
+
+function printEvents(events: ReturnType<typeof eventAggregate>): void {
+  const byCard: Record<string, string[]> = {};
+  for (const [key, n] of Object.entries(events.answers)) {
+    const [card, choice] = key.split("/");
+    const list = byCard[card ?? ""] ?? [];
+    list.push(`${choice} ${n}`);
+    byCard[card ?? ""] = list;
+  }
+  console.log(
+    `  Event decisions: PP spent on choices median ${fmt(events.ppSpentOnEvents.median)}, max ${fmt(events.ppSpentOnEvents.max)}; ${Object.entries(
+      byCard,
+    )
+      .map(([card, choices]) => `${card} ${choices.join(" / ")}`)
       .join("; ")}`,
   );
 }
@@ -614,6 +632,7 @@ function main(): number {
   const tierCount = world.config.ppTiers.length;
   const agg = aggregate(results, tierCount);
   const growth = growthAggregate(results, world.growthTree);
+  const events = eventAggregate(results);
   const summary = {
     settings: {
       campaigns,
@@ -629,6 +648,7 @@ function main(): number {
     anchorGenomeHints: anchorGenomeHints(world, anchor),
     aggregate: agg,
     growth,
+    events,
     experimentReports: written,
     campaigns: experiments.length === 0 ? results : undefined,
   };
@@ -661,6 +681,7 @@ function main(): number {
     console.log(`  Rival activity and player hardcore across all ${results.length} campaign(s):`);
     printRivalActivity(agg);
     printGrowth(growth, results.length);
+    printEvents(events);
   }
   console.log(`  invalid campaigns: ${agg.campaignsWithInvariantViolations}`);
 

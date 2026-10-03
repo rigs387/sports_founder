@@ -98,6 +98,10 @@ export interface CampaignResult {
   /** Growth tree nodes bought, in order, with the turn and the PP paid. */
   nodesBought: { nodeId: string; turn: number; cost: number }[];
   ppSpentOnNodes: number;
+  /** Decision-card answers by "card/choice"; decisions left to End Turn count as the default. */
+  eventAnswers: Record<string, number>;
+  /** PP paid for decision-card choices. */
+  ppSpentOnEvents: number;
   /** Per fork id: the node chosen, or null if the fork was never decided. */
   forkChoices: Record<string, string | null>;
   /** PP banked and cumulative PP spent on nodes after the sampled turns that were played. */
@@ -301,6 +305,19 @@ export function growthAggregate(
     nodes,
     forks,
     timeline,
+  };
+}
+
+/** Decision-card answers across campaigns: how often each choice was taken (GDD Events). */
+export function eventAggregate(results: CampaignResult[]) {
+  const answers: Record<string, number> = {};
+  for (const result of results) {
+    for (const [key, n] of Object.entries(result.eventAnswers))
+      answers[key] = (answers[key] ?? 0) + n;
+  }
+  return {
+    answers: Object.fromEntries(Object.entries(answers).sort(([a], [b]) => a.localeCompare(b))),
+    ppSpentOnEvents: distribution(results.map((r) => r.ppSpentOnEvents)),
   };
 }
 
