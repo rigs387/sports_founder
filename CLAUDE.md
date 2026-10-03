@@ -32,26 +32,36 @@ runs/                 Runner and smoke-test output (git-ignored)
 
 ## Commands
 
+**Testing is time-boxed (decided 2026-10-03).** Concise tests whose results we actually see beat
+thorough ones that never finish. Before running anything, know roughly how long it takes; if it
+would run more than about 5 minutes, make it smaller or ask first. Never play campaigns from all
+213 countries, in tests or the runner.
+
 - `npm run check`: type check, Biome, purity check, and tests. Run this before calling anything done.
-  Per-anchor sweeps (state validity, determinism) run on 11 anchors spanning the world's extremes
-  (`sweepAnchors` in `tests/helpers.ts`). Never write or run a test that plays campaigns from all
-  213 countries; use `sweepAnchors` or a smaller sample.
-- `npm run sim -- --campaigns 20 --turns 100`: headless runner, which writes to `runs/latest/`.
+  The suite takes about half a minute. Each test has a 30 s timeout and tests over 5 s are reported
+  as slow (`vitest.config.ts`); a test that needs more is too big. Per-anchor sweeps run on at most
+  the 11 `sweepAnchors` in `tests/helpers.ts`; new tests use two anchors or fewer and as few turns
+  as prove the point.
+- `npm run sim -- --campaigns 10 --turns 100`: headless runner, which writes to `runs/latest/`.
   `--help` lists the options, bots (greedy-spread, builder, anchor-turtle, media-rush, random) and
-  experiments. Bots answer event decisions by their own weights (`src/runner/event-policy.ts`); the
-  run prints how often each choice was taken and the flagship's title spread.
-- `npm run sim -- --experiment all --campaigns 10 --turns 200`: every balance experiment for the
-  tech plan exit criteria (differentiation, collapse, hard-anchor, pacing, options, rivals,
-  benchmark). Misses are reported, never counted as passes. Every run also prints rival activity,
-  the peak player hardcore share, the years to overtake the anchor's leading rival, and the growth
-  tree report (nodes bought, fork choices, PP banked vs spent). The options experiment also checks
-  that no growth node is owned in more than 40% of top-quartile runs. The options experiment plays
-  balanceTargets.optionsGenomesPerAnchor (250) random genomes per anchor and flags an option or node
-  only when its share is above the limit beyond sampling noise; collapse gives the naive bot
-  naiveBotCollapseSeeds (50) seeds. Pacing uses typical-size anchors by default.
-- Balance experiments are long. Run a single experiment (`--experiment pacing`, etc.) when tuning
-  the numbers it measures, and `--experiment all` only when the user asks or a phase's exit
-  criteria are being checked. Never run them as a routine check after a change.
+  experiments. A 200-turn campaign takes about 2-3 s. Every run prints its plan (campaign count)
+  first and progress every 15 s, and stops after its first campaign if it is projected to run past
+  `--max-minutes` (default 5), saying how to shrink it (`src/runner/budget.ts`). Raise the budget
+  only when the user asks for a long run. Bots answer event decisions by their own weights
+  (`src/runner/event-policy.ts`); the run prints how often each choice was taken, the win contest
+  (#1 lost before the win), and the flagship's title spread.
+- `npm run sim -- --experiment pacing --campaigns 10 --turns 200`: one balance experiment (about
+  2 minutes). Experiments: differentiation, collapse, hard-anchor, pacing, options, rivals,
+  benchmark. Misses are reported, never counted as passes. Defaults are sized to finish in minutes:
+  balanceTargets.experimentAnchors (5) sampled anchors, optionsGenomesPerAnchor (40),
+  nodeDominanceGenomesPerBot (15), naiveBotCollapseSeeds (15), three bots for rivals and
+  hard-anchor. The options experiment flags an option or node only when its share is above the
+  limit beyond sampling noise. Pacing uses typical-size anchors by default. Every run also prints
+  rival activity, the peak player hardcore share, and the growth tree report.
+- Run one experiment at a time, only the one measuring what changed, and `--experiment all` only
+  when the user asks (it will usually need `--turns` or `--campaigns` cut to fit the budget). Pick
+  the experiment that measures the question: the win contest is printed by every run; `rivals`
+  checks only that rivals are never eliminated. Never run experiments as a routine check.
 - `npm run dev`: launch the app with hot reload.
 - `npm run smoke`: build the app, launch it, click End Turn, and save screenshots and a report to
   `runs/smoke/`.

@@ -543,8 +543,10 @@ balanceTargets:
   # lower confidence bound of its top-quartile share (Wilson, z 1.645 = 95%) is above the limit, and
   # the options experiment plays this many random genomes per anchor (or --campaigns if higher). With
   # 10 per anchor a perfectly balanced genome shows ~6 options above 40% by chance.
+  # Cut from 250 to 40 (2026-10-03): runs must finish in minutes. The confidence bound keeps a
+  # smaller sample from flagging noise; it only catches the clearer cases of dominance.
   dominanceZ: 1.645
-  optionsGenomesPerAnchor: 250
+  optionsGenomesPerAnchor: 40
   # Turns spent in each PP tier (GDD campaign length table), and the allowed deviation.
   # Backyard Game ~40 turns and Local Curiosity ~10 (decided 2026-09-14). The last entry is the
   # turns spent in the top tier until the first win: ~180 turns to the first win in all.
@@ -557,10 +559,10 @@ balanceTargets:
   # Collapses on or before this turn are reported separately: they should be very rare.
   earlyCollapseTurn: 20
   # Experiments that sweep anchors use a deterministic sample of this many markets, spread evenly
-  # across the population range, instead of all 213 (decided 2026-09-15): the full sweep is hours of
-  # simulation, and the criteria read the same on a representative spread. `--anchors all` still
-  # plays every market.
-  experimentAnchors: 12
+  # across the population range, instead of all 213 (decided 2026-09-15). Cut from 12 to 5
+  # (2026-10-03): runs must finish in minutes, and five markets from smallest to largest still show
+  # the spread. There is no all-markets option.
+  experimentAnchors: 5
   # The signature hard anchor for the "hard anchors are winnable" criterion (GDD Map and markets).
   hardAnchor: tuvalu
   # Growth node dominance is judged strategy by strategy (decided 2026-09-21). One bot answers the
@@ -570,9 +572,11 @@ balanceTargets:
   # bots owns it in more than dominanceLimit of its own top-quartile runs - a node no strategy can
   # pass up. Each extra bot plays this many random genomes per anchor.
   nodeDominanceBots: [ builder, media-rush, anchor-turtle, greedy-spread ]
-  nodeDominanceGenomesPerBot: 40
+  nodeDominanceGenomesPerBot: 15
   # The naive strategy for the "no safe anchor" criterion.
   naiveBot: greedy-spread
   # Seeds per anchor for the naive bot in the collapse experiment (or --campaigns if higher). Rare
-  # collapses need many seeds: an anchor collapsing 12% of the time shows 0/10 about 28% of the time.
-  naiveBotCollapseSeeds: 50
+  # collapses need many seeds: an anchor collapsing 12% of the time shows 0/15 about 15% of the time.
+  # Cut from 50 to 15 (2026-10-03) to keep the run to minutes; a 0/15 anchor is a lead to follow up
+  # with a targeted run, not a verdict.
+  naiveBotCollapseSeeds: 15

@@ -75,9 +75,9 @@ window.SF_PROGRESS = {
       system: "growth",
     },
     {
-      title: "Holding #1 needs more resistance",
-      text: "Recorded lead-loss rate was 36%; the design targets roughly half. Remeasure after event balancing.",
-      date: "2026-09-22",
+      title: "Holding #1 got easier with season cards",
+      text: "Lead lost before the win in 9 of 47 campaigns (19%; was 36–43%); the design targets about half. Builder, 5 typical anchors, 200 turns. Season stories fire about 69 times a campaign; close finish alone 25 (market-it taken almost always). Tune season card frequency and value.",
+      date: "2026-10-03",
       system: "rivals",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Review",
+      title: "Testing is time-boxed",
+      text: "Tests time out at 30 s (suite ~30 s). The runner states its plan, shows progress and stops early when projected past 5 minutes; experiment defaults now finish in minutes and the all-markets option is gone.",
+    },
     {
       date: "2026-10-03",
       type: "Built",

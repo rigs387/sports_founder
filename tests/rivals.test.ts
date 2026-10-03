@@ -700,7 +700,7 @@ describe("no rival is ever eliminated", () => {
     ["the shipped poaching rate", 1],
     ["ten times the poaching rate", 10],
   ])(
-    "under overwhelming player strength with %s, every rival keeps hardcore fans in every country for 300 turns",
+    "under overwhelming player strength with %s, every rival keeps hardcore fans in every country for 150 turns",
     (_label, multiplier) => {
       const extreme = withConfig(world, (config) => {
         config.dynamics.player.casualConversionRate = 5;
@@ -719,7 +719,7 @@ describe("no rival is ever eliminated", () => {
       const problems: string[] = [];
       let peakPlayerShare = 0;
       let lowestRivalShare = 1;
-      for (let turn = 1; turn <= 300 && state.outcome === null; turn += 1) {
+      for (let turn = 1; turn <= 150 && state.outcome === null; turn += 1) {
         state = endTurn(builder(state, extreme).state, extreme);
         const global = state.rivals.map(() => 0);
         state.countries.forEach((country, i) => {
@@ -746,7 +746,8 @@ describe("no rival is ever eliminated", () => {
       }
       expect(problems).toEqual([]);
       expect(state.outcome).toBeNull();
-      expect(state.quarter).toBeGreaterThan(600);
+      // More than a century of overwhelming pressure.
+      expect(state.quarter).toBeGreaterThan(400);
       // The pressure really was overwhelming, and rivals were squeezed toward the floor.
       expect(peakPlayerShare).toBeGreaterThan(0.5);
       expect(lowestRivalShare).toBeGreaterThan(0);

@@ -1,3 +1,4 @@
+import { performance } from "node:perf_hooks";
 import {
   type Action,
   COUNTERMOVES,
@@ -52,8 +53,23 @@ interface RivalLows {
 
 const lowest = (value: number): WhereAndWhen => ({ value, countryId: "", turn: 0 });
 
+type CampaignListener = (played: PlayedCampaign, ms: number) => void;
+let listener: CampaignListener | null = null;
+
+/** Called after every campaign the runner plays: progress and the time budget (budget.ts). */
+export function onCampaignPlayed(next: CampaignListener | null): void {
+  listener = next;
+}
+
 /** Plays one campaign: the bot acts, then the turn ends, until the turn limit or the end. */
 export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
+  const started = performance.now();
+  const played = playOneCampaign(world, plan);
+  listener?.(played, performance.now() - started);
+  return played;
+}
+
+function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   let state = createCampaign(world, {
     seed: plan.seed,
     anchorCountryId: plan.anchorCountryId,
