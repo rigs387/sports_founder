@@ -1,4 +1,4 @@
-import { QUARTERS_PER_YEAR } from "./calendar";
+import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
@@ -324,14 +324,20 @@ function bracket(n: number): number[] {
   return order;
 }
 
+/** The playoff bracket: the largest power of two within the configured field. */
+export function bracketSize(clubCount: number, world: World): number {
+  let size = 1;
+  while (size * 2 <= playoffField(clubCount, world)) size *= 2;
+  return size < 2 ? 0 : size;
+}
+
 function playPlayoffs(
   rng: Rng,
   ranked: readonly TableRow[],
   clubs: ReadonlyMap<number, Club>,
   world: World,
 ): { matches: MatchResult[]; champion: number; runnerUp: number } {
-  let size = 1;
-  while (size * 2 <= playoffField(ranked.length, world)) size *= 2;
+  const size = Math.max(1, bracketSize(ranked.length, world));
   const seedOf = new Map(ranked.map((row, i) => [row.clubId, i + 1]));
   let alive = bracket(size).map((seed) => ranked[seed - 1]?.clubId ?? 0);
   const matches: MatchResult[] = [];
@@ -713,10 +719,16 @@ export interface FlagshipSnapshot {
   lastRound: MatchResult[];
   /** Every club the campaign has known, by id. */
   clubs: ClubSnapshot[];
-  /** Finished seasons, newest first, without their full tables. */
-  recentSeasons: Omit<SeasonSummary, "standings">[];
+  /** Quarters left in the season, this one included. */
+  quartersLeft: number;
+  /** American format: how many clubs make the playoffs. 0 in the European format. */
+  playoffClubs: number;
+  /** Finished seasons, newest first, without their full tables, with the year each ended. */
+  recentSeasons: (Omit<SeasonSummary, "standings"> & { year: number })[];
   /** Countries whose league could take the seat in the seasonal window (GDD v1.13). */
   seatTargets: string[];
+  /** Share of the seat country's hardcore fans who turn casual if the seat moves away. */
+  leaveCost: number;
 }
 
 /** How many finished seasons the snapshot carries. */
@@ -746,15 +758,24 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
       active: club.active,
       titles: titles.get(club.id) ?? 0,
     })),
+    quartersLeft: flagship.seasonQuarters - flagship.quartersPlayed,
+    playoffClubs: state.seasonFormat === "american" ? bracketSize(flagship.table.length, world) : 0,
     recentSeasons: flagship.seasons
       .slice(-RECENT_SEASONS)
       .reverse()
-      .map(({ standings: _standings, ...summary }) => summary),
+      .map(({ standings: _standings, ...summary }) => ({
+        ...summary,
+        year: yearOfQuarter(summary.quarter - 1, world.config),
+      })),
     seatTargets: state.countries
       .filter(
         (country) =>
           country.countryId !== flagship.countryId && seatEligible(country.league, world),
       )
       .map((country) => country.countryId),
+    leaveCost:
+      flagship.countryId === state.anchorCountryId
+        ? world.config.flagship.seatMove.anchorHardcoreDemotionShare
+        : world.config.flagship.seatMove.hardcoreDemotionShare,
   };
 }

@@ -17,7 +17,7 @@ export async function verifyLeagues(
       true,
     );
   const open = async () => {
-    await click(".game-nav button:nth-child(3)");
+    await click(".game-nav [data-view=leagues]");
     await delay();
   };
   const close = () => click(".overview-dialog > header .icon-button");

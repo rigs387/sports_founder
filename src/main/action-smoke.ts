@@ -36,8 +36,9 @@ export async function verifyActions(
     await evaluate(`document.querySelector('[data-testid="end-turn"]').click()`);
     return waitReady(before.turn + 1);
   };
-  const openGrowth = () => evaluate(`document.querySelectorAll('.game-nav button')[3].click()`);
-  const close = () => evaluate(`document.querySelectorAll('.game-nav button')[0].click()`);
+  const openGrowth = () =>
+    evaluate(`document.querySelector('.game-nav [data-view=growth]').click()`);
+  const close = () => evaluate(`document.querySelector('.game-nav [data-view=world]').click()`);
   const closeDialog = () => evaluate(`document.querySelector('dialog .icon-button').click()`);
   const purchase = () =>
     evaluate<{ cost: number; disabled: boolean; owned: boolean }>(`(() => {
@@ -106,7 +107,7 @@ export async function verifyActions(
   )
     throw new Error("Focus assignment did not spend the displayed cost or changed turn history.");
   await screenshot("10-focused-tuvalu.png");
-  await evaluate(`document.querySelectorAll('.game-nav button')[1].click()`);
+  await evaluate(`document.querySelector('.game-nav [data-view=sport]').click()`);
   await delay();
   const slots = await evaluate<string>(`document.querySelector('.focus-list').textContent`);
   if (!slots.includes("Tuvalu") || slots.toLowerCase().includes(anchorId))

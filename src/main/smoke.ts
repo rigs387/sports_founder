@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { app, type BrowserWindow } from "electron";
 import { verifyActions } from "./action-smoke";
 import { verifyEvents } from "./event-smoke";
+import { verifyFlagship } from "./flagship-smoke";
 import { verifyLeagues } from "./league-smoke";
 import { verifyMap } from "./map-smoke";
 import type { FilePrompts } from "./save-files";
@@ -125,6 +126,7 @@ async function run(
   const map = await verifyMap(win, screenshot);
   const actions = await verifyActions(win, screenshot);
   const leagues = await verifyLeagues(win, screenshot);
+  const flagship = await verifyFlagship(win, screenshot);
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
@@ -138,6 +140,7 @@ async function run(
     events,
     actions,
     leagues,
+    flagship,
     saves,
     errors,
     remoteRequests,

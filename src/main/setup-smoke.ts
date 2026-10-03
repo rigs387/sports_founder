@@ -51,9 +51,12 @@ export async function verifySetup(win: BrowserWindow, screenshot: (name: string)
     expectedGenome.contact !== "full"
   )
     throw new Error("Preset/custom genome controls did not update.");
+  // The American format: the world plays out the same; only the flagship's champion changes.
+  await evaluate(`document.querySelector('[data-testid="setup-format-american"]').click()`);
+  await waitFor(`document.querySelector('[data-testid="setup-format-american"]').checked`);
   await screenshot("00-setup-ready.png");
   const layout = await evaluate<boolean>(
-    `document.documentElement.scrollWidth <= innerWidth && document.querySelector('[data-testid="start-campaign"]').getBoundingClientRect().bottom <= innerHeight`,
+    `document.documentElement.scrollWidth <= innerWidth && document.documentElement.scrollHeight <= innerHeight && document.querySelector('[data-testid="start-campaign"]').getBoundingClientRect().bottom <= innerHeight`,
   );
   if (!layout) throw new Error("Setup launch control does not fit the desktop viewport.");
   win.setContentSize(390, 844);
@@ -73,14 +76,16 @@ export async function verifySetup(win: BrowserWindow, screenshot: (name: string)
     turn: number;
     quarter: number;
     genome: Record<string, string>;
+    format: string;
   }>(
-    `(() => {const game=document.querySelector('[data-testid="game"]');return {anchor:game.dataset.anchor,seed:Number(game.dataset.seed),turn:Number(game.dataset.turn),quarter:Number(game.dataset.quarter),genome:JSON.parse(game.dataset.genome)};})()`,
+    `(() => {const game=document.querySelector('[data-testid="game"]');return {anchor:game.dataset.anchor,seed:Number(game.dataset.seed),turn:Number(game.dataset.turn),quarter:Number(game.dataset.quarter),genome:JSON.parse(game.dataset.genome),format:document.querySelector('[data-testid="flagship-screen"]')?.dataset.format};})()`,
   );
   if (
     started.anchor !== "brazil" ||
     started.seed !== 424242 ||
     started.turn !== 1 ||
     started.quarter !== 0 ||
+    started.format !== "american" ||
     Object.entries(expectedGenome).some(([axis, option]) => started.genome[axis] !== option)
   )
     throw new Error(`Setup choices did not reach the worker: ${JSON.stringify(started)}`);

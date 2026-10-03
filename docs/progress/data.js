@@ -1,7 +1,7 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-02",
+  updated: "2026-10-03",
   design: "GDD v1.14",
   stage: "Phase 0 · playable slice",
   markets: 213,
@@ -16,9 +16,9 @@ window.SF_PROGRESS = {
     tests: 739,
     files: 27,
     note: "Type checking, purity checks and all tests passed after the flagship simulation landed. Lint has existing visual-study warnings.",
-    smokeDate: "2026-09-26",
+    smokeDate: "2026-10-03",
     smoke:
-      "Last recorded UI smoke passed; save/resume continued identically. Not rerun in the October 2 review.",
+      "UI smoke passed with the flagship screen and the American format; save/resume continued identically.",
   },
   eventDeck: { current: 8, target: "40–60" },
   phases: [
@@ -50,8 +50,8 @@ window.SF_PROGRESS = {
   priorities: [
     {
       system: "leagues",
-      title: "Build the flagship season",
-      text: "Named teams, results and standings. Add persistent stars as the league matures.",
+      title: "Make the flagship season matter",
+      text: "Titles and finals become event cards; then persistent stars as the league matures.",
       tag: "Next build",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Built",
+      title: "The flagship screen",
+      text: "Table, latest results, champions and the commissioner's seat, plus the season format choice at creation.",
+    },
     {
       date: "2026-10-02",
       type: "Built",
@@ -257,11 +263,12 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
-      summary: "The flagship plays real seasons in the simulation; the player cannot see them yet.",
-      next: "Build the flagship screen and the format choice at creation; then feed titles into events.",
+      summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
+      next: "Feed titles and finals into events; then add a few named stars as the league matures.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
+        ["The flagship league", "../flagship/README.md"],
         ["Commissioner's seat design", "../../sports-founder-gdd.md#game-loop"],
       ],
       items: [
@@ -269,8 +276,8 @@ window.SF_PROGRESS = {
         ["built", "Health ladder, promotion, restructuring and bailouts"],
         ["built", "Flagship seat: Professional+ moves in season windows; home on collapse"],
         ["built", "Named clubs in real places, results, standings and retained season summaries"],
-        ["planned", "Flagship screen: table, results, champions and the seat"],
-        ["planned", "European or American format chosen on the creation screen"],
+        ["built", "Flagship screen: table, results, champions and the seat"],
+        ["built", "European or American format chosen on the creation screen"],
         ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
         ["planned", "Standing policies and hired league directors"],
         ["planned", "Anchor purist resentment from neglect, rule changes and seat moves"],

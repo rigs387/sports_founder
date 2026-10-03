@@ -209,7 +209,13 @@
     "loading": "Preparing your sporting world…",
     "loadError": "Could not load campaign options. Please try again.",
     "startError": "The campaign could not start. Your choices are still here; check them and try again.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "formatTitle": "Season format",
+    "formatHelp": "How your flagship crowns its champion. It never changes where the sport catches on.",
+    "formats": {
+      "european": "European: the top of the table wins",
+      "american": "American: the top clubs play off"
+    }
   },
   "status": {
     "loading": "Setting up the backyard…",
@@ -604,7 +610,8 @@
       "dropFocusSlot": "Gave up focus slot {{slot}}.",
       "promoteLeague": "Promoted the league in {{country}}.",
       "stepDownLeague": "Restructured the league in {{country}}.",
-      "bailoutLeague": "Funded a bailout in {{country}}."
+      "bailoutLeague": "Funded a bailout in {{country}}.",
+      "moveSeat": "After this season the seat will be in {{country}}."
     }
   },
   "map": {
@@ -616,6 +623,7 @@
       "world": "World",
       "sport": "Your sport",
       "leagues": "Leagues",
+      "flagship": "Flagship",
       "growth": "Growth"
     },
     "prestige": "Prestige",
@@ -688,5 +696,68 @@
       "south-america": "South America",
       "oceania": "Oceania"
     }
+  },
+  "flagship": {
+    "eyebrow": "The commissioner's seat",
+    "title": "The {{country}} league",
+    "status": "Season {{season}} · Round {{round}} of {{total}}",
+    "seasonEnds_one": "The season ends this quarter.",
+    "seasonEnds_other": "The season ends in {{count}} quarters.",
+    "formats": {
+      "european": "European format: the top of the table is champion.",
+      "american": "American format: the top {{count}} clubs play off for the title."
+    },
+    "paused": "{{country}} has no league right now. The season is on hold until one forms.",
+    "club": "{{place}} {{nickname}}",
+    "titles_one": "{{count}} title",
+    "titles_other": "{{count}} titles",
+    "table": {
+      "heading": "Table",
+      "position": "Position",
+      "club": "Club",
+      "played": "P",
+      "won": "W",
+      "drawn": "D",
+      "lost": "L",
+      "scoreFor": "For",
+      "scoreAgainst": "Against",
+      "points": "Pts",
+      "playedFull": "Played",
+      "wonFull": "Won",
+      "drawnFull": "Drawn",
+      "lostFull": "Lost",
+      "pointsFull": "Points",
+      "playoffLine": "Playoff places"
+    },
+    "lastRound": {
+      "heading": "Latest results",
+      "none": "No matches yet this season.",
+      "score": "{{home}}–{{away}}",
+      "decided": "{{club}} won the decider."
+    },
+    "champions": {
+      "heading": "Champions",
+      "none": "The first champion is crowned at the end of this season.",
+      "season": "Season {{season}} · {{year}}",
+      "runnerUp": "Runner-up: {{club}}",
+      "final": "Final: {{home}} {{homeScore}}–{{awayScore}} {{away}}",
+      "abroad": "Played in {{country}}"
+    },
+    "seat": {
+      "heading": "The seat",
+      "here": "You run the league in {{country}}. Every other league runs itself.",
+      "pending": "The seat moves to {{country}} when this season ends.",
+      "cancel": "Stay in {{country}}",
+      "choose": "Move the seat to",
+      "placeholder": "Choose a league",
+      "none": "No other league is Professional or Elite yet. The seat can move only to one that is.",
+      "closed": "The seat can move only in the seasonal window.",
+      "review": "Review the move",
+      "confirm": "Move the seat",
+      "back": "Keep it here",
+      "cost": "Moving away turns {{share}} of hardcore fans in {{country}} casual. The move happens when this season ends.",
+      "target": "{{country}} · {{tier}}"
+    },
+    "footer": "Your league. Seasons end in the seasonal window."
   }
 }
