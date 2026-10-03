@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.12 | September 26, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues)*
+*Version 1.13 | October 2, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds)*
 
 ---
 
@@ -152,6 +152,14 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
     window. The former flagship's country pays a purist cost (it feeds anchor resentment when the
     anchor is left), and its league drops to the simple model under standing policies (or a
     league director, once they exist).
+  - *Only Professional or Elite leagues can take the seat (decided 2026-10-02).* The anchor is the
+    one exception: it holds the seat from turn 1 at any tier. Moving the seat abroad needs a
+    league that has already professionalized, so the player cannot park the seat in a fresh
+    Amateur league to dodge the anchor's troubles.
+  - *A folded flagship sends the seat home (decided 2026-10-02).* When a non-anchor flagship
+    collapses, the seat returns to the anchor at once, outside the seasonal window. The return is
+    free: the collapse itself is the pain (its fans, cash and stories are lost), and the anchor
+    gets its commissioner back.
   - *First build of the seat's depth:* named teams, results, standings and a few named stars
     (system 4), plus real sponsor and TV deals with length, annual value and demands (system 7).
     Venues, youth programs, expansion teams and full rosters come later.
@@ -975,8 +983,9 @@ Items flagged during the interview that need further discussion in future sessio
   DLC, Steam page timing, platforms. Tech plan §11 holds the current thinking.
 - Competitor analysis: a thorough Steam tag sweep (research task, not a design decision).
 - Water as a genome surface option (parked 2026-09-13).
-- Commissioner's seat follow-ups (parked 2026-09-26): which leagues can take the seat (any active
-  league, or a minimum tier); what happens to the seat when a non-anchor flagship folds; whether
-  other leagues ever get individual deals; and whether playtest thinness
+- Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship
+  rule decided 2026-10-02): whether other leagues ever get individual deals; where the seat goes
+  when the anchor league has folded after the win; whether a flagship restructured below
+  Professional keeps the seat; and whether playtest thinness
   was too few decisions per turn or nothing to get attached to (the seat answers the second
   directly, the first only at the flagship).

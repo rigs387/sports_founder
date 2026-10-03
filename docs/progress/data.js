@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-02",
-  design: "GDD v1.12",
+  design: "GDD v1.13",
   stage: "Phase 0 · playable slice",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-02",
+      type: "Design",
+      title: "Where the commissioner's seat can go",
+      text: "Only Professional or Elite leagues can take the seat; a folded flagship sends it back to the anchor.",
+    },
     {
       date: "2026-10-02",
       type: "Review",
@@ -243,7 +249,7 @@ window.SF_PROGRESS = {
       items: [
         ["built", "Formation, Amateur-to-Elite tiers and local finances"],
         ["built", "Health ladder, promotion, restructuring and bailouts"],
-        ["planned", "Flagship designation and seasonal seat moves with a cost"],
+        ["planned", "Flagship seat: Professional+ moves in season windows; home on collapse"],
         ["planned", "Named teams, results, standings and retained season summaries"],
         ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
         ["planned", "Standing policies and hired league directors"],
