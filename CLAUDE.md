@@ -134,6 +134,10 @@ runs/                 Runner and smoke-test output (git-ignored)
   changes.
 
 ## Workflow
+- Keep `docs/progress/data.js` current when implementation or design scope changes. Update relevant
+  checklist statuses, evidence links, next steps and the review date; add a dated build-journal entry.
+  Design-only changes remain planned. Record check results only after running them. See
+  `docs/progress/README.md`; the offline dashboard is `docs/progress/index.html`.
 - Run type check, Biome, and tests before declaring a change done.
 - For UI changes, run the game and screenshot the affected screen.
 - If a bug survives three fix attempts, stop and explain the root cause before trying again.

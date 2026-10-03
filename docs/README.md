@@ -1,5 +1,10 @@
 # Project docs
 
+Open the [development dashboard](progress/index.html) for a visual roadmap, implementation checklists,
+next priorities and build history. It works offline. [Update instructions](progress/README.md) explain
+how to keep its single progress data file current. The [October 2 review](progress-review-2026-10-02.md)
+contains the detailed baseline assessment.
+
 Start with the [world map's current direction](world-map/README.md): **Matchday + Fresh Club**, accepted as the working visual direction on 2026-09-23.
 
 - [Open the current interactive preview](world-map/index.html)

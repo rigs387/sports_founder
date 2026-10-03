@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Sports Founder · Development fieldbook</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="data.js" defer></script>
+    <script src="dashboard.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to dashboard</a>
+    <aside class="sidebar" aria-label="Dashboard navigation">
+      <a class="brand" href="#overview"><span class="brand-mark" aria-hidden="true">sf<span>↗</span></span><span>SPORTS<br />FOUNDER</span></a>
+      <p class="sidebar-label">DEVELOPMENT FIELDBOOK</p>
+      <nav>
+        <a href="#overview"><span aria-hidden="true">◉</span> The big picture</a>
+        <a href="#roadmap"><span aria-hidden="true">▦</span> System roadmap</a>
+        <a href="#priorities"><span aria-hidden="true">↗</span> Next on the field</a>
+        <a href="#journal"><span aria-hidden="true">≡</span> Build journal</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="small-label">THE NORTH STAR</span>
+        <p>A backyard game.<br />A global religion.<br /><em>One earned story at a time.</em></p>
+        <a href="../../sports-founder-gdd.md">Read the game design ↗</a>
+        <a href="README.md">How to update this board ↗</a>
+      </div>
+    </aside>
+    <main id="main">
+      <header class="page-header"><div><span class="eyebrow">THE MAKING OF SPORTS FOUNDER</span><h1>Development fieldbook<span class="title-dot">.</span></h1></div><div class="header-meta"><span id="updated"></span><button id="print" class="quiet-button" type="button">Print / save PDF ↗</button></div></header>
+      <section id="overview" aria-labelledby="overview-title">
+        <div class="hero-grid">
+          <div class="hero"><span class="stage" id="stage"></span><h2 id="overview-title">Development overview</h2><p id="summary"></p><a href="#priorities" class="primary-link">See the next milestone <span aria-hidden="true">↗</span></a><div class="hero-foot"><span class="live-dot" aria-hidden="true"></span> <span id="live-summary">PLAYABLE TODAY</span></div></div>
+          <figure class="game-preview"><img src="../world-map/assets/previews/pixi-live.png" alt="The implemented game screen, showing the aqua world map and a country information card." /><figcaption><span class="small-label">ON THE SCREEN</span><strong>A real, playable foundation.</strong><span>Creation → growth → leagues → decisions → save & resume</span><a href="../world-map/production.md">Explore the current build ↗</a></figcaption></figure>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="section-top"><div><span class="eyebrow">THE JOURNEY</span><h2>Where we are in the build</h2></div><p>Phases describe milestones, not a release-date forecast.</p></div>
+        <div class="phase-track" id="phases"></div>
+      </section>
+      <section id="roadmap" aria-labelledby="roadmap-title">
+        <div class="section-top"><div><span class="eyebrow">DESIGN → IMPLEMENTATION</span><h2 id="roadmap-title">The system roadmap</h2></div><a class="text-link" href="../../sports-founder-gdd.md#systems--build-phasing">Open the design contract ↗</a></div>
+        <p class="section-intro">Every card opens a concrete checklist, the next step, dependencies and source documents. Bars count the listed deliverables equally; they do not estimate effort or overall game completion.</p>
+        <div class="roadmap-controls"><fieldset class="status-filters"><legend class="sr-only">Filter by system status</legend><button type="button" data-status="all" aria-pressed="true">All systems</button><button type="button" data-status="built" aria-pressed="false">Built</button><button type="button" data-status="partial" aria-pressed="false">Partial</button><button type="button" data-status="planned" aria-pressed="false">Planned</button></fieldset><div class="search-controls"><label class="sr-only" for="group">Roadmap area</label><select id="group"><option value="all">Every area</option><option value="foundation">Foundation</option><option value="core">Core game</option><option value="later">Later depth</option><option value="release">Release</option></select><label class="search"><span aria-hidden="true">⌕</span><span class="sr-only">Search systems and deliverables</span><input id="search" type="search" placeholder="Find a system or feature…" /></label></div></div>
+        <div class="roadmap-meta"><p id="result-count" role="status" aria-live="polite"></p><div class="legend"><span><i class="built-dot"></i> Built</span><span><i class="partial-dot"></i> Partial</span><span><i class="planned-dot"></i> Planned</span></div></div>
+        <div class="system-grid" id="systems"></div><div id="empty" class="empty" hidden><h3>No systems match these filters.</h3><p>Try another feature name or show the full roadmap. A system is Built only when its entire listed checklist is complete.</p><button type="button" id="reset" class="quiet-button">Reset filters</button></div>
+      </section>
+      <section id="priorities" aria-labelledby="priorities-title">
+        <div class="section-top"><div><span class="eyebrow">THE NEXT CHAPTER</span><h2 id="priorities-title">Next on the field</h2></div><span class="editorial-note">Recommended order · not a scheduled commitment</span></div>
+        <div class="milestone"><span class="milestone-symbol" aria-hidden="true">↗</span><div><span class="small-label">NEXT PLAYABLE MILESTONE</span><h3 id="milestone-title">Next playable milestone</h3><p id="milestone-description"></p></div></div>
+        <div class="priority-grid" id="priority-cards"></div>
+        <div class="watch-header"><h3>Keep an eye on these</h3><span>Historical findings to recheck as the game changes</span></div><div class="watch-grid" id="watch"></div>
+      </section>
+      <section id="journal" aria-labelledby="journal-title"><div class="section-top"><div><span class="eyebrow">PROGRESS, WITH RECEIPTS</span><h2 id="journal-title">The build journal</h2></div><a class="text-link" href="../progress-review-2026-10-02.md">Read the detailed October 2 review ↗</a></div><div class="journal-layout"><ol id="history" class="timeline"></ol><aside class="verification"><span class="small-label">LAST VERIFIED BASELINE</span><h3 id="verification-title">Verification baseline</h3><p id="verification-note"></p><hr /><span class="small-label" id="smoke-date"></span><p id="smoke-note"></p><a class="text-link" href="../events/README.md#verification">Implementation evidence ↗</a><div class="verification-note">Working code and passing checks establish functionality. Playtesting establishes whether the game is worth playing.</div></aside></div></section>
+      <footer><span class="footer-brand">SPORTS FOUNDER / DEVELOPMENT FIELDBOOK</span><p id="footer-note"></p><a href="README.md">Update guide ↗</a></footer>
+      <noscript><p>This dashboard needs JavaScript to show its local progress data. You can also read <a href="../progress-review-2026-10-02.md">the progress review</a>.</p></noscript>
+    </main>
+    <dialog id="detail" aria-labelledby="detail-title"><div class="detail-header"><span id="detail-gdd" class="eyebrow"></span><button type="button" id="close-detail" class="close-button" aria-label="Close system details">×</button></div><div id="detail-content"></div></dialog>
+  </body>
+</html>
