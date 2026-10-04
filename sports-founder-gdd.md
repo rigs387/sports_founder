@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.17 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships)*
+*Version 1.18 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram)*
 
 ---
 
@@ -87,6 +87,28 @@ turn. Longer turns change how often the player decides, not the economy's math.
    and ethos seed Culture (which traditions tend to form and how fans react to change). They
    never touch affinity, so genome balance is unaffected. Terms are nouns placed into complete
    templates, never sentence fragments.
+5. **Sport identity, as built first (decided 2026-10-04, v1.18).** One build covers names,
+   founding character, terms, a preset emblem, the rulebook page and the field diagram; the full
+   logo and kit editor and image export stay Phase 2.
+   - *Names:* the sport's name (a generated default from the seed, editable, with a re-roll), the
+     founding club and its ground. Free text is trimmed and length-limited (config).
+   - *The founding club is a real flagship club at the anchor:* the player picks its town from the
+     anchor's real places (places.yaml) and names it; its ground is named too, the first candidate
+     for a famous venue. It plays like any club: its strength is rolled as founding clubs' are.
+   - *Founding character:* a birthplace (schoolyard, factory, beach, barracks, village green,
+     docks) and an ethos (gentleman's game, working-class game, rebel game, family game), chosen
+     at setup now. Until Culture is built they appear only in the rulebook and card text.
+   - *Terms:* what a score, a match and a season are called, chosen from preset nouns that carry
+     singular, plural and title forms in the locale file; used only as nouns inside complete
+     templates. Free text terms are not offered (they read badly in templates).
+   - *Emblem:* a preset shape, icon and two colors from a palette. Shown in the campaign identity
+     on the map, the flagship screen, the founding club's table row and the rulebook.
+   - *Where it lives:* a Rulebook page under "Your sport": emblem, name, founding facts, the
+     genome as almanac prose (odd trait pairings earn deadpan lines from content), and the field
+     diagram drawn from surface, footprint, team size, equipment and play structure. Rule
+     amendments join it with rules evolution.
+   - *Saves:* older saves load with generated defaults (the anchor's first club becomes the
+     founding club with its name unchanged).
 
 **Starting state:** the anchor country has a tiny founding Amateur league, a tiny hardcore base
 (the founder's friends and family), and a small casual base. The player has a small PP stash. The

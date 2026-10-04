@@ -475,6 +475,48 @@ export interface GameOutcome {
 }
 
 /** The complete, serializable state of a campaign. Plain data only. */
+// ---- Sport identity (GDD v1.18; src/sim/identity.ts) ----------------------------------------
+
+/** The sport's terms: what a score, a match and a season are called (ids from content). */
+export interface SportTerms {
+  score: string;
+  match: string;
+  season: string;
+}
+
+/** A preset emblem: a shape, an icon and two colors, all ids from content. */
+export interface Emblem {
+  shape: string;
+  icon: string;
+  primary: string;
+  secondary: string;
+}
+
+/** What the player chooses at setup. */
+export interface IdentitySetup {
+  sportName: string;
+  /** A real place of the anchor (places.yaml) where the founding club is based. */
+  foundingPlace: string;
+  clubName: string;
+  groundName: string;
+  birthplace: string;
+  ethos: string;
+  terms: SportTerms;
+  emblem: Emblem;
+}
+
+/** The sport's identity in a campaign. The founding club's place and name live on the club. */
+export interface SportIdentity {
+  sportName: string;
+  /** A flagship club at the anchor. */
+  foundingClubId: number;
+  groundName: string;
+  birthplace: string;
+  ethos: string;
+  terms: SportTerms;
+  emblem: Emblem;
+}
+
 export interface GameState {
   seed: number;
   /** Seeded generator state; part of the save so a resumed game rolls identically. */
@@ -507,6 +549,8 @@ export interface GameState {
   events: EventState;
   seasonFormat: SeasonFormat;
   flagship: FlagshipState;
+  /** The sport's name, founding club and ground, founding character, terms and emblem. */
+  identity: SportIdentity;
 }
 
 export interface CampaignSetup {
@@ -515,6 +559,8 @@ export interface CampaignSetup {
   genome: Genome;
   /** Defaults to European. */
   seasonFormat?: SeasonFormat;
+  /** Defaults to the identity generated from the seed (defaultIdentitySetup). */
+  identity?: IdentitySetup;
 }
 
 /** Index of the player's sport in GameState.sports and CountryState.fans. */

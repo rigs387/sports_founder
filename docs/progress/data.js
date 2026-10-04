@@ -380,7 +380,10 @@ window.SF_PROGRESS = {
         ["built", "Fact-based triggers and validated effect vocabulary"],
         ["built", "Decision costs, local effects, expiry and safe defaults"],
         ["built", "Reward collection, journal and saved pending cards"],
-        ["partial", "Event library: 26 of a planned 40–60 cards (8 season, 8 star, 2 rival contest cards)"],
+        [
+          "partial",
+          "Event library: 26 of a planned 40–60 cards (8 season, 8 star, 2 rival contest cards)",
+        ],
         ["planned", "Broader tier-weighted negative events and personal stories"],
         ["built", "Bots that weigh and choose non-default options"],
       ],
@@ -391,14 +394,18 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 6",
       icon: "07",
-      summary: "Incumbents defend their territory, win fans back near global #1 and swing with their world championships.",
+      summary:
+        "Incumbents defend their territory, win fans back near global #1 and swing with their world championships.",
       next: "Add the remaining modeled sports; remeasure the victory contest when new pressure lands.",
       depends: ["world"],
       sources: [
         ["Rival simulation", "../../src/sim/rivals.ts"],
         ["World championships", "../../src/sim/tournaments.ts"],
         ["Contest tests", "../../tests/contest.test.ts"],
-        ["Contest build plan", "../../sports-founder-tech-plan.md#27-build-plan-the-contest-for-1-gdd-v117"],
+        [
+          "Contest build plan",
+          "../../sports-founder-tech-plan.md#27-build-plan-the-contest-for-1-gdd-v117",
+        ],
         [
           "Carried balance gaps",
           "../../sports-founder-tech-plan.md#21-phase-0--vertical-slice-new-precedes-gdd-phase-1",

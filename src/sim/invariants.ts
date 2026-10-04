@@ -3,6 +3,7 @@ import { QUARTERS_PER_YEAR } from "./calendar";
 import { eventProblems } from "./events";
 import { flagshipProblems } from "./flagship";
 import { forkOf } from "./growth";
+import { identityStateProblems } from "./identity";
 import {
   ESCALATION_LEVELS,
   type GameState,
@@ -19,7 +20,11 @@ export function checkInvariants(state: GameState, world: World): string[] {
 }
 
 export function invariantsOf(state: GameState, world: World): string[] {
-  const problems: string[] = [...eventProblems(state, world), ...flagshipProblems(state, world)];
+  const problems: string[] = [
+    ...eventProblems(state, world),
+    ...flagshipProblems(state, world),
+    ...identityStateProblems(state, world),
+  ];
 
   if (!Number.isInteger(state.turn) || state.turn < 1)
     problems.push(`turn ${state.turn} is invalid`);

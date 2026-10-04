@@ -319,6 +319,29 @@ three years); reclaim 0.5% per quarter for 12 quarters, only at the top of the n
 and come from the rival's casual fans first. Landmarks and saves: a new landmark kind and
 countermove kind, no format change (older saves load as they were).
 
+
+### 2.8 Build Plan: Sport Identity (GDD v1.18)
+
+Every option list is content (`content/identity.yaml`, ids only; player-facing words in the locale
+file); every limit is config.
+
+1. **Identity in the simulation.** `GameState.identity`: sport name, founding club id, ground
+   name, birthplace, ethos, terms (score, match, season) and emblem (shape, icon, two colors).
+   `CampaignSetup.identity` is optional and validated; defaults are generated from the seed
+   (sport name from content name parts). The founding club takes the chosen place and name
+   after the flagship is created, so no random draw changes. In the snapshot. Save format 16;
+   format 15 migrates with generated defaults and the anchor's first club as the founding club.
+2. **Setup.** A third setup panel: name, re-roll, founding town, club and ground names,
+   birthplace, ethos, terms, emblem with a live preview and the field diagram.
+3. **Rulebook and field diagram.** The Rulebook section in "Your sport": emblem, names, founding
+   facts, genome prose with odd-pairing lines, and an SVG field diagram from surface, footprint,
+   team size, equipment and structure. The emblem in the map's campaign identity and the
+   flagship heading; the founding club marked in the table.
+4. **Terms in text.** The flagship screen, Stars panel and season and star cards use the chosen
+   score, match and season nouns.
+5. **Smoke and docs.** Smoke fills the identity panel, checks the rulebook and diagram in both
+   layouts, and screenshots them.
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)

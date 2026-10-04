@@ -4,9 +4,12 @@ import {
   applyAction,
   createCampaign,
   defaultGenome,
+  defaultGroundName,
+  defaultIdentitySetup,
   deserializeSave,
   emptyEvents,
   endTurn,
+  foundingClubOf,
   type GameState,
   newFlagship,
   runTurns,
@@ -17,18 +20,33 @@ import {
 import { firstAnchor, presetGenome, setupFor, world } from "./helpers";
 
 /** What a format 7 → 8 migration adds: a European flagship at the anchor, starting now. */
-function migratedFlagship(state: GameState): Pick<GameState, "seasonFormat" | "flagship"> {
+function migratedFlagship(
+  state: GameState,
+): Pick<GameState, "seasonFormat" | "flagship" | "identity"> {
   const anchor = state.countries.find((c) => c.countryId === state.anchorCountryId);
+  const flagship = newFlagship(
+    world,
+    state.seed,
+    state.anchorCountryId,
+    anchor?.league?.tier ?? "amateur",
+    state.quarter,
+    state.genome.scoring,
+  );
+  // Format 16 identity defaults: the anchor's oldest club founds the sport under its own name.
+  const club = foundingClubOf(flagship.clubs, state.anchorCountryId);
+  const defaults = defaultIdentitySetup(world, state.seed, state.anchorCountryId);
   return {
     seasonFormat: "european",
-    flagship: newFlagship(
-      world,
-      state.seed,
-      state.anchorCountryId,
-      anchor?.league?.tier ?? "amateur",
-      state.quarter,
-      state.genome.scoring,
-    ),
+    flagship,
+    identity: {
+      sportName: defaults.sportName,
+      foundingClubId: club?.id ?? 0,
+      groundName: defaultGroundName(world, state.seed, club?.place ?? ""),
+      birthplace: defaults.birthplace,
+      ethos: defaults.ethos,
+      terms: defaults.terms,
+      emblem: defaults.emblem,
+    },
   };
 }
 
@@ -306,6 +324,7 @@ describe("saves with the growth tree (format 5)", () => {
       events: _e,
       seasonFormat: _s,
       flagship: _f,
+      identity: _i,
       ...v4State
     } = withoutTree;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 4, state: v4State }), world);
@@ -324,7 +343,14 @@ describe("saves with the growth tree (format 5)", () => {
   it("migrates a version 5 save: the win hold starts from nothing, same key order", () => {
     const current = playWithPolicy(createCampaign(world, setup), 40);
     expect(current.win).toStrictEqual({ atTop: false, turnsHeld: 0, won: null });
-    const { win: _w, events: _e, seasonFormat: _s, flagship: _f, ...v5State } = current;
+    const {
+      win: _w,
+      events: _e,
+      seasonFormat: _s,
+      flagship: _f,
+      identity: _i,
+      ...v5State
+    } = current;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 5, state: v5State }), world);
     expect(loaded.win).toStrictEqual({ atTop: false, turnsHeld: 0, won: null });
     const migrated = {

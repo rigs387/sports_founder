@@ -3,6 +3,7 @@ import countriesText from "../../../../content/countries.yaml?raw";
 import eventsText from "../../../../content/events.yaml?raw";
 import genomeText from "../../../../content/genome.yaml?raw";
 import growthTreeText from "../../../../content/growth-tree.yaml?raw";
+import identityText from "../../../../content/identity.yaml?raw";
 import namesText from "../../../../content/names.yaml?raw";
 import placesText from "../../../../content/places.yaml?raw";
 import sourcesText from "../../../../content/sources.yaml?raw";
@@ -17,6 +18,7 @@ export function loadBundledWorld(): World {
     genome: { path: "content/genome.yaml", text: genomeText },
     growthTree: { path: "content/growth-tree.yaml", text: growthTreeText },
     events: { path: "content/events.yaml", text: eventsText },
+    identity: { path: "content/identity.yaml", text: identityText },
     names: { path: "content/names.yaml", text: namesText },
     places: { path: "content/places.yaml", text: placesText },
     sources: { path: "content/sources.yaml", text: sourcesText },

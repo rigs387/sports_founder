@@ -2,6 +2,7 @@ import { genomeSchema, startingRivalFanCounts } from "../content";
 import { tierEntry } from "./calendar";
 import { emptyEvents } from "./events-state";
 import { newFlagship } from "./flagship";
+import { defaultIdentitySetup, foundSport, identityProblems } from "./identity";
 import { newLeague } from "./leagues";
 import { landmarks } from "./records";
 import { newFront, newRivalState } from "./rivals";
@@ -35,6 +36,13 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
   const seasonFormat = setup.seasonFormat ?? "european";
   if (!SEASON_FORMATS.includes(seasonFormat)) {
     throw new Error(`Unknown season format "${String(seasonFormat)}"`);
+  }
+
+  const identitySetup =
+    setup.identity ?? defaultIdentitySetup(world, setup.seed, setup.anchorCountryId);
+  const identityIssues = identityProblems(identitySetup, world, setup.anchorCountryId);
+  if (identityIssues.length > 0) {
+    throw new Error(`Invalid sport identity: ${identityIssues.join("; ")}`);
   }
 
   const { start } = world.config;
@@ -86,7 +94,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     i === 0 ? setup.anchorCountryId : null,
   );
 
-  return {
+  const founded: Omit<GameState, "identity"> = {
     seed: setup.seed,
     rng: createRngState(setup.seed),
     anchorCountryId: setup.anchorCountryId,
@@ -124,6 +132,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
       genome.data.scoring,
     ),
   };
+  return foundSport(founded, world, identitySetup);
 }
 
 /** The default genome: the first quick-start preset in content. */

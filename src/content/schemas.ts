@@ -181,6 +181,25 @@ export const sportsFileSchema = z.strictObject({
   }),
 });
 
+// ---- Sport identity (GDD v1.18) ------------------------------------------------------------
+
+const idList = z.array(id).min(1);
+export const identityFileSchema = z.strictObject({
+  birthplaces: idList,
+  ethos: idList,
+  /** The first of each list is the default. */
+  terms: z.strictObject({ score: idList, match: idList, season: idList }),
+  emblem: z.strictObject({
+    shapes: idList,
+    icons: idList,
+    colors: z.record(id, z.string().regex(/^#[0-9a-f]{6}$/i)),
+  }),
+  maxOddLines: z.int().min(0),
+  /** A deadpan rulebook line where every listed axis has the listed option. */
+  oddPairings: z.array(z.strictObject({ id, when: z.record(z.string(), z.string()) })),
+});
+export type IdentityContent = z.infer<typeof identityFileSchema>;
+
 // ---- Names ---------------------------------------------------------------------------------
 
 export const namesFileSchema = z.strictObject({
@@ -188,6 +207,13 @@ export const namesFileSchema = z.strictObject({
   sports: z.record(z.string(), z.string().min(1)),
   /** Each rival's world championship (GDD v1.17): generic names, never the real tournament's. */
   tournaments: z.record(z.string(), z.string().min(1)),
+  /** Generated default sport names (GDD v1.18): a first part and a second part joined. */
+  sportNameParts: z.strictObject({
+    first: z.array(z.string().min(1)).min(1),
+    second: z.array(z.string().min(1)).min(1),
+  }),
+  /** The default founding ground is the club's town and one of these words. */
+  groundWords: z.array(z.string().min(1)).min(1),
   /**
    * Invented flagship club nicknames (GDD v1.14). The place is real (places.yaml); the nickname is
    * not. Needs at least as many distinct entries as the largest flagship has clubs.
@@ -607,6 +633,13 @@ export const configFileSchema = z.strictObject({
     }),
   }),
   seasonalWindow: z.strictObject({ quarterOfYear: z.int().min(1).max(4) }),
+  /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
+  identity: z.strictObject({
+    nameMinLength: z.int().min(1),
+    sportNameMaxLength: z.int().min(1),
+    clubNameMaxLength: z.int().min(1),
+    groundNameMaxLength: z.int().min(1),
+  }),
   flagship: z.strictObject({
     clubs: z.strictObject({
       amateur: z.int().min(2),

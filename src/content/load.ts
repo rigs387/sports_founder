@@ -12,6 +12,7 @@ import {
   FAN_FIELD_PREFIX,
   genomeFileSchema,
   growthTreeFileSchema,
+  identityFileSchema,
   LEAGUE_TIERS,
   namesFileSchema,
   placesFileSchema,
@@ -27,6 +28,7 @@ export const CONTENT_FILES = {
   genome: "genome.yaml",
   growthTree: "growth-tree.yaml",
   events: "events.yaml",
+  identity: "identity.yaml",
   names: "names.yaml",
   places: "places.yaml",
   sources: "sources.yaml",
@@ -106,6 +108,7 @@ export function loadWorld(sources: ContentSources): World {
   const growthTree = parseSource(sources.growthTree, growthTreeFileSchema, issues);
   const events = parseSource(sources.events, eventsFileSchema, issues);
   const names = parseSource(sources.names, namesFileSchema, issues);
+  const identity = parseSource(sources.identity, identityFileSchema, issues);
   const placesFile = parseSource(sources.places, placesFileSchema, issues);
   const sourcesFile = parseSource(sources.sources, sourcesFileSchema, issues);
   const config = parseSource(sources.config, configFileSchema, issues);
@@ -116,6 +119,7 @@ export function loadWorld(sources: ContentSources): World {
     !growthTree ||
     !events ||
     !names ||
+    !identity ||
     !placesFile ||
     !sourcesFile ||
     !config
@@ -130,6 +134,7 @@ export function loadWorld(sources: ContentSources): World {
     genome,
     growthTree,
     events,
+    identity,
     names,
     places: placesFile.places,
     sources: sourcesFile,
@@ -153,6 +158,20 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
     if (rivalIds.has(rival.id))
       issue(sources.sports, `rivals[${i}].id`, `duplicate id "${rival.id}"`);
     rivalIds.add(rival.id);
+  });
+  // ---- Identity ----------------------------------------------------------------------------
+  const { emblem, oddPairings } = world.identity;
+  if (Object.keys(emblem.colors).length < 2)
+    issue(sources.identity, "emblem.colors", "an emblem needs at least two colors");
+  oddPairings.forEach((pairing, i) => {
+    for (const [axis, option] of Object.entries(pairing.when)) {
+      const known = (AXIS_IDS as readonly string[]).includes(axis)
+        ? (GENOME_AXES[axis as keyof typeof GENOME_AXES].options as readonly string[])
+        : null;
+      if (!known) issue(sources.identity, `oddPairings[${i}].when.${axis}`, "unknown genome axis");
+      else if (!known.includes(option))
+        issue(sources.identity, `oddPairings[${i}].when.${axis}`, `unknown option "${option}"`);
+    }
   });
   const tournamentSports = new Set<string>();
   world.config.rivalAI.tournaments.forEach((tournament, i) => {

@@ -8,6 +8,7 @@ import type {
   FanShares,
   GenomeContent,
   GrowthTreeContent,
+  IdentityContent,
   Names,
   OptionModifiers,
   Places,
@@ -35,6 +36,7 @@ export interface WorldContent {
   genome: GenomeContent;
   growthTree: GrowthTreeContent;
   events: EventsContent;
+  identity: IdentityContent;
   names: Names;
   /** Real places per market, biggest first: where flagship clubs are based. */
   places: Places;
@@ -276,6 +278,7 @@ export function deriveWorld(content: WorldContent): World {
     genome: centreClimateConditions(content.genome, content.countries),
     growthTree: content.growthTree,
     events: content.events,
+    identity: content.identity,
     names: content.names,
     places: content.places,
     sources: content.sources,

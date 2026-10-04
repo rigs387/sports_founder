@@ -76,6 +76,11 @@ the one effect only season cards use.
 Pressure drains land on arrival (paying fixes the league, never the drain); season-card cooldowns
 count in seasons.
 
+**Sport identity (v1.18):** Name the sport (generated default), the founding club (a real flagship
+club in a real town of the anchor) and its ground; birthplace and ethos; what a score, match and
+season are called (preset nouns); a preset emblem. A Rulebook page in "Your sport" with almanac
+prose and a field diagram. Editor and image export in Phase 2.
+
 **Rivals:** Real-world sports, present day — soccer, cricket, basketball, American football,
 baseball, ice hockey, rugby, combat sports, plus a passive "other" bucket. Defense budgets,
 per-country escalation (Watching → Defending → Entrenched), closed countermove list. Real sport

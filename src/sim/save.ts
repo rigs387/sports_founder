@@ -14,6 +14,7 @@ import {
 import { tierEntry } from "./calendar";
 import { emptyEvents, eventStateSchema } from "./events-state";
 import { newFlagship, staffFlagship } from "./flagship";
+import { defaultGroundName, defaultIdentitySetup, foundingClubOf } from "./identity";
 import { invariantsOf } from "./invariants";
 import { newLeague } from "./leagues";
 import { newFront, newRivalState } from "./rivals";
@@ -22,7 +23,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 15;
+export const SAVE_FORMAT_VERSION = 16;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -364,6 +365,24 @@ const gameStateSchema = z.strictObject({
   events: eventStateSchema,
   seasonFormat: seasonFormatSchema,
   flagship: flagshipSchema,
+  identity: z.strictObject({
+    sportName: z.string().min(1),
+    foundingClubId: z.int().min(1),
+    groundName: z.string().min(1),
+    birthplace: z.string().min(1),
+    ethos: z.string().min(1),
+    terms: z.strictObject({
+      score: z.string().min(1),
+      match: z.string().min(1),
+      season: z.string().min(1),
+    }),
+    emblem: z.strictObject({
+      shape: z.string().min(1),
+      icon: z.string().min(1),
+      primary: z.string().min(1),
+      secondary: z.string().min(1),
+    }),
+  }),
 });
 
 const saveFileSchema = z.strictObject({
@@ -382,6 +401,31 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 15 → 16: sport identity (GDD v1.18). Generated defaults from the seed; the anchor's oldest
+  // club becomes the founding club with its place and name unchanged, its ground named after its
+  // town.
+  15: (save, world) => {
+    const seed = Number(save.state.seed);
+    const anchor = String(save.state.anchorCountryId);
+    const flagship = save.state.flagship as FlagshipState;
+    const club = foundingClubOf(flagship.clubs, anchor);
+    const defaults = defaultIdentitySetup(world, seed, anchor);
+    return {
+      formatVersion: 16,
+      state: {
+        ...save.state,
+        identity: {
+          sportName: defaults.sportName,
+          foundingClubId: club?.id ?? 0,
+          groundName: defaultGroundName(world, seed, club?.place ?? defaults.foundingPlace),
+          birthplace: defaults.birthplace,
+          ethos: defaults.ethos,
+          terms: defaults.terms,
+          emblem: defaults.emblem,
+        },
+      },
+    };
+  },
   // 14 → 15: star cards (GDD v1.16). Backings carry no honors and no mentee; earlier star moves
   // were never backed; recorded events tell no star fact, and season cards name no players.
   14: (save) => {

@@ -8,6 +8,7 @@ export * from "./flagship";
 export * from "./genome";
 export * from "./growth";
 export * from "./hints";
+export * from "./identity";
 export * from "./invariants";
 export * from "./league-actions";
 export * from "./leagues";

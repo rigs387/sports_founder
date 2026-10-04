@@ -1,0 +1,48 @@
+# Sport identity (GDD v1.18): the option lists the player chooses from at setup. Ids only; every
+# player-facing word lives in the locale file (identity.*), and invented names live in names.yaml.
+# Birthplace and ethos are founding character: until Culture is built they only color the
+# rulebook and card text, and they never touch affinity or balance.
+
+birthplaces: [schoolyard, factory, beach, barracks, village-green, docks]
+ethos: [gentlemans-game, working-class-game, rebel-game, family-game]
+
+# What a score, a match and a season are called. Each id needs singular, plural and title forms
+# in the locale file; templates use them only as nouns. The first of each list is the default.
+terms:
+  score: [score, goal, point, run, try, basket, tally]
+  match: [match, game, fixture, contest, bout]
+  season: [season, campaign, series, term]
+
+# The preset emblem (the editor is Phase 2). Colors are hex values drawn by the UI; names for them
+# live in the locale file. An emblem's two colors must differ.
+emblem:
+  shapes: [shield, roundel, pennant, diamond, crest]
+  icons: [star, ball, crown, bolt, wing, oak, wave, tower]
+  colors:
+    navy: "#1f3a68"
+    royal: "#2f63c8"
+    sky: "#6fb4e8"
+    crimson: "#b3263a"
+    scarlet: "#e0442f"
+    amber: "#f0a81c"
+    gold: "#d8b23a"
+    forest: "#2f7a43"
+    emerald: "#22a06b"
+    claret: "#7a1f3d"
+    black: "#1b1b1f"
+    white: "#f7f5ef"
+
+# Odd trait pairings earn a deadpan line in the rulebook (GDD Sport Genome: all combinations are
+# legal). A line applies when every listed axis has the listed option; at most maxOddLines show,
+# in this order.
+maxOddLines: 2
+oddPairings:
+  - { id: ice-innings, when: { surface: ice, structure: innings } }
+  - { id: street-large-field, when: { surface: street, footprint: large } }
+  - { id: indoor-large-field, when: { surface: indoor, footprint: large } }
+  - { id: full-contact-precision, when: { contact: full, physical: precision } }
+  - { id: ice-long-match, when: { surface: ice, matchLength: long } }
+  - { id: small-team-large-field, when: { teamSize: small, footprint: large } }
+  - { id: large-team-small-field, when: { teamSize: large, footprint: small } }
+  - { id: gear-no-contact, when: { equipment: protective-gear, contact: none } }
+  - { id: ice-marathon, when: { surface: ice, physical: endurance, matchLength: long } }

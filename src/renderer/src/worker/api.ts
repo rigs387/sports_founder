@@ -5,11 +5,13 @@ import {
   applyAction,
   type CampaignSetup,
   createCampaign,
+  defaultIdentitySetup,
   endTurn,
   type GameState,
   IllegalActionError,
   MAX_SEED,
   snapshot,
+  suggestSportName,
   type TurnSnapshot,
 } from "../../../sim";
 import type { CountryHistory } from "../state/history";
@@ -51,7 +53,26 @@ export function createSimWorkerApi(world: World) {
           continent,
         })),
         presets: world.genome.presets.map(({ id, genome }) => ({ id, genome: { ...genome } })),
+        identity: {
+          birthplaces: [...world.identity.birthplaces],
+          ethos: [...world.identity.ethos],
+          terms: structuredClone(world.identity.terms),
+          emblem: structuredClone(world.identity.emblem),
+          limits: { ...world.config.identity },
+          oddPairings: structuredClone(world.identity.oddPairings),
+          maxOddLines: world.identity.maxOddLines,
+        },
       };
+    },
+    /** The anchor's real places (biggest first) and the seed's default identity there. */
+    identityDefaults(seed: number, anchorCountryId: string) {
+      return {
+        places: (world.places[anchorCountryId] ?? []).map((place) => place.name),
+        defaults: defaultIdentitySetup(world, seed, anchorCountryId),
+      };
+    },
+    suggestSportName(seed: number, attempt: number) {
+      return suggestSportName(world, seed, attempt);
     },
     anchorHints(countryId: string) {
       return anchorGenomeHints(world, countryId);

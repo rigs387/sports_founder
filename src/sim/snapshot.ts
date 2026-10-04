@@ -8,6 +8,7 @@ import { fandomScore, type SportTotals, sportTotals } from "./fandom";
 import { type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { growthFactorsAt, type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
+import { type IdentitySnapshot, identitySnapshot } from "./identity";
 import { type LeagueActions, leagueActions } from "./league-actions";
 import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
 import { computeExposure } from "./spread";
@@ -143,6 +144,8 @@ export interface TurnSnapshot {
   eventModifiers: EventState["modifiers"];
   /** The league the player runs as commissioner (GDD v1.11, v1.14). */
   flagship: FlagshipSnapshot;
+  /** The sport's name, founding club and ground, character, terms and emblem (GDD v1.18). */
+  identity: IdentitySnapshot;
 }
 
 export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeSnapshot[] {
@@ -281,5 +284,6 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     growthNodes: growthNodeSnapshots(state, world),
     landmarkCount: state.landmarks.length,
     flagship: flagshipSnapshot(state, world),
+    identity: identitySnapshot(state, world),
   };
 }

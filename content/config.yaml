@@ -463,6 +463,14 @@ leagues:
 seasonalWindow:
   quarterOfYear: 3
 
+# Sport identity (GDD v1.18): limits on the names typed at setup (the sport, the founding club's
+# name and its ground), counted after trimming.
+identity:
+  nameMinLength: 2
+  sportNameMaxLength: 24
+  clubNameMaxLength: 20
+  groundNameMaxLength: 32
+
 # The flagship league (GDD v1.11 commissioner's seat, v1.14 flagship season). The player runs one
 # league in depth: named clubs, a season a year that ends in the seasonal window, a champion. Its
 # matches roll on their own random stream, so the world's random sequence (fans, spread, rivals)

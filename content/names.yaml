@@ -227,6 +227,15 @@ tournaments:
   soccer: the soccer world championship
   cricket: the cricket world championship
 
+# Generated default names for the player's sport (GDD v1.18): a first part and a second part
+# joined into one word ("Crossball"), and a default for the founding club's ground: the club's town
+# and a ground word ("Salvador Park"). The player can change both at setup.
+sportNameParts:
+  first: [Cross, Swift, Hook, Rush, Volley, Strike, Loop, Dash, Skim, Flick, Kettle, Rally, Stone,
+    Tumble, Pike, Hurl, Bound, Brisk, Clip, Sling]
+  second: [ball, stick, court, run, dash, play, shot, bat, ring, field, hoop, toss]
+groundWords: [Park, Field, Ground, Oval, Common, Meadow, Lane, Road]
+
 # Invented flagship club nicknames (GDD v1.14). Clubs are based in real places (places.yaml); only
 # the nickname is made up, e.g. "Glasgow Comets". Needs at least as many entries as the largest
 # flagship has clubs.
