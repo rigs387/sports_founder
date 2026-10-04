@@ -67,6 +67,7 @@ surface before playtesting or during it.
 | 2026-10-03 | Flagship season as event cards (GDD v1.15): a champion moment every season (tier-scaled PP, no moment slot); at most one story decision per season (dynasty, underdog, first title, close finish, repeat final), offered first and counted against the decision cap; runaway or fourth-straight champions raise pressure cards; new `clubRating` effect valid only on flagship season cards; effects stay in the flagship country | Decided |
 | 2026-10-03 | Season card list (GDD v1.15): champion, dynasty, underdog, first title, close finish, repeat final, runaway and foregone-league cards with config starting values; pressure drains land on arrival and paying never cancels them; fixed priority (pressure, then rarest); season-card cooldowns counted in seasons; American runaway needs the playoff champion to top the table; bot weights for every card, then remeasure the win contest | Decided |
 | 2026-10-03 | Testing is time-boxed: concise tests whose results we see over thorough ones that never finish. Unit tests have a 30 s timeout (suite ~30 s); the runner states its plan, prints progress and stops early when projected past `--max-minutes` (default 5). Experiment defaults cut to finish in minutes (12 sampled anchors with 5 seeds each, 40 genomes per anchor, 15 naive-bot seeds, 3 bots); `--anchors all` removed. A 5-anchor sample was tried and misread the win contest (19% vs 36%): spread beats repetition. Replaces the 250-genome size above | Decided |
+| 2026-10-03 | Flagship stars (GDD v1.16): one named leading player per club (born in real places, invented per-language-sphere names, hidden skill on a career curve; full squads deferred); every score credited to the leading player or the squad; a score is the sport's one scoring unit and the scoring frequency trait sets match chances; a season's top scorer becomes a star by taking a config share of their club's scores when a star place is open (1/2/3/4 by league tier); stars add club strength, backed stars add casual conversion at home and media reach out of the flagship; careers peak, decline and announce retirement a season ahead; stars move up within the flagship; backing slots by PP tier, window only, one-time PP price, influence over seasons, honorable endings and a cash price to keep a backed star; star cards; save format 10. Build plan: 2.6 | Decided |
 
 ---
 
@@ -193,6 +194,56 @@ The GDD defers black-hole analysis until after Phase 1. This plan names the obvi
   reach the player, so the story generator's value is hard to judge without them.
 - Keep **rival AI** and **rules evolution** deliberately simple in Phase 1; deepen in Phase 2.
 - National teams and the World Cup/Olympics equivalent stay in Phase 2.
+
+### 2.6 Build Plan: Flagship Stars (GDD v1.16)
+
+Phase 1 milestone: "an emerging star." Small on purpose: one leading player per club, a few
+stars per league. Each step ends with `npm run check` passing; a step that changes balance names
+the one experiment that measures it. Every number is config (`flagship.match`, a new
+`flagship.stars` block).
+
+1. **Scoring frequency in the match engine.** `flagship.match.chances` becomes a map by the
+   genome's scoring option (e.g. low 3, medium 6, high 14) with a rate per option, tuned in a
+   pure test so the stronger club wins about as often at every frequency. Applies from the next
+   season start. Measure the season stories' rates per frequency once (a short flagship-only
+   report, not a full experiment) and retune `flagship.stories` if close finish or runaway drift
+   far.
+2. **Leading players.** A `Player` type in `FlagshipState`: id, name, birthplace (a real place,
+   weighted as clubs are), club, birth season, hidden peak and current skill. Name pools per
+   language sphere in `names.yaml`, validated at load. Generated at club founding (ages spread
+   18–32) and on retirement (young, peak skill leaning toward the club's rating). All on the
+   flagship RNG stream; a determinism test proves the world's random sequence is unchanged.
+3. **Credited scores and career lines.** Each successful chance credits the leading player with
+   a config probability raised by skill. Season tallies (matches, scores, playoff scores, final
+   scores) become a permanent career line at season end; per-match scorers are never stored.
+   Season summaries add the top scorer and any new star.
+4. **Stars and careers.** At season end the top scorer with at least the config share of their
+   club's scores becomes a star if a place is open (places by tier). A star's strength bonus,
+   scaled by skill, adds to their club's match rating. Skill curve with a seasonal wobble,
+   final-season announcement from 31, retirement by 37, replacement. A star may move up to a
+   higher-rated club (the clubs swap leading players). Seat moves leave players at dormant
+   clubs. Landmarks: the first star, star retirements, moves.
+5. **Backing.** `backStar` and `dropStar` through `applyAction`: window only, slots by PP tier,
+   price = base × the peak tier's multiplier, no upkeep. Influence ramps over a config number of
+   seasons. Effects: casual conversion in the flagship country and the media reach channel out
+   of it, scaled by influence, paused off the seat; the honors afterglow fades over a few
+   seasons. Measure: `--experiment pacing` (win contest, 12 anchors × 5 seeds).
+6. **Star cards.** The breakout moment (always, no slot, PP by tier); final season, retirement,
+   unbacked move and career-record moments (records checked against retained careers); the
+   succession decision (honors, mentor the named candidate, let go), the keep-or-let-move
+   decision (league cash) and the full-influence drop pressure card, counted against the decision
+   cap, offered after season cards, with free defaults. Season cards name the champion's leading
+   player and the top scorer where recorded. Bot weights for every new card; bots back stars.
+7. **Save format 10.** Players, career lines, backing and the new summary fields. Format 9
+   migrates to fresh leading players at active clubs: no stars, no invented careers.
+8. **Screen.** A Stars panel on the flagship screen (recorded facts only, an influence bar,
+   backing slots with a review step), the leading player and tally on each table row, backed
+   stars named in the flagship country's tooltip. Skill and strength bonuses stay out of
+   `TurnSnapshot`. Smoke screenshots the Stars panel; run the game and screenshot a breakout
+   moment.
+
+Parked: star injuries (GDD parking lot), foreign players and moves abroad, full squads, a
+"farewell title" story.
 
 ---
 

@@ -113,7 +113,11 @@ record crowds, never bought; fans resist naming rights and moves; can be lost), 
 chants, and a homegrown gear brand (a small, demand-free sponsor at the flagship). Founding character at creation (birthplace, ethos, colors and emblem, the sport's own
 terms) seeds which traditions form, never affinity.
 
-**Stars:** Full squads at the flagship; a few lazily named standouts in every other league. The
+**Stars:** Full squads at the flagship (later; Phase 1 has one named leading player per club,
+whose scores are recorded); a few lazily named standouts in every other league. A season's top
+scorer with a big share of their club's scores becomes a star when one of the few star places
+(1-4 by tier) is open; stars strengthen their club, age, move up and retire a season after
+announcing it. The
 player backs a few as faces of the sport (slots grow with PP tier): they drive spread and seed
 traditions. Backing takes seasons to pay off; dropping a beloved star costs goodwill; exits can be
 honored (final season, retirement, mentoring a successor).

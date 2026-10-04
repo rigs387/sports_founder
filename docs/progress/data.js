@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-03",
-  design: "GDD v1.15",
+  design: "GDD v1.16",
   stage: "Phase 0 · playable slice",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Make the flagship season matter",
-      text: "Season cards are in; next, persistent stars as the league matures.",
+      text: "Season cards are in and stars are designed (GDD v1.16); next, build the first star.",
       tag: "Next build",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Design",
+      title: "Flagship stars",
+      text: "One named leading player per club, scores credited to them, and the scoring frequency trait shaping matches. A season's top scorer becomes one of a few stars (1–4 by tier); stars strengthen clubs, age, move up and retire, and backed stars carry the flagship to the map (GDD v1.16). Build plan: tech plan 2.6.",
+    },
     {
       date: "2026-10-03",
       type: "Review",
@@ -391,13 +397,19 @@ window.SF_PROGRESS = {
       id: "stars",
       title: "Stars & faces of the sport",
       group: "core",
-      gdd: "GDD v1.12 · system 4 extension",
+      gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Build a few named stars on top of flagship results, then backing and succession choices.",
+      next: "Build GDD v1.16 in tech plan 2.6 order: scoring frequency, leading players, credited scores, stars, backing, cards, saves, screen.",
       depends: ["leagues"],
-      sources: [["Stars design", "../../sports-founder-gdd.md#progression--economy"]],
+      sources: [
+        ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
+        ["Stars build plan", "../../sports-founder-tech-plan.md#26-build-plan-flagship-stars-gdd-v116"],
+      ],
       items: [
+        ["planned", "Scoring frequency in matches; each club's leading player credited"],
+        ["planned", "Stars made by a season: top scorer, club share, 1–4 places by tier"],
+        ["planned", "Star cards: breakout, final season, retirement, moves, records"],
         ["planned", "Flagship stars and lightweight standouts elsewhere"],
         ["planned", "Persistent careers, performance and retained records"],
         ["planned", "Backing slots and influence earned over seasons"],

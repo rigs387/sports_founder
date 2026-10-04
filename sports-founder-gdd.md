@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.15 | October 3, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards)*
+*Version 1.16 | October 3, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars)*
 
 ---
 
@@ -189,9 +189,9 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
 | Stage | Simulated |
 |---|---|
 | No league | Fan buckets only |
-| Amateur | Named teams, results, standings |
-| Semi-Pro | + a few named star players per team |
-| Professional / Elite | Full rosters |
+| Amateur | Named teams, results, standings, one named leading player per club |
+| Semi-Pro | + more star places (see Flagship stars) |
+| Professional / Elite | Full rosters (a later phase; Phase 1 keeps one leading player per club, decided 2026-10-03) |
 
 Even full rosters carry only what stories, records, and costs use: ratings, stats, careers,
 transfers, and **contracts**. Contracts exist to build up the league's running cost (payroll
@@ -680,6 +680,136 @@ purchased traits and percentage modifiers alone do not make culture.
   goodwill and can trigger a scandal. Relationships can end with honor: a promised final season,
   retiring with honors, or mentoring a successor. The game alerts the player when a succession
   decision is developing; there is no ritual reappointment.
+- **Flagship stars (decided 2026-10-03, GDD v1.16).** The Phase 1 build of stars, small on
+  purpose: a few stars per league, not a player database. Matches were club-level rolls in which
+  nobody scored, so no recorded fact could make a star; the first step is recording who scores.
+  - *One named leading player per club* (8–20 people at the flagship). They stand in for the
+    "full squads" above until a later phase. Each is born in a real place of the flagship's
+    country (`places.yaml`, weighted like clubs; no invented places, no foreign players in
+    Phase 1), with a name from invented per-language-sphere pools in the names file, and a
+    hidden skill that follows a career curve.
+  - *A score is the sport's one scoring unit* (decided 2026-10-03): whatever adds to a match
+    result, shown with the sport's own term once founding character is built and a neutral
+    "score" until then. No score types and no assists; innings sports count runs the same way.
+  - *The scoring frequency trait shapes matches* (decided 2026-10-03). Low, medium and high set
+    a match's scoring chances (config, e.g. 3, 6 and 14), with the scoring rate tuned so the
+    stronger club wins about as often in every sport. Low-scoring sports draw more and decide
+    more finals by one score; season story thresholds are remeasured per frequency once.
+  - *Who scored is recorded.* Each successful scoring chance is credited to the club's leading
+    player with a config probability raised by their skill, otherwise to the squad. Each season
+    records, per leading player: matches, scores, and scores in playoff matches and the final.
+    The credit rolls use the flagship's own random stream, so the world never depends on them.
+  - *A star is made by a season, and stars are scarce (choose pain).* At a season's end the top
+    scorer becomes a star only if they scored at least a config share of their club's season
+    total (e.g. 35%, which reads the same at every scoring frequency) and the league has an open
+    star place. A star stays a star until retirement, so new stars arrive mostly as old
+    ones fade, and every new one is an event.
+  - *Star places by league tier (config):* Amateur 1, Semi-Pro 2, Professional 3, Elite 4.
+    Amateur gets one, not none: the seat spends its first ten or so seasons at Amateur, and the
+    Phase 1 slice needs an emerging star inside that stretch.
+  - *A leading player is generated* when a club is founded and when its leading player retires.
+  - *Only recorded counts are cited.* Screens and stories quote tallies ("14 scores in 14
+    matches, 40% of the club's total"), never invented match moments such as the minute of a
+    winning score.
+  - *What a star does (decided 2026-10-03).*
+    - On the field (choose pain): a star adds strength to their club (config, scaled by skill)
+      on top of the drifting club rating; leading players who are not stars add nothing beyond
+      their scoring credit. Stars make strong clubs stronger, which feeds the runaway and
+      foregone-league pressure cards.
+    - Unbacked stars move fans only through the cards they raise (choose pain). A star the
+      player ignores is a strong club, not a marketing asset.
+    - A backed star raises casual conversion in the flagship country and strengthens the media
+      reach channel out of the flagship country, both scaled by their influence, which grows
+      over seasons (commitment). This is the flagship's first link to the global map, and it
+      runs through a person. It answers v1.15's open question in part; other links may follow.
+    - Stars never convert hardcore fans directly; hardcore fans still come only from the fan
+      model and from cards' temporary effects. Losing a star costs casual reach and influence,
+      not a hardcore crash.
+    - Star effects stop while their league is not the flagship, as clubs go dormant when the
+      seat moves.
+  - *Careers (decided 2026-10-03).* Every number is config.
+    - Each player has an age and a hidden peak skill. Skill climbs to peak around 27, holds,
+      and declines after about 30, with a small random wobble each season on the flagship's own
+      random stream. Founding clubs' players get spread-out ages (18–32) so the first generation
+      does not retire at once.
+    - Retirement is announced a season ahead. From 31, each season end may make a player's next
+      season their final season (a chance rising with age and lost skill); everyone retires by
+      37. The final season is a recorded fact cards and succession can use.
+    - Fading stars keep their place (choose pain): a declining star stays a star with a shrinking
+      strength bonus and holds a star place until retirement, blocking new breakouts.
+    - Replacements follow club strength (choose pain): a retiring player's replacement is young,
+      with peak skill drawn with a modest lean toward the club's rating, so strong clubs attract
+      better talent.
+    - Stars can move clubs within the flagship (choose pain): at a season's end a star may move
+      to a club rated above theirs (config chance); the two clubs swap leading players, so every
+      club keeps one. Each move is a landmark and a card, and only the player's backing levers
+      can hold a star. No moves abroad in Phase 1 (other leagues have no named players).
+    - Stars stay when the seat moves: they remain with their dormant clubs and keep ageing, and
+      return if the seat comes back while they still play. The new flagship's clubs get their
+      own leading players.
+  - *What the player can do (decided 2026-10-03).* Every number is config.
+    - Backing slots by PP tier: 1 at tiers 1–2, 2 at tiers 3–4, 3 at tier 5. Only stars can be
+      backed. Backing and dropping happen only in the seasonal window (choose pain): the player
+      commits for a year at a time.
+    - Backing costs a one-time PP price (base × the peak tier's multiplier, as growth nodes) and
+      no upkeep: slots are the limit, following the Phase 0 rule against PP upkeep. Revisit if
+      bots hoard slots.
+    - Influence grows from 0 to full over a number of seasons backed (e.g. 4). Dropping a star
+      resets it; backing them again starts from 0. Dropping a star at full influence raises a
+      pressure card (choose pain): on arrival, casual fans drain and a small share of hardcore
+      fans demote in the flagship country. An earlier drop costs only the lost progress.
+    - Honorable endings: when a backed star announces a final season, a succession decision
+      arrives. Retire with honors (PP): their effects fade over a few seasons instead of
+      stopping, and the retirement is a landmark the Hall of Fame can read. Mentor a successor
+      (PP): a chosen young leading player who is not a star takes the slot with a share of the
+      mentor's influence and a season's lift to their scoring credit; they become a star only by
+      clearing the bar. Let them go (free): influence is lost, no goodwill cost. A retirement is
+      never a drop.
+    - Keeping a star (choose pain): when a backed star would move, a decision arrives. Keep them
+      for flagship league cash (scaled by tier), which can push a weak league toward Struggling,
+      or let them move for free: backing follows the person and keeps its influence, and the old
+      club loses the strength. Unbacked stars move without asking.
+    - No selling in Phase 1: a move within the league brings no money and moves abroad need
+      foreign players. Letting a star move is how the player parts with one.
+    - Backed stars stay backed when the seat moves (choose pain): they keep the slot while their
+      effects pause, and freeing the slot is an ordinary drop.
+  - *Stars on cards (decided 2026-10-03).* Every card is built from recorded facts.
+    - The breakout moment: when a star is made, a moment always appears, takes no moment slot,
+      carries PP by league tier (config) and quotes the recorded season. The sport's first-ever
+      star is also a permanent landmark.
+    - Succession, keep-or-let-move and the drop pressure card arrive when their fact happens.
+      They are not season stories (the one-story limit does not apply) but count against the
+      decision cap and are offered after the season cards. Unanswered, they resolve to the free
+      default (let them go, let them move) and the star's influence is lost (choose pain).
+    - Star moments use normal moment slots: a star's final season announced, a star retiring
+      (also a landmark), an unbacked star moving clubs, and career records such as becoming the
+      league's all-time top scorer, checked against retained records.
+    - Season cards name the champion's leading player and the season's top scorer where the
+      record supports it. No new story types in Phase 1; a "farewell title" story can follow
+      playtest.
+    - The succession card names its mentoring candidate: last season's top-scoring leading
+      player who is not a star and is under a config age. With no candidate, mentoring is not
+      offered. No picker screen.
+    - Star injuries (a GDD negative event) are deferred to the parking lot: they need the match
+      engine to handle missed matches.
+    - Bots answer every star card and back stars through the same actions as the player. Backed
+      stars feed spread, so the win contest is remeasured once.
+  - *What is saved (decided 2026-10-03).* Each player keeps identity (name, birthplace, club,
+    birth season), hidden peak and current skill, star-since season, the final-season flag and
+    backing (season backed, influence), plus one permanent career line per season: club, matches,
+    scores, playoff scores, final scores. Season summaries add the top scorer and any new star.
+    Retired players and their careers are permanent. Who scored in each match is disposable:
+    only season tallies are kept. Older saves gain fresh leading players at active clubs (spread
+    ages, no stars, no invented careers; dormant clubs get theirs when they return), and the
+    scoring-frequency match chances start with the next season, so no season mixes two rules.
+  - *What the screen shows (decided 2026-10-03).* The flagship screen gains a Stars panel above
+    the table (name, club, age, birthplace, this season's tally, career totals, star since, a
+    final-season tag) with the backing slots: back and drop in the window only, through a review
+    step that shows the PP price or the drop's cost. Each club row adds its leading player and
+    their season tally. Skill is never shown, as a number or a word; influence is shown as a bar,
+    since it is the player's own investment. No new map layer: backed stars act through the
+    media reach channel, and the flagship country's tooltip names them. Skill and a star's
+    strength bonus never enter the turn snapshot; the sim prices backing and judges legality.
 
 **Venues & youth programs:** Each league has a venue capacity level (1–5) and a youth program level
 (1–5) — no individual stadiums or academies.
@@ -1049,6 +1179,8 @@ Items flagged during the interview that need further discussion in future sessio
   DLC, Steam page timing, platforms. Tech plan §11 holds the current thinking.
 - Competitor analysis: a thorough Steam tag sweep (research task, not a design decision).
 - Water as a genome surface option (parked 2026-09-13).
+- Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to
+  handle missed matches; deferred from the Phase 1 stars build.
 - Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship
   rule decided 2026-10-02): whether other leagues ever get individual deals; where the seat goes
   when the anchor league has folded after the win; whether a flagship restructured below
