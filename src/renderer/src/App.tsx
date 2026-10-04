@@ -9,6 +9,7 @@ import { FocusControls } from "./components/FocusControls";
 import { LeagueControls } from "./components/LeagueControls";
 import { SaveLoadControls } from "./components/SaveLoadControls";
 import { FlagshipScreen } from "./flagship/FlagshipScreen";
+import { BackedStars } from "./flagship/StarsPanel";
 import { GrowthScreen } from "./growth/GrowthScreen";
 import { heatBand, mapSettings } from "./map/model";
 import { type MapCommand, type MapHover, WorldMap } from "./map/WorldMap";
@@ -337,6 +338,9 @@ export function App() {
               </div>
             </div>
             <div className={`quick-meter band-${heatBand(hovered.share, mapSettings.heatBands)}`} />
+            {snapshot && hovered.countryId === snapshot.flagship.countryId && (
+              <BackedStars stars={snapshot.flagship.stars} />
+            )}
             <div className="quick-footer">
               <span>
                 {hovered.league

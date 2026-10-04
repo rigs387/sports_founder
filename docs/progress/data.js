@@ -1,7 +1,7 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-03",
+  updated: "2026-10-04",
   design: "GDD v1.16",
   stage: "Phase 0 · playable slice",
   markets: 213,
@@ -12,13 +12,13 @@ window.SF_PROGRESS = {
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
-    date: "2026-10-03",
-    tests: 394,
-    files: 34,
-    note: "npm run check passed after stars step 6, star cards (type checks, Biome, purity, 394 tests in 34 files). Lint has existing visual-study warnings.",
-    smokeDate: "2026-10-03",
+    date: "2026-10-04",
+    tests: 401,
+    files: 35,
+    note: "npm run check passed after stars step 8, the Stars panel (type checks, Biome, purity, 401 tests in 35 files). Lint has existing visual-study warnings.",
+    smokeDate: "2026-10-04",
     smoke:
-      "UI smoke passed: it plays to a season end and opens its story card (now naming the champions' leading player and the top scorer), then plays on until a star card arrives and opens it (a retirement naming a real player and club); save/resume continued identically.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; save/resume continued identically.",
   },
   eventDeck: { current: 24, target: "40–60" },
   phases: [
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Make the flagship season matter",
-      text: "Stars reach the player as cards: breakouts, last seasons, retirements, moves, records (stars step 6 of 8); next, the Stars panel.",
+      text: "The emerging-star milestone is built (tech plan 2.6): stars on the flagship screen, backed through a review step, named on the map. Next, decide how the flagship feeds global spread.",
       tag: "Next build",
     },
     {
@@ -88,6 +88,18 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-04",
+      type: "Milestone",
+      title: "An emerging star",
+      text: "Tech plan 2.6 is complete: named leading players, credited scores and careers, stars, backing, star cards and the Stars panel (GDD v1.16).",
+    },
+    {
+      date: "2026-10-04",
+      type: "Built",
+      title: "The Stars panel",
+      text: "Stars step 8 (tech plan 2.6): a Stars panel above the flagship table with recorded facts only (club, age, birthplace, season and career tallies, star since, final season), backing slots, influence bars, and back and drop through a review step with the price, the goodwill cost and the pressure card. Disabled buttons say why. Table rows name each club's leading player and their scores; the flagship country's map tooltip names backed stars. Skill stays out of the snapshot.",
+    },
     {
       date: "2026-10-03",
       type: "Built",
@@ -324,7 +336,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
       summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
-      next: "Add a few named stars as the league matures; then decide how the flagship feeds global spread.",
+      next: "Decide how the flagship feeds global spread beyond backed stars.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
@@ -336,7 +348,7 @@ window.SF_PROGRESS = {
         ["built", "Health ladder, promotion, restructuring and bailouts"],
         ["built", "Flagship seat: Professional+ moves in season windows; home on collapse"],
         ["built", "Named clubs in real places, results, standings and retained season summaries"],
-        ["built", "Flagship screen: table, results, champions and the seat"],
+        ["built", "Flagship screen: stars, table, results, champions and the seat"],
         ["built", "European or American format chosen on the creation screen"],
         ["built", "Season cards: champion, story and pressure cards; club strength"],
         ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
@@ -436,7 +448,7 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Step 8 of tech plan 2.6: the Stars panel on the flagship screen (recorded facts, influence bars, backing slots with a review step). Saves were built with each step.",
+      next: "Flagship stars are built and on screen (tech plan 2.6). Lightweight standouts in other leagues remain planned.",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
@@ -451,6 +463,8 @@ window.SF_PROGRESS = {
         ["Stars and careers", "../flagship/README.md#stars-and-careers"],
         ["Backing stars", "../flagship/README.md#backing-stars"],
         ["Star cards", "../flagship/README.md#star-cards"],
+        ["Stars panel", "../flagship/README.md#the-stars-panel"],
+        ["Stars panel tests", "../../tests/flagship-stars-panel.test.ts"],
       ],
       items: [
         ["built", "Scoring frequency sets flagship match chances, fixed per season"],
@@ -458,7 +472,11 @@ window.SF_PROGRESS = {
         ["built", "Scores credited to leading players; career lines and top scorers"],
         ["built", "Stars made by a season: top scorer, club share, 1–4 places by tier"],
         ["built", "Star cards: breakout, final season, retirement, moves, records"],
-        ["planned", "Flagship stars and lightweight standouts elsewhere"],
+        [
+          "built",
+          "Stars panel: recorded facts, influence bars, backing with a review step, names on the table and map",
+        ],
+        ["planned", "Lightweight standouts in leagues other than the flagship"],
         [
           "built",
           "Persistent careers: skill curve, final seasons, retirement, moves and league scoring records",

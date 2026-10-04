@@ -11,6 +11,7 @@ import { verifySaves } from "./save-smoke";
 import { verifySeasonCards } from "./season-smoke";
 import { verifySetup } from "./setup-smoke";
 import { verifyStarCards } from "./star-smoke";
+import { verifyStarsPanel } from "./stars-smoke";
 
 // Development-only self-check, enabled by the SF_SMOKE_OUT environment variable (see
 // `npm run smoke`). It drives the real window: waits for the first campaign snapshot from the
@@ -131,6 +132,7 @@ async function run(
   const flagship = await verifyFlagship(win, screenshot);
   const seasonCards = await verifySeasonCards(win, screenshot);
   const starCards = await verifyStarCards(win, screenshot);
+  const starsPanel = await verifyStarsPanel(win, screenshot);
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
@@ -147,6 +149,7 @@ async function run(
     flagship,
     seasonCards,
     starCards,
+    starsPanel,
     saves,
     errors,
     remoteRequests,

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, ClubSnapshot, MatchResult, TurnSnapshot } from "../../../sim";
 import "./flagship.css";
+import { StarsPanel } from "./StarsPanel";
 
 interface Props {
   snapshot: TurnSnapshot;
@@ -12,8 +13,8 @@ interface Props {
   onAction: (action: Action) => void;
 }
 
-// The flagship league the player runs as commissioner (GDD v1.11, v1.14): this season's table,
-// the latest round, the champions on record and the seat. Everything shown comes from the
+// The flagship league the player runs as commissioner (GDD v1.11, v1.14, v1.16): its stars, this
+// season's table, the latest round, the champions on record and the seat. Everything shown comes from the
 // snapshot; legality and costs stay in the simulation.
 export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Props) {
   const { t } = useTranslation();
@@ -62,12 +63,21 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
         </p>
       )}
       <div className="flagship-layout">
-        <LeagueTable
-          snapshot={snapshot}
-          clubs={clubs}
-          clubName={clubName}
-          playoffClubs={flagship.playoffClubs}
-        />
+        <div className="flagship-main">
+          <StarsPanel
+            snapshot={snapshot}
+            names={names}
+            busy={busy}
+            clubName={clubName}
+            onAction={onAction}
+          />
+          <LeagueTable
+            snapshot={snapshot}
+            clubs={clubs}
+            clubName={clubName}
+            playoffClubs={flagship.playoffClubs}
+          />
+        </div>
         <div className="flagship-side">
           <LatestRound results={flagship.lastRound} clubName={clubName} />
           <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
@@ -90,6 +100,8 @@ function LeagueTable({
   playoffClubs: number;
 }) {
   const { t } = useTranslation();
+  const leaders = new Map(snapshot.flagship.leaders.map((leader) => [leader.clubId, leader]));
+  const playerName = (id: number) => snapshot.flagship.players.find((p) => p.id === id)?.name;
   const columns = [
     ["played", "playedFull"],
     ["won", "wonFull"],
@@ -127,6 +139,8 @@ function LeagueTable({
         <tbody>
           {snapshot.flagship.table.map((row, index) => {
             const titles = clubs.get(row.clubId)?.titles ?? 0;
+            const leader = leaders.get(row.clubId);
+            const leaderName = leader && playerName(leader.playerId);
             const lastPlayoff = playoffClubs > 0 && index === playoffClubs - 1;
             return (
               <tr
@@ -145,6 +159,20 @@ function LeagueTable({
                       </small>
                     )}
                   </span>
+                  {leader && leaderName && (
+                    <small
+                      className="leader"
+                      title={t("flagship.table.leader")}
+                      data-testid="flagship-leader"
+                    >
+                      {leader.scores === null
+                        ? leaderName
+                        : t("flagship.table.leaderScores", {
+                            name: leaderName,
+                            count: leader.scores,
+                          })}
+                    </small>
+                  )}
                 </th>
                 <td>{row.played}</td>
                 <td>{row.won}</td>

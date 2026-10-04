@@ -3,7 +3,7 @@ import { useGameStore } from "../state/game-store";
 
 export function ActionFeedback() {
   const { t } = useTranslation();
-  const { status, actionError, lastAction, names } = useGameStore();
+  const { status, actionError, lastAction, names, snapshot } = useGameStore();
   if (actionError)
     return (
       <p className="action-feedback error" role="alert">
@@ -26,6 +26,10 @@ export function ActionFeedback() {
             ? (names?.countries[lastAction.countryId] ?? lastAction.countryId)
             : "",
         slot: "slot" in lastAction ? lastAction.slot + 1 : 0,
+        player:
+          "playerId" in lastAction
+            ? (snapshot?.flagship.players.find((p) => p.id === lastAction.playerId)?.name ?? "")
+            : "",
       })}
     </p>
   );

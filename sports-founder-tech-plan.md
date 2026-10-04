@@ -280,6 +280,12 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    stars named in the flagship country's tooltip. Skill and strength bonuses stay out of
    `TurnSnapshot`. Smoke screenshots the Stars panel; run the game and screenshot a breakout
    moment.
+   *Built 2026-10-04:* the panel sits above the table; stars show club, age, birthplace, season and
+   career tallies, star since and a final-season tag; backed stars an influence bar. Back and drop
+   use a review step (price; lost influence, goodwill cost and the pressure card at full
+   influence), and disabled buttons give the simulation's typed reason (window, slots, PP). The
+   snapshot gained `stars`, `backing` and `leaders`; no key names skill, strength or rating (a
+   test walks it). Smoke backs a star through the review and finds them in the map tooltip.
 
 Parked: star injuries (GDD parking lot), foreign players and moves abroad, full squads, a
 "farewell title" story.

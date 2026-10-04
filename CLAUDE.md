@@ -128,8 +128,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   land on arrival and are never cancelled.
 - Flagship stars (GDD v1.16) live in `FlagshipState.players`: leading players, credited scores,
   careers, stars and backing in `src/sim/flagship.ts`; star cards in `src/sim/star-cards.ts`, built
-  from recorded facts only (a season's new star and the star landmarks). Skill stays out of
-  `TurnSnapshot`; the snapshot carries player names only. Star cards' free defaults have no
+  from recorded facts only (a season's new star and the star landmarks). Skill and star strength stay out
+  of `TurnSnapshot`; it carries player names, and recorded facts and backing for the Stars panel. Star cards' free defaults have no
   effect: a backed star's move stands unless kept, a backed star's backing ends at retirement
   unless honored or passed to a mentored successor.
 - The win lives in `GameState.win` (`src/sim/win.ts`), never in `outcome`: winning must not end a

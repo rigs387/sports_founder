@@ -217,3 +217,44 @@ players from a names-only list in the snapshot; skill never leaves the simulatio
 `tests/star-cards.test.ts` covers every card's facts and choices, the breakout PP, season card
 names, the afterglow fading, the keep cost, the drop's pressure, records and the 14 → 15 migration.
 `npm run smoke` plays on until a star card arrives and opens it (`runs/smoke/35-star-card.png`).
+
+## The Stars panel
+
+Built October 4, 2026 (tech plan 2.6 step 8). The flagship screen opens with a **Stars** panel
+above the table.
+
+![The Stars panel with a backed star and their influence bar.](stars.png)
+
+- **Each star** (and any backed successor who is not a star yet) shows recorded facts only: name,
+  club, age, birthplace, this season's tally, career totals and seasons, the season they became a
+  star, and a final-season tag. Skill and star strength never appear, as a number or a word.
+- **Backing slots:** used and free slots for the current PP tier, and the one-time PP price. A
+  backed star shows their influence as a bar, and whom they mentor.
+- **Back and drop** go through `applyAction` after a review step. Backing quotes the PP price.
+  Dropping shows the influence lost; at full influence it also shows the goodwill cost (the share
+  of hardcore fans in the flagship country who turn casual) and the "Fans remember" card with its
+  drain on casual conversion. Outside the seasonal window, with every slot taken or without the PP,
+  the button is disabled and says why.
+- **The table** names each club's leading player and their scores this season.
+- **The map:** the flagship country's tooltip names its backed stars. There is no new map layer.
+
+![Reviewing a backing: the PP price before confirming.](stars-review.png)
+
+[Narrow layout](stars-narrow.png) · [Map tooltip](stars-tooltip.png)
+
+`TurnSnapshot.flagship` carries what the panel needs: `stars` (recorded facts, backing and the
+typed reason each action is blocked), `backing` (slots, used, price, the drop's goodwill share and
+the pressure card's drain, read from `content/events.yaml`) and `leaders` (each active club's
+leading player and season scores). `backStarBlocker` and `dropStarBlocker` in
+`src/sim/flagship.ts` give the reasons; `applyAction` uses the same rules. The panel is
+`src/renderer/src/flagship/StarsPanel.tsx`.
+
+`tests/flagship-stars-panel.test.ts` checks that no key in the snapshot names skill, strength or
+rating, the recorded facts and leaders, each blocker reason (window, slots, PP, already backed),
+the drop's costs at full influence, a player-facing string for every blocker and action, and the
+worker round-trip for `backStar` and `dropStar`. `npm run smoke` plays on from the star cards until
+the league has a star, screenshots the panel in both layouts (`runs/smoke/36-stars.png`,
+`37-stars-narrow.png`), plays to the seasonal window, backs a star through the review step
+(`38-stars-review.png`, `39-stars-backed.png`) and finds them in the map tooltip
+(`40-stars-tooltip.png`). The drop review at full influence is covered by the tests; the smoke
+campaign does not reach full influence.

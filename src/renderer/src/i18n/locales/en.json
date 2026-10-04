@@ -746,7 +746,9 @@
       "promoteLeague": "Promoted the league in {{country}}.",
       "stepDownLeague": "Restructured the league in {{country}}.",
       "bailoutLeague": "Funded a bailout in {{country}}.",
-      "moveSeat": "After this season the seat will be in {{country}}."
+      "moveSeat": "After this season the seat will be in {{country}}.",
+      "backStar": "You now back {{player}}. Their influence grows each season they play at the seat.",
+      "dropStar": "You no longer back {{player}}."
     }
   },
   "map": {
@@ -830,7 +832,9 @@
       "north-america": "North America",
       "south-america": "South America",
       "oceania": "Oceania"
-    }
+    },
+    "backedStars_one": "Backed star: {{names, list}}",
+    "backedStars_other": "Backed stars: {{names, list}}"
   },
   "flagship": {
     "eyebrow": "The commissioner's seat",
@@ -862,7 +866,10 @@
       "drawnFull": "Drawn",
       "lostFull": "Lost",
       "pointsFull": "Points",
-      "playoffLine": "Playoff places"
+      "playoffLine": "Playoff places",
+      "leader": "Leading player",
+      "leaderScores_one": "{{name}} · {{count, number}} score",
+      "leaderScores_other": "{{name}} · {{count, number}} scores"
     },
     "lastRound": {
       "heading": "Latest results",
@@ -893,6 +900,56 @@
       "cost": "Moving away turns {{share}} of hardcore fans in {{country}} casual. The move happens when this season ends.",
       "target": "{{country}} · {{tier}}"
     },
-    "footer": "Your league. Seasons end in the seasonal window."
+    "footer": "Your league. Seasons end in the seasonal window.",
+    "stars": {
+      "heading": "Stars",
+      "intro": "Stars are the league's leading players who carried their club. Backing one lifts the sport in {{country}} while they play here.",
+      "none": "No star yet. A season's top scorer becomes a star when they carry their club's scoring.",
+      "slots_one": "{{used, number}} of {{count, number}} backing slot used",
+      "slots_other": "{{used, number}} of {{count, number}} backing slots used",
+      "slotUsed": "Backing slot in use",
+      "slotFree": "Free backing slot",
+      "over": "You hold more backings than your PP tier allows. They stay until you drop them or they retire.",
+      "price": "Backing a star costs {{price, number(maximumFractionDigits: 1)}} PP, once.",
+      "starSince": "Star since season {{season, number}}",
+      "successor": "Backed successor",
+      "finalSeason": "Final season",
+      "club": "{{club}} · age {{age, number}}",
+      "born": "Born in {{place}}, {{country}}",
+      "seasonTally": "This season",
+      "careerTally": "Career",
+      "scores_one": "{{count, number}} score in {{matches, number}} matches",
+      "scores_other": "{{count, number}} scores in {{matches, number}} matches",
+      "untallied": "Not tallied this season",
+      "careerSeasons_one": "{{count, number}} season",
+      "careerSeasons_other": "{{count, number}} seasons",
+      "rookie": "First season",
+      "influence": "Influence",
+      "influenceValue": "{{value, number(style: percent; maximumFractionDigits: 0)}}",
+      "influenceLabel": "{{name}}'s influence: {{value, number(style: percent; maximumFractionDigits: 0)}}",
+      "mentoring": "Mentoring {{name}}",
+      "back": "Back {{name}}",
+      "drop": "Drop {{name}}",
+      "reviewBack": "Back {{name}} for {{price, number(maximumFractionDigits: 1)}} PP? Their influence starts at nothing and grows each season they play in {{country}}.",
+      "confirmBack": "Back this star",
+      "reviewDrop": "Drop {{name}}? Their influence of {{influence, number(style: percent; maximumFractionDigits: 0)}} is lost for good.",
+      "reviewDropFull": "At full influence, dropping them turns {{share, number(style: percent; maximumFractionDigits: 2)}} of hardcore fans in {{country}} casual now.",
+      "reviewDropCard": "The “{{card}}” card follows: casual conversion in {{country}} falls {{drain, number(style: percent; maximumFractionDigits: 0)}} for {{quarters, number}} quarters.",
+      "confirmDrop": "Drop this star",
+      "cancel": "Keep things as they are",
+      "blockers": {
+        "back": {
+          "window": "Stars can be backed only in the seasonal window.",
+          "notStar": "Only a star playing in the {{country}} league can be backed.",
+          "backed": "This star is already backed.",
+          "slots": "Every backing slot is taken. Drop a backed star to free one.",
+          "pp": "Backing costs {{price, number(maximumFractionDigits: 1)}} PP; you have {{pp, number(maximumFractionDigits: 1)}}."
+        },
+        "drop": {
+          "window": "A backing can be dropped only in the seasonal window.",
+          "notBacked": "This star is not backed."
+        }
+      }
+    }
   }
 }

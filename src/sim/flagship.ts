@@ -369,31 +369,65 @@ export function backingEffects(flagship: FlagshipState, world: World) {
   };
 }
 
-/** Why a star cannot be backed now, or null if they can. */
-export function backBlocker(state: GameState, world: World, playerId: number): string | null {
-  if (!seasonalWindowOpen(state, world.config))
-    return "stars can only be backed in the seasonal window";
+/** Why a star cannot be backed now (GDD v1.16), or null if they can. */
+export type BackBlocker = "window" | "notStar" | "backed" | "slots" | "pp";
+export function backStarBlocker(
+  state: GameState,
+  world: World,
+  playerId: number,
+): BackBlocker | null {
+  if (!seasonalWindowOpen(state, world.config)) return "window";
   const player = state.flagship.players.find((p) => p.id === playerId);
-  if (!player || !seatStars(state.flagship).includes(player)) {
-    return "only a star playing in the flagship league can be backed";
-  }
-  if (player.backing !== null) return "that star is already backed";
-  if (backedStars(state.flagship).length >= backingSlots(state, world)) {
-    return "every backing slot is taken";
-  }
-  const price = backingPrice(state, world);
-  if (state.pp < price)
-    return `not enough PP: costs ${Math.ceil(price)}, you have ${Math.floor(state.pp)}`;
+  if (!player || !seatStars(state.flagship).includes(player)) return "notStar";
+  if (player.backing !== null) return "backed";
+  if (backedStars(state.flagship).length >= backingSlots(state, world)) return "slots";
+  if (state.pp < backingPrice(state, world)) return "pp";
   return null;
 }
 
 /** Why a backing cannot be dropped now, or null if it can. */
-export function dropBlocker(state: GameState, world: World, playerId: number): string | null {
-  if (!seasonalWindowOpen(state, world.config))
-    return "a star can only be dropped in the seasonal window";
+export type DropBlocker = "window" | "notBacked";
+export function dropStarBlocker(
+  state: GameState,
+  world: World,
+  playerId: number,
+): DropBlocker | null {
+  if (!seasonalWindowOpen(state, world.config)) return "window";
   const player = state.flagship.players.find((p) => p.id === playerId);
-  if (!player || player.backing === null) return "that star is not backed";
+  if (!player || player.backing === null) return "notBacked";
   return null;
+}
+
+/** Why a star cannot be backed now, or null if they can. */
+export function backBlocker(state: GameState, world: World, playerId: number): string | null {
+  switch (backStarBlocker(state, world, playerId)) {
+    case "window":
+      return "stars can only be backed in the seasonal window";
+    case "notStar":
+      return "only a star playing in the flagship league can be backed";
+    case "backed":
+      return "that star is already backed";
+    case "slots":
+      return "every backing slot is taken";
+    case "pp": {
+      const price = backingPrice(state, world);
+      return `not enough PP: costs ${Math.ceil(price)}, you have ${Math.floor(state.pp)}`;
+    }
+    case null:
+      return null;
+  }
+}
+
+/** Why a backing cannot be dropped now, or null if it can. */
+export function dropBlocker(state: GameState, world: World, playerId: number): string | null {
+  switch (dropStarBlocker(state, world, playerId)) {
+    case "window":
+      return "a star can only be dropped in the seasonal window";
+    case "notBacked":
+      return "that star is not backed";
+    case null:
+      return null;
+  }
 }
 
 /** Backs a star (checked by the caller): the PP price now, influence from 0. */
@@ -1410,6 +1444,44 @@ export interface ClubSnapshot {
   titles: number;
 }
 
+/**
+ * A star or backed player as the Stars panel shows them (GDD v1.16): recorded facts and the
+ * player's backing only. Skill, peak skill and star strength never leave the simulation.
+ */
+export interface StarSnapshot {
+  id: number;
+  name: string;
+  clubId: number;
+  /** Birthplace: a market and one of its real places. */
+  countryId: string;
+  birthplace: string;
+  age: number;
+  /** The season they became a star, or null for a backed successor who is not a star yet. */
+  starSince: number | null;
+  finalSeason: boolean;
+  /** This season's tally so far, or null when the season is not tallied. */
+  season: SeasonTally | null;
+  /** Every finished season added up. */
+  career: SeasonTally & { seasons: number };
+  /** The player's backing: since when, influence 0–1, and who they mentor. */
+  backing: { season: number; influence: number; mentee: number | null } | null;
+  /** Why backing or dropping them is not possible now, or null when it is. */
+  backBlocker: BackBlocker | null;
+  dropBlocker: DropBlocker | null;
+}
+
+/** Backing slots, the price and what a drop at full influence costs (GDD v1.16). */
+export interface BackingSnapshot {
+  /** Slots at the current PP tier; used can exceed them after a demotion. */
+  slots: number;
+  used: number;
+  price: number;
+  /** Share of the flagship country's hardcore fans who turn casual on a drop at full influence. */
+  dropHardcoreShare: number;
+  /** The pressure card's drain on casual conversion there when it arrives, if content has one. */
+  dropPressure: { factor: number; quarters: number } | null;
+}
+
 /** What the UI shows of the flagship. Club ratings stay hidden. */
 export interface FlagshipSnapshot {
   countryId: string;
@@ -1439,6 +1511,11 @@ export interface FlagshipSnapshot {
   players: { id: number; name: string; clubId: number }[];
   /** The rules star cards quote: honors' fading seasons and the mentor's influence share. */
   starRules: { afterglowSeasons: number; mentorShare: number };
+  /** Stars at the seat and every backed player still playing, stars first, newest star first. */
+  stars: StarSnapshot[];
+  backing: BackingSnapshot;
+  /** Each active club's leading player and their scores this season (null when untallied). */
+  leaders: { clubId: number; playerId: number; scores: number | null }[];
 }
 
 /** How many finished seasons the snapshot carries. */
@@ -1492,5 +1569,87 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
       afterglowSeasons: world.config.flagship.stars.afterglowSeasons,
       mentorShare: world.config.flagship.stars.mentorShare,
     },
+    stars: starSnapshots(state, world),
+    backing: backingSnapshot(state, world),
+    leaders: activeClubs(flagship).flatMap((club) => {
+      const player = leadingPlayer(flagship, club.id);
+      if (!player) return [];
+      const tally = flagship.tallies?.find((entry) => entry.playerId === player.id);
+      return [
+        {
+          clubId: club.id,
+          playerId: player.id,
+          scores: flagship.tallies === null ? null : (tally?.scores ?? 0),
+        },
+      ];
+    }),
+  };
+}
+
+function starSnapshots(state: GameState, world: World): StarSnapshot[] {
+  const flagship = state.flagship;
+  const shown = new Set([...seatStars(flagship), ...backedStars(flagship)]);
+  return [...shown]
+    .sort(
+      (a, b) =>
+        (a.starSince ?? Number.POSITIVE_INFINITY) - (b.starSince ?? Number.POSITIVE_INFINITY) ||
+        a.id - b.id,
+    )
+    .map((player): StarSnapshot => {
+      const tally = flagship.tallies?.find((entry) => entry.playerId === player.id);
+      const career = player.career.reduce(
+        (sum, line) => ({
+          seasons: sum.seasons + 1,
+          matches: sum.matches + line.matches,
+          scores: sum.scores + line.scores,
+          playoffScores: sum.playoffScores + line.playoffScores,
+          finalScores: sum.finalScores + line.finalScores,
+        }),
+        { seasons: 0, ...EMPTY_TALLY },
+      );
+      return {
+        id: player.id,
+        name: player.name,
+        clubId: player.clubId,
+        countryId: player.countryId,
+        birthplace: player.birthplace,
+        age: flagship.season - player.birthSeason,
+        starSince: player.starSince,
+        finalSeason: player.finalSeason,
+        season:
+          flagship.tallies === null
+            ? null
+            : tally
+              ? {
+                  matches: tally.matches,
+                  scores: tally.scores,
+                  playoffScores: tally.playoffScores,
+                  finalScores: tally.finalScores,
+                }
+              : { ...EMPTY_TALLY },
+        career,
+        backing: player.backing && {
+          season: player.backing.season,
+          influence: player.backing.influence,
+          mentee: player.backing.mentee,
+        },
+        backBlocker: backStarBlocker(state, world, player.id),
+        dropBlocker: dropStarBlocker(state, world, player.id),
+      };
+    });
+}
+
+function backingSnapshot(state: GameState, world: World): BackingSnapshot {
+  const card = world.events.cards.find((candidate) => candidate.star === "dropped");
+  const drain = card?.arrivalEffects.find((effect) => effect.type === "conversion");
+  return {
+    slots: backingSlots(state, world),
+    used: backedStars(state.flagship).length,
+    price: backingPrice(state, world),
+    dropHardcoreShare: world.config.flagship.stars.dropDemotionShare,
+    dropPressure:
+      drain && drain.type === "conversion"
+        ? { factor: drain.factor, quarters: drain.quarters }
+        : null,
   };
 }
