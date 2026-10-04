@@ -154,6 +154,7 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   };
   observe(state, 0);
 
+  let firstBackTurn: number | null = null;
   for (let t = 0; t < plan.turns && state.outcome === null; t += 1) {
     const landmarksBefore = state.landmarks.length;
     const step = runBot(plan.bot, state, world);
@@ -162,6 +163,7 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       eventAnswers[key] = (eventAnswers[key] ?? 0) + 1;
     };
     for (const action of step.actions) {
+      if (action.type === "backStar") firstBackTurn ??= state.turn;
       if (action.type !== "chooseEvent") continue;
       const event = state.events.pending.find((e) => e.id === action.eventId);
       tally(`${event?.templateId}/${action.choiceId}`);
@@ -360,6 +362,9 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           seasons: state.flagship.seasons.length,
           distinctChampions: titles.size,
           mostTitles: Math.max(0, ...titles.values()),
+          starsMade: state.flagship.players.filter((p) => p.starSince !== null).length,
+          starsBacked: actions.filter((a) => a.type === "backStar").length,
+          firstBackTurn,
         };
       })(),
       forkChoices: Object.fromEntries(

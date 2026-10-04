@@ -249,14 +249,23 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    seasons. Effects: casual conversion in the flagship country and the media reach channel out
    of it, scaled by influence, paused off the seat; the honors afterglow fades over a few
    seasons. Measure: `--experiment pacing` (win contest, 12 anchors × 5 seeds).
+   *Built 2026-10-03:* slots in the PP tier table (1/1/2/2/3), price 60 × the peak tier's cost
+   multiplier, influence +1/4 per season played at the seat; each backed star at full influence
+   multiplies casual conversion in the flagship country by 1.15 and media reach out of it by 1.3.
+   Only stars playing at the seat can be backed; a retirement ends the backing; a lost slot after a
+   PP tier demotion keeps existing backing. Bots back the stars with the most career scores. The
+   honors afterglow comes with the succession card in step 6. Measured with pacing (builder, 12
+   anchors × 4 seeds, 200 turns; 5 seeds overran the 5-minute budget): bots backed 25 of 26 stars
+   made, first at turn 31; first win median 155 → 161 and #1 lost before the win 15/44 → 13/43, both
+   within noise: backing barely moves the world at these sizes. Save format 14.
 6. **Star cards.** The breakout moment (always, no slot, PP by tier); final season, retirement,
    unbacked move and career-record moments (records checked against retained careers); the
    succession decision (honors, mentor the named candidate, let go), the keep-or-let-move
    decision (league cash) and the full-influence drop pressure card, counted against the decision
    cap, offered after season cards, with free defaults. Season cards name the champion's leading
    player and the top scorer where recorded. Bot weights for every new card; bots back stars.
-7. **Save format 14.** Backing (players arrived in format 11 with step 2, career lines and top
-   scorers in format 12 with step 3, stars and careers in format 13 with step 4).
+7. **Saves.** Built with each step: players (format 11), career lines and top scorers (12), stars
+   and careers (13), backing (14). Star cards add a format only if they need new state.
 8. **Screen.** A Stars panel on the flagship screen (recorded facts only, an influence bar,
    backing slots with a review step), the leading player and tally on each table row, backed
    stars named in the flagship country's tooltip. Skill and strength bonuses stay out of

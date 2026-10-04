@@ -34,6 +34,7 @@ ppIncome:
 #                            globalRank           the player's sport ranks this high by Fandom Score
 #                                                 among modeled sports (player + rivals)
 #   focusSlots             focus slots held at this tier
+#   backingSlots           flagship stars the player can back at this tier (GDD v1.16)
 #   costMultiplier         scales PP costs ("growing pains"); the highest tier ever reached applies
 #   mediaRevenueMultiplier PP tier caps the size of media and sponsor deals (GDD Business Layer)
 ppTiers:
@@ -42,6 +43,7 @@ ppTiers:
     breadth: { type: none }
     turnLengthQuarters: 1
     focusSlots: 1
+    backingSlots: 1
     costMultiplier: 1
     mediaRevenueMultiplier: 1
   - tier: 2
@@ -49,6 +51,7 @@ ppTiers:
     breadth: { type: anchorLeagueTier, leagueTier: semi-pro }
     turnLengthQuarters: 1
     focusSlots: 2
+    backingSlots: 1
     costMultiplier: 1.5
     mediaRevenueMultiplier: 1.25
   - tier: 3
@@ -62,6 +65,7 @@ ppTiers:
     breadth: { type: anchorHardcoreShare, share: 0.01 }
     turnLengthQuarters: 2
     focusSlots: 3
+    backingSlots: 2
     costMultiplier: 2.5
     mediaRevenueMultiplier: 1.5
   - tier: 4
@@ -69,6 +73,7 @@ ppTiers:
     breadth: { type: leaguesOnContinents, leagueTier: professional, continents: 3 }
     turnLengthQuarters: 2
     focusSlots: 4
+    backingSlots: 2
     costMultiplier: 4
     mediaRevenueMultiplier: 2
   - tier: 5
@@ -76,6 +81,7 @@ ppTiers:
     breadth: { type: globalRank, rank: 3 }
     turnLengthQuarters: 4
     focusSlots: 5
+    backingSlots: 3
     costMultiplier: 6
     mediaRevenueMultiplier: 2.5
 
@@ -540,6 +546,18 @@ flagship:
     places: { amateur: 1, semi-pro: 2, professional: 3, elite: 4 }
     strengthPerSkill: 0.08
     moveChance: 0.25
+  # Backing stars (GDD v1.16, tech plan 2.6 step 5). In the seasonal window the player may back a
+  # star playing at the seat, one per backing slot (ppTiers), for a one-time basePrice × the peak
+  # tier's cost multiplier in PP, with no upkeep; or drop one. A backed star's influence starts at
+  # 0 and grows by 1 ÷ influenceSeasons at each season's end they played at the seat, to 1.
+  # Dropping resets it; retiring ends the backing. Each backed star playing at the seat
+  # multiplies casual conversion in the flagship country by (1 + casualConversion × influence)
+  # and media reach out of it by (1 + mediaReach × influence); off the seat both pause.
+  backing:
+    basePrice: 60
+    influenceSeasons: 4
+    casualConversion: 0.15
+    mediaReach: 0.3
   # The seat moves only to these league tiers (GDD v1.13); the anchor holds it from turn 1 at any
   # tier.
   seatEligibleTiers: [professional, elite]

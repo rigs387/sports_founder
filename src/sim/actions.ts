@@ -1,6 +1,6 @@
 import { costMultiplier, seasonalWindowOpen } from "./calendar";
 import { eventBlocker, resolveEvent } from "./events";
-import { seatBlocker } from "./flagship";
+import { backBlocker, backStar, dropBlocker, dropStar, seatBlocker } from "./flagship";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
 import { leagueActionReason, leagueActions } from "./league-actions";
 import {
@@ -25,6 +25,8 @@ import { type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } from "./types"
 //   moveSeat        ask to move the commissioner's seat to a Professional or Elite league, in the
 //                   seasonal window; it moves when the season ends (GDD v1.13, v1.14). Asking for
 //                   the current seat's country cancels a pending move.
+//   backStar        back a flagship star, in the seasonal window, for a one-time PP price
+//   dropStar        drop a backed star, in the seasonal window; their influence is lost
 
 export type Action =
   | { type: "collectMoment"; eventId: number }
@@ -35,7 +37,9 @@ export type Action =
   | { type: "promoteLeague"; countryId: string }
   | { type: "stepDownLeague"; countryId: string }
   | { type: "bailoutLeague"; countryId: string }
-  | { type: "moveSeat"; countryId: string };
+  | { type: "moveSeat"; countryId: string }
+  | { type: "backStar"; playerId: number }
+  | { type: "dropStar"; playerId: number };
 
 export class IllegalActionError extends Error {
   override name = "IllegalActionError";
@@ -136,6 +140,9 @@ export function checkAction(state: GameState, world: World, action: Action): str
     if (state.pp < cost) return `not enough PP: costs ${money(cost)}, you have ${money(state.pp)}`;
     return null;
   }
+
+  if (action.type === "backStar") return backBlocker(state, world, action.playerId);
+  if (action.type === "dropStar") return dropBlocker(state, world, action.playerId);
 
   if (action.type === "moveSeat") {
     if (countryIndexOf(world, action.countryId) < 0) return `unknown country "${action.countryId}"`;
@@ -258,6 +265,10 @@ export function applyAction(state: GameState, world: World, action: Action): Gam
           ),
         };
       });
+    case "backStar":
+      return backStar(state, world, action.playerId);
+    case "dropStar":
+      return dropStar(state, action.playerId);
     case "moveSeat":
       return {
         ...state,

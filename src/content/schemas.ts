@@ -345,6 +345,7 @@ export const ppTierSchema = z.strictObject({
   breadth: breadthConditionSchema,
   turnLengthQuarters: z.int().min(1).max(4),
   focusSlots: z.int().min(1),
+  backingSlots: z.int().min(0),
   costMultiplier: z.number().positive(),
   mediaRevenueMultiplier: z.number().positive(),
 });
@@ -617,6 +618,13 @@ export const configFileSchema = z.strictObject({
     }),
     /** A new club's place is drawn with weight population ^ placeWeightExponent. */
     placeWeightExponent: z.number().min(0),
+    /** Backing stars (GDD v1.16). */
+    backing: z.strictObject({
+      basePrice: z.number().min(0),
+      influenceSeasons: z.int().min(1),
+      casualConversion: z.number().min(0),
+      mediaReach: z.number().min(0),
+    }),
     /** Stars (GDD v1.16). */
     stars: z.strictObject({
       share: z.strictObject({ low: unitInterval, medium: unitInterval, high: unitInterval }),

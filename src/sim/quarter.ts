@@ -2,7 +2,7 @@ import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { rivalConversionBoosts } from "./countermoves";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
-import { stepFlagshipQuarter } from "./flagship";
+import { backingEffects, stepFlagshipQuarter } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { type GrowthFactors, growthFactors } from "./growth";
 import { stepLeagueQuarter } from "./leagues";
@@ -34,7 +34,8 @@ import {
 // Exposure comes from src/sim/spread.ts: local word of mouth, inbound spread over the proximity,
 // language and media channels (only casual exposure crosses borders), and focus outreach.
 // Growth tree nodes (src/sim/growth.ts) multiply the player's casual conversion, churn and decay,
-// and hardcore conversion in each country, and shrink rival countermove boosts there.
+// and hardcore conversion in each country, and shrink rival countermove boosts there. Backed
+// flagship stars multiply casual conversion in the flagship country (src/sim/flagship.ts).
 // Rivals hold their ground (GDD Rival AI: rivals only drift slowly and react to the player). Each
 // rival's real starting shares in a country are its home level, with no spread and no affinity:
 //   uninterested → casual   uninterested × casualChurnRate × (home casual ÷ home uninterested)
@@ -75,6 +76,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
   const growth = growthFactors(world, state.growthNodes);
   const quarter = state.quarter + 1;
   const found: Landmark[] = [];
+  const backing = backingEffects(state.flagship, world);
 
   const afterBusiness = state.countries.map((countryState, index) => {
     const country = world.countries[index];
@@ -104,7 +106,8 @@ export function stepQuarter(state: GameState, world: World): GameState {
         countryExposure.total *
         (countryExposure.focused ? config.focus.conversionMultiplier : 1) *
         factors.casualConversion *
-        eventRates.casual,
+        eventRates.casual *
+        (country.id === backing.countryId ? backing.casualConversion : 1),
       casualChurn:
         (config.dynamics.player.casualChurnRate +
           config.dynamics.player.casualDecayRate *

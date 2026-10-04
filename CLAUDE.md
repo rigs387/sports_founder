@@ -179,6 +179,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 13 adds stars and careers: each player's star season, final-season flag and
   retirement season, and each season summary's new star. Format 12 migrates with no stars, no
   final seasons announced and nobody retired.
+- Save format 14 adds backing (`Player.backing`: season backed and influence). Format 13 migrates
+  with nobody backed.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

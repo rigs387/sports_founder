@@ -1,4 +1,4 @@
-import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
+import { costMultiplier, QUARTERS_PER_YEAR, seasonalWindowOpen, yearOfQuarter } from "./calendar";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
@@ -278,6 +278,7 @@ function newPlayer(
     starSince: null,
     finalSeason: false,
     retiredSeason: null,
+    backing: null,
     career: [],
   };
 }
@@ -322,6 +323,90 @@ export function seatStars(flagship: FlagshipState): Player[] {
   return flagship.players.filter(
     (player) => playing(player) && player.starSince !== null && active.has(player.clubId),
   );
+}
+
+/** Backed stars, playing or not (a retirement ends a backing). */
+export function backedStars(flagship: FlagshipState): Player[] {
+  return flagship.players.filter((player) => player.backing !== null);
+}
+
+/** The PP price of backing a star now: base × the peak tier's cost multiplier. */
+export function backingPrice(state: Pick<GameState, "tierTrack">, world: World): number {
+  return world.config.flagship.backing.basePrice * costMultiplier(state, world.config);
+}
+
+/** Backing slots at the current PP tier. */
+export function backingSlots(state: Pick<GameState, "ppTier">, world: World): number {
+  return world.config.ppTiers.find((entry) => entry.tier === state.ppTier)?.backingSlots ?? 0;
+}
+
+/**
+ * What backed stars do for the sport (GDD v1.16): factors on casual conversion in the flagship
+ * country and on media reach out of it, from the backed stars playing at the seat. Off the seat
+ * their effects pause.
+ */
+export function backingEffects(flagship: FlagshipState, world: World) {
+  const { casualConversion, mediaReach } = world.config.flagship.backing;
+  const influence = seatStars(flagship)
+    .filter((player) => player.backing !== null)
+    .reduce((sum, player) => sum + (player.backing?.influence ?? 0), 0);
+  return {
+    countryId: flagship.countryId,
+    casualConversion: 1 + casualConversion * influence,
+    mediaReach: 1 + mediaReach * influence,
+  };
+}
+
+/** Why a star cannot be backed now, or null if they can. */
+export function backBlocker(state: GameState, world: World, playerId: number): string | null {
+  if (!seasonalWindowOpen(state, world.config))
+    return "stars can only be backed in the seasonal window";
+  const player = state.flagship.players.find((p) => p.id === playerId);
+  if (!player || !seatStars(state.flagship).includes(player)) {
+    return "only a star playing in the flagship league can be backed";
+  }
+  if (player.backing !== null) return "that star is already backed";
+  if (backedStars(state.flagship).length >= backingSlots(state, world)) {
+    return "every backing slot is taken";
+  }
+  const price = backingPrice(state, world);
+  if (state.pp < price)
+    return `not enough PP: costs ${Math.ceil(price)}, you have ${Math.floor(state.pp)}`;
+  return null;
+}
+
+/** Why a backing cannot be dropped now, or null if it can. */
+export function dropBlocker(state: GameState, world: World, playerId: number): string | null {
+  if (!seasonalWindowOpen(state, world.config))
+    return "a star can only be dropped in the seasonal window";
+  const player = state.flagship.players.find((p) => p.id === playerId);
+  if (!player || player.backing === null) return "that star is not backed";
+  return null;
+}
+
+/** Backs a star (checked by the caller): the PP price now, influence from 0. */
+export function backStar(state: GameState, world: World, playerId: number): GameState {
+  const price = backingPrice(state, world);
+  const backing = { season: state.flagship.season, influence: 0 };
+  return {
+    ...state,
+    pp: state.pp - price,
+    flagship: {
+      ...state.flagship,
+      players: state.flagship.players.map((p) => (p.id === playerId ? { ...p, backing } : p)),
+    },
+  };
+}
+
+/** Drops a backing (checked by the caller): its influence is lost. */
+export function dropStar(state: GameState, playerId: number): GameState {
+  return {
+    ...state,
+    flagship: {
+      ...state.flagship,
+      players: state.flagship.players.map((p) => (p.id === playerId ? { ...p, backing: null } : p)),
+    },
+  };
 }
 
 /** The chance that next season is a player's last, at next season's age. */
@@ -402,6 +487,7 @@ function playersSeasonEnd(
     if (!playing(player) || !player.finalSeason) continue;
     player.retiredSeason = season;
     player.finalSeason = false;
+    player.backing = null;
     if (player.starSince === null) continue;
     const club = flagship.clubs.find((c) => c.id === player.clubId);
     found.push(
@@ -415,6 +501,14 @@ function playersSeasonEnd(
         player.clubId,
       ),
     );
+  }
+
+  // Backed stars who played the season at the seat grow in influence.
+  const { influenceSeasons } = world.config.flagship.backing;
+  for (const backed of seatStars(current())) {
+    if (backed.backing === null) continue;
+    const influence = Math.min(1, backed.backing.influence + 1 / influenceSeasons);
+    backed.backing = { ...backed.backing, influence };
   }
 
   // Stars may move up to a stronger club without a star; the clubs swap leading players.
@@ -1104,6 +1198,9 @@ export function flagshipProblems(state: GameState, world: World): string[] {
     const past = (season: number | null) => season === null || season < flagship.season;
     if (!past(player.starSince) || !past(player.retiredSeason)) {
       problems.push(`flagship player ${player.id} has a season in the future`);
+    }
+    if (player.backing !== null && (player.starSince === null || player.retiredSeason !== null)) {
+      problems.push(`flagship player ${player.id} is backed without being a playing star`);
     }
     if (player.retiredSeason !== null) {
       if (player.finalSeason) problems.push(`retired flagship player ${player.id} plays on`);

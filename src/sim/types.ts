@@ -197,6 +197,8 @@ export interface Player {
   finalSeason: boolean;
   /** The last season the player played, once retired; null while playing. */
   retiredSeason: number | null;
+  /** The player's backing (GDD v1.16): the season it began and influence, 0–1. */
+  backing: { season: number; influence: number } | null;
   /** One permanent line per finished flagship season the player played in, oldest first. */
   career: CareerLine[];
 }

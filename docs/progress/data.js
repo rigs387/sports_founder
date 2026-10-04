@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-03",
-    tests: 377,
-    files: 32,
-    note: "npm run check passed after stars step 4, stars and careers (type checks, Biome, purity, 377 tests in 32 files). Lint has existing visual-study warnings.",
+    tests: 384,
+    files: 33,
+    note: "npm run check passed after stars step 5, backing stars (type checks, Biome, purity, 384 tests in 33 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-03",
     smoke:
       "UI smoke passed and now plays to a season end and opens its story card (a runaway pressure card naming real clubs); save/resume continued identically.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Make the flagship season matter",
-      text: "The flagship makes its own stars, who age, retire and move (stars step 4 of 8); next, backing stars.",
+      text: "Stars can be backed and reach fans beyond the league (stars step 5 of 8); next, star cards.",
       tag: "Next build",
     },
     {
@@ -76,7 +76,7 @@ window.SF_PROGRESS = {
     },
     {
       title: "Holding #1 needs more resistance",
-      text: "Lead lost before the win in 20 of 56 campaigns (36%); the design targets about half. Builder, 12 typical anchors × 5 seeds, 200 turns. Season cards are neutral here (9 of 47 with and without them on a 5-anchor sample).",
+      text: "Lead lost before the win in 13 of 43 campaigns (30%) after backed stars, 15 of 44 (34%) just before; the design targets about half. Builder, 12 typical anchors × 4 seeds, 200 turns. Season cards and backing are both neutral here.",
       date: "2026-10-03",
       system: "rivals",
     },
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Built",
+      title: "Backing stars",
+      text: "Stars step 5 (tech plan 2.6): back a flagship star in the seasonal window (slots by PP tier, one-time PP price); influence grows over four seasons and lifts casual conversion at home and media reach abroad. Bots back 25 of 26 stars; the pacing experiment shows no change beyond noise (first win 155 → 161, #1 lost 34% → 30%). Save format 14.",
+    },
     {
       date: "2026-10-03",
       type: "Built",
@@ -424,7 +430,7 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Step 5 of tech plan 2.6: backing stars (slots, PP price, influence, effects on fans), then cards, saves, screen.",
+      next: "Step 6 of tech plan 2.6: star cards (breakout, final season, retirement, moves, records, succession, keep-or-let-move, drop pressure); then the Stars panel.",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
@@ -437,6 +443,7 @@ window.SF_PROGRESS = {
         ["Leading players", "../flagship/README.md#leading-players"],
         ["Credited scores", "../flagship/README.md#credited-scores-and-careers"],
         ["Stars and careers", "../flagship/README.md#stars-and-careers"],
+        ["Backing stars", "../flagship/README.md#backing-stars"],
       ],
       items: [
         ["built", "Scoring frequency sets flagship match chances, fixed per season"],
@@ -449,7 +456,7 @@ window.SF_PROGRESS = {
           "partial",
           "Persistent careers: skill curve, final seasons, retirement and moves (records come with cards)",
         ],
-        ["planned", "Backing slots and influence earned over seasons"],
+        ["built", "Backing slots and influence earned over seasons"],
         ["planned", "Goodwill costs, honored retirements and mentoring successors"],
       ],
     },

@@ -4,6 +4,7 @@ import { xoroshiro128plus } from "pure-rand/generator/xoroshiro128plus";
 import {
   type Action,
   applyAction,
+  backingPrice,
   bailoutTerms,
   categoryUnlockTier,
   checkAction,
@@ -20,6 +21,7 @@ import {
   revenuePerQuarter,
   runningCostPerQuarter,
   SEED_WARM_UP_DRAWS,
+  seatStars,
   type World,
 } from "../sim";
 import { chooseEvents, EVENT_WEIGHTS, type EventWeights } from "./event-policy";
@@ -236,6 +238,7 @@ function greedySpreadTurn(state: GameState, world: World): BotStep {
   for (const country of world.countries) {
     attempt(step, world, { type: "promoteLeague", countryId: country.id });
   }
+  backStars(step, world, 0);
   buyNodes(step, world, 0, cheapest(step, world));
   return step;
 }
@@ -326,10 +329,27 @@ function manageLeagues(step: BotStep, world: World): void {
   }
 }
 
+/**
+ * Backs flagship stars while slots and PP above `reserve` allow (GDD v1.16), most career scores
+ * first: bots read recorded facts, never hidden skill.
+ */
+function backStars(step: BotStep, world: World, reserve: number): void {
+  const careerScores = (player: { career: { scores: number }[] }) =>
+    player.career.reduce((sum, line) => sum + line.scores, 0);
+  const candidates = seatStars(step.state.flagship)
+    .filter((player) => player.backing === null)
+    .sort((a, b) => careerScores(b) - careerScores(a) || a.id - b.id);
+  for (const star of candidates) {
+    if (step.state.pp - backingPrice(step.state, world) < reserve) return;
+    attempt(step, world, { type: "backStar", playerId: star.id });
+  }
+}
+
 function builderTurn(state: GameState, world: World): BotStep {
   const spread = spreadFocus(state, world, countriesByFit(state, world));
   const step: BotStep = { state: spread.state, actions: [...spread.actions] };
   manageLeagues(step, world);
+  backStars(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   buyNodes(
     step,
     world,
@@ -395,6 +415,7 @@ function anchorTurtleTurn(state: GameState, world: World): BotStep {
   }
 
   const pickCheapest = cheapest(step, world);
+  backStars(step, world, bailoutReserve(step.state, world, TURTLE_RESERVE_BAILOUTS));
   buyNodes(step, world, bailoutReserve(step.state, world, TURTLE_RESERVE_BAILOUTS), (candidates) =>
     pickCheapest(candidates.filter((id) => nodeValue(step.state, world, id, anchorIndex) > 0)),
   );
@@ -434,6 +455,7 @@ function mediaRushTurn(state: GameState, world: World): BotStep {
       return best === nodeId;
     });
   const reserve = bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS);
+  backStars(step, world, reserve);
   const pickCheapest = cheapest(step, world);
   buyNodes(step, world, reserve, (candidates) =>
     pickCheapest(candidates.filter((id) => wanted.includes(id))),

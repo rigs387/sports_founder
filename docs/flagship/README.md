@@ -166,3 +166,22 @@ stories up a few points as stars make strong clubs stronger. Save format 13 adds
 careers; format 12 saves migrate with nobody a star or retired. `tests/flagship-stars.test.ts`
 covers the bar and star places, star strength, moves, final seasons and retirement, young
 replacements, the untouched world and the 12 → 13 migration.
+
+## Backing stars
+
+Built October 3, 2026 (tech plan 2.6 step 5). Simulation and actions only; the Stars panel comes in
+step 8. In the seasonal window the player can back a star playing in the flagship league
+(`backStar`), one per backing slot (1 at PP tiers 1–2, 2 at tiers 3–4, 3 at tier 5), for a one-time
+60 PP × the peak tier's cost multiplier, with no upkeep; or drop one (`dropStar`), which loses their
+influence. Influence starts at 0 and grows by a quarter at each season's end the star played at
+the seat. Each backed star playing at the seat multiplies casual conversion in the flagship
+country by 1 + 0.15 × influence and media reach out of it by 1 + 0.3 × influence; off the seat both
+pause. A retirement ends the backing. Bots back the stars with the most career scores.
+
+Measured with `--experiment pacing --campaigns 4` (builder, 12 anchors × 4 seeds, 200 turns, about
+2 minutes each): bots backed 25 of the 26 stars made per campaign, the first around turn 31. First
+win median moved from turn 155 to 161 and campaigns losing #1 before the win from 15/44 to 13/43,
+within noise. Every runner run now prints stars made and backed. Save format 14 adds backing;
+format 13 saves migrate with nobody backed. `tests/flagship-backing.test.ts` covers the price,
+window, slots, influence, dropping, both effects, pausing off the seat, the bots and the 13 → 14
+migration.

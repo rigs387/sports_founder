@@ -103,7 +103,15 @@ export interface CampaignResult {
   /** PP paid for decision-card choices. */
   ppSpentOnEvents: number;
   /** Flagship seasons finished, how many clubs won one, and the most titles any club won. */
-  flagship: { seasons: number; distinctChampions: number; mostTitles: number };
+  flagship: {
+    seasons: number;
+    distinctChampions: number;
+    mostTitles: number;
+    /** Flagship stars made, and stars the bot backed (GDD v1.16). */
+    starsMade: number;
+    starsBacked: number;
+    firstBackTurn: number | null;
+  };
   /** Per fork id: the node chosen, or null if the fork was never decided. */
   forkChoices: Record<string, string | null>;
   /** PP banked and cumulative PP spent on nodes after the sampled turns that were played. */
@@ -318,6 +326,12 @@ export function flagshipAggregate(results: CampaignResult[]) {
     distinctChampions: distribution(withSeasons.map((r) => r.flagship.distinctChampions)),
     mostTitlesShare: distribution(
       withSeasons.map((r) => r.flagship.mostTitles / r.flagship.seasons),
+    ),
+    starsMade: distribution(results.map((r) => r.flagship.starsMade)),
+    starsBacked: distribution(results.map((r) => r.flagship.starsBacked)),
+    backedIn: results.filter((r) => r.flagship.starsBacked > 0).length,
+    firstBackTurn: distribution(
+      results.flatMap((r) => (r.flagship.firstBackTurn === null ? [] : [r.flagship.firstBackTurn])),
     ),
   };
 }

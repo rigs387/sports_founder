@@ -1,6 +1,7 @@
 import { mediaReachBlocked } from "./countermoves";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
+import { backingEffects } from "./flagship";
 import { growthFactors } from "./growth";
 import { type GameState, PLAYER_INDEX, type World } from "./types";
 
@@ -11,7 +12,8 @@ import { type GameState, PLAYER_INDEX, type World } from "./types";
 // adds the country's own following share, and a focus slot adds direct outreach. A rival's
 // exclusive broadcast deal blocks the media reach channel into a country (GDD Rival AI), less the
 // share the player's countermove resistance holds open. Growth tree nodes multiply each inbound
-// channel in the target country (src/sim/growth.ts).
+// channel in the target country (src/sim/growth.ts). Backed flagship stars multiply the media
+// reach channel out of the flagship country (src/sim/flagship.ts).
 
 export interface CountryExposure {
   /** Word of mouth: localWeight × player Fandom Score ÷ population. */
@@ -61,13 +63,15 @@ export function unblockedMediaReach(
 
 /** Exposure to the player's sport in every country at the current state. */
 export function computeExposure(
-  state: Pick<GameState, "countries" | "focus" | "growthNodes" | "events" | "quarter">,
+  state: Pick<GameState, "countries" | "focus" | "growthNodes" | "events" | "quarter" | "flagship">,
   world: World,
 ): CountryExposure[] {
   const { exposure: settings, focus: focusSettings } = world.config;
   const strengths = outboundStrengths(state, world);
   const growth = growthFactors(world, state.growthNodes);
   const focused = new Set(state.focus.filter((id): id is string => id !== null));
+  const backing = backingEffects(state.flagship, world);
+  const backingSource = world.countries.findIndex((country) => country.id === backing.countryId);
 
   return state.countries.map((countryState, target) => {
     const country = world.countries[target];
@@ -89,7 +93,7 @@ export function computeExposure(
       const perCapita = strength / population;
       proximity += link.proximity * perCapita;
       language += link.language * perCapita;
-      media += link.media * perCapita;
+      media += link.media * perCapita * (link.source === backingSource ? backing.mediaReach : 1);
     }
     proximity *= factors.proximity * eventRates.proximity;
     language *= factors.language * eventRates.language;
