@@ -224,6 +224,13 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    a config probability raised by skill. Season tallies (matches, scores, playoff scores, final
    scores) become a permanent career line at season end; per-match scorers are never stored.
    Season summaries add the top scorer and any new star.
+   *Built 2026-10-03:* each score goes to the leading player with chance clamp(0.25 + 0.006 × (skill
+   − 50), 0.05, 0.6), otherwise the squad; deciders are not scores. Tallies live on the flagship
+   during a season and become career lines at its end; an abandoned season (the seat returning home)
+   is never written. Save format 12. Measured once (Brazil, 5 seeds × 40 seasons): the top scorer
+   reaches 35% of the club's scores in 59% of low-scoring Amateur seasons, 38% at medium and 32% at
+   high, so the star bar does not read the same at every frequency; step 4 decides whether to make
+   it per frequency.
 4. **Stars and careers.** At season end the top scorer with at least the config share of their
    club's scores becomes a star if a place is open (places by tier). A star's strength bonus,
    scaled by skill, adds to their club's match rating. Skill curve with a seasonal wobble,
@@ -241,8 +248,8 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    decision (league cash) and the full-influence drop pressure card, counted against the decision
    cap, offered after season cards, with free defaults. Season cards name the champion's leading
    player and the top scorer where recorded. Bot weights for every new card; bots back stars.
-7. **Save format 12.** Career lines, backing and the new summary fields (players arrived in
-   format 11 with step 2): no stars and no invented careers for older saves.
+7. **Save format 13.** Stars and backing (players arrived in format 11 with step 2, career lines
+   and top scorers in format 12 with step 3): no stars and no invented careers for older saves.
 8. **Screen.** A Stars panel on the flagship screen (recorded facts only, an influence bar,
    backing slots with a review step), the leading player and tally on each table row, backed
    stars named in the flagship country's tooltip. Skill and strength bonuses stay out of

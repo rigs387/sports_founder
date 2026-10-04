@@ -22,7 +22,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 11;
+export const SAVE_FORMAT_VERSION = 12;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -157,6 +157,12 @@ const matchSchema = z.strictObject({
   awayScore: count,
   decidedFor: z.int().min(1).nullable(),
 });
+const tallyFields = {
+  matches: count,
+  scores: count,
+  playoffScores: count,
+  finalScores: count,
+};
 const seasonFormatSchema = z.enum(["european", "american"]);
 const scoringSchema = z.enum(GENOME_AXES.scoring.options);
 const flagshipSchema = z.strictObject({
@@ -190,9 +196,13 @@ const flagshipSchema = z.strictObject({
       birthSeason: z.int(),
       peakSkill: z.number(),
       skill: z.number(),
+      career: z.array(
+        z.strictObject({ season: z.int().min(1), clubId: z.int().min(1), ...tallyFields }),
+      ),
     }),
   ),
   nextPlayerId: z.int().min(1),
+  tallies: z.array(z.strictObject({ playerId: z.int().min(1), ...tallyFields })).nullable(),
   table: z.array(tableRowSchema),
   startRatings: z.array(clubRatingSchema),
   lastRound: z.array(matchSchema),
@@ -208,6 +218,9 @@ const flagshipSchema = z.strictObject({
       standings: z.array(tableRowSchema),
       playoffs: z.array(matchSchema),
       startRatings: z.array(clubRatingSchema),
+      topScorer: z
+        .strictObject({ playerId: z.int().min(1), clubId: z.int().min(1), scores: count })
+        .nullable(),
     }),
   ),
 });
@@ -303,6 +316,32 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 11 → 12: credited scores and career lines (GDD v1.16). Players start with empty careers;
+  // the season in progress was not tallied from its start, so it is never tallied (no partial
+  // career lines) and tallies begin with the next season. No past season has a top scorer.
+  11: (save) => {
+    const flagship = save.state.flagship as Record<string, unknown>;
+    // Key order follows the schema, so the migrated state re-serializes byte-identically.
+    const migrated: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(flagship)) {
+      if (key === "tallies") continue;
+      if (key === "players" && Array.isArray(value)) {
+        migrated.players = value.map((player: Record<string, unknown>) => ({
+          ...player,
+          career: player.career ?? [],
+        }));
+      } else if (key === "seasons" && Array.isArray(value)) {
+        migrated.seasons = value.map((summary: Record<string, unknown>) => ({
+          ...summary,
+          topScorer: summary.topScorer ?? null,
+        }));
+      } else {
+        migrated[key] = value;
+      }
+      if (key === "nextPlayerId") migrated.tallies = flagship.tallies ?? null;
+    }
+    return { formatVersion: 12, state: { ...save.state, flagship: migrated } };
+  },
   // 10 → 11: leading players (GDD v1.16). Every active club gets a fresh leading player, with
   // ages spread as at founding, drawn on the flagship's own stream; no stars and no invented
   // careers. Dormant clubs get theirs when they return.

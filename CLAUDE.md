@@ -173,6 +173,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 11 adds leading players (GDD v1.16): `FlagshipState.players` and `nextPlayerId`.
   Format 10 migrates with a fresh leading player at every active club (founding ages, the
   flagship's own stream); dormant clubs get theirs when they return.
+- Save format 12 adds credited scores: each player's career lines, the season's tallies
+  (`FlagshipState.tallies`) and each season summary's top scorer. Format 11 migrates with empty
+  careers and the season under way untallied (`tallies: null`, no partial career lines).
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

@@ -630,6 +630,13 @@ export const configFileSchema = z.strictObject({
       }),
       nameRetries: z.int().min(0),
       minNamePool: z.int().min(1),
+      credit: z.strictObject({
+        base: unitInterval,
+        perSkill: z.number().min(0),
+        pivot: z.number(),
+        min: unitInterval,
+        max: unitInterval,
+      }),
     }),
     seatEligibleTiers: z.array(leagueTierSchema).min(1),
     seatMove: z.strictObject({

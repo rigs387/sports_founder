@@ -191,6 +191,37 @@ export interface Player {
   birthSeason: number;
   peakSkill: number;
   skill: number;
+  /** One permanent line per finished flagship season the player played in, oldest first. */
+  career: CareerLine[];
+}
+
+/**
+ * A leading player's tally for one season (GDD v1.16). Every match counts, playoffs included;
+ * playoff scores are part of scores and final scores part of playoff scores.
+ */
+export interface SeasonTally {
+  matches: number;
+  scores: number;
+  playoffScores: number;
+  finalScores: number;
+}
+
+/** A leading player's season in progress. */
+export interface PlayerTally extends SeasonTally {
+  playerId: number;
+}
+
+/** A finished season of a leading player's career. */
+export interface CareerLine extends SeasonTally {
+  season: number;
+  clubId: number;
+}
+
+/** The leading player with the most scores in a season (fewer matches, then lower id, on ties). */
+export interface TopScorer {
+  playerId: number;
+  clubId: number;
+  scores: number;
 }
 
 /** One club's line in a season table. */
@@ -240,6 +271,8 @@ export interface SeasonSummary {
    * for seasons that ended before save format 9.
    */
   startRatings: ClubRating[];
+  /** Null when nobody scored or the season was not tallied (before save format 12). */
+  topScorer: TopScorer | null;
 }
 
 /**
@@ -269,6 +302,11 @@ export interface FlagshipState {
   /** Every club's leading player, active or dormant, in id order. */
   players: Player[];
   nextPlayerId: number;
+  /**
+   * The active clubs' leading players' tallies this season, in club order. Null for a season
+   * already under way when an older save was made: it is never tallied.
+   */
+  tallies: PlayerTally[] | null;
   /** The current season's table, in club order (not ranked). */
   table: TableRow[];
   /** The active clubs' ratings when the current season began, in club order. */

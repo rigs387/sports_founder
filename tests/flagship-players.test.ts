@@ -10,6 +10,7 @@ import {
   type LeagueTierId,
   newLeague,
   PLAYER_INDEX,
+  type Player,
   runTurns,
   seasonalWindowOpen,
   serializeSave,
@@ -47,6 +48,9 @@ function poolNames(poolId: string): Set<string> {
   }
   return names;
 }
+
+/** Players without their careers, which grow every season. */
+const identities = (players: readonly Player[]) => players.map(({ career: _c, ...rest }) => rest);
 
 const withoutSeasonCards = {
   ...world,
@@ -93,7 +97,9 @@ describe("leading players", () => {
     const founders = state.flagship.players;
     while (state.flagship.seasons.length < 1) state = stepQuarter(state, world);
     expect(state.flagship.players).toHaveLength(world.config.flagship.clubs["semi-pro"]);
-    expect(state.flagship.players.slice(0, founders.length)).toStrictEqual(founders);
+    expect(identities(state.flagship.players.slice(0, founders.length))).toStrictEqual(
+      identities(founders),
+    );
     expect(checkInvariants(state, world)).toEqual([]);
   });
 
@@ -103,7 +109,9 @@ describe("leading players", () => {
     const brazilians = state.flagship.players;
     state = endTurn(applyAction(state, world, { type: "moveSeat", countryId: "argentina" }), world);
     expect(state.flagship.countryId).toBe("argentina");
-    expect(state.flagship.players.slice(0, brazilians.length)).toStrictEqual(brazilians);
+    expect(identities(state.flagship.players.slice(0, brazilians.length))).toStrictEqual(
+      identities(brazilians),
+    );
     const argentines = state.flagship.players.slice(brazilians.length);
     expect(argentines).toHaveLength(world.config.flagship.clubs.professional);
     expect(argentines.every((p) => p.countryId === "argentina")).toBe(true);
@@ -131,7 +139,9 @@ describe("save format 11", () => {
       applyAction(played, world, { type: "moveSeat", countryId: "argentina" }),
       world,
     );
-    const { players: _p, nextPlayerId: _n, ...flagship } = played.flagship;
+    // A format 10 save has no players, tallies or top scorers.
+    const { players: _p, nextPlayerId: _n, tallies: _t, ...rest } = played.flagship;
+    const flagship = { ...rest, seasons: rest.seasons.map(({ topScorer: _s, ...s }) => s) };
     const v10 = JSON.stringify({ formatVersion: 10, state: { ...played, flagship } });
     const loaded = deserializeSave(v10, world);
     const active = activeClubs(loaded.flagship).map((club) => club.id);

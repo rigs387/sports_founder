@@ -312,6 +312,9 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
   if (players.skill.min > players.skill.max) {
     issue(sources.config, "flagship.players.skill", "min must not exceed max");
   }
+  if (players.credit.min > players.credit.max) {
+    issue(sources.config, "flagship.players.credit", "min must not exceed max");
+  }
   if (players.career.declineAge < players.career.peakAge) {
     issue(sources.config, "flagship.players.career", "declineAge must not come before peakAge");
   }

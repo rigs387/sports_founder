@@ -501,6 +501,10 @@ flagship:
   # declineAge and falls declinePerYear each year after. A drawn name already in the league is
   # redrawn up to nameRetries times. Every name pool needs at least minNamePool given and family
   # names.
+  # Credit (step 3): each of a club's scores goes to its leading player with probability
+  #   clamp(base + perSkill × (skill − pivot), min, max)
+  # and to the squad otherwise; deciders are not scores. Each season's tallies become a career
+  # line. A player at skill 50 takes about a quarter of the club's scores, one at 70 about 37%.
   players:
     foundingAge: { min: 18, max: 32 }
     skill: { min: 1, max: 100 }
@@ -508,6 +512,7 @@ flagship:
     career: { peakAge: 27, declineAge: 30, risePerYear: 0.04, declinePerYear: 0.05 }
     nameRetries: 10
     minNamePool: 20
+    credit: { base: 0.25, perSkill: 0.006, pivot: 50, min: 0.05, max: 0.6 }
   # The seat moves only to these league tiers (GDD v1.13); the anchor holds it from turn 1 at any
   # tier.
   seatEligibleTiers: [professional, elite]

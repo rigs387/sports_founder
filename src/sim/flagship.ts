@@ -3,6 +3,7 @@ import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import {
+  type CareerLine,
   type Club,
   type CountryState,
   type FlagshipState,
@@ -13,10 +14,13 @@ import {
   type MatchResult,
   PLAYER_INDEX,
   type Player,
+  type PlayerTally,
   type ScoringOption,
   type SeasonFormat,
   type SeasonSummary,
+  type SeasonTally,
   type TableRow,
+  type TopScorer,
   type World,
 } from "./types";
 
@@ -264,6 +268,7 @@ function newPlayer(
     birthSeason: flagship.season - age,
     peakSkill: peak,
     skill: clamp(peak * careerShare(age, world), skill.min, skill.max),
+    career: [],
   };
 }
 
@@ -282,6 +287,38 @@ function staffClubs(flagship: FlagshipState, world: World, rng: Rng): FlagshipSt
     next = { ...next, players: [...next.players, player], nextPlayerId: next.nextPlayerId + 1 };
   }
   return next;
+}
+
+const EMPTY_TALLY = { matches: 0, scores: 0, playoffScores: 0, finalScores: 0 };
+
+/** The club's leading player, if it has one. */
+export function leadingPlayer(flagship: FlagshipState, clubId: number): Player | undefined {
+  return flagship.players.find((player) => player.clubId === clubId);
+}
+
+/** The season's top scorer: most scores, then fewer matches, then the lower id. */
+function topScorer(flagship: FlagshipState, tallies: readonly PlayerTally[]): TopScorer | null {
+  const best = [...tallies].sort(
+    (a, b) => b.scores - a.scores || a.matches - b.matches || a.playerId - b.playerId,
+  )[0];
+  const player = best && flagship.players.find((p) => p.id === best.playerId);
+  if (!best || !player || best.scores === 0) return null;
+  return { playerId: player.id, clubId: player.clubId, scores: best.scores };
+}
+
+/** At a season's end, each tallied player who played gains a permanent career line. */
+function closeCareers(flagship: FlagshipState, tallies: readonly PlayerTally[]): FlagshipState {
+  const tallied = new Map(tallies.map((tally) => [tally.playerId, tally]));
+  return {
+    ...flagship,
+    players: flagship.players.map((player) => {
+      const tally = tallied.get(player.id);
+      if (!tally || tally.matches === 0) return player;
+      const { playerId: _id, ...counts } = tally;
+      const line: CareerLine = { season: flagship.season, clubId: player.clubId, ...counts };
+      return { ...player, career: [...player.career, line] };
+    }),
+  };
 }
 
 /** Staffs a flagship read from a save older than players (format 10 → 11 migration). */
@@ -315,6 +352,10 @@ function startSeason(
     table: activeClubs(flagship).map((club) => emptyRow(club.id)),
     startRatings: activeRatings(flagship),
     lastRound: [],
+    tallies: activeClubs(flagship).flatMap((club) => {
+      const player = leadingPlayer(flagship, club.id);
+      return player ? [{ playerId: player.id, ...EMPTY_TALLY }] : [];
+    }),
   };
 }
 
@@ -343,6 +384,7 @@ export function newFlagship(
     nextClubId: 1,
     players: [],
     nextPlayerId: 1,
+    tallies: [],
     table: [],
     startRatings: [],
     lastRound: [],
@@ -374,6 +416,21 @@ function rollScore(rng: Rng, rate: number, chances: number): number {
   return score;
 }
 
+/**
+ * The chance that one of a club's scores is credited to its leading player rather than the squad
+ * (GDD v1.16), rising with the player's hidden skill.
+ */
+export function creditChance(skill: number, world: World): number {
+  const { credit } = world.config.flagship.players;
+  return clamp(credit.base + credit.perSkill * (skill - credit.pivot), credit.min, credit.max);
+}
+
+/** A played match and how many of each side's scores went to its leading player. */
+interface PlayedMatch {
+  result: MatchResult;
+  credited: [home: number, away: number];
+}
+
 function playMatch(
   rng: Rng,
   home: Club,
@@ -381,12 +438,18 @@ function playMatch(
   scoring: ScoringOption,
   world: World,
   knockout: boolean,
-): MatchResult {
+  credit: ReadonlyMap<number, number>,
+): PlayedMatch {
   const { match } = world.config.flagship;
   const homeRate = scoringRate(home.rating, away.rating, true, scoring, world);
   const awayRate = scoringRate(away.rating, home.rating, false, scoring, world);
   const homeScore = rollScore(rng, homeRate, match.chances[scoring]);
   const awayScore = rollScore(rng, awayRate, match.chances[scoring]);
+  // Deciders settle a drawn playoff but are not scores, so only the match's scores are credited.
+  const credited: [number, number] = [
+    rollScore(rng, credit.get(home.id) ?? 0, homeScore),
+    rollScore(rng, credit.get(away.id) ?? 0, awayScore),
+  ];
   let decidedFor: number | null = null;
   if (knockout && homeScore === awayScore) {
     // Deciders: one roll each until exactly one side scores; then the higher seed (home).
@@ -400,7 +463,10 @@ function playMatch(
       }
     }
   }
-  return { homeId: home.id, awayId: away.id, homeScore, awayScore, decidedFor };
+  return {
+    result: { homeId: home.id, awayId: away.id, homeScore, awayScore, decidedFor },
+    credited,
+  };
 }
 
 export function matchWinner(result: MatchResult): number | null {
@@ -466,6 +532,8 @@ function playPlayoffs(
   clubs: ReadonlyMap<number, Club>,
   scoring: ScoringOption,
   world: World,
+  credit: ReadonlyMap<number, number>,
+  onPlayed: (played: PlayedMatch, stage: "playoff" | "final") => void,
 ): { matches: MatchResult[]; champion: number; runnerUp: number } {
   const size = Math.max(1, bracketSize(ranked.length, world));
   const seedOf = new Map(ranked.map((row, i) => [row.clubId, i + 1]));
@@ -481,7 +549,9 @@ function playPlayoffs(
       const home = clubs.get(homeId);
       const away = clubs.get(awayId);
       if (!home || !away) throw new Error("Playoff club missing");
-      const result = playMatch(rng, home, away, scoring, world, true);
+      const played = playMatch(rng, home, away, scoring, world, true, credit);
+      const { result } = played;
+      onPlayed(played, alive.length === 2 ? "final" : "playoff");
       matches.push(result);
       const winner = matchWinner(result) ?? homeId;
       winners.push(winner);
@@ -627,6 +697,31 @@ export function stepFlagshipQuarter(
   const clubs = new Map(activeClubs(flagship).map((club) => [club.id, club]));
   const ids = flagship.table.map((row) => row.clubId);
   const rounds = totalRounds(ids.length);
+  // This season's tallies, updated in place as matches are played (none if not tallied).
+  const tallies = flagship.tallies?.map((tally) => ({ ...tally })) ?? null;
+  const tallyOf = new Map<number, PlayerTally>();
+  const credit = new Map<number, number>();
+  for (const club of clubs.values()) {
+    const player = leadingPlayer(flagship, club.id);
+    if (!player) continue;
+    credit.set(club.id, creditChance(player.skill, world));
+    const tally = tallies?.find((t) => t.playerId === player.id);
+    if (tally) tallyOf.set(club.id, tally);
+  }
+  const count = ({ result, credited }: PlayedMatch, stage: "league" | "playoff" | "final") => {
+    const sides = [
+      [result.homeId, credited[0]],
+      [result.awayId, credited[1]],
+    ] as const;
+    for (const [clubId, scores] of sides) {
+      const tally = tallyOf.get(clubId);
+      if (!tally) continue;
+      tally.matches += 1;
+      tally.scores += scores;
+      if (stage !== "league") tally.playoffScores += scores;
+      if (stage === "final") tally.finalScores += scores;
+    }
+  };
   if (league() !== null) {
     const due = Math.floor((rounds * flagship.quartersPlayed) / flagship.seasonQuarters);
     let table = flagship.table;
@@ -636,11 +731,13 @@ export function stepFlagshipQuarter(
         const home = clubs.get(homeId);
         const away = clubs.get(awayId);
         if (!home || !away) throw new Error("Flagship fixture names a club not in the league");
-        return playMatch(rng, home, away, flagship.scoring, world, false);
+        const played = playMatch(rng, home, away, flagship.scoring, world, false, credit);
+        count(played, "league");
+        return played.result;
       });
       for (const result of lastRound) table = record(table, result, world);
     }
-    flagship = { ...flagship, table, lastRound, round: Math.max(flagship.round, due) };
+    flagship = { ...flagship, table, lastRound, round: Math.max(flagship.round, due), tallies };
   }
 
   if (flagship.quartersPlayed >= flagship.seasonQuarters) {
@@ -651,7 +748,7 @@ export function stepFlagshipQuarter(
       const format: SeasonFormat = state.seasonFormat;
       const playoffs =
         format === "american"
-          ? playPlayoffs(rng, ranked, clubs, flagship.scoring, world)
+          ? playPlayoffs(rng, ranked, clubs, flagship.scoring, world, credit, count)
           : {
               matches: [],
               champion: ranked[0]?.clubId ?? 0,
@@ -668,7 +765,9 @@ export function stepFlagshipQuarter(
         standings: ranked,
         playoffs: playoffs.matches,
         startRatings: flagship.startRatings,
+        topScorer: tallies === null ? null : topScorer(flagship, tallies),
       };
+      if (tallies !== null) flagship = closeCareers(flagship, tallies);
       found.push(
         landmarks.seasonChampion(
           state.turn,
@@ -842,6 +941,23 @@ export function flagshipProblems(state: GameState, world: World): string[] {
   }
   for (const clubId of active) {
     if (!clubsStaffed.has(clubId)) problems.push(`flagship club ${clubId} has no leading player`);
+  }
+  const countsAddUp = (t: SeasonTally) =>
+    t.finalScores <= t.playoffScores && t.playoffScores <= t.scores;
+  for (const player of flagship.players) {
+    let lastLine = 0;
+    for (const line of player.career) {
+      if (line.season <= lastLine || line.season >= flagship.season || !countsAddUp(line)) {
+        problems.push(`flagship player ${player.id} has a bad career line`);
+      }
+      lastLine = line.season;
+    }
+  }
+  for (const tally of flagship.tallies ?? []) {
+    const player = flagship.players.find((p) => p.id === tally.playerId);
+    if (!player || !active.has(player.clubId) || !countsAddUp(tally)) {
+      problems.push(`flagship tally for player ${tally.playerId} is bad`);
+    }
   }
   const tableIds = flagship.table.map((row) => row.clubId);
   if (

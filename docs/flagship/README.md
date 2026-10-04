@@ -126,3 +126,18 @@ moves. Generation draws on the flagship's own stream, so the world is untouched.
 adds the players; format 10 saves migrate with a fresh leading player at every active club.
 `tests/flagship-players.test.ts` covers founding players, name pools and order, expansion,
 dormant clubs, the untouched world and the 10 → 11 migration.
+
+## Credited scores and careers
+
+Built October 3, 2026 (tech plan 2.6 step 3). Simulation only. Each score is credited to the
+club's leading player with a chance that rises with their hidden skill (25% at skill 50, about 37%
+at 70; `flagship.players.credit`), otherwise to the squad. Deciders are not scores. Through a
+season each leading player keeps a tally: matches (playoffs included), scores, playoff scores and
+final scores. At the season's end the tallies become permanent career lines and the summary
+records the top scorer (most scores, then fewer matches). Who scored in each match is never kept.
+A season abandoned when the seat returns home writes no lines.
+
+Save format 12 adds careers, tallies and top scorers. A format 11 save's season under way was not
+tallied from its start, so it is never tallied; tallying begins with the next season.
+`tests/flagship-scorers.test.ts` covers the credit chance, career lines in both formats, playoff
+and final scores, the top scorer, the untouched world and the 11 → 12 migration.
