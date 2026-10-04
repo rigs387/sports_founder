@@ -75,7 +75,7 @@ export function seasonStories(
   const close =
     facts.finalMargin === null
       ? summary.standings.length > 1 && facts.pointsGap <= stories.closeFinishWins * points.win
-      : facts.finalMargin <= stories.closeFinalMargin;
+      : facts.finalMargin <= stories.closeFinalMargin[summary.scoring];
   if (close) found.push("closeFinish");
   return found;
 }

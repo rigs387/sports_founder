@@ -68,7 +68,7 @@ first title, close finish. A story counts against the turn's decision cap but is
 - **Cooldowns count in seasons.** First title and close finish wait 2 seasons; while one waits,
   the next qualifying story is told instead. The rarer stories have no cooldown.
 - **American format:** runaway needs the playoff champion to have topped the table by the gap; a
-  close finish is the final won by one score or settled by deciders. **European:** a close finish
+  close finish is the final won by one score (two in a high-scoring sport) or settled by deciders. **European:** a close finish
   is the top two within one win.
 
 Thresholds live in `config.yaml` (`flagship.stories`); the cards and their prices in
@@ -79,3 +79,26 @@ cards offered. `tests/season-cards.test.ts` covers every story, the priority ord
 caps, cooldowns, the arrival drain, club strength, content validation, save round-trip and the
 8 → 9 migration. `npm run smoke` plays to a season end and opens its story card
 (`runs/smoke/34-season-card.png`).
+
+## Scoring frequency
+
+Built October 3, 2026 (GDD v1.16, tech plan 2.6 step 1). The genome's scoring frequency sets a
+match's scoring chances per side: low 3, medium 6, high 14 (`flagship.match.chances`), each with
+its own scoring rate (`baseRate`, `ratingEffect`). Medium is the rule every season used before.
+Low and high were fitted on exact match odds so the stronger club wins about as often at every
+rating gap (stronger club's win %, gaps 5 / 10 / 20: low 47 / 61 / 85, medium 50 / 62 / 83, high
+53 / 63 / 82). Low-scoring sports draw more and the weaker club wins less; high-scoring ones draw
+less and upset more.
+
+A season plays one rule throughout: `FlagshipState.scoring` is fixed at the season's start and
+each `SeasonSummary` records it. Save format 10 adds both; format 9 saves migrate with every
+season so far, and the one in progress, on the medium rule, and the genome's rule starts with the
+next season.
+
+Story rates were measured once per frequency, flagship only (Brazil, 5 seeds × 200 seasons per
+cell, Amateur and Professional leagues). European rates and runaway moved by a few points. The
+American close finish (final won by one score) drifted: low 75%, medium 62%, high 41–43%, so the
+high-scoring margin is 2 (`closeFinalMargin`), which gives 64–65%; low stays more often close, as
+the GDD intends. `tests/flagship-match.test.ts` covers the fitted odds, draws by frequency, the
+season-start rule, the world's untouched random sequence under every rule and the 9 → 10
+migration.

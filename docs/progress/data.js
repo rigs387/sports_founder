@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-03",
-    tests: 352,
-    files: 28,
-    note: "npm run check passed after the flagship season cards landed (type checks, Biome, purity, 352 tests in 28 files; the drop from 739 is the move to an 11-anchor sweep instead of all 213 countries). Lint has existing visual-study warnings.",
+    tests: 357,
+    files: 29,
+    note: "npm run check passed after stars step 1, scoring frequency in flagship matches (type checks, Biome, purity, 357 tests in 29 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-03",
     smoke:
       "UI smoke passed and now plays to a season end and opens its story card (a runaway pressure card naming real clubs); save/resume continued identically.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Make the flagship season matter",
-      text: "Season cards are in and stars are designed (GDD v1.16); next, build the first star.",
+      text: "Scoring frequency now shapes flagship matches (stars step 1 of 8); next, each club's leading player.",
       tag: "Next build",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Built",
+      title: "Scoring frequency in flagship matches",
+      text: "Stars step 1 (tech plan 2.6): the genome's scoring frequency sets match chances (low 3, medium 6, high 14), each with a rate fitted on exact odds so the stronger club wins about as often (gap 10: 61 / 62 / 63%). A season keeps the rule it started with. High-scoring close finals now allow a two-score margin (American close finish: high 41% → 64%, medium 62%). Save format 10.",
+    },
     {
       date: "2026-10-03",
       type: "Design",
@@ -400,14 +406,20 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Build GDD v1.16 in tech plan 2.6 order: scoring frequency, leading players, credited scores, stars, backing, cards, saves, screen.",
+      next: "Step 2 of tech plan 2.6: leading players (names, real birthplaces, hidden skill), then credited scores, stars, backing, cards, saves, screen.",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
-        ["Stars build plan", "../../sports-founder-tech-plan.md#26-build-plan-flagship-stars-gdd-v116"],
+        [
+          "Stars build plan",
+          "../../sports-founder-tech-plan.md#26-build-plan-flagship-stars-gdd-v116",
+        ],
+        ["Scoring frequency", "../flagship/README.md#scoring-frequency"],
+        ["Scoring frequency tests", "../../tests/flagship-match.test.ts"],
       ],
       items: [
-        ["planned", "Scoring frequency in matches; each club's leading player credited"],
+        ["built", "Scoring frequency sets flagship match chances, fixed per season"],
+        ["planned", "Each club's leading player, credited with scores"],
         ["planned", "Stars made by a season: top scorer, club share, 1–4 places by tier"],
         ["planned", "Star cards: breakout, final season, retirement, moves, records"],
         ["planned", "Flagship stars and lightweight standouts elsewhere"],

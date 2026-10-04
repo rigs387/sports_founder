@@ -207,7 +207,8 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    pure test so the stronger club wins about as often at every frequency. Applies from the next
    season start. Measure the season stories' rates per frequency once (a short flagship-only
    report, not a full experiment) and retune `flagship.stories` if close finish or runaway drift
-   far.
+   far. *Built 2026-10-03:* the season's rule is recorded (flagship and season summary), which
+   took save format 10; the American close-finish margin became per frequency (high 2).
 2. **Leading players.** A `Player` type in `FlagshipState`: id, name, birthplace (a real place,
    weighted as clubs are), club, birth season, hidden peak and current skill. Name pools per
    language sphere in `names.yaml`, validated at load. Generated at club founding (ages spread
@@ -234,7 +235,7 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    decision (league cash) and the full-influence drop pressure card, counted against the decision
    cap, offered after season cards, with free defaults. Season cards name the champion's leading
    player and the top scorer where recorded. Bot weights for every new card; bots back stars.
-7. **Save format 10.** Players, career lines, backing and the new summary fields. Format 9
+7. **Save format 11.** Players, career lines, backing and the new summary fields. Format 10
    migrates to fresh leading players at active clubs: no stars, no invented careers.
 8. **Screen.** A Stars panel on the flagship screen (recorded facts only, an influence bar,
    backing slots with a review step), the leading player and tally on each table row, backed

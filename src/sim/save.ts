@@ -4,6 +4,7 @@ import {
   type AxisId,
   escalationLevelSchema,
   formatPath,
+  GENOME_AXES,
   genomeSchema,
   healthLevelSchema,
   LEAGUE_TIERS,
@@ -18,10 +19,10 @@ import { newLeague } from "./leagues";
 import { newFront, newRivalState } from "./rivals";
 import { MAX_SEED } from "./rng";
 import { defaultGenome } from "./setup";
-import type { GameState, World } from "./types";
+import type { GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 9;
+export const SAVE_FORMAT_VERSION = 10;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -157,11 +158,13 @@ const matchSchema = z.strictObject({
   decidedFor: z.int().min(1).nullable(),
 });
 const seasonFormatSchema = z.enum(["european", "american"]);
+const scoringSchema = z.enum(GENOME_AXES.scoring.options);
 const flagshipSchema = z.strictObject({
   countryId: z.string().min(1),
   pendingCountryId: z.string().min(1).nullable(),
   rng: z.array(z.number()).min(1),
   season: z.int().min(1),
+  scoring: scoringSchema,
   seasonQuarters: z.int().min(1),
   quartersPlayed: count,
   round: count,
@@ -186,6 +189,7 @@ const flagshipSchema = z.strictObject({
       quarter: count,
       countryId: z.string().min(1),
       format: seasonFormatSchema,
+      scoring: scoringSchema,
       championId: z.int().min(1),
       runnerUpId: z.int().min(1),
       standings: z.array(tableRowSchema),
@@ -286,6 +290,29 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 9 → 10: the flagship's match rule follows the genome's scoring frequency (GDD v1.16). Every
+  // season before this format was played under the old single rule, which is the medium rule, and
+  // a season in progress finishes under it; the genome's rule starts with the next season, so no
+  // season mixes two rules. A flagship founded by the 7 → 8 migration already started its season
+  // under the genome's rule.
+  9: (save) => {
+    const flagship = save.state.flagship as Record<string, unknown>;
+    // Key order follows the schema, so the migrated state re-serializes byte-identically.
+    const withScoring = (record: Record<string, unknown>, after: string) => {
+      const out: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(record)) {
+        if (key === "scoring") continue;
+        out[key] = value;
+        if (key === after) out.scoring = record.scoring ?? "medium";
+      }
+      return out;
+    };
+    const migrated = withScoring(flagship, "season");
+    migrated.seasons = (Array.isArray(flagship.seasons) ? flagship.seasons : []).map(
+      (summary: Record<string, unknown>) => withScoring(summary, "format"),
+    );
+    return { formatVersion: 10, state: { ...save.state, flagship: migrated } };
+  },
   // 8 → 9: the flagship season as cards (GDD v1.15). Ratings never moved mid-season before this
   // format, so the current season's start ratings are the active clubs' ratings now. Finished
   // seasons keep no start ratings (no underdog story is told about them). Every recorded event
@@ -353,6 +380,7 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
           String(anchorCountryId),
           tier,
           Number(quarter) || 0,
+          (save.state.genome as Genome).scoring,
         ),
       },
     };

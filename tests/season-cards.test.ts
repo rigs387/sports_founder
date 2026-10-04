@@ -52,6 +52,7 @@ function summary(
     quarter: season * 4,
     countryId: "brazil",
     format: "european",
+    scoring: "medium",
     championId,
     runnerUpId,
     standings: [
@@ -355,13 +356,13 @@ describe("season cards in play", () => {
     const { seasonOffered: _offered, ...events } = played.events;
     const strip = (records: GameState["events"]["pending"]) =>
       records.map(({ facts: { season: _season, ...facts }, ...record }) => ({ ...record, facts }));
-    const { startRatings: _ratings, ...flagship } = played.flagship;
+    const { startRatings: _ratings, scoring: _scoring, ...flagship } = played.flagship;
     const v8 = {
       ...played,
       events: { ...events, pending: strip(events.pending), history: strip(events.history) },
       flagship: {
         ...flagship,
-        seasons: flagship.seasons.map(({ startRatings: _r, ...season }) => season),
+        seasons: flagship.seasons.map(({ startRatings: _r, scoring: _s, ...season }) => season),
       },
     };
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 8, state: v8 }), world);
@@ -374,7 +375,12 @@ describe("season cards in play", () => {
         ...played,
         flagship: {
           ...played.flagship,
-          seasons: played.flagship.seasons.map((s) => ({ ...s, startRatings: [] })),
+          scoring: "medium",
+          seasons: played.flagship.seasons.map((s) => ({
+            ...s,
+            scoring: "medium",
+            startRatings: [],
+          })),
         },
       }),
     );

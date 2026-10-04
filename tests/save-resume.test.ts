@@ -27,6 +27,7 @@ function migratedFlagship(state: GameState): Pick<GameState, "seasonFormat" | "f
       state.anchorCountryId,
       anchor?.league?.tier ?? "amateur",
       state.quarter,
+      state.genome.scoring,
     ),
   };
 }

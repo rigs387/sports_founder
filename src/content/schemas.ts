@@ -12,6 +12,9 @@ const id = z
   .regex(/^[a-z][a-z0-9-]*$/, "must be a lowercase id (letters, digits, hyphens)");
 const unitInterval = z.number().min(0).max(1);
 const delta = z.number().min(-2).max(2);
+/** One value for each scoring frequency option (low, medium, high). */
+const byScoring = <T extends z.ZodType>(value: T) =>
+  z.strictObject({ low: value, medium: value, high: value });
 
 // ---- Countries -----------------------------------------------------------------------------
 
@@ -572,10 +575,11 @@ export const configFileSchema = z.strictObject({
     /** American format: the playoff field for the most clubs at or above each size. */
     playoffs: z.array(z.strictObject({ minClubs: z.int().min(2), clubs: z.int().min(2) })).min(1),
     points: z.strictObject({ win: z.int().min(0), draw: z.int().min(0) }),
+    /** By the genome's scoring frequency (GDD v1.16): chances per side and the scoring rate. */
     match: z.strictObject({
-      chances: z.int().min(1),
-      baseRate: unitInterval,
-      ratingEffect: z.number().min(0),
+      chances: byScoring(z.int().min(1)),
+      baseRate: byScoring(unitInterval),
+      ratingEffect: byScoring(z.number().min(0)),
       homeAdvantage: z.number().min(0),
       minRate: unitInterval,
       maxRate: unitInterval,
@@ -617,7 +621,7 @@ export const configFileSchema = z.strictObject({
         foregoneTitles: z.int().min(3),
         runawayShare: z.number().positive(),
         closeFinishWins: z.number().min(0),
-        closeFinalMargin: z.int().min(0),
+        closeFinalMargin: byScoring(z.int().min(0)),
         underdogDivisor: z.int().min(2),
       })
       .refine(

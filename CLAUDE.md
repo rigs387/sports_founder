@@ -167,6 +167,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 9 adds season cards (GDD v1.15): each season's start ratings, season facts on event
   records and season-counted cooldowns (`events.seasonOffered`). Format 8 migrates with today's
   ratings as the current season's start and no season card offered.
+- Save format 10 adds the flagship's scoring rule (GDD v1.16): `FlagshipState.scoring`, fixed at
+  each season's start from the genome, and on every season summary. Format 9 migrates with every
+  season so far, and the one in progress, on the medium rule (the old single rule).
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

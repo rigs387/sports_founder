@@ -115,7 +115,14 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     events: emptyEvents(1),
     seasonFormat,
     // The anchor's founding league is the flagship from turn 1 (GDD v1.11).
-    flagship: newFlagship(world, setup.seed, setup.anchorCountryId, "amateur", 0),
+    flagship: newFlagship(
+      world,
+      setup.seed,
+      setup.anchorCountryId,
+      "amateur",
+      0,
+      genome.data.scoring,
+    ),
   };
 }
 

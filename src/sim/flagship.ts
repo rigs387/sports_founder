@@ -12,6 +12,7 @@ import {
   type LeagueTierId,
   type MatchResult,
   PLAYER_INDEX,
+  type ScoringOption,
   type SeasonFormat,
   type SeasonSummary,
   type TableRow,
@@ -202,10 +203,19 @@ export function activeRatings(flagship: FlagshipState) {
   return activeClubs(flagship).map((club) => ({ clubId: club.id, rating: club.rating }));
 }
 
-/** A fresh table for the active clubs, and the season clock from `quarter`. */
-function startSeason(flagship: FlagshipState, world: World, quarter: number): FlagshipState {
+/**
+ * A fresh table for the active clubs, and the season clock from `quarter`. The season plays the
+ * scoring rule `scoring` throughout (GDD v1.16: no season mixes two rules).
+ */
+function startSeason(
+  flagship: FlagshipState,
+  world: World,
+  quarter: number,
+  scoring: ScoringOption,
+): FlagshipState {
   return {
     ...flagship,
+    scoring,
     seasonQuarters: quartersUntilSeasonEnd(quarter, world),
     quartersPlayed: 0,
     round: 0,
@@ -222,6 +232,7 @@ export function newFlagship(
   countryId: string,
   tier: LeagueTierId,
   quarter: number,
+  scoring: ScoringOption,
 ): FlagshipState {
   // The seat's country is mixed in, so one seed gives different clubs in different markets.
   const mix = Math.imul(indexOf(world, countryId) + 1, 0x85eb_ca6b);
@@ -231,6 +242,7 @@ export function newFlagship(
     pendingCountryId: null,
     rng: [],
     season: 1,
+    scoring,
     seasonQuarters: 0,
     quartersPlayed: 0,
     round: 0,
@@ -242,15 +254,23 @@ export function newFlagship(
     seasons: [],
   };
   const fitted = fitClubs(empty, world, rng, tier);
-  return { ...startSeason(fitted, world, quarter), rng: saveRng(rng) };
+  return { ...startSeason(fitted, world, quarter, scoring), rng: saveRng(rng) };
 }
 
 // ---- Matches --------------------------------------------------------------------------------
 
-function scoringRate(own: number, opponent: number, home: boolean, world: World): number {
+/** The chance that one of a club's scoring chances scores, under the season's scoring rule. */
+export function scoringRate(
+  own: number,
+  opponent: number,
+  home: boolean,
+  scoring: ScoringOption,
+  world: World,
+): number {
   const { match } = world.config.flagship;
   const edge = own - opponent + (home ? match.homeAdvantage / 2 : -match.homeAdvantage / 2);
-  return clamp(match.baseRate + match.ratingEffect * edge, match.minRate, match.maxRate);
+  const rate = match.baseRate[scoring] + match.ratingEffect[scoring] * edge;
+  return clamp(rate, match.minRate, match.maxRate);
 }
 
 function rollScore(rng: Rng, rate: number, chances: number): number {
@@ -259,12 +279,19 @@ function rollScore(rng: Rng, rate: number, chances: number): number {
   return score;
 }
 
-function playMatch(rng: Rng, home: Club, away: Club, world: World, knockout: boolean): MatchResult {
+function playMatch(
+  rng: Rng,
+  home: Club,
+  away: Club,
+  scoring: ScoringOption,
+  world: World,
+  knockout: boolean,
+): MatchResult {
   const { match } = world.config.flagship;
-  const homeRate = scoringRate(home.rating, away.rating, true, world);
-  const awayRate = scoringRate(away.rating, home.rating, false, world);
-  const homeScore = rollScore(rng, homeRate, match.chances);
-  const awayScore = rollScore(rng, awayRate, match.chances);
+  const homeRate = scoringRate(home.rating, away.rating, true, scoring, world);
+  const awayRate = scoringRate(away.rating, home.rating, false, scoring, world);
+  const homeScore = rollScore(rng, homeRate, match.chances[scoring]);
+  const awayScore = rollScore(rng, awayRate, match.chances[scoring]);
   let decidedFor: number | null = null;
   if (knockout && homeScore === awayScore) {
     // Deciders: one roll each until exactly one side scores; then the higher seed (home).
@@ -342,6 +369,7 @@ function playPlayoffs(
   rng: Rng,
   ranked: readonly TableRow[],
   clubs: ReadonlyMap<number, Club>,
+  scoring: ScoringOption,
   world: World,
 ): { matches: MatchResult[]; champion: number; runnerUp: number } {
   const size = Math.max(1, bracketSize(ranked.length, world));
@@ -358,7 +386,7 @@ function playPlayoffs(
       const home = clubs.get(homeId);
       const away = clubs.get(awayId);
       if (!home || !away) throw new Error("Playoff club missing");
-      const result = playMatch(rng, home, away, world, true);
+      const result = playMatch(rng, home, away, scoring, world, true);
       matches.push(result);
       const winner = matchWinner(result) ?? homeId;
       winners.push(winner);
@@ -487,7 +515,7 @@ function moveSeat(
  * country has no league, no rounds are played and the season ends without a champion.
  */
 export function stepFlagshipQuarter(
-  state: Pick<GameState, "turn" | "anchorCountryId" | "seasonFormat" | "flagship">,
+  state: Pick<GameState, "turn" | "anchorCountryId" | "genome" | "seasonFormat" | "flagship">,
   countries: CountryState[],
   world: World,
   quarter: number,
@@ -513,7 +541,7 @@ export function stepFlagshipQuarter(
         const home = clubs.get(homeId);
         const away = clubs.get(awayId);
         if (!home || !away) throw new Error("Flagship fixture names a club not in the league");
-        return playMatch(rng, home, away, world, false);
+        return playMatch(rng, home, away, flagship.scoring, world, false);
       });
       for (const result of lastRound) table = record(table, result, world);
     }
@@ -528,7 +556,7 @@ export function stepFlagshipQuarter(
       const format: SeasonFormat = state.seasonFormat;
       const playoffs =
         format === "american"
-          ? playPlayoffs(rng, ranked, clubs, world)
+          ? playPlayoffs(rng, ranked, clubs, flagship.scoring, world)
           : {
               matches: [],
               champion: ranked[0]?.clubId ?? 0,
@@ -539,6 +567,7 @@ export function stepFlagshipQuarter(
         quarter: newQuarter,
         countryId: flagship.countryId,
         format,
+        scoring: flagship.scoring,
         championId: playoffs.champion,
         runnerUpId: playoffs.runnerUp,
         standings: ranked,
@@ -583,7 +612,7 @@ export function stepFlagshipQuarter(
     }
     const seatLeague = league();
     if (seatLeague !== null) flagship = fitClubs(flagship, world, rng, seatLeague.tier);
-    flagship = startSeason(flagship, world, newQuarter);
+    flagship = startSeason(flagship, world, newQuarter, state.genome.scoring);
   }
   return {
     flagship: { ...flagship, rng: saveRng(rng) },
@@ -616,7 +645,7 @@ export function returnSeatIfFolded(state: GameState, world: World): GameState {
   let next = moved.flagship;
   const anchorLeague = state.countries[indexOf(world, state.anchorCountryId)]?.league ?? null;
   if (anchorLeague !== null) next = fitClubs(next, world, rng, anchorLeague.tier);
-  next = startSeason({ ...next, rng: saveRng(rng) }, world, state.quarter);
+  next = startSeason({ ...next, rng: saveRng(rng) }, world, state.quarter, state.genome.scoring);
   return {
     ...state,
     flagship: next,
@@ -645,7 +674,12 @@ function dormantClubs(state: GameState, world: World): GameState {
   const fitted = fitClubs(flagship, world, rng, seatLeague.tier);
   return {
     ...state,
-    flagship: startSeason({ ...fitted, rng: saveRng(rng) }, world, state.quarter),
+    flagship: startSeason(
+      { ...fitted, rng: saveRng(rng) },
+      world,
+      state.quarter,
+      state.genome.scoring,
+    ),
   };
 }
 

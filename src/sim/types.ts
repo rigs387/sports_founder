@@ -209,6 +209,8 @@ export interface SeasonSummary {
   quarter: number;
   countryId: string;
   format: SeasonFormat;
+  /** The scoring rule the season was played under (medium for seasons before format 10). */
+  scoring: ScoringOption;
   championId: number;
   runnerUpId: number;
   /** Final regular-season table, best first. */
@@ -226,6 +228,9 @@ export interface SeasonSummary {
  * The flagship league the player runs as commissioner (GDD v1.11, v1.13, v1.14). Its matches roll
  * on their own random stream (`rng`), so the world's sequence never depends on them.
  */
+/** The genome's scoring frequency, which sets the flagship's match rule (GDD v1.16). */
+export type ScoringOption = Genome["scoring"];
+
 export interface FlagshipState {
   /** The country holding the seat. Seasons pause while it has no league. */
   countryId: string;
@@ -234,6 +239,8 @@ export interface FlagshipState {
   rng: number[];
   /** The season being played (1 for the first). */
   season: number;
+  /** The scoring rule the current season plays, fixed when it starts. */
+  scoring: ScoringOption;
   /** Quarters this season lasts, and how many have been played. */
   seasonQuarters: number;
   quartersPlayed: number;
