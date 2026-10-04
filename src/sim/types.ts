@@ -191,6 +191,12 @@ export interface Player {
   birthSeason: number;
   peakSkill: number;
   skill: number;
+  /** The season the player became a star, or null. A star stays a star until retirement. */
+  starSince: number | null;
+  /** Whether the season being played (or the next, at a season's end) is their last. */
+  finalSeason: boolean;
+  /** The last season the player played, once retired; null while playing. */
+  retiredSeason: number | null;
   /** One permanent line per finished flagship season the player played in, oldest first. */
   career: CareerLine[];
 }
@@ -273,6 +279,8 @@ export interface SeasonSummary {
   startRatings: ClubRating[];
   /** Null when nobody scored or the season was not tallied (before save format 12). */
   topScorer: TopScorer | null;
+  /** The player the season made a star, if any (null before save format 13). */
+  newStarId: number | null;
 }
 
 /**
@@ -369,6 +377,26 @@ export type Landmark =
       countryId: string;
       season: number;
       clubId: number;
+    }
+  /** A flagship star was made, retired, or moved clubs (GDD v1.16). */
+  | {
+      kind: "firstStar" | "starRetired";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      playerId: number;
+      clubId: number;
+    }
+  | {
+      kind: "starMoved";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      playerId: number;
+      from: number;
+      to: number;
     }
   /** The commissioner's seat moved: by the player, or home after a flagship folded. */
   | {

@@ -49,8 +49,16 @@ function poolNames(poolId: string): Set<string> {
   return names;
 }
 
-/** Players without their careers, which grow every season. */
-const identities = (players: readonly Player[]) => players.map(({ career: _c, ...rest }) => rest);
+/** Who players are: what never changes once they are born. */
+const identities = (players: readonly Player[]) =>
+  players.map(({ id, name, countryId, birthplace, birthSeason, peakSkill }) => ({
+    id,
+    name,
+    countryId,
+    birthplace,
+    birthSeason,
+    peakSkill,
+  }));
 
 const withoutSeasonCards = {
   ...world,

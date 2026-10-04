@@ -22,7 +22,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 12;
+export const SAVE_FORMAT_VERSION = 13;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -120,6 +120,25 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     clubId: z.int().min(1),
   }),
   z.strictObject({
+    kind: z.enum(["firstStar", "starRetired"]),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    playerId: z.int().min(1),
+    clubId: z.int().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal("starMoved"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    playerId: z.int().min(1),
+    from: z.int().min(1),
+    to: z.int().min(1),
+  }),
+  z.strictObject({
     kind: z.literal("seatMoved"),
     turn: z.int().min(1),
     quarter: count,
@@ -196,6 +215,9 @@ const flagshipSchema = z.strictObject({
       birthSeason: z.int(),
       peakSkill: z.number(),
       skill: z.number(),
+      starSince: z.int().min(1).nullable(),
+      finalSeason: z.boolean(),
+      retiredSeason: z.int().min(1).nullable(),
       career: z.array(
         z.strictObject({ season: z.int().min(1), clubId: z.int().min(1), ...tallyFields }),
       ),
@@ -221,6 +243,7 @@ const flagshipSchema = z.strictObject({
       topScorer: z
         .strictObject({ playerId: z.int().min(1), clubId: z.int().min(1), scores: count })
         .nullable(),
+      newStarId: z.int().min(1).nullable(),
     }),
   ),
 });
@@ -316,6 +339,28 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 12 → 13: stars and careers (GDD v1.16). Nobody is a star, nobody has announced a final
+  // season and nobody has retired; no past season made a star.
+  12: (save) => {
+    const flagship = save.state.flagship as Record<string, unknown>;
+    const players = (Array.isArray(flagship.players) ? flagship.players : []).map(
+      ({ career, ...player }: Record<string, unknown>) => ({
+        ...player,
+        starSince: player.starSince ?? null,
+        finalSeason: player.finalSeason ?? false,
+        retiredSeason: player.retiredSeason ?? null,
+        career,
+      }),
+    );
+    const seasons = (Array.isArray(flagship.seasons) ? flagship.seasons : []).map(
+      (summary: Record<string, unknown>) => ({ ...summary, newStarId: summary.newStarId ?? null }),
+    );
+    // Key order follows the schema, so the migrated state re-serializes byte-identically.
+    return {
+      formatVersion: 13,
+      state: { ...save.state, flagship: { ...flagship, players, seasons } },
+    };
+  },
   // 11 → 12: credited scores and career lines (GDD v1.16). Players start with empty careers;
   // the season in progress was not tallied from its start, so it is never tallied (no partial
   // career lines) and tallies begin with the next season. No past season has a top scorer.

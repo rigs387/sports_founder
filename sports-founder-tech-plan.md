@@ -237,6 +237,13 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    final-season announcement from 31, retirement by 37, replacement. A star may move up to a
    higher-rated club (the clubs swap leading players). Seat moves leave players at dormant
    clubs. Landmarks: the first star, star retirements, moves.
+   *Built 2026-10-03:* the star bar is per scoring frequency (low 0.44, medium 0.39, high 0.37): a
+   single 35% bar made stars in 13% of low-scoring Amateur seasons against 10% of high-scoring ones,
+   with the first star in season 1–2. Measured once (flagship only, Brazil, 16 seeds × 40 seasons):
+   stars in 9–10% of Amateur seasons at every frequency, the first star at median season 5 / 2 / 5,
+   retirement at median age 33; stars lift runaway and foregone-league stories by a few points. Star
+   strength is 0.08 × skill rating points; a star moves with chance 0.25. Landmarks: firstStar,
+   starRetired, starMoved. Save format 13.
 5. **Backing.** `backStar` and `dropStar` through `applyAction`: window only, slots by PP tier,
    price = base × the peak tier's multiplier, no upkeep. Influence ramps over a config number of
    seasons. Effects: casual conversion in the flagship country and the media reach channel out
@@ -248,8 +255,8 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    decision (league cash) and the full-influence drop pressure card, counted against the decision
    cap, offered after season cards, with free defaults. Season cards name the champion's leading
    player and the top scorer where recorded. Bot weights for every new card; bots back stars.
-7. **Save format 13.** Stars and backing (players arrived in format 11 with step 2, career lines
-   and top scorers in format 12 with step 3): no stars and no invented careers for older saves.
+7. **Save format 14.** Backing (players arrived in format 11 with step 2, career lines and top
+   scorers in format 12 with step 3, stars and careers in format 13 with step 4).
 8. **Screen.** A Stars panel on the flagship screen (recorded facts only, an influence bar,
    backing slots with a review step), the leading player and tally on each table row, backed
    stars named in the flagship country's tooltip. Skill and strength bonuses stay out of

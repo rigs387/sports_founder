@@ -141,3 +141,28 @@ Save format 12 adds careers, tallies and top scorers. A format 11 save's season 
 tallied from its start, so it is never tallied; tallying begins with the next season.
 `tests/flagship-scorers.test.ts` covers the credit chance, career lines in both formats, playoff
 and final scores, the top scorer, the untouched world and the 11 → 12 migration.
+
+## Stars and careers
+
+Built October 3, 2026 (tech plan 2.6 step 4). Simulation only; star cards and the Stars panel come
+later. At a season's end its top scorer becomes a star if they took at least the bar's share of
+their club's scores (playoffs included) and the league has an open star place (1 / 2 / 3 / 4 by
+tier; stars at dormant clubs do not count). The bar is per scoring frequency (low 44%, medium 39%,
+high 37%) because shares swing more when there are few scores; with these bars stars arrive in
+about one Amateur season in ten at every frequency. A star stays a star until retirement and adds
+0.08 × their skill to their club's rating in matches.
+
+Careers: at every season's end each player's skill follows the career curve for next season's
+age, with a small wobble. From 31 a player may announce that next season is their last (more
+likely with age and lost skill); everyone has retired by 37. A retired player's club gets a young
+replacement (17–20) whose peak skill leans toward the club's strength. A star not in their final
+season may move to a club rated above theirs that has no star; the two clubs swap leading players.
+The sport's first star, star retirements and star moves are landmarks. All of it uses the
+flagship's own random stream.
+
+Measured once (flagship only, Brazil, 16 seeds × 40 seasons): first star at median season 5 / 2 /
+5 (low / medium / high) at Amateur, retirement at median age 33, and runaway and foregone-league
+stories up a few points as stars make strong clubs stronger. Save format 13 adds stars and
+careers; format 12 saves migrate with nobody a star or retired. `tests/flagship-stars.test.ts`
+covers the bar and star places, star strength, moves, final seasons and retirement, young
+replacements, the untouched world and the 12 → 13 migration.

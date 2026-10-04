@@ -617,6 +617,18 @@ export const configFileSchema = z.strictObject({
     }),
     /** A new club's place is drawn with weight population ^ placeWeightExponent. */
     placeWeightExponent: z.number().min(0),
+    /** Stars (GDD v1.16). */
+    stars: z.strictObject({
+      share: z.strictObject({ low: unitInterval, medium: unitInterval, high: unitInterval }),
+      places: z.strictObject({
+        amateur: z.int().min(0),
+        "semi-pro": z.int().min(0),
+        professional: z.int().min(0),
+        elite: z.int().min(0),
+      }),
+      strengthPerSkill: z.number().min(0),
+      moveChance: unitInterval,
+    }),
     /** Leading players (GDD v1.16). */
     players: z.strictObject({
       foundingAge: z.strictObject({ min: z.int().min(0), max: z.int().min(0) }),
@@ -627,6 +639,18 @@ export const configFileSchema = z.strictObject({
         declineAge: z.int().min(0),
         risePerYear: unitInterval,
         declinePerYear: unitInterval,
+        wobble: z.number().min(0),
+      }),
+      finalSeason: z.strictObject({
+        fromAge: z.int().min(0),
+        base: unitInterval,
+        perYear: z.number().min(0),
+        perLostShare: z.number().min(0),
+        lastAge: z.int().min(0),
+      }),
+      replacement: z.strictObject({
+        age: z.strictObject({ min: z.int().min(0), max: z.int().min(0) }),
+        ratingLean: z.number().min(0),
       }),
       nameRetries: z.int().min(0),
       minNamePool: z.int().min(1),

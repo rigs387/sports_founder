@@ -312,6 +312,12 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
   if (players.skill.min > players.skill.max) {
     issue(sources.config, "flagship.players.skill", "min must not exceed max");
   }
+  if (players.replacement.age.min > players.replacement.age.max) {
+    issue(sources.config, "flagship.players.replacement.age", "min must not exceed max");
+  }
+  if (players.finalSeason.lastAge < players.finalSeason.fromAge) {
+    issue(sources.config, "flagship.players.finalSeason", "lastAge must not come before fromAge");
+  }
   if (players.credit.min > players.credit.max) {
     issue(sources.config, "flagship.players.credit", "min must not exceed max");
   }

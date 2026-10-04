@@ -56,8 +56,9 @@ describe("credited scores", () => {
       const rounds = totalRounds(world.config.flagship.clubs.amateur);
       for (const summary of state.flagship.seasons) {
         for (const row of summary.standings) {
-          const player = state.flagship.players.find((p) => p.clubId === row.clubId);
-          const line = player?.career.find((l) => l.season === summary.season);
+          const line = state.flagship.players
+            .flatMap((p) => p.career)
+            .find((l) => l.season === summary.season && l.clubId === row.clubId);
           expect(line).toMatchObject({
             clubId: row.clubId,
             matches: rounds,

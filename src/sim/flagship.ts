@@ -243,19 +243,26 @@ export function careerShare(age: number, world: World): number {
   return Math.max(0, 1 - career.declinePerYear * (age - career.declineAge));
 }
 
-/** A club's first leading player, of an age spread across the founding range. */
+/**
+ * A club's new leading player. A club's first is of an age spread across the founding range; a
+ * replacement for a retired player is young, with peak skill leaning toward the club's strength.
+ */
 function newPlayer(
   world: World,
   rng: Rng,
   flagship: FlagshipState,
   club: Club,
   taken: ReadonlySet<string>,
+  replacement: boolean,
 ): Player {
-  const { foundingAge, skill, peakSkill } = world.config.flagship.players;
-  const age =
-    foundingAge.min + Math.floor(nextFloat(rng) * (foundingAge.max - foundingAge.min + 1));
+  const { foundingAge, skill, peakSkill, replacement: young } = world.config.flagship.players;
+  const ages = replacement ? young.age : foundingAge;
+  const age = ages.min + Math.floor(nextFloat(rng) * (ages.max - ages.min + 1));
+  const lean = replacement
+    ? young.ratingLean * (club.rating - world.config.flagship.rating.start)
+    : 0;
   const peak = clamp(
-    peakSkill.mean + peakSkill.spread * (2 * nextFloat(rng) - 1),
+    peakSkill.mean + peakSkill.spread * (2 * nextFloat(rng) - 1) + lean,
     skill.min,
     skill.max,
   );
@@ -268,6 +275,9 @@ function newPlayer(
     birthSeason: flagship.season - age,
     peakSkill: peak,
     skill: clamp(peak * careerShare(age, world), skill.min, skill.max),
+    starSince: null,
+    finalSeason: false,
+    retiredSeason: null,
     career: [],
   };
 }
@@ -278,11 +288,12 @@ function newPlayer(
  */
 function staffClubs(flagship: FlagshipState, world: World, rng: Rng): FlagshipState {
   let next = flagship;
-  const staffed = new Set(next.players.map((player) => player.clubId));
+  const staffed = new Set(next.players.filter(playing).map((player) => player.clubId));
+  const hadOne = new Set(next.players.map((player) => player.clubId));
   const taken = new Set(next.players.map((player) => player.name));
   for (const club of activeClubs(next)) {
     if (staffed.has(club.id)) continue;
-    const player = newPlayer(world, rng, next, club, taken);
+    const player = newPlayer(world, rng, next, club, taken, hadOne.has(club.id));
     taken.add(player.name);
     next = { ...next, players: [...next.players, player], nextPlayerId: next.nextPlayerId + 1 };
   }
@@ -291,9 +302,152 @@ function staffClubs(flagship: FlagshipState, world: World, rng: Rng): FlagshipSt
 
 const EMPTY_TALLY = { matches: 0, scores: 0, playoffScores: 0, finalScores: 0 };
 
-/** The club's leading player, if it has one. */
+const playing = (player: Player) => player.retiredSeason === null;
+
+/** The club's leading player (not retired), if it has one. */
 export function leadingPlayer(flagship: FlagshipState, clubId: number): Player | undefined {
-  return flagship.players.find((player) => player.clubId === clubId);
+  return flagship.players.find((player) => playing(player) && player.clubId === clubId);
+}
+
+/** What a club's star adds to its rating in matches (GDD v1.16); nothing without a star. */
+export function starStrength(flagship: FlagshipState, clubId: number, world: World): number {
+  const player = leadingPlayer(flagship, clubId);
+  if (!player || player.starSince === null) return 0;
+  return world.config.flagship.stars.strengthPerSkill * player.skill;
+}
+
+/** The stars at the seat's active clubs: the ones holding the league's star places. */
+export function seatStars(flagship: FlagshipState): Player[] {
+  const active = new Set(activeClubs(flagship).map((club) => club.id));
+  return flagship.players.filter(
+    (player) => playing(player) && player.starSince !== null && active.has(player.clubId),
+  );
+}
+
+/** The chance that next season is a player's last, at next season's age. */
+export function finalSeasonChance(player: Player, age: number, world: World): number {
+  const rule = world.config.flagship.players.finalSeason;
+  if (age < rule.fromAge) return 0;
+  if (age >= rule.lastAge) return 1;
+  const lost = player.peakSkill > 0 ? Math.max(0, 1 - player.skill / player.peakSkill) : 0;
+  return clamp(rule.base + rule.perYear * (age - rule.fromAge) + rule.perLostShare * lost, 0, 1);
+}
+
+/** A club's scores in a finished season, playoffs included. */
+export function clubSeasonScores(summary: SeasonSummary, clubId: number): number {
+  const row = summary.standings.find((r) => r.clubId === clubId);
+  const playoff = summary.playoffs.reduce(
+    (sum, m) => sum + (m.homeId === clubId ? m.homeScore : m.awayId === clubId ? m.awayScore : 0),
+    0,
+  );
+  return (row?.scoreFor ?? 0) + playoff;
+}
+
+interface SeasonEnd {
+  flagship: FlagshipState;
+  newStarId: number | null;
+  landmarks: Landmark[];
+}
+
+/**
+ * The leading players' season end (GDD v1.16), after career lines are written and before ratings
+ * drift: the top scorer may become a star, players who played their final season retire, stars
+ * may move up, and everyone still playing ages into next season (skill, and perhaps a final
+ * season announced). Retired players' clubs are restaffed when clubs are fitted.
+ */
+function playersSeasonEnd(
+  flagship: FlagshipState,
+  summary: SeasonSummary,
+  tier: LeagueTierId,
+  world: World,
+  rng: Rng,
+  turn: number,
+  quarter: number,
+): SeasonEnd {
+  const { stars, players: rules } = world.config.flagship;
+  const { season, countryId } = summary;
+  const found: Landmark[] = [];
+  let players = flagship.players.map((player) => ({ ...player }));
+  const current = () => ({ ...flagship, players });
+
+  // A star is made by a season: the top scorer, with the club share, if a place is open.
+  let newStarId: number | null = null;
+  const top = summary.topScorer;
+  const scorer = top ? players.find((player) => player.id === top.playerId) : undefined;
+  if (top && scorer && playing(scorer) && scorer.starSince === null) {
+    const clubScores = clubSeasonScores(summary, top.clubId);
+    const open = seatStars(current()).length < stars.places[tier];
+    if (open && clubScores > 0 && top.scores / clubScores >= stars.share[summary.scoring]) {
+      const first = !players.some((player) => player.starSince !== null);
+      scorer.starSince = season;
+      newStarId = scorer.id;
+      if (first) {
+        found.push(
+          landmarks.starLandmark(
+            "firstStar",
+            turn,
+            quarter,
+            countryId,
+            season,
+            scorer.id,
+            top.clubId,
+          ),
+        );
+      }
+    }
+  }
+
+  // Players who played their final season retire.
+  for (const player of players) {
+    if (!playing(player) || !player.finalSeason) continue;
+    player.retiredSeason = season;
+    player.finalSeason = false;
+    if (player.starSince === null) continue;
+    const club = flagship.clubs.find((c) => c.id === player.clubId);
+    found.push(
+      landmarks.starLandmark(
+        "starRetired",
+        turn,
+        quarter,
+        club?.countryId ?? countryId,
+        season,
+        player.id,
+        player.clubId,
+      ),
+    );
+  }
+
+  // Stars may move up to a stronger club without a star; the clubs swap leading players.
+  const ratingOf = new Map(flagship.clubs.map((club) => [club.id, club.rating]));
+  for (const mover of seatStars(current())) {
+    if (mover.finalSeason || nextFloat(rng) >= stars.moveChance) continue;
+    const own = ratingOf.get(mover.clubId) ?? 0;
+    const targets = activeClubs(flagship)
+      .filter((club) => club.rating > own)
+      .map((club) => players.find((p) => playing(p) && p.clubId === club.id))
+      .filter((other): other is Player => other !== undefined && other.starSince === null);
+    if (targets.length === 0) continue;
+    const other = pick(rng, targets);
+    const from = mover.clubId;
+    mover.clubId = other.clubId;
+    other.clubId = from;
+    found.push(landmarks.starMoved(turn, quarter, countryId, season, mover.id, from, mover.clubId));
+  }
+
+  // Everyone still playing ages into next season.
+  players = players.map((player) => {
+    if (!playing(player)) return player;
+    const age = season + 1 - player.birthSeason;
+    const wobble = rules.career.wobble * (2 * nextFloat(rng) - 1);
+    const skill = clamp(
+      player.peakSkill * careerShare(age, world) + wobble,
+      rules.skill.min,
+      rules.skill.max,
+    );
+    const aged = { ...player, skill };
+    return { ...aged, finalSeason: nextFloat(rng) < finalSeasonChance(aged, age, world) };
+  });
+  return { flagship: current(), newStarId, landmarks: found };
 }
 
 /** The season's top scorer: most scores, then fewer matches, then the lower id. */
@@ -695,6 +849,13 @@ export function stepFlagshipQuarter(
   const league = () => nextCountries[indexOf(world, flagship.countryId)]?.league ?? null;
 
   const clubs = new Map(activeClubs(flagship).map((club) => [club.id, club]));
+  // Matches see each club's rating plus its star's strength; the stored rating never changes.
+  const playingAs = new Map(
+    [...clubs.values()].map((club) => [
+      club.id,
+      { ...club, rating: club.rating + starStrength(flagship, club.id, world) },
+    ]),
+  );
   const ids = flagship.table.map((row) => row.clubId);
   const rounds = totalRounds(ids.length);
   // This season's tallies, updated in place as matches are played (none if not tallied).
@@ -728,8 +889,8 @@ export function stepFlagshipQuarter(
     let lastRound = flagship.lastRound;
     for (let round = flagship.round; round < due; round += 1) {
       lastRound = roundPairs(ids, round).map(([homeId, awayId]) => {
-        const home = clubs.get(homeId);
-        const away = clubs.get(awayId);
+        const home = playingAs.get(homeId);
+        const away = playingAs.get(awayId);
         if (!home || !away) throw new Error("Flagship fixture names a club not in the league");
         const played = playMatch(rng, home, away, flagship.scoring, world, false, credit);
         count(played, "league");
@@ -748,7 +909,7 @@ export function stepFlagshipQuarter(
       const format: SeasonFormat = state.seasonFormat;
       const playoffs =
         format === "american"
-          ? playPlayoffs(rng, ranked, clubs, flagship.scoring, world, credit, count)
+          ? playPlayoffs(rng, ranked, playingAs, flagship.scoring, world, credit, count)
           : {
               matches: [],
               champion: ranked[0]?.clubId ?? 0,
@@ -766,8 +927,21 @@ export function stepFlagshipQuarter(
         playoffs: playoffs.matches,
         startRatings: flagship.startRatings,
         topScorer: tallies === null ? null : topScorer(flagship, tallies),
+        newStarId: null,
       };
       if (tallies !== null) flagship = closeCareers(flagship, tallies);
+      const ended = playersSeasonEnd(
+        flagship,
+        summary,
+        current.tier,
+        world,
+        rng,
+        state.turn,
+        newQuarter,
+      );
+      flagship = ended.flagship;
+      summary.newStarId = ended.newStarId;
+      found.push(...ended.landmarks);
       found.push(
         landmarks.seasonChampion(
           state.turn,
@@ -927,6 +1101,14 @@ export function flagshipProblems(state: GameState, world: World): string[] {
     }
     playerIds.add(player.id);
     if (!ids.has(player.clubId)) problems.push(`flagship player ${player.id} has no club`);
+    const past = (season: number | null) => season === null || season < flagship.season;
+    if (!past(player.starSince) || !past(player.retiredSeason)) {
+      problems.push(`flagship player ${player.id} has a season in the future`);
+    }
+    if (player.retiredSeason !== null) {
+      if (player.finalSeason) problems.push(`retired flagship player ${player.id} plays on`);
+      continue;
+    }
     if (clubsStaffed.has(player.clubId)) {
       problems.push(`flagship club ${player.clubId} has two leading players`);
     }
@@ -955,7 +1137,12 @@ export function flagshipProblems(state: GameState, world: World): string[] {
   }
   for (const tally of flagship.tallies ?? []) {
     const player = flagship.players.find((p) => p.id === tally.playerId);
-    if (!player || !active.has(player.clubId) || !countsAddUp(tally)) {
+    if (
+      !player ||
+      player.retiredSeason !== null ||
+      !active.has(player.clubId) ||
+      !countsAddUp(tally)
+    ) {
       problems.push(`flagship tally for player ${tally.playerId} is bad`);
     }
   }

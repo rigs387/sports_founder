@@ -704,8 +704,9 @@ purchased traits and percentage modifiers alone do not make culture.
     The credit rolls use the flagship's own random stream, so the world never depends on them.
   - *A star is made by a season, and stars are scarce (choose pain).* At a season's end the top
     scorer becomes a star only if they scored at least a config share of their club's season
-    total (e.g. 35%, which reads the same at every scoring frequency) and the league has an open
-    star place. A star stays a star until retirement, so new stars arrive mostly as old
+    total and the league has an open star place. The share is set per scoring frequency (built
+    2026-10-03: a single 35% bar made stars more readily in low-scoring sports, whose shares
+    swing more; the bars are tuned so stars arrive about equally often in every sport). A star stays a star until retirement, so new stars arrive mostly as old
     ones fade, and every new one is an event.
   - *Star places by league tier (config):* Amateur 1, Semi-Pro 2, Professional 3, Elite 4.
     Amateur gets one, not none: the seat spends its first ten or so seasons at Amateur, and the

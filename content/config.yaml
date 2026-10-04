@@ -509,10 +509,37 @@ flagship:
     foundingAge: { min: 18, max: 32 }
     skill: { min: 1, max: 100 }
     peakSkill: { mean: 50, spread: 20 }
-    career: { peakAge: 27, declineAge: 30, risePerYear: 0.04, declinePerYear: 0.05 }
+    career: { peakAge: 27, declineAge: 30, risePerYear: 0.04, declinePerYear: 0.05, wobble: 3 }
+    # Careers (step 4). At every season's end each playing leading player's skill becomes
+    # peak × the career curve for next season's age ± up to career.wobble. A player who played
+    # their final season retires; then, from finalSeason.fromAge, next season becomes a player's
+    # final season with chance base + perYear × (age − fromAge) + perLostShare × the share of peak
+    # skill lost, and always at lastAge. A retired player's club gets a young replacement (age
+    # replacement.age) whose peak skill leans toward the club's strength: + ratingLean × (club
+    # rating − rating.start).
+    finalSeason: { fromAge: 31, base: 0.1, perYear: 0.12, perLostShare: 0.5, lastAge: 37 }
+    replacement: { age: { min: 17, max: 20 }, ratingLean: 0.4 }
     nameRetries: 10
     minNamePool: 20
     credit: { base: 0.25, perSkill: 0.006, pivot: 50, min: 0.05, max: 0.6 }
+  # Stars (GDD v1.16, tech plan 2.6 step 4). At a season's end its top scorer becomes a star if
+  # they took at least share[the season's scoring frequency] of their club's scores (playoffs
+  # included) and the league has an open place (places by its tier; stars at dormant clubs do not
+  # count). A star stays a star until retirement. A star adds strengthPerSkill × skill to their
+  # club's rating in matches. Each season's end, a star not in their final season moves with
+  # chance moveChance to a club rated above theirs that has no star; the clubs swap leading
+  # players.
+  # share is by scoring frequency because few scores make shares swing more (measured 2026-10-03,
+  # flagship only, Brazil, 16 seeds × 40 seasons): a single 35% bar made stars in 13% of
+  # low-scoring Amateur seasons and 10% of high-scoring ones, with the first star in season 1–2.
+  # These bars make stars in 9–10% of Amateur seasons at every frequency (Professional: low 10%,
+  # medium 17%, high 16%), the first star at median season 5 / 2 / 5, and half fill the Amateur
+  # star place. Stars lift runaway and foregone-league stories by a few points.
+  stars:
+    share: { low: 0.44, medium: 0.39, high: 0.37 }
+    places: { amateur: 1, semi-pro: 2, professional: 3, elite: 4 }
+    strengthPerSkill: 0.08
+    moveChance: 0.25
   # The seat moves only to these league tiers (GDD v1.13); the anchor holds it from turn 1 at any
   # tier.
   seatEligibleTiers: [professional, elite]

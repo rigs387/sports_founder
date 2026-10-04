@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-03",
-    tests: 369,
-    files: 31,
-    note: "npm run check passed after stars step 3, credited scores and careers (type checks, Biome, purity, 369 tests in 31 files). Lint has existing visual-study warnings.",
+    tests: 377,
+    files: 32,
+    note: "npm run check passed after stars step 4, stars and careers (type checks, Biome, purity, 377 tests in 32 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-03",
     smoke:
       "UI smoke passed and now plays to a season end and opens its story card (a runaway pressure card naming real clubs); save/resume continued identically.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Make the flagship season matter",
-      text: "Leading players are credited with scores and keep careers (stars step 3 of 8); next, the first star.",
+      text: "The flagship makes its own stars, who age, retire and move (stars step 4 of 8); next, backing stars.",
       tag: "Next build",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Built",
+      title: "Stars and careers",
+      text: "Stars step 4 (tech plan 2.6): a season's top scorer becomes a star by clearing a per-frequency share of the club's scores when a place is open; stars strengthen their club, move up, and retire after an announced final season (median age 33), replaced by young players. Stars arrive in about one Amateur season in ten at every frequency. Simulation only; save format 13.",
+    },
     {
       date: "2026-10-03",
       type: "Built",
@@ -418,7 +424,7 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Step 4 of tech plan 2.6: stars and careers (the star bar, places by tier, skill curve, retirement, moves), then backing, cards, saves, screen.",
+      next: "Step 5 of tech plan 2.6: backing stars (slots, PP price, influence, effects on fans), then cards, saves, screen.",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
@@ -430,15 +436,19 @@ window.SF_PROGRESS = {
         ["Scoring frequency tests", "../../tests/flagship-match.test.ts"],
         ["Leading players", "../flagship/README.md#leading-players"],
         ["Credited scores", "../flagship/README.md#credited-scores-and-careers"],
+        ["Stars and careers", "../flagship/README.md#stars-and-careers"],
       ],
       items: [
         ["built", "Scoring frequency sets flagship match chances, fixed per season"],
         ["built", "Each club's named leading player, born in a real place (simulation only)"],
         ["built", "Scores credited to leading players; career lines and top scorers"],
-        ["planned", "Stars made by a season: top scorer, club share, 1–4 places by tier"],
+        ["built", "Stars made by a season: top scorer, club share, 1–4 places by tier"],
         ["planned", "Star cards: breakout, final season, retirement, moves, records"],
         ["planned", "Flagship stars and lightweight standouts elsewhere"],
-        ["planned", "Persistent careers, performance and retained records"],
+        [
+          "partial",
+          "Persistent careers: skill curve, final seasons, retirement and moves (records come with cards)",
+        ],
         ["planned", "Backing slots and influence earned over seasons"],
         ["planned", "Goodwill costs, honored retirements and mentoring successors"],
       ],

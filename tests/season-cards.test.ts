@@ -63,6 +63,7 @@ function summary(
     playoffs: [],
     startRatings: [1, 2, 3, 4, 5, 6, 7, 8].map((clubId) => ({ clubId, rating: 40 + clubId })),
     topScorer: null,
+    newStarId: null,
     ...options,
   };
 }

@@ -176,6 +176,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 12 adds credited scores: each player's career lines, the season's tallies
   (`FlagshipState.tallies`) and each season summary's top scorer. Format 11 migrates with empty
   careers and the season under way untallied (`tallies: null`, no partial career lines).
+- Save format 13 adds stars and careers: each player's star season, final-season flag and
+  retirement season, and each season summary's new star. Format 12 migrates with no stars, no
+  final seasons announced and nobody retired.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.
