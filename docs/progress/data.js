@@ -460,7 +460,7 @@ window.SF_PROGRESS = {
         ["built", "Star cards: breakout, final season, retirement, moves, records"],
         ["planned", "Flagship stars and lightweight standouts elsewhere"],
         [
-          "partial",
+          "built",
           "Persistent careers: skill curve, final seasons, retirement, moves and league scoring records",
         ],
         ["built", "Backing slots and influence earned over seasons"],
