@@ -6,9 +6,9 @@ import type { Action, TurnSnapshot } from "../../../sim";
 import { ActionFeedback } from "./ActionFeedback";
 import { LeagueOverview } from "./LeagueOverview";
 
-export type Overview = "sport" | "leagues" | "growth";
+export type Overview = "sport" | "leagues" | "flagship" | "growth";
 interface Props {
-  view: Exclude<Overview, "growth">;
+  view: Exclude<Overview, "growth" | "flagship">;
   snapshot: TurnSnapshot;
   names: Names;
   onClose: () => void;

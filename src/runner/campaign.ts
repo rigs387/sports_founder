@@ -1,3 +1,4 @@
+import { performance } from "node:perf_hooks";
 import {
   type Action,
   COUNTERMOVES,
@@ -52,8 +53,23 @@ interface RivalLows {
 
 const lowest = (value: number): WhereAndWhen => ({ value, countryId: "", turn: 0 });
 
+type CampaignListener = (played: PlayedCampaign, ms: number) => void;
+let listener: CampaignListener | null = null;
+
+/** Called after every campaign the runner plays: progress and the time budget (budget.ts). */
+export function onCampaignPlayed(next: CampaignListener | null): void {
+  listener = next;
+}
+
 /** Plays one campaign: the bot acts, then the turn ends, until the turn limit or the end. */
 export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
+  const started = performance.now();
+  const played = playOneCampaign(world, plan);
+  listener?.(played, performance.now() - started);
+  return played;
+}
+
+function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   let state = createCampaign(world, {
     seed: plan.seed,
     anchorCountryId: plan.anchorCountryId,
@@ -81,6 +97,9 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   let peakPlayerShare = lowest(0);
   const nodesBought: CampaignResult["nodesBought"] = [];
   let ppSpentOnNodes = 0;
+  /** Decision answers by "card/choice"; a decision left to End Turn counts as its default. */
+  const eventAnswers: Record<string, number> = {};
+  let ppSpentOnEvents = 0;
   const ppTimeline: CampaignResult["ppTimeline"] = [];
   let anchorOvertakeYears: number | null = null;
   let firstTopTurn: number | null = null;
@@ -139,6 +158,20 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     const landmarksBefore = state.landmarks.length;
     const step = runBot(plan.bot, state, world);
     actions.push(...step.actions);
+    const tally = (key: string) => {
+      eventAnswers[key] = (eventAnswers[key] ?? 0) + 1;
+    };
+    for (const action of step.actions) {
+      if (action.type !== "chooseEvent") continue;
+      const event = state.events.pending.find((e) => e.id === action.eventId);
+      tally(`${event?.templateId}/${action.choiceId}`);
+      const settled = step.state.events.history.find((e) => e.id === action.eventId);
+      ppSpentOnEvents += settled?.resolution?.cost ?? 0;
+    }
+    for (const event of step.state.events.pending) {
+      const card = world.events.cards.find((c) => c.id === event.templateId);
+      if (card?.kind === "decision") tally(`${card.id}/${card.defaultChoice}`);
+    }
     for (const landmark of step.state.landmarks.slice(landmarksBefore)) {
       if (landmark.kind !== "nodeBought") continue;
       nodesBought.push({ nodeId: landmark.nodeId, turn: t + 1, cost: landmark.cost });
@@ -316,6 +349,19 @@ export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       anchorOvertakeYears,
       nodesBought,
       ppSpentOnNodes,
+      eventAnswers,
+      ppSpentOnEvents,
+      flagship: (() => {
+        const titles = new Map<number, number>();
+        for (const season of state.flagship.seasons) {
+          titles.set(season.championId, (titles.get(season.championId) ?? 0) + 1);
+        }
+        return {
+          seasons: state.flagship.seasons.length,
+          distinctChampions: titles.size,
+          mostTitles: Math.max(0, ...titles.values()),
+        };
+      })(),
       forkChoices: Object.fromEntries(
         world.growthTree.forks.map((fork) => [
           fork.id,

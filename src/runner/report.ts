@@ -98,6 +98,12 @@ export interface CampaignResult {
   /** Growth tree nodes bought, in order, with the turn and the PP paid. */
   nodesBought: { nodeId: string; turn: number; cost: number }[];
   ppSpentOnNodes: number;
+  /** Decision-card answers by "card/choice"; decisions left to End Turn count as the default. */
+  eventAnswers: Record<string, number>;
+  /** PP paid for decision-card choices. */
+  ppSpentOnEvents: number;
+  /** Flagship seasons finished, how many clubs won one, and the most titles any club won. */
+  flagship: { seasons: number; distinctChampions: number; mostTitles: number };
   /** Per fork id: the node chosen, or null if the fork was never decided. */
   forkChoices: Record<string, string | null>;
   /** PP banked and cumulative PP spent on nodes after the sampled turns that were played. */
@@ -301,6 +307,31 @@ export function growthAggregate(
     nodes,
     forks,
     timeline,
+  };
+}
+
+/** Flagship history across campaigns (GDD v1.14): how spread out the titles are. */
+export function flagshipAggregate(results: CampaignResult[]) {
+  const withSeasons = results.filter((r) => r.flagship.seasons > 0);
+  return {
+    seasons: distribution(results.map((r) => r.flagship.seasons)),
+    distinctChampions: distribution(withSeasons.map((r) => r.flagship.distinctChampions)),
+    mostTitlesShare: distribution(
+      withSeasons.map((r) => r.flagship.mostTitles / r.flagship.seasons),
+    ),
+  };
+}
+
+/** Decision-card answers across campaigns: how often each choice was taken (GDD Events). */
+export function eventAggregate(results: CampaignResult[]) {
+  const answers: Record<string, number> = {};
+  for (const result of results) {
+    for (const [key, n] of Object.entries(result.eventAnswers))
+      answers[key] = (answers[key] ?? 0) + n;
+  }
+  return {
+    answers: Object.fromEntries(Object.entries(answers).sort(([a], [b]) => a.localeCompare(b))),
+    ppSpentOnEvents: distribution(results.map((r) => r.ppSpentOnEvents)),
   };
 }
 

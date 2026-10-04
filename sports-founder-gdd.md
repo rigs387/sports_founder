@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.13 | October 2, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds)*
+*Version 1.15 | October 3, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards)*
 
 ---
 
@@ -76,7 +76,10 @@ turn. Longer turns change how often the player decides, not the economy's math.
 2. **Design the genome** — with qualitative hints (+ / ++ / −) for the anchor country only. No
    world affinity preview; where the sport catches on abroad is discovered in play.
 3. **Name the sport and the founding club** (generated default, editable); choose difficulty preset
-   (Easy / Normal / Hard); optional visible, shareable seed.
+   (Easy / Normal / Hard); optional visible, shareable seed. **Choose the season format (decided
+   2026-10-02):** *European* (the league table decides the champion) or *American* (the same
+   regular season, then playoffs). It is identity, not a genome trait: it never touches affinity,
+   and it applies to the flagship wherever the seat goes.
 4. **Founding character (decided 2026-09-26)** — gives the sport color beyond its rules:
    birthplace (e.g., schoolyard, factory, beach, barracks), ethos (e.g., gentleman's game,
    working-class game, rebel game), colors and a simple emblem (pulled forward from the Phase 2
@@ -163,6 +166,21 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
   - *First build of the seat's depth:* named teams, results, standings and a few named stars
     (system 4), plus real sponsor and TV deals with length, annual value and demands (system 7).
     Venues, youth programs, expansion teams and full rosters come later.
+  - *The flagship season (decided 2026-10-02).* One season per in-game year, ending in the
+    seasonal window. Every club plays every other club home and away. European format: the top
+    of the table is champion. American format: the top clubs (4 when there are 8 clubs, 8 from
+    12 up) play single-match knockout playoffs, with the higher seed at home. Club counts grow
+    with the league tier: 8 Amateur, 12 Semi-Pro, 16 Professional, 20 Elite (config); promotion
+    admits generated expansion clubs, and a step-down drops the newest. Clubs are based in real
+    towns and cities of the flagship's country with invented nicknames (no real clubs, and no
+    invented places).
+  - *Club strength (decided 2026-10-02).* Each club has a rating that drifts randomly every
+    season and is pulled toward the league's financial health, so dynasties form and fade and a
+    struggling league plays worse. Stars plug into this rating when they arrive.
+  - *The purist cost of moving the seat (decided 2026-10-02).* The country the seat leaves loses
+    a config share of its player hardcore fans to casual, a larger share when it leaves the
+    anchor. Anchor resentment can replace this once it exists. The return home after a folded
+    flagship costs nothing.
   - *Every other league* stays on the simple model: fan buckets, one cash line, the League Health
     Ladder, promotion and bailouts.
 
@@ -458,7 +476,8 @@ market. All stored in content; every conversion curve and weight lives in config
     goodwill).
 - **Closed effect vocabulary (Phase 0):** temporary casual/hardcore conversion modifier in a
   country; spread channel boost; one-time fan shift between buckets; PP bonus; rival setback;
-  hardcore demotion (scandals); league health nudge. Content selects from this list and is
+  hardcore demotion (scandals); league health nudge; club strength (flagship season cards only,
+  added 2026-10-03). Content selects from this list and is
   validated at load. Effects are local and temporary by default; permanent effects are rare and
   clearly flagged.
 - **Volume per turn:** moment count scales with turn length and number of active markets, so
@@ -469,6 +488,53 @@ market. All stored in content; every conversion curve and weight lives in config
   auto-collect at end of turn. No lost rewards.
 - **Negative events** (scandals, star injuries, rival coups) occur throughout and grow more
   frequent at higher PP tiers, reinforcing growing pains and feeding late-game pressure.
+- **The flagship season as cards (decided 2026-10-03).** The flagship's results reach the
+  player through the event system, built only from the recorded season summary.
+  - *A champion moment every season.* It names the champion and runner-up and carries a PP
+    pickup scaled by the flagship's league tier (config). It always appears and never takes a
+    moment slot.
+  - *At most one story card per season,* chosen by priority from a short list of recorded
+    facts: a dynasty (the same club's third straight title or more), an underdog champion (among
+    the weakest-rated clubs when the season began), a club's first title, a close finish (a small
+    points gap, or a final decided by the narrowest margin) and a repeat final (the same two
+    clubs again). One story a season keeps dynasties rare and memorable.
+  - *Story cards are decisions with trade-offs,* e.g. a dynasty: celebrate it (more hardcore
+    fans at home, but casual fans tire of a foregone result) or level the field (costs PP, weakens
+    the champion, its fans resent it).
+  - *Some season facts are pressure cards (choose pain).* A runaway champion (a huge points gap)
+    or a fourth straight title drains casual fans in the flagship country unless the player pays
+    to answer it.
+  - *One new effect: club strength (`clubRating`).* It moves the champion's rating, or the rest
+    of the field's, by config steps. It is valid only on flagship season cards (validated at
+    load) and is the player's first lever on competitive balance.
+  - *Effects stay in the flagship country,* like every other card. How the flagship feeds global
+    spread is designed separately, not decided by a card.
+  - *Caps:* the story card counts against the per-turn decision cap but is offered first in the
+    turn it arrives.
+  - *Pressure lands when the card appears (choose pain).* The casual drain applies at once;
+    paying adds a fix (rating changes) but never cancels the drain.
+  - *Priority when several facts qualify:* pressure first, then the rarest story — foregone
+    league or runaway, dynasty, repeat final, underdog, first title, close finish. No randomness.
+  - *Cooldowns count in seasons, not turns,* because turn length changes with the PP tier. Close
+    finish and first title wait 2 seasons; the rarer facts need none.
+  - *American format:* runaway fires only when the playoff champion also topped the table by the
+    gap; a table leader beaten in the playoffs is no runaway story.
+  - *Starting card list (every number is config and tuned by the runner; each decision also has
+    the free hold choice):*
+
+    | Card | Fact | Choices (PP) and effects in the flagship country |
+    |---|---|---|
+    | Champion (moment) | Every season end | PP by tier: Amateur 4, Semi-Pro 6, Professional 10, Elite 15 |
+    | Dynasty | A club's third straight title | Celebrate (0): hardcore ×1.25, casual ×0.85, 4 quarters. Level the field (10): champion −2 rating steps, 1% hardcore demote |
+    | Underdog | Champion in the bottom third by rating at season start | Ride the story (6): casual ×1.3, 4 quarters. Build on it (0): champion +1 step |
+    | First title | A club's first title | New fans (5): casual ×1.25, 4 quarters. Old guard (0): hardcore ×1.15, 4 quarters |
+    | Close finish | Gap of one win or less, or a final won by the narrowest margin | Market it (8): media spread ×1.4, 8 quarters. Bank the gate (0): +8 PP, casual ×0.9, 4 quarters |
+    | Repeat final | The same two clubs in the final (or first and second) two seasons running | Stoke it (0): hardcore ×1.2, league health −1 step. Cool it (6): no effect. Seeds the derby tradition later |
+    | Runaway (pressure) | Champion tops the table by a large gap | On arrival: casual ×0.8, 4 quarters. Revenue sharing (12): the rest of the field +1 step |
+    | Foregone league (pressure) | A fourth straight title or more (replaces dynasty) | On arrival: casual ×0.8, 4 quarters. Draft lottery (12): champion −2 steps, the field +1 |
+
+  - *Bots* answer every season card by their own weights, and the win contest is remeasured once
+    the cards are built.
 
 **PP Growth Tree:**
 - **Structure:** a small branching tree per category (~8–12 nodes each) with prerequisites inside

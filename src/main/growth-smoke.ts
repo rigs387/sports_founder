@@ -27,7 +27,7 @@ export async function verifyGrowth(
   const assert = async (condition: string, message: string) => {
     if (!(await evaluate<boolean>(condition))) throw new Error(message);
   };
-  await click(".game-nav button:last-child");
+  await click(".game-nav [data-view=growth]");
   await delay();
   await assert(
     'document.querySelectorAll("[data-testid=growth-picker] option").length === 20',
@@ -105,7 +105,7 @@ export async function verifyGrowth(
   await screenshot("16-growth-narrow-detail.png");
   win.setContentSize(1280, 800);
   await delay();
-  await click(".game-nav button:first-child");
+  await click(".game-nav [data-view=world]");
   await delay();
   return {
     nodes: 20,

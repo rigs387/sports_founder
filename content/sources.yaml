@@ -31,6 +31,10 @@ datasets:
     title: "GeoNames countryInfo.txt - land borders between countries and territories"
     url: https://download.geonames.org/export/dump/countryInfo.txt
     retrieved: 2026-09-15
+  geonames-places:
+    title: "GeoNames populated places (cities1000) and countryInfo - the real towns and cities flagship clubs are based in (content/places.yaml, built by scripts/build-places.ts)"
+    url: https://download.geonames.org/export/dump/cities1000.zip
+    retrieved: 2026-10-02
   koppen:
     title: "Koppen-Geiger climate classification, main group at the country's population centre"
   hand-listed:

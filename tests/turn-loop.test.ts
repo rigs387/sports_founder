@@ -8,7 +8,7 @@ import {
   runTurns,
   stepQuarter,
 } from "../src/sim";
-import { presetGenome, setupFor, withConfig, world } from "./helpers";
+import { presetGenome, setupFor, sweepAnchors, withConfig, world } from "./helpers";
 
 const setup = setupFor(11);
 const UNREACHABLE = Number.MAX_SAFE_INTEGER;
@@ -104,7 +104,7 @@ describe("turn = N quarters, with N set by PP tier", () => {
 });
 
 describe("state stays valid", () => {
-  it.each(world.countries.map((country) => country.id))(
+  it.each(sweepAnchors)(
     "anchor %s: every turn of 120 across two seeds and two genomes keeps state valid",
     (anchor) => {
       for (const seed of [1, 2]) {

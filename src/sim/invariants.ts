@@ -1,6 +1,7 @@
 import { genomeSchema, IDENTITY_AXES } from "../content";
 import { QUARTERS_PER_YEAR } from "./calendar";
 import { eventProblems } from "./events";
+import { flagshipProblems } from "./flagship";
 import { forkOf } from "./growth";
 import {
   ESCALATION_LEVELS,
@@ -18,7 +19,7 @@ export function checkInvariants(state: GameState, world: World): string[] {
 }
 
 export function invariantsOf(state: GameState, world: World): string[] {
-  const problems: string[] = eventProblems(state, world);
+  const problems: string[] = [...eventProblems(state, world), ...flagshipProblems(state, world)];
 
   if (!Number.isInteger(state.turn) || state.turn < 1)
     problems.push(`turn ${state.turn} is invalid`);

@@ -156,6 +156,100 @@ export interface WinTrack {
   won: { turn: number; quarter: number } | null;
 }
 
+/** How the flagship crowns its champion, chosen at creation (GDD v1.14). */
+export type SeasonFormat = "european" | "american";
+export const SEASON_FORMATS: readonly SeasonFormat[] = ["european", "american"];
+
+/** A flagship club. Clubs are never deleted, so history can always name them. */
+export interface Club {
+  /** Unique within the campaign. */
+  id: number;
+  /** The country whose flagship league the club plays in. */
+  countryId: string;
+  place: string;
+  nickname: string;
+  rating: number;
+  /** Whether the club plays in its country's flagship league now. */
+  active: boolean;
+  /** The season the club first played. */
+  firstSeason: number;
+}
+
+/** One club's line in a season table. */
+export interface TableRow {
+  clubId: number;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  scoreFor: number;
+  scoreAgainst: number;
+  points: number;
+}
+
+export interface MatchResult {
+  homeId: number;
+  awayId: number;
+  homeScore: number;
+  awayScore: number;
+  /** A drawn playoff settled by deciders: the club that went through. */
+  decidedFor: number | null;
+}
+
+/** A club's rating at a moment in time. */
+export interface ClubRating {
+  clubId: number;
+  rating: number;
+}
+
+/** A finished flagship season (GDD History & Records: per-league season summaries). */
+export interface SeasonSummary {
+  season: number;
+  /** The quarter the season ended. */
+  quarter: number;
+  countryId: string;
+  format: SeasonFormat;
+  championId: number;
+  runnerUpId: number;
+  /** Final regular-season table, best first. */
+  standings: TableRow[];
+  /** American format: every playoff match in order, the final last. Empty for European. */
+  playoffs: MatchResult[];
+  /**
+   * Every club's rating when the season began, by club id (underdog stories, GDD v1.15). Empty
+   * for seasons that ended before save format 9.
+   */
+  startRatings: ClubRating[];
+}
+
+/**
+ * The flagship league the player runs as commissioner (GDD v1.11, v1.13, v1.14). Its matches roll
+ * on their own random stream (`rng`), so the world's sequence never depends on them.
+ */
+export interface FlagshipState {
+  /** The country holding the seat. Seasons pause while it has no league. */
+  countryId: string;
+  /** A seat move requested in the seasonal window; it happens when the season ends. */
+  pendingCountryId: string | null;
+  rng: number[];
+  /** The season being played (1 for the first). */
+  season: number;
+  /** Quarters this season lasts, and how many have been played. */
+  seasonQuarters: number;
+  quartersPlayed: number;
+  /** Rounds played this season. */
+  round: number;
+  clubs: Club[];
+  nextClubId: number;
+  /** The current season's table, in club order (not ranked). */
+  table: TableRow[];
+  /** The active clubs' ratings when the current season began, in club order. */
+  startRatings: ClubRating[];
+  /** The most recent round's results (disposable: replaced every round). */
+  lastRound: MatchResult[];
+  seasons: SeasonSummary[];
+}
+
 /** A permanent history fact (GDD History & Records). Plain data: no text. */
 export type Landmark =
   | { kind: "leagueFormed"; turn: number; quarter: number; countryId: string; reformed: boolean }
@@ -200,6 +294,24 @@ export type Landmark =
       sportId: string;
       move: TimedCountermoveKind;
       endQuarter: number;
+    }
+  /** A flagship season ended with this champion (GDD v1.14). */
+  | {
+      kind: "seasonChampion";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      clubId: number;
+    }
+  /** The commissioner's seat moved: by the player, or home after a flagship folded. */
+  | {
+      kind: "seatMoved";
+      turn: number;
+      quarter: number;
+      from: string;
+      countryId: string;
+      reason: "moved" | "returned";
     }
   | {
       kind: "rivalRuleCopied";
@@ -260,12 +372,16 @@ export interface GameState {
   landmarks: Landmark[];
   yearly: YearlySnapshot[];
   events: EventState;
+  seasonFormat: SeasonFormat;
+  flagship: FlagshipState;
 }
 
 export interface CampaignSetup {
   seed: number;
   anchorCountryId: string;
   genome: Genome;
+  /** Defaults to European. */
+  seasonFormat?: SeasonFormat;
 }
 
 /** Index of the player's sport in GameState.sports and CountryState.fans. */

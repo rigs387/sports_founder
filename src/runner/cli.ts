@@ -4,7 +4,8 @@ import { performance } from "node:perf_hooks";
 import { parseArgs } from "node:util";
 import { ContentValidationError } from "../content";
 import { anchorGenomeHints, MAX_SEED, type World } from "../sim";
-import { type PlayedCampaign, playCampaign } from "./campaign";
+import { RunBudget } from "./budget";
+import { onCampaignPlayed, type PlayedCampaign, playCampaign } from "./campaign";
 import { DEFAULT_CONTENT_DIR, loadWorldFromDisk } from "./content-from-disk";
 import { type DifferentiationReport, RANKINGS, runDifferentiation } from "./experiment";
 import {
@@ -33,6 +34,8 @@ import {
   type CountryRow,
   campaignsCsv,
   countriesCsv,
+  eventAggregate,
+  flagshipAggregate,
   growthAggregate,
   median,
   nodeOutcomesCsv,
@@ -52,17 +55,25 @@ const EXPERIMENTS = [
 ] as const;
 type ExperimentId = (typeof EXPERIMENTS)[number];
 
+/** Bots for hard-anchor and rivals unless --bots says otherwise. */
+const EXPERIMENT_BOTS = ["builder", "greedy-spread", "anchor-turtle"];
+
 const HELP = `Headless runner: plays seeded campaigns with no UI and writes a summary.
 
+Every run states its plan (campaign count) first, prints progress every 15 s, and stops after the
+first campaign if it is projected to run past --max-minutes. Keep runs small enough to watch.
+
 Usage: npm run sim -- [options]
-  --campaigns <n>    campaigns (plain run) or seeds per cell (experiments) (default 20)
+  --campaigns <n>    campaigns (plain run) or seeds per cell (experiments) (default 5; more
+                     anchors beat more seeds for the same time)
+  --max-minutes <n>  time budget; a run projected to take longer stops early (default 5)
   --turns <n>        maximum turns per campaign; a campaign stops early if it ends (default 100)
   --seed <n>         first seed; campaign i uses seed + i (default 1)
   --anchor <id>      anchor country (default: first country in content)
   --genome <spec>    preset id, "random" (a seeded random genome per campaign), or
                      [preset:]axis=option,... overrides (default: the first preset)
   --bot <id>         bot for plain runs, differentiation, pacing, options and benchmark:
-                     ${BOT_IDS.join(", ")} (default greedy-spread)
+                     ${BOT_IDS.join(", ")} (default builder)
   --experiment <list>
                      comma-separated, or "all":
                        differentiation  preset pairs on the same seeds and anchor must share fewer
@@ -83,14 +94,13 @@ Usage: npm run sim -- [options]
                                         any country or worldwide, for every anchor × bot (random
                                         genomes); reports the lowest rival share seen and where
                        benchmark        a 120-year campaign: time, save size, load time
-  --anchors <ids>    anchors for collapse, rivals and pacing, or "all" for every market. Defaults:
+  --anchors <ids>    anchors for collapse, rivals, pacing and options. Defaults:
                      collapse and rivals, a sample of balanceTargets.experimentAnchors markets
                      spread across the population range; pacing, the same sample drawn from
                      typical-size markets (balanceTargets.pacingAnchorPopulationQuantiles);
                      options, the median-population country of each climate
-  --bots <ids>       bots for collapse (default: greedy-spread,anchor-turtle,media-rush,random),
-                     and for hard-anchor and rivals (default:
-                     greedy-spread,builder,anchor-turtle,media-rush,random)
+  --bots <ids>       bots for collapse (default: anchor-turtle,random, plus the naive bot), and
+                     for hard-anchor and rivals (default: ${EXPERIMENT_BOTS.join(",")})
   --hard-anchor <id> anchor for hard-anchor (default: config balanceTargets.hardAnchor)
   --presets <ids>    presets for differentiation (default: all)
   --content <dir>    content directory (default: ./content)
@@ -298,6 +308,23 @@ function printGrowth(growth: ReturnType<typeof growthAggregate>, campaigns: numb
   );
 }
 
+function printEvents(events: ReturnType<typeof eventAggregate>): void {
+  const byCard: Record<string, string[]> = {};
+  for (const [key, n] of Object.entries(events.answers)) {
+    const [card, choice] = key.split("/");
+    const list = byCard[card ?? ""] ?? [];
+    list.push(`${choice} ${n}`);
+    byCard[card ?? ""] = list;
+  }
+  console.log(
+    `  Event decisions: PP spent on choices median ${fmt(events.ppSpentOnEvents.median)}, max ${fmt(events.ppSpentOnEvents.max)}; ${Object.entries(
+      byCard,
+    )
+      .map(([card, choices]) => `${card} ${choices.join(" / ")}`)
+      .join("; ")}`,
+  );
+}
+
 const lowPoint = (low: RivalLowPoint | null, asShare: boolean) =>
   low === null
     ? "-"
@@ -384,7 +411,8 @@ function printBenchmark(report: BenchmarkReport): void {
 function main(): number {
   const { values } = parseArgs({
     options: {
-      campaigns: { type: "string", default: "20" },
+      campaigns: { type: "string", default: "5" },
+      "max-minutes": { type: "string", default: "5" },
       turns: { type: "string", default: "100" },
       seed: { type: "string", default: "1" },
       anchor: { type: "string" },
@@ -407,6 +435,7 @@ function main(): number {
 
   const campaigns = wholeNumber(values.campaigns, "campaigns", 1, 100_000);
   const turns = wholeNumber(values.turns, "turns", 1, 100_000);
+  const maxMinutes = wholeNumber(values["max-minutes"], "max-minutes", 1, 10_000);
   const firstSeed = wholeNumber(values.seed, "seed", 0, MAX_SEED - campaigns + 1);
   const world = loadWorldFromDisk(resolve(values.content));
   const anchor = checkAnchors(world, [values.anchor ?? world.countries[0]?.id ?? ""])[0] ?? "";
@@ -429,20 +458,14 @@ function main(): number {
       `content/config.yaml balanceTargets.naiveBot "${naiveBotId}" is not a bot (${BOT_IDS.join(", ")})`,
     );
   }
-  const bots = checkBots(
-    listOf(values.bots) ?? ["greedy-spread", "anchor-turtle", "media-rush", "random"],
-  );
+  const bots = checkBots(listOf(values.bots) ?? ["anchor-turtle", "random"]);
   const configuredHardAnchor = world.config.balanceTargets.hardAnchor;
   const hardAnchor =
     checkAnchors(world, [values["hard-anchor"] ?? configuredHardAnchor])[0] ?? configuredHardAnchor;
   const listedAnchors = listOf(values.anchors);
-  // "--anchors all" plays every market; otherwise the listed anchors, else the experiment default.
-  const anchorsOr = (fallback: string[]): string[] =>
-    listedAnchors === undefined
-      ? fallback
-      : listedAnchors.length === 1 && listedAnchors[0] === "all"
-        ? world.countries.map((c) => c.id)
-        : listedAnchors;
+  // The listed anchors, else the experiment's small default sample. There is deliberately no way to
+  // play every market: that is hours of simulation for a result nobody waits for.
+  const anchorsOr = (fallback: string[]): string[] => listedAnchors ?? fallback;
 
   const outDir = resolve(values.out);
   mkdirSync(outDir, { recursive: true });
@@ -465,82 +488,103 @@ function main(): number {
   const joinCsv = (parts: string[]) =>
     parts.map((csv, i) => (i === 0 ? csv : csv.slice(csv.indexOf("\n") + 1))).join("");
 
+  // Every job states its campaign count up front, so the run can announce its plan and stop early
+  // when it would run over its time budget (budget.ts).
+  const jobs: { id: string; campaigns: number; run: () => void }[] = [];
   if (experiments.length === 0) {
     const choice = parseGenomeArg(values.genome, world);
-    for (const seed of seeds) {
-      const genome = choice.kind === "random" ? randomGenome(seed) : choice.genome;
-      collect(true)(
-        playCampaign(world, {
-          seed,
-          anchorCountryId: anchor,
-          genome,
-          genomeLabel:
-            choice.kind === "random"
-              ? `random:${formatGenome(genome)}`
-              : (values.genome ?? world.genome.presets[0]?.id ?? "default"),
-          bot,
-          turns,
-        }),
-      );
-    }
+    jobs.push({
+      id: "plain",
+      campaigns: seeds.length,
+      run: () => {
+        for (const seed of seeds) {
+          const genome = choice.kind === "random" ? randomGenome(seed) : choice.genome;
+          collect(true)(
+            playCampaign(world, {
+              seed,
+              anchorCountryId: anchor,
+              genome,
+              genomeLabel:
+                choice.kind === "random"
+                  ? `random:${formatGenome(genome)}`
+                  : (values.genome ?? world.genome.presets[0]?.id ?? "default"),
+              bot,
+              turns,
+            }),
+          );
+        }
+      },
+    });
   }
 
   for (const experiment of experiments) {
     switch (experiment) {
       case "differentiation": {
-        const report = runDifferentiation(
-          world,
-          {
-            anchorCountryId: anchor,
-            seeds,
-            turns,
-            bot,
-            presets: listOf(values.presets) ?? world.genome.presets.map((p) => p.id),
+        const presets = listOf(values.presets) ?? world.genome.presets.map((p) => p.id);
+        jobs.push({
+          id: experiment,
+          campaigns: presets.length * seeds.length,
+          run: () => {
+            const report = runDifferentiation(
+              world,
+              { anchorCountryId: anchor, seeds, turns, bot, presets },
+              collect(true),
+            );
+            writeReport("differentiation", report);
+            printDifferentiation(report);
           },
-          collect(true),
-        );
-        writeReport("differentiation", report);
-        printDifferentiation(report);
+        });
         break;
       }
       case "collapse": {
         const anchors = checkAnchors(world, anchorsOr(sampledAnchors(world)));
         const naiveCount = Math.max(campaigns, world.config.balanceTargets.naiveBotCollapseSeeds);
         const naiveSeeds = Array.from({ length: naiveCount }, (_, i) => firstSeed + i);
-        const report = runCollapse(
-          world,
-          { anchors, bots, naiveBot: naiveBotId, seeds, naiveSeeds, turns },
-          collect(false),
-        );
-        writeReport("collapse", report);
-        printCollapse(report);
+        const otherBots = bots.filter((b) => b !== naiveBotId).length;
+        jobs.push({
+          id: experiment,
+          campaigns: anchors.length * (naiveSeeds.length + otherBots * seeds.length),
+          run: () => {
+            const report = runCollapse(
+              world,
+              { anchors, bots, naiveBot: naiveBotId, seeds, naiveSeeds, turns },
+              collect(false),
+            );
+            writeReport("collapse", report);
+            printCollapse(report);
+          },
+        });
         break;
       }
       case "hard-anchor": {
         // "The best bot wins from the hard anchor", so the competent builder bot plays too.
-        const hardAnchorBots = checkBots(
-          listOf(values.bots) ?? [
-            "greedy-spread",
-            "builder",
-            "anchor-turtle",
-            "media-rush",
-            "random",
-          ],
-        );
-        const report = runHardAnchor(
-          world,
-          { anchor: hardAnchor, bots: hardAnchorBots, seeds, turns },
-          collect(false),
-        );
-        writeReport("hard-anchor", report);
-        printHardAnchor(report);
+        const hardAnchorBots = checkBots(listOf(values.bots) ?? EXPERIMENT_BOTS);
+        jobs.push({
+          id: experiment,
+          campaigns: hardAnchorBots.length * seeds.length,
+          run: () => {
+            const report = runHardAnchor(
+              world,
+              { anchor: hardAnchor, bots: hardAnchorBots, seeds, turns },
+              collect(false),
+            );
+            writeReport("hard-anchor", report);
+            printHardAnchor(report);
+          },
+        });
         break;
       }
       case "pacing": {
         const anchors = checkAnchors(world, anchorsOr(typicalAnchors(world)));
-        const report = runPacing(world, { anchors, bot, seeds, turns }, collect(false));
-        writeReport("pacing", report);
-        printPacing(report);
+        jobs.push({
+          id: experiment,
+          campaigns: anchors.length * seeds.length,
+          run: () => {
+            const report = runPacing(world, { anchors, bot, seeds, turns }, collect(false));
+            writeReport("pacing", report);
+            printPacing(report);
+          },
+        });
         break;
       }
       case "options": {
@@ -551,69 +595,94 @@ function main(): number {
         );
         const optionSeeds = Array.from({ length: genomesPerAnchor }, (_, i) => firstSeed + i);
         const { nodeDominanceBots, nodeDominanceGenomesPerBot } = world.config.balanceTargets;
+        const nodeBots = checkBots(nodeDominanceBots);
         const nodeSeeds = Array.from(
           { length: Math.min(nodeDominanceGenomesPerBot, optionSeeds.length) },
           (_, i) => firstSeed + i,
         );
-        const report = runOptions(
-          world,
-          {
-            anchors,
-            bot,
-            seeds: optionSeeds,
-            turns,
-            nodeBots: checkBots(nodeDominanceBots),
-            nodeSeeds,
+        const extraBots = nodeBots.filter((b) => b !== bot).length;
+        jobs.push({
+          id: experiment,
+          campaigns: anchors.length * (optionSeeds.length + extraBots * nodeSeeds.length),
+          run: () => {
+            const report = runOptions(
+              world,
+              { anchors, bot, seeds: optionSeeds, turns, nodeBots, nodeSeeds },
+              collect(false),
+            );
+            writeReport("options", report);
+            optionsCsv = report.byAnchor
+              .map((entry, i) => {
+                const csv = optionOutcomesCsv(entry.anchor, entry.outcomes);
+                return i === 0 ? csv : csv.slice(csv.indexOf("\n") + 1);
+              })
+              .join("");
+            nodesCsv = joinCsv(
+              report.nodes.byAnchor.map((entry) => nodeOutcomesCsv(entry.anchor, entry.outcomes)),
+            );
+            printOptions(report);
           },
-          collect(false),
-        );
-        writeReport("options", report);
-        optionsCsv = report.byAnchor
-          .map((entry, i) => {
-            const csv = optionOutcomesCsv(entry.anchor, entry.outcomes);
-            return i === 0 ? csv : csv.slice(csv.indexOf("\n") + 1);
-          })
-          .join("");
-        nodesCsv = joinCsv(
-          report.nodes.byAnchor.map((entry) => nodeOutcomesCsv(entry.anchor, entry.outcomes)),
-        );
-        printOptions(report);
+        });
         break;
       }
       case "rivals": {
         const anchors = checkAnchors(world, anchorsOr(sampledAnchors(world)));
-        const rivalBots = checkBots(
-          listOf(values.bots) ?? [
-            "greedy-spread",
-            "builder",
-            "anchor-turtle",
-            "media-rush",
-            "random",
-          ],
-        );
-        const report = runRivalsPersist(
-          world,
-          { anchors, bots: rivalBots, seeds, turns },
-          collect(false),
-        );
-        writeReport("rivals", report);
-        printRivalsPersist(report);
+        const rivalBots = checkBots(listOf(values.bots) ?? EXPERIMENT_BOTS);
+        jobs.push({
+          id: experiment,
+          campaigns: anchors.length * rivalBots.length * seeds.length,
+          run: () => {
+            const report = runRivalsPersist(
+              world,
+              { anchors, bots: rivalBots, seeds, turns },
+              collect(false),
+            );
+            writeReport("rivals", report);
+            printRivalsPersist(report);
+          },
+        });
         break;
       }
       case "benchmark": {
-        const report = runBenchmark(world, { anchor, bot, firstSeed, years: 120, maxAttempts: 10 });
-        writeReport("benchmark", report);
-        printBenchmark(report);
+        // One 120-year campaign played directly (not counted against the plan; seconds long).
+        jobs.push({
+          id: experiment,
+          campaigns: 0,
+          run: () => {
+            const report = runBenchmark(world, {
+              anchor,
+              bot,
+              firstSeed,
+              years: 120,
+              maxAttempts: 10,
+            });
+            writeReport("benchmark", report);
+            printBenchmark(report);
+          },
+        });
         break;
       }
     }
   }
+
+  const budget = new RunBudget(
+    jobs.reduce((sum, job) => sum + job.campaigns, 0),
+    turns,
+    maxMinutes,
+  );
+  budget.start(jobs.map((job) => `${job.id} ${job.campaigns}`).join(", "));
+  onCampaignPlayed((played, ms) => budget.campaignPlayed(played, ms));
+  for (const job of jobs) job.run();
+  onCampaignPlayed(null);
+
   const elapsedMs = performance.now() - started;
 
   const { results, turnRows, countryRows } = collected;
   const tierCount = world.config.ppTiers.length;
   const agg = aggregate(results, tierCount);
   const growth = growthAggregate(results, world.growthTree);
+  const events = eventAggregate(results);
+  const flagship = flagshipAggregate(results);
   const summary = {
     settings: {
       campaigns,
@@ -629,6 +698,8 @@ function main(): number {
     anchorGenomeHints: anchorGenomeHints(world, anchor),
     aggregate: agg,
     growth,
+    events,
+    flagship,
     experimentReports: written,
     campaigns: experiments.length === 0 ? results : undefined,
   };
@@ -661,6 +732,10 @@ function main(): number {
     console.log(`  Rival activity and player hardcore across all ${results.length} campaign(s):`);
     printRivalActivity(agg);
     printGrowth(growth, results.length);
+    printEvents(events);
+    console.log(
+      `  Flagship: seasons median ${fmt(flagship.seasons.median)}; different champions median ${fmt(flagship.distinctChampions.median)}; the most successful club's share of titles median ${pct(flagship.mostTitlesShare.median ?? 0)}, max ${pct(flagship.mostTitlesShare.max ?? 0)}`,
+    );
   }
   console.log(`  invalid campaigns: ${agg.campaignsWithInvariantViolations}`);
 

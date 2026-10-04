@@ -53,7 +53,11 @@
       "hardcoreDemotion": "{{share, number(style: percent; maximumFractionDigits: 1)}} of local hardcore fans become casual, rounded down.",
       "rivalSetback": "{{share, number(style: percent; maximumFractionDigits: 1)}} of the named rival's local hardcore fans become casual. They do not become your fans.",
       "healthUp": "Improve league health by one rung, up to Healthy. No cash added; health is evaluated again next turn.",
-      "healthDown": "Lower league health by one rung, down to Near-Collapse. Health is evaluated again next turn."
+      "healthDown": "Lower league health by one rung, down to Near-Collapse. Health is evaluated again next turn.",
+      "clubRating_champion_one": "Champions {{count, number(signDisplay: always)}} rating step (hidden club strength).",
+      "clubRating_champion_other": "Champions {{count, number(signDisplay: always)}} rating steps (hidden club strength).",
+      "clubRating_field_one": "Every other club {{count, number(signDisplay: always)}} rating step (hidden club strength).",
+      "clubRating_field_other": "Every other club {{count, number(signDisplay: always)}} rating steps (hidden club strength)."
     },
     "blockers": {
       "missing": "This story has already been resolved.",
@@ -61,7 +65,8 @@
       "prestige": "Not enough Prestige for this choice.",
       "league": "There is no longer a league here.",
       "rival": "The named rival is no longer available.",
-      "ended": "This campaign has ended."
+      "ended": "This campaign has ended.",
+      "flagship": "The champions no longer play in your flagship league."
     },
     "cards": {
       "open-doors": {
@@ -120,8 +125,81 @@
           "build": "Build our own base",
           "hold": "Keep our current course"
         }
+      },
+      "season-champion": {
+        "title": "Champions of {{country}}",
+        "body_european": "{{champion}} won season {{season}} of the {{country}} league, with {{runnerUp}} runners-up. Another name on the trophy, another chapter in the league's story.",
+        "body_american": "{{champion}} beat {{runnerUp}} in the final to win season {{season}} of the {{country}} league. Another name on the trophy, another chapter in the league's story."
+      },
+      "season-foregone": {
+        "title": "A foregone league",
+        "body": "{{champion}} have now won {{streak}} titles in a row in {{country}}. Casual fans are already drifting away from a result they can predict. A draft lottery would weaken the champions and lift the rest of the field.",
+        "choices": {
+          "draft-lottery": "Run a draft lottery",
+          "hold": "Let the champions rule"
+        }
+      },
+      "season-runaway": {
+        "title": "Runaway champions",
+        "body_one": "{{champion}} won season {{season}} in {{country}} {{count, number}} point clear of {{runnerUp}}. Casual fans tuned out long before the end. Sharing revenue would strengthen the rest of the field.",
+        "body_other": "{{champion}} won season {{season}} in {{country}} {{count, number}} points clear of {{runnerUp}}. Casual fans tuned out long before the end. Sharing revenue would strengthen the rest of the field.",
+        "choices": {
+          "revenue-sharing": "Share the revenue",
+          "hold": "Leave the money where it is"
+        }
+      },
+      "season-dynasty": {
+        "title": "A dynasty",
+        "body": "{{champion}} have won {{streak}} titles in a row in {{country}}. Celebrate them and the faithful grow, though casual fans tire of a result they can call in advance. Level the field and the champions' supporters will resent it.",
+        "choices": {
+          "celebrate": "Celebrate the dynasty",
+          "level-the-field": "Level the field",
+          "hold": "Let it play out"
+        }
+      },
+      "season-repeat-final": {
+        "title": "The same two again",
+        "body_european": "For the second season running, {{champion}} and {{runnerUp}} finished first and second in {{country}}, with {{champion}} on top this time. A rivalry is forming. Stoke it and the hardcore will love it, though the league's finances may suffer.",
+        "body_american": "For the second season running, {{champion}} and {{runnerUp}} met in the final in {{country}}, and {{champion}} won it this time. A rivalry is forming. Stoke it and the hardcore will love it, though the league's finances may suffer.",
+        "choices": {
+          "stoke-it": "Stoke the rivalry",
+          "cool-it": "Cool it down",
+          "hold": "Say nothing"
+        }
+      },
+      "season-underdog": {
+        "title": "Against the odds",
+        "body": "{{champion}} began season {{season}} among the weakest clubs in {{country}} and finished as champions, ahead of {{runnerUp}}. Ride the story to win new fans, or invest in the club so it can stay competitive.",
+        "choices": {
+          "ride-the-story": "Ride the story",
+          "build-on-it": "Build on it",
+          "hold": "Enjoy the moment"
+        }
+      },
+      "season-first-title": {
+        "title": "A first title",
+        "body": "{{champion}} won the first title in their history in season {{season}} in {{country}}, ahead of {{runnerUp}}. Use the moment to reach new people, or reward the supporters who were there before it.",
+        "choices": {
+          "new-fans": "Court new fans",
+          "old-guard": "Reward the old guard",
+          "hold": "Let them celebrate"
+        }
+      },
+      "season-close-finish": {
+        "title": "Down to the wire",
+        "body_european_zero": "{{champion}} and {{runnerUp}} finished level on points at the top in {{country}}, and {{champion}} took season {{season}} on score difference. Market the finish, or take the gate money while the grounds are full.",
+        "body_european_one": "Only {{count, number}} point separated {{champion}} from {{runnerUp}} at the end of season {{season}} in {{country}}. Market the finish, or take the gate money while the grounds are full.",
+        "body_european_other": "Only {{count, number}} points separated {{champion}} from {{runnerUp}} at the end of season {{season}} in {{country}}. Market the finish, or take the gate money while the grounds are full.",
+        "body_american": "{{champion}} beat {{runnerUp}} in the final of season {{season}} in {{country}} by the narrowest of margins. Market the finish, or take the gate money while the grounds are full.",
+        "body_deciders": "The final of season {{season}} in {{country}} finished level and went to deciders, and {{champion}} came through against {{runnerUp}}. Market the finish, or take the gate money while the grounds are full.",
+        "choices": {
+          "market-it": "Market the finish",
+          "bank-the-gate": "Bank the gate",
+          "hold": "Move on"
+        }
       }
-    }
+    },
+    "arrived": "Already landed, whatever you choose:"
   },
   "saves": {
     "menu": "Campaign",
@@ -209,7 +287,13 @@
     "loading": "Preparing your sporting world…",
     "loadError": "Could not load campaign options. Please try again.",
     "startError": "The campaign could not start. Your choices are still here; check them and try again.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "formatTitle": "Season format",
+    "formatHelp": "How your flagship crowns its champion. It never changes where the sport catches on.",
+    "formats": {
+      "european": "European: the top of the table wins",
+      "american": "American: the top clubs play off"
+    }
   },
   "status": {
     "loading": "Setting up the backyard…",
@@ -604,7 +688,8 @@
       "dropFocusSlot": "Gave up focus slot {{slot}}.",
       "promoteLeague": "Promoted the league in {{country}}.",
       "stepDownLeague": "Restructured the league in {{country}}.",
-      "bailoutLeague": "Funded a bailout in {{country}}."
+      "bailoutLeague": "Funded a bailout in {{country}}.",
+      "moveSeat": "After this season the seat will be in {{country}}."
     }
   },
   "map": {
@@ -616,6 +701,7 @@
       "world": "World",
       "sport": "Your sport",
       "leagues": "Leagues",
+      "flagship": "Flagship",
       "growth": "Growth"
     },
     "prestige": "Prestige",
@@ -688,5 +774,68 @@
       "south-america": "South America",
       "oceania": "Oceania"
     }
+  },
+  "flagship": {
+    "eyebrow": "The commissioner's seat",
+    "title": "The {{country}} league",
+    "status": "Season {{season}} · Round {{round}} of {{total}}",
+    "seasonEnds_one": "The season ends this quarter.",
+    "seasonEnds_other": "The season ends in {{count}} quarters.",
+    "formats": {
+      "european": "European format: the top of the table is champion.",
+      "american": "American format: the top {{count}} clubs play off for the title."
+    },
+    "paused": "{{country}} has no league right now. The season is on hold until one forms.",
+    "club": "{{place}} {{nickname}}",
+    "titles_one": "{{count}} title",
+    "titles_other": "{{count}} titles",
+    "table": {
+      "heading": "Table",
+      "position": "Position",
+      "club": "Club",
+      "played": "P",
+      "won": "W",
+      "drawn": "D",
+      "lost": "L",
+      "scoreFor": "For",
+      "scoreAgainst": "Against",
+      "points": "Pts",
+      "playedFull": "Played",
+      "wonFull": "Won",
+      "drawnFull": "Drawn",
+      "lostFull": "Lost",
+      "pointsFull": "Points",
+      "playoffLine": "Playoff places"
+    },
+    "lastRound": {
+      "heading": "Latest results",
+      "none": "No matches yet this season.",
+      "score": "{{home}}–{{away}}",
+      "decided": "{{club}} won the decider."
+    },
+    "champions": {
+      "heading": "Champions",
+      "none": "The first champion is crowned at the end of this season.",
+      "season": "Season {{season}} · {{year}}",
+      "runnerUp": "Runner-up: {{club}}",
+      "final": "Final: {{home}} {{homeScore}}–{{awayScore}} {{away}}",
+      "abroad": "Played in {{country}}"
+    },
+    "seat": {
+      "heading": "The seat",
+      "here": "You run the league in {{country}}. Every other league runs itself.",
+      "pending": "The seat moves to {{country}} when this season ends.",
+      "cancel": "Stay in {{country}}",
+      "choose": "Move the seat to",
+      "placeholder": "Choose a league",
+      "none": "No other league is Professional or Elite yet. The seat can move only to one that is.",
+      "closed": "The seat can move only in the seasonal window.",
+      "review": "Review the move",
+      "confirm": "Move the seat",
+      "back": "Keep it here",
+      "cost": "Moving away turns {{share}} of hardcore fans in {{country}} casual. The move happens when this season ends.",
+      "target": "{{country}} · {{tier}}"
+    },
+    "footer": "Your league. Seasons end in the seasonal window."
   }
 }

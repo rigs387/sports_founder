@@ -445,3 +445,36 @@ describe("growth tree content validation", () => {
     expect(loadError(dir).message).toContain("growth-tree.yaml");
   });
 });
+
+describe("flagship content validation", () => {
+  it("every market needs a real place for its clubs", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "places.yaml", ["places", firstAnchor], remove);
+    expect(loadError(dir).message).toContain(`places.yaml at places.${firstAnchor}`);
+  });
+
+  it("places name real markets only", () => {
+    const dir = copyOfContent();
+    editYaml(
+      dir,
+      "places.yaml",
+      ["places", "atlantis"],
+      setValue([{ name: "Poseidonia", population: 1 }]),
+    );
+    expect(loadError(dir).message).toContain("places.atlantis: unknown country id");
+  });
+
+  it("needs a distinct nickname for every club in the largest flagship", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "names.yaml", ["clubNicknames"], setValue(["Comets", "Comets", "Rovers"]));
+    const message = loadError(dir).message;
+    expect(message).toContain("clubNicknames: has duplicate entries");
+    expect(message).toContain("clubNicknames: needs at least 20 distinct entries");
+  });
+
+  it("club counts may not shrink as the league climbs", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "config.yaml", ["flagship", "clubs", "elite"], setValue(6));
+    expect(loadError(dir).message).toContain("flagship.clubs: club counts must not shrink");
+  });
+});

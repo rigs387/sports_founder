@@ -21,6 +21,8 @@ function Effect({ effect }: { effect: EventEffect }) {
   if (effect.type === "pp") return <li>{t("events.effects.pp", { amount: effect.amount })}</li>;
   if (effect.type === "leagueHealth")
     return <li>{t(effect.steps > 0 ? "events.effects.healthUp" : "events.effects.healthDown")}</li>;
+  if (effect.type === "clubRating")
+    return <li>{t(`events.effects.clubRating_${effect.target}`, { count: effect.steps })}</li>;
   return (
     <li className={effect.type === "hardcoreDemotion" ? "event-tradeoff" : undefined}>
       {t(`events.effects.${effect.type === "fanShift" ? effect.target : effect.type}`, {
@@ -55,7 +57,33 @@ export function EventBoard() {
   const current = pending.find((e) => e.id === selectedId);
   const choice = current?.choices.find((c) => c.id === review);
   const country = (id: string) => names?.countries[id] ?? id;
-  const title = (event: EventRecord) => t(`events.cards.${event.templateId}.title`);
+  const club = (id: number | undefined) => {
+    const found = snapshot.flagship.clubs.find((c) => c.id === id);
+    return found ? t("flagship.club", { place: found.place, nickname: found.nickname }) : "";
+  };
+  // Season cards (GDD v1.15) name the real clubs from the record; their text varies by format.
+  const seasonText = (event: EventRecord) => {
+    const season = event.facts.season;
+    if (!season) return {};
+    return {
+      champion: club(season.championId),
+      runnerUp: club(season.runnerUpId),
+      season: season.season,
+      streak: season.streak,
+      count: season.pointsGap,
+      context:
+        season.finalMargin === null
+          ? "european"
+          : season.finalMargin === 0
+            ? "deciders"
+            : "american",
+    };
+  };
+  const title = (event: EventRecord) =>
+    t(`events.cards.${event.templateId}.title`, {
+      country: country(event.countryId),
+      ...seasonText(event),
+    });
   const chooseRecord = (event: EventRecord) => {
     setSelectedId(event.id);
     setReview(null);
@@ -214,6 +242,7 @@ export function EventBoard() {
                       tier: selected.facts.leagueTier
                         ? t(`league.tiers.${selected.facts.leagueTier}`)
                         : "",
+                      ...seasonText(selected),
                     })}
                   </p>
                   <div className="event-facts">
@@ -267,6 +296,16 @@ export function EventBoard() {
                 )}
                 {current?.kind === "decision" && (
                   <>
+                    {current.arrivalEffects.length > 0 && (
+                      <div className="event-receipt event-arrived" data-testid="event-arrived">
+                        <strong>{t("events.arrived")}</strong>
+                        <ul>
+                          {current.arrivalEffects.map((effect) => (
+                            <Effect effect={effect} key={JSON.stringify(effect)} />
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     <div className="event-choices">
                       {current.choices.map((option) => (
                         <article

@@ -1,5 +1,6 @@
-import { costMultiplier } from "./calendar";
+import { costMultiplier, seasonalWindowOpen } from "./calendar";
 import { eventBlocker, resolveEvent } from "./events";
+import { seatBlocker } from "./flagship";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
 import { leagueActionReason, leagueActions } from "./league-actions";
 import {
@@ -21,6 +22,9 @@ import { type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } from "./types"
 //   stepDownLeague  restructure a Near-Collapse league one tier down
 //   bailoutLeague   emergency PP → cash for a league in trouble, with a cooldown
 //   buyNode         buy a growth tree node (GDD PP Growth Tree); permanent, no refunds
+//   moveSeat        ask to move the commissioner's seat to a Professional or Elite league, in the
+//                   seasonal window; it moves when the season ends (GDD v1.13, v1.14). Asking for
+//                   the current seat's country cancels a pending move.
 
 export type Action =
   | { type: "collectMoment"; eventId: number }
@@ -30,7 +34,8 @@ export type Action =
   | { type: "dropFocusSlot"; slot: number }
   | { type: "promoteLeague"; countryId: string }
   | { type: "stepDownLeague"; countryId: string }
-  | { type: "bailoutLeague"; countryId: string };
+  | { type: "bailoutLeague"; countryId: string }
+  | { type: "moveSeat"; countryId: string };
 
 export class IllegalActionError extends Error {
   override name = "IllegalActionError";
@@ -130,6 +135,25 @@ export function checkAction(state: GameState, world: World, action: Action): str
     const cost = focusCost(state, world, action.countryId);
     if (state.pp < cost) return `not enough PP: costs ${money(cost)}, you have ${money(state.pp)}`;
     return null;
+  }
+
+  if (action.type === "moveSeat") {
+    if (countryIndexOf(world, action.countryId) < 0) return `unknown country "${action.countryId}"`;
+    if (action.countryId === state.flagship.countryId) {
+      return state.flagship.pendingCountryId !== null ? null : "the seat is already there";
+    }
+    switch (seatBlocker(state, world, action.countryId, seasonalWindowOpen(state, world.config))) {
+      case "window":
+        return "the seat can only move in the seasonal window";
+      case "same":
+        return "the seat is already there";
+      case "league":
+        return `"${action.countryId}" has no league`;
+      case "tier":
+        return "only a Professional or Elite league can take the seat";
+      case null:
+        return null;
+    }
   }
 
   if (
@@ -234,6 +258,14 @@ export function applyAction(state: GameState, world: World, action: Action): Gam
           ),
         };
       });
+    case "moveSeat":
+      return {
+        ...state,
+        flagship: {
+          ...state.flagship,
+          pendingCountryId: action.countryId === state.flagship.countryId ? null : action.countryId,
+        },
+      };
     case "bailoutLeague": {
       const index = countryIndexOf(world, action.countryId);
       const terms = bailoutTerms(state, world, index);

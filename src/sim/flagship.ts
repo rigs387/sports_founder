@@ -1,0 +1,818 @@
+import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
+import { demoteHardcore } from "./leagues";
+import { landmarks } from "./records";
+import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
+import {
+  type Club,
+  type CountryState,
+  type FlagshipState,
+  type GameState,
+  type Landmark,
+  type LeagueState,
+  type LeagueTierId,
+  type MatchResult,
+  PLAYER_INDEX,
+  type SeasonFormat,
+  type SeasonSummary,
+  type TableRow,
+  type World,
+} from "./types";
+
+// The flagship league (GDD v1.11 commissioner's seat, v1.13 seat rules, v1.14 flagship season).
+// The player runs one league in depth: named clubs based in real places, one season a year ending
+// in the seasonal window's quarter, a champion. Every number is config (`flagship`).
+//
+// Its matches roll on the flagship's own random stream, seeded from the campaign seed, so the
+// world's random sequence (fans, spread, rivals) is identical with or without it. In this first
+// build the flagship records history and does not yet feed fans or spread back.
+//
+// A season: every club plays every other club home and away (circle-method rounds, spread evenly
+// over the season's quarters). European format: the top of the table is champion. American format:
+// the top clubs play single-match knockouts, higher seed at home. Ranking: points, then score
+// margin, then score for, then the older club. At the season's end club ratings drift, a requested
+// seat move happens, and the club count follows the league tier.
+
+/** Distinguishes the flagship's random stream from the world's. */
+const FLAGSHIP_STREAM = 0x9e37_79b9;
+
+function indexOf(world: World, countryId: string): number {
+  return world.countries.findIndex((country) => country.id === countryId);
+}
+
+/** Quarters from `quarter` (the next one simulated) through the next season-ending quarter. */
+export function quartersUntilSeasonEnd(quarter: number, world: World): number {
+  const end = world.config.seasonalWindow.quarterOfYear - 1;
+  return ((end - (quarter % QUARTERS_PER_YEAR) + QUARTERS_PER_YEAR) % QUARTERS_PER_YEAR) + 1;
+}
+
+export function clubTarget(tier: LeagueTierId, world: World): number {
+  return world.config.flagship.clubs[tier];
+}
+
+export function activeClubs(flagship: FlagshipState): Club[] {
+  return flagship.clubs
+    .filter((club) => club.active && club.countryId === flagship.countryId)
+    .sort((a, b) => a.id - b.id);
+}
+
+export function totalRounds(clubCount: number): number {
+  const even = clubCount + (clubCount % 2);
+  return clubCount < 2 ? 0 : 2 * (even - 1);
+}
+
+/**
+ * The pairs of one round (circle method). Club ids in ascending order; an odd count gets a bye.
+ * The second half of the season repeats the first with home and away swapped.
+ */
+export function roundPairs(ids: readonly number[], round: number): [number, number][] {
+  const slots: (number | null)[] = [...ids];
+  if (slots.length % 2 === 1) slots.push(null);
+  const n = slots.length;
+  const half = n - 1;
+  const k = round % half;
+  const second = round >= half;
+  const rest = slots.slice(1);
+  const rotated = [
+    slots[0] ?? null,
+    ...rest.slice(rest.length - k),
+    ...rest.slice(0, rest.length - k),
+  ];
+  const pairs: [number, number][] = [];
+  for (let i = 0; i < n / 2; i += 1) {
+    const a = rotated[i] ?? null;
+    const b = rotated[n - 1 - i] ?? null;
+    if (a === null || b === null) continue;
+    const aHome = i === 0 ? k % 2 === 0 : i % 2 === k % 2;
+    const [home, away] = aHome !== second ? [a, b] : [b, a];
+    pairs.push([home, away]);
+  }
+  return pairs;
+}
+
+function emptyRow(clubId: number): TableRow {
+  return {
+    clubId,
+    played: 0,
+    won: 0,
+    drawn: 0,
+    lost: 0,
+    scoreFor: 0,
+    scoreAgainst: 0,
+    points: 0,
+  };
+}
+
+/** Table rows ranked best first: points, score margin, score for, then the older club. */
+export function rankTable(table: readonly TableRow[]): TableRow[] {
+  return [...table].sort(
+    (a, b) =>
+      b.points - a.points ||
+      b.scoreFor - b.scoreAgainst - (a.scoreFor - a.scoreAgainst) ||
+      b.scoreFor - a.scoreFor ||
+      a.clubId - b.clubId,
+  );
+}
+
+// ---- Clubs ----------------------------------------------------------------------------------
+
+function clamp(value: number, low: number, high: number): number {
+  return Math.min(high, Math.max(low, value));
+}
+
+/** A new club in a real place of the market, with a nickname no active club there has. */
+function newClub(
+  world: World,
+  rng: Rng,
+  flagship: Pick<FlagshipState, "clubs" | "nextClubId" | "season">,
+  countryId: string,
+  rating: number,
+): Club {
+  const places = world.places[countryId];
+  if (!places || places.length === 0) throw new Error(`No places for "${countryId}"`);
+  const exponent = world.config.flagship.placeWeightExponent;
+  const weights = places.map((place) => Math.max(1, place.population) ** exponent);
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  let roll = nextFloat(rng) * total;
+  let place = places[places.length - 1]?.name ?? "";
+  for (let i = 0; i < places.length; i += 1) {
+    roll -= weights[i] ?? 0;
+    if (roll < 0) {
+      place = places[i]?.name ?? place;
+      break;
+    }
+  }
+  const here = flagship.clubs.filter((club) => club.countryId === countryId);
+  const taken = new Set(here.filter((club) => club.active).map((club) => club.nickname));
+  const everUsedHere = new Set(here.map((club) => club.nickname));
+  const all = world.names.clubNicknames;
+  const fresh = all.filter((name) => !everUsedHere.has(name));
+  const pool = fresh.length > 0 ? fresh : all.filter((name) => !taken.has(name));
+  const nickname = pool[Math.floor(nextFloat(rng) * pool.length)] ?? all[0] ?? "";
+  return {
+    id: flagship.nextClubId,
+    countryId,
+    place,
+    nickname,
+    rating: clamp(rating, world.config.flagship.rating.min, world.config.flagship.rating.max),
+    active: true,
+    firstSeason: flagship.season,
+  };
+}
+
+function meanRating(clubs: readonly Club[], world: World): number {
+  if (clubs.length === 0) return world.config.flagship.rating.start;
+  return clubs.reduce((sum, club) => sum + club.rating, 0) / clubs.length;
+}
+
+/**
+ * Brings the active clubs to the count the league tier calls for: old clubs of this country come
+ * back first (oldest first), then generated expansion clubs; a smaller league drops the newest.
+ */
+function fitClubs(flagship: FlagshipState, world: World, rng: Rng, tier: LeagueTierId) {
+  const target = clubTarget(tier, world);
+  let next: FlagshipState = { ...flagship, clubs: flagship.clubs.map((club) => ({ ...club })) };
+  const here = (club: Club) => club.countryId === next.countryId;
+  const active = () => next.clubs.filter((club) => here(club) && club.active);
+
+  for (const club of [...next.clubs]
+    .filter((c) => here(c) && !c.active)
+    .sort((a, b) => a.id - b.id)) {
+    if (active().length >= target) break;
+    club.active = true;
+  }
+  const { rating } = world.config.flagship;
+  // A league's founding clubs each roll a rating; later arrivals are expansion clubs.
+  const founding = !next.clubs.some(here);
+  while (active().length < target) {
+    const base = founding
+      ? rating.start + rating.startSpread * (2 * nextFloat(rng) - 1)
+      : meanRating(active(), world) - rating.expansionPenalty;
+    const club = newClub(world, rng, next, next.countryId, base);
+    next = { ...next, clubs: [...next.clubs, club], nextClubId: next.nextClubId + 1 };
+  }
+  const newestFirst = active().sort((a, b) => b.firstSeason - a.firstSeason || b.id - a.id);
+  for (const club of newestFirst.slice(0, Math.max(0, newestFirst.length - target))) {
+    club.active = false;
+  }
+  return next;
+}
+
+/** The active clubs' ratings now, in club order. */
+export function activeRatings(flagship: FlagshipState) {
+  return activeClubs(flagship).map((club) => ({ clubId: club.id, rating: club.rating }));
+}
+
+/** A fresh table for the active clubs, and the season clock from `quarter`. */
+function startSeason(flagship: FlagshipState, world: World, quarter: number): FlagshipState {
+  return {
+    ...flagship,
+    seasonQuarters: quartersUntilSeasonEnd(quarter, world),
+    quartersPlayed: 0,
+    round: 0,
+    table: activeClubs(flagship).map((club) => emptyRow(club.id)),
+    startRatings: activeRatings(flagship),
+    lastRound: [],
+  };
+}
+
+/** The flagship at campaign start: the anchor's league holds the seat (GDD v1.11). */
+export function newFlagship(
+  world: World,
+  seed: number,
+  countryId: string,
+  tier: LeagueTierId,
+  quarter: number,
+): FlagshipState {
+  // The seat's country is mixed in, so one seed gives different clubs in different markets.
+  const mix = Math.imul(indexOf(world, countryId) + 1, 0x85eb_ca6b);
+  const rng = restoreRng(createRngState((seed ^ FLAGSHIP_STREAM ^ mix) >>> 0));
+  const empty: FlagshipState = {
+    countryId,
+    pendingCountryId: null,
+    rng: [],
+    season: 1,
+    seasonQuarters: 0,
+    quartersPlayed: 0,
+    round: 0,
+    clubs: [],
+    nextClubId: 1,
+    table: [],
+    startRatings: [],
+    lastRound: [],
+    seasons: [],
+  };
+  const fitted = fitClubs(empty, world, rng, tier);
+  return { ...startSeason(fitted, world, quarter), rng: saveRng(rng) };
+}
+
+// ---- Matches --------------------------------------------------------------------------------
+
+function scoringRate(own: number, opponent: number, home: boolean, world: World): number {
+  const { match } = world.config.flagship;
+  const edge = own - opponent + (home ? match.homeAdvantage / 2 : -match.homeAdvantage / 2);
+  return clamp(match.baseRate + match.ratingEffect * edge, match.minRate, match.maxRate);
+}
+
+function rollScore(rng: Rng, rate: number, chances: number): number {
+  let score = 0;
+  for (let i = 0; i < chances; i += 1) if (nextFloat(rng) < rate) score += 1;
+  return score;
+}
+
+function playMatch(rng: Rng, home: Club, away: Club, world: World, knockout: boolean): MatchResult {
+  const { match } = world.config.flagship;
+  const homeRate = scoringRate(home.rating, away.rating, true, world);
+  const awayRate = scoringRate(away.rating, home.rating, false, world);
+  const homeScore = rollScore(rng, homeRate, match.chances);
+  const awayScore = rollScore(rng, awayRate, match.chances);
+  let decidedFor: number | null = null;
+  if (knockout && homeScore === awayScore) {
+    // Deciders: one roll each until exactly one side scores; then the higher seed (home).
+    decidedFor = home.id;
+    for (let i = 0; i < match.maxDeciders; i += 1) {
+      const h = nextFloat(rng) < homeRate;
+      const a = nextFloat(rng) < awayRate;
+      if (h !== a) {
+        decidedFor = h ? home.id : away.id;
+        break;
+      }
+    }
+  }
+  return { homeId: home.id, awayId: away.id, homeScore, awayScore, decidedFor };
+}
+
+export function matchWinner(result: MatchResult): number | null {
+  if (result.homeScore > result.awayScore) return result.homeId;
+  if (result.awayScore > result.homeScore) return result.awayId;
+  return result.decidedFor;
+}
+
+function record(table: TableRow[], result: MatchResult, world: World): TableRow[] {
+  const { points } = world.config.flagship;
+  return table.map((row) => {
+    const isHome = row.clubId === result.homeId;
+    if (!isHome && row.clubId !== result.awayId) return row;
+    const own = isHome ? result.homeScore : result.awayScore;
+    const other = isHome ? result.awayScore : result.homeScore;
+    const won = own > other ? 1 : 0;
+    const drawn = own === other ? 1 : 0;
+    const lost = own < other ? 1 : 0;
+    return {
+      clubId: row.clubId,
+      played: row.played + 1,
+      won: row.won + won,
+      drawn: row.drawn + drawn,
+      lost: row.lost + lost,
+      scoreFor: row.scoreFor + own,
+      scoreAgainst: row.scoreAgainst + other,
+      points: row.points + won * points.win + drawn * points.draw,
+    };
+  });
+}
+
+/** How many clubs make the American playoffs in a league of `clubCount`. */
+export function playoffField(clubCount: number, world: World): number {
+  let best: { minClubs: number; clubs: number } | null = null;
+  for (const entry of world.config.flagship.playoffs) {
+    if (entry.minClubs <= clubCount && (best === null || entry.minClubs > best.minClubs)) {
+      best = entry;
+    }
+  }
+  return Math.min(clubCount, best?.clubs ?? 2);
+}
+
+/** Bracket order for seeds 1..n (n a power of two): 1 v n, then the halves mirrored. */
+function bracket(n: number): number[] {
+  let order = [1];
+  while (order.length < n) {
+    const size = order.length * 2;
+    order = order.flatMap((seed) => [seed, size + 1 - seed]);
+  }
+  return order;
+}
+
+/** The playoff bracket: the largest power of two within the configured field. */
+export function bracketSize(clubCount: number, world: World): number {
+  let size = 1;
+  while (size * 2 <= playoffField(clubCount, world)) size *= 2;
+  return size < 2 ? 0 : size;
+}
+
+function playPlayoffs(
+  rng: Rng,
+  ranked: readonly TableRow[],
+  clubs: ReadonlyMap<number, Club>,
+  world: World,
+): { matches: MatchResult[]; champion: number; runnerUp: number } {
+  const size = Math.max(1, bracketSize(ranked.length, world));
+  const seedOf = new Map(ranked.map((row, i) => [row.clubId, i + 1]));
+  let alive = bracket(size).map((seed) => ranked[seed - 1]?.clubId ?? 0);
+  const matches: MatchResult[] = [];
+  let runnerUp = alive[1] ?? alive[0] ?? 0;
+  while (alive.length > 1) {
+    const winners: number[] = [];
+    for (let i = 0; i < alive.length; i += 2) {
+      const a = alive[i] ?? 0;
+      const b = alive[i + 1] ?? 0;
+      const [homeId, awayId] = (seedOf.get(a) ?? 0) <= (seedOf.get(b) ?? 0) ? [a, b] : [b, a];
+      const home = clubs.get(homeId);
+      const away = clubs.get(awayId);
+      if (!home || !away) throw new Error("Playoff club missing");
+      const result = playMatch(rng, home, away, world, true);
+      matches.push(result);
+      const winner = matchWinner(result) ?? homeId;
+      winners.push(winner);
+      if (alive.length === 2) runnerUp = winner === homeId ? awayId : homeId;
+    }
+    alive = winners;
+  }
+  return { matches, champion: alive[0] ?? 0, runnerUp };
+}
+
+// ---- The quarter ----------------------------------------------------------------------------
+
+export interface FlagshipQuarter {
+  flagship: FlagshipState;
+  countries: CountryState[];
+  landmarks: Landmark[];
+}
+
+/** Ratings drift at the season's end, pulled toward the league's financial health. */
+function driftRatings(flagship: FlagshipState, world: World, rng: Rng, league: LeagueState) {
+  const { rating } = world.config.flagship;
+  const active = activeClubs(flagship);
+  const mean = meanRating(active, world);
+  const pull = rating.financePull * (rating.healthTarget[league.health] - mean);
+  const drifted = new Map(
+    active.map((club) => [
+      club.id,
+      clamp(
+        club.rating +
+          rating.drift * (2 * nextFloat(rng) - 1) +
+          rating.reversion * (mean - club.rating) +
+          pull,
+        rating.min,
+        rating.max,
+      ),
+    ]),
+  );
+  return {
+    ...flagship,
+    clubs: flagship.clubs.map((club) =>
+      drifted.has(club.id) ? { ...club, rating: drifted.get(club.id) ?? club.rating } : club,
+    ),
+  };
+}
+
+/**
+ * A season card's clubRating effect (GDD v1.15): the champion's rating, or every other active
+ * club's, moves by `steps` rating steps. The ratings recorded at the season's start stay as they were.
+ */
+export function moveClubRatings(
+  flagship: FlagshipState,
+  world: World,
+  championId: number,
+  target: "champion" | "field",
+  steps: number,
+): FlagshipState {
+  const { rating, stories } = world.config.flagship;
+  const moves = (club: Club) =>
+    target === "champion"
+      ? club.id === championId
+      : club.active && club.countryId === flagship.countryId && club.id !== championId;
+  return {
+    ...flagship,
+    clubs: flagship.clubs.map((club) =>
+      moves(club)
+        ? {
+            ...club,
+            rating: clamp(club.rating + steps * stories.ratingStep, rating.min, rating.max),
+          }
+        : club,
+    ),
+  };
+}
+
+/** Whether a country's league can take the seat (GDD v1.13): Professional or Elite. */
+export function seatEligible(league: LeagueState | null, world: World): boolean {
+  return league !== null && world.config.flagship.seatEligibleTiers.includes(league.tier);
+}
+
+/** Moves the seat now. `purist` applies the purist cost to the country left behind. */
+function moveSeat(
+  flagship: FlagshipState,
+  countries: CountryState[],
+  world: World,
+  anchorCountryId: string,
+  to: string,
+  purist: boolean,
+): { flagship: FlagshipState; countries: CountryState[] } {
+  const from = flagship.countryId;
+  let next = countries;
+  if (purist) {
+    const index = indexOf(world, from);
+    const share =
+      from === anchorCountryId
+        ? world.config.flagship.seatMove.anchorHardcoreDemotionShare
+        : world.config.flagship.seatMove.hardcoreDemotionShare;
+    const country = countries[index];
+    if (country) {
+      next = [...countries];
+      next[index] = {
+        ...country,
+        fans: country.fans.map((fans, i) =>
+          i === PLAYER_INDEX ? demoteHardcore(fans, share) : fans,
+        ),
+      };
+    }
+  }
+  return {
+    flagship: {
+      ...flagship,
+      countryId: to,
+      pendingCountryId: null,
+      clubs: flagship.clubs.map((club) =>
+        club.countryId === from && club.active ? { ...club, active: false } : club,
+      ),
+    },
+    countries: next,
+  };
+}
+
+/**
+ * One quarter of the flagship, after fans, leagues and rivals moved. `quarter` is the quarter being
+ * simulated (state.quarter before it advances). Plays the season's rounds due by the end of it;
+ * after the season-ending quarter records the champion, drifts ratings, makes a requested seat move
+ * and starts the next season with the club count the league tier calls for. While the seat's
+ * country has no league, no rounds are played and the season ends without a champion.
+ */
+export function stepFlagshipQuarter(
+  state: Pick<GameState, "turn" | "anchorCountryId" | "seasonFormat" | "flagship">,
+  countries: CountryState[],
+  world: World,
+  quarter: number,
+): FlagshipQuarter {
+  const rng = restoreRng(state.flagship.rng);
+  const found: Landmark[] = [];
+  let flagship: FlagshipState = {
+    ...state.flagship,
+    quartersPlayed: state.flagship.quartersPlayed + 1,
+  };
+  let nextCountries = countries;
+  const league = () => nextCountries[indexOf(world, flagship.countryId)]?.league ?? null;
+
+  const clubs = new Map(activeClubs(flagship).map((club) => [club.id, club]));
+  const ids = flagship.table.map((row) => row.clubId);
+  const rounds = totalRounds(ids.length);
+  if (league() !== null) {
+    const due = Math.floor((rounds * flagship.quartersPlayed) / flagship.seasonQuarters);
+    let table = flagship.table;
+    let lastRound = flagship.lastRound;
+    for (let round = flagship.round; round < due; round += 1) {
+      lastRound = roundPairs(ids, round).map(([homeId, awayId]) => {
+        const home = clubs.get(homeId);
+        const away = clubs.get(awayId);
+        if (!home || !away) throw new Error("Flagship fixture names a club not in the league");
+        return playMatch(rng, home, away, world, false);
+      });
+      for (const result of lastRound) table = record(table, result, world);
+    }
+    flagship = { ...flagship, table, lastRound, round: Math.max(flagship.round, due) };
+  }
+
+  if (flagship.quartersPlayed >= flagship.seasonQuarters) {
+    const current = league();
+    const newQuarter = quarter + 1;
+    if (current !== null && rounds > 0 && flagship.round >= rounds) {
+      const ranked = rankTable(flagship.table);
+      const format: SeasonFormat = state.seasonFormat;
+      const playoffs =
+        format === "american"
+          ? playPlayoffs(rng, ranked, clubs, world)
+          : {
+              matches: [],
+              champion: ranked[0]?.clubId ?? 0,
+              runnerUp: ranked[1]?.clubId ?? 0,
+            };
+      const summary: SeasonSummary = {
+        season: flagship.season,
+        quarter: newQuarter,
+        countryId: flagship.countryId,
+        format,
+        championId: playoffs.champion,
+        runnerUpId: playoffs.runnerUp,
+        standings: ranked,
+        playoffs: playoffs.matches,
+        startRatings: flagship.startRatings,
+      };
+      found.push(
+        landmarks.seasonChampion(
+          state.turn,
+          newQuarter,
+          flagship.countryId,
+          flagship.season,
+          playoffs.champion,
+        ),
+      );
+      flagship = driftRatings(
+        { ...flagship, seasons: [...flagship.seasons, summary], season: flagship.season + 1 },
+        world,
+        rng,
+        current,
+      );
+    }
+    const pending = flagship.pendingCountryId;
+    if (pending !== null) {
+      const target = nextCountries[indexOf(world, pending)]?.league ?? null;
+      if (seatEligible(target, world)) {
+        const from = flagship.countryId;
+        const moved = moveSeat(
+          flagship,
+          nextCountries,
+          world,
+          state.anchorCountryId,
+          pending,
+          true,
+        );
+        flagship = moved.flagship;
+        nextCountries = moved.countries;
+        found.push(landmarks.seatMoved(state.turn, newQuarter, from, pending, "moved"));
+      } else {
+        flagship = { ...flagship, pendingCountryId: null };
+      }
+    }
+    const seatLeague = league();
+    if (seatLeague !== null) flagship = fitClubs(flagship, world, rng, seatLeague.tier);
+    flagship = startSeason(flagship, world, newQuarter);
+  }
+  return {
+    flagship: { ...flagship, rng: saveRng(rng) },
+    countries: nextCountries,
+    landmarks: found,
+  };
+}
+
+/**
+ * After the turn's league evaluation: a non-anchor flagship whose league folded sends the seat
+ * home to the anchor at once and for free (GDD v1.13). The anchor's old clubs come back and a new
+ * season starts. If the anchor has no league either (it folded after the win), the seat waits
+ * there until a league forms again.
+ */
+export function returnSeatIfFolded(state: GameState, world: World): GameState {
+  const flagship = state.flagship;
+  const seatLeague = state.countries[indexOf(world, flagship.countryId)]?.league ?? null;
+  if (seatLeague !== null || flagship.countryId === state.anchorCountryId) {
+    return dormantClubs(state, world);
+  }
+  const rng = restoreRng(flagship.rng);
+  const moved = moveSeat(
+    flagship,
+    state.countries,
+    world,
+    state.anchorCountryId,
+    state.anchorCountryId,
+    false,
+  );
+  let next = moved.flagship;
+  const anchorLeague = state.countries[indexOf(world, state.anchorCountryId)]?.league ?? null;
+  if (anchorLeague !== null) next = fitClubs(next, world, rng, anchorLeague.tier);
+  next = startSeason({ ...next, rng: saveRng(rng) }, world, state.quarter);
+  return {
+    ...state,
+    flagship: next,
+    landmarks: [
+      ...state.landmarks,
+      landmarks.seatMoved(
+        state.turn,
+        state.quarter,
+        flagship.countryId,
+        state.anchorCountryId,
+        "returned",
+      ),
+    ],
+  };
+}
+
+/**
+ * A league that re-forms at the seat (the anchor after a post-win collapse) picks its season back
+ * up: if the table is empty, the clubs come back and a fresh season starts.
+ */
+function dormantClubs(state: GameState, world: World): GameState {
+  const flagship = state.flagship;
+  const seatLeague = state.countries[indexOf(world, flagship.countryId)]?.league ?? null;
+  if (seatLeague === null || flagship.table.length > 0) return state;
+  const rng = restoreRng(flagship.rng);
+  const fitted = fitClubs(flagship, world, rng, seatLeague.tier);
+  return {
+    ...state,
+    flagship: startSeason({ ...fitted, rng: saveRng(rng) }, world, state.quarter),
+  };
+}
+
+/** Why the seat cannot be moved to a country now, or null if it can (GDD v1.13). */
+export type SeatBlocker = "window" | "same" | "league" | "tier";
+export function seatBlocker(
+  state: GameState,
+  world: World,
+  countryId: string,
+  windowOpen: boolean,
+): SeatBlocker | null {
+  if (!windowOpen) return "window";
+  if (countryId === state.flagship.countryId) return "same";
+  const league = state.countries[indexOf(world, countryId)]?.league ?? null;
+  if (league === null) return "league";
+  if (!seatEligible(league, world)) return "tier";
+  return null;
+}
+
+/** Every way the flagship state is invalid (see src/sim/invariants.ts). */
+export function flagshipProblems(state: GameState, world: World): string[] {
+  const problems: string[] = [];
+  const flagship = state.flagship;
+  const known = (id: string) => world.countries.some((country) => country.id === id);
+  if (!known(flagship.countryId)) problems.push(`flagship seat "${flagship.countryId}" is unknown`);
+  if (flagship.pendingCountryId !== null) {
+    if (!known(flagship.pendingCountryId)) problems.push("flagship seat move target is unknown");
+    if (flagship.pendingCountryId === flagship.countryId) {
+      problems.push("flagship seat move targets the seat it already holds");
+    }
+  }
+  const ids = new Set<number>();
+  for (const club of flagship.clubs) {
+    if (ids.has(club.id) || club.id >= flagship.nextClubId) {
+      problems.push(`flagship club ${club.id} has a bad id`);
+    }
+    ids.add(club.id);
+    if (!known(club.countryId)) problems.push(`flagship club ${club.id} is in an unknown country`);
+    if (club.active && club.countryId !== flagship.countryId) {
+      problems.push(`flagship club ${club.id} is active away from the seat`);
+    }
+    if (!Number.isFinite(club.rating)) problems.push(`flagship club ${club.id} has a bad rating`);
+  }
+  const active = new Set(activeClubs(flagship).map((club) => club.id));
+  const tableIds = flagship.table.map((row) => row.clubId);
+  if (
+    flagship.table.length > 0 &&
+    (tableIds.length !== active.size || tableIds.some((id) => !active.has(id)))
+  ) {
+    problems.push("flagship table does not match the active clubs");
+  }
+  if (flagship.quartersPlayed >= flagship.seasonQuarters) {
+    problems.push("flagship season ran past its last quarter");
+  }
+  if (flagship.round > totalRounds(flagship.table.length)) {
+    problems.push("flagship played more rounds than the season has");
+  }
+  const { points } = world.config.flagship;
+  const rowProblems = (row: TableRow) =>
+    row.won + row.drawn + row.lost !== row.played ||
+    row.won * points.win + row.drawn * points.draw !== row.points;
+  if (flagship.table.some(rowProblems)) problems.push("flagship table rows do not add up");
+  for (const match of flagship.lastRound) {
+    if (!ids.has(match.homeId) || !ids.has(match.awayId)) {
+      problems.push("flagship result names an unknown club");
+    }
+  }
+  let lastSeason = 0;
+  for (const summary of flagship.seasons) {
+    if (summary.season <= lastSeason || summary.season >= flagship.season) {
+      problems.push(`flagship season ${summary.season} is out of order`);
+    }
+    lastSeason = summary.season;
+    if (!ids.has(summary.championId) || !ids.has(summary.runnerUpId)) {
+      problems.push(`flagship season ${summary.season} names an unknown club`);
+    }
+    if (summary.quarter > state.quarter) {
+      problems.push(`flagship season ${summary.season} ended in the future`);
+    }
+  }
+  return problems;
+}
+
+// ---- Snapshot -------------------------------------------------------------------------------
+
+export interface ClubSnapshot {
+  id: number;
+  countryId: string;
+  place: string;
+  nickname: string;
+  active: boolean;
+  /** Championships won in every season played. */
+  titles: number;
+}
+
+/** What the UI shows of the flagship. Club ratings stay hidden. */
+export interface FlagshipSnapshot {
+  countryId: string;
+  pendingCountryId: string | null;
+  format: SeasonFormat;
+  season: number;
+  round: number;
+  totalRounds: number;
+  /** Whether the seat's country has a league to play in right now. */
+  playing: boolean;
+  /** Ranked best first. */
+  table: TableRow[];
+  lastRound: MatchResult[];
+  /** Every club the campaign has known, by id. */
+  clubs: ClubSnapshot[];
+  /** Quarters left in the season, this one included. */
+  quartersLeft: number;
+  /** American format: how many clubs make the playoffs. 0 in the European format. */
+  playoffClubs: number;
+  /** Finished seasons, newest first, without their full tables, with the year each ended. */
+  recentSeasons: (Omit<SeasonSummary, "standings" | "startRatings"> & { year: number })[];
+  /** Countries whose league could take the seat in the seasonal window (GDD v1.13). */
+  seatTargets: string[];
+  /** Share of the seat country's hardcore fans who turn casual if the seat moves away. */
+  leaveCost: number;
+}
+
+/** How many finished seasons the snapshot carries. */
+const RECENT_SEASONS = 10;
+
+export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapshot {
+  const flagship = state.flagship;
+  const titles = new Map<number, number>();
+  for (const summary of flagship.seasons) {
+    titles.set(summary.championId, (titles.get(summary.championId) ?? 0) + 1);
+  }
+  return {
+    countryId: flagship.countryId,
+    pendingCountryId: flagship.pendingCountryId,
+    format: state.seasonFormat,
+    season: flagship.season,
+    round: flagship.round,
+    totalRounds: totalRounds(flagship.table.length),
+    playing: (state.countries[indexOf(world, flagship.countryId)]?.league ?? null) !== null,
+    table: rankTable(flagship.table),
+    lastRound: flagship.lastRound,
+    clubs: flagship.clubs.map((club) => ({
+      id: club.id,
+      countryId: club.countryId,
+      place: club.place,
+      nickname: club.nickname,
+      active: club.active,
+      titles: titles.get(club.id) ?? 0,
+    })),
+    quartersLeft: flagship.seasonQuarters - flagship.quartersPlayed,
+    playoffClubs: state.seasonFormat === "american" ? bracketSize(flagship.table.length, world) : 0,
+    recentSeasons: flagship.seasons
+      .slice(-RECENT_SEASONS)
+      .reverse()
+      .map(({ standings: _standings, startRatings: _ratings, ...summary }) => ({
+        ...summary,
+        year: yearOfQuarter(summary.quarter - 1, world.config),
+      })),
+    seatTargets: state.countries
+      .filter(
+        (country) =>
+          country.countryId !== flagship.countryId && seatEligible(country.league, world),
+      )
+      .map((country) => country.countryId),
+    leaveCost:
+      flagship.countryId === state.anchorCountryId
+        ? world.config.flagship.seatMove.anchorHardcoreDemotionShare
+        : world.config.flagship.seatMove.hardcoreDemotionShare,
+  };
+}

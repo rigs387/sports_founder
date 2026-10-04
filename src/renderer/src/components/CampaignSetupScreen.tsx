@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { genomeSchema, type Names } from "../../../content";
 import { AXIS_IDS, GENOME_AXES, type Genome } from "../../../content/genome-axes";
-import type { GenomeHints } from "../../../sim";
+import { type GenomeHints, SEASON_FORMATS, type SeasonFormat } from "../../../sim";
 import { useGameStore } from "../state/game-store";
 import type { SetupOptions } from "../worker/api";
 import { sim } from "../worker/client";
@@ -49,6 +49,7 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
   const [seed, setSeed] = useState(() =>
     String(crypto.getRandomValues(new Uint32Array(1))[0] ?? 1),
   );
+  const [seasonFormat, setSeasonFormat] = useState<SeasonFormat>("european");
   const [hints, setHints] = useState<{ anchor: string; values: GenomeHints } | null>(null);
   const [hintError, setHintError] = useState(false);
   const busy = status !== "setup";
@@ -89,7 +90,12 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
       onSubmit={(event) => {
         event.preventDefault();
         if (canStart && genome)
-          void startCampaign({ anchorCountryId: anchor, genome: { ...genome }, seed: seedValue });
+          void startCampaign({
+            anchorCountryId: anchor,
+            genome: { ...genome },
+            seed: seedValue,
+            seasonFormat,
+          });
       }}
     >
       <div className="setup-columns">
@@ -269,6 +275,25 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
           </p>
           {setupError && <p role="alert">{t("setup.startError")}</p>}
         </div>
+        <fieldset className="setup-format" disabled={busy} aria-describedby="format-help">
+          <legend>{t("setup.formatTitle")}</legend>
+          <div>
+            {SEASON_FORMATS.map((format) => (
+              <label key={format} className={seasonFormat === format ? "chosen" : ""}>
+                <input
+                  type="radio"
+                  name="season-format"
+                  value={format}
+                  checked={seasonFormat === format}
+                  data-testid={`setup-format-${format}`}
+                  onChange={() => setSeasonFormat(format)}
+                />
+                <span>{t(`setup.formats.${format}`)}</span>
+              </label>
+            ))}
+          </div>
+          <small id="format-help">{t("setup.formatHelp")}</small>
+        </fieldset>
         <button
           className="advance-turn"
           type="submit"

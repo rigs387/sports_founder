@@ -1,6 +1,8 @@
 import type { EventEffect, EventTemplate } from "../content";
 import { costMultiplier } from "./calendar";
-import type { EventRecord } from "./events-state";
+import type { EventRecord, EventState } from "./events-state";
+import { activeClubs, moveClubRatings } from "./flagship";
+import { seasonFacts, seasonStories } from "./season-stories";
 import { type GameState, HEALTH_LEVELS, PLAYER_INDEX, type World } from "./types";
 
 export function eventFactors(
@@ -22,11 +24,84 @@ export function eventFactors(
 const keyFor = (card: EventTemplate, countryId: string) =>
   card.scope === "campaign" ? card.id : `${card.id}/${countryId}`;
 
+/**
+ * The flagship season as cards (GDD v1.15), offered before every other card. Each season that ended
+ * since the last offer brings its champion moment and at most one story card: the first story it
+ * qualifies for, in priority order, that is off cooldown (counted in seasons). A pressure card's
+ * arrival effects land now and are never cancelled.
+ */
+function offerSeasonCards(
+  state: GameState,
+  world: World,
+  recent: GameState["landmarks"],
+  events: EventState,
+): EventState {
+  const pending = [...events.pending];
+  const seasonOffered = { ...events.seasonOffered };
+  const modifiers = [...events.modifiers];
+  let nextId = events.nextId;
+  const seasons = state.flagship.seasons;
+  for (const landmark of recent) {
+    if (landmark.kind !== "seasonChampion") continue;
+    const index = seasons.findIndex((summary) => summary.season === landmark.season);
+    const summary = seasons[index];
+    const country = state.countries.find((c) => c.countryId === summary?.countryId);
+    const fans = country?.fans[PLAYER_INDEX];
+    if (!summary || !country || !fans) continue;
+    const facts = seasonFacts(seasons, index);
+    const offer = (card: EventTemplate) => {
+      const id = nextId++;
+      pending.push({
+        id,
+        templateId: card.id,
+        countryId: country.countryId,
+        turn: state.turn,
+        quarter: state.quarter,
+        facts: {
+          casual: fans.casual,
+          hardcore: fans.hardcore,
+          leagueTier: country.league?.tier ?? null,
+          health: country.league?.health ?? null,
+          rivalId: null,
+          season: facts,
+        },
+        resolution: null,
+      });
+      for (const effect of card.arrivalEffects)
+        modifiers.push({
+          eventId: id,
+          countryId: country.countryId,
+          effect,
+          endQuarter: state.quarter + effect.quarters,
+        });
+    };
+    const champion = world.events.cards.find((card) => card.story === "champion");
+    if (champion && state.ppTier >= champion.minTier) offer(champion);
+    for (const story of seasonStories(seasons, index, world)) {
+      const card = world.events.cards.find((c) => c.story === story);
+      if (!card || state.ppTier < card.minTier) continue;
+      // Unlike turn cooldowns, no cooldown means the story may come back every season.
+      const last = seasonOffered[card.id];
+      if (
+        last !== undefined &&
+        card.cooldownSeasons !== null &&
+        summary.season - last < card.cooldownSeasons
+      )
+        continue;
+      offer(card);
+      seasonOffered[card.id] = summary.season;
+      break;
+    }
+  }
+  return { ...events, pending, seasonOffered, modifiers, nextId };
+}
+
 /** Priority then audience then content order: no wall clock or extra random stream. */
 export function offerEvents(state: GameState, world: World, elapsedQuarters: number): GameState {
   if (state.outcome) return state;
   const settings = world.events.settings;
   const recent = state.landmarks.slice(state.events.landmarkCursor);
+  const seasonEvents = offerSeasonCards(state, world, recent, state.events);
   const ranked = state.countries
     .map((country, index) => ({ country, index }))
     .sort((a, b) => {
@@ -53,16 +128,19 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
     ),
     decision: settings.maxDecisions,
   };
-  const pending = [...state.events.pending];
+  const pending = [...seasonEvents.pending];
   const offered = { ...state.events.offered };
-  let nextId = state.events.nextId;
+  let nextId = seasonEvents.nextId;
   for (const card of [...world.events.cards].sort((a, b) => b.priority - a.priority)) {
+    if (card.trigger === "seasonEnd") continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
     for (const { country } of ranked) {
+      // The champion moment never takes a moment slot; a season story counts as a decision.
       if (
-        pending.filter(
-          (event) => world.events.cards.find((c) => c.id === event.templateId)?.kind === card.kind,
-        ).length >= caps[card.kind]
+        pending.filter((event) => {
+          const other = world.events.cards.find((c) => c.id === event.templateId);
+          return other?.kind === card.kind && other.story !== "champion";
+        }).length >= caps[card.kind]
       )
         break;
       if (card.anchorOnly && country.countryId !== state.anchorCountryId) continue;
@@ -102,6 +180,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
           leagueTier: country.league?.tier ?? null,
           health: country.league?.health ?? null,
           rivalId: fact && "sportId" in fact ? fact.sportId : null,
+          season: null,
         },
         resolution: null,
       });
@@ -110,14 +189,28 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   }
   return {
     ...state,
-    events: { ...state.events, pending, offered, nextId, landmarkCursor: state.landmarks.length },
+    events: {
+      ...seasonEvents,
+      pending,
+      offered,
+      nextId,
+      landmarkCursor: state.landmarks.length,
+    },
   };
 }
 
-function effectsFor(card: EventTemplate, choiceId: string | null) {
-  return choiceId === null
-    ? card.effects
-    : (card.choices.find((choice) => choice.id === choiceId)?.effects ?? []);
+/** A card's effects for one answer. The champion moment's PP follows the league tier (config). */
+export function eventEffects(
+  world: World,
+  card: EventTemplate,
+  event: Pick<EventRecord, "facts">,
+  choiceId: string | null,
+): EventEffect[] {
+  if (choiceId !== null)
+    return card.choices.find((choice) => choice.id === choiceId)?.effects ?? [];
+  if (card.story !== "champion") return card.effects;
+  const amount = world.config.flagship.stories.championPP[event.facts.leagueTier ?? "amateur"];
+  return [{ type: "pp", amount }, ...card.effects];
 }
 export function eventChoiceCost(
   state: GameState,
@@ -130,7 +223,14 @@ export function eventChoiceCost(
     costMultiplier(state, world.config)
   );
 }
-export type EventBlocker = "missing" | "choice" | "prestige" | "league" | "rival" | "ended";
+export type EventBlocker =
+  | "missing"
+  | "choice"
+  | "prestige"
+  | "league"
+  | "rival"
+  | "flagship"
+  | "ended";
 export function eventBlocker(
   state: GameState,
   world: World,
@@ -145,8 +245,14 @@ export function eventBlocker(
     return "choice";
   if (state.pp < eventChoiceCost(state, world, card, choiceId)) return "prestige";
   const country = state.countries.find((c) => c.countryId === event.countryId);
-  for (const effect of effectsFor(card, choiceId)) {
+  for (const effect of eventEffects(world, card, event, choiceId)) {
     if (effect.type === "leagueHealth" && !country?.league) return "league";
+    // The champion must still play in the commissioner's league (the seat may have gone home).
+    if (
+      effect.type === "clubRating" &&
+      !activeClubs(state.flagship).some((club) => club.id === event.facts.season?.championId)
+    )
+      return "flagship";
     if (
       effect.type === "rivalSetback" &&
       !state.rivals.some((r) => r.sportId === event.facts.rivalId)
@@ -169,6 +275,15 @@ function applyEffects(
   for (const effect of effects) {
     if (effect.type === "pp") {
       next = { ...next, pp: next.pp + effect.amount };
+      continue;
+    }
+    if (effect.type === "clubRating") {
+      const championId = event.facts.season?.championId;
+      if (championId === undefined) throw new Error("Club rating effect without a season");
+      next = {
+        ...next,
+        flagship: moveClubRatings(next.flagship, world, championId, effect.target, effect.steps),
+      };
       continue;
     }
     if (effect.type === "conversion" || effect.type === "spread") {
@@ -239,16 +354,12 @@ export function resolveEvent(
   const card = world.events.cards.find((c) => c.id === event?.templateId);
   if (!event || !card) throw new Error("Missing event");
   const cost = eventChoiceCost(state, world, card, choiceId);
-  const ppGained = effectsFor(card, choiceId).reduce(
+  const effects = eventEffects(world, card, event, choiceId);
+  const ppGained = effects.reduce(
     (sum, effect) => sum + (effect.type === "pp" ? effect.amount : 0),
     0,
   );
-  const next = applyEffects(
-    { ...state, pp: state.pp - cost },
-    world,
-    event,
-    effectsFor(card, choiceId),
-  );
+  const next = applyEffects({ ...state, pp: state.pp - cost }, world, event, effects);
   const settled: EventRecord = {
     ...event,
     resolution: { choiceId, automatic, turn: state.turn, quarter: state.quarter, cost, ppGained },
@@ -282,7 +393,9 @@ export function eventSnapshots(state: GameState, world: World) {
       ...event,
       kind: card.kind,
       tone: card.tone,
-      effects: card.effects,
+      story: card.story,
+      effects: eventEffects(world, card, event, null),
+      arrivalEffects: card.arrivalEffects,
       defaultChoice: card.defaultChoice,
       choices: card.choices.map((choice) => ({
         ...choice,
@@ -313,6 +426,16 @@ export function eventProblems(state: GameState, world: World): string[] {
       problems.push("Event occurs in the future");
     if (event.facts.rivalId && !state.rivals.some((r) => r.sportId === event.facts.rivalId))
       problems.push("Unknown event rival");
+    const season = event.facts.season;
+    if ((card.story !== null) !== (season !== null))
+      problems.push("Season facts on the wrong card");
+    if (
+      season &&
+      (season.season >= state.flagship.season ||
+        season.championId >= state.flagship.nextClubId ||
+        season.runnerUpId >= state.flagship.nextClubId)
+    )
+      problems.push("Event names an unknown flagship season or club");
     if (
       event.resolution &&
       (event.resolution.turn < event.turn ||
@@ -344,6 +467,11 @@ export function eventProblems(state: GameState, world: World): string[] {
       turn > state.turn
     )
       problems.push("Invalid event cooldown");
+  }
+  for (const [templateId, season] of Object.entries(state.events.seasonOffered)) {
+    const card = world.events.cards.find((c) => c.id === templateId);
+    if (!card || card.story === null || season >= state.flagship.season)
+      problems.push("Invalid season card cooldown");
   }
   for (const modifier of state.events.modifiers)
     if (

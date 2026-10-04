@@ -8,6 +8,7 @@ import { EventBoard } from "./components/EventBoard";
 import { FocusControls } from "./components/FocusControls";
 import { LeagueControls } from "./components/LeagueControls";
 import { SaveLoadControls } from "./components/SaveLoadControls";
+import { FlagshipScreen } from "./flagship/FlagshipScreen";
 import { GrowthScreen } from "./growth/GrowthScreen";
 import { heatBand, mapSettings } from "./map/model";
 import { type MapCommand, type MapHover, WorldMap } from "./map/WorldMap";
@@ -42,6 +43,7 @@ export function App() {
   useEffect(() => {
     void loadSetup();
   }, [loadSetup]);
+  const fullPage = overview === "growth" || overview === "flagship";
   const navigate = (kind: MapCommand["kind"], market?: string) =>
     setCommand((previous) => ({ kind, market, serial: previous.serial + 1 }));
   const countryName = (id: string) => names?.countries[id] ?? id;
@@ -106,15 +108,17 @@ export function App() {
           <button
             type="button"
             className={overview ? undefined : "active"}
+            data-view="world"
             onClick={() => setOverview(null)}
             aria-current={overview ? undefined : "page"}
           >
             {t("map.nav.world")}
           </button>
-          {(["sport", "leagues", "growth"] as const).map((view) => (
+          {(["sport", "leagues", "flagship", "growth"] as const).map((view) => (
             <button
               type="button"
               key={view}
+              data-view={view}
               className={overview === view ? "active" : undefined}
               aria-current={overview === view ? "page" : undefined}
               disabled={!snapshot}
@@ -162,7 +166,16 @@ export function App() {
         busy={status !== "ready"}
         onAction={(action) => void dispatchAction(action)}
       />
-      <section className="world-stage" hidden={overview === "growth"} aria-label={t("map.stage")}>
+      {names && (
+        <FlagshipScreen
+          snapshot={snapshot}
+          names={names}
+          active={overview === "flagship"}
+          busy={status !== "ready"}
+          onAction={(action) => void dispatchAction(action)}
+        />
+      )}
+      <section className="world-stage" hidden={fullPage} aria-label={t("map.stage")}>
         {snapshot && (
           <WorldMap
             countryNames={names?.countries ?? {}}
@@ -373,9 +386,10 @@ export function App() {
           </div>
         )}
       </section>
-      <footer className={`game-bottom${overview === "growth" ? " is-growth" : ""}`}>
+      <footer className={`game-bottom${fullPage ? " is-growth" : ""}`}>
         {overview === "growth" && <p className="growth-footer-note">{t("growth.board.footer")}</p>}
-        <div className="map-legend" hidden={overview === "growth"}>
+        {overview === "flagship" && <p className="growth-footer-note">{t("flagship.footer")}</p>}
+        <div className="map-legend" hidden={fullPage}>
           <span>{t("map.strength")}</span>
           <div className="legend-swatches">
             {[null, ...mapSettings.heatBands].map((threshold, index) => (
@@ -413,7 +427,7 @@ export function App() {
           </span>
           <b>{t("turn.label", { turn: snapshot?.turn ?? 1 })}</b>
         </div>
-        <div className="map-options" hidden={overview === "growth"}>
+        <div className="map-options" hidden={fullPage}>
           <label>
             <input
               type="checkbox"
@@ -451,7 +465,7 @@ export function App() {
             })
           : ""}
       </div>
-      {overview && overview !== "growth" && snapshot && names && (
+      {(overview === "sport" || overview === "leagues") && snapshot && names && (
         <CampaignOverview
           initialCountryId={selectedCountryId}
           view={overview}

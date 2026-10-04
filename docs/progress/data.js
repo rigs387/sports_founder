@@ -1,8 +1,8 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-02",
-  design: "GDD v1.13",
+  updated: "2026-10-03",
+  design: "GDD v1.15",
   stage: "Phase 0 · playable slice",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -12,15 +12,15 @@ window.SF_PROGRESS = {
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
-    date: "2026-10-02",
-    tests: 717,
-    files: 25,
-    note: "Type checking, purity checks and all tests passed. Lint has existing visual-study warnings.",
-    smokeDate: "2026-09-26",
+    date: "2026-10-03",
+    tests: 352,
+    files: 28,
+    note: "npm run check passed after the flagship season cards landed (type checks, Biome, purity, 352 tests in 28 files; the drop from 739 is the move to an 11-anchor sweep instead of all 213 countries). Lint has existing visual-study warnings.",
+    smokeDate: "2026-10-03",
     smoke:
-      "Last recorded UI smoke passed; save/resume continued identically. Not rerun in the October 2 review.",
+      "UI smoke passed and now plays to a season end and opens its story card (a runaway pressure card naming real clubs); save/resume continued identically.",
   },
-  eventDeck: { current: 8, target: "40–60" },
+  eventDeck: { current: 16, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -50,8 +50,8 @@ window.SF_PROGRESS = {
   priorities: [
     {
       system: "leagues",
-      title: "Build the flagship season",
-      text: "Named teams, results and standings. Add persistent stars as the league matures.",
+      title: "Make the flagship season matter",
+      text: "Season cards are in; next, persistent stars as the league matures.",
       tag: "Next build",
     },
     {
@@ -76,18 +76,60 @@ window.SF_PROGRESS = {
     },
     {
       title: "Holding #1 needs more resistance",
-      text: "Recorded lead-loss rate was 36%; the design targets roughly half. Remeasure after event balancing.",
-      date: "2026-09-22",
+      text: "Lead lost before the win in 20 of 56 campaigns (36%); the design targets about half. Builder, 12 typical anchors × 5 seeds, 200 turns. Season cards are neutral here (9 of 47 with and without them on a 5-anchor sample).",
+      date: "2026-10-03",
       system: "rivals",
     },
     {
-      title: "Bots skip the paid event decisions",
-      text: "Current bots use neutral defaults. Add choice policies before judging the deck's balance.",
-      date: "2026-09-26",
+      title: "Paid event choices are now played",
+      text: "Bots pay for choices by their own weights. Builder (6 campaigns): League rescue taken every time; crowded-sidelines recruit 1 in 3.",
+      date: "2026-10-02",
       system: "events",
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Review",
+      title: "Testing is time-boxed",
+      text: "Tests time out at 30 s (suite ~30 s). The runner states its plan, shows progress and stops early when projected past 5 minutes; experiments keep 12 sampled anchors with 5 seeds each and the all-markets option is gone.",
+    },
+    {
+      date: "2026-10-03",
+      type: "Built",
+      title: "The flagship season as event cards",
+      text: "Every season end brings a champion moment (PP by league tier) and at most one story card in fixed priority: foregone league or runaway (pressure, drain on arrival), dynasty, repeat final, underdog, first title, close finish. New club strength effect, season-counted cooldowns, bot weights, save format 9.",
+    },
+    {
+      date: "2026-10-03",
+      type: "Design",
+      title: "The flagship season as event cards",
+      text: "A champion moment every season, at most one story decision (dynasty, underdog, first title, close finish, repeat final), pressure cards for runaway champions, and a club strength effect only season cards use (GDD v1.15).",
+    },
+    {
+      date: "2026-10-03",
+      type: "Built",
+      title: "The flagship screen",
+      text: "Table, latest results, champions and the commissioner's seat, plus the season format choice at creation.",
+    },
+    {
+      date: "2026-10-02",
+      type: "Built",
+      title: "The flagship league plays its seasons",
+      text: "Clubs in real places with invented nicknames, a season a year, European or American format, champions on record, seat moves and returns. Simulation only; the screen comes next.",
+    },
+    {
+      date: "2026-10-02",
+      type: "Built",
+      title: "Bots answer event decisions",
+      text: "Each bot weighs a card's choices and pays when it is worth it; the runner reports how often each choice is taken.",
+    },
+    {
+      date: "2026-10-02",
+      type: "Design",
+      title: "The flagship season",
+      text: "Clubs grow with the league tier (8 to 20); European or American format chosen at creation; drifting club strength; a purist cost for moving the seat.",
+    },
     {
       date: "2026-10-02",
       type: "Design",
@@ -239,18 +281,22 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
-      summary: "Abstract leagues work. The player's own flagship still needs teams and seasons.",
-      next: "Start the flagship at the anchor. Simulate named teams, results, standings and champions.",
+      summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
+      next: "Add a few named stars as the league matures; then decide how the flagship feeds global spread.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
+        ["The flagship league", "../flagship/README.md"],
         ["Commissioner's seat design", "../../sports-founder-gdd.md#game-loop"],
       ],
       items: [
         ["built", "Formation, Amateur-to-Elite tiers and local finances"],
         ["built", "Health ladder, promotion, restructuring and bailouts"],
-        ["planned", "Flagship seat: Professional+ moves in season windows; home on collapse"],
-        ["planned", "Named teams, results, standings and retained season summaries"],
+        ["built", "Flagship seat: Professional+ moves in season windows; home on collapse"],
+        ["built", "Named clubs in real places, results, standings and retained season summaries"],
+        ["built", "Flagship screen: table, results, champions and the seat"],
+        ["built", "European or American format chosen on the creation screen"],
+        ["built", "Season cards: champion, story and pressure cards; club strength"],
         ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
         ["planned", "Standing policies and hired league directors"],
         ["planned", "Anchor purist resentment from neglect, rule changes and seat moves"],
@@ -268,14 +314,15 @@ window.SF_PROGRESS = {
       sources: [
         ["Event board and initial deck", "../events/README.md"],
         ["Card definitions", "../../content/events.yaml"],
+        ["Flagship season cards", "../flagship/README.md#the-season-as-cards"],
       ],
       items: [
         ["built", "Fact-based triggers and validated effect vocabulary"],
         ["built", "Decision costs, local effects, expiry and safe defaults"],
         ["built", "Reward collection, journal and saved pending cards"],
-        ["partial", "Event library: 8 of a planned 40–60 cards"],
+        ["partial", "Event library: 16 of a planned 40–60 cards (8 are flagship season cards)"],
         ["planned", "Broader tier-weighted negative events and personal stories"],
-        ["planned", "Bots that weigh and choose non-default options"],
+        ["built", "Bots that weigh and choose non-default options"],
       ],
     },
     {

@@ -6,11 +6,13 @@ import {
   formatPath,
   genomeSchema,
   healthLevelSchema,
+  LEAGUE_TIERS,
   leagueTierSchema,
   timedCountermoveSchema,
 } from "../content";
 import { tierEntry } from "./calendar";
 import { emptyEvents, eventStateSchema } from "./events-state";
+import { newFlagship } from "./flagship";
 import { invariantsOf } from "./invariants";
 import { newLeague } from "./leagues";
 import { newFront, newRivalState } from "./rivals";
@@ -19,7 +21,7 @@ import { defaultGenome } from "./setup";
 import type { GameState, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 7;
+export const SAVE_FORMAT_VERSION = 9;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -109,6 +111,22 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     endQuarter: count,
   }),
   z.strictObject({
+    kind: z.literal("seasonChampion"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    clubId: z.int().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal("seatMoved"),
+    turn: z.int().min(1),
+    quarter: count,
+    from: z.string().min(1),
+    countryId: z.string().min(1),
+    reason: z.enum(["moved", "returned"]),
+  }),
+  z.strictObject({
     kind: z.literal("rivalRuleCopied"),
     turn: z.int().min(1),
     quarter: count,
@@ -119,6 +137,63 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     to: z.string().min(1),
   }),
 ]);
+
+const clubRatingSchema = z.strictObject({ clubId: z.int().min(1), rating: z.number() });
+const tableRowSchema = z.strictObject({
+  clubId: z.int().min(1),
+  played: count,
+  won: count,
+  drawn: count,
+  lost: count,
+  scoreFor: count,
+  scoreAgainst: count,
+  points: count,
+});
+const matchSchema = z.strictObject({
+  homeId: z.int().min(1),
+  awayId: z.int().min(1),
+  homeScore: count,
+  awayScore: count,
+  decidedFor: z.int().min(1).nullable(),
+});
+const seasonFormatSchema = z.enum(["european", "american"]);
+const flagshipSchema = z.strictObject({
+  countryId: z.string().min(1),
+  pendingCountryId: z.string().min(1).nullable(),
+  rng: z.array(z.number()).min(1),
+  season: z.int().min(1),
+  seasonQuarters: z.int().min(1),
+  quartersPlayed: count,
+  round: count,
+  clubs: z.array(
+    z.strictObject({
+      id: z.int().min(1),
+      countryId: z.string().min(1),
+      place: z.string().min(1),
+      nickname: z.string().min(1),
+      rating: z.number(),
+      active: z.boolean(),
+      firstSeason: z.int().min(1),
+    }),
+  ),
+  nextClubId: z.int().min(1),
+  table: z.array(tableRowSchema),
+  startRatings: z.array(clubRatingSchema),
+  lastRound: z.array(matchSchema),
+  seasons: z.array(
+    z.strictObject({
+      season: z.int().min(1),
+      quarter: count,
+      countryId: z.string().min(1),
+      format: seasonFormatSchema,
+      championId: z.int().min(1),
+      runnerUpId: z.int().min(1),
+      standings: z.array(tableRowSchema),
+      playoffs: z.array(matchSchema),
+      startRatings: z.array(clubRatingSchema),
+    }),
+  ),
+});
 
 const gameStateSchema = z.strictObject({
   seed: z.int().min(0).max(MAX_SEED),
@@ -191,6 +266,8 @@ const gameStateSchema = z.strictObject({
   landmarks: z.array(landmarkSchema),
   yearly: z.array(z.strictObject({ year: z.int(), fans: z.array(count) })),
   events: eventStateSchema,
+  seasonFormat: seasonFormatSchema,
+  flagship: flagshipSchema,
 });
 
 const saveFileSchema = z.strictObject({
@@ -209,6 +286,77 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 8 → 9: the flagship season as cards (GDD v1.15). Ratings never moved mid-season before this
+  // format, so the current season's start ratings are the active clubs' ratings now. Finished
+  // seasons keep no start ratings (no underdog story is told about them). Every recorded event
+  // gets no season facts, and no season card has been offered yet.
+  8: (save) => {
+    const flagship = save.state.flagship as Record<string, unknown>;
+    const clubs = (Array.isArray(flagship.clubs) ? flagship.clubs : []) as {
+      id: number;
+      countryId: string;
+      rating: number;
+      active: boolean;
+    }[];
+    const startRatings = clubs
+      .filter((club) => club.active && club.countryId === flagship.countryId)
+      .sort((a, b) => a.id - b.id)
+      .map((club) => ({ clubId: club.id, rating: club.rating }));
+    // Key order follows the schema, so the migrated state re-serializes byte-identically.
+    const migrated: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(flagship)) {
+      migrated[key] =
+        key === "seasons" && Array.isArray(value)
+          ? value.map((summary: object) => ({ ...summary, startRatings: [] }))
+          : value;
+      if (key === "table") migrated.startRatings = startRatings;
+    }
+    const events = save.state.events as Record<string, unknown>;
+    const withSeason = (records: unknown) =>
+      (Array.isArray(records) ? records : []).map((record: { facts: object }) => ({
+        ...record,
+        facts: { ...record.facts, season: null },
+      }));
+    return {
+      formatVersion: 9,
+      state: {
+        ...save.state,
+        events: {
+          nextId: events.nextId,
+          landmarkCursor: events.landmarkCursor,
+          offered: events.offered,
+          seasonOffered: {},
+          pending: withSeason(events.pending),
+          history: withSeason(events.history),
+          modifiers: events.modifiers,
+        },
+        flagship: migrated,
+      },
+    };
+  },
+  // 7 → 8: the flagship league arrived (GDD v1.11, v1.14). The anchor holds the seat with fresh
+  // clubs for its league's tier and a season that starts now; no past seasons are invented. Old
+  // campaigns play the European format.
+  7: (save, world) => {
+    const { seed, anchorCountryId, quarter } = save.state;
+    const anchorIndex = world.countries.findIndex((country) => country.id === anchorCountryId);
+    const league = rawCountries(save.state)[anchorIndex]?.league as { tier?: unknown } | null;
+    const tier = LEAGUE_TIERS.find((candidate) => candidate === league?.tier) ?? "amateur";
+    return {
+      formatVersion: 8,
+      state: {
+        ...save.state,
+        seasonFormat: "european",
+        flagship: newFlagship(
+          world,
+          Number(seed) || 0,
+          String(anchorCountryId),
+          tier,
+          Number(quarter) || 0,
+        ),
+      },
+    };
+  },
   // 6 → 7: no retroactive rewards for old landmarks; future turns start the event deck.
   6: (save) => ({
     formatVersion: 7,

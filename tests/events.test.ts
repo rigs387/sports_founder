@@ -51,16 +51,18 @@ function templateEvent(templateId: string, edit?: (state: GameState) => GameStat
 }
 
 describe("event content", () => {
-  it("ships eight translated cards with real triggers and a neutral decision default", () => {
-    expect(world.events.cards).toHaveLength(8);
+  it("ships sixteen translated cards with real triggers and a neutral decision default", () => {
+    expect(world.events.cards).toHaveLength(16);
     expect(eventsFileSchema.safeParse(world.events).success).toBe(true);
-    const text = en.events.cards as Record<
+    const text = en.events.cards as unknown as Record<
       string,
-      { title: string; body: string; choices?: Record<string, string> }
+      Record<string, string> & { title: string; choices?: Record<string, string> }
     >;
     for (const card of world.events.cards) {
       expect(text[card.id]?.title).toBeTruthy();
-      expect(text[card.id]?.body).toBeTruthy();
+      // Season cards vary their body by season format (i18next context) or by a count.
+      const bodies = Object.keys(text[card.id] ?? {}).filter((key) => key.startsWith("body"));
+      expect(bodies.length).toBeGreaterThan(0);
       for (const choice of card.choices) expect(text[card.id]?.choices?.[choice.id]).toBeTruthy();
     }
   });

@@ -2,6 +2,7 @@ import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { rivalConversionBoosts } from "./countermoves";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
+import { stepFlagshipQuarter } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { type GrowthFactors, growthFactors } from "./growth";
 import { stepLeagueQuarter } from "./leagues";
@@ -134,7 +135,10 @@ export function stepQuarter(state: GameState, world: World): GameState {
 
   const defended = stepRivals(state, afterBusiness, quarter, world);
   found.push(...defended.landmarks);
-  const countries = defended.countries;
+  // The flagship plays on its own random stream (src/sim/flagship.ts).
+  const flagshipQuarter = stepFlagshipQuarter(state, defended.countries, world, state.quarter);
+  found.push(...flagshipQuarter.landmarks);
+  const countries = flagshipQuarter.countries;
   const ppIncome = quarterPpIncome(countries, growth, config);
   const yearEnded = quarter % QUARTERS_PER_YEAR === 0;
 
@@ -149,6 +153,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
     pp: state.pp + ppIncome,
     rivals: defended.rivals,
     countries,
+    flagship: flagshipQuarter.flagship,
     landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
     yearly: yearEnded
       ? [...state.yearly, yearlySnapshot({ countries }, yearOfQuarter(quarter - 1, config))]

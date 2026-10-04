@@ -14,6 +14,22 @@ export const firstAnchor = world.countries[0]?.id ?? "missing-country";
 
 export const baseGenome: Genome = defaultGenome(world);
 
+// Anchors spanning the world's extremes: tiny and huge, rich and poor, cold and hot, dense and
+// sparse. Per-anchor sweeps use only these; never sweep campaigns over all 213 markets.
+export const sweepAnchors: string[] = [
+  "tuvalu",
+  "china",
+  "india",
+  "united-states",
+  "brazil",
+  "ecuador",
+  "iceland",
+  "chad",
+  "singapore",
+  "qatar",
+  "mongolia",
+];
+
 export function setupFor(seed: number, anchorCountryId = firstAnchor, genome = baseGenome) {
   return { seed, anchorCountryId, genome } satisfies CampaignSetup;
 }
@@ -34,6 +50,7 @@ export function withWorld(base: World, edit: (content: WorldContent) => void): W
     growthTree: base.growthTree,
     events: base.events,
     names: base.names,
+    places: base.places,
     sources: base.sources,
     config: base.config,
   });

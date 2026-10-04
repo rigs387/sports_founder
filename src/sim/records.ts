@@ -127,6 +127,20 @@ export const landmarks = {
     move,
     endQuarter,
   }),
+  seasonChampion: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    season: number,
+    clubId: number,
+  ): Landmark => ({ kind: "seasonChampion", turn, quarter, countryId, season, clubId }),
+  seatMoved: (
+    turn: number,
+    quarter: number,
+    from: string,
+    countryId: string,
+    reason: "moved" | "returned",
+  ): Landmark => ({ kind: "seatMoved", turn, quarter, from, countryId, reason }),
   rivalRuleCopied: (
     turn: number,
     quarter: number,
