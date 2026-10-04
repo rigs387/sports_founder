@@ -259,6 +259,38 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
   if (new Set(nicknames).size < mostClubs) {
     issue(sources.names, "clubNicknames", `needs at least ${mostClubs} distinct entries`);
   }
+  // Every market's players need a pool of invented names (GDD v1.16).
+  const { playerNames } = world.names;
+  const minPool = world.config.flagship.players.minNamePool;
+  const usedPools = new Set<string>();
+  for (const country of world.countries) {
+    const poolId = playerNames.countries[country.id] ?? country.languages.primary;
+    usedPools.add(poolId);
+    if (playerNames.pools[poolId] === undefined) {
+      issue(sources.names, `playerNames.pools.${poolId}`, `missing: "${country.id}" names from it`);
+    }
+  }
+  for (const [countryId, poolId] of Object.entries(playerNames.countries)) {
+    if (!countryIds.has(countryId)) {
+      issue(sources.names, `playerNames.countries.${countryId}`, "unknown country id");
+    } else if (playerNames.pools[poolId] === undefined) {
+      issue(sources.names, `playerNames.countries.${countryId}`, `unknown pool "${poolId}"`);
+    }
+  }
+  for (const [poolId, pool] of Object.entries(playerNames.pools)) {
+    if (!usedPools.has(poolId)) {
+      issue(sources.names, `playerNames.pools.${poolId}`, "no country names from this pool");
+    }
+    for (const part of ["given", "family"] as const) {
+      const names = pool[part];
+      if (new Set(names).size !== names.length) {
+        issue(sources.names, `playerNames.pools.${poolId}.${part}`, "has duplicate entries");
+      }
+      if (names.length < minPool) {
+        issue(sources.names, `playerNames.pools.${poolId}.${part}`, `needs at least ${minPool}`);
+      }
+    }
+  }
   // ---- Places: every market has at least one real place for its clubs ------------------------
   for (const country of world.countries) {
     if (world.places[country.id] === undefined) {
@@ -272,6 +304,16 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
   const tierSizes = LEAGUE_TIERS.map((tier) => flagship.clubs[tier]);
   if (tierSizes.some((size, i) => i > 0 && size < (tierSizes[i - 1] ?? 0))) {
     issue(sources.config, "flagship.clubs", "club counts must not shrink at higher league tiers");
+  }
+  const { players } = flagship;
+  if (players.foundingAge.min > players.foundingAge.max) {
+    issue(sources.config, "flagship.players.foundingAge", "min must not exceed max");
+  }
+  if (players.skill.min > players.skill.max) {
+    issue(sources.config, "flagship.players.skill", "min must not exceed max");
+  }
+  if (players.career.declineAge < players.career.peakAge) {
+    issue(sources.config, "flagship.players.career", "declineAge must not come before peakAge");
   }
   for (const [i, entry] of flagship.playoffs.entries()) {
     if (entry.clubs > entry.minClubs) {

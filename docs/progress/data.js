@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-03",
-    tests: 357,
-    files: 29,
-    note: "npm run check passed after stars step 1, scoring frequency in flagship matches (type checks, Biome, purity, 357 tests in 29 files). Lint has existing visual-study warnings.",
+    tests: 364,
+    files: 30,
+    note: "npm run check passed after stars step 2, leading players (type checks, Biome, purity, 364 tests in 30 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-03",
     smoke:
       "UI smoke passed and now plays to a season end and opens its story card (a runaway pressure card naming real clubs); save/resume continued identically.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Make the flagship season matter",
-      text: "Scoring frequency now shapes flagship matches (stars step 1 of 8); next, each club's leading player.",
+      text: "Every flagship club has a named leading player (stars step 2 of 8); next, credit them with scores.",
       tag: "Next build",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Built",
+      title: "Leading players",
+      text: "Stars step 2 (tech plan 2.6): every flagship club has one named leading player, born in a real place of its market, with a hidden skill on a career curve. Names come from 60 invented pools (the 54 language spheres plus six regional ones, such as West African and Pacific). Simulation only; save format 11.",
+    },
     {
       date: "2026-10-03",
       type: "Built",
@@ -406,7 +412,7 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Step 2 of tech plan 2.6: leading players (names, real birthplaces, hidden skill), then credited scores, stars, backing, cards, saves, screen.",
+      next: "Step 3 of tech plan 2.6: credit scores to leading players and keep career lines, then stars, backing, cards, saves, screen.",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
@@ -416,10 +422,12 @@ window.SF_PROGRESS = {
         ],
         ["Scoring frequency", "../flagship/README.md#scoring-frequency"],
         ["Scoring frequency tests", "../../tests/flagship-match.test.ts"],
+        ["Leading players", "../flagship/README.md#leading-players"],
       ],
       items: [
         ["built", "Scoring frequency sets flagship match chances, fixed per season"],
-        ["planned", "Each club's leading player, credited with scores"],
+        ["built", "Each club's named leading player, born in a real place (simulation only)"],
+        ["planned", "Scores credited to leading players"],
         ["planned", "Stars made by a season: top scorer, club share, 1–4 places by tier"],
         ["planned", "Star cards: breakout, final season, retirement, moves, records"],
         ["planned", "Flagship stars and lightweight standouts elsewhere"],

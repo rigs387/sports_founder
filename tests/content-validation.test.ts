@@ -222,6 +222,17 @@ describe("content validation", () => {
     expect(error.message).toContain(`names.yaml at countries.${firstAnchor}`);
   });
 
+  it("every market needs a player name pool of enough distinct names", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "names.yaml", ["playerNames", "countries", "nigeria"], setValue("yoruba"));
+    editYaml(dir, "names.yaml", ["playerNames", "pools", "greek", "given"], setValue(["Nikos"]));
+    editYaml(dir, "names.yaml", ["playerNames", "pools", "finnish"], remove);
+    const message = loadError(dir).message;
+    expect(message).toContain('playerNames.countries.nigeria: unknown pool "yoruba"');
+    expect(message).toContain("playerNames.pools.greek.given: needs at least");
+    expect(message).toContain('playerNames.pools.finnish: missing: "finland" names from it');
+  });
+
   it("a YAML syntax error names the file and line", () => {
     const dir = copyOfContent();
     writeFileSync(join(dir, "names.yaml"), "countries:\n  valdoria: Austria\n  kestmark: [Kest\n");

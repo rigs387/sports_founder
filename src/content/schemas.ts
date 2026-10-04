@@ -191,6 +191,21 @@ export const namesFileSchema = z.strictObject({
    * not. Needs at least as many distinct entries as the largest flagship has clubs.
    */
   clubNicknames: z.array(z.string().min(1)).min(1),
+  /**
+   * Invented flagship player names (GDD v1.16), by pool. A country uses the pool of its primary
+   * language sphere unless `countries` names a regional pool for it.
+   */
+  playerNames: z.strictObject({
+    countries: z.record(z.string(), id),
+    pools: z.record(
+      id,
+      z.strictObject({
+        order: z.enum(["givenFirst", "familyFirst"]).default("givenFirst"),
+        given: z.array(z.string().min(1)),
+        family: z.array(z.string().min(1)),
+      }),
+    ),
+  }),
 });
 
 // ---- Places (GDD v1.14: clubs belong to real places) ---------------------------------------
@@ -602,6 +617,20 @@ export const configFileSchema = z.strictObject({
     }),
     /** A new club's place is drawn with weight population ^ placeWeightExponent. */
     placeWeightExponent: z.number().min(0),
+    /** Leading players (GDD v1.16). */
+    players: z.strictObject({
+      foundingAge: z.strictObject({ min: z.int().min(0), max: z.int().min(0) }),
+      skill: z.strictObject({ min: z.number(), max: z.number() }),
+      peakSkill: z.strictObject({ mean: z.number(), spread: z.number().min(0) }),
+      career: z.strictObject({
+        peakAge: z.int().min(0),
+        declineAge: z.int().min(0),
+        risePerYear: unitInterval,
+        declinePerYear: unitInterval,
+      }),
+      nameRetries: z.int().min(0),
+      minNamePool: z.int().min(1),
+    }),
     seatEligibleTiers: z.array(leagueTierSchema).min(1),
     seatMove: z.strictObject({
       hardcoreDemotionShare: unitInterval,

@@ -102,3 +102,27 @@ high-scoring margin is 2 (`closeFinalMargin`), which gives 64–65%; low stays m
 the GDD intends. `tests/flagship-match.test.ts` covers the fitted odds, draws by frequency, the
 season-start rule, the world's untouched random sequence under every rule and the 9 → 10
 migration.
+
+## Leading players
+
+Built October 3, 2026 (GDD v1.16, tech plan 2.6 step 2). Simulation only: nothing on screen yet,
+and players do not score until step 3. Every club has one named leading player who stands in for
+the squad: born in a real place of the club's market (drawn as club places are), with an invented
+name and a hidden peak and current skill (`flagship.players` in `config.yaml`). Founding players'
+ages are spread from 18 to 32 so the first generation does not retire at once; current skill is
+peak skill times the career curve for their age.
+
+Names come from pools in `names.yaml` (`playerNames`): 30 given and 30 family names for each of
+the 54 language spheres, plus six regional pools for markets whose language sphere does not match
+how people are named (Nigeria is in the English sphere, Senegal in the French one). Each name is
+a random pairing; pairs that would name famous real athletes or public figures were avoided when
+the pools were written. Chinese, Japanese, Korean, Vietnamese, Hungarian and Khmer names put the
+family name first. Content validation requires a pool for every market, at least 20 distinct
+names per list and no unused pool.
+
+Any active club without a leading player gets one when the league's clubs are fitted: founding
+clubs, expansion clubs and clubs from older saves. Players stay with their clubs when the seat
+moves. Generation draws on the flagship's own stream, so the world is untouched. Save format 11
+adds the players; format 10 saves migrate with a fresh leading player at every active club.
+`tests/flagship-players.test.ts` covers founding players, name pools and order, expansion,
+dormant clubs, the untouched world and the 10 → 11 migration.

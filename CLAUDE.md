@@ -170,6 +170,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 10 adds the flagship's scoring rule (GDD v1.16): `FlagshipState.scoring`, fixed at
   each season's start from the genome, and on every season summary. Format 9 migrates with every
   season so far, and the one in progress, on the medium rule (the old single rule).
+- Save format 11 adds leading players (GDD v1.16): `FlagshipState.players` and `nextPlayerId`.
+  Format 10 migrates with a fresh leading player at every active club (founding ages, the
+  flagship's own stream); dormant clubs get theirs when they return.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

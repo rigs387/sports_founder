@@ -175,6 +175,24 @@ export interface Club {
   firstSeason: number;
 }
 
+/**
+ * A club's leading player (GDD v1.16): the one named person per club who stands in for the squad.
+ * Born in a real place of the club's market. Skill is hidden from the player.
+ */
+export interface Player {
+  /** Unique within the campaign. */
+  id: number;
+  name: string;
+  /** Where the player was born: a market and one of its real places (places.yaml). */
+  countryId: string;
+  birthplace: string;
+  clubId: number;
+  /** The flagship season the player was born in: their age in season s is s − birthSeason. */
+  birthSeason: number;
+  peakSkill: number;
+  skill: number;
+}
+
 /** One club's line in a season table. */
 export interface TableRow {
   clubId: number;
@@ -248,6 +266,9 @@ export interface FlagshipState {
   round: number;
   clubs: Club[];
   nextClubId: number;
+  /** Every club's leading player, active or dormant, in id order. */
+  players: Player[];
+  nextPlayerId: number;
   /** The current season's table, in club order (not ranked). */
   table: TableRow[];
   /** The active clubs' ratings when the current season began, in club order. */

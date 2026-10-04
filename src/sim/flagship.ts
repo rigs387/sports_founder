@@ -12,6 +12,7 @@ import {
   type LeagueTierId,
   type MatchResult,
   PLAYER_INDEX,
+  type Player,
   type ScoringOption,
   type SeasonFormat,
   type SeasonSummary,
@@ -120,6 +121,21 @@ function clamp(value: number, low: number, high: number): number {
   return Math.min(high, Math.max(low, value));
 }
 
+/** One of the market's real places, weighted by population ^ placeWeightExponent. */
+function drawPlace(world: World, rng: Rng, countryId: string): string {
+  const places = world.places[countryId];
+  if (!places || places.length === 0) throw new Error(`No places for "${countryId}"`);
+  const exponent = world.config.flagship.placeWeightExponent;
+  const weights = places.map((place) => Math.max(1, place.population) ** exponent);
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  let roll = nextFloat(rng) * total;
+  for (let i = 0; i < places.length; i += 1) {
+    roll -= weights[i] ?? 0;
+    if (roll < 0) return places[i]?.name ?? "";
+  }
+  return places[places.length - 1]?.name ?? "";
+}
+
 /** A new club in a real place of the market, with a nickname no active club there has. */
 function newClub(
   world: World,
@@ -128,20 +144,7 @@ function newClub(
   countryId: string,
   rating: number,
 ): Club {
-  const places = world.places[countryId];
-  if (!places || places.length === 0) throw new Error(`No places for "${countryId}"`);
-  const exponent = world.config.flagship.placeWeightExponent;
-  const weights = places.map((place) => Math.max(1, place.population) ** exponent);
-  const total = weights.reduce((sum, w) => sum + w, 0);
-  let roll = nextFloat(rng) * total;
-  let place = places[places.length - 1]?.name ?? "";
-  for (let i = 0; i < places.length; i += 1) {
-    roll -= weights[i] ?? 0;
-    if (roll < 0) {
-      place = places[i]?.name ?? place;
-      break;
-    }
-  }
+  const place = drawPlace(world, rng, countryId);
   const here = flagship.clubs.filter((club) => club.countryId === countryId);
   const taken = new Set(here.filter((club) => club.active).map((club) => club.nickname));
   const everUsedHere = new Set(here.map((club) => club.nickname));
@@ -195,7 +198,97 @@ function fitClubs(flagship: FlagshipState, world: World, rng: Rng, tier: LeagueT
   for (const club of newestFirst.slice(0, Math.max(0, newestFirst.length - target))) {
     club.active = false;
   }
+  return staffClubs(next, world, rng);
+}
+
+// ---- Leading players (GDD v1.16) ------------------------------------------------------------
+
+/** The invented-name pool a market's players are named from. */
+function namePool(world: World, countryId: string) {
+  const { playerNames } = world.names;
+  const sphere = world.countries.find((c) => c.id === countryId)?.languages.primary ?? "";
+  const pool = playerNames.pools[playerNames.countries[countryId] ?? sphere];
+  if (!pool) throw new Error(`No player name pool for "${countryId}"`);
+  return pool;
+}
+
+function pick<T>(rng: Rng, items: readonly T[]): T {
+  const item = items[Math.floor(nextFloat(rng) * items.length)];
+  if (item === undefined) throw new Error("Cannot pick from an empty list");
+  return item;
+}
+
+/** A name from the market's pool, redrawn (a few times) if someone in the league has it. */
+function drawName(world: World, rng: Rng, countryId: string, taken: ReadonlySet<string>): string {
+  const pool = namePool(world, countryId);
+  let name = "";
+  for (let attempt = 0; attempt <= world.config.flagship.players.nameRetries; attempt += 1) {
+    const given = pick(rng, pool.given);
+    const family = pick(rng, pool.family);
+    name = pool.order === "familyFirst" ? `${family} ${given}` : `${given} ${family}`;
+    if (given !== family && !taken.has(name)) break;
+  }
+  return name;
+}
+
+/** A player's share of their peak skill at `age` (the career curve). */
+export function careerShare(age: number, world: World): number {
+  const { career } = world.config.flagship.players;
+  if (age < career.peakAge) return Math.max(0, 1 - career.risePerYear * (career.peakAge - age));
+  if (age <= career.declineAge) return 1;
+  return Math.max(0, 1 - career.declinePerYear * (age - career.declineAge));
+}
+
+/** A club's first leading player, of an age spread across the founding range. */
+function newPlayer(
+  world: World,
+  rng: Rng,
+  flagship: FlagshipState,
+  club: Club,
+  taken: ReadonlySet<string>,
+): Player {
+  const { foundingAge, skill, peakSkill } = world.config.flagship.players;
+  const age =
+    foundingAge.min + Math.floor(nextFloat(rng) * (foundingAge.max - foundingAge.min + 1));
+  const peak = clamp(
+    peakSkill.mean + peakSkill.spread * (2 * nextFloat(rng) - 1),
+    skill.min,
+    skill.max,
+  );
+  return {
+    id: flagship.nextPlayerId,
+    name: drawName(world, rng, club.countryId, taken),
+    countryId: club.countryId,
+    birthplace: drawPlace(world, rng, club.countryId),
+    clubId: club.id,
+    birthSeason: flagship.season - age,
+    peakSkill: peak,
+    skill: clamp(peak * careerShare(age, world), skill.min, skill.max),
+  };
+}
+
+/**
+ * Gives every active club without a leading player one (GDD v1.16): founding and expansion clubs,
+ * and clubs from saves made before players existed. Dormant clubs keep theirs.
+ */
+function staffClubs(flagship: FlagshipState, world: World, rng: Rng): FlagshipState {
+  let next = flagship;
+  const staffed = new Set(next.players.map((player) => player.clubId));
+  const taken = new Set(next.players.map((player) => player.name));
+  for (const club of activeClubs(next)) {
+    if (staffed.has(club.id)) continue;
+    const player = newPlayer(world, rng, next, club, taken);
+    taken.add(player.name);
+    next = { ...next, players: [...next.players, player], nextPlayerId: next.nextPlayerId + 1 };
+  }
   return next;
+}
+
+/** Staffs a flagship read from a save older than players (format 10 → 11 migration). */
+export function staffFlagship(flagship: FlagshipState, world: World): FlagshipState {
+  const rng = restoreRng(flagship.rng);
+  const staffed = staffClubs(flagship, world, rng);
+  return { ...staffed, rng: saveRng(rng) };
 }
 
 /** The active clubs' ratings now, in club order. */
@@ -248,6 +341,8 @@ export function newFlagship(
     round: 0,
     clubs: [],
     nextClubId: 1,
+    players: [],
+    nextPlayerId: 1,
     table: [],
     startRatings: [],
     lastRound: [],
@@ -724,6 +819,30 @@ export function flagshipProblems(state: GameState, world: World): string[] {
     if (!Number.isFinite(club.rating)) problems.push(`flagship club ${club.id} has a bad rating`);
   }
   const active = new Set(activeClubs(flagship).map((club) => club.id));
+  const playerIds = new Set<number>();
+  const clubsStaffed = new Set<number>();
+  const { skill } = world.config.flagship.players;
+  for (const player of flagship.players) {
+    if (playerIds.has(player.id) || player.id >= flagship.nextPlayerId) {
+      problems.push(`flagship player ${player.id} has a bad id`);
+    }
+    playerIds.add(player.id);
+    if (!ids.has(player.clubId)) problems.push(`flagship player ${player.id} has no club`);
+    if (clubsStaffed.has(player.clubId)) {
+      problems.push(`flagship club ${player.clubId} has two leading players`);
+    }
+    clubsStaffed.add(player.clubId);
+    if (!world.places[player.countryId]?.some((place) => place.name === player.birthplace)) {
+      problems.push(`flagship player ${player.id} was born in an unknown place`);
+    }
+    const skills = [player.skill, player.peakSkill];
+    if (skills.some((value) => !(value >= skill.min && value <= skill.max))) {
+      problems.push(`flagship player ${player.id} has a bad skill`);
+    }
+  }
+  for (const clubId of active) {
+    if (!clubsStaffed.has(clubId)) problems.push(`flagship club ${clubId} has no leading player`);
+  }
   const tableIds = flagship.table.map((row) => row.clubId);
   if (
     flagship.table.length > 0 &&

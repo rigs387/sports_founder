@@ -686,8 +686,10 @@ purchased traits and percentage modifiers alone do not make culture.
   - *One named leading player per club* (8–20 people at the flagship). They stand in for the
     "full squads" above until a later phase. Each is born in a real place of the flagship's
     country (`places.yaml`, weighted like clubs; no invented places, no foreign players in
-    Phase 1), with a name from invented per-language-sphere pools in the names file, and a
-    hidden skill that follows a career curve.
+    Phase 1), with a name from invented per-language-sphere pools in the names file (or a
+    regional pool where a market's sphere does not match how its people are named, e.g. Nigeria
+    in the English sphere; added 2026-10-03 at build), and a hidden skill that follows a career
+    curve.
   - *A score is the sport's one scoring unit* (decided 2026-10-03): whatever adds to a match
     result, shown with the sport's own term once founding character is built and a neutral
     "score" until then. No score types and no assists; innings sports count runs the same way.

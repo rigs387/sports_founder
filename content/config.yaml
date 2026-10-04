@@ -491,6 +491,23 @@ flagship:
   # A new club is based in one of its market's real places (places.yaml), drawn with weight
   # population ^ placeWeightExponent: big cities host several clubs, small towns sometimes one.
   placeWeightExponent: 0.5
+  # Leading players (GDD v1.16, tech plan 2.6 step 2): one named player per club, born in a real
+  # place of the club's market (drawn as club places are), named from the market's pool in
+  # names.yaml. Every active club without one gets one when clubs are fitted to the league (a
+  # founding or expansion club, or an old save's club). Ages at founding are spread
+  # foundingAge.min..max so the first generation does not retire at once. Skill is hidden: peak
+  # skill is uniform mean ± spread, clamped to skill.min..max; current skill is peak × the career
+  # curve, which climbs risePerYear (as a share of peak) each year below peakAge, holds to
+  # declineAge and falls declinePerYear each year after. A drawn name already in the league is
+  # redrawn up to nameRetries times. Every name pool needs at least minNamePool given and family
+  # names.
+  players:
+    foundingAge: { min: 18, max: 32 }
+    skill: { min: 1, max: 100 }
+    peakSkill: { mean: 50, spread: 20 }
+    career: { peakAge: 27, declineAge: 30, risePerYear: 0.04, declinePerYear: 0.05 }
+    nameRetries: 10
+    minNamePool: 20
   # The seat moves only to these league tiers (GDD v1.13); the anchor holds it from turn 1 at any
   # tier.
   seatEligibleTiers: [professional, elite]

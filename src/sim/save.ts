@@ -13,16 +13,16 @@ import {
 } from "../content";
 import { tierEntry } from "./calendar";
 import { emptyEvents, eventStateSchema } from "./events-state";
-import { newFlagship } from "./flagship";
+import { newFlagship, staffFlagship } from "./flagship";
 import { invariantsOf } from "./invariants";
 import { newLeague } from "./leagues";
 import { newFront, newRivalState } from "./rivals";
 import { MAX_SEED } from "./rng";
 import { defaultGenome } from "./setup";
-import type { GameState, Genome, World } from "./types";
+import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 10;
+export const SAVE_FORMAT_VERSION = 11;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -180,6 +180,19 @@ const flagshipSchema = z.strictObject({
     }),
   ),
   nextClubId: z.int().min(1),
+  players: z.array(
+    z.strictObject({
+      id: z.int().min(1),
+      name: z.string().min(1),
+      countryId: z.string().min(1),
+      birthplace: z.string().min(1),
+      clubId: z.int().min(1),
+      birthSeason: z.int(),
+      peakSkill: z.number(),
+      skill: z.number(),
+    }),
+  ),
+  nextPlayerId: z.int().min(1),
   table: z.array(tableRowSchema),
   startRatings: z.array(clubRatingSchema),
   lastRound: z.array(matchSchema),
@@ -290,6 +303,23 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 10 → 11: leading players (GDD v1.16). Every active club gets a fresh leading player, with
+  // ages spread as at founding, drawn on the flagship's own stream; no stars and no invented
+  // careers. Dormant clubs get theirs when they return.
+  10: (save, world) => {
+    const flagship = save.state.flagship as Record<string, unknown>;
+    // Key order follows the schema, so the migrated state re-serializes byte-identically.
+    const shaped: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(flagship)) {
+      shaped[key] = value;
+      if (key === "nextClubId") {
+        shaped.players = [];
+        shaped.nextPlayerId = 1;
+      }
+    }
+    const staffed = staffFlagship(shaped as unknown as FlagshipState, world);
+    return { formatVersion: 11, state: { ...save.state, flagship: staffed } };
+  },
   // 9 → 10: the flagship's match rule follows the genome's scoring frequency (GDD v1.16). Every
   // season before this format was played under the old single rule, which is the medium rule, and
   // a season in progress finishes under it; the genome's rule starts with the next season, so no

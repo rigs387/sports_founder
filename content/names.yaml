@@ -265,3 +265,250 @@ clubNicknames:
   - Vikings
   - Wanderers
   - Wolves
+
+# Invented flagship player names (GDD v1.16): a leading player's given and family name are drawn
+# separately from their birth country's pool, so every name is a made-up combination. Pairs that
+# would name famous real athletes or public figures were avoided when the pools were written.
+# Men's names for now. A country's pool is its primary language sphere (countries.yaml) unless
+# `countries` names a regional pool: where a language sphere does not match how people are named
+# (Nigeria is in the English sphere, Senegal in the French one). `order: familyFirst` writes the
+# family name first.
+playerNames:
+  countries:
+    gambia: west-african-anglophone
+    ghana: west-african-anglophone
+    liberia: west-african-anglophone
+    nigeria: west-african-anglophone
+    sierra-leone: west-african-anglophone
+    botswana: southern-african
+    eswatini: southern-african
+    lesotho: southern-african
+    malawi: southern-african
+    namibia: southern-african
+    south-africa: southern-african
+    zambia: southern-african
+    zimbabwe: southern-african
+    benin: francophone-african
+    burkina-faso: francophone-african
+    burundi: francophone-african
+    cameroon: francophone-african
+    central-african-republic: francophone-african
+    chad: francophone-african
+    congo: francophone-african
+    dr-congo: francophone-african
+    gabon: francophone-african
+    guinea: francophone-african
+    ivory-coast: francophone-african
+    mali: francophone-african
+    niger: francophone-african
+    rwanda: francophone-african
+    senegal: francophone-african
+    togo: francophone-african
+    american-samoa: pacific-islands
+    cook-islands: pacific-islands
+    fiji: pacific-islands
+    papua-new-guinea: pacific-islands
+    samoa: pacific-islands
+    solomon-islands: pacific-islands
+    tonga: pacific-islands
+    vanuatu: pacific-islands
+    pakistan: pakistani
+    azerbaijan: central-asian
+    kazakhstan: central-asian
+    kyrgyzstan: central-asian
+    turkmenistan: central-asian
+    uzbekistan: central-asian
+    uganda: swahili
+    south-sudan: swahili
+    singapore: chinese
+    eritrea: amharic
+    djibouti: somali
+  pools:
+    english:
+      given: [James, Oliver, Jack, Harry, George, Thomas, William, Daniel, Samuel, Joseph, Michael, Ryan, Liam, Connor, Ethan, Luke, Adam, Callum, Nathan, Owen, Lewis, Ben, Tyler, Jordan, Reece, Aaron, Dylan, Kieran, Jamie, Harvey]
+      family: [Smith, Jones, Taylor, Brown, Fisher, Evans, Walker, Wright, Robinson, Thompson, Hughes, Edwards, Green, Hall, Wood, Harris, Clarke, Turner, Hill, Porter, Ward, Morris, Baker, Murphy, Kelly, Campbell, Stewart, Reid, Fletcher, Doyle]
+    french:
+      given: [Lucas, Hugo, Louis, Gabriel, Arthur, Jules, Théo, Mathis, Nathan, Raphaël, Antoine, Maxime, Julien, Nicolas, Thomas, Alexandre, Baptiste, Clément, Romain, Quentin, Florian, Kévin, Adrien, Bastien, Mathieu, Olivier, Pierre, Sébastien, Yanis, Enzo]
+      family: [Martin, Bernard, Dubois, Durand, Moreau, Laurent, Simon, Michel, Lefebvre, Leroy, Roux, David, Bertrand, Morel, Fournier, Girard, Bonnet, Dupont, Lambert, Fontaine, Rousseau, Vincent, Muller, Lefèvre, Faure, André, Mercier, Blanc, Guérin, Garnier]
+    spanish:
+      given: [Alejandro, Pablo, Daniel, Javier, Carlos, Diego, Sergio, Mateo, Santiago, Andrés, Luis, Miguel, Jorge, Rafael, Fernando, Álvaro, Iván, Rubén, Adrián, Gonzalo, Joaquín, Nicolás, Tomás, Emilio, Raúl, Héctor, Óscar, Marcos, Julián, Esteban]
+      family: [García, Rodríguez, González, Fernández, López, Martínez, Sánchez, Pérez, Gómez, Ibáñez, Serrano, Bravo, Vidal, Pastor, Muñoz, Romero, Navarro, Medina, Domínguez, Vázquez, Cabrera, Gil, Castro, Ortega, Rubio, Calvo, Delgado, Cortés, Morales, Lozano]
+    arabic:
+      given: [Mohammed, Ahmed, Ali, Omar, Youssef, Khaled, Hassan, Hussein, Ibrahim, Karim, Tarek, Mahmoud, Mostafa, Samir, Walid, Nabil, Hamza, Bilal, Faisal, Majed, Saeed, Rami, Ziad, Adel, Fares, Yasser, Anas, Sami, Amr, Hisham]
+      family: [Haddad, Mansour, Saleh, Nasser, Khalil, Hamdan, Aziz, Farouk, Rahman, Hamid, Shaker, Qasim, Qadri, Sabri, Najjar, Bakr, Khatib, Masri, Ayoub, Hijazi, Hakim, Amin, Fawzi, Taha, Sharif, Othman, Fathi, Hashem, Suleiman, Karam]
+    portuguese:
+      given: [João, Pedro, Tiago, Rafael, Gabriel, Lucas, Miguel, Gonçalo, Diogo, Rodrigo, Bruno, Caetano, Ricardo, Fábio, Vítor, Hugo, Nuno, Paulo, Luís, Mateus, Felipe, Gustavo, Leonardo, Otávio, Vinícius, Caio, Renato, Davi, Marcelo, Henrique]
+      family: [Silva, Santos, Ferreira, Pereira, Oliveira, Reis, Rodrigues, Martins, Pires, Pacheco, Gonçalves, Freitas, Lopes, Marques, Alves, Matos, Ribeiro, Pinto, Batista, Teixeira, Moreira, Correia, Vaz, Nunes, Soares, Vieira, Monteiro, Cardoso, Rocha, Barbosa]
+    turkic:
+      given: [Mehmet, Mustafa, Ahmet, Ali, Hüseyin, Emre, Batuhan, Can, Mert, Kerem, Oğuz, Serkan, Volkan, Hakan, Murat, Onur, Tolga, Barış, Cem, Arda, Yusuf, Ömer, Kaan, Eren, Selim, Furkan, Cenk, Umut, Taner, Engin]
+      family: [Yılmaz, Kaya, Demir, Şahin, Çelik, Yıldız, Yıldırım, Öztürk, Aydın, Özdemir, Arslan, Doğan, Kılıç, Aslan, Çetin, Kara, Bozkurt, Kurt, Özkan, Şimşek, Polat, Avcı, Erdoğan, Güneş, Aksoy, Tekin, Uysal, Keskin, Ünal, Acar]
+    scandinavian:
+      given: [Lars, Erik, Anders, Magnus, Johan, Henrik, Søren, Rasmus, Oskar, Emil, Nils, Jonas, Kristian, Fredrik, Sindre, Gustav, Axel, Viktor, Mathias, Jens, Ole, Sigurd, Einar, Gunnar, Björn, Halvor, Torbjørn, Aron, Kári, Sveinn]
+      family: [Hansen, Johansen, Olsen, Larsen, Andersen, Pedersen, Nilsen, Kristiansen, Jensen, Sjöberg, Nilsson, Eriksson, Sandberg, Persson, Bergström, Gustafsson, Lindqvist, Berg, Dahl, Lund, Haugen, Bakke, Strand, Holm, Nygaard, Sigurðsson, Jónsson, Magnússon, Halvorsen, Lindberg]
+    dutch:
+      given: [Daan, Sem, Lars, Thijs, Bram, Jesse, Ruben, Stijn, Jasper, Niels, Joris, Sander, Wouter, Bas, Koen, Tim, Rick, Milan, Jens, Pieter, Maarten, Floris, Gijs, Teun, Wim, Dirk, Hendrik, Arjen, Mats, Tygo]
+      family: [de Jong, Jansen, de Vries, van den Berg, van Dijk, Bakker, Janssen, Visser, Smit, Meijer, de Boer, Mulder, de Groot, Bos, Vos, Peters, Hendriks, van Leeuwen, Dekker, Brouwer, de Wit, Dijkstra, Smits, de Graaf, van der Meer, Kok, Jacobs, Vermeulen, Peeters, Maes]
+    serbo-croatian:
+      given: [Marko, Luka, Nikola, Stefan, Filip, Ivan, Dragan, Milan, Nemanja, Aleksandar, Dušan, Vladimir, Goran, Zoran, Mateo, Josip, Ante, Dino, Edin, Emir, Haris, Mirza, Amar, Petar, Bojan, Igor, Tomislav, Darko, Vuk, Miloš]
+      family: [Jovanović, Simić, Nikolić, Marković, Ristić, Stojanović, Ilić, Pavlović, Horvat, Bošnjak, Grgić, Marić, Novak, Knežević, Vuković, Popović, Hodžić, Begić, Delić, Mujić, Mehmedović, Perić, Tomić, Radić, Kovač, Šarić, Lukić, Radović, Bilić, Vidović]
+    german:
+      given: [Lukas, Leon, Felix, Jonas, Maximilian, Paul, Elias, Noah, Tim, Jan, Niklas, Moritz, Florian, Sebastian, Tobias, Matthias, Stefan, Kai, Dominik, Fabian, Julian, Philipp, Simon, David, Benedikt, Marcel, Dennis, Lennart, Jannik, Timo]
+      family: [Müller, Schmidt, Schneider, Fischer, Weber, Meyer, Wagner, Becker, Schulz, Hoffmann, Koch, Bauer, Richter, Klein, Wolf, Schröder, Neumann, Schwarz, Zimmermann, Braun, Krüger, Seidel, Hartmann, Lange, Schmitt, Vogel, Krause, Lehmann, Huber, Gruber]
+    chinese:
+      order: familyFirst
+      given: [Wei, Kang, Jun, Hang, Shuai, Peng, Bo, Chen, Jie, Shan, Ming, Qiang, Tao, Ze, Yu, Zhen, Hong, Kai, Rui, Feng, Jian, Liang, Bin, Hui, Zhiwei, Haoran, Zixuan, Junjie, Yuchen, Jiahao]
+      family: [Wang, Li, Zhang, Liu, Chen, Shuai, Huang, Zhao, Wu, Zhou, Xu, Sun, Ma, Zhu, Hu, Guo, He, Lin, Gao, Luo, Zheng, Liang, Xie, Song, Tang, Han, Feng, Deng, Cao, Peng]
+    persian:
+      given: [Ali, Reza, Mohammad, Hossein, Amir, Mehdi, Saeed, Hamid, Majid, Farhad, Babak, Kaveh, Arash, Dariush, Behzad, Omid, Siavash, Pouya, Milad, Sina, Navid, Ehsan, Karim, Ahmad, Mahmoud, Javad, Shahram, Kamran, Ramin, Hamed]
+      family: [Ghaffari, Najafi, Yazdani, Ahmadi, Moradi, Daneshvar, Jafari, Rahimi, Hashemi, Ghorbani, Sadeghi, Kazemi, Mousavi, Rostami, Azizi, Nazari, Shirazi, Tehrani, Esfahani, Akbari, Safari, Bagheri, Heidari, Nouri, Amini, Sohrabi, Taheri, Zand, Farahani, Kamali]
+    malay-indonesian:
+      given: [Ahmad, Muhammad, Budi, Agus, Rizky, Fajar, Dimas, Arif, Hafiz, Faiz, Irfan, Syafiq, Aiman, Danish, Hakim, Bayu, Eko, Andi, Wahyu, Yusuf, Rahmat, Hendra, Dwi, Taufik, Zulkifli, Amirul, Haziq, Firdaus, Ilham, Nur]
+      family: [Santoso, Wijaya, Pratama, Saputra, Purnomo, Nugroho, Setiawan, Kurniawan, Gunawan, Halim, Ismail, Ibrahim, Abdullah, Rahman, Hamzah, Hassan, Osman, Yusof, Aziz, Kamal, Razak, Salleh, Siregar, Simanjuntak, Lubis, Hutagalung, Susanto, Firmansyah, Ramadhan, Sulaiman]
+    swahili:
+      given: [Juma, Baraka, Hamisi, Rashidi, Salim, Omari, Abdallah, Hassani, Bakari, Athumani, Joseph, Daniel, Peter, Emmanuel, Brian, Kevin, Dennis, Collins, Victor, Eric, Moses, Isaac, Stephen, Godfrey, Amani, Faraji, Jabari, Zuberi, Makame, Mussa]
+      family: [Otieno, Odhiambo, Ochieng, Kamau, Mwangi, Njoroge, Kariuki, Wekesa, Kiprono, Kipchoge, Cheruiyot, Mutua, Musyoka, Wafula, Barasa, Mwakyusa, Massawe, Mushi, Kimaro, Mrisho, Mbwana, Ngowi, Lyimo, Mollel, Okello, Mugisha, Ssempala, Kato, Ouma, Onyango]
+    russian:
+      given: [Aleksandr, Dmitry, Sergey, Andrey, Alexey, Maxim, Ivan, Mikhail, Nikita, Artyom, Pavel, Roman, Yegor, Kirill, Denis, Anton, Vladislav, Igor, Oleg, Yuri, Viktor, Vadim, Konstantin, Stanislav, Ilya, Gleb, Timur, Arseny, Fyodor, Ruslan]
+      family: [Grigoriev, Smirnov, Kuznetsov, Popov, Vasiliev, Petrov, Sokolov, Mikhailov, Novikov, Fyodorov, Morozov, Volkov, Alekseev, Lebedev, Semyonov, Yegorov, Pavlov, Kozlov, Stepanov, Nikolaev, Orlov, Andreev, Makarov, Zakharov, Zaitsev, Solovyov, Borisov, Belov, Gusev, Kovalyov]
+    romanian:
+      given: [Andrei, Alexandru, Mihai, Ionuț, Bogdan, Cristian, Florin, Adrian, Răzvan, Vlad, Ștefan, Gabriel, Marius, Cosmin, Dragoș, Sorin, Lucian, Dan, Radu, Ciprian, Victor, Ion, Nicolae, Tudor, Iulian, Cătălin, Sergiu, Vasile, Octavian, Petru]
+      family: [Popescu, Ionescu, Popa, Dumitru, Stan, Stoica, Gheorghe, Matei, Ciobanu, Constantin, Rusu, Munteanu, Lungu, Moldovan, Ene, Florea, Dinu, Tudose, Enache, Ungureanu, Ilie, Neagu, Barbu, Mocanu, Cojocaru, Lazăr, Toma, Nistor, Sârbu, Preda]
+    korean:
+      order: familyFirst
+      given: [Min-jun, Seo-jun, Ji-ho, Do-yun, Ha-jun, Jun-woo, Sang-hoon, Ji-hoon, Sung-min, Dong-hyun, Jae-won, Tae-yang, Woo-jin, Young-ho, Seung-ho, Jin-woo, Kyung-soo, Hyun-jun, Sang-woo, Joon-young, Hyeon-seok, Dae-sung, Jung-hoon, Chan-woo, Yoon-seok, Seong-jin, Jae-hyun, Ho-jun, Dong-wook, Ji-woong]
+      family: [Kim, Lee, Park, Choi, Jung, Kang, Cho, Yoon, Jang, Lim, Han, Oh, Seo, Shin, Kwon, Hwang, Ahn, Song, Yoo, Hong, Jeon, Ko, Moon, Yang, Son, Bae, Baek, Heo, Nam, Noh]
+    italian:
+      given: [Lorenzo, Alessandro, Francesco, Leonardo, Mattia, Andrea, Gabriele, Riccardo, Tommaso, Davide, Marco, Luca, Matteo, Federico, Simone, Giuseppe, Antonio, Stefano, Edoardo, Nicola, Giovanni, Daniele, Fabio, Emanuele, Christian, Filippo, Pietro, Michele, Alberto, Salvatore]
+      family: [Testa, Russo, Ferrari, Esposito, Bianchi, Romano, Colombo, Ricci, Marino, Greco, Bruno, Gallo, Valentini, De Luca, Mancini, Costa, Giordano, Rizzo, Lombardi, Moretti, Barbieri, Fontana, Santoro, Mariani, Rinaldi, Caruso, Ferrara, Galli, Martini, Leone]
+    hindi-urdu:
+      given: [Rahul, Amit, Rohit, Vikram, Arjun, Aditya, Karan, Rajesh, Sanjay, Suresh, Anil, Vijay, Ravi, Deepak, Manish, Nikhil, Akash, Varun, Siddharth, Pranav, Harsh, Ankit, Gaurav, Ajay, Vivek, Abhishek, Rohan, Kunal, Yash, Ishaan]
+      family: [Bhardwaj, Verma, Gupta, Singh, Kumar, Patel, Yadav, Trivedi, Dwivedi, Tiwari, Chauhan, Joshi, Mehta, Reddy, Nair, Iyer, Rao, Desai, Kulkarni, Bhat, Bajaj, Ahuja, Bose, Saxena, Agarwal, Dubey, Shukla, Thakur, Jain, Pillai]
+    greek:
+      given: [Giorgos, Evangelos, Konstantinos, Nikos, Giannis, Kostas, Panagiotis, Christos, Vasilis, Thanasis, Michalis, Stavros, Alexandros, Andreas, Spyros, Manolis, Petros, Sotiris, Theodoros, Ilias, Lefteris, Antonis, Stelios, Marios, Fotis, Apostolos, Charalambos, Pavlos, Savvas, Kyriakos]
+      family: [Papadopoulos, Papadakis, Georgiou, Nikolaou, Sideris, Dimitriou, Ioannou, Papageorgiou, Vasileiou, Pappas, Oikonomou, Karagiannis, Christodoulou, Makris, Michailidis, Antoniou, Alexiou, Athanasiou, Panagiotou, Stavrou, Kyriakou, Theodorou, Hatzis, Lambrou, Petrou, Mavros, Karras, Zervas, Angelopoulos, Kostopoulos]
+    czech-slovak:
+      given: [Jakub, Jan, Tomáš, Lukáš, Matěj, Adam, Ondřej, Martin, Filip, Petr, David, Vojtěch, Michal, Marek, Pavel, Vít, Štěpán, Dominik, Patrik, Roman, Radek, Milan, Josef, Peter, Juraj, Matúš, Miroslav, Zdeněk, Ladislav, Šimon]
+      family: [Novák, Svoboda, Novotný, Dvořák, Černý, Procházka, Kučera, Veselý, Horák, Němec, Pokorný, Mareš, Pospíšil, Hájek, Jelínek, Král, Růžička, Beneš, Fiala, Sedláček, Doležal, Zeman, Kolář, Navrátil, Čermák, Horváth, Kováč, Varga, Tóth, Baláž]
+    vietnamese:
+      order: familyFirst
+      given: [Văn An, Minh Tuấn, Đức Anh, Quang Huy, Thành Long, Hoàng Phúc, Đức Thịnh, Quốc Khánh, Hoàng Nam, Quốc Bảo, Trung Kiên, Thanh Tùng, Hữu Thắng, Minh Khoa, Gia Bảo, Đăng Khoa, Mạnh Cường, Hữu Nghĩa, Trọng Hoàng, Việt Hoàng, Gia Huy, Thanh Bình, Hải Đăng, Nhật Minh, Bảo Long, Phúc Thịnh, Thế Vinh, Minh Quân, Anh Đức, Tấn Tài]
+      family: [Nguyễn, Trần, Lê, Phạm, Hoàng, Huỳnh, Phan, Vũ, Võ, Đặng, Bùi, Đỗ, Hồ, Ngô, Dương, Lý, Đinh, Trịnh, Lương, Mai, Cao, Đoàn, Tạ, Lâm, Hà, Tô, Châu, Quách, Kiều, Thái]
+    ukrainian:
+      given: [Oleksandr, Andriy, Serhiy, Dmytro, Mykola, Volodymyr, Yuriy, Oleh, Vasyl, Bohdan, Taras, Ivan, Maksym, Artem, Denys, Vitaliy, Roman, Ruslan, Viktor, Yaroslav, Ihor, Mykhailo, Petro, Stepan, Danylo, Nazar, Ostap, Vladyslav, Yevhen, Anatoliy]
+      family: [Kostenko, Kovalenko, Bondarenko, Tkachenko, Kravchenko, Oliynyk, Shevchuk, Polishchuk, Lysenko, Rudenko, Marchenko, Savchenko, Petrenko, Klymenko, Pavlenko, Moroz, Boyko, Melnyk, Kovalchuk, Tkachuk, Hrytsenko, Yatsenko, Fedorchuk, Honcharenko, Ponomarenko, Mazur, Levchenko, Didenko, Hnatyuk, Romanenko]
+    tuvaluan:
+      given: [Sione, Taufa, Ioane, Paeniu, Fusi, Lafaele, Mafala, Falani, Iosefa, Lotoala, Monise, Naama, Puakena, Seve, Simati, Talafou, Tavita, Teo, Tomu, Vete, Nelesone, Faimalaga, Lagitupu, Malaki, Pita, Samuelu, Tafaoga, Uota, Valoa, Sopo]
+      family: [Natano, Sopoaga, Tafaki, Ielemia, Apinelu, Italeli, Puapua, Sapoaga, Tauala, Taukelina, Penitala, Feue, Kofe, Latasi, Maatusi, Niuatui, Paeniu, Seluka, Telito, Toafa, Tonise, Vaguna, Fakaalofa, Homasi, Lauti, Malua, Pelesala, Satupa, Vaimalu, Kelesoma]
+    thai:
+      given: [Somchai, Somsak, Chaiwat, Thanawat, Kittisak, Nattapong, Supachai, Anucha, Prasert, Wichai, Anan, Prasit, Sarawut, Surachai, Pansa, Kawin, Thawatchai, Ekanit, Bordin, Narubadin, Sittichok, Weerathep, Tanaboon, Kritsada, Pathompol, Apichart, Jakkaphan, Peerapat, Thitipan, Worachit]
+      family: [Saetang, Srisuk, Charoenphon, Wongsawat, Boonmee, Thongdee, Rattanakorn, Sukprasert, Chaiyaphum, Jaidee, Kaewmanee, Phromsri, Saelim, Sombat, Thammasat, Wattana, Chanthong, Kongkaew, Inthasorn, Puangmalai, Ruangsri, Sirisuk, Srithong, Suksawat, Tangsiri, Wongsa, Yodsri, Buasri, Kamolsiri, Nakhonsri]
+    tetum:
+      given: [João, José, Manuel, António, Francisco, Domingos, Mateus, Agostinho, Martinho, Henrique, Alfredo, Joaquim, Afonso, Rui, Paulo, Nelson, Mário, Armando, Gaspar, Celestino, Aniceto, Feliciano, Zeferino, Marcelino, Rogério, Filomeno, Cristóvão, Basílio, Inácio, Ventura]
+      family: [da Silva, dos Santos, Soares, Pereira, Ximenes, Sequeira, Belo, Martins, da Costa, Gusmão, Alves, de Araújo, Freitas, Amaral, Fernandes, Mendonça, Barreto, Carvalho, Lopes, Sarmento, Tilman, Babo, Correia, Magno, Pinto, da Cruz, Moniz, Nunes, Vicente, Cabral]
+    somali:
+      given: [Abdi, Ahmed, Abdiaziz, Ali, Hassan, Abdiqani, Abdirahman, Ismail, Yusuf, Omar, Farah, Mahad, Liban, Hamza, Abdikarim, Said, Bashir, Khalid, Mukhtar, Nur, Osman, Sharif, Warsame, Jama, Guled, Hussein, Ibrahim, Adan, Ayanle, Dahir]
+      family: [Warsame, Farah, Hirsi, Jama, Abdi, Mohamud, Ali, Egal, Gure, Hassan, Aden, Nur, Samatar, Yusuf, Barre, Duale, Ismail, Elmi, Shire, Dirie, Abdulle, Omar, Haji, Abdiaziz, Guleid, Awale, Bile, Gedi, Hersi, Muse]
+    slovene:
+      given: [Luka, Jan, Žiga, Nejc, Matej, Rok, Jaka, Tim, Anže, Blaž, Gašper, Miha, Jure, Aljaž, Klemen, Uroš, Gregor, Primož, Matic, Domen, Jakob, Tilen, Andraž, Benjamin, Bor, Žan, Nik, Martin, Boštjan, Marko]
+      family: [Novak, Horvat, Kovačič, Krajnc, Zupančič, Potočnik, Kovač, Mlakar, Kos, Vidmar, Golob, Turk, Kralj, Božič, Korošec, Bizjak, Zupan, Hribar, Kotnik, Kavčič, Rozman, Kastelic, Pavlin, Petek, Žagar, Kolar, Košir, Koren, Mežnar, Jerman]
+    sinhala:
+      given: [Kasun, Nuwan, Chamara, Dinesh, Lahiru, Dhanushka, Isuru, Lakshan, Saman, Roshan, Mahesh, Chaminda, Hasitha, Gayan, Nalin, Niroshan, Ruwan, Sanjaya, Tharindu, Chathura, Asitha, Dilshan, Ishara, Thilina, Nimal, Sunil, Prasanna, Janith, Pradeep, Malinda]
+      family: [Perera, Fernando, de Silva, Silva, Jayasuriya, Mendis, Wickramasinghe, Bandara, Dissanayake, Rajapaksa, Gunawardena, Herath, Jayawardena, Kumara, Senanayake, Weerasinghe, Ranasinghe, Karunaratne, Wijesinghe, Samarawickrama, Liyanage, Pathirana, Rathnayake, Ekanayake, Hettiarachchi, Abeysekera, Gamage, Peiris, Amarasinghe, Kularatne]
+    polish:
+      given: [Jakub, Kacper, Szymon, Filip, Jan, Mateusz, Bartosz, Michał, Piotr, Paweł, Krzysztof, Tomasz, Łukasz, Marcin, Kamil, Dawid, Adrian, Wojciech, Grzegorz, Rafał, Damian, Sebastian, Maciej, Przemysław, Hubert, Oskar, Igor, Antoni, Wiktor, Karol]
+      family: [Nowak, Kowalski, Wiśniewski, Wójcik, Kowalczyk, Kamiński, Lewandowski, Sikora, Szymański, Woźniak, Dąbrowski, Kozłowski, Jankowski, Mazur, Kwiatkowski, Krawczyk, Piotrowski, Grabowski, Nowakowski, Pawłowski, Michalski, Nowicki, Adamczyk, Dudek, Zając, Wieczorek, Jabłoński, Król, Majewski, Olszewski]
+    nepali:
+      given: [Ramesh, Suresh, Bikash, Sujan, Anil, Prakash, Rajesh, Sandeep, Kiran, Bishal, Krishna, Hari, Rohit, Sagar, Bikram, Gopal, Mahesh, Karan, Bimal, Hemant, Nabin, Pawan, Roshan, Santosh, Sunil, Umesh, Arjun, Binod, Dinesh, Manoj]
+      family: [Shrestha, Gurung, Tamang, Thapa, Magar, Rai, Limbu, Sherpa, Adhikari, Bhandari, Khadka, Karki, Basnet, Poudel, Sharma, Koirala, Pandey, Gautam, Bhattarai, Dahal, Ghimire, Joshi, Lama, Maharjan, Malla, Pokharel, Regmi, Rana, Subedi, Tiwari]
+    mongolian:
+      given: [Batbayar, Ganbold, Bat-Erdene, Enkhbayar, Tömörbaatar, Gantulga, Erdenebat, Sükhbaatar, Bold, Munkh-Erdene, Temuulen, Altangerel, Battulga, Chinzorig, Dorjsuren, Gankhuyag, Khurelsukh, Naranbaatar, Otgonbayar, Purevdorj, Sodnomdorj, Tsogtbayar, Ulziibayar, Zorigt, Byambadorj, Davaasuren, Enkhtaivan, Nyamdorj, Batkhuyag, Oyunbat]
+      family: [Batbold, Ganzorig, Tsogt, Bayar, Dorj, Erdene, Enkh, Bat, Altan, Sukh, Naran, Munkh, Purev, Tömör, Ochir, Lkhagva, Gerel, Davaa, Nyam, Byamba, Otgon, Baatar, Chuluun, Delger, Jargal, Khuyag, Oyun, Sodnom, Tseveen, Ulzii]
+    maltese:
+      given: [Matthew, Luke, Jake, Kurt, Andrea, Joseph, Michael, Mark, Daniel, Ryan, Nicholas, Karl, Jean, Clayton, Steve, Zach, Jurgen, Ian, Gilbert, Christian, Paul, Kyle, Neil, Jamie, Kenneth, Carlo, Gianluca, Shaun, Roderick, Owen]
+      family: [Borg, Camilleri, Vella, Farrugia, Zammit, Galea, Micallef, Grech, Attard, Spiteri, Azzopardi, Gauci, Agius, Pace, Sammut, Cassar, Fenech, Xuereb, Caruana, Abela, Formosa, Bonnici, Schembri, Debono, Cutajar, Calleja, Tabone, Mangion, Saliba, Bugeja]
+    malagasy:
+      given: [Hery, Andry, Rivo, Tiana, Faniry, Mamy, Njaka, Rado, Toky, Fetra, Haja, Lova, Mahery, Nirina, Solo, Tojo, Zo, Avotra, Dina, Fidy, Hasina, Jaona, Koto, Liva, Mino, Naina, Rija, Sitraka, Tahina, Voahary]
+      family: [Rakotoarisoa, Randriamampionona, Rasolofo, Razafindrakoto, Andrianarisoa, Rakotomalala, Randrianarivelo, Rabemananjara, Ravelomanana, Rajaonarison, Ratsimbazafy, Rakotondrabe, Razanamahefa, Andriamihaja, Ramanantsoa, Rafanomezantsoa, Randriamanana, Rasoanaivo, Ravelojaona, Rakotonirina, Razafimahatratra, Andrianjafy, Rabearivelo, Ramaroson, Rasamoelina, Rakotovao, Randrianasolo, Razafy, Andriantsitohaina, Rajaonah]
+    macedonian:
+      given: [Aleksandar, Nikola, Stefan, Marko, Filip, Bojan, Goran, Dragan, Darko, Zoran, Igor, Vlatko, Goce, Ilija, Kiril, Kristijan, Mihail, Petar, Toni, Daniel, Martin, Boban, Ljupčo, Trajče, Blagoja, Hristijan, Dimitar, Jovan, Andrej, Viktor]
+      family: [Stojanovski, Nikolovski, Petkovski, Petrovski, Jovanovski, Mitkovski, Dimitrovski, Angelovski, Dukovski, Ristevski, Stojkovski, Spasovski, Gjorgjievski, Mitrevski, Ivanovski, Kostovski, Todorovski, Markovski, Popovski, Ilievski, Kirovski, Naumovski, Siljanovski, Taneski, Zdravkovski, Lazarevski, Atanasovski, Bogdanovski, Cvetkovski, Pavlovski]
+    lithuanian:
+      given: [Lukas, Matas, Jonas, Tomas, Mantas, Paulius, Darius, Rokas, Domantas, Justas, Andrius, Mindaugas, Vytautas, Giedrius, Žygimantas, Karolis, Kęstutis, Arnas, Deividas, Edgaras, Ignas, Linas, Nerijus, Povilas, Rimantas, Saulius, Tadas, Vaidas, Augustas, Dovydas]
+      family: [Kazlauskas, Jankauskas, Petrauskas, Stankevičius, Vasiliauskas, Žukauskas, Butkus, Paulauskas, Urbonas, Kavaliauskas, Balčiūnas, Navickas, Grigonis, Mačiulis, Lekavičius, Milaknis, Pocius, Rimkus, Sakalauskas, Bernotas, Vaitkus, Kairys, Daugėla, Jakštas, Lukoševičius, Mockus, Norkus, Radzevičius, Šimkus, Žilinskas]
+    latvian:
+      given: [Jānis, Andris, Mārtiņš, Artūrs, Kristaps, Edgars, Dāvis, Roberts, Rihards, Aleksandrs, Raimonds, Ivars, Uldis, Valdis, Kārlis, Rolands, Gints, Aigars, Juris, Māris, Ēriks, Toms, Emīls, Ralfs, Gustavs, Markuss, Niks, Oskars, Ričards, Dainis]
+      family: [Bērziņš, Kalniņš, Ozoliņš, Jansons, Liepiņš, Krūmiņš, Balodis, Zariņš, Kļaviņš, Pētersons, Vītols, Siliņš, Ozols, Lācis, Kalējs, Grīnbergs, Strazds, Eglītis, Vanags, Celms, Mednis, Zīle, Priedītis, Sproģis, Āboliņš, Kazāks, Lapiņš, Rozenbergs, Sīlis, Upītis]
+    lao:
+      given: [Somphone, Khamphoui, Souksavanh, Phonesavanh, Vilay, Bounmy, Khamla, Sengphet, Thongchanh, Vongsa, Phouthone, Sisouk, Boualai, Chanthala, Keo, Manivanh, Noukone, Outhai, Phaivanh, Saysana, Somsanith, Soulivanh, Thanousay, Vanxay, Xaysomphou, Bounthavy, Kongkham, Phetsamone, Sithat, Viengxay]
+      family: [Phommachanh, Sisavath, Vongphachanh, Keomany, Inthavong, Phomvihane, Souvannavong, Xayavong, Chanthavong, Siharath, Bounmixay, Douangchanh, Khounphakdy, Luangrath, Manivong, Norasing, Phanthavong, Rattanavong, Saysouk, Sengsavang, Somsack, Thammavong, Vilayhong, Vongsakda, Keovongsa, Phengsavanh, Sayavong, Sithideth, Thipphavong, Xaysana]
+    khmer:
+      order: familyFirst
+      given: [Sophal, Vuthy, Dara, Rithy, Sokha, Vannak, Chanthou, Piseth, Sovann, Bunthoeun, Chea, Kosal, Makara, Narith, Pheakdey, Rotha, Samnang, Sambath, Thearith, Visal, Bopha, Chhay, Kimheng, Mony, Nimol, Ponleu, Raksmey, Sokunthea, Vibol, Kakada]
+      family: [Sok, Chan, Kim, Heng, Chea, Keo, Ly, Meas, Nhem, Pen, Prak, Sam, Seng, Sim, Sun, Tep, Touch, Uy, Yin, Hun, Mao, Ouk, Phan, Ros, Som, Srey, Long, Mean, Chhun, Nuon]
+    japanese:
+      order: familyFirst
+      given: [Haruto, Yuto, Sota, Ren, Riku, Kaito, Daiki, Takumi, Shota, Kenta, Yuki, Ryota, Hiroshi, Takeshi, Kazuki, Naoki, Shinji, Keisuke, Yusuke, Daisuke, Shunsuke, Tomoya, Kohei, Wataru, Ryo, Hayato, Kotaro, Yuya, Genki, Kaoru]
+      family: [Sato, Suzuki, Takahashi, Tanaka, Watanabe, Ito, Yamamoto, Nakamura, Kobayashi, Kato, Yoshida, Yamada, Sasaki, Yamaguchi, Matsumoto, Inoue, Kimura, Hayashi, Shimizu, Yamazaki, Mori, Abe, Ikeda, Kondo, Fujii, Ogawa, Fujita, Murata, Goto, Hasegawa]
+    hungarian:
+      order: familyFirst
+      given: [Bence, Máté, Levente, Dávid, Dániel, Ádám, Balázs, Péter, Gábor, Zoltán, László, Attila, Tamás, Krisztián, Norbert, Roland, Zsolt, Barnabás, Gergő, Marcell, Milán, Olivér, Áron, Botond, Kristóf, Benedek, Csaba, Ferenc, Imre, Szabolcs]
+      family: [Nagy, Kovács, Tóth, Szabó, Horváth, Varga, Kiss, Molnár, Bognár, Farkas, Balogh, Papp, Takács, Juhász, Lakatos, Mészáros, Oláh, Simon, Rácz, Fekete, Szilágyi, Török, Fehér, Balázs, Gál, Kis, Szűcs, Kocsis, Orsós, Pintér]
+    hebrew:
+      given: [Yosef, David, Moshe, Daniel, Itay, Noam, Omer, Eitan, Yair, Ariel, Amit, Tomer, Ido, Guy, Lior, Nadav, Roee, Shay, Eran, Yaniv, Oren, Elad, Ben, Asaf, Gal, Matan, Uri, Yuval, Ohad, Barak]
+      family: [Cohen, Levi, Mizrahi, Sharabi, Biton, Dahan, Avraham, Friedman, Malka, Azulay, Katz, Yosef, Amar, Ohana, Gabay, Hadad, Ben-David, Shapira, Golan, Segal, Ben-Haim, Vaknin, Elbaz, Shalom, Zohar, Tal, Ashkenazi, Rosen, Klein, Sasson]
+    georgian:
+      given: [Giorgi, Davit, Luka, Nikoloz, Levan, Irakli, Zurab, Lasha, Otar, Tornike, Vakhtang, Shota, Beka, Saba, Guram, Mamuka, Revaz, Tamaz, Gocha, Valeri, Jaba, Budu, Goga, Ilia, Nika, Sandro, Temur, Vato, Zviad, Gela]
+      family: [Beridze, Kapanadze, Gelashvili, Maisuradze, Giorgadze, Lomidze, Tsiklauri, Bolkvadze, Nozadze, Khutsishvili, Chikovani, Tsereteli, Davitashvili, Gelovani, Abuladze, Japaridze, Gogua, Chanturia, Margvelashvili, Shonia, Nadiradze, Tsertsvadze, Bakradze, Mchedlishvili, Lordkipanidze, Gabunia, Jgerenaia, Kurashvili, Papava, Sikharulidze]
+    finnish:
+      given: [Mikko, Juha, Jari, Timo, Antti, Matti, Ville, Janne, Jussi, Teemu, Joonas, Lauri, Eetu, Aleksi, Onni, Elias, Veeti, Niko, Aku, Sami, Tuomas, Pekka, Kalle, Riku, Toni, Jesse, Otto, Eemeli, Valtteri, Kimmo]
+      family: [Korhonen, Virtanen, Mäkinen, Nieminen, Mäkelä, Hämäläinen, Laine, Heikkinen, Koskinen, Järvinen, Lehtonen, Lehtinen, Saarinen, Salminen, Heinonen, Rautio, Heikkilä, Hyvönen, Salonen, Turunen, Salo, Laitinen, Tuominen, Rantanen, Karjalainen, Jokinen, Mattila, Savolainen, Lahtinen, Huttunen]
+    filipino:
+      given: [Juan, Jose, Mark, John, Paolo, Miguel, Carlo, Rafael, Gabriel, Angelo, Christian, Jerome, Jomar, Noel, Ramon, Ricardo, Enrique, Joaquin, Andres, Emmanuel, Francis, Marvin, Allan, Dennis, Jayson, Rodel, Rommel, Edgar, Chris, Ronnie]
+      family: [Santos, Reyes, Cruz, Bautista, Ocampo, Garcia, Mendoza, Torres, Tomas, Andrada, Castillo, Flores, Villanueva, Ramos, Castro, Rivera, Aquino, Navarro, Salazar, Mercado, Dela Cruz, Pascual, Domingo, Manalo, Gonzales, Fernandez, Lopez, Soriano, Tolentino, Aguilar]
+
+    west-african-anglophone:
+      given: [Chinedu, Emeka, Obinna, Tunde, Segun, Kunle, Babajide, Ifeanyi, Chukwudi, Kwame, Kofi, Kwabena, Yaw, Kojo, Nana, Samuel, Daniel, Emmanuel, Joseph, Ibrahim, Musa, Abdul, Mohammed, Victor, Godwin, Felix, Isaac, Ebenezer, Prince, Alhaji]
+      family: [Okeke, Okonkwo, Eze, Nwosu, Adeyemi, Adebayo, Ogunleye, Balogun, Olawale, Bello, Danjuma, Abubakar, Mensah, Owusu, Ofori, Asante, Appiah, Osei, Agyeman, Quaye, Kamara, Sesay, Conteh, Bangura, Jallow, Ceesay, Sowe, Kollie, Toure, Dennis]
+    southern-african:
+      given: [Thabo, Sipho, Themba, Bongani, Mandla, Lungile, Kagiso, Tshepo, Lebogang, Kabelo, Mpho, Tumelo, Tatenda, Tendai, Farai, Tinashe, Kudakwashe, Blessing, Chisomo, Mphatso, Mwila, Chanda, Bwalya, Lwazi, Sibusiso, Siyabonga, Ndumiso, Ruan, Pieter, Jaco]
+      family: [Nkosi, Dlamini, Ndlovu, Mokoena, Mkhize, Mthembu, Zulu, Ngcobo, Molefe, Mahlangu, Sithole, Mabaso, Moyo, Ncube, Sibanda, Chikwanha, Mutasa, Banda, Phiri, Mwale, Tembo, Mulenga, Chilufya, Kgosi, Seretse, Motsamai, Shikongo, Nghipondoka, van der Merwe, Coetzee]
+    francophone-african:
+      given: [Modibo, Mamadou, Ibrahima, Ousmane, Abdoulaye, Cheikh, Souleymane, Boubacar, Lamine, Seydou, Amadou, Idrissa, Yacouba, Adama, Bakary, Koffi, Yao, Serge, Didier, Hervé, Arnaud, Christian, Patrick, Guy, Jean-Paul, Fabrice, Landry, Prince, Junior, Kader]
+      family: [Diallo, Diop, Ndiaye, Fall, Sow, Ba, Sy, Cissé, Sidibé, Coulibaly, Kanouté, Sanogo, Diarra, Sangaré, Kaboré, Ouédraogo, Zongo, Kouassi, Koné, Kouamé, Yao, Mbarga, Ndongo, Mballa, Mpia, Lusamba, Kabongo, Mukendi, Habimana, Niyonzima]
+    pacific-islands:
+      given: [Sione, Tevita, Viliami, Semisi, Josefa, Waisale, Epeli, Apolosi, Isikeli, Manasa, Taniela, Sitiveni, Iosefo, Fetu, Losa, Tavita, Malakai, Peni, Joeli, Vilikesa, Kaveni, Toby, Nathan, Joshua, Matthias, Benjamin, Kila, Gima, Hiri, Wesley]
+      family: [Tuilagi, Vunipola, Fifita, Taufahema, Naivalu, Ravouvou, Waqa, Qereqeretabua, Tora, Vakacegu, Raiwalui, Lomani, Vatubua, Leiua, Fonoti, Lealaiauloto, Faleolo, Tagaloa, Matagi, Moengangongo, Latu, Kautai, Rokotuiveikau, Siwi, Aisi, Kaupa, Taunao, Maesua, Tasi, Bulai]
+    pakistani:
+      given: [Muhammad, Ahmed, Ali, Hassan, Bilal, Usman, Hamza, Umar, Irfan, Asif, Zubair, Fahad, Haris, Faisal, Kamran, Moiz, Saad, Danish, Arslan, Adnan, Waqas, Tariq, Nadeem, Zeeshan, Sohail, Ammar, Waleed, Yasir, Owais, Talha]
+      family: [Khan, Ahmed, Hayat, Hussain, Awan, Butt, Malik, Qureshi, Chaudhry, Sheikh, Raza, Durrani, Mirza, Lodhi, Ansari, Javed, Rehman, Akhtar, Anwar, Baig, Bhatti, Cheema, Gill, Hashmi, Niazi, Rana, Sadiq, Tahir, Warraich, Yousaf]
+    central-asian:
+      given: [Nursultan, Daniyar, Yerlan, Arman, Azamat, Aibek, Bakhyt, Dauren, Ruslan, Timur, Bekzod, Jasur, Sardor, Dilshod, Otabek, Rustam, Sherzod, Farrukh, Eldor, Islom, Elvin, Rashad, Elchin, Orkhan, Tural, Murad, Serdar, Merdan, Atabek, Kanat]
+      family: [Abenov, Nurlanov, Seitkali, Zhakupov, Bekov, Akhmetov, Omarov, Sadykov, Nazarov, Yusupov, Rakhimov, Tashkentov, Ergashev, Kholmatov, Usmonov, Alimov, Mammadov, Aliyev, Hasanov, Guliyev, Huseynov, Ismayilov, Atayev, Berdiyev, Orazov, Toktogulov, Asanov, Mamytov, Kenzhebekov, Tursunov]
+
+    albanian:
+      given: [Arben, Besnik, Dritan, Ermal, Fatmir, Gentian, Ilir, Klodian, Lorik, Altin, Arlind, Blerim, Edon, Elvis, Endrit, Erion, Fisnik, Florian, Gëzim, Kreshnik, Labinot, Mergim, Nderim, Olsi, Redon, Rron, Bekim, Valon, Visar, Agon]
+      family: [Hoxha, Shehu, Krasniqi, Gashi, Bytyqi, Morina, Kelmendi, Leka, Dervishi, Bajrami, Kola, Prifti, Shala, Hasani, Rama, Mema, Topalli, Çela, Dushku, Marku, Gjoni, Lika, Basha, Kryeziu, Sadiku, Zeka, Lushi, Dibra, Rexhepi, Ademaj]
+    bulgarian:
+      given: [Georgi, Ivan, Dimitar, Nikolay, Petar, Hristo, Todor, Stoyan, Krasimir, Martin, Aleksandar, Kaloyan, Boris, Plamen, Valentin, Yordan, Lyubomir, Radoslav, Svetoslav, Tsvetan, Velizar, Zdravko, Momchil, Kiril, Angel, Bozhidar, Emil, Simeon, Stanislav, Viktor]
+      family: [Kanev, Georgiev, Stoilov, Ruskov, Nikolov, Hristov, Stoyanov, Kalchev, Shopov, Dobrev, Atanasov, Gerov, Radev, Yordanov, Marinov, Popov, Stefanov, Ganev, Penev, Vasilev, Zhelev, Tsvetkov, Kirilov, Genchev, Bozhinov, Raykov, Slavov, Velikov, Donchev, Gospodinov]
+    estonian:
+      given: [Martin, Rasmus, Markus, Karl, Sander, Kristjan, Siim, Mihkel, Tanel, Rene, Andres, Indrek, Margus, Priit, Tarmo, Urmas, Kaspar, Oliver, Robin, Robert, Henri, Joosep, Mattias, Ott, Raul, Taavi, Toomas, Ragnar, Erki, Kert]
+      family: [Tamm, Saar, Sepp, Vaino, Kask, Kukk, Rebane, Sild, Pärn, Koppel, Lepik, Oja, Kuusk, Karu, Lill, Mets, Raudsepp, Vaher, Laur, Teder, Kangur, Mänd, Põder, Kivi, Luik, Mölder, Toom, Jõgi, Org, Paju]
+    amharic:
+      given: [Abebe, Dawit, Tesfaye, Yohannes, Solomon, Mulugeta, Getachew, Haile, Bekele, Girma, Kebede, Tadesse, Alemayehu, Yonas, Biniam, Henok, Natnael, Robel, Samuel, Mikiyas, Abel, Eyob, Fikru, Gebre, Habtamu, Mesfin, Selam, Tewodros, Yared, Zerihun]
+      family: [Alemu, Tefera, Mekonnen, Wondimu, Wolde, Desta, Hailu, Kassa, Tsegaye, Negash, Berhanu, Demissie, Abera, Ayele, Belay, Gebremedhin, Haileselassie, Kahsay, Lemma, Mengistu, Shiferaw, Tilahun, Woldemariam, Yilma, Zewdie, Asfaw, Fikre, Gebru, Mulatu, Tekle]
+    armenian:
+      given: [Aram, Armen, Arman, Davit, Gor, Hayk, Karen, Levon, Narek, Tigran, Vahe, Vardan, Artur, Ashot, Edgar, Gevorg, Hovhannes, Mher, Rafayel, Sargis, Sevak, Suren, Vazgen, Arsen, Erik, Grigor, Hrant, Khoren, Robert, Zaven]
+      family: [Avagyan, Sahakyan, Nazaryan, Grigoryan, Mirzoyan, Hakobyan, Vardanyan, Harutyunyan, Saakyan, Gevorgyan, Avetisyan, Mkrtchyan, Badalyan, Abrahamyan, Kirakosyan, Manukyan, Stepanyan, Davtyan, Mnatsakanyan, Poghosyan, Asatryan, Galstyan, Simonyan, Martirosyan, Yeghiazaryan, Torosyan, Arakelyan, Babayan, Melkonyan, Zakaryan]
+    bengali:
+      given: [Rahim, Karim, Arif, Shakil, Tanvir, Mahmud, Rafiq, Jubayer, Nahid, Sohel, Imtiaz, Monir, Faisal, Sumon, Shamim, Habib, Anis, Mizan, Rasel, Sajib, Tamim, Mehedi, Nayeem, Rifat, Rakib, Fahim, Zahid, Shahriar, Towhid, Ashraf]
+      family: [Rahman, Hossain, Islam, Ahmed, Uddin, Chowdhury, Khan, Haque, Alam, Miah, Sarkar, Talukder, Bhuiyan, Mollah, Sheikh, Akand, Mridha, Biswas, Das, Roy, Saha, Paul, Mondal, Mostafa, Kabir, Sultan, Siddique, Majumder, Pramanik, Barua]
+    dzongkha:
+      given: [Tshering, Dorji, Karma, Sonam, Pema, Ugyen, Kinley, Kezang, Tandin, Namgay, Sangay, Phuntsho, Wangchuk, Tenzin, Sithar, Dawa, Gyeltshen, Jamyang, Kuenga, Leki, Nima, Passang, Rinchen, Sherub, Thinley, Tobgay, Yeshey, Zangpo, Lhendup, Norbu]
+      family: [Dorji, Wangdi, Tshering, Namgyel, Gyeltshen, Penjor, Dukpa, Lhundup, Rinzin, Lhamo, Tenzin, Jamtsho, Choden, Dhendup, Gyamtsho, Lhendup, Nidup, Norbu, Phuntsho, Rabten, Sherpa, Tashi, Thinley, Tshewang, Yangzom, Zangmo, Dendup, Kinga, Peljor, Samdrup]
+    dhivehi:
+      given: [Ahmed, Mohamed, Ibrahim, Ali, Hassan, Hussain, Ismail, Abdulla, Moosa, Yoosuf, Ilham, Asadhulla, Akram, Ashfaq, Hamza, Naiz, Shafiu, Mausoom, Samdhooh, Fasir, Imran, Nashid, Rilwan, Shamweel, Easa, Haisham, Ihusaan, Shaaz, Zayan, Riyaz]
+      family: [Rasheed, Saeed, Nafiz, Shareef, Hilmy, Faiz, Adam, Manik, Didi, Fulhu, Hameed, Latheef, Majeed, Mujthaba, Nadheem, Niyaz, Rasool, Shakir, Thoyyib, Umar, Zahir, Zubair, Habeeb, Jaleel, Kareem, Mahir, Rauf, Shiham, Visham, Faisal]
+    burmese:
+      given: [Aung, Kyaw, Zaw, Min, Thura, Htet, Ye, Soe, Win, Nay, Phyo, Myo, Tun, Hein, Khant, Thant, Wai, Si Thu, Pyae, Kaung, Lin, Naing, Zin, Thet, Yan, Ko, Hlaing, Swe, Moe, Paing]
+      family: [Naing, Lin, Oo, Htet, Aung, Tun, Khine, Zaw, Kyaw, Myat, Thein, Soe, Hlaing, Htun, Khaing, Maung, Shein, Kyi, Ye Aung, Zaw Win, Min Htet, Paing Soe, Kyaw Zin, Thant Zin, Hein Htet, Pyae Phyo, Lwin, Nyein, Wai Yan, Phyo Wai]

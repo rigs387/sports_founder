@@ -214,6 +214,12 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    language sphere in `names.yaml`, validated at load. Generated at club founding (ages spread
    18–32) and on retirement (young, peak skill leaning toward the club's rating). All on the
    flagship RNG stream; a determinism test proves the world's random sequence is unchanged.
+   *Built 2026-10-03:* 60 pools of 30 given and 30 family names (men's names): the 54 language
+   spheres plus six regional pools for markets whose sphere does not match how people are named
+   (West African anglophone, southern African, francophone African, Pacific islands, Pakistani,
+   Central Asian), mapped per country in `names.yaml`. Any active club without a leading player
+   gets one when clubs are fitted, which covers founding, expansion and old saves. Save format 11
+   (players). Replacement on retirement moves to step 4 with retirement itself.
 3. **Credited scores and career lines.** Each successful chance credits the leading player with
    a config probability raised by skill. Season tallies (matches, scores, playoff scores, final
    scores) become a permanent career line at season end; per-match scorers are never stored.
@@ -235,8 +241,8 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    decision (league cash) and the full-influence drop pressure card, counted against the decision
    cap, offered after season cards, with free defaults. Season cards name the champion's leading
    player and the top scorer where recorded. Bot weights for every new card; bots back stars.
-7. **Save format 11.** Players, career lines, backing and the new summary fields. Format 10
-   migrates to fresh leading players at active clubs: no stars, no invented careers.
+7. **Save format 12.** Career lines, backing and the new summary fields (players arrived in
+   format 11 with step 2): no stars and no invented careers for older saves.
 8. **Screen.** A Stars panel on the flagship screen (recorded facts only, an influence bar,
    backing slots with a review step), the leading player and tally on each table row, backed
    stars named in the flagship country's tooltip. Skill and strength bonuses stay out of
