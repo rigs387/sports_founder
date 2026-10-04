@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, StarSnapshot, TurnSnapshot } from "../../../sim";
+import { useTermVars } from "../identity/terms";
 
 interface Props {
   snapshot: TurnSnapshot;
@@ -19,6 +20,8 @@ export function StarsPanel({ snapshot, names, busy, clubName, onAction }: Props)
   const { t } = useTranslation();
   const flagship = snapshot.flagship;
   const backing = flagship.backing;
+  const termVars = useTermVars(snapshot.identity.terms);
+  const nouns = termVars();
   const country = (id: string) => names.countries[id] ?? id;
   const [review, setReview] = useState<{ id: number; kind: "back" | "drop" } | null>(null);
   const playerName = (id: number) => flagship.players.find((p) => p.id === id)?.name ?? "";
@@ -57,7 +60,7 @@ export function StarsPanel({ snapshot, names, busy, clubName, onAction }: Props)
       </p>
       {backing.used > backing.slots && <p className="stars-over">{t("flagship.stars.over")}</p>}
       {flagship.stars.length === 0 ? (
-        <p className="flagship-empty">{t("flagship.stars.none")}</p>
+        <p className="flagship-empty">{t("flagship.stars.none", nouns)}</p>
       ) : (
         <ul className="stars-list">
           {flagship.stars.map((star) => (
@@ -107,6 +110,8 @@ function StarCard({
   const { t } = useTranslation();
   const flagship = snapshot.flagship;
   const backing = flagship.backing;
+  const termVars = useTermVars(snapshot.identity.terms);
+  const nouns = termVars();
   const seat = country(flagship.countryId);
   const kind = star.backing ? "drop" : "back";
   const blocker = kind === "drop" ? star.dropBlocker : star.backBlocker;
@@ -134,14 +139,14 @@ function StarCard({
           {star.starSince !== null ? (
             <small className="tag">
               <span aria-hidden="true">&#9733;</span>{" "}
-              {t("flagship.stars.starSince", { season: star.starSince })}
+              {t("flagship.stars.starSince", { ...nouns, season: star.starSince })}
             </small>
           ) : (
             <small className="tag">{t("flagship.stars.successor")}</small>
           )}
           {star.finalSeason && (
             <small className="tag final" data-testid="flagship-star-final">
-              {t("flagship.stars.finalSeason")}
+              {t("flagship.stars.finalSeason", nouns)}
             </small>
           )}
         </span>
@@ -153,28 +158,35 @@ function StarCard({
       </p>
       <dl className="star-tallies">
         <div>
-          <dt>{t("flagship.stars.seasonTally")}</dt>
+          <dt>{t("flagship.stars.seasonTally", nouns)}</dt>
           <dd>
             {star.season
               ? t("flagship.stars.scores", {
+                  ...termVars({ score: star.season.scores, match: star.season.matches }),
                   count: star.season.scores,
                   matches: star.season.matches,
                 })
-              : t("flagship.stars.untallied")}
+              : t("flagship.stars.untallied", nouns)}
           </dd>
         </div>
         <div>
           <dt>{t("flagship.stars.careerTally")}</dt>
           <dd>
             {star.career.seasons === 0 ? (
-              t("flagship.stars.rookie")
+              t("flagship.stars.rookie", nouns)
             ) : (
               <>
                 {t("flagship.stars.scores", {
+                  ...termVars({ score: star.career.scores, match: star.career.matches }),
                   count: star.career.scores,
                   matches: star.career.matches,
                 })}
-                <small>{t("flagship.stars.careerSeasons", { count: star.career.seasons })}</small>
+                <small>
+                  {t("flagship.stars.careerSeasons", {
+                    ...termVars({ seasons: star.career.seasons }),
+                    count: star.career.seasons,
+                  })}
+                </small>
               </>
             )}
           </dd>
@@ -206,6 +218,7 @@ function StarCard({
           {review === "back" ? (
             <p>
               {t("flagship.stars.reviewBack", {
+                ...nouns,
                 name: star.name,
                 price: backing.price,
                 country: seat,

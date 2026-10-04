@@ -342,6 +342,13 @@ file); every limit is config.
 5. **Smoke and docs.** Smoke fills the identity panel, checks the rulebook and diagram in both
    layouts, and screenshots them.
 
+*Built 2026-10-04.* Setup became two pages so each fits a 1280 × 800 window (the founding panel
+pushed Start off-screen). Terms reach the flagship screen, Stars panel, season and star cards and
+their effect text through one helper (`useTermVars`); the seasonal window keeps its name (it is
+the game's calendar, not the sport's season). Renamed terms each get a full sentence in the
+Rulebook. Save format 16. `tests/identity.test.ts`; smoke screenshots the founding page and the
+Rulebook in both layouts.
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)

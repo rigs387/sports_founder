@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, ClubSnapshot, MatchResult, TurnSnapshot } from "../../../sim";
+import { Emblem } from "../identity/Emblem";
+import { useTermVars } from "../identity/terms";
 import "./flagship.css";
 import { StarsPanel } from "./StarsPanel";
 
@@ -26,6 +28,7 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
     return club ? t("flagship.club", { place: club.place, nickname: club.nickname }) : "";
   };
   const seatName = country(flagship.countryId);
+  const nouns = useTermVars(snapshot.identity.terms)();
 
   return (
     <section
@@ -39,13 +42,21 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
       data-format={flagship.format}
     >
       <div className="flagship-heading">
-        <div>
+        <Emblem
+          {...snapshot.identity.emblem}
+          primary={snapshot.identity.colors.primary}
+          secondary={snapshot.identity.colors.secondary}
+          size={56}
+          label={t("flagship.foundingEmblem", { sport: snapshot.identity.sportName })}
+        />
+        <div className="flagship-title">
           <span className="eyebrow">{t("flagship.eyebrow")}</span>
           <h1 id="flagship-title">{t("flagship.title", { country: seatName })}</h1>
         </div>
         <div className="flagship-status">
           <strong>
             {t("flagship.status", {
+              ...nouns,
               season: flagship.season,
               round: flagship.round,
               total: flagship.totalRounds,
@@ -53,13 +64,13 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
           </strong>
           <p>
             {t(`flagship.formats.${flagship.format}`, { count: flagship.playoffClubs })}{" "}
-            {t("flagship.seasonEnds", { count: flagship.quartersLeft })}
+            {t("flagship.seasonEnds", { ...nouns, count: flagship.quartersLeft })}
           </p>
         </div>
       </div>
       {!flagship.playing && (
         <p className="flagship-paused" role="status">
-          {t("flagship.paused", { country: seatName })}
+          {t("flagship.paused", { ...nouns, country: seatName })}
         </p>
       )}
       <div className="flagship-layout">
@@ -79,7 +90,7 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
           />
         </div>
         <div className="flagship-side">
-          <LatestRound results={flagship.lastRound} clubName={clubName} />
+          <LatestRound results={flagship.lastRound} clubName={clubName} nouns={nouns} />
           <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           <Champions snapshot={snapshot} clubName={clubName} country={country} />
         </div>
@@ -101,6 +112,7 @@ function LeagueTable({
 }) {
   const { t } = useTranslation();
   const leaders = new Map(snapshot.flagship.leaders.map((leader) => [leader.clubId, leader]));
+  const termVars = useTermVars(snapshot.identity.terms);
   const playerName = (id: number) => snapshot.flagship.players.find((p) => p.id === id)?.name;
   const columns = [
     ["played", "playedFull"],
@@ -140,6 +152,7 @@ function LeagueTable({
           {snapshot.flagship.table.map((row, index) => {
             const titles = clubs.get(row.clubId)?.titles ?? 0;
             const leader = leaders.get(row.clubId);
+            const founding = row.clubId === snapshot.identity.foundingClubId;
             const leaderName = leader && playerName(leader.playerId);
             const lastPlayoff = playoffClubs > 0 && index === playoffClubs - 1;
             return (
@@ -151,7 +164,20 @@ function LeagueTable({
                 <td className="position">{index + 1}</td>
                 <th scope="row" className="club">
                   <span className="club-name">
+                    {founding && (
+                      <Emblem
+                        {...snapshot.identity.emblem}
+                        primary={snapshot.identity.colors.primary}
+                        secondary={snapshot.identity.colors.secondary}
+                        size={16}
+                      />
+                    )}
                     <span>{clubName(row.clubId)}</span>
+                    {founding && (
+                      <small className="founding" data-testid="flagship-founding">
+                        {t("flagship.founding")}
+                      </small>
+                    )}
                     {titles > 0 && (
                       <small className="titles">
                         <span aria-hidden="true">&#9733;</span>
@@ -168,6 +194,7 @@ function LeagueTable({
                       {leader.scores === null
                         ? leaderName
                         : t("flagship.table.leaderScores", {
+                            ...termVars({ score: leader.scores }),
                             name: leaderName,
                             count: leader.scores,
                           })}
@@ -199,16 +226,18 @@ function LeagueTable({
 function LatestRound({
   results,
   clubName,
+  nouns,
 }: {
   results: MatchResult[];
   clubName: (id: number) => string;
+  nouns: Record<string, string>;
 }) {
   const { t } = useTranslation();
   return (
     <section className="flagship-card" aria-labelledby="flagship-round-heading">
       <h2 id="flagship-round-heading">{t("flagship.lastRound.heading")}</h2>
       {results.length === 0 ? (
-        <p className="flagship-empty">{t("flagship.lastRound.none")}</p>
+        <p className="flagship-empty">{t("flagship.lastRound.none", nouns)}</p>
       ) : (
         <ul className="flagship-results" data-testid="flagship-results">
           {results.map((result) => (
@@ -244,18 +273,19 @@ function Champions({
 }) {
   const { t } = useTranslation();
   const seasons = snapshot.flagship.recentSeasons;
+  const nouns = useTermVars(snapshot.identity.terms)();
   return (
     <section className="flagship-card" aria-labelledby="flagship-champions-heading">
       <h2 id="flagship-champions-heading">{t("flagship.champions.heading")}</h2>
       {seasons.length === 0 ? (
-        <p className="flagship-empty">{t("flagship.champions.none")}</p>
+        <p className="flagship-empty">{t("flagship.champions.none", nouns)}</p>
       ) : (
         <ol className="flagship-champions" data-testid="flagship-champions">
           {seasons.map((season) => {
             const final = season.playoffs.at(-1);
             return (
               <li key={season.season}>
-                <small>{t("flagship.champions.season", season)}</small>
+                <small>{t("flagship.champions.season", { ...nouns, ...season })}</small>
                 <strong>
                   <span aria-hidden="true">&#9733;</span> {clubName(season.championId)}
                 </strong>
@@ -300,6 +330,7 @@ function Seat({
   onAction: (action: Action) => void;
 }) {
   const { t } = useTranslation();
+  const nouns = useTermVars(snapshot.identity.terms)();
   const flagship = snapshot.flagship;
   const country = (id: string) => names.countries[id] ?? id;
   const [target, setTarget] = useState("");
@@ -317,7 +348,12 @@ function Seat({
       <p>{t("flagship.seat.here", { country: country(flagship.countryId) })}</p>
       {flagship.pendingCountryId ? (
         <div className="flagship-pending" data-testid="flagship-pending">
-          <p>{t("flagship.seat.pending", { country: country(flagship.pendingCountryId) })}</p>
+          <p>
+            {t("flagship.seat.pending", {
+              ...nouns,
+              country: country(flagship.pendingCountryId),
+            })}
+          </p>
           <button
             type="button"
             className="action-button"
@@ -362,6 +398,7 @@ function Seat({
             <div className="flagship-review" data-testid="flagship-review">
               <p>
                 {t("flagship.seat.cost", {
+                  ...nouns,
                   share: t("format.percent", { value: flagship.leaveCost }),
                   country: country(flagship.countryId),
                 })}

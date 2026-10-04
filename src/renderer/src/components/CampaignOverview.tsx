@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import { AXIS_IDS } from "../../../content/genome-axes";
 import type { Action, TurnSnapshot } from "../../../sim";
+import { Rulebook } from "../identity/Rulebook";
 import { ActionFeedback } from "./ActionFeedback";
 import { LeagueOverview } from "./LeagueOverview";
 
@@ -63,6 +64,7 @@ export function CampaignOverview({
       {view === "sport" && <ActionFeedback />}
       {view === "sport" && (
         <>
+          <Rulebook snapshot={snapshot} names={names} />
           <p>
             {t("campaign.meta", { seed: snapshot.seed, country: name(snapshot.anchorCountryId) })}
           </p>

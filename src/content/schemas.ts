@@ -194,6 +194,11 @@ export const identityFileSchema = z.strictObject({
     icons: idList,
     colors: z.record(id, z.string().regex(/^#[0-9a-f]{6}$/i)),
   }),
+  playersPerSide: z.strictObject({
+    small: z.int().min(1),
+    medium: z.int().min(1),
+    large: z.int().min(1),
+  }),
   maxOddLines: z.int().min(0),
   /** A deadpan rulebook line where every listed axis has the listed option. */
   oddPairings: z.array(z.strictObject({ id, when: z.record(z.string(), z.string()) })),

@@ -13,6 +13,9 @@ terms:
   match: [match, game, fixture, contest, bout]
   season: [season, campaign, series, term]
 
+# Players a side by the genome's team size, as the rulebook and the field diagram show them.
+playersPerSide: { small: 5, medium: 8, large: 11 }
+
 # The preset emblem (the editor is Phase 2). Colors are hex values drawn by the UI; names for them
 # live in the locale file. An emblem's two colors must differ.
 emblem:

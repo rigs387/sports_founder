@@ -58,8 +58,8 @@
       "clubRating_champion_other": "Champions {{count, number(signDisplay: always)}} rating steps (hidden club strength).",
       "clubRating_field_one": "Every other club {{count, number(signDisplay: always)}} rating step (hidden club strength).",
       "clubRating_field_other": "Every other club {{count, number(signDisplay: always)}} rating steps (hidden club strength).",
-      "starHonors": "Retire them with honors: their influence fades over {{seasons, number}} seasons instead of stopping.",
-      "starMentor": "{{candidate}} gets a lift to their scoring this season, then takes the backing with {{share, number(style: percent)}} of the influence.",
+      "starHonors": "Retire them with honors: their influence fades over {{seasons, number}} {{seasonsNoun}} instead of stopping.",
+      "starMentor": "{{candidate}} gets a lift to their scoring this {{seasonNoun}}, then takes the backing with {{share, number(style: percent)}} of the influence.",
       "starKeep": "Costs the league {{cash, number(maximumFractionDigits: 0)}} in cash. The move is cancelled."
     },
     "blockers": {
@@ -132,8 +132,8 @@
       },
       "season-champion": {
         "title": "Champions of {{country}}",
-        "body_european": "{{champion}} won season {{season}} of the {{country}} league, with {{runnerUp}} runners-up. Another name on the trophy, another chapter in the league's story.",
-        "body_american": "{{champion}} beat {{runnerUp}} in the final to win season {{season}} of the {{country}} league. Another name on the trophy, another chapter in the league's story."
+        "body_european": "{{champion}} won {{seasonNoun}} {{season}} of the {{country}} league, with {{runnerUp}} runners-up. Another name on the trophy, another chapter in the league's story.",
+        "body_american": "{{champion}} beat {{runnerUp}} in the final to win {{seasonNoun}} {{season}} of the {{country}} league. Another name on the trophy, another chapter in the league's story."
       },
       "season-foregone": {
         "title": "A foregone league",
@@ -145,8 +145,8 @@
       },
       "season-runaway": {
         "title": "Runaway champions",
-        "body_one": "{{champion}} won season {{season}} in {{country}} {{count, number}} point clear of {{runnerUp}}. Casual fans tuned out long before the end. Sharing revenue would strengthen the rest of the field.",
-        "body_other": "{{champion}} won season {{season}} in {{country}} {{count, number}} points clear of {{runnerUp}}. Casual fans tuned out long before the end. Sharing revenue would strengthen the rest of the field.",
+        "body_one": "{{champion}} won {{seasonNoun}} {{season}} in {{country}} {{count, number}} point clear of {{runnerUp}}. Casual fans tuned out long before the end. Sharing revenue would strengthen the rest of the field.",
+        "body_other": "{{champion}} won {{seasonNoun}} {{season}} in {{country}} {{count, number}} points clear of {{runnerUp}}. Casual fans tuned out long before the end. Sharing revenue would strengthen the rest of the field.",
         "choices": {
           "revenue-sharing": "Share the revenue",
           "hold": "Leave the money where it is"
@@ -163,8 +163,8 @@
       },
       "season-repeat-final": {
         "title": "The same two again",
-        "body_european": "For the second season running, {{champion}} and {{runnerUp}} finished first and second in {{country}}, with {{champion}} on top this time. A rivalry is forming. Stoke it and the hardcore will love it, though the league's finances may suffer.",
-        "body_american": "For the second season running, {{champion}} and {{runnerUp}} met in the final in {{country}}, and {{champion}} won it this time. A rivalry is forming. Stoke it and the hardcore will love it, though the league's finances may suffer.",
+        "body_european": "For the second {{seasonNoun}} running, {{champion}} and {{runnerUp}} finished first and second in {{country}}, with {{champion}} on top this time. A rivalry is forming. Stoke it and the hardcore will love it, though the league's finances may suffer.",
+        "body_american": "For the second {{seasonNoun}} running, {{champion}} and {{runnerUp}} met in the final in {{country}}, and {{champion}} won it this time. A rivalry is forming. Stoke it and the hardcore will love it, though the league's finances may suffer.",
         "choices": {
           "stoke-it": "Stoke the rivalry",
           "cool-it": "Cool it down",
@@ -173,7 +173,7 @@
       },
       "season-underdog": {
         "title": "Against the odds",
-        "body": "{{champion}} began season {{season}} among the weakest clubs in {{country}} and finished as champions, ahead of {{runnerUp}}. Ride the story to win new fans, or invest in the club so it can stay competitive.",
+        "body": "{{champion}} began {{seasonNoun}} {{season}} among the weakest clubs in {{country}} and finished as champions, ahead of {{runnerUp}}. Ride the story to win new fans, or invest in the club so it can stay competitive.",
         "choices": {
           "ride-the-story": "Ride the story",
           "build-on-it": "Build on it",
@@ -182,7 +182,7 @@
       },
       "season-first-title": {
         "title": "A first title",
-        "body": "{{champion}} won the first title in their history in season {{season}} in {{country}}, ahead of {{runnerUp}}. Use the moment to reach new people, or reward the supporters who were there before it.",
+        "body": "{{champion}} won the first title in their history in {{seasonNoun}} {{season}} in {{country}}, ahead of {{runnerUp}}. Use the moment to reach new people, or reward the supporters who were there before it.",
         "choices": {
           "new-fans": "Court new fans",
           "old-guard": "Reward the old guard",
@@ -191,11 +191,11 @@
       },
       "season-close-finish": {
         "title": "Down to the wire",
-        "body_european_zero": "{{champion}} and {{runnerUp}} finished level on points at the top in {{country}}, and {{champion}} took season {{season}} on score difference. Market the finish, or take the gate money while the grounds are full.",
-        "body_european_one": "Only {{count, number}} point separated {{champion}} from {{runnerUp}} at the end of season {{season}} in {{country}}. Market the finish, or take the gate money while the grounds are full.",
-        "body_european_other": "Only {{count, number}} points separated {{champion}} from {{runnerUp}} at the end of season {{season}} in {{country}}. Market the finish, or take the gate money while the grounds are full.",
-        "body_american": "{{champion}} beat {{runnerUp}} in the final of season {{season}} in {{country}} by the narrowest of margins. Market the finish, or take the gate money while the grounds are full.",
-        "body_deciders": "The final of season {{season}} in {{country}} finished level and went to deciders, and {{champion}} came through against {{runnerUp}}. Market the finish, or take the gate money while the grounds are full.",
+        "body_european_zero": "{{champion}} and {{runnerUp}} finished level on points at the top in {{country}}, and {{champion}} took {{seasonNoun}} {{season}} on score difference. Market the finish, or take the gate money while the grounds are full.",
+        "body_european_one": "Only {{count, number}} point separated {{champion}} from {{runnerUp}} at the end of {{seasonNoun}} {{season}} in {{country}}. Market the finish, or take the gate money while the grounds are full.",
+        "body_european_other": "Only {{count, number}} points separated {{champion}} from {{runnerUp}} at the end of {{seasonNoun}} {{season}} in {{country}}. Market the finish, or take the gate money while the grounds are full.",
+        "body_american": "{{champion}} beat {{runnerUp}} in the final of {{seasonNoun}} {{season}} in {{country}} by the narrowest of margins. Market the finish, or take the gate money while the grounds are full.",
+        "body_deciders": "The final of {{seasonNoun}} {{season}} in {{country}} finished level and went to deciders, and {{champion}} came through against {{runnerUp}}. Market the finish, or take the gate money while the grounds are full.",
         "choices": {
           "market-it": "Market the finish",
           "bank-the-gate": "Bank the gate",
@@ -204,18 +204,18 @@
       },
       "star-breakout": {
         "title": "A star is born",
-        "body_one": "{{player}} scored {{count, number}} time in {{matches, number}} matches for {{club}} in season {{season}}: {{share, number(style: percent)}} of the club's scores. The league has a new star.",
-        "body_other": "{{player}} scored {{count, number}} times in {{matches, number}} matches for {{club}} in season {{season}}: {{share, number(style: percent)}} of the club's scores. The league has a new star."
+        "body_one": "{{player}} scored {{count, number}} time in {{matches, number}} {{matchNoun}} for {{club}} in {{seasonNoun}} {{season}}: {{share, number(style: percent)}} of the club's {{scoresNoun}}. The league has a new star.",
+        "body_other": "{{player}} scored {{count, number}} times in {{matches, number}} {{matchNoun}} for {{club}} in {{seasonNoun}} {{season}}: {{share, number(style: percent)}} of the club's {{scoresNoun}}. The league has a new star."
       },
       "star-final-season": {
-        "title": "One last season",
-        "body_one": "{{player}} of {{club}} will retire after next season. They have scored {{count, number}} time in {{seasons, number}} seasons, and fans want to see them play while they can.",
-        "body_other": "{{player}} of {{club}} will retire after next season. They have scored {{count, number}} times in {{seasons, number}} seasons, and fans want to see them play while they can."
+        "title": "One last {{seasonNoun}}",
+        "body_one": "{{player}} of {{club}} will retire after next {{seasonNoun}}. They have scored {{count, number}} time in {{seasons, number}} {{seasonsNoun}}, and fans want to see them play while they can.",
+        "body_other": "{{player}} of {{club}} will retire after next {{seasonNoun}}. They have scored {{count, number}} times in {{seasons, number}} {{seasonsNoun}}, and fans want to see them play while they can."
       },
       "star-retired": {
         "title": "A star retires",
-        "body_one": "{{player}} has played their last match for {{club}}. They retire with {{count, number}} score in {{matches, number}} matches over {{seasons, number}} seasons.",
-        "body_other": "{{player}} has played their last match for {{club}}. They retire with {{count, number}} scores in {{matches, number}} matches over {{seasons, number}} seasons."
+        "body_one": "{{player}} has played their last {{matchOne}} for {{club}}. They retire with {{count, number}} {{scoreNoun}} in {{matches, number}} {{matchNoun}} over {{seasons, number}} {{seasonsNoun}}.",
+        "body_other": "{{player}} has played their last {{matchOne}} for {{club}}. They retire with {{count, number}} {{scoreNoun}} in {{matches, number}} {{matchNoun}} over {{seasons, number}} {{seasonsNoun}}."
       },
       "star-moved": {
         "title": "A star changes clubs",
@@ -223,13 +223,13 @@
       },
       "star-record": {
         "title": "A league record",
-        "body_one": "{{player}} of {{club}} is now the {{country}} league's all-time top scorer, with {{count, number}} score.",
-        "body_other": "{{player}} of {{club}} is now the {{country}} league's all-time top scorer, with {{count, number}} scores."
+        "body_one": "{{player}} of {{club}} is now the {{country}} league's all-time top scorer, with {{count, number}} {{scoreNoun}}.",
+        "body_other": "{{player}} of {{club}} is now the {{country}} league's all-time top scorer, with {{count, number}} {{scoreNoun}}."
       },
       "star-succession": {
-        "title": "A backed star's last season",
-        "body": "{{player}} of {{club}}, a star you back, will retire after next season. Retire them with honors and their influence fades slowly instead of stopping, or let them go.",
-        "body_mentor": "{{player}} of {{club}}, a star you back, will retire after next season. Retire them with honors and their influence fades slowly instead of stopping, or let them mentor {{candidate}}, who would take on part of it.",
+        "title": "A backed star's last {{seasonNoun}}",
+        "body": "{{player}} of {{club}}, a star you back, will retire after next {{seasonNoun}}. Retire them with honors and their influence fades slowly instead of stopping, or let them go.",
+        "body_mentor": "{{player}} of {{club}}, a star you back, will retire after next {{seasonNoun}}. Retire them with honors and their influence fades slowly instead of stopping, or let them mentor {{candidate}}, who would take on part of it.",
         "choices": {
           "honors": "Retire with honors",
           "mentor": "Mentor a successor",
@@ -263,8 +263,8 @@
     },
     "arrived": "Already landed, whatever you choose:",
     "seasonLeader": "{{player}} led {{champion}}.",
-    "seasonScorer_one": "{{player}} was the season's top scorer, with {{count, number}} score.",
-    "seasonScorer_other": "{{player}} was the season's top scorer, with {{count, number}} scores."
+    "seasonScorer_one": "{{player}} was the {{seasonNoun}}'s top scorer, with {{count, number}} {{scoreNoun}}.",
+    "seasonScorer_other": "{{player}} was the {{seasonNoun}}'s top scorer, with {{count, number}} {{scoreNoun}}."
   },
   "saves": {
     "menu": "Campaign",
@@ -310,7 +310,7 @@
     "tagline": "One birthplace. A world to win.",
     "stepOne": "01 / The birthplace",
     "stepTwo": "02 / The sport",
-    "stepThree": "03 / Your first season",
+    "stepThree": "04 / Your first season",
     "anchorTitle": "Start somewhere.",
     "anchorIntro": "Choose where your first club and following take root.",
     "anchorLabel": "Anchor country",
@@ -782,7 +782,7 @@
     "chapter": "Every obsession starts somewhere",
     "headlineFirst": "Small sport.",
     "headlineSecond": "Big world.",
-    "campaignIdentity": "Your sport / {{tier}}",
+    "campaignIdentity": "{{sport}} / {{tier}}",
     "established_zero": "A world of possibilities.",
     "established_one": "{{count}} market at {{threshold}}+ fandom strength.",
     "established_other": "{{count}} markets at {{threshold}}+ fandom strength.",
@@ -848,14 +848,14 @@
   "flagship": {
     "eyebrow": "The commissioner's seat",
     "title": "The {{country}} league",
-    "status": "Season {{season}} · Round {{round}} of {{total}}",
-    "seasonEnds_one": "The season ends this quarter.",
-    "seasonEnds_other": "The season ends in {{count}} quarters.",
+    "status": "{{SeasonNoun}} {{season}} · Round {{round}} of {{total}}",
+    "seasonEnds_one": "The {{seasonNoun}} ends this quarter.",
+    "seasonEnds_other": "The {{seasonNoun}} ends in {{count}} quarters.",
     "formats": {
       "european": "European format: the top of the table is champion.",
       "american": "American format: the top {{count}} clubs play off for the title."
     },
-    "paused": "{{country}} has no league right now. The season is on hold until one forms.",
+    "paused": "{{country}} has no league right now. The {{seasonNoun}} is on hold until one forms.",
     "club": "{{place}} {{nickname}}",
     "titles_one": "{{count}} title",
     "titles_other": "{{count}} titles",
@@ -877,19 +877,19 @@
       "pointsFull": "Points",
       "playoffLine": "Playoff places",
       "leader": "Leading player",
-      "leaderScores_one": "{{name}} · {{count, number}} score",
-      "leaderScores_other": "{{name}} · {{count, number}} scores"
+      "leaderScores_one": "{{name}} · {{count, number}} {{scoreNoun}}",
+      "leaderScores_other": "{{name}} · {{count, number}} {{scoreNoun}}"
     },
     "lastRound": {
       "heading": "Latest results",
-      "none": "No matches yet this season.",
+      "none": "No {{matchesNoun}} yet this {{seasonNoun}}.",
       "score": "{{home}}–{{away}}",
       "decided": "{{club}} won the decider."
     },
     "champions": {
       "heading": "Champions",
-      "none": "The first champion is crowned at the end of this season.",
-      "season": "Season {{season}} · {{year}}",
+      "none": "The first champion is crowned at the end of this {{seasonNoun}}.",
+      "season": "{{SeasonNoun}} {{season}} · {{year}}",
       "runnerUp": "Runner-up: {{club}}",
       "final": "Final: {{home}} {{homeScore}}–{{awayScore}} {{away}}",
       "abroad": "Played in {{country}}"
@@ -897,7 +897,7 @@
     "seat": {
       "heading": "The seat",
       "here": "You run the league in {{country}}. Every other league runs itself.",
-      "pending": "The seat moves to {{country}} when this season ends.",
+      "pending": "The seat moves to {{country}} when this {{seasonNoun}} ends.",
       "cancel": "Stay in {{country}}",
       "choose": "Move the seat to",
       "placeholder": "Choose a league",
@@ -906,40 +906,40 @@
       "review": "Review the move",
       "confirm": "Move the seat",
       "back": "Keep it here",
-      "cost": "Moving away turns {{share}} of hardcore fans in {{country}} casual. The move happens when this season ends.",
+      "cost": "Moving away turns {{share}} of hardcore fans in {{country}} casual. The move happens when this {{seasonNoun}} ends.",
       "target": "{{country}} · {{tier}}"
     },
     "footer": "Your league. Seasons end in the seasonal window.",
     "stars": {
       "heading": "Stars",
       "intro": "Stars are the league's leading players who carried their club. Backing one lifts the sport in {{country}} while they play here.",
-      "none": "No star yet. A season's top scorer becomes a star when they carry their club's scoring.",
+      "none": "No star yet. A {{seasonNoun}}'s top scorer becomes a star when they carry their club's scoring.",
       "slots_one": "{{used, number}} of {{count, number}} backing slot used",
       "slots_other": "{{used, number}} of {{count, number}} backing slots used",
       "slotUsed": "Backing slot in use",
       "slotFree": "Free backing slot",
       "over": "You hold more backings than your PP tier allows. They stay until you drop them or they retire.",
       "price": "Backing a star costs {{price, number(maximumFractionDigits: 1)}} PP, once.",
-      "starSince": "Star since season {{season, number}}",
+      "starSince": "Star since {{seasonNoun}} {{season, number}}",
       "successor": "Backed successor",
-      "finalSeason": "Final season",
+      "finalSeason": "Final {{seasonNoun}}",
       "club": "{{club}} · age {{age, number}}",
       "born": "Born in {{place}}, {{country}}",
-      "seasonTally": "This season",
+      "seasonTally": "This {{seasonNoun}}",
       "careerTally": "Career",
-      "scores_one": "{{count, number}} score in {{matches, number}} matches",
-      "scores_other": "{{count, number}} scores in {{matches, number}} matches",
-      "untallied": "Not tallied this season",
-      "careerSeasons_one": "{{count, number}} season",
-      "careerSeasons_other": "{{count, number}} seasons",
-      "rookie": "First season",
+      "scores_one": "{{count, number}} {{scoreNoun}} in {{matches, number}} {{matchNoun}}",
+      "scores_other": "{{count, number}} {{scoreNoun}} in {{matches, number}} {{matchNoun}}",
+      "untallied": "Not tallied this {{seasonNoun}}",
+      "careerSeasons_one": "{{count, number}} {{seasonNoun}}",
+      "careerSeasons_other": "{{count, number}} {{seasonsNoun}}",
+      "rookie": "First {{seasonNoun}}",
       "influence": "Influence",
       "influenceValue": "{{value, number(style: percent; maximumFractionDigits: 0)}}",
       "influenceLabel": "{{name}}'s influence: {{value, number(style: percent; maximumFractionDigits: 0)}}",
       "mentoring": "Mentoring {{name}}",
       "back": "Back {{name}}",
       "drop": "Drop {{name}}",
-      "reviewBack": "Back {{name}} for {{price, number(maximumFractionDigits: 1)}} PP? Their influence starts at nothing and grows each season they play in {{country}}.",
+      "reviewBack": "Back {{name}} for {{price, number(maximumFractionDigits: 1)}} PP? Their influence starts at nothing and grows each {{seasonNoun}} they play in {{country}}.",
       "confirmBack": "Back this star",
       "reviewDrop": "Drop {{name}}? Their influence of {{influence, number(style: percent; maximumFractionDigits: 0)}} is lost for good.",
       "reviewDropFull": "At full influence, dropping them turns {{share, number(style: percent; maximumFractionDigits: 2)}} of hardcore fans in {{country}} casual now.",
@@ -958,6 +958,253 @@
           "window": "A backing can be dropped only in the seasonal window.",
           "notBacked": "This star is not backed."
         }
+      }
+    },
+    "founding": "Founding club",
+    "foundingEmblem": "Emblem of {{sport}}"
+  },
+  "identity": {
+    "terms": {
+      "score": {
+        "score_one": "score",
+        "score_other": "scores",
+        "score_title": "Score",
+        "score_titlePlural": "Scores",
+        "goal_one": "goal",
+        "goal_other": "goals",
+        "goal_title": "Goal",
+        "goal_titlePlural": "Goals",
+        "point_one": "point",
+        "point_other": "points",
+        "point_title": "Point",
+        "point_titlePlural": "Points",
+        "run_one": "run",
+        "run_other": "runs",
+        "run_title": "Run",
+        "run_titlePlural": "Runs",
+        "try_one": "try",
+        "try_other": "tries",
+        "try_title": "Try",
+        "try_titlePlural": "Tries",
+        "basket_one": "basket",
+        "basket_other": "baskets",
+        "basket_title": "Basket",
+        "basket_titlePlural": "Baskets",
+        "tally_one": "tally",
+        "tally_other": "tallies",
+        "tally_title": "Tally",
+        "tally_titlePlural": "Tallies"
+      },
+      "match": {
+        "match_one": "match",
+        "match_other": "matches",
+        "match_title": "Match",
+        "match_titlePlural": "Matches",
+        "game_one": "game",
+        "game_other": "games",
+        "game_title": "Game",
+        "game_titlePlural": "Games",
+        "fixture_one": "fixture",
+        "fixture_other": "fixtures",
+        "fixture_title": "Fixture",
+        "fixture_titlePlural": "Fixtures",
+        "contest_one": "contest",
+        "contest_other": "contests",
+        "contest_title": "Contest",
+        "contest_titlePlural": "Contests",
+        "bout_one": "bout",
+        "bout_other": "bouts",
+        "bout_title": "Bout",
+        "bout_titlePlural": "Bouts"
+      },
+      "season": {
+        "season_one": "season",
+        "season_other": "seasons",
+        "season_title": "Season",
+        "season_titlePlural": "Seasons",
+        "campaign_one": "campaign",
+        "campaign_other": "campaigns",
+        "campaign_title": "Campaign",
+        "campaign_titlePlural": "Campaigns",
+        "series_one": "series",
+        "series_other": "series",
+        "series_title": "Series",
+        "series_titlePlural": "Series",
+        "term_one": "term",
+        "term_other": "terms",
+        "term_title": "Term",
+        "term_titlePlural": "Terms"
+      }
+    },
+    "birthplaces": {
+      "schoolyard": "a schoolyard",
+      "factory": "a factory yard",
+      "beach": "a beach",
+      "barracks": "a barracks square",
+      "village-green": "a village green",
+      "docks": "the docks"
+    },
+    "ethos": {
+      "gentlemans-game": "A gentleman's game",
+      "working-class-game": "A working-class game",
+      "rebel-game": "A rebel game",
+      "family-game": "A family game"
+    },
+    "shapes": {
+      "shield": "Shield",
+      "roundel": "Roundel",
+      "pennant": "Banner",
+      "diamond": "Diamond",
+      "crest": "Crest"
+    },
+    "icons": {
+      "star": "Star",
+      "ball": "Ball",
+      "crown": "Crown",
+      "bolt": "Bolt",
+      "wing": "Wing",
+      "oak": "Oak leaf",
+      "wave": "Wave",
+      "tower": "Tower"
+    },
+    "colors": {
+      "navy": "Navy",
+      "royal": "Royal blue",
+      "sky": "Sky blue",
+      "crimson": "Crimson",
+      "scarlet": "Scarlet",
+      "amber": "Amber",
+      "gold": "Gold",
+      "forest": "Forest green",
+      "emerald": "Emerald",
+      "claret": "Claret",
+      "black": "Black",
+      "white": "White"
+    },
+    "emblemLabel": "The emblem of {{sport}}: a {{color}} {{shape}} with a {{icon}}",
+    "setup": {
+      "step": "03 / The founding",
+      "title": "Found your sport.",
+      "intro": "Give it a name, a first club and a home. None of this changes how the sport spreads; it makes it yours.",
+      "sportName": "Name of the sport",
+      "reroll": "Suggest another",
+      "town": "Founding club's town",
+      "townHelp": "Real towns and cities of {{country}}, biggest first.",
+      "chooseAnchorFirst": "Choose a birthplace country first.",
+      "clubName": "Club name",
+      "clubPreview": "Your founding club: {{club}}",
+      "groundName": "Home ground",
+      "birthplace": "First played on",
+      "ethos": "Character",
+      "terms": "What it calls things",
+      "scoreTerm": "A score is a",
+      "matchTerm": "A match is a",
+      "seasonTerm": "A season is a",
+      "emblem": "Emblem",
+      "shape": "Shape",
+      "icon": "Icon",
+      "primary": "Main color",
+      "secondary": "Second color",
+      "sameColors": "Pick two different colors.",
+      "nameLength": "Use {{min, number}}–{{max, number}} characters.",
+      "preview": "Preview",
+      "next": "Next: found your sport",
+      "continue": "Continue",
+      "back": "Back to the sport"
+    },
+    "rulebook": {
+      "heading": "Rulebook",
+      "eyebrow": "The rules of {{sport}}",
+      "founded": "{{sport}} was founded in {{year}} in {{place}}, {{country}}. Its first club, {{club}}, plays at {{ground}}.",
+      "origin": "It was first played on {{birthplace}}.",
+      "ethos": {
+        "gentlemans-game": "It is a gentleman's game: fair play is spoken of more than winning.",
+        "working-class-game": "It is a working-class game, played after shifts and paid for in coins.",
+        "rebel-game": "It is a rebel game, loved partly because the respectable disapprove.",
+        "family-game": "It is a family game: three generations stand on the same touchline."
+      },
+      "terms": {
+        "score": "A score is called a {{noun}}.",
+        "match": "A match is called a {{noun}}.",
+        "season": "A season is called a {{noun}}."
+      },
+      "surface": {
+        "grass": "It is played outdoors on grass.",
+        "indoor": "It is played indoors, on a hard court.",
+        "street": "It is played on the street, on whatever tarmac is free.",
+        "ice": "It is played on ice."
+      },
+      "equipment": {
+        "ball-only": "It needs nothing but a ball.",
+        "stick-or-bat": "Players carry a stick or bat, and there is a ball.",
+        "protective-gear": "Players wear protective gear, and there is a ball."
+      },
+      "physical": {
+        "speed": "Speed wins more than anything else.",
+        "strength": "Strength decides most contests.",
+        "precision": "Precision matters more than pace or power.",
+        "endurance": "The fittest side usually wins in the end."
+      },
+      "footprint": {
+        "small": "The playing area is small.",
+        "medium": "The playing area is of middling size.",
+        "large": "The playing area is large."
+      },
+      "teamSize": "Each side fields {{count, number}} players.",
+      "contact": {
+        "none": "Contact between players is not allowed.",
+        "incidental": "Contact is incidental and penalized when it is not.",
+        "full": "Full contact is part of the game."
+      },
+      "matchLength": {
+        "short": "A {{match}} is short.",
+        "standard": "A {{match}} runs a standard length.",
+        "long": "A {{match}} is long, sometimes very long."
+      },
+      "scoring": {
+        "low": "{{scores}} are rare and precious.",
+        "medium": "{{scores}} come at a steady rate.",
+        "high": "{{scores}} come thick and fast."
+      },
+      "complexity": {
+        "simple": "The rules fit on a postcard.",
+        "moderate": "The rules take an afternoon to learn.",
+        "intricate": "The rules are intricate; arguments about them are part of the fun."
+      },
+      "structure": {
+        "continuous": "Play flows continuously.",
+        "stop-start": "Play stops and starts in set pieces.",
+        "innings": "Sides take turns to attack and defend, in innings."
+      },
+      "odd": {
+        "ice-innings": "Innings on ice are slow, cold and, to their admirers, perfect.",
+        "street-large-field": "A large field on the street means closing several roads; councils are rarely consulted.",
+        "indoor-large-field": "Few halls are big enough, so most matches are played in aircraft hangars.",
+        "full-contact-precision": "Precision under full contact is admired and rarely achieved.",
+        "ice-long-match": "Long matches on ice are played in layers of wool.",
+        "small-team-large-field": "Small sides on a large field do a great deal of running.",
+        "large-team-small-field": "Large sides on a small field leave little room to move.",
+        "gear-no-contact": "Players wear protective gear in a game without contact, just in case.",
+        "ice-marathon": "An endurance game on ice, played long: spectators are advised to bring soup."
+      },
+      "amendments": "Amendments to these rules will be recorded here."
+    },
+    "diagram": {
+      "heading": "The field",
+      "label": "Field diagram: {{surface}}, a {{size}} field, {{count, number}} players a side.",
+      "legendHome": "{{club}}",
+      "legendAway": "Visitors",
+      "perSide": "{{count, number}} a side",
+      "sizes": {
+        "small": "small",
+        "medium": "medium-sized",
+        "large": "large"
+      },
+      "surfaces": {
+        "grass": "grass",
+        "indoor": "an indoor court",
+        "street": "the street",
+        "ice": "ice"
       }
     }
   }

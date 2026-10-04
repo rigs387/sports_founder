@@ -61,6 +61,7 @@ export function createSimWorkerApi(world: World) {
           limits: { ...world.config.identity },
           oddPairings: structuredClone(world.identity.oddPairings),
           maxOddLines: world.identity.maxOddLines,
+          playersPerSide: { ...world.identity.playersPerSide },
         },
       };
     },

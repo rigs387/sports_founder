@@ -11,6 +11,7 @@ import { SaveLoadControls } from "./components/SaveLoadControls";
 import { FlagshipScreen } from "./flagship/FlagshipScreen";
 import { BackedStars } from "./flagship/StarsPanel";
 import { GrowthScreen } from "./growth/GrowthScreen";
+import { Emblem } from "./identity/Emblem";
 import { heatBand, mapSettings } from "./map/model";
 import { type MapCommand, type MapHover, WorldMap } from "./map/WorldMap";
 import { useGameStore } from "./state/game-store";
@@ -196,8 +197,18 @@ export function App() {
             <em>{t("map.headlineSecond")}</em>
           </h1>
           <p>
-            <span aria-hidden="true">&#9675;</span>
+            {snapshot ? (
+              <Emblem
+                {...snapshot.identity.emblem}
+                primary={snapshot.identity.colors.primary}
+                secondary={snapshot.identity.colors.secondary}
+                size={18}
+              />
+            ) : (
+              <span aria-hidden="true">&#9675;</span>
+            )}
             {t("map.campaignIdentity", {
+              sport: snapshot?.identity.sportName ?? t("map.nav.sport"),
               tier: snapshot ? t(`tiers.${snapshot.ppTier}`) : t("status.loading"),
             })}
           </p>

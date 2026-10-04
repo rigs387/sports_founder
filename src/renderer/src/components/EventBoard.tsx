@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { EventEffect } from "../../../content";
 import type { EventRecord } from "../../../sim";
+import { PLAIN_TERMS, useTermVars } from "../identity/terms";
 import { useGameStore } from "../state/game-store";
 import { ActionFeedback } from "./ActionFeedback";
 import "./events.css";
@@ -15,11 +16,13 @@ interface StarValues {
 function Effect({ effect, star = {} }: { effect: EventEffect; star?: StarValues }) {
   const { t } = useTranslation();
   const { snapshot } = useGameStore();
+  const termVars = useTermVars(snapshot?.identity.terms ?? PLAIN_TERMS);
   if (effect.type === "starHonors" || effect.type === "starMentor" || effect.type === "starKeep") {
     const stars = snapshot?.flagship.starRules;
     return (
       <li>
         {t(`events.effects.${effect.type}`, {
+          ...termVars({ seasons: stars?.afterglowSeasons ?? 0 }),
           seasons: stars?.afterglowSeasons ?? 0,
           share: stars?.mentorShare ?? 0,
           candidate: star.candidate ?? "",
@@ -61,6 +64,7 @@ export function EventBoard() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [review, setReview] = useState<string | null>(null);
   const busy = status !== "ready";
+  const termVars = useTermVars(snapshot?.identity.terms ?? PLAIN_TERMS);
   useEffect(() => {
     if (open) dialog.current?.showModal();
     else dialog.current?.close();
@@ -118,11 +122,21 @@ export function EventBoard() {
             : "american",
     };
   };
+  // The sport's own nouns (GDD v1.18), in the number the card's counts call for.
+  const textVars = (event: EventRecord) => {
+    const values: Record<string, unknown> = seasonText(event);
+    const number = (key: string) =>
+      typeof values[key] === "number" ? (values[key] as number) : undefined;
+    return {
+      ...termVars({ score: number("count"), match: number("matches"), seasons: number("seasons") }),
+      ...values,
+    };
+  };
   const title = (event: EventRecord) =>
     t(`events.cards.${event.templateId}.title`, {
       country: country(event.countryId),
       rival: names?.sports[event.facts.rivalId ?? ""] ?? "",
-      ...seasonText(event),
+      ...textVars(event),
     });
   const chooseRecord = (event: EventRecord) => {
     setSelectedId(event.id);
@@ -283,7 +297,7 @@ export function EventBoard() {
                       tier: selected.facts.leagueTier
                         ? t(`league.tiers.${selected.facts.leagueTier}`)
                         : "",
-                      ...seasonText(selected),
+                      ...textVars(selected),
                     })}
                   </p>
                   {selected.facts.season?.championPlayerId != null && (
@@ -297,6 +311,7 @@ export function EventBoard() {
                   {selected.facts.season?.topScorerId != null && (
                     <p>
                       {t("events.seasonScorer", {
+                        ...termVars({ score: selected.facts.season.topScorerScores ?? 0 }),
                         player: player(selected.facts.season.topScorerId),
                         count: selected.facts.season.topScorerScores ?? 0,
                       })}

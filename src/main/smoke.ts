@@ -5,6 +5,7 @@ import { verifyActions } from "./action-smoke";
 import { verifyChampionshipCard } from "./contest-smoke";
 import { verifyEvents } from "./event-smoke";
 import { verifyFlagship } from "./flagship-smoke";
+import { verifyRulebook } from "./identity-smoke";
 import { verifyLeagues } from "./league-smoke";
 import { verifyMap } from "./map-smoke";
 import type { FilePrompts } from "./save-files";
@@ -123,6 +124,7 @@ async function run(
   }
   await screenshot("02-after-turns.png");
   const championship = await verifyChampionshipCard(win, screenshot);
+  const rulebook = await verifyRulebook(win, screenshot);
 
   const passed =
     current.turn === before.turn + TURNS_TO_PLAY &&
@@ -147,6 +149,7 @@ async function run(
     setup,
     events,
     championship,
+    rulebook,
     actions,
     leagues,
     flagship,

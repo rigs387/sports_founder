@@ -206,6 +206,8 @@ export interface IdentitySnapshot extends SportIdentity {
   colors: { primary: string; secondary: string };
   oddPairings: string[];
   foundedYear: number;
+  /** Players a side, by the genome's team size. */
+  playersPerSide: number;
 }
 
 export function identitySnapshot(state: GameState, world: World): IdentitySnapshot {
@@ -218,5 +220,6 @@ export function identitySnapshot(state: GameState, world: World): IdentitySnapsh
     },
     oddPairings: oddPairings(state.genome, world),
     foundedYear: world.config.calendar.startYear,
+    playersPerSide: world.identity.playersPerSide[state.genome.teamSize],
   };
 }

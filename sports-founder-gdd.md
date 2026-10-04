@@ -109,6 +109,9 @@ turn. Longer turns change how often the player decides, not the economy's math.
      amendments join it with rules evolution.
    - *Saves:* older saves load with generated defaults (the anchor's first club becomes the
      founding club with its name unchanged).
+   - *Built 2026-10-04:* setup is two pages (the sport, then the founding), each fitting the
+     window. Players a side by team size: 5 / 8 / 11. The league's text (flagship screen, Stars
+     panel, season and star cards) uses the sport's terms; the seasonal window keeps its name.
 
 **Starting state:** the anchor country has a tiny founding Amateur league, a tiny hardcore base
 (the founder's friends and family), and a small casual base. The player has a small PP stash. The

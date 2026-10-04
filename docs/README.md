@@ -10,6 +10,7 @@ Start with the [world map's current direction](world-map/README.md): **Matchday 
 - [Open the current interactive preview](world-map/index.html)
 - [Live Pixi game screen and screenshots](world-map/production.md)
 - [Campaign setup and screenshot](campaign-setup/README.md)
+- [Sport identity: the founding, the Rulebook and the field diagram](identity/README.md)
 - [Clubhouse growth board: live screen and choices](growth-tree/production.md)
 - [League management: promotion, restructuring and bailouts](league-management/README.md)
 - [Save/load: campaign files, history and resume verification](save-load/README.md)

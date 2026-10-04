@@ -1,0 +1,254 @@
+/* Sport identity (GDD v1.18): the Rulebook, the field diagram and the setup panel. */
+.emblem {
+  flex: none;
+  display: inline-block;
+  vertical-align: middle;
+}
+.rulebook {
+  margin: 0 0 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fbf8f0;
+  box-shadow: 0 3px 0 #d9cfb6;
+}
+.rulebook-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e4dbc3;
+}
+.rulebook-heading h3 {
+  margin: 2px 0;
+  font-size: 26px;
+  letter-spacing: -0.8px;
+}
+.rulebook .rulebook-ethos {
+  margin: 0;
+  font-size: 12px;
+  font-style: italic;
+  color: #6b5a33;
+}
+.rulebook-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  gap: 16px;
+  padding-top: 12px;
+}
+.rulebook-prose p {
+  margin: 0 0 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.rulebook-odd {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-style: italic;
+  color: #5d4a1f;
+}
+.rulebook .rulebook-note {
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--muted);
+}
+.rulebook-field h4 {
+  margin: 0 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--second);
+}
+.field-diagram {
+  margin: 0;
+}
+.field-diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: #e8efe4;
+}
+.field-diagram figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.field-diagram figcaption span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.field-diagram figcaption i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  box-shadow: 0 0 0 1px #9aa9ba;
+}
+@media (max-width: 700px) {
+  .rulebook-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The founding panel on the setup screen. */
+.setup-identity {
+  padding: 16px 21px;
+}
+.setup-identity h2 {
+  margin-bottom: 4px;
+}
+.setup-identity > p {
+  margin: 0 0 10px;
+}
+.setup-identity-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 300px;
+  gap: 16px 20px;
+  align-items: start;
+}
+.setup-preview {
+  grid-row: 1 / 3;
+}
+.setup-identity-grid > div {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.setup-identity-grid > .setup-emblem {
+  grid-column: 1 / 3;
+  grid-row: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+.setup-identity-grid > .setup-name-row {
+  display: flex;
+  gap: 6px;
+  align-items: end;
+}
+.setup-name-row .setup-field {
+  flex: 1;
+}
+.setup-reroll {
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.setup-identity small {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.setup-identity small.invalid {
+  color: var(--warning);
+  font-weight: 700;
+}
+.setup-identity fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.setup-identity legend {
+  padding: 0 0 5px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.setup-terms {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.emblem-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.emblem-choices label {
+  display: grid;
+  place-items: center;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  cursor: pointer;
+}
+.emblem-choices label.chosen {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  background: #e2edff;
+}
+.emblem-choices input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.emblem-choices label:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.swatch {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #7f8b99;
+}
+.setup-preview {
+  padding: 12px;
+  border-radius: 10px;
+  background: linear-gradient(140deg, #fbf8f0, #eef4e6);
+  border: 1px solid #d9cfb6;
+}
+.setup-preview-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.setup-preview-heading strong {
+  display: block;
+  font-size: 18px;
+}
+.setup-preview-heading .preview-note {
+  font-size: 11px;
+  color: var(--muted);
+}
+@media (max-width: 1100px) {
+  .setup-identity-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .setup-identity-grid > .setup-preview {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .setup-identity-grid > .setup-emblem {
+    grid-row: auto;
+  }
+}
+@media (max-width: 700px) {
+  .setup-identity-grid,
+  .setup-terms {
+    grid-template-columns: 1fr;
+  }
+  .setup-identity-grid > .setup-emblem {
+    grid-column: auto;
+  }
+}
+.setup-columns[hidden] {
+  display: none;
+}

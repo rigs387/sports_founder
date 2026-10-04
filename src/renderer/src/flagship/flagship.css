@@ -16,6 +16,21 @@
   justify-content: space-between;
   gap: 20px;
 }
+.flagship-title {
+  margin-right: auto;
+}
+.flagship-table .founding {
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--second);
+  background: #e2edff;
+  white-space: nowrap;
+}
+.flagship-table .club-name .emblem {
+  align-self: center;
+}
 .flagship-heading h1 {
   margin: 4px 0;
   text-transform: none;

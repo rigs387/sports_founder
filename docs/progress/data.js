@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-04",
-  design: "GDD v1.17",
+  design: "GDD v1.18",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -13,12 +13,12 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-04",
-    tests: 407,
-    files: 36,
-    note: "npm run check passed after the contest for #1 (type checks, Biome, purity, 407 tests in 36 files). Lint has existing visual-study warnings.",
+    tests: 416,
+    files: 37,
+    note: "npm run check passed after sport identity (type checks, Biome, purity, 416 tests in 37 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-04",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it also opens the soccer world championship card from turn 3; save/resume continued identically.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms and opens the soccer world championship card; save/resume continued identically.",
   },
   eventDeck: { current: 26, target: "40–60" },
   phases: [
@@ -56,8 +56,8 @@ window.SF_PROGRESS = {
     },
     {
       system: "creation",
-      title: "Give the sport its identity",
-      text: "Names, a readable rulebook and founding character that seeds future traditions.",
+      title: "Make the start a choice",
+      text: "The sport now has its identity (GDD v1.18). Next: country difficulty, recommended starts and difficulty presets.",
       tag: "Then",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-04",
+      type: "Built",
+      title: "Sport identity",
+      text: "GDD v1.18, tech plan 2.8: a second setup page founds the sport: its name (generated, re-rollable), the founding club in a real town of the anchor and its ground, birthplace and ethos, terms for score, match and season, and a preset emblem. A Rulebook under Your sport reads it back as almanac prose with odd-pairing lines and a field diagram drawn from the genome. The flagship screen, Stars panel and cards use the sport's terms. Save format 16.",
+    },
     {
       date: "2026-10-04",
       type: "Built",
@@ -298,20 +304,30 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 2 · founding character",
       icon: "03",
-      summary: "The mechanics of invention work; the sport needs its own name and character.",
-      next: "Add sport, club and ground names plus a generated rulebook; then founding character.",
+      summary:
+        "Invent the rules, then found the sport: its name, first club, ground, character, terms and emblem, read back as a Rulebook.",
+      next: "Country difficulty and recommended starts; let Culture read birthplace and ethos.",
       depends: ["foundation"],
       sources: [
         ["Campaign setup", "../campaign-setup/README.md"],
         ["Founding character design", "../../sports-founder-gdd.md#game-loop"],
+        ["Sport identity", "../identity/README.md"],
+        ["Identity tests", "../../tests/identity.test.ts"],
+        [
+          "Identity build plan",
+          "../../sports-founder-tech-plan.md#28-build-plan-sport-identity-gdd-v118",
+        ],
       ],
       items: [
         ["built", "Ten editable traits and four quick-start genomes"],
         ["built", "Any anchor country, local fit hints and editable seed"],
-        ["planned", "Sport, founding club and ground naming"],
+        ["built", "Sport, founding club and ground naming; the club in a real town of the anchor"],
         ["planned", "Country difficulty, recommended starts and difficulty presets"],
-        ["planned", "Generated prose rulebook and field diagram"],
-        ["planned", "Birthplace, ethos, colors, emblem and sport terminology"],
+        ["built", "Generated prose rulebook and field diagram"],
+        [
+          "partial",
+          "Birthplace, ethos, emblem and terms built; birthplace and ethos wait for Culture to matter",
+        ],
       ],
     },
     {

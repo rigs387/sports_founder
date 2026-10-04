@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { genomeSchema, type Names } from "../../../content";
 import { AXIS_IDS, GENOME_AXES, type Genome } from "../../../content/genome-axes";
-import { type GenomeHints, SEASON_FORMATS, type SeasonFormat } from "../../../sim";
+import {
+  type GenomeHints,
+  type IdentitySetup,
+  SEASON_FORMATS,
+  type SeasonFormat,
+} from "../../../sim";
+import { nameProblems, SetupIdentity } from "../identity/SetupIdentity";
 import { useGameStore } from "../state/game-store";
 import type { SetupOptions } from "../worker/api";
 import { sim } from "../worker/client";
@@ -52,6 +58,14 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
   const [seasonFormat, setSeasonFormat] = useState<SeasonFormat>("european");
   const [hints, setHints] = useState<{ anchor: string; values: GenomeHints } | null>(null);
   const [hintError, setHintError] = useState(false);
+  const [identity, setIdentity] = useState<IdentitySetup | null>(null);
+  const [places, setPlaces] = useState<string[]>([]);
+  // The ground's default ("<town> Park") follows the founding town until the player edits it.
+  const [groundWord, setGroundWord] = useState("");
+  const [groundEdited, setGroundEdited] = useState(false);
+  const [rerolls, setRerolls] = useState(0);
+  // Two pages, each fitting the window: the birthplace and the sport, then the founding.
+  const [stage, setStage] = useState<"sport" | "founding">("sport");
   const busy = status !== "setup";
   const country = options.countries.find((entry) => entry.id === anchor);
   const preset = options.presets.find((entry) =>
@@ -64,7 +78,11 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
     seedValue >= 0 &&
     seedValue <= options.seedMax;
   const currentHints = hints?.anchor === anchor ? hints.values : null;
-  const canStart = !busy && !!country && !!genome && !!currentHints && validSeed;
+  const identityProblems = identity ? nameProblems(identity, options.identity) : null;
+  const identityValid =
+    !!identityProblems && !Object.values(identityProblems).some((problem) => problem);
+  const canContinue = !busy && !!country && !!genome && !!currentHints && validSeed && !!identity;
+  const canStart = canContinue && stage === "founding" && identityValid;
 
   useEffect(() => {
     let active = true;
@@ -84,6 +102,40 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
     };
   }, [hintRequest]);
 
+  // Choosing a birthplace country fills the founding panel from the seed's defaults the first time;
+  // afterwards it moves only the founding town (and an unedited ground name) to the new country.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only a new country reloads the places
+  useEffect(() => {
+    let active = true;
+    if (!anchor) return;
+    void sim.identityDefaults(validSeed ? seedValue : 1, anchor).then((result) => {
+      if (!active) return;
+      const { defaults } = result;
+      setPlaces(result.places);
+      setGroundWord(defaults.groundName.slice(defaults.foundingPlace.length + 1));
+      setIdentity((current) =>
+        current
+          ? {
+              ...current,
+              foundingPlace: defaults.foundingPlace,
+              groundName: groundEdited ? current.groundName : defaults.groundName,
+            }
+          : defaults,
+      );
+    });
+    return () => {
+      active = false;
+    };
+  }, [anchor]);
+
+  const changeIdentity = (next: IdentitySetup) => {
+    if (!identity) return;
+    if (next.groundName !== identity.groundName) setGroundEdited(true);
+    else if (next.foundingPlace !== identity.foundingPlace && !groundEdited)
+      next = { ...next, groundName: `${next.foundingPlace} ${groundWord}` };
+    setIdentity(next);
+  };
+
   return (
     <form
       className="setup-form"
@@ -95,10 +147,11 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
             genome: { ...genome },
             seed: seedValue,
             seasonFormat,
+            ...(identity ? { identity } : {}),
           });
       }}
     >
-      <div className="setup-columns">
+      <div className="setup-columns" hidden={stage !== "sport"}>
         <section className="setup-anchor setup-panel" aria-labelledby="anchor-heading">
           <span className="eyebrow">{t("setup.stepOne")}</span>
           <h2 id="anchor-heading">{t("setup.anchorTitle")}</h2>
@@ -264,45 +317,95 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
           <p className="setup-discovery">{t("setup.discovery")}</p>
         </section>
       </div>
-      <footer className="setup-launch">
-        <div>
-          <strong>{t("setup.stepThree")}</strong>
-          <p>
-            {t(country ? "setup.summary" : "setup.readyHint", {
-              country: names.countries[anchor] ?? anchor,
-              genome: preset ? t(`setup.presets.${preset.id}`) : t("setup.custom"),
-            })}
-          </p>
-          {setupError && <p role="alert">{t("setup.startError")}</p>}
-        </div>
-        <fieldset className="setup-format" disabled={busy} aria-describedby="format-help">
-          <legend>{t("setup.formatTitle")}</legend>
+      {stage === "founding" && (
+        <SetupIdentity
+          options={options.identity}
+          identity={identity}
+          places={places}
+          countryName={names.countries[anchor] ?? anchor}
+          genome={genome}
+          busy={busy}
+          onChange={changeIdentity}
+          onReroll={() => {
+            const attempt = rerolls + 1;
+            setRerolls(attempt);
+            void sim.suggestSportName(validSeed ? seedValue : 1, attempt).then((name) => {
+              setIdentity((current) => (current ? { ...current, sportName: name } : current));
+            });
+          }}
+        />
+      )}
+      {stage === "sport" ? (
+        <footer className="setup-launch">
           <div>
-            {SEASON_FORMATS.map((format) => (
-              <label key={format} className={seasonFormat === format ? "chosen" : ""}>
-                <input
-                  type="radio"
-                  name="season-format"
-                  value={format}
-                  checked={seasonFormat === format}
-                  data-testid={`setup-format-${format}`}
-                  onChange={() => setSeasonFormat(format)}
-                />
-                <span>{t(`setup.formats.${format}`)}</span>
-              </label>
-            ))}
+            <strong>{t("identity.setup.next")}</strong>
+            <p>
+              {t(country ? "setup.summary" : "setup.readyHint", {
+                country: names.countries[anchor] ?? anchor,
+                genome: preset ? t(`setup.presets.${preset.id}`) : t("setup.custom"),
+              })}
+            </p>
           </div>
-          <small id="format-help">{t("setup.formatHelp")}</small>
-        </fieldset>
-        <button
-          className="advance-turn"
-          type="submit"
-          disabled={!canStart}
-          data-testid="start-campaign"
-        >
-          {t(busy ? "setup.starting" : "setup.start")} <span aria-hidden="true">→</span>
-        </button>
-      </footer>
+          <button
+            className="advance-turn"
+            type="button"
+            disabled={!canContinue}
+            data-testid="setup-continue"
+            onClick={() => setStage("founding")}
+          >
+            {t("identity.setup.continue")} <span aria-hidden="true">→</span>
+          </button>
+        </footer>
+      ) : (
+        <footer className="setup-launch">
+          <button
+            type="button"
+            className="setup-reroll"
+            disabled={busy}
+            data-testid="setup-back"
+            onClick={() => setStage("sport")}
+          >
+            <span aria-hidden="true">←</span> {t("identity.setup.back")}
+          </button>
+          <div>
+            <strong>{t("setup.stepThree")}</strong>
+            <p>
+              {t(country ? "setup.summary" : "setup.readyHint", {
+                country: names.countries[anchor] ?? anchor,
+                genome: preset ? t(`setup.presets.${preset.id}`) : t("setup.custom"),
+              })}
+            </p>
+            {setupError && <p role="alert">{t("setup.startError")}</p>}
+          </div>
+          <fieldset className="setup-format" disabled={busy} aria-describedby="format-help">
+            <legend>{t("setup.formatTitle")}</legend>
+            <div>
+              {SEASON_FORMATS.map((format) => (
+                <label key={format} className={seasonFormat === format ? "chosen" : ""}>
+                  <input
+                    type="radio"
+                    name="season-format"
+                    value={format}
+                    checked={seasonFormat === format}
+                    data-testid={`setup-format-${format}`}
+                    onChange={() => setSeasonFormat(format)}
+                  />
+                  <span>{t(`setup.formats.${format}`)}</span>
+                </label>
+              ))}
+            </div>
+            <small id="format-help">{t("setup.formatHelp")}</small>
+          </fieldset>
+          <button
+            className="advance-turn"
+            type="submit"
+            disabled={!canStart}
+            data-testid="start-campaign"
+          >
+            {t(busy ? "setup.starting" : "setup.start")} <span aria-hidden="true">→</span>
+          </button>
+        </footer>
+      )}
     </form>
   );
 }
