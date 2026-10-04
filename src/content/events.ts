@@ -88,6 +88,8 @@ const template = z
       "leagueFormed",
       "leaguePromoted",
       "rivalEscalated",
+      "rivalReclaim",
+      "rivalTournament",
       "leaguePressure",
       "seasonEnd",
       "star",

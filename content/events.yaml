@@ -189,6 +189,41 @@ cards:
         cost: 15
         effects: [{ type: conversion, target: hardcore, factor: 1.2, quarters: 4 }]
       - { id: hold, cost: 0, effects: [] }
+  # Rivals win ground back near #1 (GDD v1.17). A reclaim tells where a rival is taking the
+  # player's hardcore fans back; a world championship is told once, in the player's biggest market.
+  # Both only inform: their effect is the rival's own.
+  - id: rival-reclaim
+    kind: moment
+    tone: pressure
+    priority: 75
+    trigger: rivalReclaim
+    minQuarter: 1
+    minFans: 0
+    minHardcore: 1
+    minTier: 1
+    anchorOnly: false
+    scope: country
+    cooldownTurns: 1
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: rival-championship
+    kind: moment
+    tone: pressure
+    priority: 74
+    trigger: rivalTournament
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: 1
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   # The flagship season as cards (GDD v1.15). Every season end offers the champion moment (PP by
   # league tier: config flagship.stories.championPP; it never takes a moment slot) and at most one
   # story card, the first that qualifies in the GDD's fixed order: foregone, runaway, dynasty,

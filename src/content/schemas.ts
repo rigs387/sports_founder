@@ -186,6 +186,8 @@ export const sportsFileSchema = z.strictObject({
 export const namesFileSchema = z.strictObject({
   countries: z.record(z.string(), z.string().min(1)),
   sports: z.record(z.string(), z.string().min(1)),
+  /** Each rival's world championship (GDD v1.17): generic names, never the real tournament's. */
+  tournaments: z.record(z.string(), z.string().min(1)),
   /**
    * Invented flagship club nicknames (GDD v1.14). The place is real (places.yaml); the nickname is
    * not. Needs at least as many distinct entries as the largest flagship has clubs.
@@ -373,6 +375,7 @@ export type EscalationLevel = z.infer<typeof escalationLevelSchema>;
 
 /** The closed countermove list (GDD Rival AI). */
 export const countermoveSchema = z.enum([
+  "reclaim",
   "mediaBlitz",
   "youthPrograms",
   "broadcastDeal",
@@ -384,6 +387,7 @@ export type CountermoveKind = z.infer<typeof countermoveSchema>;
 
 /** Countermoves with an effect that lasts for a period; rule copying is instant and permanent. */
 export const timedCountermoveSchema = z.enum([
+  "reclaim",
   "mediaBlitz",
   "youthPrograms",
   "broadcastDeal",
@@ -510,6 +514,13 @@ export const configFileSchema = z.strictObject({
     costPopulationExponent: z.number().min(0).max(1),
     preference: z.array(countermoveSchema),
     countermoves: z.strictObject({
+      reclaim: z.strictObject({
+        ...timedMoveBase,
+        /** Share of the player's hardcore fans there (above the turnover floor) won back per quarter. */
+        sharePerQuarter: unitInterval,
+        /** Bought only at or past this point of the near-top ramp (0 at intensity 1, 1 at max). */
+        minNearTopProgress: unitInterval,
+      }),
       mediaBlitz: z.strictObject({ ...timedMoveBase, casualConversionBoost: z.number().min(0) }),
       youthPrograms: z.strictObject({
         ...timedMoveBase,
@@ -524,6 +535,21 @@ export const configFileSchema = z.strictObject({
         cooldownQuarters: z.int().min(0),
       }),
     }),
+    /** Each rival's quadrennial world championship (GDD v1.17), on its real cycle. */
+    tournaments: z.array(
+      z.strictObject({
+        sportId: z.string().min(1),
+        firstYear: z.int(),
+        everyYears: z.int().min(1),
+        /** The quarter of the year it starts, 1–4. */
+        startQuarterOfYear: z.int().min(1).max(4),
+        /** Quarters the surge lasts from the start. */
+        quarters: z.int().min(1),
+        casualConversionBoost: z.number().min(0),
+        hardcoreConversionBoost: z.number().min(0),
+        homeLift: z.number().min(0),
+      }),
+    ),
   }),
   hints: z.strictObject({
     plusPlus: z.number(),

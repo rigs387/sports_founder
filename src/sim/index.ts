@@ -23,6 +23,7 @@ export * from "./snapshot";
 export * from "./spread";
 export * from "./star-cards";
 export * from "./tiers";
+export * from "./tournaments";
 export * from "./turn";
 export * from "./types";
 export * from "./win";

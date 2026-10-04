@@ -251,6 +251,14 @@
           "farewell": "Stage a farewell match",
           "hold": "Ride it out"
         }
+      },
+      "rival-reclaim": {
+        "title": "They want their fans back",
+        "body": "{{rival}} is winning back the terraces in {{country}}. With your sport near the top of the world, it is turning some of your {{hardcore, number}} hardcore fans here back to its own game, season by season."
+      },
+      "rival-championship": {
+        "title": "The world tunes in to {{rival}}",
+        "body": "This year belongs to {{tournament}}. For a year {{rival}} pulls new fans in every country, even in {{country}}, before the excitement fades."
       }
     },
     "arrived": "Already landed, whatever you choose:",
@@ -480,7 +488,8 @@
       "mediaBlitz": "media blitz",
       "youthPrograms": "youth programs",
       "broadcastDeal": "exclusive broadcast deal",
-      "sponsorLockout": "sponsor lockout"
+      "sponsorLockout": "sponsor lockout",
+      "reclaim": "reclaiming fans"
     }
   },
   "growth": {

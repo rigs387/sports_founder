@@ -154,6 +154,17 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
       issue(sources.sports, `rivals[${i}].id`, `duplicate id "${rival.id}"`);
     rivalIds.add(rival.id);
   });
+  const tournamentSports = new Set<string>();
+  world.config.rivalAI.tournaments.forEach((tournament, i) => {
+    const field = `rivalAI.tournaments[${i}].sportId`;
+    if (!rivalIds.has(tournament.sportId))
+      issue(sources.config, field, `unknown rival sport "${tournament.sportId}"`);
+    if (tournamentSports.has(tournament.sportId))
+      issue(sources.config, field, `"${tournament.sportId}" has two world championships`);
+    tournamentSports.add(tournament.sportId);
+    if (!world.names.tournaments[tournament.sportId])
+      issue(sources.names, `tournaments.${tournament.sportId}`, "missing display name");
+  });
 
   // ---- Countries ---------------------------------------------------------------------------
   const countryIds = new Set(world.countries.map((country) => country.id));

@@ -383,7 +383,7 @@ function printRivalActivity(agg: ReturnType<typeof aggregate>): void {
     const m = rival.medianPerCampaign as Record<string, number | null>;
     const n = (key: string) => fmt(m[key] ?? null);
     console.log(
-      `  ${rival.sportId} (median per campaign): budget spent ${n("budgetSpent")}; escalations ${n("escalations")}, de-escalations ${n("deescalations")}; countermoves ${n("countermoves")} (media blitz ${n("mediaBlitz")}, youth programs ${n("youthPrograms")}, broadcast deal ${n("broadcastDeal")}, sponsor lockout ${n("sponsorLockout")}, rule copying ${n("ruleCopying")}); anchor hardcore share ${share(m.anchorHardcoreShareStart ?? null)} → ${share(m.anchorHardcoreShareEnd ?? null)}; peak anchor level ${JSON.stringify(rival.peakAnchorLevels)}; campaigns with an elimination ${rival.campaignsWithEliminations}`,
+      `  ${rival.sportId} (median per campaign): budget spent ${n("budgetSpent")}; escalations ${n("escalations")}, de-escalations ${n("deescalations")}; countermoves ${n("countermoves")} (reclaim ${n("reclaim")}, media blitz ${n("mediaBlitz")}, youth programs ${n("youthPrograms")}, broadcast deal ${n("broadcastDeal")}, sponsor lockout ${n("sponsorLockout")}, rule copying ${n("ruleCopying")}); anchor hardcore share ${share(m.anchorHardcoreShareStart ?? null)} → ${share(m.anchorHardcoreShareEnd ?? null)}; peak anchor level ${JSON.stringify(rival.peakAnchorLevels)}; campaigns with an elimination ${rival.campaignsWithEliminations}`,
     );
   }
 }

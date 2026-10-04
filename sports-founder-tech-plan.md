@@ -290,6 +290,35 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
 Parked: star injuries (GDD parking lot), foreign players and moves abroad, full squads, a
 "farewell title" story.
 
+
+### 2.7 Build Plan: The Contest for #1 (GDD v1.17)
+
+Measured 2026-10-04 (pacing, builder, 12 anchors × 3 seeds): #1 lost before the win in 11/33.
+Raising max intensity (7/30), youth lift (10/31) or position pressure (5/33) does not help: the
+player's lead grows steadily once past parity. Every number is config.
+
+1. **Reclaim.** A timed countermove (`rivalAI.countermoves.reclaim`): Entrenched, near-top
+   progress at least a config minimum, rival home hardcore share meaningful, player hardcore
+   there. While it runs, a share of the player's hardcore fans there (above the turnover floor)
+   switch to the rival each quarter, deterministic (no extra rolls), scaled by countermove
+   resistance. A pressure moment card from the countermove landmark.
+2. **World championships.** `rivalAI.tournaments`: per rival a first year, a cycle, the quarter
+   of the year it starts, how many quarters the surge lasts, and casual, hardcore and home-lift
+   boosts applied everywhere. A `rivalTournament` landmark at the start; a moment card in the
+   player's biggest market. Names in `names.yaml`.
+3. **Measure:** `--experiment pacing` until about half of the campaigns that reach #1 lose it
+   before the win, with pacing still inside tolerance.
+
+*Built 2026-10-04.* First sizes overshot: championships at ×3 casual / ×5 hardcore / +10% home,
+or reclaim at 2% from mid-ramp, stopped every campaign short of #1 or made it flip every turn (a
+30-turn hold spans about seven of each rival's championships). Settled: championships ×1.18
+casual, ×1.6 hardcore, +1.8% home for 4 quarters (about a 1% world Fandom Score lift, fading over
+three years); reclaim 0.5% per quarter for 12 quarters, only at the top of the near-top ramp
+(its effect on the contest is small; championships carry it). #1 lost before the win 36/68
+(53%), seeds 1–6; first win median 159–164. Reclaimed fans stay casual about the player's sport
+and come from the rival's casual fans first. Landmarks and saves: a new landmark kind and
+countermove kind, no format change (older saves load as they were).
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)

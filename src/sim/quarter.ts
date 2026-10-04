@@ -1,5 +1,5 @@
 import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
-import { rivalConversionBoosts } from "./countermoves";
+import { reclaimShare, rivalConversionBoosts } from "./countermoves";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
 import { backingEffects, stepFlagshipQuarter } from "./flagship";
@@ -7,10 +7,11 @@ import { leverMultipliers, similarityEffect } from "./genome";
 import { type GrowthFactors, growthFactors } from "./growth";
 import { stepLeagueQuarter } from "./leagues";
 import { poachableHardcore, poachingRates } from "./poaching";
-import { yearlySnapshot } from "./records";
+import { landmarks, yearlySnapshot } from "./records";
 import { stepRivals } from "./rivals";
 import { nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { type CountryExposure, computeExposure } from "./spread";
+import { activeTournament, type Tournament, tournamentsStarting } from "./tournaments";
 import {
   type Config,
   type Country,
@@ -47,7 +48,12 @@ import {
 //                           they run): only ground below home is rebuilt, or below the lifted
 //                           level while youth programs run
 // Left alone, a rival stays where the real data put it; it moves only when the player wins fans
-// from it or its countermoves push it. "Other" never converts anyone.
+// from it, its countermoves push it, or its world championship lifts it everywhere for a year
+// (GDD v1.17, src/sim/tournaments.ts: boosts like a media blitz and youth programs together).
+// "Other" never converts anyone.
+// Reclaim (GDD v1.17): while a rival's reclaim runs in a country, a share of the player's hardcore
+// fans there above the turnover floor become that rival's hardcore fans at the end of the quarter,
+// with no random rolls. They stay casual about the player's sport, as poached fans do.
 // Hardcore poaching (src/sim/poaching.ts): every sport's hardcore fans demote to casual about the
 // same sport at a rate set by the sports pulling on them.
 // Generational turnover (GDD Late-Game Pressure): the player's and every rival's hardcore fans above
@@ -77,6 +83,19 @@ export function stepQuarter(state: GameState, world: World): GameState {
   const quarter = state.quarter + 1;
   const found: Landmark[] = [];
   const backing = backingEffects(state.flagship, world);
+  const tournaments = new Map(
+    state.sports.map((sport) => [sport.id, activeTournament(sport.id, state.quarter, config)]),
+  );
+  for (const tournament of tournamentsStarting(state.quarter, config)) {
+    found.push(
+      landmarks.rivalTournament(
+        state.turn,
+        quarter,
+        tournament.sportId,
+        yearOfQuarter(state.quarter, config),
+      ),
+    );
+  }
 
   const afterBusiness = state.countries.map((countryState, index) => {
     const country = world.countries[index];
@@ -128,6 +147,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
       state.sports,
       playerRates,
       factors,
+      tournaments,
       config,
       rng,
     );
@@ -212,6 +232,7 @@ function stepCountryFans(
   sports: readonly SportState[],
   playerRates: PlayerRates,
   factors: GrowthFactors,
+  tournaments: ReadonlyMap<string, Tournament | null>,
   config: Config,
   rng: Rng,
 ): CountryState {
@@ -264,6 +285,7 @@ function stepCountryFans(
         sport.id,
         config,
         factors.countermoveEffect,
+        tournaments.get(sport.id) ?? null,
       );
       const home = country.startingRivalFans[sport.id];
       const homeCasual = home?.casual ?? 0;
@@ -305,17 +327,47 @@ function stepCountryFans(
   const scale = requested > unattached ? unattached / requested : 1;
   let remaining = unattached;
 
+  const moved = countryState.fans.map((fans, index) => {
+    const flow = flows[index];
+    if (!flow) throw new Error(`No flows for sport #${index}`);
+    const hardcoreGain = Math.min(remaining, Math.floor(flow.hardcoreGain * scale));
+    remaining -= hardcoreGain;
+    return {
+      sportId: fans.sportId,
+      casual: fans.casual + flow.casualGain - flow.casualChurn - hardcoreGain + flow.hardcoreLoss,
+      hardcore: fans.hardcore + hardcoreGain - flow.hardcoreLoss,
+    };
+  });
+
+  // Reclaim: each rival with one running wins back its share of the player's hardcore fans above
+  // the turnover floor, in sport order, never more than are there.
+  const player = moved[PLAYER_INDEX];
+  const reclaimable = Math.max(0, (player?.hardcore ?? 0) - turnoverFloor);
+  let available = reclaimable;
+  const reclaimed = moved.map((fans, index) => {
+    const sport = sports[index];
+    if (sport?.kind !== "rival" || available <= 0) return 0;
+    const share = reclaimShare(countryState, sport.id, config, factors.countermoveEffect);
+    // Never more people than are not already the rival's hardcore fans.
+    const room = population - fans.hardcore;
+    const won = Math.min(available, Math.round(reclaimable * share), room);
+    available -= won;
+    return won;
+  });
+  const lost = reclaimable - available;
+  if (lost === 0) return { ...countryState, fans: moved };
   return {
     ...countryState,
-    fans: countryState.fans.map((fans, index) => {
-      const flow = flows[index];
-      if (!flow) throw new Error(`No flows for sport #${index}`);
-      const hardcoreGain = Math.min(remaining, Math.floor(flow.hardcoreGain * scale));
-      remaining -= hardcoreGain;
+    // The player's fans who switch stay casual about the player's sport, as poached fans do. For
+    // the rival they come from its casual fans first, then from people it had not reached.
+    fans: moved.map((fans, index) => {
+      if (index === PLAYER_INDEX)
+        return { ...fans, casual: fans.casual + lost, hardcore: fans.hardcore - lost };
+      const won = reclaimed[index] ?? 0;
       return {
-        sportId: fans.sportId,
-        casual: fans.casual + flow.casualGain - flow.casualChurn - hardcoreGain + flow.hardcoreLoss,
-        hardcore: fans.hardcore + hardcoreGain - flow.hardcoreLoss,
+        ...fans,
+        casual: fans.casual - Math.min(won, fans.casual),
+        hardcore: fans.hardcore + won,
       };
     }),
   };

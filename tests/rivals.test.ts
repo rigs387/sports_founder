@@ -120,9 +120,11 @@ const withMove = (state: GameState, w: World, countryId: string, move: ActiveCou
 describe("rivals hold their ground", () => {
   it("left alone for a century, every rival stays at its real starting level", () => {
     // The player's sport never grows, so nothing pulls on the rivals or provokes a countermove.
+    // World championships lift rivals on a schedule (GDD v1.17; tests/contest.test.ts): off here.
     const w = withConfig(world, (config) => {
       config.dynamics.player.casualConversionRate = 0;
       config.dynamics.player.hardcoreConversionRate = 0;
+      config.rivalAI.tournaments = [];
     });
     const start = createCampaign(w, setupFor(1, ANCHOR_COUNTRY));
     let state = start;
@@ -239,7 +241,10 @@ describe("escalation ladder", () => {
     const start = createCampaign(noHardcoreGains, setupFor(3, ANCHOR_COUNTRY));
     const quiet = runTurns(start, noHardcoreGains, 60);
     expect(quiet.quarter).toBeGreaterThanOrEqual(60);
-    expect(quiet.landmarks.filter((l) => l.kind.startsWith("rival"))).toEqual([]);
+    // World championships come on a schedule whatever the player does (GDD v1.17).
+    expect(
+      quiet.landmarks.filter((l) => l.kind.startsWith("rival") && l.kind !== "rivalTournament"),
+    ).toEqual([]);
     expect(quiet.rivals.every((rival) => rival.budgetSpent === 0 && rival.budget > 0)).toBe(true);
     expect(quiet.countries.every((c) => c.countermoves.length === 0)).toBe(true);
     // Rival fans still move on their own (the slow drift).

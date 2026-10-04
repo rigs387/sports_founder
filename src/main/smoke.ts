@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { app, type BrowserWindow } from "electron";
 import { verifyActions } from "./action-smoke";
+import { verifyChampionshipCard } from "./contest-smoke";
 import { verifyEvents } from "./event-smoke";
 import { verifyFlagship } from "./flagship-smoke";
 import { verifyLeagues } from "./league-smoke";
@@ -121,6 +122,7 @@ async function run(
     );
   }
   await screenshot("02-after-turns.png");
+  const championship = await verifyChampionshipCard(win, screenshot);
 
   const passed =
     current.turn === before.turn + TURNS_TO_PLAY &&
@@ -144,6 +146,7 @@ async function run(
     map,
     setup,
     events,
+    championship,
     actions,
     leagues,
     flagship,

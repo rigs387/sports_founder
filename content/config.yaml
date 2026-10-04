@@ -309,10 +309,17 @@ rivalAI:
   # bigger countries cost more to defend, but less than in proportion, so a rival can afford its
   # populous heartlands.
   costPopulationExponent: 0.5
-  preference: [youthPrograms, mediaBlitz, sponsorLockout, broadcastDeal, ruleCopying]
+  preference: [reclaim, youthPrograms, mediaBlitz, sponsorLockout, broadcastDeal, ruleCopying]
   # Closed countermove list. A countermove needs the rival to be at minLevel or above in that
   # country. Timed countermoves last durationQuarters and are not bought again while in effect there.
   countermoves:
+    # Reclaim (GDD v1.17): rivals win ground back near #1. Bought only at or past
+    # minNearTopProgress of the near-top ramp, where the rival is Entrenched and was the incumbent
+    # (its home hardcore share is at least meaningfulHardcoreShare), and the player has hardcore
+    # fans there. While it runs, sharePerQuarter of the player's hardcore fans there above the
+    # turnover floor switch to the rival each quarter (× the growth tree's countermove factor).
+    # Ground won above home ages away after it ends.
+    reclaim: { minLevel: entrenched, baseCost: 2500, durationQuarters: 12, sharePerQuarter: 0.005, minNearTopProgress: 1 }
     # Rival casual conversion × (1 + casualConversionBoost) in that country.
     mediaBlitz: { minLevel: defending, baseCost: 1800, durationQuarters: 12, casualConversionBoost: 4 }
     # Rival hardcore conversion × (1 + hardcoreConversionBoost) in that country.
@@ -330,6 +337,14 @@ rivalAI:
     # accessibility + depth) above the rival's own option. Changes the rival's genome everywhere.
     # Costs a flat amount (it is one global rulebook change).
     ruleCopying: { minLevel: entrenched, cost: 30000, cooldownQuarters: 40 }
+  # World championships (GDD v1.17), on each rival's real quadrennial cycle: soccer's in June–July
+  # (from 2026), cricket's one-day championship in October–November (from 2027). From its start
+  # quarter for `quarters` quarters the rival's casual and hardcore conversion in every country are
+  # × (1 + boost) and the level it rebuilds toward is home × (1 + homeLift); that ground ages away
+  # afterward. Stacks with the rival's own countermoves.
+  tournaments:
+    - { sportId: soccer, firstYear: 2026, everyYears: 4, startQuarterOfYear: 2, quarters: 4, casualConversionBoost: 0.18, hardcoreConversionBoost: 0.6, homeLift: 0.018 }
+    - { sportId: cricket, firstYear: 2027, everyYears: 4, startQuarterOfYear: 4, quarters: 4, casualConversionBoost: 0.18, hardcoreConversionBoost: 0.6, homeLift: 0.018 }
 
 # Anchor genome hints (GDD Campaign setup): an option's net lever delta at the anchor country
 # (affinity + accessibility + depth) maps to ++ / + / − by these thresholds.

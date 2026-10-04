@@ -366,6 +366,8 @@ export type Landmark =
       from: EscalationLevel;
       to: EscalationLevel;
     }
+  /** A rival's world championship began (GDD v1.17): it lifts the rival everywhere for a while. */
+  | { kind: "rivalTournament"; turn: number; quarter: number; sportId: string; year: number }
   | {
       kind: "rivalCountermove";
       turn: number;

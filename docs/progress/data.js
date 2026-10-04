@@ -2,37 +2,37 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-04",
-  design: "GDD v1.16",
-  stage: "Phase 0 · playable slice",
+  design: "GDD v1.17",
+  stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
   summary:
-    "Creation, global growth, rival pressure, league management, events and saving are playable. The next step is a flagship league with teams and people worth remembering.",
+    "Creation, global growth, rival pressure, league management, events and saving are playable, and the flagship league has clubs, seasons and stars. Next, the sport's own identity: names, a rulebook and founding character.",
   milestone: "A flagship season the player remembers",
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-04",
-    tests: 401,
-    files: 35,
-    note: "npm run check passed after stars step 8, the Stars panel (type checks, Biome, purity, 401 tests in 35 files). Lint has existing visual-study warnings.",
+    tests: 407,
+    files: 36,
+    note: "npm run check passed after the contest for #1 (type checks, Biome, purity, 407 tests in 36 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-04",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; save/resume continued identically.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it also opens the soccer world championship card from turn 3; save/resume continued identically.",
   },
-  eventDeck: { current: 24, target: "40–60" },
+  eventDeck: { current: 26, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
       title: "Prove the loop",
-      state: "Current",
-      text: "Playable slice; content and felt depth still need work.",
+      state: "Done",
+      text: "Playable slice: spread, rivals, leagues and the win. Content and felt depth still need work.",
     },
     {
       name: "Phase 1",
       title: "Make it matter",
-      state: "Next",
-      text: "Flagship, people, deals, evolving rules and traditions.",
+      state: "Current",
+      text: "Flagship, people, deals, evolving rules and traditions. The flagship and its stars are built.",
     },
     {
       name: "Phase 2",
@@ -75,9 +75,9 @@ window.SF_PROGRESS = {
       system: "growth",
     },
     {
-      title: "Holding #1 needs more resistance",
-      text: "Lead lost before the win in 13 of 43 campaigns (30%) after backed stars, 15 of 44 (34%) just before; the design targets about half. Builder, 12 typical anchors × 4 seeds, 200 turns. Season cards and backing are both neutral here.",
-      date: "2026-10-03",
+      title: "The #1 hold is now a contest",
+      text: "Lead lost before the win in 36 of 68 campaigns (53%), on target, after rival world championships and reclaim (was 33%). Builder, 12 typical anchors × 6 seeds, 200 turns. Reclaim adds little; championships carry it. Remeasure when new pressure lands.",
+      date: "2026-10-04",
       system: "rivals",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-04",
+      type: "Built",
+      title: "The contest for #1",
+      text: "GDD v1.17, tech plan 2.7: rivals win ground back. Soccer's and cricket's world championships (generic names, real quadrennial cycles) lift them about 1% worldwide for a year and fade; near #1 a rival may reclaim the player's hardcore fans where it was the incumbent. Both arrive as moment cards. #1 lost before the win 33% → 53% (target about half); pacing still passes.",
+    },
     {
       date: "2026-10-04",
       type: "Milestone",
@@ -374,7 +380,7 @@ window.SF_PROGRESS = {
         ["built", "Fact-based triggers and validated effect vocabulary"],
         ["built", "Decision costs, local effects, expiry and safe defaults"],
         ["built", "Reward collection, journal and saved pending cards"],
-        ["partial", "Event library: 16 of a planned 40–60 cards (8 are flagship season cards)"],
+        ["partial", "Event library: 26 of a planned 40–60 cards (8 season, 8 star, 2 rival contest cards)"],
         ["planned", "Broader tier-weighted negative events and personal stories"],
         ["built", "Bots that weigh and choose non-default options"],
       ],
@@ -385,11 +391,14 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 6",
       icon: "07",
-      summary: "Incumbents defend their territory and fight harder near global #1.",
-      next: "Remeasure the victory contest after new event choices; tune defense where needed.",
+      summary: "Incumbents defend their territory, win fans back near global #1 and swing with their world championships.",
+      next: "Add the remaining modeled sports; remeasure the victory contest when new pressure lands.",
       depends: ["world"],
       sources: [
         ["Rival simulation", "../../src/sim/rivals.ts"],
+        ["World championships", "../../src/sim/tournaments.ts"],
+        ["Contest tests", "../../tests/contest.test.ts"],
+        ["Contest build plan", "../../sports-founder-tech-plan.md#27-build-plan-the-contest-for-1-gdd-v117"],
         [
           "Carried balance gaps",
           "../../sports-founder-tech-plan.md#21-phase-0--vertical-slice-new-precedes-gdd-phase-1",
@@ -397,9 +406,10 @@ window.SF_PROGRESS = {
       ],
       items: [
         ["built", "Soccer, cricket and a passive other-sports bucket"],
-        ["built", "Defense budgets, escalation and five countermove types"],
+        ["built", "Defense budgets, escalation and six countermove types, reclaim included"],
+        ["built", "Rival world championships on real quadrennial cycles"],
         ["built", "Slow two-way poaching, aging and rival home levels"],
-        ["partial", "Contested victory hold: historical lead-loss rate below target"],
+        ["built", "Contested victory hold: about half lose #1 before the win (53%)"],
         ["planned", "Remaining modeled sports and later rival-to-rival competition"],
       ],
     },

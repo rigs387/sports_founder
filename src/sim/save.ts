@@ -103,6 +103,13 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     to: escalationLevelSchema,
   }),
   z.strictObject({
+    kind: z.literal("rivalTournament"),
+    turn: z.int().min(1),
+    quarter: count,
+    sportId: z.string().min(1),
+    year: z.int(),
+  }),
+  z.strictObject({
     kind: z.literal("rivalCountermove"),
     turn: z.int().min(1),
     quarter: count,

@@ -1,3 +1,4 @@
+import type { Tournament } from "./tournaments";
 import type { Config, CountryState, TimedCountermoveKind } from "./types";
 
 // Effects of rival countermoves in effect in a country (GDD Rival AI). A countermove stored in a
@@ -35,24 +36,45 @@ export function mediaRevenueFactor(
 }
 
 /**
- * Multipliers on one rival's own conversion rates from its media blitz and youth programs, and on
- * the hardcore level it rebuilds toward (youth programs lift it above home while they run).
+ * Multipliers on one rival's own conversion rates from its media blitz, youth programs and world
+ * championship, and on the hardcore level it rebuilds toward (youth programs and a world
+ * championship lift it above home while they run). The growth tree's factor shrinks countermoves,
+ * not championships.
  */
 export function rivalConversionBoosts(
   country: WithCountermoves,
   sportId: string,
   config: Config,
   effect: number,
+  tournament: Tournament | null = null,
 ): { casual: number; hardcore: number; homeLift: number } {
   const { mediaBlitz, youthPrograms } = config.rivalAI.countermoves;
   const youth = hasCountermove(country, "youthPrograms", sportId);
   return {
-    homeLift: 1 + (youth ? youthPrograms.homeLift * effect : 0),
+    homeLift: 1 + (youth ? youthPrograms.homeLift * effect : 0) + (tournament?.homeLift ?? 0),
     casual:
-      1 +
-      (hasCountermove(country, "mediaBlitz", sportId)
-        ? mediaBlitz.casualConversionBoost * effect
-        : 0),
-    hardcore: 1 + (youth ? youthPrograms.hardcoreConversionBoost * effect : 0),
+      (1 +
+        (hasCountermove(country, "mediaBlitz", sportId)
+          ? mediaBlitz.casualConversionBoost * effect
+          : 0)) *
+      (1 + (tournament?.casualConversionBoost ?? 0)),
+    hardcore:
+      (1 + (youth ? youthPrograms.hardcoreConversionBoost * effect : 0)) *
+      (1 + (tournament?.hardcoreConversionBoost ?? 0)),
   };
+}
+
+/**
+ * The share of the player's hardcore fans (above the turnover floor) one rival wins back in a
+ * country this quarter through reclaim (GDD v1.17), or 0 when it has none running there.
+ */
+export function reclaimShare(
+  country: WithCountermoves,
+  sportId: string,
+  config: Config,
+  effect: number,
+): number {
+  return hasCountermove(country, "reclaim", sportId)
+    ? config.rivalAI.countermoves.reclaim.sharePerQuarter * effect
+    : 0;
 }

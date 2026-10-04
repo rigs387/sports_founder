@@ -138,8 +138,12 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   league and records a `birthplaceOutlived` landmark instead of ending the game.
 - Rivals hold their ground: each rival's real starting shares in a country are its home level
   (`src/sim/quarter.ts`). They never spread or grow past it on their own; only the player's
-  poaching and their own countermoves move them (youth programs lift a rival above home while
-  they run, and that ground ages away after).
+  poaching, their own countermoves and their world championships move them (youth programs and a
+  championship lift a rival above home while they run, and that ground ages away after).
+- Rivals win ground back (GDD v1.17): world championships (`src/sim/tournaments.ts`, real
+  quadrennial cycles in `rivalAI.tournaments`, generic names in `names.yaml`) lift a rival
+  everywhere for a year; reclaim, a countermove near #1 where the rival was the incumbent, turns
+  the player's hardcore fans there into the rival's (they stay casual about the player's sport).
 - The win hold is a contest (GDD v1.8): near #1 (`rivalAI.nearTop`) rival intensity peaks just past
   parity, rivals defend wherever the player holds ground in their territory, and they may buy more
   countermoves per quarter. The runner reports how many campaigns lost #1 before winning; the

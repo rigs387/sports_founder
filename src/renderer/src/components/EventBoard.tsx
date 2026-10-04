@@ -121,6 +121,7 @@ export function EventBoard() {
   const title = (event: EventRecord) =>
     t(`events.cards.${event.templateId}.title`, {
       country: country(event.countryId),
+      rival: names?.sports[event.facts.rivalId ?? ""] ?? "",
       ...seasonText(event),
     });
   const chooseRecord = (event: EventRecord) => {
@@ -275,6 +276,7 @@ export function EventBoard() {
                       fans: selected.facts.casual + selected.facts.hardcore,
                       hardcore: selected.facts.hardcore,
                       rival: names?.sports[selected.facts.rivalId ?? ""] ?? "",
+                      tournament: names?.tournaments[selected.facts.rivalId ?? ""] ?? "",
                       health: selected.facts.health
                         ? t(`league.health.${selected.facts.health}`)
                         : "",

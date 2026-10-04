@@ -221,6 +221,12 @@ sports:
   soccer: Soccer
   cricket: Cricket
 
+# Each rival's world championship (GDD v1.17). Generic names: real tournaments are never named
+# (GDD naming boundary).
+tournaments:
+  soccer: the soccer world championship
+  cricket: the cricket world championship
+
 # Invented flagship club nicknames (GDD v1.14). Clubs are based in real places (places.yaml); only
 # the nickname is made up, e.g. "Glasgow Comets". Needs at least as many entries as the largest
 # flagship has clubs.

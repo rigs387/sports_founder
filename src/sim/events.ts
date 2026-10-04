@@ -176,11 +176,17 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
         continue;
       if (card.health.length && (!country.league || !card.health.includes(country.league.health)))
         continue;
-      const fact = recent.find(
-        (landmark) =>
-          landmark.kind === card.trigger &&
-          "countryId" in landmark &&
-          landmark.countryId === country.countryId,
+      const fact = recent.find((landmark) =>
+        card.trigger === "rivalReclaim"
+          ? landmark.kind === "rivalCountermove" &&
+            landmark.move === "reclaim" &&
+            landmark.countryId === country.countryId
+          : card.trigger === "rivalTournament"
+            ? // A world championship is global: told in the player's biggest market.
+              landmark.kind === "rivalTournament" && country === ranked[0]?.country
+            : landmark.kind === card.trigger &&
+              "countryId" in landmark &&
+              landmark.countryId === country.countryId,
       );
       if (card.trigger !== "audience" && card.trigger !== "leaguePressure" && !fact) continue;
       if (

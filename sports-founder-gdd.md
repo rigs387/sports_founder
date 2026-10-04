@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.16 | October 3, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars)*
+*Version 1.17 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships)*
 
 ---
 
@@ -217,6 +217,21 @@ campaign — the player can keep playing past the win.
   the first win at about turn 200 (inside the pacing tolerance of the ~180 budget). Tier 5 turns are years: the hold is about 30 years.
 - **The hold is a real contest (decided 2026-09-19).** Of the campaigns that take #1, about half
   lose it at least once before the win. See Late-Game Pressure.
+  - *Rivals must be able to win ground back (decided 2026-10-04, v1.17).* Measured: once the
+    player first passed the best rival, the lead only grew (about +1% of the rival's score every 5
+    turns); every loss of #1 was a wobble in the first few turns at parity. Rivals that hold their
+    ground and only slow the player cannot make a contest, and stronger defense made losses rarer.
+    Two mechanisms fix it (choose pain): **reclaim**, a countermove near #1 that wins the player's
+    hardcore fans back where a rival is the incumbent, and **world championships**, the rivals'
+    dated quadrennial tournaments that lift them everywhere for a year. The target stays about
+    half. Details under Rival AI.
+  - *Built 2026-10-04:* a world championship lifts its rival's world Fandom Score about 1% at the
+    peak (soccer 1.1%, cricket 1.4%) and fades over about three years, so the player must pull
+    about 1% clear to ride one out. Reclaim acts only once the player is past #1 (the top of the
+    near-top ramp), at 0.5% of their hardcore fans there per quarter for 12 quarters. Measured
+    (pacing, builder, 12 anchors × 6 seeds, 200 turns): #1 lost before the win in 36 of 68
+    campaigns (53%, was 33%); first win median turn 159–164 (was 158). A stronger first build
+    stopped every campaign short of #1.
 - Taking #1, losing it (and to which rival), and the win itself are permanent landmarks, recorded
   at any tier.
 
@@ -990,7 +1005,23 @@ snowballing. Works alongside tier-scaled costs, tier-scaled negative events, and
   boost), youth programs (rival hardcore conversion boost), exclusive broadcast deal (blocks the
   player's media reach channel in that country for a period), sponsor lockout (worse cash offers
   for the player's league there), rule copying (rival adopts one of the player's popular traits,
-  eroding similarity advantage). Every countermove surfaces as a Moment.
+  eroding similarity advantage), reclaim (near #1 only: the rival wins back a share of the
+  player's hardcore fans each quarter while it runs). Every countermove surfaces as a Moment.
+- **Reclaim (decided 2026-10-04, v1.17).** Bought only while the player is near global #1 (the
+  near-top ramp), only where the rival is Entrenched, and only in countries where the rival was the
+  incumbent at the start (its home hardcore share is meaningful), never where the player built
+  from nothing. While it runs, a config share of the player's hardcore fans there switch to the
+  rival each quarter. Ground won above home ages away after it ends, as with youth programs. Each
+  reclaim is a landmark and arrives as a pressure moment ("Soccer wins back the terraces in
+  Argentina"), so a lost lead has a visible cause. Countermove resistance in the growth tree
+  shrinks it like any countermove.
+- **World championships (decided 2026-10-04, v1.17).** Each modeled rival has a quadrennial world
+  championship on its real cycle (soccer from 2026, cricket from 2027; dates and sizes in config).
+  For a year the rival converts more casual and hardcore fans in every country and rebuilds above
+  its home level; that ground ages away afterward, so the rival swings up and back every four
+  years whatever the player does. Generic names (naming boundary: "the soccer world
+  championship"), in the names file. Each one is a landmark and a moment card. Rival-to-rival
+  competition is still later.
 - **Visibility:** escalation level is shown on the map; rival budgets are hidden.
 - **Rival vs. rival competition:** wanted later, not in Phase 0. Until then rivals only drift slowly
   and react to the player.

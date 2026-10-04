@@ -40,6 +40,8 @@ import {
 //      base), in preference order, while budget lasts: it cannot defend everywhere at once. When
 //      the countermove it wants most in a country is beyond its budget, it saves up and buys
 //      nothing more that quarter. Near #1 intensity also multiplies how many it may buy per quarter.
+// Near #1 a rival may also reclaim (GDD v1.17): where it was the incumbent and is Entrenched, it
+// wins back a share of the player's hardcore fans each quarter while the reclaim runs.
 // Every escalation change and countermove is recorded as a landmark. Every number is config.
 
 export function newFront(sportId: string): RivalFront {
@@ -167,6 +169,28 @@ export function updateFront(
   return { sportId: front.sportId, level: front.level, pressure, quartersAtLevel, calmQuarters };
 }
 
+/**
+ * Whether a rival may reclaim the player's hardcore fans in a country (GDD v1.17): near #1 only,
+ * where it was the incumbent at the start, with none running and the player holding hardcore fans.
+ */
+export function reclaimAllowed(
+  country: CountryState,
+  sportId: string,
+  world: World,
+  countryIndex: number,
+  progress: number,
+): boolean {
+  const { meaningfulHardcoreShare, countermoves } = world.config.rivalAI;
+  const home = world.countries[countryIndex]?.startingRivalFans[sportId]?.hardcore ?? 0;
+  return (
+    progress >= countermoves.reclaim.minNearTopProgress &&
+    progress > 0 &&
+    home >= meaningfulHardcoreShare &&
+    (country.fans[PLAYER_INDEX]?.hardcore ?? 0) > 0 &&
+    !hasCountermove(country, "reclaim", sportId)
+  );
+}
+
 /** Whether a timed countermove would do anything in a country right now. */
 function countermoveUseful(
   kind: TimedCountermoveKind,
@@ -175,8 +199,11 @@ function countermoveUseful(
   world: World,
   strengths: readonly number[],
   countryIndex: number,
+  progress: number,
 ): boolean {
   switch (kind) {
+    case "reclaim":
+      return reclaimAllowed(country, sportId, world, countryIndex, progress);
     case "mediaBlitz":
     case "youthPrograms":
       return !hasCountermove(country, kind, sportId);
@@ -212,8 +239,8 @@ export function stepRivals(
   const current = { sports: before.sports, countries: after as CountryState[] };
   const intensity = defenseIntensity(current, world);
   const movesAllowed = Math.floor(rivalAI.movesPerQuarter * intensity);
-  const positionWeight =
-    rivalAI.nearTop.positionPressure * nearTopProgress(intensity, world.config);
+  const progress = nearTopProgress(intensity, world.config);
+  const positionWeight = rivalAI.nearTop.positionPressure * progress;
   const totals = sportTotals(current, world);
 
   const rivals = before.rivals.map((rival): RivalState => {
@@ -292,7 +319,15 @@ export function stepRivals(
           if (
             kind === "ruleCopying"
               ? copy === null
-              : !countermoveUseful(kind, country, rival.sportId, world, strengths, front.index)
+              : !countermoveUseful(
+                  kind,
+                  country,
+                  rival.sportId,
+                  world,
+                  strengths,
+                  front.index,
+                  progress,
+                )
           ) {
             continue;
           }
