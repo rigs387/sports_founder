@@ -3,6 +3,14 @@ import { costMultiplier } from "./calendar";
 import type { EventRecord, EventState } from "./events-state";
 import { activeClubs, moveClubRatings } from "./flagship";
 import { seasonFacts, seasonStories } from "./season-stories";
+import {
+  applyStarEffect,
+  breakoutPP,
+  keepCost,
+  offerStarCards,
+  starEffectBlocker,
+  takesNoSlot,
+} from "./star-cards";
 import { type GameState, HEALTH_LEVELS, PLAYER_INDEX, type World } from "./types";
 
 export function eventFactors(
@@ -48,7 +56,7 @@ function offerSeasonCards(
     const country = state.countries.find((c) => c.countryId === summary?.countryId);
     const fans = country?.fans[PLAYER_INDEX];
     if (!summary || !country || !fans) continue;
-    const facts = seasonFacts(seasons, index);
+    const facts = seasonFacts(seasons, index, state.flagship.players);
     const offer = (card: EventTemplate) => {
       const id = nextId++;
       pending.push({
@@ -64,6 +72,7 @@ function offerSeasonCards(
           health: country.league?.health ?? null,
           rivalId: null,
           season: facts,
+          star: null,
         },
         resolution: null,
       });
@@ -128,18 +137,29 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
     ),
     decision: settings.maxDecisions,
   };
-  const pending = [...seasonEvents.pending];
+  // Star cards (GDD v1.16) follow the season cards, inside the caps.
+  const used = (kind: "moment" | "decision", list: typeof seasonEvents.pending) =>
+    list.filter((event) => {
+      const card = world.events.cards.find((c) => c.id === event.templateId);
+      return card?.kind === kind && !takesNoSlot(card);
+    }).length;
+  const starEvents = offerStarCards(state, world, recent, seasonEvents, {
+    moment: caps.moment - used("moment", seasonEvents.pending),
+    decision: caps.decision - used("decision", seasonEvents.pending),
+  });
+  const pending = [...starEvents.pending];
   const offered = { ...state.events.offered };
-  let nextId = seasonEvents.nextId;
+  let nextId = starEvents.nextId;
   for (const card of [...world.events.cards].sort((a, b) => b.priority - a.priority)) {
-    if (card.trigger === "seasonEnd") continue;
+    if (card.trigger === "seasonEnd" || card.trigger === "star") continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
     for (const { country } of ranked) {
-      // The champion moment never takes a moment slot; a season story counts as a decision.
+      // The champion and breakout moments never take a moment slot; a season story counts as a
+      // decision.
       if (
         pending.filter((event) => {
           const other = world.events.cards.find((c) => c.id === event.templateId);
-          return other?.kind === card.kind && other.story !== "champion";
+          return other?.kind === card.kind && !takesNoSlot(other);
         }).length >= caps[card.kind]
       )
         break;
@@ -181,6 +201,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
           health: country.league?.health ?? null,
           rivalId: fact && "sportId" in fact ? fact.sportId : null,
           season: null,
+          star: null,
         },
         resolution: null,
       });
@@ -190,7 +211,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   return {
     ...state,
     events: {
-      ...seasonEvents,
+      ...starEvents,
       pending,
       offered,
       nextId,
@@ -208,6 +229,8 @@ export function eventEffects(
 ): EventEffect[] {
   if (choiceId !== null)
     return card.choices.find((choice) => choice.id === choiceId)?.effects ?? [];
+  if (card.star === "breakout")
+    return [{ type: "pp", amount: breakoutPP(world, event) }, ...card.effects];
   if (card.story !== "champion") return card.effects;
   const amount = world.config.flagship.stories.championPP[event.facts.leagueTier ?? "amateur"];
   return [{ type: "pp", amount }, ...card.effects];
@@ -230,6 +253,7 @@ export type EventBlocker =
   | "league"
   | "rival"
   | "flagship"
+  | "star"
   | "ended";
 export function eventBlocker(
   state: GameState,
@@ -258,6 +282,8 @@ export function eventBlocker(
       !state.rivals.some((r) => r.sportId === event.facts.rivalId)
     )
       return "rival";
+    const star = starEffectBlocker(state, world, event, effect);
+    if (star !== null) return star;
   }
   return null;
 }
@@ -275,6 +301,14 @@ function applyEffects(
   for (const effect of effects) {
     if (effect.type === "pp") {
       next = { ...next, pp: next.pp + effect.amount };
+      continue;
+    }
+    if (
+      effect.type === "starHonors" ||
+      effect.type === "starMentor" ||
+      effect.type === "starKeep"
+    ) {
+      next = applyStarEffect(next, world, event, effect);
       continue;
     }
     if (effect.type === "clubRating") {
@@ -394,12 +428,17 @@ export function eventSnapshots(state: GameState, world: World) {
       kind: card.kind,
       tone: card.tone,
       story: card.story,
+      star: card.star,
       effects: eventEffects(world, card, event, null),
       arrivalEffects: card.arrivalEffects,
       defaultChoice: card.defaultChoice,
       choices: card.choices.map((choice) => ({
         ...choice,
         cost: eventChoiceCost(state, world, card, choice.id),
+        /** League cash the choice spends (keeping a star from moving). */
+        leagueCash: choice.effects.some((effect) => effect.type === "starKeep")
+          ? keepCost(state, world, event.countryId)
+          : 0,
         blocker: eventBlocker(state, world, event.id, choice.id),
       })),
     };
@@ -429,6 +468,17 @@ export function eventProblems(state: GameState, world: World): string[] {
     const season = event.facts.season;
     if ((card.story !== null) !== (season !== null))
       problems.push("Season facts on the wrong card");
+    const star = event.facts.star;
+    if ((card.star !== null) !== (star !== null)) problems.push("Star facts on the wrong card");
+    if (
+      star &&
+      (star.playerId >= state.flagship.nextPlayerId ||
+        (star.candidateId ?? 0) >= state.flagship.nextPlayerId ||
+        star.clubId >= state.flagship.nextClubId ||
+        (star.otherClubId ?? 0) >= state.flagship.nextClubId ||
+        star.season >= state.flagship.season)
+    )
+      problems.push("Event names an unknown flagship player, club or season");
     if (
       season &&
       (season.season >= state.flagship.season ||

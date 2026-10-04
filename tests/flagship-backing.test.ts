@@ -63,7 +63,12 @@ describe("backing a star", () => {
     ).toMatch(/not enough PP/);
     const backed = back(state, star.id);
     expect(backed.pp).toBeCloseTo(state.pp - backingPrice(state, content));
-    expect(starOf(backed).backing).toEqual({ season: state.flagship.season, influence: 0 });
+    expect(starOf(backed).backing).toEqual({
+      season: state.flagship.season,
+      influence: 0,
+      honors: false,
+      mentee: null,
+    });
     expect(checkAction(backed, content, { type: "backStar", playerId: star.id })).toMatch(
       /already backed/,
     );
@@ -121,7 +126,9 @@ describe("what a backed star does", () => {
   function atFull(state: GameState): GameState {
     const star = starOf(state);
     const players = state.flagship.players.map((p) =>
-      p.id === star.id ? { ...p, backing: { season: 1, influence: 1 } } : p,
+      p.id === star.id
+        ? { ...p, backing: { season: 1, influence: 1, honors: false, mentee: null } }
+        : p,
     );
     return { ...state, flagship: { ...state.flagship, players } };
   }

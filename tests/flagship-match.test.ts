@@ -104,7 +104,9 @@ describe("the season's scoring rule", () => {
       ...world,
       events: {
         ...world.events,
-        cards: world.events.cards.filter((card) => card.trigger !== "seasonEnd"),
+        cards: world.events.cards.filter(
+          (card) => card.trigger !== "seasonEnd" && card.trigger !== "star",
+        ),
       },
     };
     const base = withScoring("medium", 5);

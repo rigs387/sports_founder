@@ -185,3 +185,35 @@ within noise. Every runner run now prints stars made and backed. Save format 14 
 format 13 saves migrate with nobody backed. `tests/flagship-backing.test.ts` covers the price,
 window, slots, influence, dropping, both effects, pausing off the seat, the bots and the 13 → 14
 migration.
+
+## Star cards
+
+Built October 3, 2026 (tech plan 2.6 step 6), kept subtle on purpose. Stars reach the player as
+cards on the story board, each built from a recorded fact:
+
+- **A star is born** (moment): the season's new star, quoting their recorded season (scores,
+  matches, share of the club's scores). PP by league tier (3 / 5 / 8 / 12); it takes no moment
+  slot, like the champion moment.
+- **One last season**, **A star retires**, **A star changes clubs** (an unbacked star) and **A league
+  record** (a new all-time top scorer, once the league has played 5 seasons): moments in the normal
+  slots, with small effects or none.
+- **A backed star's last season** (decision): retire them with honors (their influence fades over 3
+  seasons instead of stopping), mentor the named successor (last season's top-scoring leading
+  player who is no star, unbacked and not retiring: a lift to their scoring through the mentor's
+  final season, then half the influence and the slot), or let them go (free).
+- **A backed star wants to move** (decision): the move happens at season end; paying 4 quarters of
+  the league's running cost in league cash swaps the players back. Letting them move is free and
+  the backing goes with them.
+- **Fans remember** (pressure decision): after dropping a star at full influence. 1% of the
+  player's hardcore fans in the flagship country turn casual at the drop, and casual conversion
+  there drops 10% for a year when the card arrives.
+
+Season cards now name the champion's leading player and the season's top scorer where the career
+lines record them. Decisions count against the decision cap after the season cards; unanswered
+ones take the free default, which never has an effect. Bots value honors and mentoring by the
+influence they keep, and keeping a star by competitive balance against league cash; in a short
+builder run they mentored every successor and kept every moving star. The story board names
+players from a names-only list in the snapshot; skill never leaves the simulation. Save format 15.
+`tests/star-cards.test.ts` covers every card's facts and choices, the breakout PP, season card
+names, the afterglow fading, the keep cost, the drop's pressure, records and the 14 → 15 migration.
+`npm run smoke` plays on until a star card arrives and opens it (`runs/smoke/35-star-card.png`).

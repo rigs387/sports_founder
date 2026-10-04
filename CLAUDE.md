@@ -126,6 +126,12 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   `src/sim/events.ts` offers the champion moment and at most one story card before other cards.
   The `clubRating` effect is valid only on `seasonEnd` cards; pressure cards' `arrivalEffects`
   land on arrival and are never cancelled.
+- Flagship stars (GDD v1.16) live in `FlagshipState.players`: leading players, credited scores,
+  careers, stars and backing in `src/sim/flagship.ts`; star cards in `src/sim/star-cards.ts`, built
+  from recorded facts only (a season's new star and the star landmarks). Skill stays out of
+  `TurnSnapshot`; the snapshot carries player names only. Star cards' free defaults have no
+  effect: a backed star's move stands unless kept, a backed star's backing ends at retirement
+  unless honored or passed to a mentored successor.
 - The win lives in `GameState.win` (`src/sim/win.ts`), never in `outcome`: winning must not end a
   campaign. Checked once per turn after the tier track: #1 by global Fandom Score held
   `win.holdTurns` turns at PP tier `win.requiredTier`. After the win an anchor collapse folds the
@@ -181,6 +187,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   final seasons announced and nobody retired.
 - Save format 14 adds backing (`Player.backing`: season backed and influence). Format 13 migrates
   with nobody backed.
+- Save format 15 adds star cards: star facts on event records, the champion's leading player and
+  top scorer on season facts, honors and mentee on backings, and the backed flag on star moves.
+  Format 14 migrates with no star facts, no players named, no honors or mentees, moves unbacked.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

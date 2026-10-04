@@ -325,9 +325,18 @@ export function seatStars(flagship: FlagshipState): Player[] {
   );
 }
 
-/** Backed stars, playing or not (a retirement ends a backing). */
+/**
+ * Backed players still playing: each holds a backing slot. A mentored successor may hold one
+ * before becoming a star; an honored retiree's fading afterglow holds none.
+ */
 export function backedStars(flagship: FlagshipState): Player[] {
-  return flagship.players.filter((player) => player.backing !== null);
+  return flagship.players.filter((player) => playing(player) && player.backing !== null);
+}
+
+/** Backed players playing at the seat's active clubs: the ones whose influence acts and grows. */
+function seatBacked(flagship: FlagshipState): Player[] {
+  const active = new Set(activeClubs(flagship).map((club) => club.id));
+  return backedStars(flagship).filter((player) => active.has(player.clubId));
 }
 
 /** The PP price of backing a star now: base × the peak tier's cost multiplier. */
@@ -347,9 +356,12 @@ export function backingSlots(state: Pick<GameState, "ppTier">, world: World): nu
  */
 export function backingEffects(flagship: FlagshipState, world: World) {
   const { casualConversion, mediaReach } = world.config.flagship.backing;
-  const influence = seatStars(flagship)
-    .filter((player) => player.backing !== null)
-    .reduce((sum, player) => sum + (player.backing?.influence ?? 0), 0);
+  // Backed players at the seat, plus the fading afterglow of stars retired with honors.
+  const afterglow = flagship.players.filter((p) => !playing(p) && p.backing?.honors);
+  const influence = [...seatBacked(flagship), ...afterglow].reduce(
+    (sum, player) => sum + (player.backing?.influence ?? 0),
+    0,
+  );
   return {
     countryId: flagship.countryId,
     casualConversion: 1 + casualConversion * influence,
@@ -387,7 +399,7 @@ export function dropBlocker(state: GameState, world: World, playerId: number): s
 /** Backs a star (checked by the caller): the PP price now, influence from 0. */
 export function backStar(state: GameState, world: World, playerId: number): GameState {
   const price = backingPrice(state, world);
-  const backing = { season: state.flagship.season, influence: 0 };
+  const backing = { season: state.flagship.season, influence: 0, honors: false, mentee: null };
   return {
     ...state,
     pp: state.pp - price,
@@ -398,14 +410,45 @@ export function backStar(state: GameState, world: World, playerId: number): Game
   };
 }
 
-/** Drops a backing (checked by the caller): its influence is lost. */
-export function dropStar(state: GameState, playerId: number): GameState {
-  return {
+/**
+ * Drops a backing (checked by the caller): its influence is lost. Dropping a star at full
+ * influence costs goodwill (GDD v1.16): a share of the player's hardcore fans in the flagship
+ * country turn casual now, and the dropped-star pressure card follows.
+ */
+export function dropStar(state: GameState, world: World, playerId: number): GameState {
+  const player = state.flagship.players.find((p) => p.id === playerId);
+  const next: GameState = {
     ...state,
     flagship: {
       ...state.flagship,
       players: state.flagship.players.map((p) => (p.id === playerId ? { ...p, backing: null } : p)),
     },
+  };
+  if ((player?.backing?.influence ?? 0) < 1) return next;
+  const index = indexOf(world, state.flagship.countryId);
+  const share = world.config.flagship.stars.dropDemotionShare;
+  return {
+    ...next,
+    countries: next.countries.map((country, i) =>
+      i === index
+        ? {
+            ...country,
+            fans: country.fans.map((fans, f) =>
+              f === PLAYER_INDEX ? demoteHardcore(fans, share) : fans,
+            ),
+          }
+        : country,
+    ),
+    landmarks: [
+      ...next.landmarks,
+      landmarks.starDropped(
+        state.turn,
+        state.quarter,
+        state.flagship.countryId,
+        state.flagship.season,
+        playerId,
+      ),
+    ],
   };
 }
 
@@ -482,12 +525,41 @@ function playersSeasonEnd(
     }
   }
 
-  // Players who played their final season retire.
+  // Backed players who played the season at the seat grow in influence.
+  const { influenceSeasons } = world.config.flagship.backing;
+  for (const backed of seatBacked(current())) {
+    // A backing inherited by a mentored successor starts growing from next season.
+    if (backed.backing === null || backed.backing.season > season) continue;
+    const influence = Math.min(1, backed.backing.influence + 1 / influenceSeasons);
+    backed.backing = { ...backed.backing, influence };
+  }
+
+  // An honored retiree's afterglow fades a step each season.
+  const { afterglowSeasons, mentorShare } = stars;
+  for (const player of players) {
+    if (playing(player) || !player.backing?.honors) continue;
+    const influence = player.backing.influence - 1 / afterglowSeasons;
+    player.backing = influence > 1e-9 ? { ...player.backing, influence } : null;
+  }
+
+  // Players who played their final season retire. A mentored successor takes the backing with a
+  // share of its influence; a star retired with honors keeps a fading afterglow; otherwise the
+  // backing ends.
   for (const player of players) {
     if (!playing(player) || !player.finalSeason) continue;
     player.retiredSeason = season;
     player.finalSeason = false;
-    player.backing = null;
+    const backing = player.backing;
+    const mentee = backing?.mentee ? players.find((p) => p.id === backing.mentee) : undefined;
+    if (backing && mentee && playing(mentee) && mentee.backing === null) {
+      mentee.backing = {
+        season: season + 1,
+        influence: mentorShare * backing.influence,
+        honors: false,
+        mentee: null,
+      };
+    }
+    player.backing = backing?.honors ? { ...backing, mentee: null } : null;
     if (player.starSince === null) continue;
     const club = flagship.clubs.find((c) => c.id === player.clubId);
     found.push(
@@ -501,14 +573,6 @@ function playersSeasonEnd(
         player.clubId,
       ),
     );
-  }
-
-  // Backed stars who played the season at the seat grow in influence.
-  const { influenceSeasons } = world.config.flagship.backing;
-  for (const backed of seatStars(current())) {
-    if (backed.backing === null) continue;
-    const influence = Math.min(1, backed.backing.influence + 1 / influenceSeasons);
-    backed.backing = { ...backed.backing, influence };
   }
 
   // Stars may move up to a stronger club without a star; the clubs swap leading players.
@@ -525,7 +589,18 @@ function playersSeasonEnd(
     const from = mover.clubId;
     mover.clubId = other.clubId;
     other.clubId = from;
-    found.push(landmarks.starMoved(turn, quarter, countryId, season, mover.id, from, mover.clubId));
+    found.push(
+      landmarks.starMoved(
+        turn,
+        quarter,
+        countryId,
+        season,
+        mover.id,
+        from,
+        mover.clubId,
+        mover.backing !== null,
+      ),
+    );
   }
 
   // Everyone still playing ages into next season.
@@ -541,6 +616,45 @@ function playersSeasonEnd(
     const aged = { ...player, skill };
     return { ...aged, finalSeason: nextFloat(rng) < finalSeasonChance(aged, age, world) };
   });
+  for (const player of players) {
+    if (!playing(player) || !player.finalSeason || player.starSince === null) continue;
+    const club = flagship.clubs.find((c) => c.id === player.clubId);
+    found.push(
+      landmarks.starFinalSeason(
+        turn,
+        quarter,
+        club?.countryId ?? countryId,
+        season,
+        player.id,
+        player.clubId,
+        player.backing !== null,
+      ),
+    );
+  }
+
+  // A new all-time top scorer of this league, once it has a history.
+  const leaguesSeasons = flagship.seasons.filter((s) => s.countryId === countryId).length + 1;
+  if (leaguesSeasons >= stars.recordMinSeasons) {
+    const here = new Set(flagship.clubs.filter((c) => c.countryId === countryId).map((c) => c.id));
+    const total = (player: Player, upTo: number) =>
+      player.career
+        .filter((line) => line.season <= upTo && here.has(line.clubId))
+        .reduce((sum, line) => sum + line.scores, 0);
+    const leader = (upTo: number) =>
+      [...players].sort((a, b) => total(b, upTo) - total(a, upTo) || a.id - b.id)[0];
+    const before = leader(season - 1);
+    const after = leader(season);
+    if (
+      after &&
+      before &&
+      after.id !== before.id &&
+      total(after, season) > total(before, season - 1)
+    ) {
+      found.push(
+        landmarks.scoringRecord(turn, quarter, countryId, season, after.id, total(after, season)),
+      );
+    }
+  }
   return { flagship: current(), newStarId, landmarks: found };
 }
 
@@ -959,7 +1073,9 @@ export function stepFlagshipQuarter(
   for (const club of clubs.values()) {
     const player = leadingPlayer(flagship, club.id);
     if (!player) continue;
-    credit.set(club.id, creditChance(player.skill, world));
+    const mentored = flagship.players.some((p) => playing(p) && p.backing?.mentee === player.id);
+    const lift = mentored ? world.config.flagship.stars.mentorCreditLift : 0;
+    credit.set(club.id, Math.min(1, creditChance(player.skill, world) + lift));
     const tally = tallies?.find((t) => t.playerId === player.id);
     if (tally) tallyOf.set(club.id, tally);
   }
@@ -1199,8 +1315,8 @@ export function flagshipProblems(state: GameState, world: World): string[] {
     if (!past(player.starSince) || !past(player.retiredSeason)) {
       problems.push(`flagship player ${player.id} has a season in the future`);
     }
-    if (player.backing !== null && (player.starSince === null || player.retiredSeason !== null)) {
-      problems.push(`flagship player ${player.id} is backed without being a playing star`);
+    if (player.backing !== null && player.retiredSeason !== null && !player.backing.honors) {
+      problems.push(`retired flagship player ${player.id} is still backed`);
     }
     if (player.retiredSeason !== null) {
       if (player.finalSeason) problems.push(`retired flagship player ${player.id} plays on`);
@@ -1319,6 +1435,10 @@ export interface FlagshipSnapshot {
   seatTargets: string[];
   /** Share of the seat country's hardcore fans who turn casual if the seat moves away. */
   leaveCost: number;
+  /** Every leading player the campaign has known, by id: names only (skill stays hidden). */
+  players: { id: number; name: string; clubId: number }[];
+  /** The rules star cards quote: honors' fading seasons and the mentor's influence share. */
+  starRules: { afterglowSeasons: number; mentorShare: number };
 }
 
 /** How many finished seasons the snapshot carries. */
@@ -1367,5 +1487,10 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
       flagship.countryId === state.anchorCountryId
         ? world.config.flagship.seatMove.anchorHardcoreDemotionShare
         : world.config.flagship.seatMove.hardcoreDemotionShare,
+    players: flagship.players.map(({ id, name, clubId }) => ({ id, name, clubId })),
+    starRules: {
+      afterglowSeasons: world.config.flagship.stars.afterglowSeasons,
+      mentorShare: world.config.flagship.stars.mentorShare,
+    },
   };
 }

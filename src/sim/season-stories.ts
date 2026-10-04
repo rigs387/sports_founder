@@ -1,12 +1,19 @@
 import type { SeasonStory } from "../content";
 import type { SeasonFacts } from "./events-state";
-import type { SeasonSummary, World } from "./types";
+import type { Player, SeasonSummary, World } from "./types";
 
 // The flagship season as cards (GDD v1.15). Every story is read from the recorded season summaries
 // and nothing else; there is no randomness. Thresholds are config (flagship.stories).
 
-/** The facts a season card records about `seasons[index]`. */
-export function seasonFacts(seasons: readonly SeasonSummary[], index: number): SeasonFacts {
+/**
+ * The facts a season card records about `seasons[index]`. The champion's leading player is read
+ * from the retained career lines (GDD v1.16), so a season without them names nobody.
+ */
+export function seasonFacts(
+  seasons: readonly SeasonSummary[],
+  index: number,
+  players: readonly Player[] = [],
+): SeasonFacts {
   const summary = seasons[index];
   if (!summary) throw new Error("No such flagship season");
   let streak = 1;
@@ -24,6 +31,14 @@ export function seasonFacts(seasons: readonly SeasonSummary[], index: number): S
     pointsGap: first && second ? first.points - second.points : 0,
     finalMargin:
       summary.format === "american" && final ? Math.abs(final.homeScore - final.awayScore) : null,
+    championPlayerId:
+      players.find((player) =>
+        player.career.some(
+          (line) => line.season === summary.season && line.clubId === summary.championId,
+        ),
+      )?.id ?? null,
+    topScorerId: summary.topScorer?.playerId ?? null,
+    topScorerScores: summary.topScorer?.scores ?? null,
   };
 }
 

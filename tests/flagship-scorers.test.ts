@@ -104,7 +104,9 @@ describe("credited scores", () => {
       ...base,
       events: {
         ...base.events,
-        cards: base.events.cards.filter((card) => card.trigger !== "seasonEnd"),
+        cards: base.events.cards.filter(
+          (card) => card.trigger !== "seasonEnd" && card.trigger !== "star",
+        ),
       },
     });
     const a = runTurns(start("european", world, 5), cardless(world), 30);

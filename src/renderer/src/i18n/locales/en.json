@@ -57,7 +57,10 @@
       "clubRating_champion_one": "Champions {{count, number(signDisplay: always)}} rating step (hidden club strength).",
       "clubRating_champion_other": "Champions {{count, number(signDisplay: always)}} rating steps (hidden club strength).",
       "clubRating_field_one": "Every other club {{count, number(signDisplay: always)}} rating step (hidden club strength).",
-      "clubRating_field_other": "Every other club {{count, number(signDisplay: always)}} rating steps (hidden club strength)."
+      "clubRating_field_other": "Every other club {{count, number(signDisplay: always)}} rating steps (hidden club strength).",
+      "starHonors": "Retire them with honors: their influence fades over {{seasons, number}} seasons instead of stopping.",
+      "starMentor": "{{candidate}} gets a lift to their scoring this season, then takes the backing with {{share, number(style: percent)}} of the influence.",
+      "starKeep": "Costs the league {{cash, number(maximumFractionDigits: 0)}} in cash. The move is cancelled."
     },
     "blockers": {
       "missing": "This story has already been resolved.",
@@ -66,7 +69,8 @@
       "league": "There is no longer a league here.",
       "rival": "The named rival is no longer available.",
       "ended": "This campaign has ended.",
-      "flagship": "The champions no longer play in your flagship league."
+      "flagship": "The champions no longer play in your flagship league.",
+      "star": "That star's situation has changed: this choice is no longer possible."
     },
     "cards": {
       "open-doors": {
@@ -197,9 +201,62 @@
           "bank-the-gate": "Bank the gate",
           "hold": "Move on"
         }
+      },
+      "star-breakout": {
+        "title": "A star is born",
+        "body_one": "{{player}} scored {{count, number}} time in {{matches, number}} matches for {{club}} in season {{season}}: {{share, number(style: percent)}} of the club's scores. The league has a new star.",
+        "body_other": "{{player}} scored {{count, number}} times in {{matches, number}} matches for {{club}} in season {{season}}: {{share, number(style: percent)}} of the club's scores. The league has a new star."
+      },
+      "star-final-season": {
+        "title": "One last season",
+        "body_one": "{{player}} of {{club}} will retire after next season. They have scored {{count, number}} time in {{seasons, number}} seasons, and fans want to see them play while they can.",
+        "body_other": "{{player}} of {{club}} will retire after next season. They have scored {{count, number}} times in {{seasons, number}} seasons, and fans want to see them play while they can."
+      },
+      "star-retired": {
+        "title": "A star retires",
+        "body_one": "{{player}} has played their last match for {{club}}. They retire with {{count, number}} score in {{matches, number}} matches over {{seasons, number}} seasons.",
+        "body_other": "{{player}} has played their last match for {{club}}. They retire with {{count, number}} scores in {{matches, number}} matches over {{seasons, number}} seasons."
+      },
+      "star-moved": {
+        "title": "A star changes clubs",
+        "body": "{{player}} has left {{otherClub}} for {{club}}, a stronger side. Stars go where they can win."
+      },
+      "star-record": {
+        "title": "A league record",
+        "body_one": "{{player}} of {{club}} is now the {{country}} league's all-time top scorer, with {{count, number}} score.",
+        "body_other": "{{player}} of {{club}} is now the {{country}} league's all-time top scorer, with {{count, number}} scores."
+      },
+      "star-succession": {
+        "title": "A backed star's last season",
+        "body": "{{player}} of {{club}}, a star you back, will retire after next season. Retire them with honors and their influence fades slowly instead of stopping, or let them go.",
+        "body_mentor": "{{player}} of {{club}}, a star you back, will retire after next season. Retire them with honors and their influence fades slowly instead of stopping, or let them mentor {{candidate}}, who would take on part of it.",
+        "choices": {
+          "honors": "Retire with honors",
+          "mentor": "Mentor a successor",
+          "let-go": "Let them go"
+        }
+      },
+      "star-keep": {
+        "title": "A backed star wants to move",
+        "body": "{{player}} wants to leave {{otherClub}} for {{club}}, a stronger side. Your backing goes with them. The league can pay to keep them where they are.",
+        "choices": {
+          "keep": "Pay to keep them",
+          "let-move": "Let them move"
+        }
+      },
+      "star-dropped": {
+        "title": "Fans remember",
+        "body": "Supporters have not forgiven you for dropping {{player}}. Casual interest in {{country}} is cooling.",
+        "choices": {
+          "farewell": "Stage a farewell match",
+          "hold": "Ride it out"
+        }
       }
     },
-    "arrived": "Already landed, whatever you choose:"
+    "arrived": "Already landed, whatever you choose:",
+    "seasonLeader": "{{player}} led {{champion}}.",
+    "seasonScorer_one": "{{player}} was the season's top scorer, with {{count, number}} score.",
+    "seasonScorer_other": "{{player}} was the season's top scorer, with {{count, number}} scores."
   },
   "saves": {
     "menu": "Campaign",

@@ -13,14 +13,14 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-03",
-    tests: 384,
-    files: 33,
-    note: "npm run check passed after stars step 5, backing stars (type checks, Biome, purity, 384 tests in 33 files). Lint has existing visual-study warnings.",
+    tests: 394,
+    files: 34,
+    note: "npm run check passed after stars step 6, star cards (type checks, Biome, purity, 394 tests in 34 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-03",
     smoke:
-      "UI smoke passed and now plays to a season end and opens its story card (a runaway pressure card naming real clubs); save/resume continued identically.",
+      "UI smoke passed: it plays to a season end and opens its story card (now naming the champions' leading player and the top scorer), then plays on until a star card arrives and opens it (a retirement naming a real player and club); save/resume continued identically.",
   },
-  eventDeck: { current: 16, target: "40–60" },
+  eventDeck: { current: 24, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Make the flagship season matter",
-      text: "Stars can be backed and reach fans beyond the league (stars step 5 of 8); next, star cards.",
+      text: "Stars reach the player as cards: breakouts, last seasons, retirements, moves, records (stars step 6 of 8); next, the Stars panel.",
       tag: "Next build",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-03",
+      type: "Built",
+      title: "Star cards",
+      text: "Stars step 6 (tech plan 2.6), kept subtle: a breakout moment (PP by tier, no slot), final-season, retirement, move and record moments, and three decisions: a backed star's succession (honors or mentor a named successor), keeping a backed star from moving (league cash) and a pressure card after dropping a star at full influence. Season cards name the champion's leading player and top scorer. Save format 15.",
+    },
     {
       date: "2026-10-03",
       type: "Built",
@@ -430,7 +436,7 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Step 6 of tech plan 2.6: star cards (breakout, final season, retirement, moves, records, succession, keep-or-let-move, drop pressure); then the Stars panel.",
+      next: "Step 8 of tech plan 2.6: the Stars panel on the flagship screen (recorded facts, influence bars, backing slots with a review step). Saves were built with each step.",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
@@ -444,20 +450,21 @@ window.SF_PROGRESS = {
         ["Credited scores", "../flagship/README.md#credited-scores-and-careers"],
         ["Stars and careers", "../flagship/README.md#stars-and-careers"],
         ["Backing stars", "../flagship/README.md#backing-stars"],
+        ["Star cards", "../flagship/README.md#star-cards"],
       ],
       items: [
         ["built", "Scoring frequency sets flagship match chances, fixed per season"],
         ["built", "Each club's named leading player, born in a real place (simulation only)"],
         ["built", "Scores credited to leading players; career lines and top scorers"],
         ["built", "Stars made by a season: top scorer, club share, 1–4 places by tier"],
-        ["planned", "Star cards: breakout, final season, retirement, moves, records"],
+        ["built", "Star cards: breakout, final season, retirement, moves, records"],
         ["planned", "Flagship stars and lightweight standouts elsewhere"],
         [
           "partial",
-          "Persistent careers: skill curve, final seasons, retirement and moves (records come with cards)",
+          "Persistent careers: skill curve, final seasons, retirement, moves and league scoring records",
         ],
         ["built", "Backing slots and influence earned over seasons"],
-        ["planned", "Goodwill costs, honored retirements and mentoring successors"],
+        ["built", "Goodwill costs, honored retirements and mentoring successors"],
       ],
     },
     {

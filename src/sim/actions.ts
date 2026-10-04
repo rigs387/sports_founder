@@ -268,7 +268,7 @@ export function applyAction(state: GameState, world: World, action: Action): Gam
     case "backStar":
       return backStar(state, world, action.playerId);
     case "dropStar":
-      return dropStar(state, action.playerId);
+      return dropStar(state, world, action.playerId);
     case "moveSeat":
       return {
         ...state,

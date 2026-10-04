@@ -197,8 +197,12 @@ export interface Player {
   finalSeason: boolean;
   /** The last season the player played, once retired; null while playing. */
   retiredSeason: number | null;
-  /** The player's backing (GDD v1.16): the season it began and influence, 0–1. */
-  backing: { season: number; influence: number } | null;
+  /**
+   * The player's backing (GDD v1.16): the season it began and influence, 0–1. A star retired with
+   * honors keeps a fading backing (the afterglow); `mentee` is the successor a backed star in their
+   * final season is mentoring.
+   */
+  backing: { season: number; influence: number; honors: boolean; mentee: number | null } | null;
   /** One permanent line per finished flagship season the player played in, oldest first. */
   career: CareerLine[];
 }
@@ -399,6 +403,37 @@ export type Landmark =
       playerId: number;
       from: number;
       to: number;
+      /** A backed star's move waits on the keep-or-let-move card. */
+      backed: boolean;
+    }
+  | {
+      kind: "starFinalSeason";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      playerId: number;
+      clubId: number;
+      backed: boolean;
+    }
+  /** A player became the league's all-time top scorer. */
+  | {
+      kind: "scoringRecord";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      playerId: number;
+      scores: number;
+    }
+  /** The player dropped a backed star at full influence. */
+  | {
+      kind: "starDropped";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      playerId: number;
     }
   /** The commissioner's seat moved: by the player, or home after a flagship folded. */
   | {

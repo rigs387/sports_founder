@@ -8,6 +8,7 @@ import {
   eventBlocker,
   eventChoiceCost,
   type GameState,
+  keepCost,
   PLAYER_INDEX,
   type World,
 } from "../sim";
@@ -18,7 +19,7 @@ import {
 // policy.ts, these weights shape bot behavior only; they are not game balance.
 //
 // A choice's value is the sum of its effects, each measured as a relative change to a fan bucket
-// or to the league, so different effect types can be compared:
+// or to the league, so different effect types can be compared (star effects: see effectValue):
 //   conversion/spread  (factor − 1) × years it lasts
 //   fanShift           fans moved ÷ the bucket they join (casual or hardcore)
 //   hardcoreDemotion   − share of the player's hardcore lost
@@ -98,6 +99,7 @@ function effectValue(
   countryId: string,
   rivalId: string | null,
   championId: number | null,
+  starId: number | null,
   effect: EventEffect,
   weights: EventWeights,
 ): number {
@@ -125,6 +127,35 @@ function effectValue(
       return effect.steps * weights.league;
     case "pp":
       return (effect.amount * weights.ppPrice) / costMultiplier(state, world.config);
+    // Star cards (GDD v1.16). Honors and mentoring keep some of a backed star's influence working
+    // after they retire; keeping a star holds their strength at their old club for league cash.
+    case "starHonors":
+    case "starMentor": {
+      const { casualConversion, mediaReach } = world.config.flagship.backing;
+      const { afterglowSeasons, mentorShare } = world.config.flagship.stars;
+      const star = state.flagship.players.find((p) => p.id === starId);
+      const seasons =
+        effect.type === "starHonors"
+          ? afterglowSeasons / 2
+          : mentorShare * world.config.flagship.backing.influenceSeasons;
+      return (
+        (star?.backing?.influence ?? 0) *
+        seasons *
+        (casualConversion * weights.casual + mediaReach * weights.media)
+      );
+    }
+    case "starKeep": {
+      // A typical star's strength (bots never read hidden skill) stays with the weaker club, in
+      // rating steps of competitive balance, against the share of league cash it costs.
+      const league = country.league;
+      if (!league || league.cash <= 0) return Number.NEGATIVE_INFINITY;
+      const { stars, players, stories } = world.config.flagship;
+      const balance = (stars.strengthPerSkill * players.peakSkill.mean) / stories.ratingStep;
+      return (
+        balance * weights.balance -
+        (keepCost(state, world, countryId) / league.cash) * weights.league
+      );
+    }
     case "clubRating": {
       const clubs = activeClubs(state.flagship);
       const champion = clubs.find((club) => club.id === championId);
@@ -159,6 +190,7 @@ export function choiceValue(
         event.countryId,
         event.facts.rivalId,
         event.facts.season?.championId ?? null,
+        event.facts.star?.playerId ?? null,
         effect,
         weights,
       ),

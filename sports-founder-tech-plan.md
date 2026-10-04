@@ -264,8 +264,17 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    decision (league cash) and the full-influence drop pressure card, counted against the decision
    cap, offered after season cards, with free defaults. Season cards name the champion's leading
    player and the top scorer where recorded. Bot weights for every new card; bots back stars.
+   *Built 2026-10-03, kept subtle:* eight cards (breakout, final season, retirement, move and record
+   moments; succession, keep-or-let-move and dropped decisions) in `src/sim/star-cards.ts`, built
+   from a season's new star and four new landmarks (starFinalSeason, scoringRecord, starDropped, and
+   starMoved's backed flag). Every free default has no effect: a backed star's move happens at
+   season end and keeping them swaps the players back for 4 quarters of league running cost; a
+   backing ends at retirement unless honored (fades over 3 seasons) or passed to the mentored
+   successor (half the influence, +0.1 credit through the final season). The snapshot carries player
+   names only. Runner (builder, 4 campaigns): bots mentor every time and always keep a moving star,
+   since healthy leagues hold plenty of cash. Smoke opens a star card. Save format 15.
 7. **Saves.** Built with each step: players (format 11), career lines and top scorers (12), stars
-   and careers (13), backing (14). Star cards add a format only if they need new state.
+   and careers (13), backing (14), star cards (15).
 8. **Screen.** A Stars panel on the flagship screen (recorded facts only, an influence bar,
    backing slots with a review step), the leading player and tally on each table row, backed
    stars named in the flagship country's tooltip. Skill and strength bonuses stay out of

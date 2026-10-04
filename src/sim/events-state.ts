@@ -13,6 +13,27 @@ export const seasonFactsSchema = z.strictObject({
   pointsGap: z.int().nonnegative(),
   /** American format: the final's score margin (0 when deciders settled it). Null in European. */
   finalMargin: z.int().nonnegative().nullable(),
+  /** The champion's leading player and the season's top scorer, where recorded (GDD v1.16). */
+  championPlayerId: z.int().positive().nullable(),
+  topScorerId: z.int().positive().nullable(),
+  topScorerScores: z.int().nonnegative().nullable(),
+});
+
+/**
+ * The recorded flagship star fact a star card tells (GDD v1.16). Counts are the season's (breakout)
+ * or the career's (every other card). `otherClubId` is the club a star moved from; `candidateId`
+ * the successor a succession card names.
+ */
+export const starFactsSchema = z.strictObject({
+  playerId: z.int().positive(),
+  clubId: z.int().positive(),
+  otherClubId: z.int().positive().nullable(),
+  candidateId: z.int().positive().nullable(),
+  season: z.int().positive(),
+  scores: z.int().nonnegative(),
+  matches: z.int().nonnegative(),
+  clubScores: z.int().nonnegative(),
+  seasons: z.int().nonnegative(),
 });
 
 export const eventRecordSchema = z.strictObject({
@@ -28,6 +49,7 @@ export const eventRecordSchema = z.strictObject({
     health: healthLevelSchema.nullable(),
     rivalId: z.string().nullable(),
     season: seasonFactsSchema.nullable(),
+    star: starFactsSchema.nullable(),
   }),
   resolution: z
     .strictObject({
@@ -59,6 +81,7 @@ export const eventStateSchema = z.strictObject({
 });
 export type EventRecord = z.infer<typeof eventRecordSchema>;
 export type SeasonFacts = z.infer<typeof seasonFactsSchema>;
+export type StarFacts = z.infer<typeof starFactsSchema>;
 export type EventState = z.infer<typeof eventStateSchema>;
 export const emptyEvents = (landmarkCursor: number): EventState => ({
   nextId: 1,

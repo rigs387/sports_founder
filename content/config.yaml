@@ -546,6 +546,23 @@ flagship:
     places: { amateur: 1, semi-pro: 2, professional: 3, elite: 4 }
     strengthPerSkill: 0.08
     moveChance: 0.25
+    # Star cards (step 6). The breakout moment's PP by league tier (it takes no moment slot).
+    # Keeping a backed star from moving costs keepCashQuarters × the flagship league's running
+    # cost in league cash. Mentoring: the succession card names last season's top-scoring
+    # leading player who is no star, unbacked and younger than mentorMaxAge; they get
+    # mentorCreditLift on their credit chance through the mentor's final season, then take the
+    # slot with mentorShare of the mentor's influence. Honors: a retired star's influence fades by
+    # 1 ÷ afterglowSeasons each season's end instead of stopping. Dropping a star at full
+    # influence demotes dropDemotionShare of the player's hardcore fans in the flagship country.
+    # A new all-time top scorer of a league is a record once it has played recordMinSeasons.
+    breakoutPP: { amateur: 3, semi-pro: 5, professional: 8, elite: 12 }
+    keepCashQuarters: 4
+    mentorMaxAge: 24
+    mentorCreditLift: 0.1
+    mentorShare: 0.5
+    afterglowSeasons: 3
+    dropDemotionShare: 0.01
+    recordMinSeasons: 5
   # Backing stars (GDD v1.16, tech plan 2.6 step 5). In the seasonal window the player may back a
   # star playing at the seat, one per backing slot (ppTiers), for a one-time basePrice × the peak
   # tier's cost multiplier in PP, with no upkeep; or drop one. A backed star's influence starts at

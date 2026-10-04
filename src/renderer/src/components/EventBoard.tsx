@@ -6,8 +6,28 @@ import { useGameStore } from "../state/game-store";
 import { ActionFeedback } from "./ActionFeedback";
 import "./events.css";
 
-function Effect({ effect }: { effect: EventEffect }) {
+/** Names and numbers a star effect's line needs (GDD v1.16). */
+interface StarValues {
+  candidate?: string;
+  cash?: number;
+}
+
+function Effect({ effect, star = {} }: { effect: EventEffect; star?: StarValues }) {
   const { t } = useTranslation();
+  const { snapshot } = useGameStore();
+  if (effect.type === "starHonors" || effect.type === "starMentor" || effect.type === "starKeep") {
+    const stars = snapshot?.flagship.starRules;
+    return (
+      <li>
+        {t(`events.effects.${effect.type}`, {
+          seasons: stars?.afterglowSeasons ?? 0,
+          share: stars?.mentorShare ?? 0,
+          candidate: star.candidate ?? "",
+          cash: star.cash ?? 0,
+        })}
+      </li>
+    );
+  }
   if (effect.type === "conversion" || effect.type === "spread")
     return (
       <li className={effect.factor < 1 ? "event-tradeoff" : undefined}>
@@ -61,10 +81,29 @@ export function EventBoard() {
     const found = snapshot.flagship.clubs.find((c) => c.id === id);
     return found ? t("flagship.club", { place: found.place, nickname: found.nickname }) : "";
   };
+  const player = (id: number | null | undefined) =>
+    snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
+  // Star cards (GDD v1.16) name the player and clubs from the record.
+  const starText = (event: EventRecord) => {
+    const star = event.facts.star;
+    if (!star) return {};
+    return {
+      player: player(star.playerId),
+      club: club(star.clubId),
+      otherClub: club(star.otherClubId ?? undefined),
+      candidate: player(star.candidateId),
+      season: star.season,
+      count: star.scores,
+      matches: star.matches,
+      seasons: star.seasons,
+      share: star.clubScores > 0 ? star.scores / star.clubScores : 0,
+      context: star.candidateId === null ? undefined : "mentor",
+    };
+  };
   // Season cards (GDD v1.15) name the real clubs from the record; their text varies by format.
   const seasonText = (event: EventRecord) => {
     const season = event.facts.season;
-    if (!season) return {};
+    if (!season) return starText(event);
     return {
       champion: club(season.championId),
       runnerUp: club(season.runnerUpId),
@@ -245,6 +284,22 @@ export function EventBoard() {
                       ...seasonText(selected),
                     })}
                   </p>
+                  {selected.facts.season?.championPlayerId != null && (
+                    <p>
+                      {t("events.seasonLeader", {
+                        player: player(selected.facts.season.championPlayerId),
+                        champion: club(selected.facts.season.championId),
+                      })}
+                    </p>
+                  )}
+                  {selected.facts.season?.topScorerId != null && (
+                    <p>
+                      {t("events.seasonScorer", {
+                        player: player(selected.facts.season.topScorerId),
+                        count: selected.facts.season.topScorerScores ?? 0,
+                      })}
+                    </p>
+                  )}
                   <div className="event-facts">
                     <span>
                       {t("events.fans", { count: selected.facts.casual + selected.facts.hardcore })}
@@ -325,7 +380,14 @@ export function EventBoard() {
                           <ul>
                             {option.effects.length ? (
                               option.effects.map((effect) => (
-                                <Effect effect={effect} key={JSON.stringify(effect)} />
+                                <Effect
+                                  effect={effect}
+                                  key={JSON.stringify(effect)}
+                                  star={{
+                                    candidate: player(current.facts.star?.candidateId),
+                                    cash: option.leagueCash,
+                                  }}
+                                />
                               ))
                             ) : (
                               <li>{t("events.noChange")}</li>

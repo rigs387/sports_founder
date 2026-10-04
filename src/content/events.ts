@@ -36,7 +36,30 @@ export const eventEffectSchema = z.union([
     target: z.enum(["champion", "field"]),
     steps: z.int().refine((steps) => steps !== 0, "steps must not be 0"),
   }),
+  // Star cards only (GDD v1.16): retire a backed star with honors, mentor the named successor,
+  // or keep a backed star from moving for flagship league cash.
+  z.strictObject({ type: z.literal("starHonors") }),
+  z.strictObject({ type: z.literal("starMentor") }),
+  z.strictObject({ type: z.literal("starKeep") }),
 ]);
+/** The flagship star facts a card can tell (GDD v1.16). */
+export const STAR_CARDS = [
+  "breakout",
+  "finalSeason",
+  "retired",
+  "moved",
+  "record",
+  "succession",
+  "keepOrMove",
+  "dropped",
+] as const;
+export type StarCard = (typeof STAR_CARDS)[number];
+const STAR_DECISIONS: readonly StarCard[] = ["succession", "keepOrMove", "dropped"];
+const STAR_EFFECT_CARD = {
+  starHonors: "succession",
+  starMentor: "succession",
+  starKeep: "keepOrMove",
+};
 /** The flagship season facts a card can tell (GDD v1.15), highest priority first after the champion. */
 export const SEASON_STORIES = [
   "champion",
@@ -67,9 +90,12 @@ const template = z
       "rivalEscalated",
       "leaguePressure",
       "seasonEnd",
+      "star",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),
+    /** star cards only: the star fact the card tells. */
+    star: z.enum(STAR_CARDS).nullable().default(null),
     minQuarter: z.int().nonnegative(),
     minFans: z.int().nonnegative(),
     minHardcore: z.int().nonnegative(),
@@ -101,8 +127,19 @@ const template = z
     }
     const season = card.trigger === "seasonEnd";
     if (season !== (card.story !== null)) issue("Season stories need the seasonEnd trigger");
+    const star = card.trigger === "star";
+    if (star !== (card.star !== null)) issue("Star cards need the star trigger");
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");
+    if (star) {
+      if (card.cooldownTurns !== null) issue("Star cards follow recorded facts: no cooldown");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("Star cards belong to the flagship: campaign scope, no anchor or health filter");
+      if (STAR_DECISIONS.includes(card.star ?? "breakout") !== (card.kind === "decision"))
+        issue(
+          "Succession, keep-or-let-move and dropped are decisions; other star cards are moments",
+        );
+    }
     if (season) {
       if (card.cooldownTurns !== null) issue("Season cards count cooldowns in seasons, not turns");
       if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
@@ -110,8 +147,8 @@ const template = z
       if ((card.story === "champion") !== (card.kind === "moment"))
         issue("The champion card is the season's moment; every other season card is a decision");
     }
-    if (card.arrivalEffects.length && !(season && card.tone === "pressure"))
-      issue("Arrival effects belong to pressure season cards only");
+    if (card.arrivalEffects.length && !((season || star) && card.tone === "pressure"))
+      issue("Arrival effects belong to pressure season and star cards only");
     for (const effect of [...card.effects, ...card.choices.flatMap((c) => c.effects)]) {
       if (effect.type === "rivalSetback" && card.trigger !== "rivalEscalated")
         issue("Rival setbacks require a recorded rival escalation");
@@ -122,6 +159,13 @@ const template = z
         issue("Health effects require a league fact");
       if (effect.type === "clubRating" && !season)
         issue("Club rating effects belong to flagship season cards only");
+      if (
+        (effect.type === "starHonors" ||
+          effect.type === "starMentor" ||
+          effect.type === "starKeep") &&
+        card.star !== STAR_EFFECT_CARD[effect.type]
+      )
+        issue(`${effect.type} belongs to the ${STAR_EFFECT_CARD[effect.type]} star card only`);
     }
   });
 export const eventsFileSchema = z
@@ -150,6 +194,13 @@ export const eventsFileSchema = z
         code: "custom",
         path: ["cards"],
         message: "Two cards tell the same season story",
+      });
+    const stars = data.cards.flatMap((c) => (c.star === null ? [] : [c.star]));
+    if (new Set(stars).size !== stars.length)
+      ctx.addIssue({
+        code: "custom",
+        path: ["cards"],
+        message: "Two cards tell the same star fact",
       });
   });
 export type EventsContent = z.infer<typeof eventsFileSchema>;

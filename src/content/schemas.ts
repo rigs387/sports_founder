@@ -636,6 +636,19 @@ export const configFileSchema = z.strictObject({
       }),
       strengthPerSkill: z.number().min(0),
       moveChance: unitInterval,
+      breakoutPP: z.strictObject({
+        amateur: z.number().min(0),
+        "semi-pro": z.number().min(0),
+        professional: z.number().min(0),
+        elite: z.number().min(0),
+      }),
+      keepCashQuarters: z.number().min(0),
+      mentorMaxAge: z.int().min(0),
+      mentorCreditLift: unitInterval,
+      mentorShare: unitInterval,
+      afterglowSeasons: z.int().min(1),
+      dropDemotionShare: unitInterval,
+      recordMinSeasons: z.int().min(1),
     }),
     /** Leading players (GDD v1.16). */
     players: z.strictObject({

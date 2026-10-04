@@ -64,7 +64,9 @@ const withoutSeasonCards = {
   ...world,
   events: {
     ...world.events,
-    cards: world.events.cards.filter((card) => card.trigger !== "seasonEnd"),
+    cards: world.events.cards.filter(
+      (card) => card.trigger !== "seasonEnd" && card.trigger !== "star",
+    ),
   },
 };
 

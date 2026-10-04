@@ -390,3 +390,162 @@ cards:
           - { type: pp, amount: 8 }
           - { type: conversion, target: casual, factor: 0.9, quarters: 4 }
       - { id: hold, cost: 0, effects: [] }
+  # Flagship stars as cards (GDD v1.16). Built from recorded facts only: a season's new star, or a
+  # star landmark. The breakout moment (PP by league tier: config flagship.stars.breakoutPP) takes
+  # no moment slot; the other moments use moment slots; the decisions count against maxDecisions
+  # and come after the season cards. Unanswered decisions take their free default: the backed star
+  # retires without honors or a successor, the backed star's move stands, the drop is ridden out.
+  # Kept subtle on purpose: stars are a story first.
+  - id: star-breakout
+    kind: moment
+    tone: positive
+    priority: 200
+    trigger: star
+    star: breakout
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: star-final-season
+    kind: moment
+    tone: positive
+    priority: 200
+    trigger: star
+    star: finalSeason
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: [{ type: conversion, target: casual, factor: 1.05, quarters: 4 }]
+    choices: []
+    defaultChoice: null
+  - id: star-retired
+    kind: moment
+    tone: positive
+    priority: 200
+    trigger: star
+    star: retired
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: star-moved
+    kind: moment
+    tone: positive
+    priority: 200
+    trigger: star
+    star: moved
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: star-record
+    kind: moment
+    tone: positive
+    priority: 200
+    trigger: star
+    star: record
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: [{ type: conversion, target: hardcore, factor: 1.05, quarters: 4 }]
+    choices: []
+    defaultChoice: null
+  - id: star-succession
+    kind: decision
+    tone: positive
+    priority: 200
+    trigger: star
+    star: succession
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    defaultChoice: let-go
+    choices:
+      - id: honors
+        cost: 8
+        effects: [{ type: starHonors }]
+      - id: mentor
+        cost: 8
+        effects: [{ type: starMentor }]
+      - { id: let-go, cost: 0, effects: [] }
+  - id: star-keep
+    kind: decision
+    tone: positive
+    priority: 200
+    trigger: star
+    star: keepOrMove
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    defaultChoice: let-move
+    choices:
+      - id: keep
+        cost: 0
+        effects: [{ type: starKeep }]
+      - { id: let-move, cost: 0, effects: [] }
+  - id: star-dropped
+    kind: decision
+    tone: pressure
+    priority: 200
+    trigger: star
+    star: dropped
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    arrivalEffects:
+      - { type: conversion, target: casual, factor: 0.9, quarters: 4 }
+    defaultChoice: hold
+    choices:
+      - id: farewell
+        cost: 6
+        effects: [{ type: conversion, target: casual, factor: 1.08, quarters: 4 }]
+      - { id: hold, cost: 0, effects: [] }

@@ -22,7 +22,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 14;
+export const SAVE_FORMAT_VERSION = 15;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -137,6 +137,34 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     playerId: z.int().min(1),
     from: z.int().min(1),
     to: z.int().min(1),
+    backed: z.boolean(),
+  }),
+  z.strictObject({
+    kind: z.literal("starFinalSeason"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    playerId: z.int().min(1),
+    clubId: z.int().min(1),
+    backed: z.boolean(),
+  }),
+  z.strictObject({
+    kind: z.literal("scoringRecord"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    playerId: z.int().min(1),
+    scores: count,
+  }),
+  z.strictObject({
+    kind: z.literal("starDropped"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    playerId: z.int().min(1),
   }),
   z.strictObject({
     kind: z.literal("seatMoved"),
@@ -219,7 +247,12 @@ const flagshipSchema = z.strictObject({
       finalSeason: z.boolean(),
       retiredSeason: z.int().min(1).nullable(),
       backing: z
-        .strictObject({ season: z.int().min(1), influence: z.number().min(0).max(1) })
+        .strictObject({
+          season: z.int().min(1),
+          influence: z.number().min(0).max(1),
+          honors: z.boolean(),
+          mentee: z.int().min(1).nullable(),
+        })
         .nullable(),
       career: z.array(
         z.strictObject({ season: z.int().min(1), clubId: z.int().min(1), ...tallyFields }),
@@ -342,6 +375,57 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 14 → 15: star cards (GDD v1.16). Backings carry no honors and no mentee; earlier star moves
+  // were never backed; recorded events tell no star fact, and season cards name no players.
+  14: (save) => {
+    const flagship = save.state.flagship as Record<string, unknown>;
+    const players = (Array.isArray(flagship.players) ? flagship.players : []).map(
+      (player: Record<string, unknown>) => {
+        const backing = player.backing as Record<string, unknown> | null;
+        return {
+          ...player,
+          backing: backing && {
+            ...backing,
+            honors: backing.honors ?? false,
+            mentee: backing.mentee ?? null,
+          },
+        };
+      },
+    );
+    const landmarkList = (Array.isArray(save.state.landmarks) ? save.state.landmarks : []).map(
+      (landmark: Record<string, unknown>) =>
+        landmark.kind === "starMoved"
+          ? { ...landmark, backed: landmark.backed ?? false }
+          : landmark,
+    );
+    const events = save.state.events as Record<string, unknown>;
+    const withStar = (records: unknown) =>
+      (Array.isArray(records) ? records : []).map((record: { facts: Record<string, unknown> }) => {
+        const season = record.facts.season as Record<string, unknown> | null;
+        return {
+          ...record,
+          facts: {
+            ...record.facts,
+            season: season && {
+              ...season,
+              championPlayerId: null,
+              topScorerId: null,
+              topScorerScores: null,
+            },
+            star: null,
+          },
+        };
+      });
+    return {
+      formatVersion: 15,
+      state: {
+        ...save.state,
+        landmarks: landmarkList,
+        events: { ...events, pending: withStar(events.pending), history: withStar(events.history) },
+        flagship: { ...flagship, players },
+      },
+    };
+  },
   // 13 → 14: backing stars (GDD v1.16). Nobody is backed.
   13: (save) => {
     const flagship = save.state.flagship as Record<string, unknown>;
