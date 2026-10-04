@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.18 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram)*
+*Version 1.19 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel)*
 
 ---
 
@@ -50,6 +50,19 @@ turn. Longer turns change how often the player decides, not the economy's math.
   always stops for decision cards, seasonal windows, League Health Ladder changes (anchor always;
   others in focus countries), PP tier-ups, rival moves in focus countries, and the start of the win
   hold / the win. Interrupt list lives in config. Not required for Phase 0.
+- **Turn-based, not real-time (decided 2026-10-04, v1.19).** Real-time with pause (Paradox style)
+  was considered and rejected for the core. That model works when many fine-grained things move
+  at once and attention is the scarce resource; here spread moves by the quarter, league business
+  and seasons by the year, and decisions are few and deliberate, so a running clock would mostly
+  be waiting. Several rules are defined in turns (the decision cap, End Turn settling defaults,
+  turn length by PP tier, the win hold, every pacing target), and "choose pain" relies on
+  deliberate tradeoffs, not reflexes. The living-world feel comes from **auto-advance** instead:
+  a Play / Pause control with two or three speeds that ends turns on its own and stops on the
+  interrupt list above (plus a star who can be backed in the seasonal window, and any card that
+  needs an answer), like Football Manager's Continue or Plague Inc's speed controls. It is a
+  presentation layer over End Turn: no simulation, balance or save change, so it can be built at
+  any time. Open when it is built: the speeds, whether it is on by default, and whether the map
+  animates between auto-played turns.
 
 **Turn anatomy:**
 1. **Recap** — map animates the elapsed quarters; pickups appear; headlines.

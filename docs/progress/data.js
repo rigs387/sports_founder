@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-04",
-  design: "GDD v1.18",
+  design: "GDD v1.19",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-04",
+      type: "Design",
+      title: "Turn-based, with auto-advance",
+      text: "GDD v1.19: real-time with pause was considered and rejected for the core; spread, seasons and decisions are slow and deliberate, and the decision cap, turn length, win hold and pacing are all defined in turns. The real-time feel comes from an optional auto-advance (Play / Pause, speeds, stopping on anything that needs the player), a UI layer that can be built at any time.",
+    },
     {
       date: "2026-10-04",
       type: "Built",
@@ -296,6 +302,7 @@ window.SF_PROGRESS = {
         ["built", "Interactive map, market selection and real trends"],
         ["partial", "Map lenses: fandom and rival signals exist; the full set remains"],
         ["planned", "Animated turn recap and story pickups on the map"],
+        ["planned", "Auto-advance: Play / Pause with speeds, stopping when something needs you"],
       ],
     },
     {

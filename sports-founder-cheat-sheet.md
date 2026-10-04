@@ -76,6 +76,9 @@ the one effect only season cards use.
 Pressure drains land on arrival (paying fixes the league, never the drain); season-card cooldowns
 count in seasons.
 
+**Time (v1.19):** Turn-based, not real-time. An optional auto-advance (Play / Pause, a few speeds)
+ends turns on its own and stops whenever something needs the player; any time, low priority.
+
 **Sport identity (v1.18):** Name the sport (generated default), the founding club (a real flagship
 club in a real town of the anchor) and its ground; birthplace and ethos; what a score, match and
 season are called (preset nouns); a preset emblem. A Rulebook page in "Your sport" with almanac
