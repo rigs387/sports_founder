@@ -689,7 +689,8 @@ purchased traits and percentage modifiers alone do not make culture.
     Phase 1), with a name from invented per-language-sphere pools in the names file (or a
     regional pool where a market's sphere does not match how its people are named, e.g. Nigeria
     in the English sphere; added 2026-10-03 at build), and a hidden skill that follows a career
-    curve.
+    curve. The sport is a men's sport for now (decided 2026-10-03): every player, name pool and
+    piece of text is men's. A women's version of a sport is a much later option (parking lot).
   - *A score is the sport's one scoring unit* (decided 2026-10-03): whatever adds to a match
     result, shown with the sport's own term once founding character is built and a neutral
     "score" until then. No score types and no assists; innings sports count runs the same way.
@@ -1181,6 +1182,8 @@ Items flagged during the interview that need further discussion in future sessio
   DLC, Steam page timing, platforms. Tech plan §11 holds the current thinking.
 - Competitor analysis: a thorough Steam tag sweep (research task, not a design decision).
 - Water as a genome surface option (parked 2026-09-13).
+- Women's sports (parked 2026-10-03): a women's version of the player's sport, as an option built
+  much later. Until then every sport is men's (players, name pools, text).
 - Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to
   handle missed matches; deferred from the Phase 1 stars build.
 - Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship

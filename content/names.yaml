@@ -269,10 +269,11 @@ clubNicknames:
 # Invented flagship player names (GDD v1.16): a leading player's given and family name are drawn
 # separately from their birth country's pool, so every name is a made-up combination. Pairs that
 # would name famous real athletes or public figures were avoided when the pools were written.
-# Men's names for now. A country's pool is its primary language sphere (countries.yaml) unless
-# `countries` names a regional pool: where a language sphere does not match how people are named
-# (Nigeria is in the English sphere, Senegal in the French one). `order: familyFirst` writes the
-# family name first.
+# Men's names: every sport is men's for now (GDD v1.16, decided 2026-10-03; a women's version is
+# parked as a much later option). A country's pool is its primary language sphere
+# (countries.yaml) unless `countries` names a regional pool: where a language sphere does not
+# match how people are named (Nigeria is in the English sphere, Senegal in the French one).
+# `order: familyFirst` writes the family name first.
 playerNames:
   countries:
     gambia: west-african-anglophone

@@ -214,12 +214,12 @@ the one experiment that measures it. Every number is config (`flagship.match`, a
    language sphere in `names.yaml`, validated at load. Generated at club founding (ages spread
    18–32) and on retirement (young, peak skill leaning toward the club's rating). All on the
    flagship RNG stream; a determinism test proves the world's random sequence is unchanged.
-   *Built 2026-10-03:* 60 pools of 30 given and 30 family names (men's names): the 54 language
-   spheres plus six regional pools for markets whose sphere does not match how people are named
-   (West African anglophone, southern African, francophone African, Pacific islands, Pakistani,
-   Central Asian), mapped per country in `names.yaml`. Any active club without a leading player
-   gets one when clubs are fitted, which covers founding, expansion and old saves. Save format 11
-   (players). Replacement on retirement moves to step 4 with retirement itself.
+   *Built 2026-10-03:* 60 pools of 30 given and 30 family names (men's names; every sport is men's
+   for now): the 54 language spheres plus six regional pools for markets whose sphere does not match
+   how people are named (West African anglophone, southern African, francophone African, Pacific
+   islands, Pakistani, Central Asian), mapped per country in `names.yaml`. Any active club without a
+   leading player gets one when clubs are fitted, which covers founding, expansion and old saves.
+   Save format 11 (players). Replacement on retirement moves to step 4 with retirement itself.
 3. **Credited scores and career lines.** Each successful chance credits the leading player with
    a config probability raised by skill. Season tallies (matches, scores, playoff scores, final
    scores) become a permanent career line at season end; per-match scorers are never stored.
