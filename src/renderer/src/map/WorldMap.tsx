@@ -402,6 +402,7 @@ function MapScene(props: SceneProps) {
       host.dataset.patterns = String(current.patterns);
       host.dataset.rivals = String(current.rivals);
       host.dataset.selected = current.selected ?? "";
+      host.dataset.highlighted = current.highlighted ?? "";
       invalidate();
     };
     controller.current = {

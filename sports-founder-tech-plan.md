@@ -523,6 +523,14 @@ scrolls instead of wrapping (the top bar and the page column may shrink). The st
 steps now act on the offseason screen and check that the tabs are read-only (before, the rules
 step passed by clicking the hidden screen's controls while screenshotting the Rulebook).
 
+*Step 6 built 2026-10-05.* `src/main/popup-smoke.ts` plays on the world map to a decision and
+checks the window names its country, the map outlines it (`data-highlighted`) without moving the
+selection, a choice's full effects show on hover, a paid choice asks first and cancelling spends
+nothing, a free choice answers at once, Decide later answers nothing, the outline clears, and a
+moment toast collects; then it plays to the next offseason from the world map and checks its
+screen opens on the season's champion. Screenshots and overflow checks in both layouts. Build plan
+2.13 is complete.
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)

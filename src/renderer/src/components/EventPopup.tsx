@@ -64,6 +64,7 @@ export function EventLayer({ onHighlight }: { onHighlight: (countryId: string | 
       data-testid="event-popup"
       data-event-id={current.id}
       data-event-template={current.templateId}
+      data-country={current.countryId}
     >
       <header>
         <span className="eyebrow">

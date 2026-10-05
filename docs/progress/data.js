@@ -18,7 +18,7 @@ window.SF_PROGRESS = {
     note: "npm run check passed after cards were dated by their facts (type checks, Biome, purity, 468 tests in 44 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-05",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout.",
   },
   eventDeck: { current: 28, target: "40–60" },
   phases: [
@@ -51,14 +51,14 @@ window.SF_PROGRESS = {
     {
       system: "foundation",
       title: "Living time and the offseason",
-      text: "The first playtest loved the game but found the choice board stiff and the seasonal window never usable. Built: the offseason opens right after each season, and every card knows when it happened. A Play / Pause clock was tried and dropped (GDD v1.25): Next Turn stays. Decisions now pop up over the map after each turn, with their country outlined, and once a year the offseason screen gathers the season review and all league business. Next, the smoke and docs pass (step 6), then the flagship's broadcast (tech plan 2.12).",
-      tag: "Next build",
+      text: "The first playtest loved the game but found the choice board stiff and the seasonal window never usable. Built: the offseason opens right after each season, and every card knows when it happened. A Play / Pause clock was tried and dropped (GDD v1.25): Next Turn stays. Decisions now pop up over the map after each turn, with their country outlined, and once a year the offseason screen gathers the season review and all league business. Build plan 2.13 is complete, with a smoke test for the pop-ups and the offseason screen. Next, the flagship's broadcast (tech plan 2.12).",
+      tag: "Done",
     },
     {
       system: "leagues",
       title: "Make the flagship season matter",
       text: "How the flagship feeds global spread is decided (GDD v1.23): it broadcasts on its own, earned by season interest and league health, pulses after big seasons and ripples when it fails. Next, build it (tech plan 2.12).",
-      tag: "Then",
+      tag: "Next build",
     },
     {
       system: "creation",

@@ -9,6 +9,7 @@ import { verifyFlagship } from "./flagship-smoke";
 import { verifyRulebook } from "./identity-smoke";
 import { verifyLeagues } from "./league-smoke";
 import { verifyMap } from "./map-smoke";
+import { verifyPopups } from "./popup-smoke";
 import { verifyAmendment } from "./rules-smoke";
 import type { FilePrompts } from "./save-files";
 import { verifySaves } from "./save-smoke";
@@ -133,6 +134,7 @@ async function run(
     current.quarter > before.quarter &&
     current.playerFandomScore !== before.playerFandomScore;
   const map = await verifyMap(win, screenshot);
+  const popups = await verifyPopups(win, screenshot);
   const actions = await verifyActions(win, screenshot);
   const leagues = await verifyLeagues(win, screenshot);
   const flagship = await verifyFlagship(win, screenshot);
@@ -150,6 +152,7 @@ async function run(
     before,
     after: current,
     map,
+    popups,
     setup,
     events,
     championship,
