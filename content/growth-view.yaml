@@ -25,3 +25,13 @@ nodes:
   sponsor-showcase: { x: 624, y: 20, icon: shield }
   tabloid-buzz: { x: 624, y: 130, icon: voice }
   satellite-feed: { x: 420, y: 340, icon: radio }
+  oral-history: { x: 12, y: 40, icon: voice }
+  derby-days: { x: 12, y: 158, icon: fans }
+  supporters-trusts: { x: 12, y: 290, icon: shield }
+  club-museum: { x: 216, y: 20, icon: club }
+  hall-of-legends: { x: 216, y: 110, icon: trophy }
+  twinned-towns: { x: 216, y: 200, icon: flag }
+  heritage-listing: { x: 216, y: 330, icon: shield }
+  travelling-support: { x: 420, y: 100, icon: flag }
+  heritage-trust: { x: 420, y: 220, icon: shield }
+  living-game: { x: 420, y: 330, icon: ball }

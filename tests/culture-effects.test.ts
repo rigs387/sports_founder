@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   createCampaign,
+  cultureFactors,
   eventEffects,
   type GameState,
   PLAYER_INDEX,
@@ -147,6 +148,35 @@ describe("famous venues", () => {
     expect(pp(plain)).toBe(base);
     expect(pp(withTradition(plain, "venue", ANCHOR))).toBeCloseTo(
       base * (1 + world.config.culture.championBonus),
+    );
+  });
+});
+
+describe("the Culture category", () => {
+  it("nurtures by type: strength, protection and hold, and the fork's downside", () => {
+    const none = cultureFactors(world, [], "derby");
+    expect(none).toEqual({
+      strength: 1,
+      reach: { proximity: 1, language: 1 },
+      protection: 1,
+      hold: 1,
+    });
+    const derby = cultureFactors(world, ["derby-days"], "derby");
+    expect(derby.strength).toBeCloseTo(1.6);
+    expect(derby.hold).toBeCloseTo(1.2);
+    expect(cultureFactors(world, ["derby-days"], "venue")).toEqual(none);
+    const living = cultureFactors(world, ["supporters-trusts", "living-game"], "rite");
+    expect(living.protection).toBeCloseTo(1 - 0.4 + 0.3);
+    expect(living.reach).toEqual({ proximity: 1.5, language: 1.5 });
+  });
+
+  it("hold raises a tradition's weight: stickier fans, and harder betrayals", () => {
+    const base = createCampaign(world, setupFor(1, ANCHOR));
+    const held = withTradition(base, "derby", ANCHOR, { strength: 0.5 });
+    const index = countryIndex(world, ANCHOR);
+    expect(traditionWeights(held, world)[index]).toBeCloseTo(0.5);
+    expect(traditionWeights({ ...held, growthNodes: ["derby-days"] }, world)[index]).toBeCloseTo(
+      0.6,
     );
   });
 });

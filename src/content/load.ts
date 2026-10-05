@@ -749,10 +749,17 @@ function checkGrowthTree(world: World, sources: ContentSources, issues: ContentI
         issue(`${field}.conditions`, "Culture effects apply everywhere and take no conditions");
       if (!culture && effect.traditionType !== undefined)
         issue(`${field}.traditionType`, `only Culture effects take a tradition type`);
-      if (effect.type !== "spreadChannel" && effect.channel !== undefined) {
+      // Reach may be limited to the proximity or language links (GDD v1.22).
+      if (effect.type === "traditionReach" && effect.channel === "media")
+        issue(`${field}.channel`, "traditions reach only along proximity or language links");
+      if (
+        effect.type !== "spreadChannel" &&
+        effect.type !== "traditionReach" &&
+        effect.channel !== undefined
+      ) {
         issue(
           `${field}.channel`,
-          `only spreadChannel effects take a channel (this is ${effect.type})`,
+          `only spreadChannel and traditionReach effects take a channel (this is ${effect.type})`,
         );
       }
     });

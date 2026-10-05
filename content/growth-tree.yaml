@@ -40,6 +40,7 @@
 categories:
   grassroots: { unlockTier: 1 }
   media: { unlockTier: 2 }
+  culture: { unlockTier: 4 }
 
 limits:
   minFactor: 0.25
@@ -67,6 +68,8 @@ forks:
     nodes: [ pay-tv-exclusivity, free-to-air ]
   - id: coverage
     nodes: [ sponsor-showcase, tabloid-buzz ]
+  - id: culture-way
+    nodes: [ heritage-trust, living-game ]
 
 nodes:
   # ---- Grassroots (tier 1): proximity spread, casual conversion, league formation, churn ----------
@@ -248,3 +251,89 @@ nodes:
     effects:
       - { type: spreadChannel, channel: media, amount: 0.96 }
       - { type: ppIncome, amount: 0.08 }
+
+  # ---- Culture (tier 4, GDD v1.22): nurture traditions that exist; never create one ----------------
+  # Culture effects apply everywhere (no conditions) and may name one traditionType:
+  #   traditionStrength    bigger renewals and slower yearly decay
+  #   traditionReach       a yearly chance to gain a follower along proximity or language links
+  #                        (channel limits it to one); national names never spread
+  #   traditionProtection  less strength lost to an offending amendment
+  #   traditionHold        more weight per unit of strength: stickier fans, and harder betrayals
+  - id: oral-history
+    category: culture
+    cost: 400
+    requires: []
+    effects:
+      - { type: traditionStrength, amount: 0.3 }
+
+  - id: derby-days
+    category: culture
+    cost: 400
+    requires: []
+    effects:
+      - { type: traditionStrength, traditionType: derby, amount: 0.6 }
+      - { type: traditionHold, traditionType: derby, amount: 0.2 }
+
+  - id: supporters-trusts
+    category: culture
+    cost: 450
+    requires: []
+    effects:
+      - { type: traditionProtection, amount: 0.4 }
+
+  - id: club-museum
+    category: culture
+    cost: 450
+    requires: [ oral-history ]
+    effects:
+      - { type: traditionStrength, traditionType: rite, amount: 0.5 }
+      - { type: traditionStrength, traditionType: venue, amount: 0.5 }
+
+  - id: hall-of-legends
+    category: culture
+    cost: 450
+    requires: [ oral-history ]
+    effects:
+      - { type: traditionStrength, traditionType: legacy, amount: 0.6 }
+      - { type: traditionHold, traditionType: legacy, amount: 0.2 }
+
+  - id: travelling-support
+    category: culture
+    cost: 500
+    requires: [ derby-days ]
+    effects:
+      - { type: traditionReach, channel: proximity, amount: 0.5 }
+
+  - id: twinned-towns
+    category: culture
+    cost: 500
+    requires: [ oral-history ]
+    effects:
+      - { type: traditionReach, channel: language, amount: 0.5 }
+
+  - id: heritage-listing
+    category: culture
+    cost: 450
+    requires: [ supporters-trusts ]
+    effects:
+      - { type: traditionProtection, traditionType: venue, amount: 0.4 }
+      - { type: traditionHold, traditionType: venue, amount: 0.3 }
+
+  # The fork (choose pain): Heritage trust holds traditions harder, so fans resist every change
+  # more; Living game spreads and grows them but leaves them easier to break.
+  - id: heritage-trust
+    category: culture
+    cost: 700
+    requires: [ supporters-trusts ]
+    effects:
+      - { type: traditionProtection, amount: 0.3 }
+      - { type: traditionHold, amount: 0.3 }
+
+  - id: living-game
+    category: culture
+    cost: 700
+    requires: [ supporters-trusts ]
+    effects:
+      - { type: traditionReach, amount: 0.5 }
+      - { type: traditionStrength, amount: 0.3 }
+      - { type: traditionProtection, amount: -0.3 }

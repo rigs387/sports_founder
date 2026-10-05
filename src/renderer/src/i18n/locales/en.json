@@ -547,7 +547,17 @@
       "star-profiles": "Star Profiles",
       "sponsor-showcase": "Sponsor Showcase",
       "tabloid-buzz": "Tabloid Buzz",
-      "satellite-feed": "Satellite Feed"
+      "satellite-feed": "Satellite Feed",
+      "oral-history": "Oral History",
+      "derby-days": "Derby Days",
+      "supporters-trusts": "Supporters' Trusts",
+      "club-museum": "Club Museum",
+      "hall-of-legends": "Hall of Legends",
+      "travelling-support": "Travelling Support",
+      "twinned-towns": "Twinned Towns",
+      "heritage-listing": "Heritage Listing",
+      "heritage-trust": "Heritage Trust",
+      "living-game": "Living Game"
     },
     "board": {
       "eyebrow": "The next chapter / Your sport",
@@ -613,7 +623,11 @@
         "ppIncome": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} Prestige income",
         "runningCostReduction": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} league running costs",
         "countermoveResistance": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} rival countermove impact",
-        "spreadChannel": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} {{channel}} spread"
+        "spreadChannel": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} {{channel}} spread",
+        "traditionStrength": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} strength for {{traditions}}: bigger renewals, slower fading",
+        "traditionReach": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} reach for {{traditions}} along {{links}}",
+        "traditionProtection": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} strength {{traditions}} lose to rule changes",
+        "traditionHold": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} weight of {{traditions}}: stickier fans, harder betrayals"
       },
       "summaries": {
         "backyard-clinics": "Turn curious neighbours into first-time players.",
@@ -635,9 +649,25 @@
         "star-profiles": "Turn familiar faces into reasons to care.",
         "sponsor-showcase": "Buy protection at the expense of broad appeal.",
         "tabloid-buzz": "A bigger crowd, with less reason to stay.",
-        "satellite-feed": "Take the spectacle beyond the local signal."
+        "satellite-feed": "Take the spectacle beyond the local signal.",
+        "oral-history": "Old fans tell the young what happened here.",
+        "derby-days": "Make the big rivalry the day of the year.",
+        "supporters-trusts": "Let the faithful guard what they love.",
+        "club-museum": "Keep the shirts, the photos and the first ball.",
+        "hall-of-legends": "Name the greats, so the young know them.",
+        "travelling-support": "Fans who follow the game across the border.",
+        "twinned-towns": "Towns that share a language share a tradition.",
+        "heritage-listing": "Protect the famous grounds by law.",
+        "heritage-trust": "Hold every tradition fast, and every change hurts more.",
+        "living-game": "Let traditions grow and travel, and break more easily."
       },
-      "tileCost": "{{cost, number(notation: compact; maximumFractionDigits: 1)}} PP"
+      "tileCost": "{{cost, number(notation: compact; maximumFractionDigits: 1)}} PP",
+      "reachLinks": {
+        "proximity": "borders and sea links",
+        "language": "language links",
+        "both": "borders, sea and language links"
+      },
+      "allTraditions": "every tradition"
     }
   },
   "genome": {
@@ -1276,5 +1306,23 @@
     "inForce": "In force",
     "amend": "Amend",
     "changeShort": "Change"
+  },
+  "culture": {
+    "types": {
+      "derby": "derby",
+      "rite": "club rite",
+      "legacy": "star legacy",
+      "nationalName": "national name",
+      "venue": "famous ground",
+      "trophy": "trophy"
+    },
+    "typesPlural": {
+      "derby": "derbies",
+      "rite": "club rites",
+      "legacy": "star legacies",
+      "nationalName": "national names",
+      "venue": "famous grounds",
+      "trophy": "trophies"
+    }
   }
 }

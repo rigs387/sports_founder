@@ -3,7 +3,7 @@ import { yearOfQuarter } from "./calendar";
 import { tidyName } from "./identity";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
-import { createRngState } from "./rng";
+import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import {
   type AxisId,
   type Club,
@@ -94,15 +94,23 @@ export const living = (tradition: Tradition) => tradition.lost === null;
 export interface CultureFactors {
   /** Multiplies renewals and divides yearly decay. */
   strength: number;
-  /** The bonus above 1 sets the yearly chance to gain a follower; 1 means no reach. */
-  reach: number;
+  /**
+   * The bonus above 1 sets the yearly chance to gain a follower along proximity or language
+   * links; 1 means no reach that way.
+   */
+  reach: { proximity: number; language: number };
   /** Multiplies the strength an offending amendment or seat move takes. */
   protection: number;
   /** Multiplies a tradition's weight in its countries (stickiness and betrayal alike). */
   hold: number;
 }
 
-const NO_CULTURE: CultureFactors = { strength: 1, reach: 1, protection: 1, hold: 1 };
+const NO_CULTURE: CultureFactors = {
+  strength: 1,
+  reach: { proximity: 1, language: 1 },
+  protection: 1,
+  hold: 1,
+};
 
 /** The owned Culture nodes' factors on a tradition type (global: Culture effects take no conditions). */
 export function cultureFactors(
@@ -111,21 +119,26 @@ export function cultureFactors(
   type: TraditionType,
 ): CultureFactors {
   if (owned.length === 0) return NO_CULTURE;
-  const totals = { strength: 0, reach: 0, protection: 0, hold: 0 };
+  const totals = { strength: 0, proximity: 0, language: 0, protection: 0, hold: 0 };
   for (const nodeId of owned) {
     const node = world.growthTree.nodes.find((n) => n.id === nodeId);
     for (const effect of node?.effects ?? []) {
       if (effect.traditionType !== undefined && effect.traditionType !== type) continue;
       if (effect.type === "traditionStrength") totals.strength += effect.amount;
-      else if (effect.type === "traditionReach") totals.reach += effect.amount;
-      else if (effect.type === "traditionProtection") totals.protection += effect.amount;
+      else if (effect.type === "traditionReach") {
+        if (effect.channel !== "language") totals.proximity += effect.amount;
+        if (effect.channel !== "proximity") totals.language += effect.amount;
+      } else if (effect.type === "traditionProtection") totals.protection += effect.amount;
       else if (effect.type === "traditionHold") totals.hold += effect.amount;
     }
   }
   const floor = world.growthTree.limits.minFactor;
   return {
     strength: Math.max(floor, 1 + totals.strength),
-    reach: Math.max(1, 1 + totals.reach),
+    reach: {
+      proximity: Math.max(1, 1 + totals.proximity),
+      language: Math.max(1, 1 + totals.language),
+    },
     protection: Math.max(floor, 1 - totals.protection),
     hold: Math.max(floor, 1 + totals.hold),
   };
@@ -193,11 +206,14 @@ class CultureUpdate {
   nextId: number;
   naming: number | null = null;
 
+  readonly rng: Rng;
+
   constructor(
     readonly state: GameState,
     readonly world: World,
   ) {
-    this.traditions = state.culture.traditions.map((t) => ({ ...t }));
+    this.rng = restoreRng(state.culture.rng);
+    this.traditions = state.culture.traditions.map((t) => ({ ...t, followers: [...t.followers] }));
     this.nextId = state.culture.nextId;
   }
 
@@ -477,11 +493,53 @@ class CultureUpdate {
           continue;
         }
       }
-      if (tradition.renewedYear >= year) continue;
-      const { strength } = cultureFactors(world, state.growthNodes, tradition.type);
-      tradition.strength = Math.max(0, tradition.strength - this.config.decayPerYear / strength);
-      if (tradition.strength <= 1e-9) this.lose(tradition, "faded");
+      if (tradition.renewedYear < year) {
+        const { strength } = cultureFactors(world, state.growthNodes, tradition.type);
+        tradition.strength = Math.max(0, tradition.strength - this.config.decayPerYear / strength);
+        if (tradition.strength <= 1e-9) {
+          this.lose(tradition, "faded");
+          continue;
+        }
+      }
+      this.reachOut(tradition);
     }
+  }
+
+  /**
+   * Reach (Culture nodes only): a tradition at full strength at home may gain one follower a
+   * year, a country linked to a follower by a channel the nodes reach along, where the player has
+   * enough hardcore fans. National names never spread.
+   */
+  reachOut(tradition: Tradition): void {
+    const { state, world } = this;
+    const { reach } = this.config;
+    if (tradition.type === "nationalName" || tradition.strength < reach.minStrength) return;
+    const bonus = cultureFactors(world, state.growthNodes, tradition.type).reach;
+    if (bonus.proximity <= 1 && bonus.language <= 1) return;
+    const roll = nextFloat(this.rng);
+    const pick = nextFloat(this.rng);
+    const followers = new Set(
+      tradition.followers.map((id) => world.countries.findIndex((c) => c.id === id)),
+    );
+    const candidates: { index: number; chance: number }[] = [];
+    world.countries.forEach((country, index) => {
+      if (followers.has(index)) return;
+      const hardcore = state.countries[index]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
+      if (hardcore < reach.minHardcoreShare * country.population) return;
+      let best = 0;
+      for (const link of world.inbound[index] ?? []) {
+        if (!followers.has(link.source)) continue;
+        if (link.proximity > 0) best = Math.max(best, bonus.proximity - 1);
+        if (link.language > 0) best = Math.max(best, bonus.language - 1);
+      }
+      if (best > 0) candidates.push({ index, chance: reach.chancePerReach * best });
+    });
+    if (candidates.length === 0) return;
+    const chance = Math.min(1, Math.max(...candidates.map((c) => c.chance)));
+    if (roll >= chance) return;
+    const chosen = candidates[Math.floor(pick * candidates.length)];
+    const country = chosen && world.countries[chosen.index];
+    if (country) tradition.followers.push(country.id);
   }
 }
 
@@ -542,6 +600,7 @@ export function updateCulture(state: GameState, world: World): GameState {
     landmarks: landmarksNow,
     culture: {
       ...state.culture,
+      rng: saveRng(update.rng),
       landmarkCursor: landmarksNow.length,
       year: Math.max(state.culture.year, lastYear),
       traditions: update.traditions,

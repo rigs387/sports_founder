@@ -1,7 +1,7 @@
 import { uniformFloat64 } from "pure-rand/distribution/uniformFloat64";
 import { uniformInt } from "pure-rand/distribution/uniformInt";
 import { xoroshiro128plus } from "pure-rand/generator/xoroshiro128plus";
-import { GENOME_AXES, RULE_AXES } from "../content";
+import { GENOME_AXES, RULE_AXES, TRADITION_EFFECT_TYPES, type TraditionType } from "../content";
 import {
   type Action,
   amendBlocker,
@@ -20,6 +20,7 @@ import {
   type GameState,
   growthFactorsAt,
   growthNode,
+  heldStrength,
   leverMultipliers,
   mediaRevenueFactor,
   nodeCost,
@@ -196,6 +197,19 @@ export function nodeValue(
 ): number {
   const node = growthNode(world, nodeId);
   const { casualWeight } = world.config.fandomScore;
+  // Culture effects (GDD v1.22) act only on traditions that exist: each counts by the strength of
+  // the traditions of its type held in a country, as a share of a full weight there.
+  const held = new Map<string, number[]>();
+  const heldOf = (type: TraditionType | undefined) => {
+    const key = type ?? "all";
+    let list = held.get(key);
+    if (!list) {
+      const traditions = state.culture.traditions.filter((t) => !type || t.type === type);
+      list = heldStrength(traditions, state, world).map((h) => h / world.config.culture.weightCap);
+      held.set(key, list);
+    }
+    return list;
+  };
   let value = 0;
   state.countries.forEach((country, index) => {
     if (onlyCountry !== undefined && index !== onlyCountry) return;
@@ -204,7 +218,11 @@ export function nodeValue(
     if (!fans || !attributes) return;
     const weight = fans.hardcore + fans.casual * casualWeight;
     if (weight <= 0) return;
-    for (const effect of node.effects) value += weight * effectValue(effect, attributes);
+    for (const effect of node.effects) {
+      const culture = TRADITION_EFFECT_TYPES.includes(effect.type);
+      const share = culture ? (heldOf(effect.traditionType)[index] ?? 0) : 1;
+      value += weight * effectValue(effect, attributes) * share;
+    }
   });
   return value;
 }

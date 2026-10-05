@@ -9,7 +9,7 @@ import {
   seasonFacts,
   updateCulture,
 } from "../src/sim";
-import { clubIds, fresh, ofType, withSeason } from "./culture-helpers";
+import { clubIds, fresh, ofType, withSeason, withTradition } from "./culture-helpers";
 import { world } from "./helpers";
 
 // Culture, first build (GDD v1.22): traditions as cards.
@@ -91,5 +91,38 @@ describe("stoking a repeat final", () => {
     ]);
     expect(ofType(updateCulture(stoked, world), "derby")).toHaveLength(1);
     expect(ofType(updateCulture(state, world), "derby")).toHaveLength(0);
+  });
+});
+
+describe("the Culture category: reach", () => {
+  /** England with a full-strength derby and fans across the region, ten years on. */
+  function tenYears(nodes: string[]): GameState {
+    const base = fresh("beach", 3);
+    let state: GameState = {
+      ...withTradition(base, "derby", "england", { renewedYear: 9999 }),
+      growthNodes: nodes,
+      countries: base.countries.map((country) => ({
+        ...country,
+        fans: country.fans.map((f, s) =>
+          s === PLAYER_INDEX ? { ...f, hardcore: Math.max(f.hardcore, 1_000_000) } : f,
+        ),
+      })),
+    };
+    for (let year = 0; year < 10; year += 1)
+      state = updateCulture({ ...state, quarter: state.quarter + 4 }, world);
+    return state;
+  }
+
+  it("spreads followers only with reach nodes, and only along the links they name", () => {
+    expect(ofType(tenYears([]), "derby")[0]?.followers).toEqual(["england"]);
+    const followers = ofType(tenYears(["derby-days", "travelling-support"]), "derby")[0]?.followers;
+    expect(followers?.length).toBeGreaterThan(1);
+    // Travelling support reaches along borders and sea links only.
+    const index = new Map(world.countries.map((c, i) => [c.id, i]));
+    const followerIndexes = new Set((followers ?? []).map((id) => index.get(id)));
+    for (const id of followers?.slice(1) ?? []) {
+      const links = world.inbound[index.get(id) ?? -1] ?? [];
+      expect(links.some((l) => l.proximity > 0 && followerIndexes.has(l.source))).toBe(true);
+    }
   });
 });

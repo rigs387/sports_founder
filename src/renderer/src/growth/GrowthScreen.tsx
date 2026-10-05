@@ -23,7 +23,9 @@ function Effects({ effects }: { effects: NodeEffect[] }) {
     <ul className="growth-effects">
       {effects.map((effect, index) => {
         const reduction =
-          effect.type.endsWith("Reduction") || effect.type === "countermoveResistance";
+          effect.type.endsWith("Reduction") ||
+          effect.type === "countermoveResistance" ||
+          effect.type === "traditionProtection";
         const value = effect.amount * (reduction ? -1 : 1);
         const attributes = Object.keys(effect.conditions ?? {}).map((attribute) =>
           t(`growth.board.attributes.${attribute}`),
@@ -43,6 +45,11 @@ function Effects({ effects }: { effects: NodeEffect[] }) {
               {t(`growth.board.effects.${effect.type}`, {
                 value,
                 channel: t(`growth.board.channels.${effect.channel ?? "proximity"}`),
+                // Culture effects (GDD v1.22) name the traditions and links they act on.
+                traditions: effect.traditionType
+                  ? t(`culture.typesPlural.${effect.traditionType}`)
+                  : t("growth.board.allTraditions"),
+                links: t(`growth.board.reachLinks.${effect.channel ?? "both"}`),
               })}
               {attributes.length > 0 && (
                 <small>
