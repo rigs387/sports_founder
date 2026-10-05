@@ -3,7 +3,9 @@ import {
   createCampaign,
   type GameState,
   landmarks,
+  ruleTraits,
   type SeasonSummary,
+  type Tradition,
 } from "../src/sim";
 import { setupFor, world } from "./helpers";
 
@@ -79,3 +81,37 @@ export function fresh(birthplace = "schoolyard", seed = 11): GameState {
 export const clubIds = (state: GameState) => activeClubs(state.flagship).map((c) => c.id);
 export const ofType = (state: GameState, type: string) =>
   state.culture.traditions.filter((t) => t.type === type);
+
+/** A state holding one living tradition (built directly, for effect tests). */
+export function withTradition(
+  state: GameState,
+  type: Tradition["type"],
+  countryId: string,
+  extra: Partial<Tradition> = {},
+): GameState {
+  const tradition: Tradition = {
+    id: state.culture.nextId,
+    type,
+    countryId,
+    clubIds: [],
+    playerId: null,
+    name: null,
+    seasons: [],
+    rules: ruleTraits(state.genome),
+    bornTurn: state.turn,
+    bornQuarter: state.quarter,
+    strength: 1,
+    renewedYear: state.culture.year + 1,
+    followers: [countryId],
+    lost: null,
+    ...extra,
+  };
+  return {
+    ...state,
+    culture: {
+      ...state.culture,
+      traditions: [...state.culture.traditions, tradition],
+      nextId: tradition.id + 1,
+    },
+  };
+}

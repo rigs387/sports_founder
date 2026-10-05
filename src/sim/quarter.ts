@@ -1,5 +1,6 @@
 import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { reclaimShare, rivalConversionBoosts } from "./countermoves";
+import { traditionShelter, traditionWeights, venueStrength } from "./culture";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
 import { backingEffects, stepFlagshipQuarter } from "./flagship";
@@ -56,6 +57,10 @@ import {
 // with no random rolls. They stay casual about the player's sport, as poached fans do.
 // Hardcore poaching (src/sim/poaching.ts): every sport's hardcore fans demote to casual about the
 // same sport at a rate set by the sports pulling on them.
+// Traditions (GDD v1.22, src/sim/culture.ts) shelter the player's hardcore fans where they are
+// held: by up to culture.turnoverCut of generational turnover and culture.poachCut of rival
+// poaching and reclaim, scaled by the country's tradition weight; famous grounds draw pilgrims
+// (casual conversion) into their country.
 // Generational turnover (GDD Late-Game Pressure): the player's and every rival's hardcore fans above
 // a floor age out at a small annual rate and demote to casual about the same sport. The "other
 // sports" bucket is exempt: it is a fixed backdrop that never recruits, so aging would only erode it.
@@ -83,6 +88,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
   const quarter = state.quarter + 1;
   const found: Landmark[] = [];
   const backing = backingEffects(state.flagship, world);
+  const traditions = traditionWeights(state, world);
   const tournaments = new Map(
     state.sports.map((sport) => [sport.id, activeTournament(sport.id, state.quarter, config)]),
   );
@@ -126,7 +132,9 @@ export function stepQuarter(state: GameState, world: World): GameState {
         (countryExposure.focused ? config.focus.conversionMultiplier : 1) *
         factors.casualConversion *
         eventRates.casual *
-        (country.id === backing.countryId ? backing.casualConversion : 1),
+        (country.id === backing.countryId ? backing.casualConversion : 1) *
+        // Pilgrimage to a famous ground (GDD v1.22).
+        (1 + config.culture.pilgrimage * venueStrength(state, country.id)),
       casualChurn:
         (config.dynamics.player.casualChurnRate +
           config.dynamics.player.casualDecayRate *
@@ -148,6 +156,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
       playerRates,
       factors,
       tournaments,
+      traditionShelter(traditions[index] ?? 0, world),
       config,
       rng,
     );
@@ -243,6 +252,7 @@ function stepCountryFans(
   playerRates: PlayerRates,
   factors: GrowthFactors,
   tournaments: ReadonlyMap<string, Tournament | null>,
+  shelter: { turnover: number; poaching: number },
   config: Config,
   rng: Rng,
 ): CountryState {
@@ -267,13 +277,15 @@ function stepCountryFans(
     const poached = drawFlow(
       rng,
       poachableHardcore(fans.hardcore, population, config),
-      poaching[index] ?? 0,
+      (poaching[index] ?? 0) * (sport.kind === "player" ? shelter.poaching : 1),
       noise,
     );
     const agedOut = drawFlow(
       rng,
       Math.max(0, fans.hardcore - poached - turnoverFloor),
-      sport.kind === "other" ? 0 : turnoverRate,
+      sport.kind === "other"
+        ? 0
+        : turnoverRate * (sport.kind === "player" ? shelter.turnover : 1),
       noise,
     );
     const hardcoreLoss = poached + agedOut;
@@ -357,7 +369,8 @@ function stepCountryFans(
   const reclaimed = moved.map((fans, index) => {
     const sport = sports[index];
     if (sport?.kind !== "rival" || available <= 0) return 0;
-    const share = reclaimShare(countryState, sport.id, config, factors.countermoveEffect);
+    const share =
+      reclaimShare(countryState, sport.id, config, factors.countermoveEffect) * shelter.poaching;
     // Never more people than are not already the rival's hardcore fans.
     const room = population - fans.hardcore;
     const won = Math.min(available, Math.round(reclaimable * share), room);

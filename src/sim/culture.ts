@@ -591,3 +591,44 @@ export function cultureProblems(state: GameState, world: World): string[] {
       problems.push("culture: a derby stoke names unknown clubs");
   return problems;
 }
+
+// ---- Effects (GDD v1.22: traditions help and constrain) --------------------------------------
+
+/**
+ * Each country's tradition weight (content order): the strength of every living tradition its
+ * fans hold (abroad at reach.followerShare), × the Culture nodes' hold on its type, capped.
+ */
+export function traditionWeights(
+  state: Pick<GameState, "culture" | "growthNodes">,
+  world: World,
+): number[] {
+  const { weightCap, reach } = world.config.culture;
+  const weights = world.countries.map(() => 0);
+  if (state.culture.traditions.length === 0) return weights;
+  const index = new Map(world.countries.map((country, i) => [country.id, i]));
+  for (const tradition of state.culture.traditions) {
+    if (!living(tradition)) continue;
+    const { hold } = cultureFactors(world, state.growthNodes, tradition.type);
+    tradition.followers.forEach((countryId, f) => {
+      const i = index.get(countryId);
+      if (i === undefined) return;
+      const share = f === 0 ? 1 : reach.followerShare;
+      weights[i] = (weights[i] ?? 0) + tradition.strength * share * hold;
+    });
+  }
+  return weights.map((weight) => Math.min(weightCap, weight));
+}
+
+/** How much of the player's hardcore loss to aging, poaching and reclaim remains at a weight. */
+export function traditionShelter(weight: number, world: World) {
+  const { weightCap, turnoverCut, poachCut } = world.config.culture;
+  const level = Math.min(1, weight / weightCap);
+  return { turnover: 1 - turnoverCut * level, poaching: 1 - poachCut * level };
+}
+
+/** The strength of the living famous venues at home in a country. */
+export function venueStrength(state: Pick<GameState, "culture">, countryId: string): number {
+  return state.culture.traditions
+    .filter((t) => t.type === "venue" && living(t) && t.countryId === countryId)
+    .reduce((sum, t) => sum + t.strength, 0);
+}

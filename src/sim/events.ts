@@ -1,5 +1,6 @@
 import type { EventEffect, EventTemplate } from "../content";
 import { costMultiplier } from "./calendar";
+import { venueStrength } from "./culture";
 import type { EventRecord, EventState } from "./events-state";
 import { activeClubs, moveClubRatings } from "./flagship";
 import { seasonFacts, seasonStories } from "./season-stories";
@@ -226,11 +227,15 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   };
 }
 
-/** A card's effects for one answer. The champion moment's PP follows the league tier (config). */
+/**
+ * A card's effects for one answer. The champion moment's PP follows the league tier (config),
+ * raised by the famous grounds of the league's country (GDD v1.22).
+ */
 export function eventEffects(
+  state: Pick<GameState, "culture">,
   world: World,
   card: EventTemplate,
-  event: Pick<EventRecord, "facts">,
+  event: Pick<EventRecord, "facts" | "countryId">,
   choiceId: string | null,
 ): EventEffect[] {
   if (choiceId !== null)
@@ -238,7 +243,9 @@ export function eventEffects(
   if (card.star === "breakout")
     return [{ type: "pp", amount: breakoutPP(world, event) }, ...card.effects];
   if (card.story !== "champion") return card.effects;
-  const amount = world.config.flagship.stories.championPP[event.facts.leagueTier ?? "amateur"];
+  const base = world.config.flagship.stories.championPP[event.facts.leagueTier ?? "amateur"];
+  const fame = Math.min(1, venueStrength(state, event.countryId));
+  const amount = base * (1 + world.config.culture.championBonus * fame);
   return [{ type: "pp", amount }, ...card.effects];
 }
 export function eventChoiceCost(
@@ -275,7 +282,7 @@ export function eventBlocker(
     return "choice";
   if (state.pp < eventChoiceCost(state, world, card, choiceId)) return "prestige";
   const country = state.countries.find((c) => c.countryId === event.countryId);
-  for (const effect of eventEffects(world, card, event, choiceId)) {
+  for (const effect of eventEffects(state, world, card, event, choiceId)) {
     if (effect.type === "leagueHealth" && !country?.league) return "league";
     // The champion must still play in the commissioner's league (the seat may have gone home).
     if (
@@ -394,7 +401,7 @@ export function resolveEvent(
   const card = world.events.cards.find((c) => c.id === event?.templateId);
   if (!event || !card) throw new Error("Missing event");
   const cost = eventChoiceCost(state, world, card, choiceId);
-  const effects = eventEffects(world, card, event, choiceId);
+  const effects = eventEffects(state, world, card, event, choiceId);
   const ppGained = effects.reduce(
     (sum, effect) => sum + (effect.type === "pp" ? effect.amount : 0),
     0,
@@ -435,7 +442,7 @@ export function eventSnapshots(state: GameState, world: World) {
       tone: card.tone,
       story: card.story,
       star: card.star,
-      effects: eventEffects(world, card, event, null),
+      effects: eventEffects(state, world, card, event, null),
       arrivalEffects: card.arrivalEffects,
       defaultChoice: card.defaultChoice,
       choices: card.choices.map((choice) => ({
