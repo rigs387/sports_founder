@@ -62,6 +62,14 @@ export async function verifyMap(win: BrowserWindow, screenshot: (name: string) =
     evaluate<{ x: number; y: number; cardLeft: number }>(
       `(() => {const map=document.querySelector('[data-testid="world-map"]');const box=map.getBoundingClientRect();return {x:Math.round(box.x+Number(map.dataset.selectedX)),y:Math.round(box.y+Number(map.dataset.selectedY)),cardLeft:document.querySelector('[data-testid="country-card"]').getBoundingClientRect().left};})()`,
     );
+  // Pending decisions pop up over the map (GDD v1.25); set them aside so physical clicks reach it.
+  for (let i = 0; i < 6; i += 1) {
+    const later = await evaluate<boolean>(
+      `(() => { const b=document.querySelector('[data-testid="event-popup-later"]'); b?.click(); return !!b; })()`,
+    );
+    if (!later) break;
+    await flush();
+  }
   await select("brazil");
   const brazil = await target();
   await evaluate(`document.querySelector('.card-close').click()`);

@@ -506,6 +506,15 @@ and league-pressure cards (judged then). The field already existed, so the save 
 unchanged; records from before keep the turn's end. The snapshot passes it through. With the
 clock gone, the pop-ups use it to order a turn's cards and to date them.
 
+*Step 4 built 2026-10-05.* `EventLayer` (renderer) shows the next unanswered decision as a window
+over the world view, oldest fact first, dated by its quarter; choices are buttons with their first
+effect line and the full list on hover or focus, a confirm only when a choice costs PP, and
+"Decide later" sets a card aside for the turn. The card's country is outlined in its own colour
+(the selection is untouched: selecting it switched the country card away from the player's own
+choice) and the window docks on the half of the map away from it. Once no decision waits, moments
+show as toasts (three at most) that collect on click. The board's card words moved to a shared
+`event-text.tsx`. The map smoke sets pending cards aside before its physical clicks.
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)

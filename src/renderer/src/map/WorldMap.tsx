@@ -27,6 +27,8 @@ interface Props {
   countryNames: Record<string, string>;
   snapshot: TurnSnapshot;
   selected: string | null;
+  /** The country of the card popped up over the map (GDD v1.25), outlined apart from the selection. */
+  highlighted: string | null;
   command: MapCommand;
   patterns: boolean;
   rivals: boolean;
@@ -39,7 +41,10 @@ interface SceneProps extends Props {
 }
 interface MapController {
   update: (
-    state: Pick<Props, "snapshot" | "selected" | "patterns" | "rivals" | "countryNames">,
+    state: Pick<
+      Props,
+      "snapshot" | "selected" | "highlighted" | "patterns" | "rivals" | "countryNames"
+    >,
   ) => void;
   command: (command: MapCommand) => void;
 }
@@ -167,6 +172,9 @@ function MapScene(props: SceneProps) {
     const selectedLand = new Graphics();
     selectedLand.eventMode = "none";
     viewport.addChild(selectedLand);
+    const highlightedLand = new Graphics();
+    highlightedLand.eventMode = "none";
+    viewport.addChild(highlightedLand);
     const markers = new Graphics();
     markers.eventMode = "none";
     viewport.addChild(markers);
@@ -351,6 +359,7 @@ function MapScene(props: SceneProps) {
       for (const { id, label } of countryLabels) label.text = current.countryNames[id] ?? id;
       rivalMarks.clear();
       selectedLand.clear();
+      highlightedLand.clear();
       for (const entry of entries) {
         if (!entry.shape.market) continue;
         const country = countries.get(entry.shape.market);
@@ -368,6 +377,13 @@ function MapScene(props: SceneProps) {
         if (entry.shape.market === current.selected) {
           for (const polygon of entry.shape.polygons)
             selectedLand.poly(polygon.outer).stroke({ color: color("--accent"), width: 2 });
+        }
+        if (entry.shape.market === current.highlighted) {
+          for (const polygon of entry.shape.polygons)
+            highlightedLand
+              .poly(polygon.outer)
+              .fill({ color: color("--highlight"), alpha: 0.25 })
+              .stroke({ color: color("--highlight"), width: 3 });
         }
       }
       if (current.rivals)
@@ -430,10 +446,18 @@ function MapScene(props: SceneProps) {
       snapshot: props.snapshot,
       countryNames: props.countryNames,
       selected: props.selected,
+      highlighted: props.highlighted,
       patterns: props.patterns,
       rivals: props.rivals,
     });
-  }, [props.snapshot, props.selected, props.patterns, props.rivals, props.countryNames]);
+  }, [
+    props.snapshot,
+    props.selected,
+    props.highlighted,
+    props.patterns,
+    props.rivals,
+    props.countryNames,
+  ]);
   useEffect(() => {
     controller.current?.command(props.command);
   }, [props.command]);

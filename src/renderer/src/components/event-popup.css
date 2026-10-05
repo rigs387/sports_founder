@@ -1,0 +1,241 @@
+/* Event windows over the map and moment toasts (GDD v1.25). */
+.event-popup {
+  position: absolute;
+  z-index: 4;
+  top: 96px;
+  width: min(540px, calc(100% - 400px));
+  padding: 20px 22px 16px;
+  color: var(--ink);
+  background: linear-gradient(125deg, #fff 55%, #eef8f5);
+  border: 2px solid #2d5482;
+  border-radius: 12px;
+  box-shadow:
+    0 6px 0 #2d5482,
+    0 18px 40px rgb(16 40 70 / 0.28);
+}
+.event-popup.dock-left {
+  left: 24px;
+}
+.event-popup.dock-right {
+  right: 350px;
+}
+.event-popup.is-pressure {
+  border-color: #a1533c;
+  box-shadow:
+    0 6px 0 #a1533c,
+    0 18px 40px rgb(16 40 70 / 0.28);
+}
+.event-popup > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #c6d8e4;
+}
+.event-popup > header small {
+  color: #66879c;
+  font-size: 11px;
+  font-weight: 800;
+}
+.event-popup h3 {
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  margin: 12px 0 10px;
+}
+.event-popup > p {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+.event-popup-arrived {
+  margin: 4px 0 10px;
+  padding: 10px 14px;
+  font-size: 12px;
+  background: #fbefe9;
+  border: 1px solid #dcb2a4;
+  border-radius: 8px;
+}
+.event-popup-arrived ul,
+.event-popup-detail ul {
+  margin: 6px 0 0;
+  padding-left: 16px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.event-popup-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.event-popup-choice {
+  position: relative;
+}
+.event-popup-choice > button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 12px 13px;
+  text-align: left;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #bdccdf;
+  border-radius: 10px;
+  box-shadow: 0 3px 0 #bfd0dc;
+  cursor: pointer;
+}
+.event-popup-choice > button:hover:enabled,
+.event-popup-choice > button:focus-visible,
+.event-popup-choice > button[aria-pressed="true"] {
+  border-color: #2764df;
+  box-shadow: 0 3px 0 #2764df;
+}
+.event-popup-choice > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.choice-name {
+  font-size: 14px;
+  font-weight: 800;
+}
+.event-popup-choice b {
+  font-size: 11px;
+  color: #2c66c8;
+}
+.choice-line {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.choice-more {
+  color: #66879c;
+}
+/* The full effects, on hover or keyboard focus. */
+.event-popup-detail {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  display: none;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #2764df;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgb(16 40 70 / 0.2);
+}
+.event-popup-choice:hover .event-popup-detail,
+.event-popup-choice:focus-within .event-popup-detail {
+  display: block;
+}
+.event-popup-detail p {
+  margin: 6px 0 0;
+  font-size: 11px;
+}
+.event-popup-confirm {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  background: #e6edff;
+  border: 1px solid #7196df;
+  border-radius: 10px;
+}
+.event-popup-confirm > div {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.event-popup > footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+}
+.event-popup > footer small {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #526e82;
+}
+.event-popup-later {
+  flex: none;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #2d5482;
+  background: transparent;
+  border: 1px solid #2d5482;
+  border-radius: 8px;
+}
+
+.moment-toasts {
+  position: absolute;
+  z-index: 3;
+  left: 24px;
+  top: 220px;
+  display: grid;
+  gap: 8px;
+  width: 260px;
+}
+.moment-toast {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  text-align: left;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #abc7bd;
+  border-left: 4px solid #548d83;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgb(16 40 70 / 0.15);
+  cursor: pointer;
+}
+.moment-toast .moment-where {
+  font-size: 10px;
+  font-weight: 700;
+  color: #5e768a;
+}
+.moment-toast strong {
+  font-size: 13px;
+}
+.moment-collect {
+  justify-self: end;
+  font-size: 11px;
+  font-weight: 800;
+  color: #326d61;
+}
+.moment-more {
+  margin: 0;
+  font-size: 11px;
+  color: #526e82;
+}
+
+@media (max-width: 850px) {
+  .event-popup.dock-left,
+  .event-popup.dock-right {
+    position: fixed;
+    top: auto;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .moment-toasts {
+    position: fixed;
+    z-index: 4;
+    top: auto;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+}

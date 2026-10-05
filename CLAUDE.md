@@ -128,6 +128,12 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   full year, so seasons end on turn boundaries). A bare `stepQuarter` closes it first, as a
   quarter-length turn would; `endTurn` holds one that opens mid-turn. League business (promotion,
   amendments, backing, the seat, the trophy) happens only while it is open.
+- Event windows (GDD v1.25) are `EventLayer` in `src/renderer/src/components/EventPopup.tsx`: on the
+  world view, a turn's unanswered decisions pop up one at a time over the map in the order their
+  facts happened (the record's `quarter`), docked away from the card's country, which the map
+  outlines (`highlighted`) without changing the player's selection. "Decide later" leaves a card to
+  the board and Next Turn's free default. With no decision waiting, moments show as toasts that
+  collect on click. Card words come from `event-text.tsx`, shared with the board (the journal).
 - Flagship seasons reach the player as event cards (GDD v1.15): `src/sim/season-stories.ts` reads
   the recorded `SeasonSummary` (thresholds in `config.flagship.stories`), and `offerSeasonCards` in
   `src/sim/events.ts` offers the champion moment and at most one story card before other cards.

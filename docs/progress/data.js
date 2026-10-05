@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "foundation",
       title: "Living time and the offseason",
-      text: "The first playtest loved the game but found the choice board stiff and the seasonal window never usable. Built: the offseason opens right after each season, and every card knows when it happened. A Play / Pause clock was tried and dropped (GDD v1.25): Next Turn stays. Next, decisions pop up over the map after each turn (tech plan 2.13 step 4), then the offseason screen.",
+      text: "The first playtest loved the game but found the choice board stiff and the seasonal window never usable. Built: the offseason opens right after each season, and every card knows when it happened. A Play / Pause clock was tried and dropped (GDD v1.25): Next Turn stays. Decisions now pop up over the map after each turn, in the order they happened, with their country outlined (step 4). Next, the offseason screen (step 5).",
       tag: "Next build",
     },
     {
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-05",
+      type: "Built",
+      title: "Decisions pop up over the map",
+      text: "Tech plan 2.13 step 4 (GDD v1.25): after Next Turn, each decision appears as a window over the map, oldest first and dated, its country outlined beside it. Choices are buttons with a one-line effect and the full detail on hover; only paid choices ask to confirm; Decide later leaves a card to the board. Moments become toasts collected with a click. The board stays as the journal.",
+    },
     {
       date: "2026-10-05",
       type: "Review",
@@ -466,6 +472,7 @@ window.SF_PROGRESS = {
         ["built", "Fact-based triggers and validated effect vocabulary"],
         ["built", "Decision costs, local effects, expiry and safe defaults"],
         ["built", "Reward collection, journal and saved pending cards"],
+        ["built", "Decisions pop up over the map after each turn; moments as toasts (GDD v1.25)"],
         [
           "partial",
           "Event library: 26 of a planned 40–60 cards (8 season, 8 star, 2 rival contest cards)",

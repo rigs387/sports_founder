@@ -1,73 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { EventEffect } from "../../../content";
 import type { EventRecord } from "../../../sim";
-import { useTraditionWords } from "../culture/traditions";
-import { PLAIN_TERMS, useTermVars } from "../identity/terms";
 import { useGameStore } from "../state/game-store";
 import { ActionFeedback } from "./ActionFeedback";
+import { Effect, useEventText } from "./event-text";
 import "./events.css";
-
-/** Names and numbers a star effect's line needs (GDD v1.16). */
-interface StarValues {
-  candidate?: string;
-  cash?: number;
-}
-
-function Effect({ effect, star = {} }: { effect: EventEffect; star?: StarValues }) {
-  const { t } = useTranslation();
-  const { snapshot } = useGameStore();
-  const termVars = useTermVars(snapshot?.identity.terms ?? PLAIN_TERMS);
-  if (effect.type === "starHonors" || effect.type === "starMentor" || effect.type === "starKeep") {
-    const stars = snapshot?.flagship.starRules;
-    return (
-      <li>
-        {t(`events.effects.${effect.type}`, {
-          ...termVars({ seasons: stars?.afterglowSeasons ?? 0 }),
-          seasons: stars?.afterglowSeasons ?? 0,
-          share: stars?.mentorShare ?? 0,
-          candidate: star.candidate ?? "",
-          cash: star.cash ?? 0,
-        })}
-      </li>
-    );
-  }
-  if (effect.type === "conversion" || effect.type === "spread")
-    return (
-      <li className={effect.factor < 1 ? "event-tradeoff" : undefined}>
-        {t(`events.effects.${effect.type}`, {
-          target: t(`events.targets.${effect.target}`),
-          value: effect.factor - 1,
-          quarters: effect.quarters,
-        })}
-      </li>
-    );
-  if (effect.type === "pp") return <li>{t("events.effects.pp", { amount: effect.amount })}</li>;
-  if (effect.type === "leagueHealth")
-    return <li>{t(effect.steps > 0 ? "events.effects.healthUp" : "events.effects.healthDown")}</li>;
-  if (effect.type === "clubRating")
-    return <li>{t(`events.effects.clubRating_${effect.target}`, { count: effect.steps })}</li>;
-  if (effect.type === "derbyStoke") return <li>{t("events.effects.derbyStoke")}</li>;
-  return (
-    <li className={effect.type === "hardcoreDemotion" ? "event-tradeoff" : undefined}>
-      {t(`events.effects.${effect.type === "fanShift" ? effect.target : effect.type}`, {
-        share: effect.share,
-      })}
-    </li>
-  );
-}
 
 export function EventBoard() {
   const { t } = useTranslation();
-  const { snapshot, names, status, dispatchAction } = useGameStore();
+  const { snapshot, status, dispatchAction } = useGameStore();
   const dialog = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"pending" | "history">("pending");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [review, setReview] = useState<string | null>(null);
   const busy = status !== "ready";
-  const termVars = useTermVars(snapshot?.identity.terms ?? PLAIN_TERMS);
-  const words = useTraditionWords(snapshot);
+  const text = useEventText();
   useEffect(() => {
     if (open) dialog.current?.showModal();
     else dialog.current?.close();
@@ -75,7 +23,8 @@ export function EventBoard() {
   useEffect(() => {
     if (review) dialog.current?.querySelector<HTMLButtonElement>(".event-confirm button")?.focus();
   }, [review]);
-  if (!snapshot) return null;
+  if (!snapshot || !text) return null;
+  const { country, player, title } = text;
   const pending = snapshot.events;
   const history = [...snapshot.eventHistory].reverse();
   const decisions = pending.filter((event) => event.kind === "decision").length;
@@ -83,84 +32,6 @@ export function EventBoard() {
     pending.find((e) => e.id === selectedId) ?? history.find((e) => e.id === selectedId);
   const current = pending.find((e) => e.id === selectedId);
   const choice = current?.choices.find((c) => c.id === review);
-  const country = (id: string) => names?.countries[id] ?? id;
-  const club = (id: number | undefined) => {
-    const found = snapshot.flagship.clubs.find((c) => c.id === id);
-    return found ? t("flagship.club", { place: found.place, nickname: found.nickname }) : "";
-  };
-  const player = (id: number | null | undefined) =>
-    snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
-  // Tradition cards (GDD v1.22) name the tradition and the facts that made it.
-  const traditionText = (event: EventRecord) => {
-    const told = event.facts.tradition;
-    const tradition = snapshot.culture.traditions.find((item) => item.id === told?.traditionId);
-    if (!told || !tradition) return {};
-    const born = event.templateId === "tradition-born";
-    return {
-      ...termVars({ seasons: born ? snapshot.culture.derby.seasons : tradition.seasons.length }),
-      name: words.name(tradition),
-      club: club(tradition.clubIds[0]),
-      clubA: club(tradition.clubIds[0]),
-      clubB: club(tradition.clubIds[1]),
-      ground: snapshot.flagship.clubs.find((c) => c.id === tradition.clubIds[0])?.ground ?? "",
-      player: player(tradition.playerId),
-      country: country(tradition.countryId),
-      count: tradition.seasons.length,
-      span: snapshot.culture.derby.seasons,
-      context: born ? tradition.type : (tradition.lost?.reason ?? "faded"),
-    };
-  };
-  // Star cards (GDD v1.16) name the player and clubs from the record.
-  const starText = (event: EventRecord) => {
-    const star = event.facts.star;
-    if (!star) return traditionText(event);
-    return {
-      player: player(star.playerId),
-      club: club(star.clubId),
-      otherClub: club(star.otherClubId ?? undefined),
-      candidate: player(star.candidateId),
-      season: star.season,
-      count: star.scores,
-      matches: star.matches,
-      seasons: star.seasons,
-      share: star.clubScores > 0 ? star.scores / star.clubScores : 0,
-      context: star.candidateId === null ? undefined : "mentor",
-    };
-  };
-  // Season cards (GDD v1.15) name the real clubs from the record; their text varies by format.
-  const seasonText = (event: EventRecord) => {
-    const season = event.facts.season;
-    if (!season) return starText(event);
-    return {
-      champion: club(season.championId),
-      runnerUp: club(season.runnerUpId),
-      season: season.season,
-      streak: season.streak,
-      count: season.pointsGap,
-      context:
-        season.finalMargin === null
-          ? "european"
-          : season.finalMargin === 0
-            ? "deciders"
-            : "american",
-    };
-  };
-  // The sport's own nouns (GDD v1.18), in the number the card's counts call for.
-  const textVars = (event: EventRecord) => {
-    const values: Record<string, unknown> = seasonText(event);
-    const number = (key: string) =>
-      typeof values[key] === "number" ? (values[key] as number) : undefined;
-    return {
-      ...termVars({ score: number("count"), match: number("matches"), seasons: number("seasons") }),
-      ...values,
-    };
-  };
-  const title = (event: EventRecord) =>
-    t(`events.cards.${event.templateId}.title`, {
-      country: country(event.countryId),
-      rival: names?.sports[event.facts.rivalId ?? ""] ?? "",
-      ...textVars(event),
-    });
   const chooseRecord = (event: EventRecord) => {
     setSelectedId(event.id);
     setReview(null);
@@ -307,39 +178,10 @@ export function EventBoard() {
                     )}
                   </span>
                   <h3>{title(selected)}</h3>
-                  <p>
-                    {t(`events.cards.${selected.templateId}.body`, {
-                      country: country(selected.countryId),
-                      fans: selected.facts.casual + selected.facts.hardcore,
-                      hardcore: selected.facts.hardcore,
-                      rival: names?.sports[selected.facts.rivalId ?? ""] ?? "",
-                      tournament: names?.tournaments[selected.facts.rivalId ?? ""] ?? "",
-                      health: selected.facts.health
-                        ? t(`league.health.${selected.facts.health}`)
-                        : "",
-                      tier: selected.facts.leagueTier
-                        ? t(`league.tiers.${selected.facts.leagueTier}`)
-                        : "",
-                      ...textVars(selected),
-                    })}
-                  </p>
-                  {selected.facts.season?.championPlayerId != null && (
-                    <p>
-                      {t("events.seasonLeader", {
-                        player: player(selected.facts.season.championPlayerId),
-                        champion: club(selected.facts.season.championId),
-                      })}
-                    </p>
-                  )}
-                  {selected.facts.season?.topScorerId != null && (
-                    <p>
-                      {t("events.seasonScorer", {
-                        ...termVars({ score: selected.facts.season.topScorerScores ?? 0 }),
-                        player: player(selected.facts.season.topScorerId),
-                        count: selected.facts.season.topScorerScores ?? 0,
-                      })}
-                    </p>
-                  )}
+                  <p>{text.body(selected)}</p>
+                  {text.seasonLines(selected).map((line) => (
+                    <p key={line}>{line}</p>
+                  ))}
                   <div className="event-facts">
                     <span>
                       {t("events.fans", { count: selected.facts.casual + selected.facts.hardcore })}

@@ -31,6 +31,16 @@
     "confirmChoice": "Make the call",
     "cancel": "Keep thinking",
     "collect": "Collect moment",
+    "popup": {
+      "where": "{{kind}} · {{country}} · {{date}}",
+      "position": "{{index}} of {{count}}",
+      "more_one": "+ {{count}} more effect",
+      "more_other": "+ {{count}} more effects",
+      "later": "Decide later",
+      "moments": "Moments to collect",
+      "moreMoments_one": "{{count}} more moment on the board",
+      "moreMoments_other": "{{count}} more moments on the board"
+    },
     "collected": "Moment collected",
     "manualResolution": "Resolved on turn {{turn}}. {{cost, number(maximumFractionDigits: 1)}} PP spent; {{gained, number(maximumFractionDigits: 1)}} PP gained.",
     "autoResolution": "Settled automatically before advancing turn {{turn}}. {{gained, number(maximumFractionDigits: 1)}} PP collected; no decision cost.",

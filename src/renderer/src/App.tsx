@@ -5,6 +5,7 @@ import { CampaignOverview, type Overview } from "./components/CampaignOverview";
 import { CampaignSetupScreen } from "./components/CampaignSetupScreen";
 import { CountryCard } from "./components/CountryCard";
 import { EventBoard } from "./components/EventBoard";
+import { EventLayer } from "./components/EventPopup";
 import { FocusControls } from "./components/FocusControls";
 import { LeagueControls } from "./components/LeagueControls";
 import { SaveLoadControls } from "./components/SaveLoadControls";
@@ -46,6 +47,8 @@ export function App() {
     void loadSetup();
   }, [loadSetup]);
   const fullPage = overview === "growth" || overview === "flagship";
+  // A pop-up card outlines its country on the map (GDD v1.25), leaving the selection alone.
+  const [highlighted, setHighlighted] = useState<string | null>(null);
   const navigate = (kind: MapCommand["kind"], market?: string) =>
     setCommand((previous) => ({ kind, market, serial: previous.serial + 1 }));
   const countryName = (id: string) => names?.countries[id] ?? id;
@@ -183,6 +186,7 @@ export function App() {
             countryNames={names?.countries ?? {}}
             snapshot={snapshot}
             selected={selectedCountryId}
+            highlighted={overview === null ? highlighted : null}
             command={command}
             patterns={patterns}
             rivals={rivals}
@@ -190,6 +194,7 @@ export function App() {
             onHover={setHover}
           />
         )}
+        {overview === null && <EventLayer onHighlight={setHighlighted} />}
         <div className="campaign-heading">
           <span className="eyebrow">{t("map.chapter")}</span>
           <h1>
