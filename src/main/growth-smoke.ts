@@ -30,7 +30,7 @@ export async function verifyGrowth(
   await click(".game-nav [data-view=growth]");
   await delay();
   await assert(
-    'document.querySelectorAll("[data-testid=growth-picker] option").length === 20',
+    'document.querySelectorAll("[data-testid=growth-picker] option").length === 30',
     "Every growth node must be keyboard selectable.",
   );
   await click('[data-category="media"]');
@@ -108,7 +108,7 @@ export async function verifyGrowth(
   await click(".game-nav [data-view=world]");
   await delay();
   return {
-    nodes: 20,
+    nodes: 30,
     permanentForkVerified: true,
     cancelledWithoutSpend: true,
     doubleClickSpentOnce: true,

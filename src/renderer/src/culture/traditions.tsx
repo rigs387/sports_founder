@@ -78,8 +78,13 @@ interface ListProps {
 export function TraditionList({ traditions, countryId, testId, showRules }: ListProps) {
   const { t, i18n } = useTranslation();
   const rules = (tradition: TraditionSnapshot) =>
-    new Intl.ListFormat(i18n.language, { style: "short" }).format(
-      tradition.rules.map(({ axis, option }) => t(`genome.options.${axis}.${option}`)),
+    new Intl.ListFormat(i18n.language).format(
+      tradition.rules.map(({ axis, option }) =>
+        t("culture.rule", {
+          trait: t(`genome.axes.${axis}`),
+          option: t(`genome.options.${axis}.${option}`),
+        }),
+      ),
     );
   const { snapshot } = useGameStore();
   const words = useTraditionWords(snapshot);

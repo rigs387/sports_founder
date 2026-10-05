@@ -1392,6 +1392,7 @@
         "trophy": "The league at the seat has no trophy yet."
       }
     },
-    "marker": "{{count}} traditions held here"
+    "marker": "{{count}} traditions held here",
+    "rule": "{{trait}}: {{option}}"
   }
 }

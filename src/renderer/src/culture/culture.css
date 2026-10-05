@@ -20,6 +20,11 @@
   font-size: 0.95em;
 }
 
+/* Names often start with "the": a heading starts with a capital. */
+.tradition strong::first-letter {
+  text-transform: uppercase;
+}
+
 .tradition small {
   display: block;
   opacity: 0.75;
