@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.23 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails)*
+*Version 1.24 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen)*
 
 ---
 
@@ -44,12 +44,13 @@ turn. Longer turns change how often the player decides, not the economy's math.
   must spend a full turn at Near-Collapse before it can collapse. No run ends on a collapse the
   player never saw coming, at any turn length.
 - **Tier-ups mid-turn:** the new turn length applies starting next turn.
-- **Seasonal windows:** one per in-game year. At quarter-length turns it falls on one turn in four;
-  at year-length turns every turn includes it.
-- **Auto-advance (low priority):** an optional "advance until something happens" control that
-  always stops for decision cards, seasonal windows, League Health Ladder changes (anchor always;
+- **The offseason (renamed from the seasonal window, v1.24):** one per in-game year, opening on
+  the first turn that starts after the flagship season ends. At quarter-length turns it is one
+  turn in four; at year-length turns every turn starts with one.
+- **Auto-advance (superseded by v1.24 below):** an optional "advance until something happens" control that
+  always stops for decision cards, offseasons, League Health Ladder changes (anchor always;
   others in focus countries), PP tier-ups, rival moves in focus countries, and the start of the win
-  hold / the win. Interrupt list lives in config. Not required for Phase 0.
+  hold / the win. Interrupt list lives in config.
 - **Turn-based, not real-time (decided 2026-10-04, v1.19).** Real-time with pause (Paradox style)
   was considered and rejected for the core. That model works when many fine-grained things move
   at once and attention is the scarce resource; here spread moves by the quarter, league business
@@ -58,13 +59,50 @@ turn. Longer turns change how often the player decides, not the economy's math.
   turn length by PP tier, the win hold, every pacing target), and "choose pain" relies on
   deliberate tradeoffs, not reflexes. The living-world feel comes from **auto-advance** instead:
   a Play / Pause control with two or three speeds that ends turns on its own and stops on the
-  interrupt list above (plus a star who can be backed in the seasonal window, and any card that
+  interrupt list above (plus a star who can be backed in the offseason, and any card that
   needs an answer), like Football Manager's Continue or Plague Inc's speed controls. It is a
   presentation layer over End Turn: no simulation, balance or save change, so it can be built at
   any time. Open when it is built: the speeds, whether it is on by default, and whether the map
   animates between auto-played turns.
+- **Living time and the offseason (decided 2026-10-05, v1.24).** The first full playtest loved
+  the game but found the turn clicking flat, the choice board stiff and the seasonal window never
+  usable. Measured in the real game: the window opened on turns 3 and 7, but the first star
+  arrived on turn 4 (the season ends inside the window's turn, so its cards land after it
+  closes), nothing announced the window, and on turn 7 backing cost 60 PP against about 39.
+  - *Time runs, Crusader Kings style.* Play / Pause with speeds is the main control. The date is
+    the headline and ticks visibly quarter by quarter, with the heatmap blending between
+    quarters, also inside year-long turns. Turns stay inside the simulation (pacing, the
+    decision cap, End Turn defaults and the win hold still count turns); a step button plays one
+    turn. Three speeds in config, starting at one quarter every 2 s, 1 s and 0.4 s.
+  - *It pauses itself and resumes.* The game starts paused. It stops on the interrupt list
+    (config) and on every decision; after the player answers the card it stopped for, it resumes
+    at the same speed if it was playing.
+  - *Choices pop up as they happen.* While the clock animates a turn, each card appears at the
+    quarter its fact happened, not as a batch at the end. A decision is an event window over the
+    map, one at a time, with its country highlighted: the story, then two or three choice buttons,
+    each with a one-line effect and the full detail on hover. No separate review step, except a
+    confirm when a choice costs PP. Moments without a choice are map pickups and toasts that do
+    not pause. The board becomes the journal of past cards.
+  - *Presentation only for now (choose the cheap step first).* The sim still simulates the whole
+    turn before the cards appear, and answers take effect from the next turn, as before. Late in
+    the game an answer to a card from a year-long turn's first quarter cannot change the rest of
+    that year. Parked: a sim that really stops mid-turn (see the parking lot).
+  - *The offseason screen.* When the offseason opens, time pauses on one screen in a set order:
+    the season review (champion, new star, stories), then everything the offseason allows in one
+    place — back or drop stars, amend a rule, promote leagues, move the seat, name or rename the
+    trophy — each showing its price against the PP the player has ("60 PP · you have 39"). It
+    stays open until the player resumes. It is the home of future league business: sponsors, TV
+    deals and the rest of the business layer arrive here. With it, locked controls elsewhere need
+    no countdowns.
+  - *Offseason timing.* The offseason opens on the first turn that starts after the season ends,
+    so the season's cards and its new star are in front of the player while it is open.
+    Offseason actions take effect when it closes, before the next season's first matches (a seat
+    move included). This is a small sim change; the win contest is remeasured once.
+  - *The backing price stays (choose pain).* 60 PP base: the first star is usually not affordable
+    in their first offseason, and the screen shows the gap as a goal to save toward.
 
-**Turn anatomy:**
+**Turn anatomy:** (v1.24: with time running, the recap is the animated clock, decisions pop up
+at their quarter and global actions happen while paused; the offseason gathers league business.)
 1. **Recap** — map animates the elapsed quarters; pickups appear; headlines.
 2. **Decisions** — 0–3 decision cards.
 3. **Global** — spend PP on growth nodes, reassign focus slots, change rules.
@@ -124,7 +162,7 @@ turn. Longer turns change how often the player decides, not the economy's math.
      founding club with its name unchanged).
    - *Built 2026-10-04:* setup is two pages (the sport, then the founding), each fitting the
      window. Players a side by team size: 5 / 8 / 11. The league's text (flagship screen, Stars
-     panel, season and star cards) uses the sport's terms; the seasonal window keeps its name.
+     panel, season and star cards) uses the sport's terms; the offseason keeps its name.
 
 **Starting state:** the anchor country has a tiny founding Amateur league, a tiny hardcore base
 (the founder's friends and family), and a small casual base. The player has a small PP stash. The
@@ -137,16 +175,16 @@ no list or inbox anywhere:
 - **The map is the signal.** Countries needing attention show it directly on the map (pulsing
   border for a health drop, icon for a sponsor offer, rival color creeping in). A "next country
   needing attention" key prevents missed issues.
-- **Seasonal windows.** League business (sponsor and TV renewals, etc.) happens in defined
-  offseason windows rather than trickling in every turn — quiet turns punctuated by busy windows.
+- **The offseason.** League business (sponsor and TV renewals, etc.) happens in the offseason
+  rather than trickling in every turn — quiet turns punctuated by a busy offseason (v1.24).
 - **Crises become decision cards.** Urgent league problems compete for the capped decision-card
   slots; anything that doesn't surface resolves via the player's standing policies.
 
 **Delegation (scaling to 30+ markets):**
 - **Standing policies:** a small set of global defaults with per-country overrides (e.g., minimum
   acceptable sponsor offer, ticket pricing stance, routine-crisis response). Policy resolves any
-  window business the player doesn't touch.
-- **Focus slots define hands-on involvement.** Seasonal-window business surfaces to the player only
+  offseason business the player doesn't touch.
+- **Focus slots define hands-on involvement.** Offseason business surfaces to the player only
   in focus countries; elsewhere it resolves via policy and reports as Moments. Focus means both
   "where I push growth" and "where I personally operate," which feeds anchor-neglect pressure.
 - **The player is the commissioner of one league: the flagship (decided 2026-09-26).** Deep league
@@ -169,7 +207,7 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
   then an Amateur league forms automatically (milestone pickup) and the country becomes an active
   market. The anchor country starts with an Amateur league.
 - **Promotion is the player's call.** Once a league qualifies (hardcore fan base + cash reserve
-  thresholds), the player may promote it during the seasonal window. Promotion costs cash and
+  thresholds), the player may promote it during the offseason. Promotion costs cash and
   raises running costs — going pro too early can sink a league. (Contrast: PP tiers promote
   automatically.)
 - **Relationship to the League Health Ladder:** health is the league's condition within its tier.
@@ -189,8 +227,8 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
   map stays the game.
   - *Starts at the anchor.* The anchor league is the flagship from turn 1, which fills the long
     Backyard Game stretch and ties the deepest league to the one whose collapse ends the run.
-  - *Moving the seat hurts (choose pain).* The flagship is reassignable only during a seasonal
-    window. The former flagship's country pays a purist cost (it feeds anchor resentment when the
+  - *Moving the seat hurts (choose pain).* The flagship is reassignable only during the
+    offseason. The former flagship's country pays a purist cost (it feeds anchor resentment when the
     anchor is left), and its league drops to the simple model under standing policies (or a
     league director, once they exist).
   - *Only Professional or Elite leagues can take the seat (decided 2026-10-02).* The anchor is the
@@ -198,14 +236,14 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
     league that has already professionalized, so the player cannot park the seat in a fresh
     Amateur league to dodge the anchor's troubles.
   - *A folded flagship sends the seat home (decided 2026-10-02).* When a non-anchor flagship
-    collapses, the seat returns to the anchor at once, outside the seasonal window. The return is
+    collapses, the seat returns to the anchor at once, outside the offseason. The return is
     free: the collapse itself is the pain (its fans, cash and stories are lost), and the anchor
     gets its commissioner back.
   - *First build of the seat's depth:* named teams, results, standings and a few named stars
     (system 4), plus real sponsor and TV deals with length, annual value and demands (system 7).
     Venues, youth programs, expansion teams and full rosters come later.
-  - *The flagship season (decided 2026-10-02).* One season per in-game year, ending in the
-    seasonal window. Every club plays every other club home and away. European format: the top
+  - *The flagship season (decided 2026-10-02).* One season per in-game year; the offseason
+    follows its end (v1.24). Every club plays every other club home and away. European format: the top
     of the table is champion. American format: the top clubs (4 when there are 8 clubs, 8 from
     12 up) play single-match knockout playoffs, with the higher seed at home. Club counts grow
     with the league tier: 8 Amateur, 12 Semi-Pro, 16 Professional, 20 Elite (config); promotion
@@ -729,7 +767,7 @@ the game does not stop that, it makes them play differently.
 - **Founding:** the player founds and names the World Championship (default name provided) once
   enough countries have leagues. Held every 4 years. The multi-sport Games route is not used.
 - **Effects:** a casual conversion burst in every participating country plus PP pickups.
-  **Hosting:** countries bid in the seasonal window and the player picks the host, which gains a
+  **Hosting:** countries bid in the offseason and the player picks the host, which gains a
   large hardcore conversion and cash boost — a strategic tool for cracking a target market.
 - **Field:** countries with a league at Semi-Pro or above, plus the host; 16 or 32 teams depending
   on eligibility; seeded by strength. No qualification simulation.
@@ -971,7 +1009,7 @@ purchased traits and percentage modifiers alone do not make culture.
       own leading players.
   - *What the player can do (decided 2026-10-03).* Every number is config.
     - Backing slots by PP tier: 1 at tiers 1–2, 2 at tiers 3–4, 3 at tier 5. Only stars can be
-      backed. Backing and dropping happen only in the seasonal window (choose pain): the player
+      backed. Backing and dropping happen only in the offseason (choose pain): the player
       commits for a year at a time.
     - Backing costs a one-time PP price (base × the peak tier's multiplier, as growth nodes) and
       no upkeep: slots are the limit, following the Phase 0 rule against PP upkeep. Revisit if
@@ -1035,7 +1073,7 @@ purchased traits and percentage modifiers alone do not make culture.
 
 **Venues & youth programs:** Each league has a venue capacity level (1–5) and a youth program level
 (1–5) — no individual stadiums or academies.
-- *Venues:* bought with cash in the seasonal window; take multiple turns to build; raise the gate
+- *Venues:* bought with cash in the offseason; take multiple turns to build; raise the gate
   revenue cap, add hardcore conversion, add upkeep.
 - *Youth programs:* bought with cash; upkeep; accelerate hardcore conversion and improve homegrown
   player quality (stronger national teams).
@@ -1045,7 +1083,7 @@ purchased traits and percentage modifiers alone do not make culture.
 lengths — lives in config files. No balance values in code.
 
 **Rules Evolution:**
-- **When:** rule changes cost PP and happen only in the seasonal window, at most one per year
+- **When:** rule changes cost PP and happen only in the offseason, at most one per year
   (config). Costs scale with PP tier.
 - **Purist backlash scales with size and tradition.** Backlash grows with the global hardcore base
   and with how long the rule has stood. Early inventor-era tinkering is nearly free; changing a
@@ -1132,7 +1170,7 @@ under standing policies; whether they later gain individual deals is open.
   sponsor deals on offer.
 - **Costs:** payroll (from contracts; scales with player quality and league tier), operations
   (base cost by league tier), venue upkeep, league director salary (Phase 1; none at the flagship).
-- **Deals:** TV and sponsor deals are multi-year contracts offered in the seasonal window — length,
+- **Deals:** TV and sponsor deals are multi-year contracts offered in the offseason — length,
   annual value, and sometimes a demand (rule-change proposal, exclusivity, "stay Professional or
   above"). Standing policy accepts or rejects outside focus countries. Long deals trade security
   for locked terms.
@@ -1455,6 +1493,10 @@ Items flagged during the interview that need further discussion in future sessio
 - Flagship talent pull (parked 2026-10-05, v1.23): the flagship should work like the Premier
   League or the NBA, a top flight that draws the world's best players. Foreign stars moving in
   need named standouts in other leagues first; build it with them, not with the broadcast.
+- A sim that stops mid-turn (parked 2026-10-05, v1.24): cards offered the quarter their fact
+  happens and answers applied from the next quarter, a true Crusader Kings pause. It changes the
+  turn contract (decision cap, End Turn defaults, pacing). Build it if v1.24's presentation-only
+  pop-ups read as staged.
 - Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to
   handle missed matches; deferred from the Phase 1 stars build.
 - Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship

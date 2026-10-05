@@ -12,6 +12,11 @@ never fully retires (rules can always be revisited).
 **Turn Structure:** Turn length set by PP tier — quarters at tier 1 (inventor era), up to years at
 the top (operator era). The sim always steps quarterly underneath. Turns always complete; league
 health moves at most one step per turn, so collapse always gets a warning turn.
+Living time (v1.24): Play / Pause with three speeds; the date ticks quarter by quarter and the game
+pauses itself for decisions, resuming after. Cards pop up at the quarter they happened as event
+windows over the map (presentation only; a true mid-turn stop is parked). Once a year the
+offseason screen pauses on the season review, then all league business in one place (stars,
+rules, promotions, the seat, the trophy; sponsors and TV later), prices against PP on hand.
 
 **Win Condition:** #1 sport by global Fandom Score (hardcore + weighted casual fans, raw
 population), held for X turns (30) at PP tier 5 — a turn below #1 or below tier 5 restarts the
@@ -56,7 +61,7 @@ locally. Player pushes markets with limited focus slots (more at higher tiers).
 collected as clickable map pickups. Costs rise per tier. All numbers in config.
 
 **Business Layer:** Per-country cash. Gate (hardcore × wealth, venue-capped), TV (casual ×
-media market), sponsors (reach × wealth); multi-year deals in seasonal windows, some with demands.
+media market), sponsors (reach × wealth); multi-year deals in offseasons, some with demands.
 Costs: payroll, operations, venues. Cash builds local hardcore via venues/youth, never PP. No
 cross-country transfers; PP-funded bailouts. Phase 0: gate + one media/sponsor line.
 
@@ -100,7 +105,7 @@ names; generic leagues/orgs/teams, all in one moddable names file. Rivals hold t
 real starting shares are home, they never spread or grow past it on their own, and they lose ground
 only to the player.
 
-**Rules Evolution:** PP cost, seasonal window only, max 1/year. First build (v1.20): one rule trait
+**Rules Evolution:** PP cost, offseason only, max 1/year. First build (v1.20): one rule trait
 per amendment, priced and punished by the jump; purists turn casual everywhere, more in the anchor,
 where the old rule fit better and the older the rule; the review shows price, loss and hints for
 the anchor and top five markets; dated amendments in the Rulebook; world proposals come with deals. Backlash scales with hardcore base
@@ -120,12 +125,12 @@ rivals defend hardest when you near #1.
 Amateur → Semi-Pro → Professional → Elite (player-chosen promotion). One player-assigned flagship
 league worldwide, and the player is its commissioner: it starts at the anchor and is the only league
 with deep management (named teams, standings, stars, real sponsor and TV deals with demands).
-Moving the seat happens only in a seasonal window and costs purists in the old country, whose league
+Moving the seat happens only in the offseason and costs purists in the old country, whose league
 drops to the simple model. Flagship sim depth grows with tier: teams → stars → full rosters
 (contracts drive payroll cost, not negotiation); other leagues stay simple. Delegation: standing
 policies everywhere; hands-on business only in focus countries; trait-driven league directors
 (Phase 1); intervene anywhere anytime. No inbox: the map signals trouble, business happens in
-seasonal windows, crises arrive as decision cards.
+offseasons, crises arrive as decision cards.
 
 **Culture:** Never bought. Traditions (derbies, styles of play, nicknames, rites) emerge from real
 sim facts and are held by fans in particular countries: they make fans stickier and make them resist

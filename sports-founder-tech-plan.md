@@ -70,6 +70,7 @@ surface before playtesting or during it.
 | 2026-10-03 | Flagship stars (GDD v1.16): one named leading player per club (born in real places, invented per-language-sphere names, hidden skill on a career curve; full squads deferred); every score credited to the leading player or the squad; a score is the sport's one scoring unit and the scoring frequency trait sets match chances; a season's top scorer becomes a star by taking a config share of their club's scores when a star place is open (1/2/3/4 by league tier); stars add club strength, backed stars add casual conversion at home and media reach out of the flagship; careers peak, decline and announce retirement a season ahead; stars move up within the flagship; backing slots by PP tier, window only, one-time PP price, influence over seasons, honorable endings and a cash price to keep a backed star; star cards; save format 10. Build plan: 2.6 | Decided |
 | 2026-10-04 | Culture, first build (GDD v1.22): six types from recorded facts (derby, club rite, star legacy, national name, famous venue, trophy); strength renews and decays, loss by facts or betrayal, landmarks both ways; weight cuts the player's hardcore turnover and rival poaching/reclaim; venue pilgrimage and champion PP; each tradition remembers its rulebook and offending amendments multiply backlash and wear it; seat moves and trophy renames cost more where traditions are held; birthplace biases births, ethos betrayals, balanced near 1; rivals carry flavor-only content traditions; Culture tree category (strength, reach, protection, hold; Heritage trust / Living game fork). Save format 18. Build plan: 2.11 | Decided |
 | 2026-10-05 | Flagship broadcast (GDD v1.23): the seat league multiplies media reach out of its country by (1 + tier ceiling × season interest × health); interest is read from the last season summary (gripping, ordinary, dynasty, runaway/foregone); a season-end pulse on the same channel, none after runaways; a Near-Collapse flagship drains casual fans where its reach lands; stacks with backed stars; balance target 5–15% of world media exposure and one win-contest remeasure. Talent pull parked until other leagues have named players. Build plan: 2.12 | Decided |
+| 2026-10-05 | Living time and the offseason (GDD v1.24), after the first playtest: Play / Pause with three speeds over End Turn, the date ticking quarter by quarter, auto-pause on the interrupt list and decisions with resume after answering; cards revealed at their fact's quarter as event windows over the map (presentation only; a mid-turn sim stop is parked); the seasonal window renamed the offseason, opening on the first turn after the season ends, with one screen for the season review and all league business, prices against PP on hand; backing stays 60 PP. Build plan: 2.13 | Decided |
 
 ---
 
@@ -465,6 +466,30 @@ Every number is config (`flagship.broadcast` in `content/config.yaml`). The sim 
 5. **Measure and docs.** The runner reports the flagship's share of world media reach exposure
    against the target; pacing on seeds 1–3 (must pass; #1 lost before the win about half).
    `docs/flagship/README.md`, `docs/progress/data.js`, CLAUDE.md.
+
+### 2.13 Build Plan: Living Time and the Offseason (GDD v1.24)
+
+Mostly renderer work. Every number is config (speeds, the interrupt list, pop-up pacing).
+
+1. **Offseason timing (sim).** Rename the seasonal window to the offseason in code, config, the
+   snapshot and the locale. The offseason opens on the first turn that starts after a season
+   ends; its actions apply when it closes, before the next season's first matches (the seat move
+   included). Tests on quarter, half-year and year turns. Save: derived from the season record if
+   possible, otherwise a format step. Pacing on seeds 1–3 and the win contest remeasured once.
+2. **Quarter facts on cards (sim).** Every offered card carries the quarter its fact happened, so
+   the renderer can reveal it there. No change to what is offered or when it resolves.
+3. **The clock (renderer).** Play / Pause, three speeds and step; the date as the headline; the
+   heatmap blending per quarter from per-quarter snapshots of the turn (the worker returns them);
+   auto-pause on the interrupt list and decisions, resume after answering.
+4. **Event windows.** One card at a time over the map at its quarter, country highlighted, choice
+   buttons with one-line effects and hover detail, a confirm only for PP costs; moments as map
+   pickups and toasts; the board becomes the journal.
+5. **The offseason screen.** Season review, then stars, rules, promotions, the seat and the trophy
+   in one place with prices against PP on hand; the amend, backing and seat controls move here
+   from their tabs (tabs keep read-only views).
+6. **Smoke and docs.** The smoke plays with the clock to the first offseason, backs or prices a
+   star there, answers a pop-up decision and checks resume; screenshots in both layouts.
+   `docs/progress/data.js`, CLAUDE.md.
 
 ---
 

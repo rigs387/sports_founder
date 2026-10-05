@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-05",
-  design: "GDD v1.23",
+  design: "GDD v1.24",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -49,10 +49,16 @@ window.SF_PROGRESS = {
   ],
   priorities: [
     {
+      system: "foundation",
+      title: "Living time and the offseason",
+      text: "The first playtest loved the game but found turn clicking flat and the seasonal window never usable. Decided (GDD v1.24): Play / Pause with speeds, cards popping up as they happen, and an offseason screen for all league business. Build it first (tech plan 2.13).",
+      tag: "Next build",
+    },
+    {
       system: "leagues",
       title: "Make the flagship season matter",
       text: "How the flagship feeds global spread is decided (GDD v1.23): it broadcasts on its own, earned by season interest and league health, pulses after big seasons and ripples when it fails. Next, build it (tech plan 2.12).",
-      tag: "Next build",
+      tag: "Then",
     },
     {
       system: "creation",
@@ -88,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-05",
+      type: "Design",
+      title: "Living time and the offseason",
+      text: "GDD v1.24, after the first full playtest: time runs with Play / Pause and three speeds, pausing itself for decisions and resuming after; cards pop up at the quarter they happened as event windows over the map; the seasonal window becomes the offseason, opening after the season ends on one screen for the season review and every league action, prices against PP on hand. In the real game the window had opened before any star existed and backing cost more than the player had. A sim that stops mid-turn is parked.",
+    },
     {
       date: "2026-10-05",
       type: "Design",
