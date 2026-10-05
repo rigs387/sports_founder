@@ -128,6 +128,11 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   full year, so seasons end on turn boundaries). A bare `stepQuarter` closes it first, as a
   quarter-length turn would; `endTurn` holds one that opens mid-turn. League business (promotion,
   amendments, backing, the seat, the trophy) happens only while it is open.
+- The offseason screen (GDD v1.24) is `src/renderer/src/offseason/OffseasonScreen.tsx`: the season
+  in review, then stars, rules, promotions, the seat and the trophy, priced against PP on hand. It
+  opens itself only from the world map; its nav tab shows while the offseason is open. The
+  Flagship tab and the Rulebook pass `readOnly` to `StarsPanel`, `Seat`, `TrophyCard` and
+  `AmendRules`, so those actions happen only on this screen (smoke steps act there).
 - Event windows (GDD v1.25) are `EventLayer` in `src/renderer/src/components/EventPopup.tsx`: on the
   world view, a turn's unanswered decisions pop up one at a time over the map in the order their
   facts happened (the record's `quarter`), docked away from the card's country, which the map

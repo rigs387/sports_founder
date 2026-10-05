@@ -119,7 +119,7 @@ export function Rulebook({
           />
         </div>
       </div>
-      <AmendRules snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
+      <AmendRules snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
       <TraditionsSection snapshot={snapshot} />
     </section>
   );

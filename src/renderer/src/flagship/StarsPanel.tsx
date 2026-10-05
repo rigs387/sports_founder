@@ -10,13 +10,15 @@ interface Props {
   busy: boolean;
   clubName: (id: number) => string;
   onAction: (action: Action) => void;
+  /** Outside the offseason screen (GDD v1.24): stars are shown; backing happens there. */
+  readOnly?: boolean;
 }
 
 // The flagship's stars (GDD v1.16): recorded facts only (name, club, age, birthplace, tallies,
 // star since, final season) and the player's backing. Skill and star strength stay in the
 // simulation. Backing and dropping go through applyAction after a review step; the simulation
 // decides legality and price, and the panel shows its reasons.
-export function StarsPanel({ snapshot, names, busy, clubName, onAction }: Props) {
+export function StarsPanel({ snapshot, names, busy, clubName, onAction, readOnly = false }: Props) {
   const { t } = useTranslation();
   const flagship = snapshot.flagship;
   const backing = flagship.backing;
@@ -59,6 +61,7 @@ export function StarsPanel({ snapshot, names, busy, clubName, onAction }: Props)
         {t("flagship.stars.price", { price: backing.price })}
       </p>
       {backing.used > backing.slots && <p className="stars-over">{t("flagship.stars.over")}</p>}
+      {readOnly && <p className="flagship-empty">{t("flagship.stars.elsewhere")}</p>}
       {flagship.stars.length === 0 ? (
         <p className="flagship-empty">{t("flagship.stars.none", nouns)}</p>
       ) : (
@@ -72,6 +75,7 @@ export function StarsPanel({ snapshot, names, busy, clubName, onAction }: Props)
               clubName={clubName}
               playerName={playerName}
               busy={busy}
+              readOnly={readOnly}
               review={review?.id === star.id ? review.kind : null}
               onReview={(kind) => setReview(kind ? { id: star.id, kind } : null)}
               onAction={(action) => {
@@ -93,6 +97,7 @@ function StarCard({
   clubName,
   playerName,
   busy,
+  readOnly,
   review,
   onReview,
   onAction,
@@ -103,6 +108,7 @@ function StarCard({
   clubName: (id: number) => string;
   playerName: (id: number) => string;
   busy: boolean;
+  readOnly: boolean;
   review: "back" | "drop" | null;
   onReview: (kind: "back" | "drop" | null) => void;
   onAction: (action: Action) => void;
@@ -213,7 +219,7 @@ function StarCard({
           )}
         </div>
       )}
-      {review ? (
+      {readOnly ? null : review ? (
         <div className="flagship-review" data-testid="flagship-star-review">
           {review === "back" ? (
             <p>

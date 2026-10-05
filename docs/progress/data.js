@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "foundation",
       title: "Living time and the offseason",
-      text: "The first playtest loved the game but found the choice board stiff and the seasonal window never usable. Built: the offseason opens right after each season, and every card knows when it happened. A Play / Pause clock was tried and dropped (GDD v1.25): Next Turn stays. Decisions now pop up over the map after each turn, in the order they happened, with their country outlined (step 4). Next, the offseason screen (step 5).",
+      text: "The first playtest loved the game but found the choice board stiff and the seasonal window never usable. Built: the offseason opens right after each season, and every card knows when it happened. A Play / Pause clock was tried and dropped (GDD v1.25): Next Turn stays. Decisions now pop up over the map after each turn, with their country outlined, and once a year the offseason screen gathers the season review and all league business. Next, the smoke and docs pass (step 6), then the flagship's broadcast (tech plan 2.12).",
       tag: "Next build",
     },
     {
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-05",
+      type: "Built",
+      title: "The offseason screen",
+      text: "Tech plan 2.13 step 5 (GDD v1.24): once a year a screen gathers the season in review (champion, runner-up, top scorer, new star) and all league business: back or drop stars, amend a rule, promote leagues, move the seat, name or rename the trophy, each priced against the PP on hand. It opens itself from the world map; the Flagship tab and the Rulebook are now read-only. Sponsors and TV deals will join it.",
+    },
     {
       date: "2026-10-05",
       type: "Built",
@@ -436,7 +442,7 @@ window.SF_PROGRESS = {
           "built",
           "The offseason opens after each season, with the season's cards and new star (GDD v1.24)",
         ],
-        ["planned", "The offseason screen: season review and every league action in one place"],
+        ["built", "The offseason screen: season review and every league action in one place"],
         ["built", "Named clubs in real places, results, standings and retained season summaries"],
         ["built", "Flagship screen: stars, table, results, champions and the seat"],
         ["built", "European or American format chosen on the creation screen"],

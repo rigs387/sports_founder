@@ -515,6 +515,14 @@ choice) and the window docks on the half of the map away from it. Once no decisi
 show as toasts (three at most) that collect on click. The board's card words moved to a shared
 `event-text.tsx`. The map smoke sets pending cards aside before its physical clicks.
 
+*Step 5 built 2026-10-05.* `OffseasonScreen` (renderer, full page like the flagship) reuses
+`StarsPanel`, `AmendRules`, `Seat` and `TrophyCard`, which gained `readOnly` for the tabs, and adds
+a promotions list (qualifying leagues, biggest followings first, five shown). It opens itself only
+from the world map; while the offseason is open a nav tab leads to it. Narrow layout: the nav
+scrolls instead of wrapping (the top bar and the page column may shrink). The stars and rules smoke
+steps now act on the offseason screen and check that the tabs are read-only (before, the rules
+step passed by clicking the hidden screen's controls while screenshotting the Rulebook).
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)

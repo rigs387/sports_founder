@@ -88,7 +88,12 @@ turn. Longer turns change how often the player decides, not the economy's math.
     trophy — each showing its price against the PP the player has ("60 PP · you have 39"). It
     stays open until the player plays the next turn. It is the home of future league business: sponsors, TV
     deals and the rest of the business layer arrive here. With it, locked controls elsewhere need
-    no countdowns.
+    no countdowns. *Built 2026-10-05 (step 5):* it opens by itself only when the player is on the
+    world map (taking over another screen mid-task was disruptive); elsewhere its tab appears in
+    the nav while the offseason is open. The Flagship tab and the Rulebook show stars, the seat,
+    the trophy and the rules read-only. Promotions list the five leagues with the biggest
+    followings, with the rest a click away; the season's decisions stay on the map, and the review
+    says how many wait there.
   - *Offseason timing.* The offseason opens on the first turn that starts after the season ends,
     so the season's cards and its new star are in front of the player while it is open.
     Offseason actions take effect when it closes, before the next season's first matches (a seat

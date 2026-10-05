@@ -2,9 +2,10 @@ import type { BrowserWindow } from "electron";
 
 /**
  * The Stars panel (GDD v1.16, tech plan 2.6 step 8). Runs after the star cards, so the league has
- * a star. Screenshots the panel in both layouts, then plays on to the offseason with a star
- * that can be backed, backs them through the review step, and checks the influence bar and the
- * backed star's name in the flagship country's map tooltip.
+ * a star. Screenshots the flagship's read-only panel in both layouts, then plays on to an offseason
+ * with a star that can be backed, backs them on the offseason screen (GDD v1.24) through the review
+ * step, and checks the influence bar and the backed star's name in the flagship country's map
+ * tooltip.
  */
 export async function verifyStarsPanel(
   win: BrowserWindow,
@@ -22,7 +23,9 @@ export async function verifyStarsPanel(
     }
     throw new Error(`Stars panel smoke timed out: ${condition}`);
   };
-  const panel = () =>
+  const FLAGSHIP = '[data-testid="flagship-screen"]';
+  const OFFSEASON = '[data-testid="offseason-screen"]';
+  const panel = (root = FLAGSHIP) =>
     evaluate<{
       stars: number;
       slots: number;
@@ -33,7 +36,8 @@ export async function verifyStarsPanel(
       rows: number;
       text: string;
     }>(`(() => {
-      const panel = document.querySelector('[data-testid="flagship-stars"]');
+      const panel = document.querySelector('${root} [data-testid="flagship-stars"]');
+      if (!panel) return { stars: 0, slots: 0, used: 0, backable: 0, reasons: [], leaders: 0, rows: 0, text: "" };
       return {
         stars: panel.querySelectorAll('[data-testid="flagship-star"]').length,
         slots: Number(panel.dataset.slots),
@@ -45,8 +49,8 @@ export async function verifyStarsPanel(
         text: panel.textContent,
       };
     })()`);
-  const showPanel = () =>
-    evaluate(`document.querySelector('[data-testid="flagship-stars"]').scrollIntoView()`);
+  const showPanel = (root = FLAGSHIP) =>
+    evaluate(`document.querySelector('${root} [data-testid="flagship-stars"]').scrollIntoView()`);
 
   let turnsPlayed = 0;
   const endTurn = async () => {
@@ -61,6 +65,10 @@ export async function verifyStarsPanel(
     turnsPlayed += 1;
     return panel();
   };
+  const readOnlyButtons = () =>
+    evaluate<number>(
+      `document.querySelectorAll('${FLAGSHIP} [data-testid="flagship-star-back"], ${FLAGSHIP} [data-testid="flagship-star-drop"]').length`,
+    );
 
   await click(".game-nav [data-view=flagship]");
   await wait(`!!document.querySelector('[data-testid="flagship-stars"]')`);
@@ -75,6 +83,9 @@ export async function verifyStarsPanel(
   // Skill and strength never appear, as a number or a word.
   if (/skill|strength|rating/i.test(first.text) || first.text.includes("{{"))
     throw new Error(`The Stars panel shows something it must not: ${first.text}`);
+  // The flagship's panel is read-only (GDD v1.24): backing happens on the offseason screen.
+  if ((await readOnlyButtons()) > 0)
+    throw new Error("The flagship's Stars panel must not back or drop stars.");
   await screenshot("36-stars.png");
   win.setContentSize(390, 844);
   await delay();
@@ -87,9 +98,13 @@ export async function verifyStarsPanel(
   await delay();
   if (narrowOverflow) throw new Error("The Stars panel overflows on a narrow viewport.");
 
-  // Play on (up to two years) until a star can be backed: the window open, a free slot, the PP.
-  let current = first;
-  for (let more = 0; current.backable === 0 && more < 8; more += 1) current = await endTurn();
+  // Play on (up to two years) until a star can be backed on the offseason screen: the offseason
+  // open, a free slot, the PP.
+  let current = await panel(OFFSEASON);
+  for (let more = 0; current.backable === 0 && more < 8; more += 1) {
+    await endTurn();
+    current = await panel(OFFSEASON);
+  }
   if (current.backable === 0) {
     // Nothing to back in this campaign (slots full or no PP): the reasons must say why.
     if (current.reasons.length === 0)
@@ -98,11 +113,13 @@ export async function verifyStarsPanel(
     return { ...first, narrowOverflow, backed: false, turnsPlayed, reasons: current.reasons };
   }
 
-  const backButton = '[data-testid="flagship-star-back"]:not(:disabled)';
+  await click(".game-nav [data-view=offseason]");
+  await wait(`!document.querySelector('${OFFSEASON}').hidden`);
+  const backButton = `${OFFSEASON} [data-testid="flagship-star-back"]:not(:disabled)`;
   const playerId = await evaluate<string>(
     `document.querySelector(${JSON.stringify(backButton)}).closest('[data-testid="flagship-star"]').dataset.player`,
   );
-  const card = `[data-testid="flagship-star"][data-player="${playerId}"]`;
+  const card = `${OFFSEASON} [data-testid="flagship-star"][data-player="${playerId}"]`;
   await click(backButton);
   await wait(`!!document.querySelector('${card} [data-testid="flagship-star-review"]')`);
   const review = await evaluate<string>(
@@ -114,8 +131,8 @@ export async function verifyStarsPanel(
   await click(`${card} [data-testid="flagship-star-confirm"]`);
   await wait(`document.querySelector('${card}')?.dataset.backed === 'true'`);
   await wait(`!!document.querySelector('${card} [data-testid="flagship-star-influence"]')`);
-  await showPanel();
-  const backed = await panel();
+  await showPanel(OFFSEASON);
+  const backed = await panel(OFFSEASON);
   await screenshot("39-stars-backed.png");
 
   // The backed star's name in the flagship country's map tooltip.

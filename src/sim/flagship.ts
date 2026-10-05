@@ -392,7 +392,7 @@ export function backStarBlocker(
 export type DropBlocker = "window" | "notBacked";
 export function dropStarBlocker(
   state: GameState,
-  world: World,
+  _world: World,
   playerId: number,
 ): DropBlocker | null {
   if (!offseasonOpen(state)) return "window";

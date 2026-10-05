@@ -15,10 +15,12 @@ interface Props {
   snapshot: TurnSnapshot;
   names: Names;
   busy: boolean;
+  /** Outside the offseason screen (GDD v1.24): the rulebook shows the rules; changes are made there. */
+  readOnly?: boolean;
   onAction: (action: Action) => void;
 }
 
-export function AmendRules({ snapshot, names, busy, onAction }: Props) {
+export function AmendRules({ snapshot, names, busy, onAction, readOnly = false }: Props) {
   const { t, i18n } = useTranslation();
   const words = useTraditionWords(snapshot);
   const list = (items: string[]) => new Intl.ListFormat(i18n.language).format(items);
@@ -43,8 +45,11 @@ export function AmendRules({ snapshot, names, busy, onAction }: Props) {
     <section className="amend-rules" aria-labelledby="amend-heading" data-testid="amend-rules">
       <h4 id="amend-heading">{t("rules.heading")}</h4>
       <p>{t("rules.intro", { anchor: country(snapshot.anchorCountryId) })}</p>
-      <p className={status === "open" ? "amend-status open" : "amend-status"} role="status">
-        {t(`rules.${status}`)}
+      <p
+        className={status === "open" && !readOnly ? "amend-status open" : "amend-status"}
+        role="status"
+      >
+        {t(readOnly ? "rules.elsewhere" : `rules.${status}`)}
       </p>
       <table className="amend-table">
         <thead>
@@ -54,7 +59,7 @@ export function AmendRules({ snapshot, names, busy, onAction }: Props) {
             <th scope="col" className="amend-since">
               {t("rules.inForce")}
             </th>
-            <th scope="col">{t("rules.amend")}</th>
+            {!readOnly && <th scope="col">{t("rules.amend")}</th>}
           </tr>
         </thead>
         <tbody>
@@ -63,22 +68,24 @@ export function AmendRules({ snapshot, names, busy, onAction }: Props) {
               <th scope="row">{traitName(entry.axis)}</th>
               <td>{optionName(entry.axis, entry.option)}</td>
               <td className="amend-since">{t("rules.since", { year: entry.sinceYear })}</td>
-              <td>
-                <button
-                  type="button"
-                  className="amend-pick"
-                  disabled={busy || status !== "open"}
-                  aria-label={t("rules.change", { trait: traitName(entry.axis) })}
-                  data-testid={`amend-${entry.axis}`}
-                  onClick={() => {
-                    setAxis(entry.axis);
-                    setOption(null);
-                    setReviewing(false);
-                  }}
-                >
-                  {t("rules.changeShort")}
-                </button>
-              </td>
+              {!readOnly && (
+                <td>
+                  <button
+                    type="button"
+                    className="amend-pick"
+                    disabled={busy || status !== "open"}
+                    aria-label={t("rules.change", { trait: traitName(entry.axis) })}
+                    data-testid={`amend-${entry.axis}`}
+                    onClick={() => {
+                      setAxis(entry.axis);
+                      setOption(null);
+                      setReviewing(false);
+                    }}
+                  >
+                    {t("rules.changeShort")}
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

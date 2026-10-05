@@ -20,17 +20,21 @@ export async function verifyAmendment(
     }
     throw new Error(`Amendment smoke timed out: ${condition}`);
   };
-  const openSport = async () => {
-    await click(".game-nav [data-view=sport]");
-    await wait(`!!document.querySelector('[data-testid="amend-rules"]')`);
-  };
-  const isOpen = () =>
-    evaluate<boolean>(`!!document.querySelector('[data-testid="amend-rules"] .amend-status.open')`);
+  const OFFSEASON = '[data-testid="offseason-screen"]';
+  const RULES = `${OFFSEASON} [data-testid="amend-rules"]`;
+  const isOpen = () => evaluate<boolean>(`!!document.querySelector('${RULES} .amend-status.open')`);
+  const closeOverview = () =>
+    evaluate(`document.querySelector(".overview-dialog > header .icon-button")?.click()`);
 
-  await openSport();
+  // The Rulebook is read-only (GDD v1.24): rules are amended on the offseason screen.
+  await click(".game-nav [data-view=sport]");
+  await wait(`!!document.querySelector('.overview-dialog [data-testid="amend-rules"]')`);
+  if (await evaluate<boolean>(`!!document.querySelector('.overview-dialog .amend-pick')`))
+    throw new Error("The Rulebook must not amend rules outside the offseason screen.");
+  await closeOverview();
   let turnsPlayed = 0;
   while (!(await isOpen()) && turnsPlayed < 6) {
-    await click(".overview-dialog > header .icon-button");
+    await closeOverview();
     const next =
       Number(
         await evaluate<string>(`document.querySelector('[data-testid="game"]').dataset.turn`),
@@ -40,11 +44,12 @@ export async function verifyAmendment(
       `(() => { const g=document.querySelector('[data-testid="game"]'); return g.dataset.status === 'ready' && Number(g.dataset.turn) === ${next}; })()`,
     );
     turnsPlayed += 1;
-    await openSport();
   }
   if (!(await isOpen())) throw new Error("No offseason with an amendment left in 6 turns.");
+  await click(".game-nav [data-view=offseason]");
+  await wait(`!document.querySelector('${OFFSEASON}').hidden`);
 
-  await click('[data-testid="amend-rules"] .amend-pick:not(:disabled)');
+  await click(`${RULES} .amend-pick:not(:disabled)`);
   await wait(`!!document.querySelector('[data-testid="amend-options"]')`);
   const picked = await evaluate<boolean>(`(() => {
     const free = [...document.querySelectorAll('[data-testid="amend-options"] label')]
@@ -67,19 +72,19 @@ export async function verifyAmendment(
   );
   await screenshot("41-amend-review.png");
   await click('[data-testid="amend-confirm"]');
-  await wait(`!!document.querySelector('[data-testid="amendments"] li')`);
+  await wait(`!!document.querySelector('${RULES} [data-testid="amendments"] li')`);
   const listed = await evaluate<string>(
-    `document.querySelector('[data-testid="amendments"]').textContent`,
+    `document.querySelector('${RULES} [data-testid="amendments"]').textContent`,
   );
   const done = await evaluate<string>(
-    `document.querySelector('[data-testid="amend-rules"] .amend-status').textContent`,
+    `document.querySelector('${RULES} .amend-status').textContent`,
   );
   if (!/amended \d{4}/.test(listed) || !/amended this year/.test(done))
     throw new Error(`The amendment was not recorded: ${listed} / ${done}`);
   await evaluate(
-    `document.querySelector('[data-testid="amendments"]').scrollIntoView({ block: "center" })`,
+    `document.querySelector('${RULES} [data-testid="amendments"]').scrollIntoView({ block: "center" })`,
   );
   await screenshot("42-amendments.png");
-  await click(".overview-dialog > header .icon-button");
+  await click(".game-nav [data-view=world]");
   return { turnsPlayed, review: review.text.slice(0, 160), listed };
 }

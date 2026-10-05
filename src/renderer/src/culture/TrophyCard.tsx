@@ -9,10 +9,13 @@ export function TrophyCard({
   snapshot,
   busy,
   onAction,
+  readOnly = false,
 }: {
   snapshot: TurnSnapshot;
   busy: boolean;
   onAction: (action: Action) => void;
+  /** Outside the offseason screen (GDD v1.24): the trophy is named and renamed there. */
+  readOnly?: boolean;
 }) {
   const { t } = useTranslation();
   const words = useTraditionWords(snapshot);
@@ -39,11 +42,14 @@ export function TrophyCard({
     >
       <h2 id="flagship-trophy-heading">{t("culture.trophy.heading")}</h2>
       <p data-testid="flagship-trophy-name">{t("culture.trophy.named", { name: current })}</p>
-      {naming && <p className="culture-note">{t("culture.trophy.nameNow")}</p>}
-      {!naming && blocker !== null && (
+      {readOnly && (naming || blocker === null) && (
+        <p className="flagship-empty">{t("culture.trophy.elsewhere")}</p>
+      )}
+      {!readOnly && naming && <p className="culture-note">{t("culture.trophy.nameNow")}</p>}
+      {!readOnly && !naming && blocker !== null && (
         <p className="flagship-empty">{t(`culture.trophy.blockers.${blocker}`)}</p>
       )}
-      {(naming || blocker === null) && !reviewing && (
+      {!readOnly && (naming || blocker === null) && !reviewing && (
         <form
           className="flagship-picker"
           onSubmit={(event) => {
@@ -76,7 +82,7 @@ export function TrophyCard({
           </button>
         </form>
       )}
-      {reviewing && (
+      {!readOnly && reviewing && (
         <div className="flagship-review" data-testid="flagship-trophy-review">
           <p className="warning">
             {t("culture.trophy.renameReview", {

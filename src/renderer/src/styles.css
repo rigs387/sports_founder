@@ -963,6 +963,7 @@ h2 {
     grid-template-rows: auto 1020px auto;
   }
   .game-topbar {
+    min-width: 0;
     min-height: 105px;
     flex-wrap: wrap;
     gap: 14px;
@@ -973,6 +974,13 @@ h2 {
     width: 100%;
     justify-content: space-between;
     height: 28px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .game-nav button {
+    flex: none;
+    white-space: nowrap;
   }
   .game-brand {
     font-size: 14px;

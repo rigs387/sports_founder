@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActionFeedback } from "./components/ActionFeedback";
 import { CampaignOverview, type Overview } from "./components/CampaignOverview";
@@ -15,6 +15,7 @@ import { GrowthScreen } from "./growth/GrowthScreen";
 import { Emblem } from "./identity/Emblem";
 import { heatBand, mapSettings } from "./map/model";
 import { type MapCommand, type MapHover, WorldMap } from "./map/WorldMap";
+import { OffseasonScreen } from "./offseason/OffseasonScreen";
 import { useGameStore } from "./state/game-store";
 
 export function App() {
@@ -46,7 +47,22 @@ export function App() {
   useEffect(() => {
     void loadSetup();
   }, [loadSetup]);
-  const fullPage = overview === "growth" || overview === "flagship";
+  const fullPage = overview === "growth" || overview === "flagship" || overview === "offseason";
+  // On narrow screens the nav scrolls; keep the current view's tab in sight.
+  useEffect(() => {
+    document
+      .querySelector(`.game-nav [data-view="${overview ?? "world"}"]`)
+      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [overview]);
+  // The offseason opens on its own screen (GDD v1.24), once each time it opens, if the player is
+  // on the world map; elsewhere its tab appears and waits.
+  const offseasonOpen = snapshot?.offseasonOpen ?? false;
+  const wasOpen = useRef(offseasonOpen);
+  useEffect(() => {
+    if (offseasonOpen && !wasOpen.current && overview === null) setOverview("offseason");
+    if (!offseasonOpen && overview === "offseason") setOverview(null);
+    wasOpen.current = offseasonOpen;
+  }, [offseasonOpen, overview]);
   // A pop-up card outlines its country on the map (GDD v1.25), leaving the selection alone.
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const navigate = (kind: MapCommand["kind"], market?: string) =>
@@ -132,6 +148,17 @@ export function App() {
               {t(`map.nav.${view}`)}
             </button>
           ))}
+          {offseasonOpen && (
+            <button
+              type="button"
+              data-view="offseason"
+              className={`nav-offseason${overview === "offseason" ? " active" : ""}`}
+              aria-current={overview === "offseason" ? "page" : undefined}
+              onClick={() => setOverview("offseason")}
+            >
+              {t("map.nav.offseason")}
+            </button>
+          )}
         </nav>
         <div className="resources">
           <div>
@@ -178,6 +205,16 @@ export function App() {
           active={overview === "flagship"}
           busy={status !== "ready"}
           onAction={(action) => void dispatchAction(action)}
+        />
+      )}
+      {names && (
+        <OffseasonScreen
+          snapshot={snapshot}
+          names={names}
+          active={overview === "offseason"}
+          busy={status !== "ready"}
+          onAction={(action) => void dispatchAction(action)}
+          onWorld={() => setOverview(null)}
         />
       )}
       <section className="world-stage" hidden={fullPage} aria-label={t("map.stage")}>
@@ -410,6 +447,7 @@ export function App() {
       <footer className={`game-bottom${fullPage ? " is-growth" : ""}`}>
         {overview === "growth" && <p className="growth-footer-note">{t("growth.board.footer")}</p>}
         {overview === "flagship" && <p className="growth-footer-note">{t("flagship.footer")}</p>}
+        {overview === "offseason" && <p className="growth-footer-note">{t("offseason.footer")}</p>}
         <div className="map-legend" hidden={fullPage}>
           <span>{t("map.strength")}</span>
           <div className="legend-swatches">

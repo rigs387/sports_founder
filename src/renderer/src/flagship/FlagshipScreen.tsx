@@ -83,6 +83,7 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
             busy={busy}
             clubName={clubName}
             onAction={onAction}
+            readOnly
           />
           <LeagueTable
             snapshot={snapshot}
@@ -93,8 +94,8 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
         </div>
         <div className="flagship-side">
           <LatestRound results={flagship.lastRound} clubName={clubName} nouns={nouns} />
-          <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} />
-          <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
+          <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} readOnly />
+          <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
           <Champions snapshot={snapshot} clubName={clubName} country={country} />
         </div>
       </div>
@@ -342,16 +343,19 @@ function Champions({
   );
 }
 
-function Seat({
+/** The commissioner's seat; `readOnly` outside the offseason screen (GDD v1.24). */
+export function Seat({
   snapshot,
   names,
   busy,
   onAction,
+  readOnly = false,
 }: {
   snapshot: TurnSnapshot;
   names: Names;
   busy: boolean;
   onAction: (action: Action) => void;
+  readOnly?: boolean;
 }) {
   const { t } = useTranslation();
   const nouns = useTermVars(snapshot.identity.terms)();
@@ -383,17 +387,21 @@ function Seat({
               country: country(flagship.pendingCountryId),
             })}
           </p>
-          <button
-            type="button"
-            className="action-button"
-            disabled={busy}
-            onClick={() => onAction({ type: "moveSeat", countryId: flagship.countryId })}
-          >
-            {t("flagship.seat.cancel", { country: country(flagship.countryId) })}
-          </button>
+          {!readOnly && (
+            <button
+              type="button"
+              className="action-button"
+              disabled={busy}
+              onClick={() => onAction({ type: "moveSeat", countryId: flagship.countryId })}
+            >
+              {t("flagship.seat.cancel", { country: country(flagship.countryId) })}
+            </button>
+          )}
         </div>
       ) : targets.length === 0 ? (
         <p className="flagship-empty">{t("flagship.seat.none")}</p>
+      ) : readOnly ? (
+        <p className="flagship-empty">{t("flagship.seat.elsewhere")}</p>
       ) : (
         <>
           <label className="flagship-picker">

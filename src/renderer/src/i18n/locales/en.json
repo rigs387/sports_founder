@@ -387,6 +387,32 @@
       "american": "American: the top clubs play off"
     }
   },
+  "offseason": {
+    "eyebrow": "League business",
+    "title": "The {{year}} offseason in {{country}}",
+    "pp": "You have {{pp, number(maximumFractionDigits: 0)}} PP",
+    "closed": "The offseason opens when the {{seasonNoun}} ends.",
+    "footer": "League business is open until the next turn. Next Turn starts the new season.",
+    "review": {
+      "heading": "The {{seasonNoun}} in review",
+      "champion": "{{SeasonNoun}} {{season}} champions: {{club}}",
+      "newStar": "New star: {{player}}",
+      "decisions_one": "{{count}} decision from this season waits on the map.",
+      "decisions_other": "{{count}} decisions from this season wait on the map.",
+      "toMap": "Go to the map"
+    },
+    "promotions": {
+      "heading": "Promotions",
+      "none": "No league qualifies for promotion this year.",
+      "step": "{{from}} to {{to}}",
+      "cost": "Costs {{cost, number(maximumFractionDigits: 0)}} of the league's {{cash, number(maximumFractionDigits: 0)}} cash; then {{running, number(maximumFractionDigits: 1)}} a quarter to run.",
+      "promote": "Promote to {{to}}",
+      "confirm": "Confirm: {{to}}",
+      "cancel": "Cancel",
+      "all": "Show all {{count}} leagues",
+      "fewer": "Show the five biggest"
+    }
+  },
   "status": {
     "loading": "Setting up the backyard…",
     "simulating": "Simulating…",
@@ -830,7 +856,8 @@
       "sport": "Your sport",
       "leagues": "Leagues",
       "flagship": "Flagship",
-      "growth": "Growth"
+      "growth": "Growth",
+      "offseason": "Offseason"
     },
     "prestige": "Prestige",
     "home": "World view",
@@ -966,6 +993,7 @@
       "here": "You run the league in {{country}}. Every other league runs itself.",
       "pending": "The seat moves to {{country}} when the offseason closes, before the next {{seasonNoun}}.",
       "cancel": "Stay in {{country}}",
+      "elsewhere": "The seat moves only from the offseason screen.",
       "choose": "Move the seat to",
       "placeholder": "Choose a league",
       "none": "No other league is Professional or Elite yet. The seat can move only to one that is.",
@@ -978,6 +1006,7 @@
     },
     "footer": "Your league. Each season is followed by the offseason, when league business is done.",
     "stars": {
+      "elsewhere": "Stars are backed and dropped on the offseason screen.",
       "heading": "Stars",
       "intro": "Stars are the league's leading players who carried their club. Backing one lifts the sport in {{country}} while they play here.",
       "none": "No star yet. A {{seasonNoun}}'s top scorer becomes a star when they carry their club's scoring.",
@@ -1275,6 +1304,7 @@
     }
   },
   "rules": {
+    "elsewhere": "Rules are amended once a year, on the offseason screen.",
     "heading": "Amend the rules",
     "intro": "Once a year, in the offseason, you may change one rule. Purists push back: some hardcore fans turn casual, more the older the rule, the bigger the change, in {{anchor}}, and where the old rule suited fans better.",
     "closed": "Rules can be amended only in the offseason.",
@@ -1387,6 +1417,7 @@
       "venue": "Famous ground"
     },
     "trophy": {
+      "elsewhere": "The trophy is named and renamed on the offseason screen.",
       "heading": "The trophy",
       "named": "The champions lift {{name}}.",
       "nameNow": "Name the trophy, free while its first champion card is open.",

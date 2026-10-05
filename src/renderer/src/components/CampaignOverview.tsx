@@ -7,7 +7,7 @@ import { Rulebook } from "../identity/Rulebook";
 import { ActionFeedback } from "./ActionFeedback";
 import { LeagueOverview } from "./LeagueOverview";
 
-export type Overview = "sport" | "leagues" | "flagship" | "growth";
+export type Overview = "sport" | "leagues" | "flagship" | "growth" | "offseason";
 interface Props {
   view: Exclude<Overview, "growth" | "flagship">;
   snapshot: TurnSnapshot;

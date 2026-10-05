@@ -1,0 +1,109 @@
+/* The offseason screen (GDD v1.24): the season in review, then all league business. */
+.offseason-screen {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 22px 26px 30px;
+  background: #f1f8fa;
+  color: var(--ink);
+}
+.offseason-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+.offseason-heading h1 {
+  margin: 4px 0 0;
+  font-size: 30px;
+  letter-spacing: -0.5px;
+}
+.offseason-pp {
+  margin: 0;
+  padding: 8px 14px;
+  font-weight: 800;
+  background: #fff;
+  border: 2px solid #2d5482;
+  border-radius: 8px;
+}
+.offseason-review {
+  margin-bottom: 18px;
+}
+.offseason-review p {
+  margin: 6px 0;
+}
+.offseason-champion {
+  font-size: 18px;
+  font-weight: 800;
+}
+.offseason-star {
+  font-weight: 700;
+  color: #2c66c8;
+}
+.offseason-decisions {
+  font-weight: 700;
+}
+.offseason-business {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.offseason-column {
+  display: grid;
+  gap: 18px;
+}
+.offseason-column .amend-rules {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.offseason-promotions {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.offseason-promotions li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.offseason-promotions li > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+.offseason-promotions small {
+  color: var(--muted);
+}
+.offseason-confirm {
+  display: flex;
+  gap: 8px;
+}
+.nav-offseason {
+  color: #ffd27a;
+}
+@media (max-width: 850px) {
+  .offseason-screen {
+    padding: 18px 16px 30px;
+  }
+  .offseason-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .offseason-business {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .offseason-column {
+    min-width: 0;
+  }
+  .offseason-promotions li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

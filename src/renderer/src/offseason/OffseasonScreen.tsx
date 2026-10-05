@@ -1,0 +1,249 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { Names } from "../../../content";
+import type { Action, CountrySnapshot, TurnSnapshot } from "../../../sim";
+import { TrophyCard } from "../culture/TrophyCard";
+import { Seat } from "../flagship/FlagshipScreen";
+import { StarsPanel } from "../flagship/StarsPanel";
+import { AmendRules } from "../identity/AmendRules";
+import { useTermVars } from "../identity/terms";
+import "../flagship/flagship.css";
+import "./offseason.css";
+
+interface Props {
+  snapshot: TurnSnapshot;
+  names: Names;
+  busy: boolean;
+  active: boolean;
+  onAction: (action: Action) => void;
+  /** Back to the world map, where the season's decisions wait. */
+  onWorld: () => void;
+}
+
+// The offseason (GDD v1.24): once a year, after the flagship season ends, one screen holds the
+// season in review and then all league business — stars, the rules, promotions, the seat and the
+// trophy — each priced against the PP on hand. Sponsors and TV deals will join it. The tabs keep
+// read-only views; legality and prices stay in the simulation.
+export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWorld }: Props) {
+  const { t } = useTranslation();
+  const flagship = snapshot.flagship;
+  const termVars = useTermVars(snapshot.identity.terms);
+  const nouns = termVars();
+  const country = (id: string) => names.countries[id] ?? id;
+  const clubs = new Map(flagship.clubs.map((club) => [club.id, club]));
+  const clubName = (id: number) => {
+    const club = clubs.get(id);
+    return club ? t("flagship.club", { place: club.place, nickname: club.nickname }) : "";
+  };
+  const playerName = (id: number | null | undefined) =>
+    flagship.players.find((player) => player.id === id)?.name ?? "";
+  const last = flagship.recentSeasons[0];
+  const final = last?.playoffs.at(-1);
+  const decisions = snapshot.events.filter((event) => event.kind === "decision").length;
+
+  return (
+    <section
+      className="offseason-screen"
+      hidden={!active}
+      aria-labelledby="offseason-title"
+      data-testid="offseason-screen"
+      data-open={snapshot.offseasonOpen}
+    >
+      <div className="offseason-heading">
+        <div>
+          <span className="eyebrow">{t("offseason.eyebrow")}</span>
+          <h1 id="offseason-title">
+            {t("offseason.title", { year: snapshot.year, country: country(flagship.countryId) })}
+          </h1>
+        </div>
+        <p className="offseason-pp" data-testid="offseason-pp">
+          {t("offseason.pp", { pp: snapshot.pp })}
+        </p>
+      </div>
+      {!snapshot.offseasonOpen && (
+        <p className="flagship-paused" role="status">
+          {t("offseason.closed", nouns)}
+        </p>
+      )}
+      <section className="flagship-card offseason-review" aria-labelledby="offseason-review">
+        <h2 id="offseason-review">{t("offseason.review.heading", nouns)}</h2>
+        {last ? (
+          <>
+            <p className="offseason-champion" data-testid="offseason-champion">
+              <span aria-hidden="true">&#9733;</span>{" "}
+              {t("offseason.review.champion", {
+                ...nouns,
+                season: last.season,
+                club: clubName(last.championId),
+              })}
+            </p>
+            <p>
+              {final
+                ? t("flagship.champions.final", {
+                    home: clubName(final.homeId),
+                    away: clubName(final.awayId),
+                    homeScore: final.homeScore,
+                    awayScore: final.awayScore,
+                  })
+                : t("flagship.champions.runnerUp", { club: clubName(last.runnerUpId) })}
+            </p>
+            {last.topScorer && (
+              <p>
+                {t("events.seasonScorer", {
+                  ...termVars({ score: last.topScorer.scores }),
+                  player: playerName(last.topScorer.playerId),
+                  count: last.topScorer.scores,
+                })}
+              </p>
+            )}
+            {last.newStarId !== null && (
+              <p className="offseason-star" data-testid="offseason-new-star">
+                {t("offseason.review.newStar", { player: playerName(last.newStarId) })}
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="flagship-empty">{t("flagship.champions.none", nouns)}</p>
+        )}
+        {decisions > 0 && (
+          <p className="offseason-decisions">
+            {t("offseason.review.decisions", { count: decisions })}{" "}
+            <button type="button" className="flagship-back" onClick={onWorld}>
+              {t("offseason.review.toMap")}
+            </button>
+          </p>
+        )}
+      </section>
+      <div className="offseason-business">
+        <div className="offseason-column">
+          <StarsPanel
+            snapshot={snapshot}
+            names={names}
+            busy={busy}
+            clubName={clubName}
+            onAction={onAction}
+          />
+          <div className="flagship-card">
+            <AmendRules snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
+          </div>
+        </div>
+        <div className="offseason-column">
+          <Promotions snapshot={snapshot} country={country} busy={busy} onAction={onAction} />
+          <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
+          <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** How many qualifying leagues show before "Show all". */
+const PROMOTIONS_SHOWN = 5;
+
+/**
+ * Leagues that qualify for promotion this offseason, paid from the league's own cash: the biggest
+ * followings first.
+ */
+function Promotions({
+  snapshot,
+  country,
+  busy,
+  onAction,
+}: {
+  snapshot: TurnSnapshot;
+  country: (id: string) => string;
+  busy: boolean;
+  onAction: (action: Action) => void;
+}) {
+  const { t } = useTranslation();
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const [all, setAll] = useState(false);
+  const ready = snapshot.countries
+    .filter(
+      (entry): entry is CountrySnapshot & { league: NonNullable<CountrySnapshot["league"]> } =>
+        entry.league?.actions.promoteLeague.blocker === null,
+    )
+    .sort((a, b) => b.fandomScore - a.fandomScore || a.countryId.localeCompare(b.countryId));
+  const shown = all ? ready : ready.slice(0, PROMOTIONS_SHOWN);
+  return (
+    <section
+      className="flagship-card"
+      aria-labelledby="offseason-promotions"
+      data-testid="offseason-promotions"
+    >
+      <h2 id="offseason-promotions">{t("offseason.promotions.heading")}</h2>
+      {ready.length === 0 ? (
+        <p className="flagship-empty">{t("offseason.promotions.none")}</p>
+      ) : (
+        <ul className="offseason-promotions">
+          {shown.map((entry) => {
+            const terms = entry.league.actions.promoteLeague.terms;
+            if (!terms) return null;
+            const from = t(`league.tiers.${entry.league.tier}`);
+            const to = t(`league.tiers.${terms.to}`);
+            return (
+              <li key={entry.countryId} data-country={entry.countryId}>
+                <div>
+                  <strong>{country(entry.countryId)}</strong>
+                  <small>{t("offseason.promotions.step", { from, to })}</small>
+                  <small>
+                    {t("offseason.promotions.cost", {
+                      cost: terms.cost,
+                      cash: entry.league.cash,
+                      running: terms.runningCostPerQuarter,
+                    })}
+                  </small>
+                </div>
+                {confirming === entry.countryId ? (
+                  <div className="offseason-confirm">
+                    <button
+                      type="button"
+                      className="action-button"
+                      disabled={busy}
+                      data-testid="offseason-promote-confirm"
+                      onClick={() => {
+                        setConfirming(null);
+                        onAction({ type: "promoteLeague", countryId: entry.countryId });
+                      }}
+                    >
+                      {t("offseason.promotions.confirm", { to })}
+                    </button>
+                    <button
+                      type="button"
+                      className="flagship-back"
+                      onClick={() => setConfirming(null)}
+                    >
+                      {t("offseason.promotions.cancel")}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="action-button"
+                    disabled={busy}
+                    data-testid="offseason-promote"
+                    onClick={() => setConfirming(entry.countryId)}
+                  >
+                    {t("offseason.promotions.promote", { to })}
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {ready.length > PROMOTIONS_SHOWN && (
+        <button
+          type="button"
+          className="flagship-back"
+          data-testid="offseason-promotions-all"
+          onClick={() => setAll(!all)}
+        >
+          {t(all ? "offseason.promotions.fewer" : "offseason.promotions.all", {
+            count: ready.length,
+          })}
+        </button>
+      )}
+    </section>
+  );
+}
