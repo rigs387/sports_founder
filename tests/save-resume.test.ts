@@ -17,7 +17,7 @@ import {
   SaveError,
   serializeSave,
 } from "../src/sim";
-import { firstAnchor, presetGenome, setupFor, world } from "./helpers";
+import { firstAnchor, migratedCulture, presetGenome, setupFor, world } from "./helpers";
 
 /** What a format 7 → 8 migration adds: a European flagship at the anchor, starting now. */
 function migratedFlagship(
@@ -339,6 +339,7 @@ describe("saves with the growth tree (format 5)", () => {
         events: emptyEvents(withoutTree.landmarks.length),
         ...migratedFlagship(withoutTree),
         rules: { amendments: [] },
+        culture: migratedCulture({ ...withoutTree, ...migratedFlagship(withoutTree) }),
       }),
     );
     const later = playWithPolicy(loaded, 6);
@@ -364,6 +365,7 @@ describe("saves with the growth tree (format 5)", () => {
       events: emptyEvents(current.landmarks.length),
       ...migratedFlagship(current),
       rules: { amendments: [] },
+      culture: migratedCulture({ ...current, ...migratedFlagship(current) }),
     };
     expect(serializeSave(loaded)).toBe(serializeSave(migrated));
     expect(playWithPolicy(loaded, 6)).toStrictEqual(playWithPolicy(migrated, 6));

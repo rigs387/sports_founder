@@ -41,7 +41,8 @@ export interface GrowthFactors {
 
 type FactorKey = keyof GrowthFactors;
 
-function factorKey(effect: NodeEffect): { key: FactorKey; reduction: boolean } {
+/** The factor an effect sets, or null for Culture effects (src/sim/culture.ts reads those). */
+function factorKey(effect: NodeEffect): { key: FactorKey; reduction: boolean } | null {
   switch (effect.type) {
     case "spreadChannel":
       return { key: effect.channel ?? "proximity", reduction: false };
@@ -61,6 +62,11 @@ function factorKey(effect: NodeEffect): { key: FactorKey; reduction: boolean } {
       return { key: "runningCost", reduction: true };
     case "countermoveResistance":
       return { key: "countermoveEffect", reduction: true };
+    case "traditionStrength":
+    case "traditionReach":
+    case "traditionProtection":
+    case "traditionHold":
+      return null;
   }
 }
 
@@ -127,7 +133,9 @@ export function growthFactors(world: World, owned: readonly string[]): readonly 
     const reductions = new Set<FactorKey>();
     for (const node of nodes) {
       for (const effect of node.effects) {
-        const { key, reduction } = factorKey(effect);
+        const target = factorKey(effect);
+        if (!target) continue;
+        const { key, reduction } = target;
         totals[key] += effectValue(effect, attributes);
         if (reduction) reductions.add(key);
       }

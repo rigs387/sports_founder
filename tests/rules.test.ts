@@ -19,7 +19,7 @@ import {
   stepQuarter,
   type World,
 } from "../src/sim";
-import { setupFor, withConfig, world } from "./helpers";
+import { migratedCulture, setupFor, withConfig, world } from "./helpers";
 
 // Rules evolution, first build (GDD v1.20, tech plan 2.9).
 
@@ -196,7 +196,9 @@ describe("the review and saves", () => {
     expect(deserializeSave(serializeSave(amended), content)).toEqual(amended);
     const { rules: _r, ...v16 } = state;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 16, state: v16 }), content);
-    expect(serializeSave(loaded)).toBe(serializeSave(state));
+    expect(serializeSave(loaded)).toBe(
+      serializeSave({ ...state, culture: migratedCulture(state) }),
+    );
   });
 
   it("rejects a save whose genome disagrees with its last amendment", () => {

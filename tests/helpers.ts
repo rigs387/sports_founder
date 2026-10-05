@@ -6,7 +6,7 @@ import {
   type WorldContent,
 } from "../src/content";
 import { loadWorldFromDisk } from "../src/runner/content-from-disk";
-import { type CampaignSetup, defaultGenome } from "../src/sim";
+import { type CampaignSetup, defaultGenome, type GameState, newCulture } from "../src/sim";
 
 export const world = loadWorldFromDisk();
 
@@ -68,4 +68,15 @@ export function countryIndex(w: World, id: string): number {
   const index = w.countries.findIndex((country) => country.id === id);
   if (index < 0) throw new Error(`No country "${id}" in content`);
   return index;
+}
+
+/** The culture an older save gains on loading (format 18): none yet, facts counted from now. */
+export function migratedCulture(state: GameState) {
+  return newCulture(
+    state.seed,
+    state.flagship.season,
+    state.landmarks.length,
+    state.quarter,
+    world,
+  );
 }

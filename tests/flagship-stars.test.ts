@@ -14,7 +14,7 @@ import {
   stepQuarter,
   type World,
 } from "../src/sim";
-import { setupFor, withConfig, world } from "./helpers";
+import { migratedCulture, setupFor, withConfig, world } from "./helpers";
 
 // Stars and careers (GDD v1.16, tech plan 2.6 step 4).
 
@@ -177,6 +177,7 @@ describe("save format 13", () => {
         players: plain,
         seasons: played.flagship.seasons.map((s) => ({ ...s, newStarId: null })),
       },
+      culture: migratedCulture(played),
     };
     expect(serializeSave(loaded)).toBe(serializeSave(expected));
   });

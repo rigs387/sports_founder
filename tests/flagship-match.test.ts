@@ -9,7 +9,7 @@ import {
   scoringRate,
   stepQuarter,
 } from "../src/sim";
-import { baseGenome, setupFor, world } from "./helpers";
+import { baseGenome, migratedCulture, setupFor, world } from "./helpers";
 
 // Scoring frequency in the flagship's matches (GDD v1.16, tech plan 2.6 step 1).
 
@@ -139,6 +139,7 @@ describe("save format 10", () => {
         scoring: "medium",
         seasons: played.flagship.seasons.map((s) => ({ ...s, scoring: "medium" })),
       },
+      culture: migratedCulture(played),
     });
     const next = playSeasons(loaded, 3);
     expect(next.flagship.seasons.at(-1)?.scoring).toBe("medium");

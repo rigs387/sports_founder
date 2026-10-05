@@ -49,3 +49,23 @@ oddPairings:
   - { id: large-team-small-field, when: { teamSize: large, footprint: small } }
   - { id: gear-no-contact, when: { equipment: protective-gear, contact: none } }
   - { id: ice-marathon, when: { surface: ice, physical: endurance, matchLength: long } }
+
+# Culture (GDD v1.22): founding character shapes culture, never affinity. Each birthplace sets an
+# ease per tradition type: birth thresholds are divided by it and starting strength multiplied by
+# it. Each ethos sets multipliers on the three betrayals: rule changes, the seat move and renaming
+# the trophy. Content validation keeps every birthplace's eases and every ethos's multipliers at a
+# geometric mean within 1 ± config culture.characterBand: character changes a campaign's shape,
+# never its difficulty. Every birthplace and ethos above needs an entry; every type needs an ease.
+culture:
+  birthplaces:
+    schoolyard: { derby: 0.85, rite: 0.9, legacy: 1.3, nationalName: 1.1, venue: 0.9, trophy: 1 }
+    factory: { derby: 1.35, rite: 0.9, legacy: 0.9, nationalName: 1, venue: 1.1, trophy: 0.85 }
+    beach: { derby: 0.9, rite: 0.9, legacy: 1.3, nationalName: 1.15, venue: 0.8, trophy: 1 }
+    barracks: { derby: 0.9, rite: 1.3, legacy: 0.8, nationalName: 0.95, venue: 1.2, trophy: 1 }
+    village-green: { derby: 0.8, rite: 1.25, legacy: 0.85, nationalName: 0.95, venue: 1, trophy: 1.25 }
+    docks: { derby: 1.3, rite: 1, legacy: 0.85, nationalName: 1.1, venue: 0.9, trophy: 0.95 }
+  ethos:
+    gentlemans-game: { rules: 1.3, seat: 0.9, rename: 0.85 }
+    working-class-game: { rules: 0.65, seat: 1.3, rename: 1.2 }
+    rebel-game: { rules: 0.7, seat: 1.3, rename: 1.1 }
+    family-game: { rules: 0.9, seat: 0.85, rename: 1.3 }

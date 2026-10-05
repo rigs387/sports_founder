@@ -19,7 +19,7 @@ import {
   settleEvents,
   type TableRow,
 } from "../src/sim";
-import { countryIndex, setupFor, sweepAnchors, withWorld, world } from "./helpers";
+import { countryIndex, migratedCulture, setupFor, sweepAnchors, withWorld, world } from "./helpers";
 
 // The flagship season as cards (GDD v1.15).
 
@@ -384,6 +384,7 @@ describe("season cards in play", () => {
             startRatings: [],
           })),
         },
+        culture: migratedCulture(played),
       }),
     );
   });

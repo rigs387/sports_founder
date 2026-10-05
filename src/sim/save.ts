@@ -10,8 +10,10 @@ import {
   LEAGUE_TIERS,
   leagueTierSchema,
   timedCountermoveSchema,
+  traditionTypeSchema,
 } from "../content";
 import { tierEntry } from "./calendar";
+import { newCulture } from "./culture";
 import { emptyEvents, eventStateSchema } from "./events-state";
 import { newFlagship, staffFlagship } from "./flagship";
 import { defaultGroundName, defaultIdentitySetup, foundingClubOf } from "./identity";
@@ -23,7 +25,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 17;
+export const SAVE_FORMAT_VERSION = 18;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -43,6 +45,8 @@ const leagueSchema = z.strictObject({
   formedQuarter: count,
   bailoutReadyQuarter: count,
 });
+
+const lossReasonSchema = z.enum(["faded", "folded", "broken", "renamed"]);
 
 const landmarkSchema = z.discriminatedUnion("kind", [
   z.strictObject({
@@ -190,6 +194,23 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     from: z.string().min(1),
     countryId: z.string().min(1),
     reason: z.enum(["moved", "returned"]),
+  }),
+  z.strictObject({
+    kind: z.literal("traditionBorn"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    traditionId: z.int().min(1),
+    type: traditionTypeSchema,
+  }),
+  z.strictObject({
+    kind: z.literal("traditionLost"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    traditionId: z.int().min(1),
+    type: traditionTypeSchema,
+    reason: lossReasonSchema,
   }),
   z.strictObject({
     kind: z.literal("rivalRuleCopied"),
@@ -406,6 +427,35 @@ const gameStateSchema = z.strictObject({
       }),
     ),
   }),
+  culture: z.strictObject({
+    startSeason: z.int().min(1),
+    landmarkCursor: count,
+    year: z.int(),
+    rng: z.array(z.number()).min(1),
+    traditions: z.array(
+      z.strictObject({
+        id: z.int().min(1),
+        type: traditionTypeSchema,
+        countryId: z.string().min(1),
+        clubIds: z.array(z.int().min(1)),
+        playerId: z.int().min(1).nullable(),
+        name: z.string().min(1).nullable(),
+        seasons: z.array(z.int().min(1)),
+        rules: z.partialRecord(axisSchema, z.string().min(1)),
+        bornTurn: z.int().min(1),
+        bornQuarter: count,
+        strength: z.number().min(0).max(1),
+        renewedYear: z.int(),
+        followers: z.array(z.string().min(1)).min(1),
+        lost: z
+          .strictObject({ turn: z.int().min(1), quarter: count, reason: lossReasonSchema })
+          .nullable(),
+      }),
+    ),
+    nextId: z.int().min(1),
+    stokes: z.array(z.strictObject({ clubIds: z.array(z.int().min(1)), season: z.int().min(1) })),
+    naming: z.int().min(1).nullable(),
+  }),
 });
 
 const saveFileSchema = z.strictObject({
@@ -424,6 +474,25 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 17 → 18: culture (GDD v1.22). No traditions and no retroactive history: facts count from the
+  // flagship season under way, and only landmarks recorded from now on are read.
+  17: (save, world) => {
+    const flagship = save.state.flagship as FlagshipState;
+    const landmarks = Array.isArray(save.state.landmarks) ? save.state.landmarks : [];
+    return {
+      formatVersion: 18,
+      state: {
+        ...save.state,
+        culture: newCulture(
+          Number(save.state.seed),
+          flagship.season,
+          landmarks.length,
+          Number(save.state.quarter),
+          world,
+        ),
+      },
+    };
+  },
   // 16 → 17: rules evolution (GDD v1.20). No amendments yet; every rule has stood since the start.
   16: (save) => ({
     formatVersion: 17,

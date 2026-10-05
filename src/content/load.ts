@@ -20,6 +20,7 @@ import {
   SOURCED_FIELDS,
   sourcesFileSchema,
   sportsFileSchema,
+  TRADITION_EFFECT_TYPES,
 } from "./schemas";
 
 export const CONTENT_FILES = {
@@ -173,6 +174,54 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
         issue(sources.identity, `oddPairings[${i}].when.${axis}`, `unknown option "${option}"`);
     }
   });
+  // Culture (GDD v1.22): every birthplace and ethos has its multipliers, each balanced near 1.
+  const band = world.config.culture.characterBand;
+  const geometricMean = (values: readonly number[]) =>
+    Math.exp(values.reduce((sum, v) => sum + Math.log(v), 0) / values.length);
+  const character = world.identity.culture;
+  const checkCharacter = (
+    list: readonly string[],
+    table: Record<string, Record<string, number>>,
+    field: string,
+  ) => {
+    for (const choice of list) {
+      const entry = table[choice];
+      if (!entry) {
+        issue(sources.identity, `culture.${field}.${choice}`, "missing");
+        continue;
+      }
+      const mean = geometricMean(Object.values(entry));
+      if (Math.abs(mean - 1) > band)
+        issue(
+          sources.identity,
+          `culture.${field}.${choice}`,
+          `geometric mean ${mean.toFixed(3)} is outside 1 ± ${band}`,
+        );
+    }
+    for (const choice of Object.keys(table))
+      if (!list.includes(choice))
+        issue(sources.identity, `culture.${field}.${choice}`, "not a choice in this list");
+  };
+  checkCharacter(world.identity.birthplaces, character.birthplaces, "birthplaces");
+  checkCharacter(world.identity.ethos, character.ethos, "ethos");
+  const { traditions } = world.names;
+  for (const birthplace of world.identity.birthplaces)
+    if (!traditions.rites[birthplace])
+      issue(sources.names, `traditions.rites.${birthplace}`, "missing rite names");
+  if (!traditions.nationalNames.default)
+    issue(sources.names, "traditions.nationalNames.default", "missing the default pool");
+  for (const [sportId, list] of Object.entries(traditions.rivals)) {
+    if (!rivalIds.has(sportId))
+      issue(sources.names, `traditions.rivals.${sportId}`, "unknown rival sport");
+    list.forEach((tradition, i) => {
+      if (!world.countries.some((country) => country.id === tradition.countryId))
+        issue(
+          sources.names,
+          `traditions.rivals.${sportId}[${i}].countryId`,
+          `unknown country "${tradition.countryId}"`,
+        );
+    });
+  }
   const tournamentSports = new Set<string>();
   world.config.rivalAI.tournaments.forEach((tournament, i) => {
     const field = `rivalAI.tournaments[${i}].sportId`;
@@ -693,6 +742,13 @@ function checkGrowthTree(world: World, sources: ContentSources, issues: ContentI
       if (effect.type === "spreadChannel" && effect.channel === undefined) {
         issue(`${field}.channel`, "a spreadChannel effect needs a channel");
       }
+      const culture = TRADITION_EFFECT_TYPES.includes(effect.type);
+      if (culture && node.category !== "culture")
+        issue(`${field}.type`, `${effect.type} belongs to Culture nodes only`);
+      if (culture && effect.conditions !== undefined)
+        issue(`${field}.conditions`, "Culture effects apply everywhere and take no conditions");
+      if (!culture && effect.traditionType !== undefined)
+        issue(`${field}.traditionType`, `only Culture effects take a tradition type`);
       if (effect.type !== "spreadChannel" && effect.channel !== undefined) {
         issue(
           `${field}.channel`,

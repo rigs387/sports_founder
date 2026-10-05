@@ -1,5 +1,6 @@
 import { genomeSchema, IDENTITY_AXES } from "../content";
 import { QUARTERS_PER_YEAR } from "./calendar";
+import { cultureProblems } from "./culture";
 import { eventProblems } from "./events";
 import { flagshipProblems } from "./flagship";
 import { forkOf } from "./growth";
@@ -26,6 +27,7 @@ export function invariantsOf(state: GameState, world: World): string[] {
     ...flagshipProblems(state, world),
     ...identityStateProblems(state, world),
     ...rulesProblems(state),
+    ...cultureProblems(state, world),
   ];
 
   if (!Number.isInteger(state.turn) || state.turn < 1)

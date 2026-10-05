@@ -515,6 +515,49 @@ rulesEvolution:
     maxShare: 0.25
   previewMarkets: 5
 
+# Culture, first build (GDD v1.22). Traditions are born only from recorded facts, held by the
+# player's fans in follower countries, renewed by new facts and faded without them. Founding
+# character's multipliers live in identity.yaml; names in names.yaml.
+culture:
+  # Strength runs 0-1: born at startStrength × the birthplace's ease (honored star legacies add
+  # honorsBonus), + renewal per renewing fact, − decayPerYear for each year without one. Lost at 0.
+  startStrength: 0.4
+  renewal: 0.2
+  decayPerYear: 0.1
+  honorsBonus: 0.2
+  # Births. Thresholds are divided by the birthplace's ease for the type and rounded (at least 1).
+  # Facts count only from culture.startSeason (no retroactive history for older saves).
+  derby: { meetings: 3, window: 5 }
+  legacy: { starSeasons: 4 }
+  venue: { fameFacts: 3, foundingFacts: 1 }
+  # Effects. A country's weight is the strength its traditions hold there (abroad at
+  # reach.followerShare), capped; each effect scales with weight ÷ weightCap at most.
+  weightCap: 2
+  turnoverCut: 0.33
+  poachCut: 0.4
+  # Famous venue extras: casual conversion × (1 + pilgrimage × strength) in its country; the
+  # champion moment's PP × (1 + championBonus × the flagship country's venue strength, at most 1).
+  pilgrimage: 0.05
+  championBonus: 0.5
+  # Betrayal. Amendment backlash × (1 + backlashWeight × ethos × offended strength held there);
+  # an offending amendment cuts the tradition's strength by amendmentDamage × jump. The seat move's
+  # purist cost × (1 + seatWeight × ethos × weight of the country left). Renaming the trophy turns
+  # renameShare × strength × ethos of its followers' hardcore fans casual.
+  backlashWeight: 1
+  amendmentDamage: 0.25
+  seatWeight: 0.5
+  renameShare: 0.03
+  # Reach (Culture nodes only): once a year a tradition at minStrength or more at home may gain a
+  # follower: chance = chancePerReach × the reach bonus (zero without reach nodes). A candidate is
+  # linked to a follower by proximity or language and has a player hardcore share of at least
+  # minHardcoreShare.
+  reach: { minStrength: 0.9, chancePerReach: 1, followerShare: 0.5, minHardcoreShare: 0.001 }
+  # The birth moment's PP by type (the loss moment pays nothing).
+  birthPP: { derby: 6, rite: 8, legacy: 6, nationalName: 6, venue: 6, trophy: 4 }
+  # Content validation: each birthplace's eases and each ethos's betrayal multipliers must have a
+  # geometric mean within 1 ± characterBand (character changes a campaign's shape, not difficulty).
+  characterBand: 0.1
+
 # Sport identity (GDD v1.18): limits on the names typed at setup (the sport, the founding club's
 # name and its ground), counted after trimming.
 identity:

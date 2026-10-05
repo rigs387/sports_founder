@@ -236,6 +236,41 @@ sportNameParts:
   second: [ball, stick, court, run, dash, play, shot, bat, ring, field, hoop, toss]
 groundWords: [Park, Field, Ground, Oval, Common, Meadow, Lane, Road]
 
+# Culture (GDD v1.22). Every club's ground is its town and one of the ground words above (the
+# founding club keeps the ground named at setup). Tradition names come from facts (the derby's
+# towns, the star's name, the ground, the trophy the player names) or from these invented pools:
+# the founding club's rite by birthplace, and a country's own nickname for the sport by the
+# language sphere of the country (default when a sphere has no pool).
+traditions:
+  rites:
+    schoolyard: [the Bell Run, the Chalk Line, the Last Lesson, the Satchel Toss]
+    factory: [the Shift Whistle, the Lamp Walk, the Clocking Off, the Foundry March]
+    beach: [the Tide Walk, the Sunset Swim, the Driftwood Fire, the Low Tide Roll]
+    barracks: [the Muster, the Colour Parade, the Reveille, the Long March]
+    village-green: [the Bell, the Maypole Lap, the Oak Toast, the Hat Pass]
+    docks: [the Lantern Walk, the Rope Pull, the Harbour Horn, the Crane Salute]
+  nationalNames:
+    default: [the Old Game, the People's Game, the Weekend Game, the Long Game, the Quick Game,
+      the Street Game, the Big Game, the Proper Game]
+    spanish: [el Juego Grande, el Juego del Barrio, la Fiesta, el Clásico Diario]
+    portuguese: [o Jogo do Povo, o Jogo de Rua, a Pelada, o Jogão]
+    french: [le Grand Jeu, le Jeu du Dimanche, la Partie, le Jeu du Peuple]
+    german: [das Volksspiel, das Sonntagsspiel, das Große Spiel, das Hofspiel]
+    italian: [il Gioco del Popolo, la Partitella, il Gioco Grande, il Gioco di Piazza]
+  # Rivals' traditions are flavor (GDD v1.22): shown on the map, no effect, never born or lost.
+  # Generic invented names; a mod can rename them.
+  rivals:
+    soccer:
+      - { id: old-ground, type: venue, countryId: england, name: the Old Ground }
+      - { id: association-cup, type: trophy, countryId: england, name: the Association Cup }
+      - { id: river-derby, type: derby, countryId: argentina, name: the River Derby }
+      - { id: samba-style, type: legacy, countryId: brazil, name: the Samba Style }
+    cricket:
+      - { id: long-room, type: venue, countryId: england, name: the Long Room Ground }
+      - { id: ember-urn, type: trophy, countryId: australia, name: the Ember Urn }
+      - { id: border-derby, type: derby, countryId: india, name: the Border Derby }
+      - { id: maidan-game, type: nationalName, countryId: india, name: the Maidan Game }
+
 # Invented flagship club nicknames (GDD v1.14). Clubs are based in real places (places.yaml); only
 # the nickname is made up, e.g. "Glasgow Comets". Needs at least as many entries as the largest
 # flagship has clubs.

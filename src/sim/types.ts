@@ -5,6 +5,7 @@ import type {
   HealthLevel,
   LeagueTierId,
   TimedCountermoveKind,
+  TraditionType,
 } from "../content";
 import type { EventState } from "./events-state";
 
@@ -27,6 +28,7 @@ export type {
   RivalSport,
   SpreadLink,
   TimedCountermoveKind,
+  TraditionType,
   World,
 } from "../content";
 export {
@@ -456,6 +458,25 @@ export type Landmark =
       countryId: string;
       reason: "moved" | "returned";
     }
+  /** A tradition was born from recorded facts (GDD v1.22). */
+  | {
+      kind: "traditionBorn";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      traditionId: number;
+      type: TraditionType;
+    }
+  /** A tradition was lost: faded, its league folded, broken by an amendment, or renamed. */
+  | {
+      kind: "traditionLost";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      traditionId: number;
+      type: TraditionType;
+      reason: TraditionLossReason;
+    }
   | {
       kind: "rivalRuleCopied";
       turn: number;
@@ -548,6 +569,60 @@ export interface RulesState {
   amendments: Amendment[];
 }
 
+// ---- Culture (GDD v1.22; src/sim/culture.ts) -------------------------------------------------
+
+export type TraditionLossReason = "faded" | "folded" | "broken" | "renamed";
+
+/**
+ * A tradition: born only from recorded facts, held by the player's fans in its follower countries
+ * (home first). Name parts are facts: the clubs (derby: two; rite and venue: one), the star (star
+ * legacy), or a name (the trophy's, given by the player; a rite's or national name's, from a pool).
+ */
+export interface Tradition {
+  id: number;
+  type: TraditionType;
+  /** Its home country. */
+  countryId: string;
+  clubIds: number[];
+  playerId: number | null;
+  name: string | null;
+  /** The flagship seasons whose facts made it, oldest first (empty for a national name). */
+  seasons: number[];
+  /** The rule traits it was born under: amendments away from them offend it. */
+  rules: Partial<Record<AxisId, string>>;
+  bornTurn: number;
+  bornQuarter: number;
+  /** 0–1. Renewed by new facts, decaying each year without one; lost at 0. */
+  strength: number;
+  /** The last in-game year a fact renewed it (its birth year at first). */
+  renewedYear: number;
+  /** Countries whose fans hold it, home first. Abroad they hold it at reach.followerShare. */
+  followers: string[];
+  lost: { turn: number; quarter: number; reason: TraditionLossReason } | null;
+}
+
+/** A "Stoke it" answer on the repeat-final card: one extra meeting toward a derby. */
+export interface DerbyStoke {
+  clubIds: number[];
+  season: number;
+}
+
+export interface CultureState {
+  /** Facts count from this flagship season on (no retroactive history for older saves). */
+  startSeason: number;
+  /** Landmarks before this index have been read. */
+  landmarkCursor: number;
+  /** The last in-game year whose decay and reach rolls have run. */
+  year: number;
+  /** Culture's own random stream (reach rolls), so the world's sequence never depends on it. */
+  rng: number[];
+  traditions: Tradition[];
+  nextId: number;
+  stokes: DerbyStoke[];
+  /** The trophy the player may name for free (born on the champion card now open), or null. */
+  naming: number | null;
+}
+
 export interface GameState {
   seed: number;
   /** Seeded generator state; part of the save so a resumed game rolls identically. */
@@ -584,6 +659,8 @@ export interface GameState {
   identity: SportIdentity;
   /** The rulebook's amendments (GDD v1.20). */
   rules: RulesState;
+  /** Traditions and what makes them (GDD v1.22). */
+  culture: CultureState;
 }
 
 export interface CampaignSetup {

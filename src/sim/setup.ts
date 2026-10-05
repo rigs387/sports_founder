@@ -1,5 +1,6 @@
 import { genomeSchema, startingRivalFanCounts } from "../content";
 import { tierEntry } from "./calendar";
+import { newCulture } from "./culture";
 import { emptyEvents } from "./events-state";
 import { newFlagship } from "./flagship";
 import { defaultIdentitySetup, foundSport, identityProblems } from "./identity";
@@ -94,7 +95,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     i === 0 ? setup.anchorCountryId : null,
   );
 
-  const founded: Omit<GameState, "identity" | "rules"> = {
+  const founded: Omit<GameState, "identity" | "rules" | "culture"> = {
     seed: setup.seed,
     rng: createRngState(setup.seed),
     anchorCountryId: setup.anchorCountryId,
@@ -133,7 +134,11 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     ),
   };
   // Key order follows the save schema, so a new campaign re-serializes byte-identically.
-  return { ...foundSport(founded, world, identitySetup), rules: { amendments: [] } };
+  return {
+    ...foundSport(founded, world, identitySetup),
+    rules: { amendments: [] },
+    culture: newCulture(setup.seed, 1, founded.landmarks.length, 0, world),
+  };
 }
 
 /** The default genome: the first quick-start preset in content. */

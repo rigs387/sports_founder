@@ -181,6 +181,29 @@ export const sportsFileSchema = z.strictObject({
   }),
 });
 
+// ---- Culture (GDD v1.22) -------------------------------------------------------------------
+
+/** The closed tradition vocabulary of the first build: four traditions and two artifacts. */
+export const TRADITION_TYPES = [
+  "derby",
+  "rite",
+  "legacy",
+  "nationalName",
+  "venue",
+  "trophy",
+] as const;
+export const traditionTypeSchema = z.enum(TRADITION_TYPES);
+export type TraditionType = z.infer<typeof traditionTypeSchema>;
+const byTradition = <T extends z.ZodType>(value: T) =>
+  z.strictObject({
+    derby: value,
+    rite: value,
+    legacy: value,
+    nationalName: value,
+    venue: value,
+    trophy: value,
+  });
+
 // ---- Sport identity (GDD v1.18) ------------------------------------------------------------
 
 const idList = z.array(id).min(1);
@@ -202,6 +225,21 @@ export const identityFileSchema = z.strictObject({
   maxOddLines: z.int().min(0),
   /** A deadpan rulebook line where every listed axis has the listed option. */
   oddPairings: z.array(z.strictObject({ id, when: z.record(z.string(), z.string()) })),
+  /**
+   * Founding character in Culture (GDD v1.22): each birthplace's ease per tradition type, and
+   * each ethos's multipliers on the three betrayals.
+   */
+  culture: z.strictObject({
+    birthplaces: z.record(id, byTradition(z.number().positive())),
+    ethos: z.record(
+      id,
+      z.strictObject({
+        rules: z.number().positive(),
+        seat: z.number().positive(),
+        rename: z.number().positive(),
+      }),
+    ),
+  }),
 });
 export type IdentityContent = z.infer<typeof identityFileSchema>;
 
@@ -219,6 +257,23 @@ export const namesFileSchema = z.strictObject({
   }),
   /** The default founding ground is the club's town and one of these words. */
   groundWords: z.array(z.string().min(1)).min(1),
+  /** Culture (GDD v1.22): tradition name pools and the rivals' flavor traditions. */
+  traditions: z.strictObject({
+    rites: z.record(id, z.array(z.string().min(1)).min(1)),
+    /** By language sphere; `default` for spheres without a pool. */
+    nationalNames: z.record(id, z.array(z.string().min(1)).min(1)),
+    rivals: z.record(
+      id,
+      z.array(
+        z.strictObject({
+          id,
+          type: traditionTypeSchema,
+          countryId: z.string().min(1),
+          name: z.string().min(1),
+        }),
+      ),
+    ),
+  }),
   /**
    * Invented flagship club nicknames (GDD v1.14). The place is real (places.yaml); the nickname is
    * not. Needs at least as many distinct entries as the largest flagship has clubs.
@@ -278,7 +333,19 @@ export const NODE_EFFECT_TYPES = [
   "ppIncome",
   "runningCostReduction",
   "countermoveResistance",
+  // Culture (GDD v1.22): nurture traditions that exist, never create one.
+  "traditionStrength",
+  "traditionReach",
+  "traditionProtection",
+  "traditionHold",
 ] as const;
+/** The Culture effects: global (no conditions), optionally limited to one tradition type. */
+export const TRADITION_EFFECT_TYPES: readonly NodeEffectType[] = [
+  "traditionStrength",
+  "traditionReach",
+  "traditionProtection",
+  "traditionHold",
+];
 export type NodeEffectType = (typeof NODE_EFFECT_TYPES)[number];
 const NOT_YET_BUILT = ["cashOpportunityUnlock", "backlashResistance"];
 
@@ -299,6 +366,8 @@ export const nodeEffectSchema = z.strictObject({
   type: nodeEffectTypeSchema,
   /** Only for spreadChannel. */
   channel: spreadChannelSchema.optional(),
+  /** Only for the Culture effects: limits the effect to one tradition type. */
+  traditionType: traditionTypeSchema.optional(),
   amount: z
     .number()
     .min(-1)
@@ -695,6 +764,33 @@ export const configFileSchema = z.strictObject({
     }),
     /** Markets besides the anchor whose fit hints a review shows. */
     previewMarkets: z.int().min(0),
+  }),
+  /** Culture, first build (GDD v1.22). */
+  culture: z.strictObject({
+    startStrength: unitInterval,
+    renewal: unitInterval,
+    decayPerYear: unitInterval,
+    honorsBonus: unitInterval,
+    derby: z.strictObject({ meetings: z.int().min(1), window: z.int().min(1) }),
+    legacy: z.strictObject({ starSeasons: z.int().min(1) }),
+    venue: z.strictObject({ fameFacts: z.int().min(1), foundingFacts: z.int().min(0) }),
+    weightCap: z.number().positive(),
+    turnoverCut: unitInterval,
+    poachCut: unitInterval,
+    pilgrimage: z.number().min(0),
+    championBonus: z.number().min(0),
+    backlashWeight: z.number().min(0),
+    amendmentDamage: unitInterval,
+    seatWeight: z.number().min(0),
+    renameShare: unitInterval,
+    reach: z.strictObject({
+      minStrength: unitInterval,
+      chancePerReach: z.number().min(0),
+      followerShare: unitInterval,
+      minHardcoreShare: unitInterval,
+    }),
+    birthPP: byTradition(z.number().min(0)),
+    characterBand: unitInterval,
   }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({
