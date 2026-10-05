@@ -537,6 +537,13 @@ export const configFileSchema = z.strictObject({
       .refine((near) => near.peakRatio > near.startRatio, {
         message: "peakRatio must be greater than startRatio",
       }),
+    /** How much a market matters to rivals (GDD v1.21): it divides escalation thresholds there. */
+    marketValue: z.strictObject({
+      referencePopulation: z.number().positive(),
+      exponent: z.number().min(0),
+      min: z.number().positive(),
+      max: z.number().positive(),
+    }),
     budget: z.strictObject({
       incomePerFandomScore: z.number().min(0),
       capQuarters: z.number().positive(),
@@ -638,6 +645,38 @@ export const configFileSchema = z.strictObject({
     }),
   }),
   seasonalWindow: z.strictObject({ quarterOfYear: z.int().min(1).max(4) }),
+  /**
+   * A giant market is many audiences (GDD v1.21): genome fit (every option's lever deltas) in a
+   * country is × min(1, (referencePopulation ÷ population) ^ fitExponent), never below minScale.
+   */
+  bigMarkets: z.strictObject({
+    referencePopulation: z.number().positive(),
+    fitExponent: z.number().min(0),
+    minScale: unitInterval,
+  }),
+  /**
+   * Wealth levels (GDD v1.21): income per person at or above each threshold moves a market up one
+   * level. Each level weighs Prestige income and how hard rivals defend there.
+   */
+  wealthLevels: z
+    .strictObject({
+      thresholds: z.array(z.number().positive()),
+      levels: z
+        .array(
+          z.strictObject({
+            id,
+            ppWeight: z.number().positive(),
+            defenseWeight: z.number().positive(),
+          }),
+        )
+        .min(1),
+    })
+    .refine((w) => w.levels.length === w.thresholds.length + 1, {
+      message: "one more level than thresholds",
+    })
+    .refine((w) => w.thresholds.every((t, i) => i === 0 || t > (w.thresholds[i - 1] ?? 0)), {
+      message: "thresholds must rise",
+    }),
   /** Rules evolution, first build (GDD v1.20). */
   rulesEvolution: z.strictObject({
     basePrice: z.number().min(0),
@@ -648,6 +687,10 @@ export const configFileSchema = z.strictObject({
       fullAgeYears: z.number().positive(),
       anchorFactor: z.number().min(1),
       fitWeight: z.number().min(0),
+      /** Per step the new rule sits from the sport's founding rule. */
+      driftWeight: z.number().min(0),
+      /** Multiplies the backlash of a move back toward the founding rule. */
+      returnFactor: unitInterval,
       maxShare: unitInterval,
     }),
     /** Markets besides the anchor whose fit hints a review shows. */

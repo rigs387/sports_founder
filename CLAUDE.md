@@ -142,6 +142,12 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   casual everywhere, by rule age and jump, heavier in the anchor and where the old rule fit
   better), `GameState.rules` and the review snapshot. The genome is the setup's with each
   amendment applied; invariants check it.
+- Big and rich markets (GDD v1.21): genome fit in a country is softened by its `fitScale`
+  (derived at load from population, `bigMarkets`), in `leverMultipliers` and `optionNetDelta`.
+  Each market has a `wealthLevel` (World Bank income groups, `wealthLevels`): Prestige income
+  weighs Fandom Score by it (`ppWeights`), and rivals weigh markets by population × wealth
+  (`marketValue` in `src/sim/rivals.ts`). The race for #1 counts raw fans. The differentiation
+  experiment's criterion plays bots that never amend; with amendments it is reported only.
 - The win lives in `GameState.win` (`src/sim/win.ts`), never in `outcome`: winning must not end a
   campaign. Checked once per turn after the tier track: #1 by global Fandom Score held
   `win.holdTurns` turns at PP tier `win.requiredTier`. After the win an anchor collapse folds the

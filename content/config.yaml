@@ -293,6 +293,11 @@ rivalAI:
     # filled). Pressure in a country is at least positionPressure × progress × the player's
     # hardcore share there, progress running from 0 at intensity 1 to 1 at maxIntensity.
     positionPressure: 0.05
+  # Rivals fight hardest where it matters most (GDD v1.21): a market's value is
+  # (population × its wealth level's defenseWeight ÷ referencePopulation) ^ exponent, clamped to
+  # [min, max]. It divides the escalation thresholds there (on top of intensity), and among fronts
+  # at the same level a rival spends first where its hardcore base × defenseWeight is biggest.
+  marketValue: { referencePopulation: 50000000, exponent: 0.15, min: 0.67, max: 1.5 }
   # Hidden defense budget per rival: income per quarter = incomePerFandomScore × the rival's world
   # Fandom Score × intensity. Unspent budget is capped at capQuarters of income.
   budget:
@@ -343,8 +348,8 @@ rivalAI:
   # × (1 + boost) and the level it rebuilds toward is home × (1 + homeLift); that ground ages away
   # afterward. Stacks with the rival's own countermoves.
   tournaments:
-    - { sportId: soccer, firstYear: 2026, everyYears: 4, startQuarterOfYear: 2, quarters: 4, casualConversionBoost: 0.26, hardcoreConversionBoost: 0.9, homeLift: 0.026 }
-    - { sportId: cricket, firstYear: 2027, everyYears: 4, startQuarterOfYear: 4, quarters: 4, casualConversionBoost: 0.26, hardcoreConversionBoost: 0.9, homeLift: 0.026 }
+    - { sportId: soccer, firstYear: 2026, everyYears: 4, startQuarterOfYear: 2, quarters: 4, casualConversionBoost: 0.12, hardcoreConversionBoost: 0.4, homeLift: 0.012 }
+    - { sportId: cricket, firstYear: 2027, everyYears: 4, startQuarterOfYear: 4, quarters: 4, casualConversionBoost: 0.12, hardcoreConversionBoost: 0.4, homeLift: 0.012 }
 
 # Anchor genome hints (GDD Campaign setup): an option's net lever delta at the anchor country
 # (affinity + accessibility + depth) maps to ++ / + / − by these thresholds.
@@ -463,13 +468,40 @@ leagues:
 seasonalWindow:
   quarterOfYear: 3
 
+# A giant market is many audiences (GDD v1.21): tastes vary inside India or China, so no rulebook
+# suits them strongly. Genome fit in a country (every option's lever deltas) is
+# × min(1, (referencePopulation ÷ population) ^ fitExponent), never below minScale. Giants are won
+# by breadth and patience; fit is sharpest in mid-sized and small markets. Content validation of
+# genome balance reads the unsoftened deltas.
+bigMarkets:
+  referencePopulation: 50000000
+  fitExponent: 0.3
+  minScale: 0.3
+
+# Wealth levels (GDD v1.21), named for what fans can spend on sport. countries.yaml's income per
+# person is GNI per capita (World Bank Atlas method, 2024), the measure the World Bank classifies by,
+# so these are its FY2026 income-group thresholds (US$): low ≤ 1,135, lower-middle ≤ 4,495,
+# upper-middle ≤ 13,935, high above. Prestige income counts each market's Fandom Score × ppWeight;
+# rivals weigh their defense there by population × defenseWeight. The race for #1 counts raw fans.
+wealthLevels:
+  thresholds: [1136, 4496, 13936]
+  levels:
+    - { id: shoestring, ppWeight: 0.5, defenseWeight: 0.5 }
+    - { id: modest, ppWeight: 0.75, defenseWeight: 0.75 }
+    - { id: comfortable, ppWeight: 1, defenseWeight: 1 }
+    - { id: affluent, ppWeight: 1.5, defenseWeight: 1.5 }
+
 # Rules evolution, first build (GDD v1.20). In the seasonal window the player may amend one rule
 # trait a year to any of its options. The jump is the number of steps between the options, or
 # fixedJump for traits whose options have no order. Price = basePrice × the peak tier's cost
 # multiplier × jump. Purist backlash: in every country a share of the player's hardcore fans turn
 # casual: sharePerJump × jump × min(1, the rule's age in years ÷ fullAgeYears), × anchorFactor in
 # the anchor, × (1 + fitWeight × how much the new option's net lever delta there falls short of the
-# old one's), capped at maxShare. A review shows fit hints for the anchor and previewMarkets more.
+# old one's), capped at maxShare. Purists remember the founding rules (decided 2026-10-04): the
+# share is also × (1 + driftWeight × steps from the trait's founding rule to the new one), and
+# × returnFactor for a move back toward it, so sports keep their founding identity (without it
+# every sport amended toward the same rulebook and the differentiation experiment failed). A
+# review shows fit hints for the anchor and previewMarkets more.
 rulesEvolution:
   basePrice: 100
   fixedJump: { structure: 2 }
@@ -478,6 +510,8 @@ rulesEvolution:
     fullAgeYears: 40
     anchorFactor: 2
     fitWeight: 2
+    driftWeight: 1.5
+    returnFactor: 0.5
     maxShare: 0.25
   previewMarkets: 5
 

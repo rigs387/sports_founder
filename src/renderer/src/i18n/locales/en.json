@@ -844,7 +844,14 @@
       "oceania": "Oceania"
     },
     "backedStars_one": "Backed star: {{names, list}}",
-    "backedStars_other": "Backed stars: {{names, list}}"
+    "backedStars_other": "Backed stars: {{names, list}}",
+    "wealthLevel": "Spending power: {{level}}",
+    "wealthLevels": {
+      "shoestring": "Shoestring",
+      "modest": "Modest",
+      "comfortable": "Comfortable",
+      "affluent": "Affluent"
+    }
   },
   "flagship": {
     "eyebrow": "The commissioner's seat",

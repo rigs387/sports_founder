@@ -36,6 +36,16 @@ export function amendmentJump(axis: AxisId, from: string, to: string, world: Wor
   return Math.abs(options.indexOf(to) - options.indexOf(from));
 }
 
+/**
+ * How far an option is from the founding rule: steps between options, or 1 for any other option
+ * of a trait whose options have no order (play structure).
+ */
+export function driftSteps(axis: AxisId, founding: string, option: string, world: World): number {
+  if (founding === option) return 0;
+  if (world.config.rulesEvolution.fixedJump[axis] !== undefined) return 1;
+  return amendmentJump(axis, founding, option, world);
+}
+
 /** The PP price of an amendment of this jump now. */
 export function amendmentPrice(state: Pick<GameState, "tierTrack">, world: World, jump: number) {
   return world.config.rulesEvolution.basePrice * costMultiplier(state, world.config) * jump;
@@ -48,6 +58,16 @@ export function ruleSince(state: Pick<GameState, "rules">, axis: AxisId): number
     if (amendment?.axis === axis) return amendment.quarter;
   }
   return 0;
+}
+
+/**
+ * The rule a trait had when the sport was founded: where its first amendment started, or the rule
+ * now if it was never amended.
+ */
+export function foundingRule(state: Pick<GameState, "rules" | "genome">, axis: AxisId): string {
+  return (
+    state.rules.amendments.find((amendment) => amendment.axis === axis)?.from ?? state.genome[axis]
+  );
 }
 
 /** Whether this in-game year's amendment has been made. */
@@ -73,8 +93,10 @@ export function amendBlocker(
 
 /**
  * The share of the player's hardcore fans in each country who turn casual if `axis` changes to
- * `option` now (GDD v1.20): base × jump × the rule's age (capped), × the anchor factor in the
- * anchor, × (1 + fit weight × how much worse the new option fits there), capped.
+ * `option` now (GDD v1.20): base × jump × the rule's age (capped), × (1 + drift weight × how far
+ * the new option is from the founding rule), × the return factor when it moves back toward the
+ * founding rule, × the anchor factor in the anchor, × (1 + fit weight × how much worse the new
+ * option fits there), capped. Purists remember the sport as it was founded.
  */
 export function backlashShares(
   state: GameState,
@@ -87,7 +109,15 @@ export function backlashShares(
   const jump = amendmentJump(axis, from, option, world);
   const ageYears = (state.quarter - ruleSince(state, axis)) / QUARTERS_PER_YEAR;
   const age = Math.min(1, ageYears / backlash.fullAgeYears);
-  const base = backlash.sharePerJump * jump * age;
+  const founding = foundingRule(state, axis);
+  const drift = driftSteps(axis, founding, option, world);
+  const homeward = drift < driftSteps(axis, founding, from, world);
+  const base =
+    backlash.sharePerJump *
+    jump *
+    age *
+    (1 + backlash.driftWeight * drift) *
+    (homeward ? backlash.returnFactor : 1);
   return state.countries.map((country, index) => {
     if (base <= 0) return 0;
     const fitLoss = Math.max(

@@ -12,6 +12,7 @@ Start with the [world map's current direction](world-map/README.md): **Matchday 
 - [Campaign setup and screenshot](campaign-setup/README.md)
 - [Sport identity: the founding, the Rulebook and the field diagram](identity/README.md)
 - [Rules evolution: amendments, purist backlash and the dated rulebook](rules/README.md)
+- [Big and rich markets: giants as many audiences, wealth levels, rival defense](markets/README.md)
 - [Clubhouse growth board: live screen and choices](growth-tree/production.md)
 - [League management: promotion, restructuring and bailouts](league-management/README.md)
 - [Save/load: campaign files, history and resume verification](save-load/README.md)

@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-04",
-  design: "GDD v1.20",
+  design: "GDD v1.21",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-04",
-    tests: 425,
-    files: 38,
-    note: "npm run check passed after rules evolution (type checks, Biome, purity, 425 tests in 38 files). Lint has existing visual-study warnings.",
+    tests: 430,
+    files: 39,
+    note: "npm run check passed after big and rich markets (type checks, Biome, purity, 430 tests in 39 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-04",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; save/resume continued identically.",
@@ -76,7 +76,7 @@ window.SF_PROGRESS = {
     },
     {
       title: "The #1 hold is now a contest",
-      text: "Lead lost before the win in 34 of 68 campaigns (50%), on target, after amendments (which made it 34%) and one step stronger world championships. Builder, 12 typical anchors × 6 seeds, 200 turns. Reclaim adds little; championships carry it. Remeasure when new pressure lands.",
+      text: "Lead lost before the win in 37 of 70 campaigns (53%), on target, after amendments, big and rich markets and retuned world championships. Builder, 12 typical anchors × 6 seeds, 200 turns. Reclaim adds little; championships and rich-market defense carry it. Remeasure when new pressure lands.",
       date: "2026-10-04",
       system: "rivals",
     },
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-04",
+      type: "Built",
+      title: "Big and rich markets",
+      text: "GDD v1.21: the balance check found amendments made every sport converge on the population giants. Accepted as natural; instead giants are many audiences (genome fit softens with population), four wealth levels (Shoestring, Modest, Comfortable, Affluent; World Bank income groups) weigh Prestige income and where rivals defend, and purists remember the founding rules. Differentiation is judged on sports as invented (5 of 6, as before); #1 contest 53%, pacing passes.",
+    },
     {
       date: "2026-10-04",
       type: "Built",
@@ -305,6 +311,7 @@ window.SF_PROGRESS = {
         ["built", "213 sourced markets and fan buckets"],
         ["built", "Proximity, language and media spread"],
         ["built", "Focus slots and cold-launch costs"],
+        ["built", "Big markets: genome fit softens in giants; four wealth levels weigh Prestige"],
         ["built", "Interactive map, market selection and real trends"],
         ["partial", "Map lenses: fandom and rival signals exist; the full set remains"],
         ["planned", "Animated turn recap and story pickups on the map"],
@@ -446,6 +453,7 @@ window.SF_PROGRESS = {
         ["built", "Rival world championships on real quadrennial cycles"],
         ["built", "Slow two-way poaching, aging and rival home levels"],
         ["built", "Contested victory hold: about half lose #1 before the win (53%)"],
+        ["built", "Rivals escalate sooner and spend first in big rich markets"],
         ["planned", "Remaining modeled sports and later rival-to-rival competition"],
       ],
     },

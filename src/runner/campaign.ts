@@ -33,6 +33,8 @@ export interface CampaignPlan {
   bot: BotId;
   /** Maximum turns; the campaign stops early if it ends. */
   turns: number;
+  /** Whether the bot may amend rules (default true). */
+  amend?: boolean;
 }
 
 export interface PlayedCampaign {
@@ -157,7 +159,7 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   let firstBackTurn: number | null = null;
   for (let t = 0; t < plan.turns && state.outcome === null; t += 1) {
     const landmarksBefore = state.landmarks.length;
-    const step = runBot(plan.bot, state, world);
+    const step = runBot(plan.bot, state, world, { amend: plan.amend ?? true });
     actions.push(...step.actions);
     const tally = (key: string) => {
       eventAnswers[key] = (eventAnswers[key] ?? 0) + 1;

@@ -49,6 +49,10 @@ export interface CountryDerived extends AffinityAttributes {
   otherHardcoreShare: number;
   /** Indices of every proximity link (land borders and sea links, undirected). */
   proximity: number[];
+  /** The market's wealth level, 0 (Shoestring) up (GDD v1.21). */
+  wealthLevel: number;
+  /** How strongly genome fit applies here: 1, or less in a giant market (GDD v1.21). */
+  fitScale: number;
 }
 
 /** Spread link strengths from one source into a target, per channel, before any modifiers. */
@@ -126,6 +130,17 @@ function deriveCountry(
     mediaMarket: applyCurve(attributeCurves.mediaMarket, country.population * wealth),
     otherHardcoreShare: otherHardcoreShare(country, content.otherSports),
     proximity: [...links].sort((a, b) => a - b),
+    fitScale: Math.max(
+      content.config.bigMarkets.minScale,
+      Math.min(
+        1,
+        (content.config.bigMarkets.referencePopulation / country.population) **
+          content.config.bigMarkets.fitExponent,
+      ),
+    ),
+    wealthLevel: content.config.wealthLevels.thresholds.filter(
+      (threshold) => country.incomePerPerson >= threshold,
+    ).length,
   };
 }
 

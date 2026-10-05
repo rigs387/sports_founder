@@ -45,6 +45,8 @@ export interface LeagueSnapshot {
 export interface CountrySnapshot {
   countryId: string;
   population: number;
+  /** The market's wealth level id (GDD v1.21): what its fans can spend on sport. */
+  wealthLevel: string;
   casual: number;
   hardcore: number;
   fandomScore: number;
@@ -184,6 +186,8 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     return {
       countryId: country.id,
       population: country.population,
+      wealthLevel:
+        world.config.wealthLevels.levels[world.derived[index]?.wealthLevel ?? 0]?.id ?? "",
       casual: fans.casual,
       hardcore: fans.hardcore,
       fandomScore: score,

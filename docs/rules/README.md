@@ -16,8 +16,10 @@ footprint) never change.
   options (none → full contact is 2), and 2 for any change of play structure.
 - **Price:** 100 PP × the peak tier's cost multiplier × the jump, once.
 - **Purist backlash:** in every country a share of your hardcore fans turn casual, at once:
-  3% × jump × the rule's age (full at 40 years), doubled in the anchor, raised where the old option
-  suited fans better than the new one (× 1 + 2 × the fit lost), capped at 25%. A rule a few months
+  3% × jump × the rule's age (full at 40 years) × (1 + 1.5 × steps from the trait's founding rule),
+  halved for a move back toward the founding rule, doubled in the anchor, raised where the old
+  option suited fans better than the new one (× 1 + 2 × the fit lost), capped at 25%. Purists
+  remember the sport as it was founded (GDD v1.21). A rule a few months
   old costs almost nothing; amending one that has stood for decades is a real loss (the smoke
   campaign's 30-year-old contact rule cost 24 million hardcore fans).
 - **Before confirming** the review shows the price, exactly how many hardcore fans will turn
@@ -40,9 +42,12 @@ campaign, first around turn 45; typical amendments cost a few thousand hardcore 
 millions.
 
 Amending made the leader pull clear faster: #1 lost before the win fell from 53% to 34% of the
-campaigns that reached it. Rival world championships were strengthened one step (casual × 1.26,
-hardcore × 1.9, home + 2.6%; about a 1.6% lift of soccer's world Fandom Score), which brought it
-back to 34/68 (50%). First win median turn 167–170 (target 180 ± 30%); pacing passes.
+campaigns that reached it, and championships were strengthened to compensate (50%). The balance
+check after the build then found sports converging: every bot amended toward the population
+giants' tastes (differentiation 1 of 6 pairs). Decided (GDD v1.21): convergence is natural, so
+differentiation is judged on the sports as invented, purists remember the founding rules, and big
+and rich markets behave differently ([Big and rich markets](../markets/README.md)), which also
+retuned the championships. Current: #1 lost before the win 53%, first win median turn 163–169.
 
 ## Implementation and verification
 

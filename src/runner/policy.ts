@@ -4,6 +4,7 @@ import { xoroshiro128plus } from "pure-rand/generator/xoroshiro128plus";
 import { GENOME_AXES, RULE_AXES } from "../content";
 import {
   type Action,
+  amendBlocker,
   amendedThisYear,
   amendmentJump,
   amendmentPrice,
@@ -385,7 +386,7 @@ function amendRules(step: BotStep, world: World, reserve: number): void {
   for (const axis of RULE_AXES) {
     const current = state.genome[axis];
     for (const option of GENOME_AXES[axis].options as readonly string[]) {
-      if (option === current) continue;
+      if (option === current || amendBlocker(state, world, axis, option) !== null) continue;
       const jump = amendmentJump(axis, current, option, world);
       if (state.pp - amendmentPrice(state, world, jump) < reserve) continue;
       let gain = 0;
@@ -406,11 +407,17 @@ function amendRules(step: BotStep, world: World, reserve: number): void {
   if (best) attempt(step, world, best);
 }
 
-function builderTurn(state: GameState, world: World): BotStep {
+/** Bot switches: whether the builder amends rules (the differentiation criterion turns it off). */
+export interface BotOptions {
+  amend: boolean;
+}
+
+function builderTurn(state: GameState, world: World, options: BotOptions): BotStep {
   const spread = spreadFocus(state, world, countriesByFit(state, world));
   const step: BotStep = { state: spread.state, actions: [...spread.actions] };
   manageLeagues(step, world);
-  amendRules(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
+  if (options.amend)
+    amendRules(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   backStars(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   buyNodes(
     step,
@@ -579,10 +586,14 @@ export function greedySpread(state: GameState, world: World): BotStep {
   );
 }
 
-export function builder(state: GameState, world: World): BotStep {
+export function builder(
+  state: GameState,
+  world: World,
+  options: BotOptions = { amend: true },
+): BotStep {
   const reserve = bailoutReserve(state, world, BUILDER_RESERVE_BAILOUTS);
   return afterEvents(answerEvents(state, world, EVENT_WEIGHTS.builder, reserve), (s) =>
-    builderTurn(s, world),
+    builderTurn(s, world, options),
   );
 }
 
@@ -627,12 +638,17 @@ export function randomBot(state: GameState, world: World): BotStep {
   return afterEvents(randomEvents(state, world), (s) => randomBotTurn(s, world));
 }
 
-export function runBot(bot: BotId, state: GameState, world: World): BotStep {
+export function runBot(
+  bot: BotId,
+  state: GameState,
+  world: World,
+  options: BotOptions = { amend: true },
+): BotStep {
   switch (bot) {
     case "greedy-spread":
       return greedySpread(state, world);
     case "builder":
-      return builder(state, world);
+      return builder(state, world, options);
     case "anchor-turtle":
       return anchorTurtle(state, world);
     case "media-rush":

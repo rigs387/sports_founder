@@ -35,6 +35,15 @@ function inWindow(years: number): GameState {
   return state;
 }
 
+/** Plays on `years` more years from `state` and stops in the next seasonal window. */
+function inWindowFrom(start: GameState, years: number): GameState {
+  let state = start;
+  const until = start.quarter + years * 4;
+  while (state.quarter < until || !seasonalWindowOpen(state, content.config))
+    state = stepQuarter(state, content);
+  return state;
+}
+
 const amend = (state: GameState, axis: "contact" | "structure" | "scoring", option: string) =>
   applyAction(state, content, { type: "amendRule", axis, option });
 
@@ -128,6 +137,19 @@ describe("amending", () => {
     expect(oldShares[anchor] ?? 0).toBeGreaterThanOrEqual(
       Math.min(...base) * backlash.anchorFactor - 1e-12,
     );
+  });
+
+  it("remembers the founding rule: moving back costs less than moving further away", () => {
+    // Medium team size can step to small or large; after one step, back is home and on is away.
+    let state = inWindow(20);
+    state = { ...state, genome: { ...state.genome, teamSize: "medium" } };
+    state = applyAction(state, content, { type: "amendRule", axis: "teamSize", option: "small" });
+    const later = inWindowFrom(state, 20);
+    const home = backlashTotal(later, content, "teamSize", "medium");
+    const away = backlashTotal(later, content, "teamSize", "large");
+    // Large is two steps from small (twice the jump) and two from the founding rule; medium is home.
+    expect(home).toBeGreaterThan(0);
+    expect(away).toBeGreaterThan(home * 4);
   });
 
   it("reaches the flagship at its next season, not mid-season", () => {

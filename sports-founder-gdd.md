@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.20 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook)*
+*Version 1.21 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules)*
 
 ---
 
@@ -442,6 +442,32 @@ market. All stored in content; every conversion curve and weight lives in config
 - The secondary language sphere counts toward the language channel at a config weight (e.g.,
   India: Hindi-Urdu + English; Canada: English + French).
 - Continent is what the tier-4 condition "pro leagues on N continents" counts.
+
+**Big and rich markets (decided 2026-10-04, v1.21).** Every sport wants the population giants;
+the game does not stop that, it makes them play differently.
+- **A giant is many audiences.** Tastes vary inside India or China, so no rulebook can suit them
+  strongly: a country's genome fit (every option's lever deltas) is softened the bigger its
+  population is beyond a reference size (config). Giants are won by breadth and patience; fit
+  is sharpest in mid-sized and small markets.
+- **Wealth levels.** Each market has one of four wealth levels, named for what fans can spend on
+  sport: **Shoestring, Modest, Comfortable, Affluent**. The income per person in the data is the
+  World Bank's GNI per capita (Atlas method), the measure it classifies by, so the levels are its
+  income groups (FY2026 thresholds for the 2024 figures). Each level carries config weights.
+- **Wealth weighs Prestige.** PP income counts each market's Fandom Score × its wealth level's
+  weight: a fan in the US earns more Prestige than a fan in India. The race for #1 still counts
+  raw fans.
+- **Rivals fight hardest where it matters most.** Rival defense is weighted by population ×
+  wealth weight: rivals escalate sooner and spend first in big rich markets, so those are where
+  the contest is fought.
+- **Measuring:** genome differentiation is judged on the sport as invented (bots that never
+  amend); the convergence that amendments cause is reported, not failed, because every sport
+  adapting toward the same giant markets is natural.
+- *Built 2026-10-04:* fit × min(1, (50M ÷ population) ^ 0.3), floor 0.3 (India about 0.36);
+  Prestige weights 0.5 / 0.75 / 1 / 1.5; rival market value (population × weight ÷ 50M) ^ 0.15 in
+  0.67–1.5, dividing escalation thresholds. Rich-market defense pushed #1 lost before the win to
+  75%, so the world championships were scaled back (about a 0.75% lift): 37 of 70 (53%), first win
+  median turn 163–169. Differentiation as invented 5 of 6 pairs (as before); with amendments the
+  pairs share 3.8–7.2 top markets (reported).
 
 **Real-world data (Phase 0, decided 2026-09-13):**
 - **Markets:** FIFA member associations plus any cricket country missing from FIFA, limited to
@@ -916,6 +942,13 @@ lengths — lives in config files. No balance values in code.
     years), anchor × 2, fit weight 2, capped at 25%. A better-fitting rulebook lets the leader pull
     clear, so the world championships were strengthened one step to keep the #1 contest at about
     half (34 of 68).
+  - *Purists remember the founding rules (decided 2026-10-04, v1.21).* Measured: with amendments
+    every sport adapted toward the population giants' tastes and contrasting sports came to share
+    their top markets (differentiation 1 of 6 pairs, against 5 of 6 without). Backlash now also
+    grows with how far a trait drifts from its founding rule (× 1 + drift weight × steps), and a
+    move back toward it costs less; a hard bound on drift was tried and dropped (it did not stop
+    the convergence). Convergence toward the giants is accepted as natural; big markets behave
+    differently instead (Country attributes: Big and rich markets).
 
 **History & Records:** Stories and retrospectives may only claim what the simulation retained.
 

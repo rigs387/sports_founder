@@ -40,6 +40,8 @@ import {
 //      base), in preference order, while budget lasts: it cannot defend everywhere at once. When
 //      the countermove it wants most in a country is beyond its budget, it saves up and buys
 //      nothing more that quarter. Near #1 intensity also multiplies how many it may buy per quarter.
+// Rivals weigh markets by population × wealth (GDD v1.21): they escalate sooner where a market
+// matters more, and spend there first among fronts at the same level.
 // Near #1 a rival may also reclaim (GDD v1.17): where it was the incumbent and is Entrenched, it
 // wins back a share of the player's hardcore fans each quarter while the reclaim runs.
 // Every escalation change and countermove is recorded as a landmark. Every number is config.
@@ -50,6 +52,24 @@ export function newFront(sportId: string): RivalFront {
 
 export function newRivalState(sportId: string, genome: Genome): RivalState {
   return { sportId, genome: { ...genome }, budget: 0, budgetSpent: 0, ruleCopyReadyQuarter: 0 };
+}
+
+/** A market's wealth level weight on rival defense (GDD v1.21). */
+export function defenseWeight(world: World, countryIndex: number): number {
+  const level = world.derived[countryIndex]?.wealthLevel ?? 0;
+  return world.config.wealthLevels.levels[level]?.defenseWeight ?? 1;
+}
+
+/**
+ * How much a market matters to rivals (GDD v1.21): (population × wealth weight ÷ reference) ^
+ * exponent, clamped. It divides the escalation thresholds there, so rivals react sooner in big
+ * rich markets and later in small poor ones.
+ */
+export function marketValue(world: World, countryIndex: number): number {
+  const { referencePopulation, exponent, min, max } = world.config.rivalAI.marketValue;
+  const population = world.countries[countryIndex]?.population ?? 0;
+  const value = (population * defenseWeight(world, countryIndex)) / referencePopulation;
+  return Math.min(max, Math.max(min, value ** exponent));
 }
 
 export function escalationIndex(level: EscalationLevel): number {
@@ -261,11 +281,12 @@ export function stepRivals(
     );
     const defense = country.defense.map((front) => {
       const rivalHardcore = country.fans[sportIndexOf.get(front.sportId) ?? -1]?.hardcore ?? 0;
+      // Rivals react sooner where the market matters more (GDD v1.21).
       const next = updateFront(
         front,
         annualGainShare,
         rivalHardcore / population,
-        intensity,
+        intensity * marketValue(world, index),
         world.config,
       );
       if (next.level !== front.level) {
@@ -296,7 +317,8 @@ export function stepRivals(
       .map((country, index) => ({
         index,
         level: escalationIndex(country.defense[r]?.level ?? "none"),
-        base: country.fans[sportIndex]?.hardcore ?? 0,
+        // Its hardcore base there, weighted by the market's wealth (GDD v1.21).
+        base: (country.fans[sportIndex]?.hardcore ?? 0) * defenseWeight(world, index),
       }))
       .filter((front) => front.level > 0)
       .sort((a, b) => b.level - a.level || b.base - a.base || a.index - b.index);

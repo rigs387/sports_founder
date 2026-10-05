@@ -7,6 +7,9 @@ import { mean } from "./report";
 // constant, contrasting genomes share fewer than half of their top-10 fandom countries. "Top-10
 // fandom countries" means top-10 by Fandom Score ÷ population (decided 2026-09-13); the raw-score
 // ranking is reported alongside. Every pair and every seed is reported, passes and failures alike.
+// The criterion judges the sports as invented: bots never amend rules (GDD v1.21). The same pairs
+// are then replayed with amendments and reported, not judged: every sport adapting toward the same
+// giant markets is natural.
 
 export type Ranking = "byShare" | "byScore";
 export const RANKINGS: Ranking[] = ["byShare", "byScore"];
@@ -50,6 +53,8 @@ export interface DifferentiationReport {
   pairsFailed: Record<Ranking, number>;
   /** The criterion: every pair passes by population share. */
   passed: boolean;
+  /** The same pairs with amendments allowed, by population share (reported, not judged). */
+  amended: { a: string; b: string; meanShared: number }[];
 }
 
 export interface DifferentiationSettings {
@@ -101,8 +106,24 @@ export function runDifferentiation(
   }
 
   const lists = new Map<string, { byShare: string[][]; byScore: string[][] }>();
+  const amendedLists = new Map<string, string[][]>();
   const outcomes: PresetOutcome[] = [];
   for (const preset of presets) {
+    const amended: string[][] = [];
+    for (const seed of settings.seeds) {
+      const played = playCampaign(world, {
+        seed,
+        anchorCountryId: settings.anchorCountryId,
+        genome: preset.genome,
+        genomeLabel: preset.id,
+        bot: settings.bot,
+        turns: settings.turns,
+        amend: true,
+      });
+      onCampaign?.(played);
+      amended.push(played.result.topCountriesByShare.slice(0, topN));
+    }
+    amendedLists.set(preset.id, amended);
     const entry = { byShare: [] as string[][], byScore: [] as string[][] };
     const outcome: PresetOutcome = { preset: preset.id, fandomScoreBySeed: [], collapsedSeeds: [] };
     for (const seed of settings.seeds) {
@@ -113,6 +134,7 @@ export function runDifferentiation(
         genomeLabel: preset.id,
         bot: settings.bot,
         turns: settings.turns,
+        amend: false,
       });
       onCampaign?.(played);
       entry.byShare.push(played.result.topCountriesByShare.slice(0, topN));
@@ -158,5 +180,11 @@ export function runDifferentiation(
       byScore: pairs.length - pairsPassed.byScore,
     },
     passed: pairs.length > 0 && pairsPassed.byShare === pairs.length,
+    amended: pairs.map(({ a, b }) => ({
+      a,
+      b,
+      meanShared: compare(amendedLists.get(a) ?? [], amendedLists.get(b) ?? [], sharedLimit)
+        .meanShared,
+    })),
   };
 }

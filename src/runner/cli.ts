@@ -179,6 +179,11 @@ function printDifferentiation(report: DifferentiationReport): void {
     );
   }
   console.log(`  Differentiation criterion: ${report.passed ? "PASSED" : "FAILED"}`);
+  console.log(
+    "  With rule amendments (reported, not judged): mean shared top-10 by population share",
+  );
+  for (const pair of report.amended)
+    console.log(`    ${pair.a} vs ${pair.b}: ${pair.meanShared.toFixed(2)}`);
 }
 
 function printCollapse(report: CollapseReport): void {
@@ -524,7 +529,8 @@ function main(): number {
         const presets = listOf(values.presets) ?? world.genome.presets.map((p) => p.id);
         jobs.push({
           id: experiment,
-          campaigns: presets.length * seeds.length,
+          // Played twice: as invented (the criterion), then with rule amendments (reported).
+          campaigns: presets.length * seeds.length * 2,
           run: () => {
             const report = runDifferentiation(
               world,

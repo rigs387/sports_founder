@@ -354,6 +354,7 @@ describe("saves with the growth tree (format 5)", () => {
       seasonFormat: _s,
       flagship: _f,
       identity: _i,
+      rules: _r,
       ...v5State
     } = current;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 5, state: v5State }), world);
@@ -362,6 +363,7 @@ describe("saves with the growth tree (format 5)", () => {
       ...current,
       events: emptyEvents(current.landmarks.length),
       ...migratedFlagship(current),
+      rules: { amendments: [] },
     };
     expect(serializeSave(loaded)).toBe(serializeSave(migrated));
     expect(playWithPolicy(loaded, 6)).toStrictEqual(playWithPolicy(migrated, 6));

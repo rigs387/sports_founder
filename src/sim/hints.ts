@@ -1,5 +1,5 @@
 import { AXIS_IDS, GENOME_AXES, LEVERS, optionDeltas, optionModifiers } from "../content";
-import { countryAttributes } from "./genome";
+import { countryAttributes, fitScale } from "./genome";
 import type { AxisId, World } from "./types";
 
 // Anchor-only genome hints (GDD Campaign setup): qualitative + / ++ / − per option, computed for
@@ -10,13 +10,13 @@ export type GenomeHint = "++" | "+" | "-" | null;
 
 export type GenomeHints = Record<AxisId, Record<string, GenomeHint>>;
 
-/** An option's net lever delta at a country: affinity + accessibility + depth. */
+/** An option's net lever delta at a country: affinity + accessibility + depth, softened in a giant. */
 export function optionNetDelta(world: World, axis: AxisId, option: string, index: number) {
   const deltas = optionDeltas(
     optionModifiers(world.genome, axis, option),
     countryAttributes(world, index),
   );
-  return LEVERS.reduce((sum, lever) => sum + deltas[lever], 0);
+  return LEVERS.reduce((sum, lever) => sum + deltas[lever], 0) * fitScale(world, index);
 }
 
 export function anchorGenomeHints(world: World, anchorCountryId: string): GenomeHints {

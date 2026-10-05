@@ -73,6 +73,13 @@ export function CountryCard({
                 continent: t(`map.continents.${continent}`),
               })}
             </p>
+            <p
+              className="wealth-level"
+              data-testid="country-wealth"
+              data-level={country.wealthLevel}
+            >
+              {t("map.wealthLevel", { level: t(`map.wealthLevels.${country.wealthLevel}`) })}
+            </p>
           </div>
           <button
             type="button"

@@ -26,6 +26,19 @@ export function countryAttributes(world: World, countryIndex: number): AffinityA
   return derived;
 }
 
+/** How strongly genome fit applies in a country: less in a giant market (GDD v1.21). */
+export function fitScale(world: World, countryIndex: number): number {
+  return world.derived[countryIndex]?.fitScale ?? 1;
+}
+
+function scaleDeltas(deltas: LeverDeltas, scale: number): LeverDeltas {
+  return {
+    affinity: deltas.affinity * scale,
+    accessibility: deltas.accessibility * scale,
+    depth: deltas.depth * scale,
+  };
+}
+
 export function multipliersFromDeltas(deltas: LeverDeltas, config: Config): LeverMultipliers {
   const clamp = (lever: keyof LeverMultipliers) => {
     const { min, max } = config.levers[lever];
@@ -45,7 +58,7 @@ export function leverMultipliers(
   countryIndex: number,
 ): LeverMultipliers {
   const deltas = genomeDeltas(world.genome, genome, countryAttributes(world, countryIndex));
-  return multipliersFromDeltas(deltas, world.config);
+  return multipliersFromDeltas(scaleDeltas(deltas, fitScale(world, countryIndex)), world.config);
 }
 
 export interface LeverExplanation {
@@ -72,7 +85,9 @@ export function explainLevers(
     for (const c of contributions) deltas[c.lever] += c.delta;
     return { axis, option, contributions };
   });
-  return { multipliers: multipliersFromDeltas(deltas, world.config), deltas, options };
+  // A giant market softens every contribution alike (GDD v1.21).
+  const scaled = scaleDeltas(deltas, fitScale(world, countryIndex));
+  return { multipliers: multipliersFromDeltas(scaled, world.config), deltas: scaled, options };
 }
 
 /** Weighted share of axes on which two genomes choose the same option, 0–1. */

@@ -79,6 +79,10 @@ count in seasons.
 **Time (v1.19):** Turn-based, not real-time. An optional auto-advance (Play / Pause, a few speeds)
 ends turns on its own and stops whenever something needs the player; any time, low priority.
 
+**Big and rich markets (v1.21):** A giant is many audiences: genome fit softens with population.
+Four wealth levels (Shoestring, Modest, Comfortable, Affluent) weigh Prestige income and where
+rivals defend hardest. The race for #1 counts raw fans.
+
 **Sport identity (v1.18):** Name the sport (generated default), the founding club (a real flagship
 club in a real town of the anchor) and its ground; birthplace and ethos; what a score, match and
 season are called (preset nouns); a preset emblem. A Rulebook page in "Your sport" with almanac

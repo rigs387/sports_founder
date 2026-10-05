@@ -380,6 +380,21 @@ leader pulls clear faster on a better-fitting rulebook), so world championships 
 stronger (casual × 1.26, hardcore × 1.9, home + 2.6%), giving 34/68 (50%); first win median turn
 167–170. The price is small against late-game PP; the backlash is the real cost. Save format 17.
 
+
+### 2.10 Big and Rich Markets (GDD v1.21)
+
+Built 2026-10-04 with the rules-evolution follow-up. The balance check after amendments found
+differentiation 1 of 6 pairs: every sport amended toward the population giants' tastes (the
+biggest markets by Fandom Score are the same for everyone late on). A drift backlash, a hard
+one-step bound and stronger backlash did not stop it (3 of 6 at best, or no amendments at all).
+Decided: accept convergence as natural, judge differentiation on sports as invented, keep the
+founding-drift backlash (weight 1.5, return factor 0.5), and make big markets behave differently:
+genome fit softens with population (`bigMarkets`), four wealth levels from the World Bank income
+groups (`wealthLevels`) weigh Prestige income and rival market value (`rivalAI.marketValue`).
+Measured: pacing passes (first win 163–169), #1 lost before the win 53% after scaling the world
+championships back, differentiation 5 of 6 as invented. `tests/markets.test.ts`; docs in
+`docs/markets/README.md`.
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
