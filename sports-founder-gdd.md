@@ -98,6 +98,13 @@ turn. Longer turns change how often the player decides, not the economy's math.
     so the season's cards and its new star are in front of the player while it is open.
     Offseason actions take effect when it closes, before the next season's first matches (a seat
     move included). This is a small sim change; the win contest is remeasured once.
+    *Built 2026-10-05 (step 1):* a season started by closing the offseason lasts a full year, so
+    with every turn length dividing a year it ends on a turn boundary (after a tier change, at
+    most one season ends mid-turn and the rest of that turn is a break with no matches). The
+    campaign's first season, and one restarted when the seat is sent home, run to the configured
+    quarter. Retired players are replaced when the season ends, so the offseason shows every
+    club's new leading player; the club count follows the tier when it closes. A star dropped in
+    the offseason is recorded against the season just finished.
   - *The backing price stays (choose pain).* 60 PP base: the first star is usually not affordable
     in their first offseason, and the screen shows the gap as a goal to save toward.
 

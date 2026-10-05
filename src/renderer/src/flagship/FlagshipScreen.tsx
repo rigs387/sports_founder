@@ -364,7 +364,7 @@ function Seat({
     .filter((c) => c?.league)
     .sort((a, b) => country(a?.countryId ?? "").localeCompare(country(b?.countryId ?? "")));
   const valid = targets.some((c) => c?.countryId === target);
-  const open = snapshot.seasonalWindowOpen;
+  const open = snapshot.offseasonOpen;
   const words = useTraditionWords(snapshot);
   const { i18n } = useTranslation();
   const leaving = snapshot.culture.traditions.filter((tradition) =>

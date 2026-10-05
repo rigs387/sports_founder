@@ -1,6 +1,6 @@
 import type { NodeEffect } from "../content";
 import { focusCostFromExposure } from "./actions";
-import { seasonalWindowOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
+import { offseasonOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
 import { mediaRevenueFactor } from "./countermoves";
 import { type CultureSnapshot, cultureSnapshot } from "./culture";
 import { type EventSnapshot, eventSnapshots } from "./events";
@@ -132,7 +132,7 @@ export interface TurnSnapshot {
   ppTier: number;
   turnLengthQuarters: number;
   pp: number;
-  seasonalWindowOpen: boolean;
+  offseasonOpen: boolean;
   tierTrack: TierTrackSnapshot;
   focus: (string | null)[];
   win: WinSnapshot;
@@ -261,7 +261,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     ppTier: state.ppTier,
     turnLengthQuarters: turnLengthQuarters(state.ppTier, world.config),
     pp: state.pp,
-    seasonalWindowOpen: seasonalWindowOpen(state, world.config),
+    offseasonOpen: offseasonOpen(state),
     tierTrack: {
       peakTier: track.peakTier,
       pendingTierUp: track.pendingTierUp,
@@ -296,6 +296,6 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     flagship: flagshipSnapshot(state, world),
     identity: identitySnapshot(state, world),
     rules: rulesSnapshot(state, world),
-    culture: cultureSnapshot(state, world, seasonalWindowOpen(state, world.config)),
+    culture: cultureSnapshot(state, world, offseasonOpen(state)),
   };
 }

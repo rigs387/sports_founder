@@ -24,13 +24,13 @@ import {
   leverMultipliers,
   mediaRevenueFactor,
   nodeCost,
+  offseasonOpen,
   optionNetDelta,
   PLAYER_INDEX,
   promotionTerms,
   revenuePerQuarter,
   runningCostPerQuarter,
   SEED_WARM_UP_DRAWS,
-  seasonalWindowOpen,
   seatStars,
   type World,
 } from "../sim";
@@ -50,7 +50,7 @@ import { chooseEvents, EVENT_WEIGHTS, type EventWeights } from "./event-policy";
 //                  Nodes: keeps one bailout's PP in reserve, then buys the node with the best value
 //                  per PP (value: each effect's size in every country, weighted by its Fandom
 //                  Score there), skipping nodes worth nothing to it. Amends a rule in the
-//                  seasonal window when the change's fit gain across its fans' markets beats the
+//                  offseason when the change's fit gain across its fans' markets beats the
 //                  backlash by a margin (GDD v1.20); no other bot amends. The competent bot used
 //                  for pacing.
 //   anchor-turtle  keeps a slot on the anchor, fills the rest next door, promotes the anchor only
@@ -387,7 +387,7 @@ function backStars(step: BotStep, world: World, reserve: number): void {
  */
 function amendRules(step: BotStep, world: World, reserve: number): void {
   const state = step.state;
-  if (!seasonalWindowOpen(state, world.config) || amendedThisYear(state, world)) return;
+  if (!offseasonOpen(state) || amendedThisYear(state, world)) return;
   const { casualWeight } = world.config.fandomScore;
   const weights = state.countries.map((country) => {
     const fans = country.fans[PLAYER_INDEX];

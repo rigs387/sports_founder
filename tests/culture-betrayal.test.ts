@@ -8,8 +8,8 @@ import {
   cultureProblems,
   type GameState,
   offendedTraditions,
+  offseasonOpen,
   PLAYER_INDEX,
-  seasonalWindowOpen,
   seatLeaveShare,
   stepQuarter,
   updateCulture,
@@ -25,11 +25,10 @@ const content: World = withConfig(world, (config) => {
 });
 const ANCHOR = "brazil";
 
-/** Brazil in the seasonal window after two years, with fans to lose, under this ethos. */
+/** Brazil in the offseason after two years, with fans to lose, under this ethos. */
 function inWindow(ethos = "family-game"): GameState {
   let state = createCampaign(content, setupFor(5, ANCHOR));
-  while (state.quarter < 8 || !seasonalWindowOpen(state, content.config))
-    state = stepQuarter(state, content);
+  while (state.quarter < 8 || !offseasonOpen(state)) state = stepQuarter(state, content);
   return { ...state, identity: { ...state.identity, ethos } };
 }
 
@@ -141,7 +140,7 @@ describe("the trophy's name", () => {
       applyAction(withTrophy(), content, { type: "nameTrophy", name: "Founders Cup" }),
       content,
     );
-    if (!seasonalWindowOpen(state, content.config)) throw new Error("not in the window");
+    if (!offseasonOpen(state)) throw new Error("not in the window");
     expect(checkAction(state, content, { type: "renameTrophy", name: "Founders Cup" })).toMatch(
       /already has that name/,
     );

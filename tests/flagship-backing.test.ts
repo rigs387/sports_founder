@@ -6,12 +6,13 @@ import {
   backingPrice,
   checkAction,
   checkInvariants,
+  closeOffseason,
   computeExposure,
   createCampaign,
   deserializeSave,
   type GameState,
+  offseasonOpen,
   PLAYER_INDEX,
-  seasonalWindowOpen,
   seatStars,
   serializeSave,
   stepQuarter,
@@ -33,11 +34,11 @@ function step(state: GameState): GameState {
   return next;
 }
 
-/** Brazil after its first season, in the next seasonal window, with a star and PP to spend. */
+/** Brazil after its first season, in the next offseason, with a star and PP to spend. */
 function withStar(): GameState {
   let state = createCampaign(content, setupFor(11, "brazil"));
   while (state.flagship.seasons.length < 1) state = step(state);
-  while (!seasonalWindowOpen(state, content.config)) state = step(state);
+  while (!offseasonOpen(state)) state = step(state);
   return { ...state, pp: 10_000 };
 }
 
@@ -73,9 +74,9 @@ describe("backing a star", () => {
       /already backed/,
     );
     let outside = backed;
-    while (seasonalWindowOpen(outside, content.config)) outside = step(outside);
+    outside = closeOffseason(outside, content);
     expect(checkAction(outside, content, { type: "dropStar", playerId: star.id })).toMatch(
-      /seasonal window/,
+      /offseason/,
     );
   });
 
@@ -111,7 +112,7 @@ describe("backing a star", () => {
     const star = state.flagship.players.find((p) => p.id === starOf(withStar()).id);
     if (star?.retiredSeason === null) {
       expect(star.backing?.influence).toBe(1);
-      while (!seasonalWindowOpen(state, content.config)) state = step(state);
+      while (!offseasonOpen(state)) state = step(state);
       const dropped = applyAction(state, content, { type: "dropStar", playerId: star.id });
       expect(dropped.flagship.players.find((p) => p.id === star.id)?.backing).toBeNull();
     } else {

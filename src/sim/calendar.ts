@@ -28,18 +28,9 @@ export function yearOfQuarter(quarter: number, config: Config): number {
 }
 
 /**
- * Whether the seasonal window is open for the turn about to be played: true when the turn's
- * quarters include the window's quarter of the year. At quarter-length turns that is one turn in
- * four; at year-length turns it is every turn.
+ * Whether the offseason is open (GDD v1.24): from the flagship season's end until the next turn
+ * ends. League business happens only in it, once a year.
  */
-export function seasonalWindowOpen(
-  state: Pick<GameState, "quarter" | "ppTier">,
-  config: Config,
-): boolean {
-  const windowIndex = config.seasonalWindow.quarterOfYear - 1;
-  const length = turnLengthQuarters(state.ppTier, config);
-  for (let q = state.quarter; q < state.quarter + length; q += 1) {
-    if (q % QUARTERS_PER_YEAR === windowIndex) return true;
-  }
-  return false;
+export function offseasonOpen(state: Pick<GameState, "flagship">): boolean {
+  return state.flagship.offseason;
 }

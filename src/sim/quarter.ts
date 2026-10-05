@@ -3,7 +3,7 @@ import { reclaimShare, rivalConversionBoosts } from "./countermoves";
 import { traditionShelter, traditionWeights, venueStrengths } from "./culture";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
-import { backingEffects, stepFlagshipQuarter } from "./flagship";
+import { backingEffects, closeOffseason, stepFlagshipQuarter } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { type GrowthFactors, growthFactors } from "./growth";
 import { stepLeagueQuarter } from "./leagues";
@@ -80,7 +80,15 @@ import {
 // At the end of each in-game year the yearly world snapshot is recorded.
 
 /** Advances the simulation by one in-game quarter. Pure: returns a new state. */
-export function stepQuarter(state: GameState, world: World): GameState {
+export function stepQuarter(
+  input: GameState,
+  world: World,
+  options: { holdOffseason?: boolean } = {},
+): GameState {
+  // An open offseason closes before the quarter is played, as at a quarter-length turn's start.
+  // End Turn closes it itself at the turn's start and holds one that opens mid-turn until the next
+  // turn, so the player always meets it (GDD v1.24).
+  const state = options.holdOffseason ? input : closeOffseason(input, world);
   const { config } = world;
   const rng = restoreRng(state.rng);
   const exposure = computeExposure(state, world);

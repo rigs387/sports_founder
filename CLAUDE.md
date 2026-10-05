@@ -117,12 +117,17 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   to continue.
 - The flagship league (GDD v1.11, v1.13, v1.14) lives in `src/sim/flagship.ts` and
   `GameState.flagship`. The anchor holds the commissioner's seat from turn 1. Clubs are based in real
-  places (`content/places.yaml`) with invented nicknames; never invent places. One season a year ends
-  in the seasonal window's quarter; the format (European table or American playoffs) is chosen at
-  creation (`GameState.seasonFormat`). Matches roll on the flagship's own RNG stream, so the world's
-  random sequence never depends on the flagship. `moveSeat` (window only, Professional or Elite
-  league) moves the seat at the season's end with a purist hardcore cost; a folded flagship abroad
-  sends the seat home for free.
+  places (`content/places.yaml`) with invented nicknames; never invent places. One season a year; the
+  format (European table or American playoffs) is chosen at creation (`GameState.seasonFormat`).
+  Matches roll on the flagship's own RNG stream, so the world's random sequence never depends on the
+  flagship. `moveSeat` (offseason only, Professional or Elite league) moves the seat when the
+  offseason closes, with a purist hardcore cost; a folded flagship abroad sends the seat home free.
+- The offseason (GDD v1.24) is `FlagshipState.offseason`, read through `offseasonOpen`: it opens
+  when a season ends (retired players are replaced then; no matches while it is open) and closes at
+  the start of the next `endTurn` (`closeOffseason`: seat move, club count by tier, a season of a
+  full year, so seasons end on turn boundaries). A bare `stepQuarter` closes it first, as a
+  quarter-length turn would; `endTurn` holds one that opens mid-turn. League business (promotion,
+  amendments, backing, the seat, the trophy) happens only while it is open.
 - Flagship seasons reach the player as event cards (GDD v1.15): `src/sim/season-stories.ts` reads
   the recorded `SeasonSummary` (thresholds in `config.flagship.stories`), and `offerSeasonCards` in
   `src/sim/events.ts` offers the champion moment and at most one story card before other cards.
@@ -139,8 +144,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   emblem. Option lists are ids in `content/identity.yaml`; words are in the locale file. Defaults
   come from the seed on their own random stream; identity never touches the simulation's numbers.
   League text uses the sport's terms through `useTermVars` (`src/renderer/src/identity/terms.ts`).
-- Rules evolution (GDD v1.20) lives in `src/sim/rules.ts`: the `amendRule` action (seasonal
-  window, once a year, rule traits only), price by jump and tier, purist backlash (hardcore →
+- Rules evolution (GDD v1.20) lives in `src/sim/rules.ts`: the `amendRule` action (offseason,
+  once a year, rule traits only), price by jump and tier, purist backlash (hardcore →
   casual everywhere, by rule age and jump, heavier in the anchor and where the old rule fit
   better), `GameState.rules` and the review snapshot. The genome is the setup's with each
   amendment applied; invariants check it.
@@ -231,6 +236,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 18 adds culture (GDD v1.22): `GameState.culture` and tradition facts on event
   records. Format 17 migrates with no traditions, facts counted from the season under way and only
   landmarks recorded from then on read; older event records tell no tradition.
+- Save format 19 adds the offseason (GDD v1.24): `FlagshipState.offseason`. Format 18 migrates with
+  it closed and the season under way playing on (open only if the saved season had run out).
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

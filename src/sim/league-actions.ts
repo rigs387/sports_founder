@@ -1,4 +1,4 @@
-import { seasonalWindowOpen } from "./calendar";
+import { offseasonOpen } from "./calendar";
 import { bailoutTerms, leagueTierIndex, promotionTerms, runningCostPerQuarter } from "./leagues";
 import {
   type GameState,
@@ -66,7 +66,7 @@ export function leagueActions(state: GameState, world: World, index: number): Le
   const ended: LeagueActionBlocker | null = state.outcome ? { kind: "ended" } : null;
   const promotionBlocker: LeagueActionBlocker | null =
     ended ??
-    (!seasonalWindowOpen(state, world.config)
+    (!offseasonOpen(state)
       ? { kind: "window" }
       : !promotion
         ? { kind: "topTier", tier: league.tier }
@@ -147,7 +147,7 @@ export function leagueActionReason(blocker: LeagueActionBlocker | null): string 
     case "ended":
       return "the campaign has ended";
     case "window":
-      return "leagues can only be promoted in the seasonal window";
+      return "leagues can only be promoted in the offseason";
     case "topTier":
       return `the league is already ${blocker.tier}, the top tier`;
     case "hardcore":

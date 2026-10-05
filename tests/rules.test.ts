@@ -8,12 +8,13 @@ import {
   backlashTotal,
   checkAction,
   checkInvariants,
+  closeOffseason,
   costMultiplier,
   createCampaign,
   deserializeSave,
   type GameState,
+  offseasonOpen,
   PLAYER_INDEX,
-  seasonalWindowOpen,
   serializeSave,
   snapshot,
   stepQuarter,
@@ -27,20 +28,18 @@ const content: World = withConfig(world, (config) => {
   config.start.startingPP = 100_000;
 });
 
-/** Brazil in the seasonal window after `years` years, with fans to lose. */
+/** Brazil in the offseason after `years` years, with fans to lose. */
 function inWindow(years: number): GameState {
   let state = createCampaign(content, setupFor(5, "brazil"));
-  while (state.quarter < years * 4 || !seasonalWindowOpen(state, content.config))
-    state = stepQuarter(state, content);
+  while (state.quarter < years * 4 || !offseasonOpen(state)) state = stepQuarter(state, content);
   return state;
 }
 
-/** Plays on `years` more years from `state` and stops in the next seasonal window. */
+/** Plays on `years` more years from `state` and stops in the next offseason. */
 function inWindowFrom(start: GameState, years: number): GameState {
   let state = start;
   const until = start.quarter + years * 4;
-  while (state.quarter < until || !seasonalWindowOpen(state, content.config))
-    state = stepQuarter(state, content);
+  while (state.quarter < until || !offseasonOpen(state)) state = stepQuarter(state, content);
   return state;
 }
 
@@ -79,7 +78,7 @@ describe("when a rule can be amended", () => {
       checkAction(amended, content, { type: "amendRule", axis: "scoring", option: scoring }),
     ).toMatch(/already been amended this year/);
     let closed = amended;
-    while (seasonalWindowOpen(closed, content.config)) closed = stepQuarter(closed, content);
+    closed = closeOffseason(closed, content);
     expect(amendBlocker(closed, content, "scoring", scoring)).toBe("window");
     expect(
       checkAction(state, content, { type: "amendRule", axis: "contact", option: "slam" }),

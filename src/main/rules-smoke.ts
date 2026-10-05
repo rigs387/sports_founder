@@ -1,7 +1,7 @@
 import type { BrowserWindow } from "electron";
 
 /**
- * Amending the rules (GDD v1.20): plays on to a seasonal window if needed, picks a rule and an
+ * Amending the rules (GDD v1.20): plays on to the offseason if needed, picks a rule and an
  * option the simulation allows, reviews it (price, purist loss, fit hints) and confirms, then checks
  * the Rulebook lists the dated amendment.
  */
@@ -42,7 +42,7 @@ export async function verifyAmendment(
     turnsPlayed += 1;
     await openSport();
   }
-  if (!(await isOpen())) throw new Error("No seasonal window with an amendment left in 6 turns.");
+  if (!(await isOpen())) throw new Error("No offseason with an amendment left in 6 turns.");
 
   await click('[data-testid="amend-rules"] .amend-pick:not(:disabled)');
   await wait(`!!document.querySelector('[data-testid="amend-options"]')`);

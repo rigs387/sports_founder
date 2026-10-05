@@ -302,8 +302,8 @@ describe("content validation", () => {
     expect(loadError(dir2).message).toContain("config.yaml at ppTiers[3].breadth.leagueTier");
 
     const dir3 = copyOfContent();
-    editYaml(dir3, "config.yaml", ["seasonalWindow", "quarterOfYear"], setValue(5));
-    expect(loadError(dir3).message).toContain("config.yaml at seasonalWindow.quarterOfYear");
+    editYaml(dir3, "config.yaml", ["offseason", "seasonEndQuarter"], setValue(5));
+    expect(loadError(dir3).message).toContain("config.yaml at offseason.seasonEndQuarter");
   });
 
   it("bad poaching, rival AI and promotion minimum config names the file and field", () => {

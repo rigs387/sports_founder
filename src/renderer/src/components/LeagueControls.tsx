@@ -94,7 +94,7 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
           <ul className="league-terms">
             <li>
               {t(
-                snapshot.seasonalWindowOpen
+                snapshot.offseasonOpen
                   ? "league.manage.windowOpen"
                   : "league.manage.blockers.window",
               )}

@@ -20,7 +20,7 @@ const initial = createCampaign(world, setupFor(27, anchor));
 const make = (league: Partial<LeagueState> = {}, pp = 10000, hardcore = 100000): GameState => ({
   ...initial,
   pp,
-  quarter: world.config.seasonalWindow.quarterOfYear - 1,
+  flagship: { ...initial.flagship, offseason: true },
   countries: initial.countries.map((country, i) =>
     i !== index
       ? country

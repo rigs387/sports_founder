@@ -3,16 +3,17 @@ import {
   activeClubs,
   applyAction,
   checkInvariants,
+  closeOffseason,
   createCampaign,
   deserializeSave,
   endTurn,
   type GameState,
   type LeagueTierId,
   newLeague,
+  offseasonOpen,
   PLAYER_INDEX,
   type Player,
   runTurns,
-  seasonalWindowOpen,
   serializeSave,
   stepQuarter,
 } from "../src/sim";
@@ -105,6 +106,9 @@ describe("leading players", () => {
     let state = withLeague(start(), "brazil", "semi-pro");
     const founders = state.flagship.players;
     while (state.flagship.seasons.length < 1) state = stepQuarter(state, world);
+    // Expansion clubs join when the offseason closes (GDD v1.24).
+    expect(state.flagship.offseason).toBe(true);
+    state = closeOffseason(state, world);
     expect(state.flagship.players).toHaveLength(world.config.flagship.clubs["semi-pro"]);
     expect(identities(state.flagship.players.slice(0, founders.length))).toStrictEqual(
       identities(founders),
@@ -114,7 +118,7 @@ describe("leading players", () => {
 
   it("keeps players with their dormant clubs when the seat moves; the new league gets its own", () => {
     let state = withLeague(start(), "argentina", "professional");
-    while (!seasonalWindowOpen(state, world.config)) state = stepQuarter(state, world);
+    while (!offseasonOpen(state)) state = stepQuarter(state, world);
     const brazilians = state.flagship.players;
     state = endTurn(applyAction(state, world, { type: "moveSeat", countryId: "argentina" }), world);
     expect(state.flagship.countryId).toBe("argentina");
@@ -143,7 +147,7 @@ describe("leading players", () => {
 describe("save format 11", () => {
   it("migrates a version 10 save: fresh players at active clubs, none at dormant ones", () => {
     let played = withLeague(start("brazil", 3), "argentina", "professional");
-    while (!seasonalWindowOpen(played, world.config)) played = stepQuarter(played, world);
+    while (!offseasonOpen(played)) played = stepQuarter(played, world);
     played = endTurn(
       applyAction(played, world, { type: "moveSeat", countryId: "argentina" }),
       world,

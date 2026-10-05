@@ -3,7 +3,9 @@ import {
   applyAction,
   CampaignOverError,
   checkAction,
+  checkInvariants,
   createCampaign,
+  deserializeSave,
   endTurn,
   formationThreshold,
   type GameState,
@@ -11,7 +13,7 @@ import {
   type LeagueState,
   PLAYER_INDEX,
   runningCostPerQuarter,
-  seasonalWindowOpen,
+  serializeSave,
   stepLeagueQuarter,
   stepQuarter,
   type World,
@@ -327,16 +329,14 @@ describe("league actions are validated", () => {
     hardcore: Math.ceil((promotion?.hardcoreShare ?? 0) * population) + 10,
     league: { cash: (promotion?.reserveQuarters ?? 0) * semiCost + 1 },
   });
-  const inWindow = (s: GameState): GameState => {
-    let q = s.quarter;
-    while (!seasonalWindowOpen({ quarter: q, ppTier: s.ppTier }, world.config)) q += 1;
-    return { ...s, quarter: q };
-  };
-  const outOfWindow = (s: GameState): GameState => {
-    let q = s.quarter;
-    while (seasonalWindowOpen({ quarter: q, ppTier: s.ppTier }, world.config)) q += 1;
-    return { ...s, quarter: q };
-  };
+  const inWindow = (s: GameState): GameState => ({
+    ...s,
+    flagship: { ...s.flagship, offseason: true },
+  });
+  const outOfWindow = (s: GameState): GameState => ({
+    ...s,
+    flagship: { ...s.flagship, offseason: false },
+  });
   const promote = { type: "promoteLeague" as const, countryId: ANCHOR };
 
   it("promotion is legal for a qualifying league in the window, and pays its cost", () => {
@@ -355,8 +355,8 @@ describe("league actions are validated", () => {
     });
   });
 
-  it("promotion outside the seasonal window is rejected", () => {
-    expect(checkAction(outOfWindow(qualified), world, promote)).toMatch(/seasonal window/);
+  it("promotion outside the offseason is rejected", () => {
+    expect(checkAction(outOfWindow(qualified), world, promote)).toMatch(/offseason/);
   });
 
   it("promotion below the hardcore or cash thresholds is rejected", () => {
@@ -411,22 +411,53 @@ describe("league actions are validated", () => {
   });
 });
 
-describe("seasonal windows", () => {
-  const openTurns = (turnLength: number) => {
+describe("offseasons", () => {
+  /** Plays 16 turns at one turn length; returns which turns started with the offseason open. */
+  const play = (turnLength: number) => {
     const w = withConfig(world, (config) => {
-      const tier1 = config.ppTiers[0];
-      if (tier1) tier1.turnLengthQuarters = turnLength;
+      for (const tier of config.ppTiers) tier.turnLengthQuarters = turnLength;
     });
-    let open = 0;
-    for (let turn = 0; turn < 8; turn += 1) {
-      if (seasonalWindowOpen({ quarter: turn * turnLength, ppTier: 1 }, w.config)) open += 1;
+    let state = createCampaign(w, setupFor(3));
+    const open: boolean[] = [];
+    for (let turn = 0; turn < 16; turn += 1) {
+      open.push(state.flagship.offseason);
+      state = endTurn(state, w);
     }
-    return open;
+    return { open, state };
   };
 
-  it("falls on one quarter-length turn in four, one half-year turn in two, and every year turn", () => {
-    expect(openTurns(1)).toBe(2);
-    expect(openTurns(2)).toBe(4);
-    expect(openTurns(4)).toBe(8);
+  it("opens once a year: one quarter-length turn in four, one half-year turn in two, every year turn", () => {
+    const later = (turnLength: number) => play(turnLength).open.slice(8).filter(Boolean).length;
+    expect(later(1)).toBe(2);
+    expect(later(2)).toBe(4);
+    expect(later(4)).toBe(8);
+  });
+
+  it("opens on the turn after the season ends, and seasons after the first end on a turn boundary", () => {
+    for (const turnLength of [1, 2, 4]) {
+      const { open, state } = play(turnLength);
+      expect(open[0]).toBe(false);
+      for (const season of state.flagship.seasons.slice(1)) {
+        // A summary's quarter is the first quarter after the season's last.
+        expect(season.quarter % turnLength).toBe(0);
+      }
+    }
+  });
+
+  it("offers the season's cards while it is open", () => {
+    let state = createCampaign(world, setupFor(3));
+    while (!state.flagship.offseason) state = endTurn(state, world);
+    expect(state.events.pending.map((card) => card.templateId)).toContain("season-champion");
+  });
+
+  it("migrates a version 18 save with the season under way and the offseason closed", () => {
+    let state = createCampaign(world, setupFor(3));
+    for (let i = 0; i < 5; i += 1) state = endTurn(state, world);
+    const { offseason: _o, ...flagship } = state.flagship;
+    const v18 = { ...state, flagship };
+    const loaded = deserializeSave(JSON.stringify({ formatVersion: 18, state: v18 }), world);
+    expect(loaded.flagship.offseason).toBe(false);
+    expect(checkInvariants(loaded, world)).toEqual([]);
+    expect(deserializeSave(serializeSave(loaded), world)).toEqual(loaded);
   });
 });

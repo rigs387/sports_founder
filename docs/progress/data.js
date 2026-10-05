@@ -12,13 +12,13 @@ window.SF_PROGRESS = {
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
-    date: "2026-10-04",
-    tests: 464,
+    date: "2026-10-05",
+    tests: 467,
     files: 44,
-    note: "npm run check passed after Culture (type checks, Biome, purity, 464 tests in 44 files). Lint has existing visual-study warnings.",
-    smokeDate: "2026-10-04",
+    note: "npm run check passed after the offseason's timing (type checks, Biome, purity, 467 tests in 44 files). Lint has existing visual-study warnings.",
+    smokeDate: "2026-10-05",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically.",
   },
   eventDeck: { current: 28, target: "40–60" },
   phases: [
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "foundation",
       title: "Living time and the offseason",
-      text: "The first playtest loved the game but found turn clicking flat and the seasonal window never usable. Decided (GDD v1.24): Play / Pause with speeds, cards popping up as they happen, and an offseason screen for all league business. Build it first (tech plan 2.13).",
+      text: "The first playtest loved the game but found turn clicking flat and the seasonal window never usable. Decided (GDD v1.24): Play / Pause with speeds, cards popping up as they happen, and an offseason screen for all league business. Step 1 is built: the offseason opens right after each season, so a new star can be backed at once. Next, the clock and pop-up cards (tech plan 2.13).",
       tag: "Next build",
     },
     {
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-05",
+      type: "Built",
+      title: "The offseason opens after the season",
+      text: "Tech plan 2.13 step 1 (GDD v1.24): the seasonal window is now the offseason. It opens when the flagship season ends, so the champion card and the new star are in front of the player while league business is open, and closes at the start of the next turn: a seat move happens, clubs follow the tier and a season of a full year starts. Retired players are replaced at the season's end. Pacing passes; #1 contest 47%; stars first backed at turn median 40. Save format 19.",
+    },
     {
       date: "2026-10-05",
       type: "Design",
@@ -413,13 +419,21 @@ window.SF_PROGRESS = {
       items: [
         ["built", "Formation, Amateur-to-Elite tiers and local finances"],
         ["built", "Health ladder, promotion, restructuring and bailouts"],
-        ["built", "Flagship seat: Professional+ moves in season windows; home on collapse"],
+        ["built", "Flagship seat: Professional+ moves in the offseason; home on collapse"],
+        ["built", "The offseason opens after each season, with the season's cards and new star (GDD v1.24)"],
+        ["planned", "The offseason screen: season review and every league action in one place"],
         ["built", "Named clubs in real places, results, standings and retained season summaries"],
         ["built", "Flagship screen: stars, table, results, champions and the seat"],
         ["built", "European or American format chosen on the creation screen"],
         ["built", "Season cards: champion, story and pressure cards; club strength"],
-        ["planned", "Flagship broadcast: media reach by season interest and health, pulses, ripple (GDD v1.23)"],
-        ["planned", "Talent pull toward the flagship (parked until other leagues have named players)"],
+        [
+          "planned",
+          "Flagship broadcast: media reach by season interest and health, pulses, ripple (GDD v1.23)",
+        ],
+        [
+          "planned",
+          "Talent pull toward the flagship (parked until other leagues have named players)",
+        ],
         ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
         ["planned", "Standing policies and hired league directors"],
         ["planned", "Anchor purist resentment from neglect, rule changes and seat moves"],

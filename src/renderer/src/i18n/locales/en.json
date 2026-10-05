@@ -403,8 +403,8 @@
     "focus": "Focus: {{countries}}",
     "emptySlot": "(empty slot)",
     "listSeparator": ", ",
-    "windowOpen": "Seasonal window open this turn",
-    "windowClosed": "No seasonal window this turn",
+    "windowOpen": "The offseason is open",
+    "windowClosed": "The season is under way",
     "approaching": "Approaching tier {{tier}}: {{name}} in {{count}} turn(s)",
     "atRisk_one": "Tier at risk: demotion in {{count}} turn unless it recovers",
     "atRisk_other": "Tier at risk: demotion in {{count}} turns unless it recovers",
@@ -459,7 +459,7 @@
       "promotionPrice": "Promote to {{tier}} for {{cash, number(maximumFractionDigits: 1)}} local cash.",
       "restructurePrice": "Step down to {{tier}}. {{count, number}} hardcore fans will become casual.",
       "bailoutPrice": "Spend {{pp, number(maximumFractionDigits: 1)}} Prestige to add {{cash, number(maximumFractionDigits: 1)}} local cash.",
-      "windowOpen": "The seasonal promotion window is open.",
+      "windowOpen": "The offseason is open: leagues can be promoted.",
       "fansRequired": "Hardcore fans: {{current, number}} / {{needed, number}} required.",
       "reserveRequired": "Cash reserve: {{current, number(maximumFractionDigits: 1)}} / {{needed, number(maximumFractionDigits: 1)}} required before promotion.",
       "promotionDeduction": "Promotion spends {{cost, number(maximumFractionDigits: 1)}} cash, leaving {{remaining, number(maximumFractionDigits: 1)}}.",
@@ -479,7 +479,7 @@
       "option": "{{country}} / {{tier}} / {{health}}",
       "blockers": {
         "ended": "The campaign has ended.",
-        "window": "Promotion is only available during the seasonal window.",
+        "window": "Promotion is only available during the offseason.",
         "topTier": "{{tier}} is the highest league tier.",
         "hardcore": "Not enough hardcore fans: {{current, number}} of {{needed, number}} required.",
         "reserve": "Not enough local cash: {{current, number(maximumFractionDigits: 1)}} of {{needed, number(maximumFractionDigits: 1)}} required.",
@@ -954,19 +954,19 @@
     "seat": {
       "heading": "The seat",
       "here": "You run the league in {{country}}. Every other league runs itself.",
-      "pending": "The seat moves to {{country}} when this {{seasonNoun}} ends.",
+      "pending": "The seat moves to {{country}} when the offseason closes, before the next {{seasonNoun}}.",
       "cancel": "Stay in {{country}}",
       "choose": "Move the seat to",
       "placeholder": "Choose a league",
       "none": "No other league is Professional or Elite yet. The seat can move only to one that is.",
-      "closed": "The seat can move only in the seasonal window.",
+      "closed": "The seat can move only in the offseason.",
       "review": "Review the move",
       "confirm": "Move the seat",
       "back": "Keep it here",
       "cost": "Moving away turns {{share}} of hardcore fans in {{country}} casual. The move happens when this {{seasonNoun}} ends.",
       "target": "{{country}} · {{tier}}"
     },
-    "footer": "Your league. Seasons end in the seasonal window.",
+    "footer": "Your league. Each season is followed by the offseason, when league business is done.",
     "stars": {
       "heading": "Stars",
       "intro": "Stars are the league's leading players who carried their club. Backing one lifts the sport in {{country}} while they play here.",
@@ -1005,14 +1005,14 @@
       "cancel": "Keep things as they are",
       "blockers": {
         "back": {
-          "window": "Stars can be backed only in the seasonal window.",
+          "window": "Stars can be backed only in the offseason.",
           "notStar": "Only a star playing in the {{country}} league can be backed.",
           "backed": "This star is already backed.",
           "slots": "Every backing slot is taken. Drop a backed star to free one.",
           "pp": "Backing costs {{price, number(maximumFractionDigits: 1)}} PP; you have {{pp, number(maximumFractionDigits: 1)}}."
         },
         "drop": {
-          "window": "A backing can be dropped only in the seasonal window.",
+          "window": "A backing can be dropped only in the offseason.",
           "notBacked": "This star is not backed."
         }
       }
@@ -1266,10 +1266,10 @@
   },
   "rules": {
     "heading": "Amend the rules",
-    "intro": "Once a year, in the seasonal window, you may change one rule. Purists push back: some hardcore fans turn casual, more the older the rule, the bigger the change, in {{anchor}}, and where the old rule suited fans better.",
-    "closed": "Rules can be amended only in the seasonal window.",
+    "intro": "Once a year, in the offseason, you may change one rule. Purists push back: some hardcore fans turn casual, more the older the rule, the bigger the change, in {{anchor}}, and where the old rule suited fans better.",
+    "closed": "Rules can be amended only in the offseason.",
     "done": "The rules have been amended this year. The next amendment waits for next year's window.",
-    "open": "The seasonal window is open: you may amend one rule this year.",
+    "open": "The offseason is open: you may amend one rule this year.",
     "trait": "Rule",
     "current": "Now",
     "since": "Since {{year}}",
@@ -1288,7 +1288,7 @@
     "confirm": "Amend the rulebook",
     "back": "Keep the rule",
     "blockers": {
-      "window": "Rules can be amended only in the seasonal window.",
+      "window": "Rules can be amended only in the offseason.",
       "thisYear": "The rules have already been amended this year.",
       "identity": "Identity traits never change.",
       "same": "That is already the rule.",
@@ -1387,7 +1387,7 @@
       "confirmRename": "Rename it",
       "cancel": "Keep the name",
       "blockers": {
-        "window": "The trophy can be renamed only in the seasonal window.",
+        "window": "The trophy can be renamed only in the offseason.",
         "naming": "Give the newborn trophy its name first.",
         "trophy": "The league at the seat has no trophy yet."
       }

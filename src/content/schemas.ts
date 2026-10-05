@@ -713,7 +713,7 @@ export const configFileSchema = z.strictObject({
       cooldownQuarters: z.int().min(0),
     }),
   }),
-  seasonalWindow: z.strictObject({ quarterOfYear: z.int().min(1).max(4) }),
+  offseason: z.strictObject({ seasonEndQuarter: z.int().min(1).max(4) }),
   /**
    * A giant market is many audiences (GDD v1.21): genome fit (every option's lever deltas) in a
    * country is × min(1, (referencePopulation ÷ population) ^ fitExponent), never below minScale.

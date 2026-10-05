@@ -4,7 +4,7 @@ import type { Action, TurnSnapshot } from "../../../sim";
 import { useTraditionWords } from "./traditions";
 
 // The flagship's trophy (GDD v1.22): named free while its first champion card is open; renamed
-// only in the seasonal window, which ends the old trophy as a tradition and costs its purists.
+// only in the offseason, which ends the old trophy as a tradition and costs its purists.
 export function TrophyCard({
   snapshot,
   busy,

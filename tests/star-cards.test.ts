@@ -9,8 +9,8 @@ import {
   endTurn,
   type GameState,
   keepCost,
+  offseasonOpen,
   PLAYER_INDEX,
-  seasonalWindowOpen,
   seatStars,
   serializeSave,
   type World,
@@ -56,10 +56,10 @@ function toSeason(state: GameState, seasons: number, content: World): GameState 
   return current;
 }
 
-/** Brazil after its first season, back in the seasonal window, the new star backed. */
+/** Brazil after its first season, back in the offseason, the new star backed. */
 function backedStar(): GameState {
   let state = toSeason(createCampaign(base, setupFor(11, "brazil")), 1, base);
-  while (!seasonalWindowOpen(state, base.config)) state = turn(state, base);
+  while (!offseasonOpen(state)) state = turn(state, base);
   state = { ...state, pp: 10_000 };
   const star = seatStars(state.flagship)[0];
   if (!star) throw new Error("No star");
@@ -196,6 +196,20 @@ describe("star cards", () => {
       },
     };
     const brazil = countryIndex(base, "brazil");
+    // Enough hardcore fans that the drop's small demotion share is at least one person.
+    state = {
+      ...state,
+      countries: state.countries.map((country, i) =>
+        i !== brazil
+          ? country
+          : {
+              ...country,
+              fans: country.fans.map((fans, j) =>
+                j === PLAYER_INDEX ? { ...fans, hardcore: 50_000 } : fans,
+              ),
+            },
+      ),
+    };
     const hardcore = state.countries[brazil]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
     state = applyAction(state, base, { type: "dropStar", playerId: star.id });
     expect(state.countries[brazil]?.fans[PLAYER_INDEX]?.hardcore).toBeLessThan(hardcore);

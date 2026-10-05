@@ -2,7 +2,7 @@ import type { BrowserWindow } from "electron";
 
 /**
  * The Stars panel (GDD v1.16, tech plan 2.6 step 8). Runs after the star cards, so the league has
- * a star. Screenshots the panel in both layouts, then plays on to a seasonal window with a star
+ * a star. Screenshots the panel in both layouts, then plays on to the offseason with a star
  * that can be backed, backs them through the review step, and checks the influence bar and the
  * backed star's name in the flagship country's map tooltip.
  */

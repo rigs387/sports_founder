@@ -68,7 +68,7 @@ export function CampaignOverview({
           <p>
             {t("campaign.meta", { seed: snapshot.seed, country: name(snapshot.anchorCountryId) })}
           </p>
-          <p>{t(snapshot.seasonalWindowOpen ? "campaign.windowOpen" : "campaign.windowClosed")}</p>
+          <p>{t(snapshot.offseasonOpen ? "campaign.windowOpen" : "campaign.windowClosed")}</p>
           <dl className="overview-list">
             {AXIS_IDS.map((axis) => (
               <div key={axis}>

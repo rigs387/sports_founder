@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { GENOME_AXES } from "../src/content";
 import {
+  closeOffseason,
   createCampaign,
   deserializeSave,
   type GameState,
@@ -91,6 +92,8 @@ describe("the season's scoring rule", () => {
       state = stepQuarter(state, world);
     }
     expect(state.flagship.seasons.at(-1)?.scoring).toBe("high");
+    // The next season starts, on the new rule, when the offseason closes (GDD v1.24).
+    state = closeOffseason(state, world);
     expect(state.flagship.scoring).toBe("low");
     state = playSeasons(state, state.flagship.seasons.length + 1);
     const low = world.config.flagship.match.chances.low;
@@ -117,7 +120,8 @@ describe("the season's scoring rule", () => {
 
 describe("save format 10", () => {
   it("migrates a version 9 save: seasons so far are medium, the genome's rule starts next season", () => {
-    const played = playSeasons(withScoring("high", 3), 2);
+    // Saved one quarter into the third season, so a season is under way.
+    const played = stepQuarter(playSeasons(withScoring("high", 3), 2), world);
     const { scoring: _s, ...flagship } = played.flagship;
     const v9 = {
       ...played,
@@ -133,7 +137,7 @@ describe("save format 10", () => {
       },
       culture: migratedCulture(played),
     });
-    const next = playSeasons(loaded, 3);
+    const next = closeOffseason(playSeasons(loaded, 3), world);
     expect(next.flagship.seasons.at(-1)?.scoring).toBe("medium");
     expect(next.flagship.scoring).toBe("high");
   });

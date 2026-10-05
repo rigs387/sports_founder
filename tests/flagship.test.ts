@@ -4,6 +4,7 @@ import {
   applyAction,
   checkAction,
   checkInvariants,
+  closeOffseason,
   createCampaign,
   deserializeSave,
   endTurn,
@@ -11,12 +12,12 @@ import {
   type LeagueTierId,
   matchWinner,
   newLeague,
+  offseasonOpen,
   PLAYER_INDEX,
   quartersUntilSeasonEnd,
   rankTable,
   roundPairs,
   runTurns,
-  seasonalWindowOpen,
   serializeSave,
   stepQuarter,
   totalRounds,
@@ -47,10 +48,10 @@ function withLeague(state: GameState, countryId: string, tier: LeagueTierId): Ga
   return { ...state, countries };
 }
 
-/** Advances quarter by quarter (no turn) until the seasonal window is open for a one-quarter turn. */
+/** Advances quarter by quarter (no turn) until the season ends and the offseason opens. */
 function toWindow(state: GameState): GameState {
   let current = state;
-  while (!seasonalWindowOpen(current, world.config)) current = stepQuarter(current, world);
+  while (!offseasonOpen(current)) current = stepQuarter(current, world);
   return current;
 }
 
@@ -75,8 +76,8 @@ describe("the flagship at campaign start", () => {
     expect(a).not.toEqual(b);
   });
 
-  it("is a season that runs to the seasonal window's quarter", () => {
-    const end = world.config.seasonalWindow.quarterOfYear - 1;
+  it("is a season that runs to the offseason's quarter", () => {
+    const end = world.config.offseason.seasonEndQuarter - 1;
     for (let quarter = 0; quarter < 8; quarter += 1) {
       const length = quartersUntilSeasonEnd(quarter, world);
       expect((quarter + length - 1) % 4).toBe(end);
@@ -158,7 +159,8 @@ describe("a season", () => {
 
   it("grows the league with its tier: expansion clubs join at the next season", () => {
     const promoted = withLeague(start(), "brazil", "semi-pro");
-    const state = playSeasons(promoted, 1);
+    // Expansion clubs join when the offseason closes (GDD v1.24).
+    const state = closeOffseason(playSeasons(promoted, 1), world);
     const clubs = activeClubs(state.flagship);
     expect(clubs).toHaveLength(world.config.flagship.clubs["semi-pro"]);
     expect(state.flagship.table).toHaveLength(clubs.length);
@@ -182,12 +184,12 @@ describe("a season", () => {
 });
 
 describe("the commissioner's seat", () => {
-  it("moves only in the seasonal window, only to a Professional or Elite league", () => {
+  it("moves only in the offseason, only to a Professional or Elite league", () => {
     let state = withLeague(start(), "argentina", "professional");
     state = withLeague(state, "uruguay", "semi-pro");
-    while (seasonalWindowOpen(state, world.config)) state = stepQuarter(state, world);
+    state = closeOffseason(state, world);
     expect(checkAction(state, world, { type: "moveSeat", countryId: "argentina" })).toMatch(
-      /seasonal window/,
+      /offseason/,
     );
     state = toWindow(state);
     expect(checkAction(state, world, { type: "moveSeat", countryId: "uruguay" })).toMatch(
@@ -202,24 +204,29 @@ describe("the commissioner's seat", () => {
     expect(checkAction(state, world, { type: "moveSeat", countryId: "argentina" })).toBeNull();
   });
 
-  it("moves at the season's end, with the purist cost at the anchor it leaves", () => {
+  it("moves when the offseason closes, with the purist cost at the anchor it leaves", () => {
     const window = toWindow(withLeague(start(), "argentina", "professional"));
     const state = applyAction(window, world, { type: "moveSeat", countryId: "argentina" });
     expect(state.flagship.pendingCountryId).toBe("argentina");
     const brazil = countryIndex(world, "brazil");
-    // The same turn without the move: the world's dice are identical, so the gap is the cost.
-    const stayed = endTurn(window, world).countries[brazil]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
+    // The move happens as the offseason closes, before the turn's quarters: the cost is a share
+    // of the hardcore fans the anchor had then.
+    const stayed = window.countries[brazil]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
+    const closed = closeOffseason(state, world);
     const seasonsBefore = state.flagship.seasons.length;
     const after = endTurn(state, world);
-    expect(after.flagship.seasons.length).toBe(seasonsBefore + 1);
+    // The season ended before the offseason opened; the next one is played at the new seat.
+    expect(after.flagship.seasons.length).toBe(seasonsBefore);
     expect(after.flagship.seasons.at(-1)?.countryId).toBe("brazil");
+    expect(after.flagship.offseason).toBe(false);
+    expect(after.flagship.quartersPlayed).toBe(1);
     expect(after.flagship.countryId).toBe("argentina");
     expect(after.flagship.pendingCountryId).toBeNull();
     const clubs = activeClubs(after.flagship);
     expect(clubs).toHaveLength(world.config.flagship.clubs.professional);
     expect(clubs.every((club) => club.countryId === "argentina")).toBe(true);
     const share = world.config.flagship.seatMove.anchorHardcoreDemotionShare;
-    const lost = stayed - (after.countries[brazil]?.fans[PLAYER_INDEX]?.hardcore ?? 0);
+    const lost = stayed - (closed.countries[brazil]?.fans[PLAYER_INDEX]?.hardcore ?? 0);
     expect(lost).toBeGreaterThan(0);
     expect(Math.abs(lost - stayed * share)).toBeLessThanOrEqual(1);
     expect(after.landmarks).toContainEqual(
@@ -228,7 +235,7 @@ describe("the commissioner's seat", () => {
     expect(checkInvariants(after, world)).toEqual([]);
   });
 
-  it("can cancel a requested move before the season ends", () => {
+  it("can cancel a requested move before the offseason closes", () => {
     let state = toWindow(withLeague(start(), "argentina", "professional"));
     state = applyAction(state, world, { type: "moveSeat", countryId: "argentina" });
     state = applyAction(state, world, { type: "moveSeat", countryId: "brazil" });

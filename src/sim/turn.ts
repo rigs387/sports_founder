@@ -1,7 +1,7 @@
 import { turnLengthQuarters } from "./calendar";
 import { updateCulture } from "./culture";
 import { offerEvents, settleEvents } from "./events";
-import { returnSeatIfFolded } from "./flagship";
+import { closeOffseason, returnSeatIfFolded } from "./flagship";
 import { evaluateLeagues } from "./leagues";
 import { stepQuarter } from "./quarter";
 import { applyDefaultSlotDrops, updateTierTrack } from "./tiers";
@@ -14,7 +14,8 @@ export class CampaignOverError extends Error {
 
 /**
  * Ends the current turn (GDD Turn anatomy, Time advancement rules):
- * 1. focus slots still owed after a demotion are dropped by default (highest-numbered first);
+ * 1. focus slots still owed after a demotion are dropped by default (highest-numbered first), and
+ *    an open offseason closes: a requested seat move happens and the next season starts (GDD v1.24);
  * 2. the turn's quarters are simulated, with length set by the PP tier at the start of the turn;
  * 3. every league's health is evaluated once and moves at most one rung; collapses fold leagues,
  *    and an anchor collapse ends the campaign unless the sport has already won; a folded
@@ -31,10 +32,10 @@ export function endTurn(state: GameState, world: World): GameState {
       `The campaign ended on turn ${state.outcome.turn} (${state.outcome.kind}); no more turns can be played`,
     );
   }
-  const start = applyDefaultSlotDrops(settleEvents(state, world));
+  const start = closeOffseason(applyDefaultSlotDrops(settleEvents(state, world)), world);
   const quarters = turnLengthQuarters(start.ppTier, world.config);
   let next = start;
-  for (let i = 0; i < quarters; i += 1) next = stepQuarter(next, world);
+  for (let i = 0; i < quarters; i += 1) next = stepQuarter(next, world, { holdOffseason: true });
 
   const evaluation = evaluateLeagues(start, next, world, quarters);
   next = {

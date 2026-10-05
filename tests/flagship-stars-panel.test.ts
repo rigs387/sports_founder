@@ -7,10 +7,11 @@ import {
   applyAction,
   type BackBlocker,
   backingPrice,
+  closeOffseason,
   createCampaign,
   type DropBlocker,
   type GameState,
-  seasonalWindowOpen,
+  offseasonOpen,
   seatStars,
   snapshot,
   stepQuarter,
@@ -29,11 +30,11 @@ const content: World = withConfig(world, (config) => {
   config.start.startingPP = 10_000;
 });
 
-/** Brazil after its first season, in the next seasonal window, with a star. */
+/** Brazil after its first season, in the next offseason, with a star. */
 function withStar(): GameState {
   let state = createCampaign(content, setupFor(11, "brazil"));
   while (state.flagship.seasons.length < 1) state = stepQuarter(state, content);
-  while (!seasonalWindowOpen(state, content.config)) state = stepQuarter(state, content);
+  while (!offseasonOpen(state)) state = stepQuarter(state, content);
   return state;
 }
 
@@ -111,7 +112,7 @@ describe("backing review and blocker reasons", () => {
     expect(panelStar(open, id).backBlocker).toBeNull();
     expect(panelStar(snapshot({ ...state, pp: 0 }, content), id).backBlocker).toBe("pp");
     let closed = state;
-    while (seasonalWindowOpen(closed, content.config)) closed = stepQuarter(closed, content);
+    closed = closeOffseason(closed, content);
     expect(panelStar(snapshot(closed, content), id).backBlocker).toBe("window");
 
     // A second star, made by hand, finds the only slot taken.
@@ -165,7 +166,7 @@ describe("backing review and blocker reasons", () => {
       quarters: drain?.quarters,
     });
     let closed = full;
-    while (seasonalWindowOpen(closed, content.config)) closed = stepQuarter(closed, content);
+    closed = closeOffseason(closed, content);
     expect(panelStar(snapshot(closed, content), id).dropBlocker).toBe("window");
   });
 
@@ -182,7 +183,7 @@ describe("the worker round-trip", () => {
     const api = createSimWorkerApi(content);
     let snap = api.newCampaign(setupFor(11, "brazil"));
     for (let turn = 0; turn < 20; turn += 1) {
-      if (snap.seasonalWindowOpen && snap.flagship.stars.some((s) => s.backBlocker === null)) break;
+      if (snap.offseasonOpen && snap.flagship.stars.some((s) => s.backBlocker === null)) break;
       snap = api.endTurn();
     }
     const star = snap.flagship.stars.find((s) => s.backBlocker === null);

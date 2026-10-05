@@ -25,7 +25,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 18;
+export const SAVE_FORMAT_VERSION = 19;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -253,6 +253,7 @@ const scoringSchema = z.enum(GENOME_AXES.scoring.options);
 const flagshipSchema = z.strictObject({
   countryId: z.string().min(1),
   pendingCountryId: z.string().min(1).nullable(),
+  offseason: z.boolean(),
   rng: z.array(z.number()).min(1),
   season: z.int().min(1),
   scoring: scoringSchema,
@@ -474,6 +475,17 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 18 → 19: the offseason (GDD v1.24). The season under way plays on; the offseason first opens
+  // when it ends. A save made just after a season ended keeps the season already started; one
+  // whose season has run its quarters without a new one starting is in the offseason.
+  18: (save) => {
+    const flagship = save.state.flagship as FlagshipState;
+    const over = flagship.quartersPlayed >= flagship.seasonQuarters;
+    return {
+      formatVersion: 19,
+      state: { ...save.state, flagship: { ...flagship, offseason: over } },
+    };
+  },
   // 17 → 18: culture (GDD v1.22). No traditions and no retroactive history: facts count from the
   // flagship season under way, and only landmarks recorded from now on are read.
   17: (save, world) => {

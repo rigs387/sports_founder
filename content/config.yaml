@@ -463,10 +463,12 @@ leagues:
     cashQuarters: 8
     cooldownQuarters: 16
 
-# League business happens in one seasonal window per in-game year (GDD Time advancement rules). The
-# window is open for a turn whose quarters include this quarter of the year.
-seasonalWindow:
-  quarterOfYear: 3
+# The flagship season ends in this quarter of the year, and the offseason opens (GDD v1.24): league
+# business happens in it, once a year. It stays open from the season's end until the next turn ends,
+# so the player meets it at the start of the first turn after the season; closing it applies a seat
+# move and starts the next season.
+offseason:
+  seasonEndQuarter: 3
 
 # A giant market is many audiences (GDD v1.21): tastes vary inside India or China, so no rulebook
 # suits them strongly. Genome fit in a country (every option's lever deltas) is

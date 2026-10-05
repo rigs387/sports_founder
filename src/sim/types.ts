@@ -301,8 +301,13 @@ export type ScoringOption = Genome["scoring"];
 export interface FlagshipState {
   /** The country holding the seat. Seasons pause while it has no league. */
   countryId: string;
-  /** A seat move requested in the seasonal window; it happens when the season ends. */
+  /** A seat move requested in the offseason; it happens when the offseason closes. */
   pendingCountryId: string | null;
+  /**
+   * The offseason (GDD v1.24): open from the season's end until the next turn ends. No matches are
+   * played; closing it applies a seat move, fits the clubs and starts the next season.
+   */
+  offseason: boolean;
   rng: number[];
   /** The season being played (1 for the first). */
   season: number;

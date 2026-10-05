@@ -1,5 +1,5 @@
 import { AXIS_IDS, GENOME_AXES } from "../content";
-import { costMultiplier, seasonalWindowOpen } from "./calendar";
+import { costMultiplier, offseasonOpen } from "./calendar";
 import { nameTrophy, nameTrophyBlocker, renameTrophy, renameTrophyBlocker } from "./culture";
 import { eventBlocker, resolveEvent } from "./events";
 import { backBlocker, backStar, dropBlocker, dropStar, seatBlocker } from "./flagship";
@@ -21,19 +21,19 @@ import { type AxisId, type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } f
 // validates legality first, so nothing can bypass the rules.
 //   assignFocus     point a focus slot at a country (GDD Spread Model: focus slots, cold launches)
 //   dropFocusSlot   give up a slot owed after a PP tier demotion
-//   promoteLeague   promote a qualifying league, in the seasonal window only (GDD League tiers)
+//   promoteLeague   promote a qualifying league, in the offseason only (GDD League tiers)
 //   stepDownLeague  restructure a Near-Collapse league one tier down
 //   bailoutLeague   emergency PP → cash for a league in trouble, with a cooldown
 //   buyNode         buy a growth tree node (GDD PP Growth Tree); permanent, no refunds
 //   moveSeat        ask to move the commissioner's seat to a Professional or Elite league, in the
-//                   seasonal window; it moves when the season ends (GDD v1.13, v1.14). Asking for
+//                   offseason; it moves when the offseason closes (GDD v1.13, v1.24). Asking for
 //                   the current seat's country cancels a pending move.
-//   backStar        back a flagship star, in the seasonal window, for a one-time PP price
-//   dropStar        drop a backed star, in the seasonal window; their influence is lost
-//   amendRule       change one rule trait, in the seasonal window, once a year (GDD v1.20)
+//   backStar        back a flagship star, in the offseason, for a one-time PP price
+//   dropStar        drop a backed star, in the offseason; their influence is lost
+//   amendRule       change one rule trait, in the offseason, once a year (GDD v1.20)
 //   nameTrophy      name the flagship's newborn trophy, free, while its champion card is open
 //                   (GDD v1.22)
-//   renameTrophy    rename the seat's trophy in the seasonal window: the old trophy tradition
+//   renameTrophy    rename the seat's trophy in the offseason: the old trophy tradition
 //                   ends and its followers' purists turn casual (GDD v1.22)
 
 export type Action =
@@ -159,7 +159,7 @@ export function checkAction(state: GameState, world: World, action: Action): str
       return `"${action.option}" is not an option of ${action.axis}`;
     switch (amendBlocker(state, world, action.axis, action.option)) {
       case "window":
-        return "rules can only be amended in the seasonal window";
+        return "rules can only be amended in the offseason";
       case "thisYear":
         return "the rules have already been amended this year";
       case "identity":
@@ -185,14 +185,14 @@ export function checkAction(state: GameState, world: World, action: Action): str
     }
   }
   if (action.type === "renameTrophy") {
-    const open = seasonalWindowOpen(state, world.config);
+    const open = offseasonOpen(state);
     switch (renameTrophyBlocker(state, world, action.name, open)) {
       case "trophy":
         return "the league at the seat has no trophy";
       case "naming":
         return "the newborn trophy is named for free (nameTrophy)";
       case "window":
-        return "the trophy can only be renamed in the seasonal window";
+        return "the trophy can only be renamed in the offseason";
       case "name":
         return "the trophy's name is too short or too long";
       case "same":
@@ -209,9 +209,9 @@ export function checkAction(state: GameState, world: World, action: Action): str
     if (action.countryId === state.flagship.countryId) {
       return state.flagship.pendingCountryId !== null ? null : "the seat is already there";
     }
-    switch (seatBlocker(state, world, action.countryId, seasonalWindowOpen(state, world.config))) {
+    switch (seatBlocker(state, world, action.countryId, offseasonOpen(state))) {
       case "window":
-        return "the seat can only move in the seasonal window";
+        return "the seat can only move in the offseason";
       case "same":
         return "the seat is already there";
       case "league":

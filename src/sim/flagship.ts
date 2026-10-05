@@ -1,4 +1,4 @@
-import { costMultiplier, QUARTERS_PER_YEAR, seasonalWindowOpen, yearOfQuarter } from "./calendar";
+import { costMultiplier, offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights } from "./culture";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
@@ -27,7 +27,8 @@ import {
 
 // The flagship league (GDD v1.11 commissioner's seat, v1.13 seat rules, v1.14 flagship season).
 // The player runs one league in depth: named clubs based in real places, one season a year ending
-// in the seasonal window's quarter, a champion. Every number is config (`flagship`).
+// in the configured quarter, a champion, then the offseason (GDD v1.24). Every number is config
+// (`flagship`, `offseason`).
 //
 // Its matches roll on the flagship's own random stream, seeded from the campaign seed, so the
 // world's random sequence (fans, spread, rivals) is identical with or without it. In this first
@@ -36,8 +37,9 @@ import {
 // A season: every club plays every other club home and away (circle-method rounds, spread evenly
 // over the season's quarters). European format: the top of the table is champion. American format:
 // the top clubs play single-match knockouts, higher seed at home. Ranking: points, then score
-// margin, then score for, then the older club. At the season's end club ratings drift, a requested
-// seat move happens, and the club count follows the league tier.
+// margin, then score for, then the older club. At the season's end club ratings drift and the
+// offseason opens; no matches are played in it. When it closes (the start of the next End Turn) a
+// requested seat move happens, the club count follows the league tier and the next season starts.
 
 /** Distinguishes the flagship's random stream from the world's. */
 const FLAGSHIP_STREAM = 0x9e37_79b9;
@@ -48,7 +50,7 @@ function indexOf(world: World, countryId: string): number {
 
 /** Quarters from `quarter` (the next one simulated) through the next season-ending quarter. */
 export function quartersUntilSeasonEnd(quarter: number, world: World): number {
-  const end = world.config.seasonalWindow.quarterOfYear - 1;
+  const end = world.config.offseason.seasonEndQuarter - 1;
   return ((end - (quarter % QUARTERS_PER_YEAR) + QUARTERS_PER_YEAR) % QUARTERS_PER_YEAR) + 1;
 }
 
@@ -377,7 +379,7 @@ export function backStarBlocker(
   world: World,
   playerId: number,
 ): BackBlocker | null {
-  if (!seasonalWindowOpen(state, world.config)) return "window";
+  if (!offseasonOpen(state)) return "window";
   const player = state.flagship.players.find((p) => p.id === playerId);
   if (!player || !seatStars(state.flagship).includes(player)) return "notStar";
   if (player.backing !== null) return "backed";
@@ -393,7 +395,7 @@ export function dropStarBlocker(
   world: World,
   playerId: number,
 ): DropBlocker | null {
-  if (!seasonalWindowOpen(state, world.config)) return "window";
+  if (!offseasonOpen(state)) return "window";
   const player = state.flagship.players.find((p) => p.id === playerId);
   if (!player || player.backing === null) return "notBacked";
   return null;
@@ -403,7 +405,7 @@ export function dropStarBlocker(
 export function backBlocker(state: GameState, world: World, playerId: number): string | null {
   switch (backStarBlocker(state, world, playerId)) {
     case "window":
-      return "stars can only be backed in the seasonal window";
+      return "stars can only be backed in the offseason";
     case "notStar":
       return "only a star playing in the flagship league can be backed";
     case "backed":
@@ -423,7 +425,7 @@ export function backBlocker(state: GameState, world: World, playerId: number): s
 export function dropBlocker(state: GameState, world: World, playerId: number): string | null {
   switch (dropStarBlocker(state, world, playerId)) {
     case "window":
-      return "a star can only be dropped in the seasonal window";
+      return "a star can only be dropped in the offseason";
     case "notBacked":
       return "that star is not backed";
     case null:
@@ -476,11 +478,12 @@ export function dropStar(state: GameState, world: World, playerId: number): Game
     ),
     landmarks: [
       ...next.landmarks,
+      // Dropped in the offseason, after the season just finished (GDD v1.24).
       landmarks.starDropped(
         state.turn,
         state.quarter,
         state.flagship.countryId,
-        state.flagship.season,
+        state.flagship.seasons.at(-1)?.season ?? state.flagship.season - 1,
         playerId,
       ),
     ],
@@ -734,16 +737,23 @@ export function activeRatings(flagship: FlagshipState) {
  * A fresh table for the active clubs, and the season clock from `quarter`. The season plays the
  * scoring rule `scoring` throughout (GDD v1.16: no season mixes two rules).
  */
+/**
+ * Starts a season at `quarter`. One started by closing the offseason lasts a full year, so with
+ * every turn length dividing a year it ends on a turn boundary (GDD v1.24); any other start (the
+ * campaign's first season, a seat sent home, a league re-formed) runs to the configured season end.
+ */
 function startSeason(
   flagship: FlagshipState,
   world: World,
   quarter: number,
   scoring: ScoringOption,
+  fullYear = false,
 ): FlagshipState {
   return {
     ...flagship,
+    offseason: false,
     scoring,
-    seasonQuarters: quartersUntilSeasonEnd(quarter, world),
+    seasonQuarters: fullYear ? QUARTERS_PER_YEAR : quartersUntilSeasonEnd(quarter, world),
     quartersPlayed: 0,
     round: 0,
     table: activeClubs(flagship).map((club) => emptyRow(club.id)),
@@ -771,6 +781,7 @@ export function newFlagship(
   const empty: FlagshipState = {
     countryId,
     pendingCountryId: null,
+    offseason: false,
     rng: [],
     season: 1,
     scoring,
@@ -1108,13 +1119,15 @@ export function stepFlagshipQuarter(
   world: World,
   quarter: number,
 ): FlagshipQuarter {
+  // No matches in the offseason (GDD v1.24): the flagship waits for it to close.
+  if (state.flagship.offseason) return { flagship: state.flagship, countries, landmarks: [] };
   const rng = restoreRng(state.flagship.rng);
   const found: Landmark[] = [];
   let flagship: FlagshipState = {
     ...state.flagship,
     quartersPlayed: state.flagship.quartersPlayed + 1,
   };
-  let nextCountries = countries;
+  const nextCountries = countries;
   const league = () => nextCountries[indexOf(world, flagship.countryId)]?.league ?? null;
 
   const clubs = new Map(activeClubs(flagship).map((club) => [club.id, club]));
@@ -1229,28 +1242,10 @@ export function stepFlagshipQuarter(
         current,
       );
     }
-    const pending = flagship.pendingCountryId;
-    if (pending !== null) {
-      const target = nextCountries[indexOf(world, pending)]?.league ?? null;
-      if (seatEligible(target, world)) {
-        const from = flagship.countryId;
-        const moved = moveSeat(
-          flagship,
-          nextCountries,
-          world,
-          pending,
-          seatLeaveShare(state, world, from),
-        );
-        flagship = moved.flagship;
-        nextCountries = moved.countries;
-        found.push(landmarks.seatMoved(state.turn, newQuarter, from, pending, "moved"));
-      } else {
-        flagship = { ...flagship, pendingCountryId: null };
-      }
-    }
-    const seatLeague = league();
-    if (seatLeague !== null) flagship = fitClubs(flagship, world, rng, seatLeague.tier);
-    flagship = startSeason(flagship, world, newQuarter, state.genome.scoring);
+    // The offseason opens; the next season starts when it closes. Retired players are replaced
+    // now, so every club has its leading player through the offseason; the season's tallies are
+    // closed into careers.
+    flagship = { ...staffClubs(flagship, world, rng), offseason: true, tallies: [] };
   }
   return {
     flagship: { ...flagship, rng: saveRng(rng) },
@@ -1276,7 +1271,10 @@ export function returnSeatIfFolded(state: GameState, world: World): GameState {
   let next = moved.flagship;
   const anchorLeague = state.countries[indexOf(world, state.anchorCountryId)]?.league ?? null;
   if (anchorLeague !== null) next = fitClubs(next, world, rng, anchorLeague.tier);
-  next = startSeason({ ...next, rng: saveRng(rng) }, world, state.quarter, state.genome.scoring);
+  // In the offseason the season starts when it closes.
+  next = next.offseason
+    ? { ...next, rng: saveRng(rng) }
+    : startSeason({ ...next, rng: saveRng(rng) }, world, state.quarter, state.genome.scoring);
   return {
     ...state,
     flagship: next,
@@ -1294,13 +1292,54 @@ export function returnSeatIfFolded(state: GameState, world: World): GameState {
 }
 
 /**
+ * Closes the offseason at the start of End Turn (GDD v1.24): a requested seat move happens (with
+ * its purist cost), the club count follows the seat league's tier, and a season of a full year
+ * starts. Does nothing outside the offseason.
+ */
+export function closeOffseason(state: GameState, world: World): GameState {
+  if (!state.flagship.offseason) return state;
+  const rng = restoreRng(state.flagship.rng);
+  let flagship = state.flagship;
+  let countries = state.countries;
+  const found: Landmark[] = [];
+  const pending = flagship.pendingCountryId;
+  if (pending !== null) {
+    const target = countries[indexOf(world, pending)]?.league ?? null;
+    if (seatEligible(target, world)) {
+      const from = flagship.countryId;
+      const moved = moveSeat(
+        flagship,
+        countries,
+        world,
+        pending,
+        seatLeaveShare(state, world, from),
+      );
+      flagship = moved.flagship;
+      countries = moved.countries;
+      found.push(landmarks.seatMoved(state.turn, state.quarter, from, pending, "moved"));
+    } else {
+      flagship = { ...flagship, pendingCountryId: null };
+    }
+  }
+  const seatLeague = countries[indexOf(world, flagship.countryId)]?.league ?? null;
+  if (seatLeague !== null) flagship = fitClubs(flagship, world, rng, seatLeague.tier);
+  flagship = startSeason(flagship, world, state.quarter, state.genome.scoring, true);
+  return {
+    ...state,
+    flagship: { ...flagship, rng: saveRng(rng) },
+    countries,
+    landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
+  };
+}
+
+/**
  * A league that re-forms at the seat (the anchor after a post-win collapse) picks its season back
  * up: if the table is empty, the clubs come back and a fresh season starts.
  */
 function dormantClubs(state: GameState, world: World): GameState {
   const flagship = state.flagship;
   const seatLeague = state.countries[indexOf(world, flagship.countryId)]?.league ?? null;
-  if (seatLeague === null || flagship.table.length > 0) return state;
+  if (seatLeague === null || flagship.table.length > 0 || flagship.offseason) return state;
   const rng = restoreRng(flagship.rng);
   const fitted = fitClubs(flagship, world, rng, seatLeague.tier);
   return {
@@ -1419,7 +1458,7 @@ export function flagshipProblems(state: GameState, world: World): string[] {
   ) {
     problems.push("flagship table does not match the active clubs");
   }
-  if (flagship.quartersPlayed >= flagship.seasonQuarters) {
+  if (!flagship.offseason && flagship.quartersPlayed >= flagship.seasonQuarters) {
     problems.push("flagship season ran past its last quarter");
   }
   if (flagship.round > totalRounds(flagship.table.length)) {
@@ -1524,7 +1563,7 @@ export interface FlagshipSnapshot {
   playoffClubs: number;
   /** Finished seasons, newest first, without their full tables, with the year each ended. */
   recentSeasons: (Omit<SeasonSummary, "standings" | "startRatings"> & { year: number })[];
-  /** Countries whose league could take the seat in the seasonal window (GDD v1.13). */
+  /** Countries whose league could take the seat in the offseason (GDD v1.13). */
   seatTargets: string[];
   /** Share of the seat country's hardcore fans who turn casual if the seat moves away. */
   leaveCost: number;

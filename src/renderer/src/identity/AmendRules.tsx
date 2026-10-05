@@ -5,7 +5,7 @@ import type { Action, AxisId, TurnSnapshot } from "../../../sim";
 import { useTraditionWords } from "../culture/traditions";
 import { useTermVars } from "./terms";
 
-// Rules evolution, first build (GDD v1.20): amend one rule trait a year in the seasonal window,
+// Rules evolution, first build (GDD v1.20): amend one rule trait a year in the offseason,
 // through a review step showing the price, the purist backlash and fit hints for the anchor and the
 // five biggest markets. Prices, backlash and legality come from the simulation.
 
@@ -32,7 +32,7 @@ export function AmendRules({ snapshot, names, busy, onAction }: Props) {
   const optionName = (id: AxisId, value: string) => t(`genome.options.${id}.${value}`);
   const trait = rules.traits.find((entry) => entry.axis === axis);
   const choice = trait?.options.find((entry) => entry.option === option);
-  const status = !snapshot.seasonalWindowOpen ? "closed" : rules.amendedThisYear ? "done" : "open";
+  const status = !snapshot.offseasonOpen ? "closed" : rules.amendedThisYear ? "done" : "open";
   const reset = () => {
     setAxis(null);
     setOption(null);

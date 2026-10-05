@@ -1,5 +1,5 @@
 import { GENOME_AXES, RULE_AXES } from "../content";
-import { costMultiplier, seasonalWindowOpen, yearOfQuarter } from "./calendar";
+import { costMultiplier, offseasonOpen, yearOfQuarter } from "./calendar";
 import { ethosFactor, heldStrength, living, wearTraditions } from "./culture";
 import { fandomScore } from "./fandom";
 import { optionNetDelta } from "./hints";
@@ -15,7 +15,7 @@ import {
   type World,
 } from "./types";
 
-// Rules evolution, first build (GDD v1.20). In the seasonal window the player may amend one rule
+// Rules evolution, first build (GDD v1.20). In the offseason the player may amend one rule
 // trait a year, to any of its options. The amendment's size is its jump: steps along the trait's
 // options, or a fixed size for traits whose options have no order (play structure). It costs a
 // base PP price × the peak tier's cost multiplier × the jump, and purists push back: in every
@@ -85,7 +85,7 @@ export function amendBlocker(
   axis: AxisId,
   option: string,
 ): AmendBlocker | null {
-  if (!seasonalWindowOpen(state, world.config)) return "window";
+  if (!offseasonOpen(state)) return "window";
   if (amendedThisYear(state, world)) return "thisYear";
   if (!(RULE_AXES as readonly string[]).includes(axis)) return "identity";
   if (state.genome[axis] === option) return "same";
