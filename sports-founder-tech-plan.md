@@ -498,6 +498,11 @@ it first (as at a quarter-length turn's start) while `endTurn` holds one opened 
 over 12 typical anchors × seeds 1–3, 200 turns: pacing passes (tier 5 median turn 122, first win
 160); #1 lost before the win 17/36 (47%, was 51%); stars first backed at turn median 40.
 
+*Step 2 built 2026-10-05.* An event record's `quarter` is now when its fact happened: the
+landmark's quarter for season, star, tradition, rival and league cards, the turn's end for audience
+and league-pressure cards (judged then). The field already existed, so the save format is
+unchanged; records from before keep the turn's end. The snapshot passes it through.
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)

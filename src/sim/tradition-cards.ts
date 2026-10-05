@@ -34,7 +34,8 @@ export function offerTraditionCards(
       templateId: card.id,
       countryId: country.countryId,
       turn: state.turn,
-      quarter: state.quarter,
+      // When the tradition was born or lost (GDD v1.24).
+      quarter: landmark.quarter,
       facts: {
         casual: fans.casual,
         hardcore: fans.hardcore,

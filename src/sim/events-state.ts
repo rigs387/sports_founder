@@ -52,6 +52,10 @@ export const eventRecordSchema = z.strictObject({
   templateId: z.string(),
   countryId: z.string(),
   turn: z.int().positive(),
+  /**
+   * When the card's fact happened (quarters simulated by then; GDD v1.24): a landmark's quarter, or
+   * the turn's end for cards judged then. Records offered before v1.24 hold the turn's end.
+   */
   quarter: z.int().nonnegative(),
   facts: z.strictObject({
     casual: z.int().nonnegative(),

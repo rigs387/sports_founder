@@ -175,7 +175,8 @@ export function offerStarCards(
       templateId: card.id,
       countryId: country.countryId,
       turn: state.turn,
-      quarter: state.quarter,
+      // When the star's fact happened (GDD v1.24).
+      quarter: landmark.quarter,
       facts: {
         casual: fans.casual,
         hardcore: fans.hardcore,

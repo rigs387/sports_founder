@@ -20,7 +20,7 @@ import {
   snapshot,
   stepQuarter,
 } from "../src/sim";
-import { setupFor, world } from "./helpers";
+import { setupFor, withConfig, world } from "./helpers";
 
 const start = () => createCampaign(world, setupFor(424242, "brazil"));
 function firstDecision() {
@@ -303,5 +303,28 @@ describe("local event effects and saves", () => {
     const unknown = JSON.parse(serializeSave(state));
     unknown.state.events.pending[0].templateId = "invented";
     expect(() => deserializeSave(JSON.stringify(unknown), world)).toThrow("event content");
+  });
+});
+
+describe("when a card's fact happened (GDD v1.24)", () => {
+  it("dates every card inside its turn, and the champion card at the season's end", () => {
+    const yearTurns = withConfig(world, (config) => {
+      for (const tier of config.ppTiers) tier.turnLengthQuarters = 4;
+    });
+    let state = createCampaign(yearTurns, setupFor(3, "brazil"));
+    let champions = 0;
+    for (let turn = 0; turn < 6; turn += 1) {
+      const startQuarter = state.quarter;
+      state = endTurn(state, yearTurns);
+      for (const card of state.events.pending.filter((e) => e.turn === state.turn)) {
+        expect(card.quarter).toBeGreaterThanOrEqual(startQuarter);
+        expect(card.quarter).toBeLessThanOrEqual(state.quarter);
+        if (card.templateId !== "season-champion") continue;
+        champions += 1;
+        const season = state.flagship.seasons.find((s) => s.season === card.facts.season?.season);
+        expect(card.quarter).toBe(season?.quarter);
+      }
+    }
+    expect(champions).toBeGreaterThan(1);
   });
 });

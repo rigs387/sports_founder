@@ -66,7 +66,8 @@ function offerSeasonCards(
         templateId: card.id,
         countryId: country.countryId,
         turn: state.turn,
-        quarter: state.quarter,
+        // When the season ended, so the turn's replay can show the card there (GDD v1.24).
+        quarter: landmark.quarter,
         facts: {
           casual: fans.casual,
           hardcore: fans.hardcore,
@@ -211,7 +212,9 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
         templateId: card.id,
         countryId: country.countryId,
         turn: state.turn,
-        quarter: state.quarter,
+        // The quarter of the fact behind the card; audience and pressure cards are judged at the
+        // turn's end (GDD v1.24).
+        quarter: fact?.quarter ?? state.quarter,
         facts: {
           casual: fans.casual,
           hardcore: fans.hardcore,

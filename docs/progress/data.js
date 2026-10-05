@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-05",
-    tests: 467,
+    tests: 468,
     files: 44,
-    note: "npm run check passed after the offseason's timing (type checks, Biome, purity, 467 tests in 44 files). Lint has existing visual-study warnings.",
+    note: "npm run check passed after cards were dated by their facts (type checks, Biome, purity, 468 tests in 44 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-05",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "foundation",
       title: "Living time and the offseason",
-      text: "The first playtest loved the game but found turn clicking flat and the seasonal window never usable. Decided (GDD v1.24): Play / Pause with speeds, cards popping up as they happen, and an offseason screen for all league business. Step 1 is built: the offseason opens right after each season, so a new star can be backed at once. Next, the clock and pop-up cards (tech plan 2.13).",
+      text: "The first playtest loved the game but found turn clicking flat and the seasonal window never usable. Decided (GDD v1.24): Play / Pause with speeds, cards popping up as they happen, and an offseason screen for all league business. Steps 1–2 are built: the offseason opens right after each season, so a new star can be backed at once, and every card knows the quarter it happened. Next, the clock (tech plan 2.13 step 3).",
       tag: "Next build",
     },
     {
@@ -420,7 +420,10 @@ window.SF_PROGRESS = {
         ["built", "Formation, Amateur-to-Elite tiers and local finances"],
         ["built", "Health ladder, promotion, restructuring and bailouts"],
         ["built", "Flagship seat: Professional+ moves in the offseason; home on collapse"],
-        ["built", "The offseason opens after each season, with the season's cards and new star (GDD v1.24)"],
+        [
+          "built",
+          "The offseason opens after each season, with the season's cards and new star (GDD v1.24)",
+        ],
         ["planned", "The offseason screen: season review and every league action in one place"],
         ["built", "Named clubs in real places, results, standings and retained season summaries"],
         ["built", "Flagship screen: stars, table, results, champions and the seat"],
