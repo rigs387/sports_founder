@@ -1,4 +1,4 @@
-import type { EventEffect, EventTemplate } from "../content";
+import type { EventEffect, EventTemplate, MomentWeight } from "../content";
 import { costMultiplier } from "./calendar";
 import { venueStrength } from "./culture";
 import type { EventRecord, EventState } from "./events-state";
@@ -463,6 +463,42 @@ export function settleEvents(state: GameState, world: World): GameState {
   return next;
 }
 
+/** Which news section a card belongs to (GDD v1.26): each family has its own look. */
+export type EventFamily = "season" | "star" | "tradition" | "rival" | "sport";
+function eventFamily(event: EventRecord): EventFamily {
+  if (event.facts.season) return "season";
+  if (event.facts.star) return "star";
+  if (event.facts.tradition) return "tradition";
+  if (event.facts.rivalId) return "rival";
+  return "sport";
+}
+
+/**
+ * A moment's weight on the world map (GDD v1.26): the card's own, raised to a headline for a big
+ * flagship moment (season or star facts) while the flagship is at a headline tier, and for the
+ * breakout of the sport's first star. Decisions have none.
+ */
+function momentWeight(
+  state: GameState,
+  world: World,
+  card: EventTemplate,
+  event: EventRecord,
+): MomentWeight | null {
+  if (card.weight !== "big") return card.weight;
+  const flagship = event.facts.season !== null || event.facts.star !== null;
+  const tier = event.facts.leagueTier;
+  if (flagship && tier && world.events.settings.flagshipHeadlineTiers.includes(tier))
+    return "headline";
+  const first = state.landmarks.find((landmark) => landmark.kind === "firstStar");
+  if (
+    card.star === "breakout" &&
+    first?.kind === "firstStar" &&
+    first.playerId === event.facts.star?.playerId
+  )
+    return "headline";
+  return "big";
+}
+
 export function eventSnapshots(state: GameState, world: World) {
   return state.events.pending.map((event) => {
     const card = world.events.cards.find((c) => c.id === event.templateId);
@@ -470,6 +506,8 @@ export function eventSnapshots(state: GameState, world: World) {
     return {
       ...event,
       kind: card.kind,
+      weight: momentWeight(state, world, card, event),
+      family: eventFamily(event),
       tone: card.tone,
       story: card.story,
       star: card.star,

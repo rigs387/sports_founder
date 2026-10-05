@@ -1,4 +1,5 @@
 import type { BrowserWindow } from "electron";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /** Exercise the full Growth screen against the real worker; never inject campaign state. */
 export async function verifyGrowth(
@@ -47,6 +48,7 @@ export async function verifyGrowth(
     turns++ < 80
   ) {
     const before = await state();
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await assert(
       '!document.querySelector("[data-testid=end-turn]").disabled',
       "Campaign ended before fork test.",

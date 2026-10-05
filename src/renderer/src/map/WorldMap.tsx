@@ -11,7 +11,8 @@ import { pickMarket } from "./hit-test";
 import { geometry, heatBand, mapSettings } from "./model";
 
 export interface MapCommand {
-  kind: "home" | "in" | "out" | "locate";
+  /** burst: a ring spreads from the market when a big moment there is collected (GDD v1.26). */
+  kind: "home" | "in" | "out" | "locate" | "burst";
   serial: number;
   market?: string;
 }
@@ -175,6 +176,40 @@ function MapScene(props: SceneProps) {
     const highlightedLand = new Graphics();
     highlightedLand.eventMode = "none";
     viewport.addChild(highlightedLand);
+    // The outlined country pulses while its card is up; a collected big moment bursts from it.
+    const burstRing = new Graphics();
+    burstRing.eventMode = "none";
+    viewport.addChild(burstRing);
+    let pulseFrame = 0;
+    const pulse = () => {
+      pulseFrame = 0;
+      if (disposed || !latest.current.highlighted) {
+        highlightedLand.alpha = 1;
+        return;
+      }
+      highlightedLand.alpha = 0.6 + 0.4 * Math.sin(performance.now() / 260);
+      invalidate();
+      pulseFrame = requestAnimationFrame(pulse);
+    };
+    let burstFrame = 0;
+    const burst = (market: string) => {
+      const center = geometry.markets[market]?.center;
+      if (!center) return;
+      const start = performance.now();
+      cancelAnimationFrame(burstFrame);
+      const step = () => {
+        const t = Math.min(1, (performance.now() - start) / 900);
+        burstRing.clear();
+        if (t < 1 && !disposed) {
+          burstRing
+            .circle(center[0], center[1], 6 + 60 * t)
+            .stroke({ color: color("--highlight"), width: 4 * (1 - t) + 1, alpha: 1 - t });
+          burstFrame = requestAnimationFrame(step);
+        }
+        invalidate();
+      };
+      step();
+    };
     const markers = new Graphics();
     markers.eventMode = "none";
     viewport.addChild(markers);
@@ -403,12 +438,17 @@ function MapScene(props: SceneProps) {
       host.dataset.rivals = String(current.rivals);
       host.dataset.selected = current.selected ?? "";
       host.dataset.highlighted = current.highlighted ?? "";
+      if (current.highlighted && !pulseFrame) pulse();
       invalidate();
     };
     controller.current = {
       update,
       command(command) {
         latest.current.onHover(null);
+        if (command.kind === "burst") {
+          if (command.market) burst(command.market);
+          return;
+        }
         if (command.kind === "home") home();
         else if (command.kind === "locate" && command.market) {
           const market = geometry.markets[command.market];
@@ -434,6 +474,8 @@ function MapScene(props: SceneProps) {
     return () => {
       disposed = true;
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(pulseFrame);
+      cancelAnimationFrame(burstFrame);
       observer.disconnect();
       controller.current = null;
       delete host.dataset.ready;

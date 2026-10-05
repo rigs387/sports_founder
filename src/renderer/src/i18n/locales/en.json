@@ -31,7 +31,17 @@
     "confirmChoice": "Make the call",
     "cancel": "Keep thinking",
     "collect": "Collect moment",
+    "mastheads": {
+      "season": "The Sports Page",
+      "star": "Player Profile",
+      "tradition": "Heritage",
+      "rival": "World News",
+      "sport": "The {{sport}} Gazette"
+    },
+    "newsFirst_one": "Collect the news first: {{count}} story waits",
+    "newsFirst_other": "Collect the news first: {{count}} stories wait",
     "popup": {
+      "dateline": "{{country}} · {{date}}",
       "where": "{{kind}} · {{country}} · {{date}}",
       "position": "{{index}} of {{count}}",
       "more_one": "+ {{count}} more effect",
@@ -907,6 +917,7 @@
     "patterns": "Patterns",
     "rivals": "Rival pressure",
     "nextTurn": "Next turn",
+    "readNews": "Read the news",
     "turnAnnounced": "Turn {{turn}}. Fandom Score {{score}}.",
     "bandZero": "No fandom yet",
     "bandTop": "{{lower}}+",

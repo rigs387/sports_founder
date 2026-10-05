@@ -17,6 +17,10 @@ jarring stops). Next Turn stays, the date is the bottom bar's headline. After ea
 decisions pop up one at a time as event windows over the map, in the order they happened. Once a
 year the offseason screen opens on the season review, then all league business in one place
 (stars, rules, promotions, the seat, the trophy; sponsors and TV later), prices against PP on hand.
+Moments have weight (v1.26): minor ones are toasts; big ones (champion, new star, tradition born,
+world championship, tier-up, #1) get a back-page window, and headlines a front page over a dimmed map
+(flagship big moments become headlines at Professional/Elite). Big moments come first and must be
+collected before Next Turn.
 
 **Win Condition:** #1 sport by global Fandom Score (hardcore + weighted casual fans, raw
 population), held for X turns (30) at PP tier 5 — a turn below #1 or below tier 5 restarts the

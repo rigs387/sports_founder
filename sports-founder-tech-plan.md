@@ -71,6 +71,7 @@ surface before playtesting or during it.
 | 2026-10-04 | Culture, first build (GDD v1.22): six types from recorded facts (derby, club rite, star legacy, national name, famous venue, trophy); strength renews and decays, loss by facts or betrayal, landmarks both ways; weight cuts the player's hardcore turnover and rival poaching/reclaim; venue pilgrimage and champion PP; each tradition remembers its rulebook and offending amendments multiply backlash and wear it; seat moves and trophy renames cost more where traditions are held; birthplace biases births, ethos betrayals, balanced near 1; rivals carry flavor-only content traditions; Culture tree category (strength, reach, protection, hold; Heritage trust / Living game fork). Save format 18. Build plan: 2.11 | Decided |
 | 2026-10-05 | Flagship broadcast (GDD v1.23): the seat league multiplies media reach out of its country by (1 + tier ceiling × season interest × health); interest is read from the last season summary (gripping, ordinary, dynasty, runaway/foregone); a season-end pulse on the same channel, none after runaways; a Near-Collapse flagship drains casual fans where its reach lands; stacks with backed stars; balance target 5–15% of world media exposure and one win-contest remeasure. Talent pull parked until other leagues have named players. Build plan: 2.12 | Decided |
 | 2026-10-05 | Living time and the offseason (GDD v1.24), after the first playtest: Play / Pause with three speeds over End Turn, the date ticking quarter by quarter, auto-pause on the interrupt list and decisions with resume after answering; cards revealed at their fact's quarter as event windows over the map (presentation only; a mid-turn sim stop is parked); the seasonal window renamed the offseason, opening on the first turn after the season ends, with one screen for the season review and all league business, prices against PP on hand; backing stays 60 PP. Build plan: 2.13 | Decided |
+| 2026-10-05 | Moments have weight (GDD v1.26): minor (toast), big (back-page window) and headline (front page over a dimmed map) per card in content; big flagship moments become headlines at Professional and Elite; card families look different; big moments come first and cannot be skipped (Next Turn waits); auto-collect for minor moments parked. Build plan: 2.14 | Decided |
 | 2026-10-05 | The clock is dropped after playtest (GDD v1.25): built as step 3 and played, the quarter-by-quarter replay was choppy and the self-pauses jarring; reverted the same day. Next Turn stays with tier-scaled lengths, the date heads the bottom bar, and cards pop up over the map after each turn in the order they happened. Build plan 2.13 revised | Decided |
 
 ---
@@ -530,6 +531,30 @@ nothing, a free choice answers at once, Decide later answers nothing, the outlin
 moment toast collects; then it plays to the next offseason from the world map and checks its
 screen opens on the season's champion. Screenshots and overflow checks in both layouts. Build plan
 2.13 is complete.
+
+### 2.14 Build Plan: Moments Have Weight (GDD v1.26)
+
+1. **Content and snapshot.** `weight: minor | big | headline` on every moment card in
+   `content/events.yaml` (Zod, required for moments); config `events.weight.flagshipHeadlineTiers`
+   (a big flagship card is a headline at these league tiers) and the first-ever star as a
+   headline. `EventSnapshot` carries the resolved `weight` and a `family` (season, star,
+   tradition, rival, sport) read from the card's facts.
+2. **Windows.** `EventLayer` shows big and headline moments first, oldest fact first, then
+   decisions, then minor toasts. Big: a back-page window with a Collect button and a pulsing ring
+   on the country. Headline: a front page over a dimmed map with the emblem and colours, and a
+   burst on collect. Each family has its own masthead and accent. No dismiss.
+3. **Next Turn waits.** Next Turn is disabled, with the reason, while a big or headline moment is
+   uncollected. Smoke steps collect them through one shared helper before ending a turn.
+4. **Smoke and docs.** The pop-up smoke collects a big moment and screenshots a headline in both
+   layouts. `docs/progress/data.js`, CLAUDE.md.
+
+*Built 2026-10-05.* Weights as content: minor for first following, league formed or promoted,
+reclaim, a star's final season and a star's move; big for the champion, a star's breakout,
+retirement and record, a tradition born or lost, and a rival's world championship. There are no
+tier-up or #1 cards yet, so those wait for their cards. The map pulses the card's country and a
+collected headline bursts from it. Next Turn reads "Read the news" while big news waits, and away
+from the map it leads back there; the offseason screen opens once the season's news is collected.
+Smoke steps collect news through `COLLECT_NEWS`.
 
 ---
 

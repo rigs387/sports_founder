@@ -1,4 +1,5 @@
 import type { BrowserWindow } from "electron";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /**
  * Event windows and the offseason screen (GDD v1.24, v1.25; tech plan 2.13 step 6). Plays on the
@@ -42,6 +43,7 @@ export async function verifyPopups(
       Number(
         await evaluate<string>(`document.querySelector('[data-testid="game"]').dataset.turn`),
       ) + 1;
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await click('[data-testid="end-turn"]');
     await wait(
       `(() => { const g=document.querySelector('[data-testid="game"]'); return g.dataset.status === 'ready' && Number(g.dataset.turn) === ${next}; })()`,
@@ -54,8 +56,65 @@ export async function verifyPopups(
     await delay();
   };
 
+  // Big news comes before decisions (GDD v1.26): collect it, then look for a decision.
+  const collectNews = () => win.webContents.executeJavaScript(COLLECT_NEWS, true);
   await toWorld();
-  while (!(await exists('[data-testid="event-popup"]')) && turnsPlayed < 30) await endTurn();
+
+  // A headline (the first star is always one) is a front page; Next Turn waits for it.
+  const windowWeight = () =>
+    evaluate<string | null>(
+      `document.querySelector('[data-testid="moment-window"]')?.dataset.weight ?? null`,
+    );
+  let headline = false;
+  let bigSeen = false;
+  for (let more = 0; !headline && more < 30; more += 1) {
+    for (let k = 0; k < 10; k += 1) {
+      const weight = await windowWeight();
+      if (!weight) break;
+      bigSeen = true;
+      if (weight === "headline") {
+        headline = true;
+        if (
+          !(await evaluate<boolean>(`document.querySelector('[data-testid="end-turn"]').disabled`))
+        )
+          throw new Error("Next Turn must wait while a headline is uncollected.");
+        await delay(400);
+        await screenshot("27f-headline.png");
+        win.setContentSize(390, 844);
+        await delay(300);
+        const overflow = await evaluate<boolean>(
+          "document.documentElement.scrollWidth > innerWidth",
+        );
+        await screenshot("27g-headline-narrow.png");
+        win.setContentSize(1280, 800);
+        await delay(300);
+        if (overflow) throw new Error("The headline overflows on a narrow viewport.");
+      }
+      const country = await evaluate<string>(
+        `document.querySelector('[data-testid="moment-window"]').dataset.country`,
+      );
+      if (
+        (await evaluate<string>(
+          `document.querySelector('[data-testid="world-map"]').dataset.highlighted`,
+        )) !== country
+      )
+        throw new Error("A big moment must outline its country on the map.");
+      await click('[data-testid="moment-window-collect"]');
+      await wait(`document.querySelector('[data-testid="game"]').dataset.status === 'ready'`);
+      await delay();
+    }
+    if (headline) break;
+    while (await exists('[data-testid="event-popup-later"]'))
+      await click('[data-testid="event-popup-later"]');
+    await endTurn();
+  }
+  if (!headline) throw new Error("No headline moment came up in 30 turns.");
+
+  for (;;) {
+    await collectNews();
+    if ((await exists('[data-testid="event-popup"]')) || turnsPlayed >= 30) break;
+    await endTurn();
+  }
   if (!(await exists('[data-testid="event-popup"]')))
     throw new Error("No decision popped up over the map in 30 turns.");
   const map = '[data-testid="world-map"]';
@@ -118,6 +177,7 @@ export async function verifyPopups(
   // Decide later sets a card aside for the turn; it stays on the board. Play on until one comes up.
   let setAside = 0;
   for (let more = 0; setAside === 0 && more < 10; more += 1) {
+    await collectNews();
     while (await exists('[data-testid="event-popup-later"]')) {
       const waiting = await decisions();
       await click('[data-testid="event-popup-later"]');
@@ -134,6 +194,7 @@ export async function verifyPopups(
   // A moment toast collects with a click (toasts wait until no decision is up).
   let collected = false;
   for (let more = 0; !collected && more < 10; more += 1) {
+    await collectNews();
     while (await exists('[data-testid="event-popup-later"]'))
       await click('[data-testid="event-popup-later"]');
     if (await exists(".moment-toast")) {
@@ -152,6 +213,10 @@ export async function verifyPopups(
   let guard = 0;
   while (guard++ < 12) {
     if (!(await ready())) await delay();
+    // The offseason screen opens once the season's big news is collected.
+    await toWorld();
+    await collectNews();
+    await delay(300);
     if (await evaluate<boolean>(`!document.querySelector('${offseason}').hidden`)) break;
     await toWorld();
     while (await exists('[data-testid="event-popup-later"]'))
@@ -177,6 +242,8 @@ export async function verifyPopups(
   await toWorld();
 
   return {
+    headline,
+    bigSeen,
     template: card.template,
     country: card.country,
     confirmChecked,

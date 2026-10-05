@@ -1,4 +1,5 @@
 import type { BrowserWindow } from "electron";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /**
  * Flagship stars as cards (GDD v1.16): plays turns until a star card arrives (usually the
@@ -54,6 +55,7 @@ export async function verifyStarCards(
     }
     await click('[data-testid="events-close"]');
     const next = (await turn()) + 1;
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await click('[data-testid="end-turn"]');
     await readyAt(next);
   }

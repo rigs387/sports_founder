@@ -9,6 +9,10 @@ settings:
   historyLimit: 60
   minFactor: 0.25
   maxFactor: 3
+  # Moments have weight (GDD v1.26): each moment card says minor (a toast), big (a back page over
+  # the map) or headline (a front page). A big flagship moment (season or star facts) becomes a
+  # headline while the flagship league is at one of these tiers; the sport's first star always is.
+  flagshipHeadlineTiers: [professional, elite]
 cards:
   - id: open-doors
     kind: decision
@@ -39,6 +43,7 @@ cards:
       - { id: hold, cost: 0, effects: [] }
   - id: first-following
     kind: moment
+    weight: minor
     tone: positive
     priority: 60
     trigger: audience
@@ -55,6 +60,7 @@ cards:
     defaultChoice: null
   - id: league-arrival
     kind: moment
+    weight: minor
     tone: positive
     priority: 80
     trigger: leagueFormed
@@ -71,6 +77,7 @@ cards:
     defaultChoice: null
   - id: moving-up
     kind: moment
+    weight: minor
     tone: positive
     priority: 90
     trigger: leaguePromoted
@@ -194,6 +201,7 @@ cards:
   # Both only inform: their effect is the rival's own.
   - id: rival-reclaim
     kind: moment
+    weight: minor
     tone: pressure
     priority: 75
     trigger: rivalReclaim
@@ -210,6 +218,7 @@ cards:
     defaultChoice: null
   - id: rival-championship
     kind: moment
+    weight: big
     tone: pressure
     priority: 74
     trigger: rivalTournament
@@ -233,6 +242,7 @@ cards:
   # Thresholds live in config flagship.stories.
   - id: season-champion
     kind: moment
+    weight: big
     tone: positive
     priority: 200
     trigger: seasonEnd
@@ -436,6 +446,7 @@ cards:
   # on the tradition. Each uses a moment slot; a birth pays culture.birthPP by its type (config).
   - id: tradition-born
     kind: moment
+    weight: big
     tone: positive
     priority: 200
     trigger: tradition
@@ -453,6 +464,7 @@ cards:
     defaultChoice: null
   - id: tradition-lost
     kind: moment
+    weight: big
     tone: pressure
     priority: 200
     trigger: tradition
@@ -470,6 +482,7 @@ cards:
     defaultChoice: null
   - id: star-breakout
     kind: moment
+    weight: big
     tone: positive
     priority: 200
     trigger: star
@@ -487,6 +500,7 @@ cards:
     defaultChoice: null
   - id: star-final-season
     kind: moment
+    weight: minor
     tone: positive
     priority: 200
     trigger: star
@@ -504,6 +518,7 @@ cards:
     defaultChoice: null
   - id: star-retired
     kind: moment
+    weight: big
     tone: positive
     priority: 200
     trigger: star
@@ -521,6 +536,7 @@ cards:
     defaultChoice: null
   - id: star-moved
     kind: moment
+    weight: minor
     tone: positive
     priority: 200
     trigger: star
@@ -538,6 +554,7 @@ cards:
     defaultChoice: null
   - id: star-record
     kind: moment
+    weight: big
     tone: positive
     priority: 200
     trigger: star

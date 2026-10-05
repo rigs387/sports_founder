@@ -3,6 +3,7 @@ import type { BrowserWindow } from "electron";
 import type { GameState } from "../sim";
 import { readCampaignFile } from "./save-file-io";
 import type { FilePrompts } from "./save-files";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /** Drives real story cards and file controls; only OS file pickers are substituted. */
 export async function verifyEvents(
@@ -60,6 +61,7 @@ export async function verifyEvents(
     await wait(`!!document.querySelector('[data-testid="event-resolved"]')`);
   };
   try {
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await click('[data-testid="end-turn"]');
     await ready();
     await board();

@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { EventSnapshot } from "../../../sim";
+import { Emblem } from "../identity/Emblem";
 import { geometry } from "../map/model";
 import { useGameStore } from "../state/game-store";
 import { Effect, useEventText } from "./event-text";
 import "./event-popup.css";
 
-// Event windows (GDD v1.25): after Next Turn, the turn's decisions appear one at a time over the
-// map in the order their facts happened, with their country picked out on the map. Moments are
-// toasts the player collects with a click. The board stays as the journal.
+// Event windows (GDD v1.25, v1.26): after Next Turn, big and headline moments come first (a back
+// page, or a front page over a dimmed map), then the turn's decisions one at a time, each in the
+// order its fact happened and with its country picked out on the map; minor moments are toasts.
+// Big moments cannot be skipped. The board stays as the journal.
 
 const byWhenItHappened = (a: EventSnapshot, b: EventSnapshot) =>
   a.quarter - b.quarter || a.id - b.id;
@@ -17,7 +19,13 @@ const byWhenItHappened = (a: EventSnapshot, b: EventSnapshot) =>
  * The turn's cards over the map: the next unanswered decision as a window, and once none is
  * waiting, the moments as toasts. One thing at a time.
  */
-export function EventLayer({ onHighlight }: { onHighlight: (countryId: string | null) => void }) {
+export function EventLayer({
+  onHighlight,
+  onBurst,
+}: {
+  onHighlight: (countryId: string | null) => void;
+  onBurst: (countryId: string) => void;
+}) {
   const { t } = useTranslation();
   const { snapshot, status, dispatchAction } = useGameStore();
   const text = useEventText();
@@ -31,7 +39,9 @@ export function EventLayer({ onHighlight }: { onHighlight: (countryId: string | 
     .sort(byWhenItHappened);
   const current = queue[0];
   const currentId = current?.id ?? null;
-  const currentCountry = current?.countryId ?? null;
+  // Big and headline moments come before decisions.
+  const news = bigMoments(snapshot?.events ?? [])[0];
+  const currentCountry = news?.countryId ?? current?.countryId ?? null;
   // A new card comes up: drop any half-made choice.
   const shown = useRef<number | null>(null);
   useEffect(() => {
@@ -46,6 +56,7 @@ export function EventLayer({ onHighlight }: { onHighlight: (countryId: string | 
     return () => onHighlight(null);
   }, [outlined, onHighlight]);
   if (!snapshot || !text || snapshot.outcome) return null;
+  if (news) return <MomentWindow event={news} onBurst={onBurst} />;
   if (!current) return <MomentToasts />;
   const busy = status !== "ready";
   const total = snapshot.events.filter((event) => event.kind === "decision").length;
@@ -58,7 +69,7 @@ export function EventLayer({ onHighlight }: { onHighlight: (countryId: string | 
   const dock = x < geometry.width / 2 ? "dock-right" : "dock-left";
   return (
     <section
-      className={`event-popup ${dock}${current.tone === "pressure" ? " is-pressure" : ""}`}
+      className={`event-popup ${dock} family-${current.family}${current.tone === "pressure" ? " is-pressure" : ""}`}
       role="dialog"
       aria-labelledby="event-popup-title"
       data-testid="event-popup"
@@ -197,7 +208,9 @@ function MomentToasts() {
   const { snapshot, status, dispatchAction } = useGameStore();
   const text = useEventText();
   if (!snapshot || !text || snapshot.outcome) return null;
-  const moments = snapshot.events.filter((event) => event.kind === "moment").sort(byWhenItHappened);
+  const moments = snapshot.events
+    .filter((event) => event.kind === "moment" && event.weight === "minor")
+    .sort(byWhenItHappened);
   if (moments.length === 0) return null;
   const shown = moments.slice(0, 3);
   return (
@@ -239,4 +252,98 @@ function MomentToasts() {
       )}
     </section>
   );
+}
+
+/** Uncollected big and headline moments, in the order they happened (GDD v1.26). */
+export function bigMoments(events: readonly EventSnapshot[]): EventSnapshot[] {
+  return events
+    .filter((event) => event.kind === "moment" && event.weight !== "minor")
+    .sort(byWhenItHappened);
+}
+
+/**
+ * A big moment as a back page over the map, or a headline as a front page over a dimmed map in
+ * the sport's colours. Collect is the only way on; a headline bursts from its country.
+ */
+function MomentWindow({
+  event,
+  onBurst,
+}: {
+  event: EventSnapshot;
+  onBurst: (countryId: string) => void;
+}) {
+  const { t } = useTranslation();
+  const { snapshot, status, dispatchAction } = useGameStore();
+  const text = useEventText();
+  if (!snapshot || !text) return null;
+  const headline = event.weight === "headline";
+  const x = geometry.markets[event.countryId]?.center[0] ?? 0;
+  const dock = x < geometry.width / 2 ? "dock-right" : "dock-left";
+  const { identity } = snapshot;
+  const masthead = t(`events.mastheads.${event.family}`, { sport: identity.sportName });
+  const page = (
+    <section
+      className={`moment-window family-${event.family}${headline ? " is-headline" : ` ${dock}`}${event.tone === "pressure" ? " is-pressure" : ""}`}
+      role="dialog"
+      aria-modal={headline}
+      aria-labelledby="moment-window-title"
+      data-testid="moment-window"
+      data-weight={event.weight}
+      data-family={event.family}
+      data-event-template={event.templateId}
+      data-country={event.countryId}
+      style={
+        headline
+          ? ({
+              "--sport-primary": identity.colors.primary,
+              "--sport-secondary": identity.colors.secondary,
+            } as React.CSSProperties)
+          : undefined
+      }
+    >
+      <header className="moment-masthead">
+        {headline && (
+          <Emblem
+            {...identity.emblem}
+            primary={identity.colors.primary}
+            secondary={identity.colors.secondary}
+            size={40}
+            label={identity.sportName}
+          />
+        )}
+        <strong>{masthead}</strong>
+        <small className="moment-dateline">
+          {t("events.popup.dateline", {
+            country: text.country(event.countryId),
+            date: text.dateOf(event),
+          })}
+        </small>
+      </header>
+      <h2 id="moment-window-title">{text.title(event)}</h2>
+      <p>{text.body(event)}</p>
+      {text.seasonLines(event).map((line) => (
+        <p key={line}>{line}</p>
+      ))}
+      <footer>
+        <ul className="moment-reward">
+          {event.effects.map((effect) => (
+            <Effect effect={effect} key={JSON.stringify(effect)} />
+          ))}
+        </ul>
+        <button
+          type="button"
+          className="action-button"
+          data-testid="moment-window-collect"
+          disabled={status !== "ready"}
+          onClick={() => {
+            if (headline) onBurst(event.countryId);
+            void dispatchAction({ type: "collectMoment", eventId: event.id });
+          }}
+        >
+          {t("events.collect")}
+        </button>
+      </footer>
+    </section>
+  );
+  return headline ? <div className="moment-backdrop">{page}</div> : page;
 }

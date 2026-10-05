@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-05",
-  design: "GDD v1.25",
+  design: "GDD v1.26",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-05",
+      type: "Built",
+      title: "Big moments get front pages",
+      text: "GDD v1.26, after a playtest where a new star slipped by unseen: every moment has a weight. Minor ones stay toasts; big ones (the champion, a new star, a tradition born, a world championship) get a back-page window with the country ringed on the map; headlines (the first star, and the flagship's big moments at Professional and Elite) get a front page over a dimmed map in the sport's colours. Each card family has its own masthead. Big news comes first and Next Turn waits for it.",
+    },
     {
       date: "2026-10-05",
       type: "Built",
@@ -479,6 +485,11 @@ window.SF_PROGRESS = {
         ["built", "Decision costs, local effects, expiry and safe defaults"],
         ["built", "Reward collection, journal and saved pending cards"],
         ["built", "Decisions pop up over the map after each turn; moments as toasts (GDD v1.25)"],
+        [
+          "built",
+          "Moments have weight: big back pages and headline front pages that wait for you (GDD v1.26)",
+        ],
+        ["planned", "Optional auto-collect for minor moments"],
         [
           "partial",
           "Event library: 26 of a planned 40–60 cards (8 season, 8 star, 2 rival contest cards)",

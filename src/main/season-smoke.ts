@@ -1,4 +1,5 @@
 import type { BrowserWindow } from "electron";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /**
  * The flagship season as cards (GDD v1.15): plays turns until a season ends, then opens the story
@@ -54,6 +55,7 @@ export async function verifySeasonCards(
     }
     await click('[data-testid="events-close"]');
     const next = (await turn()) + 1;
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await click('[data-testid="end-turn"]');
     await readyAt(next);
   }

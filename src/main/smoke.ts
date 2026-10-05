@@ -15,6 +15,7 @@ import type { FilePrompts } from "./save-files";
 import { verifySaves } from "./save-smoke";
 import { verifySeasonCards } from "./season-smoke";
 import { verifySetup } from "./setup-smoke";
+import { COLLECT_NEWS } from "./smoke-news";
 import { verifyStarCards } from "./star-smoke";
 import { verifyStarsPanel } from "./stars-smoke";
 
@@ -117,11 +118,12 @@ async function run(
   let current = before;
   for (let i = 0; i < TURNS_TO_PLAY; i += 1) {
     const expectedTurn = current.turn + 1;
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await win.webContents.executeJavaScript(
       `document.querySelector('[data-testid="end-turn"]').click()`,
     );
     current = await waitFor(
-      (s) => s.status === "ready" && s.turn === expectedTurn && s.endTurnEnabled,
+      (s) => s.status === "ready" && s.turn === expectedTurn,
       `turn ${expectedTurn}`,
     );
   }

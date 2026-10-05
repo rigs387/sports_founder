@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { healthLevelSchema } from "./schemas";
+import { healthLevelSchema, leagueTierSchema } from "./schemas";
 
 export const timedEventEffectSchema = z.discriminatedUnion("type", [
   z.strictObject({
@@ -77,6 +77,9 @@ export const SEASON_STORIES = [
   "closeFinish",
 ] as const;
 export type SeasonStory = (typeof SEASON_STORIES)[number];
+/** How much a moment matters on the world map (GDD v1.26): a toast, a back page or a front page. */
+export const MOMENT_WEIGHTS = ["minor", "big", "headline"] as const;
+export type MomentWeight = (typeof MOMENT_WEIGHTS)[number];
 const choice = z.strictObject({
   id: z.string().regex(/^[a-z][a-z0-9-]*$/),
   cost: z.number().nonnegative(),
@@ -121,6 +124,8 @@ const template = z
     arrivalEffects: z.array(timedEventEffectSchema).default([]),
     choices: z.array(choice),
     defaultChoice: z.string().nullable(),
+    /** Moments only (GDD v1.26): minor (toast), big (back page) or headline (front page). */
+    weight: z.enum(MOMENT_WEIGHTS).nullable().default(null),
   })
   .superRefine((card, ctx) => {
     const issue = (message: string) => ctx.addIssue({ code: "custom", message });
@@ -128,6 +133,8 @@ const template = z
       issue("Duplicate choice id");
     if (card.kind === "moment" && (card.choices.length || card.defaultChoice !== null))
       issue("Moments have effects, not choices");
+    if ((card.kind === "moment") !== (card.weight !== null))
+      issue("Every moment has a weight, and only moments");
     if (card.kind === "decision") {
       const fallback = card.choices.find((c) => c.id === card.defaultChoice);
       if (card.choices.length < 2 || card.effects.length)
@@ -202,6 +209,8 @@ export const eventsFileSchema = z
         historyLimit: z.int().positive(),
         minFactor: z.number().positive(),
         maxFactor: z.number().positive(),
+        /** A big flagship moment is a headline while the flagship is at one of these tiers. */
+        flagshipHeadlineTiers: z.array(leagueTierSchema),
       })
       .refine((s) => s.minFactor <= 1 && s.maxFactor >= 1, "Factor bounds must include 1"),
     cards: z.array(template),

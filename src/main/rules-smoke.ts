@@ -1,4 +1,5 @@
 import type { BrowserWindow } from "electron";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /**
  * Amending the rules (GDD v1.20): plays on to the offseason if needed, picks a rule and an
@@ -39,6 +40,7 @@ export async function verifyAmendment(
       Number(
         await evaluate<string>(`document.querySelector('[data-testid="game"]').dataset.turn`),
       ) + 1;
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await click('[data-testid="end-turn"]');
     await wait(
       `(() => { const g=document.querySelector('[data-testid="game"]'); return g.dataset.status === 'ready' && Number(g.dataset.turn) === ${next}; })()`,

@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.25 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn)*
+*Version 1.26 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier)*
 
 ---
 
@@ -611,6 +611,26 @@ the game does not stop that, it makes them play differently.
   decisions stay macro.
 - **Pickups:** clicking opens the story and collects the PP immediately; uncollected pickups
   auto-collect at end of turn. No lost rewards.
+- **Moments have weight (decided 2026-10-05, v1.26).** A first thousand fans in a small country
+  is not your Elite flagship's new star. Every moment card has a weight in content: *minor*,
+  *big* or *headline*.
+  - *Minor* moments stay toasts on the world map (collect with a click; Next Turn collects them).
+  - *Big* moments get a window over the map styled as a back page: date line, large headline,
+    the story, the reward and a Collect button, with a pulsing ring on the country.
+  - *Headline* moments get a front page: the map dims behind it, the sport's emblem and colours
+    frame it, and the country bursts when it is collected.
+  - *The flagship scales with its tier.* A big flagship moment (the champion, a star breaking
+    out) becomes a headline when the flagship is Professional or Elite (config). The sport's
+    first-ever star is always a headline.
+  - *Card families look different* so the news has variety: season cards read as the sports
+    page, star cards as a player profile, tradition cards as heritage, rival cards as world news,
+    the rest as the sport's own paper.
+  - *Order:* after Next Turn, big and headline moments come first, in the order they happened
+    (the champion and a new star explain the season's decision cards), then decisions, then
+    minor toasts.
+  - *Big moments cannot be skipped (choose pain on attention).* They have no dismiss; Next Turn
+    stays locked until each is collected. Only minor moments are collected by Next Turn.
+  - *Parked:* an optional auto-collect for minor moments.
 - **Negative events** (scandals, star injuries, rival coups) occur throughout and grow more
   frequent at higher PP tiers, reinforcing growing pains and feeding late-game pressure.
 - **The flagship season as cards (decided 2026-10-03).** The flagship's results reach the
@@ -1500,6 +1520,8 @@ Items flagged during the interview that need further discussion in future sessio
 - Flagship talent pull (parked 2026-10-05, v1.23): the flagship should work like the Premier
   League or the NBA, a top flight that draws the world's best players. Foreign stars moving in
   need named standouts in other leagues first; build it with them, not with the broadcast.
+- Auto-collect for minor moments (parked 2026-10-05, v1.26): an option that collects toasts
+  without clicks, for players who want only the big news.
 - Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to
   handle missed matches; deferred from the Phase 1 stars build.
 - Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship

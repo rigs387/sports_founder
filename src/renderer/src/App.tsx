@@ -5,7 +5,7 @@ import { CampaignOverview, type Overview } from "./components/CampaignOverview";
 import { CampaignSetupScreen } from "./components/CampaignSetupScreen";
 import { CountryCard } from "./components/CountryCard";
 import { EventBoard } from "./components/EventBoard";
-import { EventLayer } from "./components/EventPopup";
+import { bigMoments, EventLayer } from "./components/EventPopup";
 import { FocusControls } from "./components/FocusControls";
 import { LeagueControls } from "./components/LeagueControls";
 import { SaveLoadControls } from "./components/SaveLoadControls";
@@ -47,6 +47,7 @@ export function App() {
   useEffect(() => {
     void loadSetup();
   }, [loadSetup]);
+  const news = snapshot ? bigMoments(snapshot.events).length : 0;
   const fullPage = overview === "growth" || overview === "flagship" || overview === "offseason";
   // On narrow screens the nav scrolls; keep the current view's tab in sight.
   useEffect(() => {
@@ -55,14 +56,21 @@ export function App() {
       ?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [overview]);
   // The offseason opens on its own screen (GDD v1.24), once each time it opens, if the player is
-  // on the world map; elsewhere its tab appears and waits.
+  // on the world map; elsewhere its tab appears and waits. The season's big news comes first
+  // (GDD v1.26): the screen opens once it has been collected.
   const offseasonOpen = snapshot?.offseasonOpen ?? false;
   const wasOpen = useRef(offseasonOpen);
+  const owed = useRef(false);
   useEffect(() => {
-    if (offseasonOpen && !wasOpen.current && overview === null) setOverview("offseason");
+    if (offseasonOpen && !wasOpen.current) owed.current = overview === null;
+    if (!offseasonOpen) owed.current = false;
+    if (owed.current && news === 0 && overview === null) {
+      owed.current = false;
+      setOverview("offseason");
+    }
     if (!offseasonOpen && overview === "offseason") setOverview(null);
     wasOpen.current = offseasonOpen;
-  }, [offseasonOpen, overview]);
+  }, [offseasonOpen, overview, news]);
   // A pop-up card outlines its country on the map (GDD v1.25), leaving the selection alone.
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const navigate = (kind: MapCommand["kind"], market?: string) =>
@@ -231,7 +239,9 @@ export function App() {
             onHover={setHover}
           />
         )}
-        {overview === null && <EventLayer onHighlight={setHighlighted} />}
+        {overview === null && (
+          <EventLayer onHighlight={setHighlighted} onBurst={(id) => navigate("burst", id)} />
+        )}
         <div className="campaign-heading">
           <span className="eyebrow">{t("map.chapter")}</span>
           <h1>
@@ -505,14 +515,26 @@ export function App() {
           </label>
         </div>
         <EventBoard key={campaignRevision} />
+        {/* Big moments cannot be skipped (GDD v1.26): Next Turn waits until they are collected,
+            and away from the map it leads back to them. */}
         <button
           type="button"
           className="advance-turn"
           data-testid="end-turn"
-          disabled={status !== "ready" || !!snapshot?.outcome}
-          onClick={() => void endTurn()}
+          data-news={news}
+          title={news > 0 ? t("events.newsFirst", { count: news }) : undefined}
+          disabled={status !== "ready" || !!snapshot?.outcome || (news > 0 && overview === null)}
+          onClick={() => (news > 0 ? setOverview(null) : void endTurn())}
         >
-          <span>{t(status === "simulating" ? "status.simulating" : "map.nextTurn")}</span>
+          <span>
+            {t(
+              status === "simulating"
+                ? "status.simulating"
+                : news > 0
+                  ? "map.readNews"
+                  : "map.nextTurn",
+            )}
+          </span>
           <b aria-hidden="true">&#8594;</b>
         </button>
       </footer>

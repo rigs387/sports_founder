@@ -1,5 +1,6 @@
 import type { BrowserWindow } from "electron";
 import { verifyGrowth } from "./growth-smoke";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /** Real controls -> Comlink worker -> authoritative snapshot, without injecting simulation state. */
 export async function verifyActions(
@@ -29,6 +30,7 @@ export async function verifyActions(
   };
   const advance = async () => {
     const before = await state();
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     const enabled = await evaluate<boolean>(
       `!document.querySelector('[data-testid="end-turn"]').disabled`,
     );

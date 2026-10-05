@@ -1,4 +1,5 @@
 import type { BrowserWindow } from "electron";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /**
  * The Stars panel (GDD v1.16, tech plan 2.6 step 8). Runs after the star cards, so the league has
@@ -58,6 +59,7 @@ export async function verifyStarsPanel(
       Number(
         await evaluate<string>(`document.querySelector('[data-testid="game"]').dataset.turn`),
       ) + 1;
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await click('[data-testid="end-turn"]');
     await wait(
       `(() => { const g=document.querySelector('[data-testid="game"]'); return g.dataset.status === 'ready' && Number(g.dataset.turn) === ${next}; })()`,

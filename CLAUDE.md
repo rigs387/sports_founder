@@ -139,6 +139,13 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   outlines (`highlighted`) without changing the player's selection. "Decide later" leaves a card to
   the board and Next Turn's free default. With no decision waiting, moments show as toasts that
   collect on click. Card words come from `event-text.tsx`, shared with the board (the journal).
+- Moments have weight (GDD v1.26): every moment card in `content/events.yaml` has `weight` (minor,
+  big, headline); `eventSnapshots` resolves it (big flagship cards become headlines at
+  `settings.flagshipHeadlineTiers`; the first star's breakout is a headline) and adds a `family`
+  (season, star, tradition, rival, sport) for the card's look. Big and headline moments show first
+  as `MomentWindow`s (headline: a front page over a dimmed map) and cannot be skipped: Next Turn
+  waits (`data-news`). Smoke steps run `COLLECT_NEWS` (`src/main/smoke-news.ts`) before ending a
+  turn or checking that Next Turn is enabled.
 - Flagship seasons reach the player as event cards (GDD v1.15): `src/sim/season-stories.ts` reads
   the recorded `SeasonSummary` (thresholds in `config.flagship.stories`), and `offerSeasonCards` in
   `src/sim/events.ts` offers the champion moment and at most one story card before other cards.

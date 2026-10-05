@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { BrowserWindow } from "electron";
 import { readCampaignFile } from "./save-file-io";
 import type { FilePrompts } from "./save-files";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /** Only the OS picker is substituted. UI, preload, IPC, disk, worker and validation are real. */
 export async function verifySaves(
@@ -51,6 +52,7 @@ export async function verifySaves(
     const turn = await evaluate<number>(
       `Number(document.querySelector('[data-testid="game"]').dataset.turn)`,
     );
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await click("end-turn");
     await wait(
       `document.querySelector('[data-testid="game"]').dataset.status === 'ready' && Number(document.querySelector('[data-testid="game"]').dataset.turn) === ${turn + 1}`,

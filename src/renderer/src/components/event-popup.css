@@ -217,6 +217,154 @@
   color: #526e82;
 }
 
+/* Moments have weight (GDD v1.26). Each card family has its own accent. */
+.family-season {
+  --family: #1f6f5c;
+}
+.family-star {
+  --family: #b07a12;
+}
+.family-tradition {
+  --family: #7a4e2d;
+}
+.family-rival {
+  --family: #a1533c;
+}
+.family-sport {
+  --family: #2d5482;
+}
+.event-popup[class*="family-"] > header .eyebrow {
+  color: var(--family);
+}
+.moment-window {
+  position: absolute;
+  z-index: 5;
+  top: 96px;
+  width: min(500px, calc(100% - 400px));
+  padding: 0 0 18px;
+  color: var(--ink);
+  background: #fffdf7;
+  border: 2px solid var(--family);
+  border-radius: 6px;
+  box-shadow:
+    0 6px 0 var(--family),
+    0 22px 46px rgb(16 40 70 / 0.32);
+  animation: moment-in 0.35s ease-out;
+}
+.moment-window.dock-left {
+  left: 24px;
+}
+.moment-window.dock-right {
+  right: 350px;
+}
+.moment-masthead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  color: #fff;
+  background: var(--family);
+  border-radius: 3px 3px 0 0;
+}
+.moment-masthead strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+}
+.moment-masthead .moment-dateline {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+.moment-window h2 {
+  margin: 16px 20px 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+}
+.moment-window > p {
+  margin: 0 20px 10px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.moment-window > footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin: 14px 20px 0;
+  padding-top: 12px;
+  border-top: 1px solid #e3dcc8;
+}
+.moment-reward {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--family);
+}
+/* A headline: the front page over a dimmed map, in the sport's colours. */
+.moment-backdrop {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(16 30 50 / 0.55);
+  animation: moment-fade 0.3s ease-out;
+}
+.moment-window.is-headline {
+  position: relative;
+  top: auto;
+  width: min(640px, 100%);
+  border-width: 3px;
+  border-color: var(--sport-primary, var(--family));
+  box-shadow:
+    0 8px 0 var(--sport-primary, var(--family)),
+    0 30px 60px rgb(0 0 0 / 0.45);
+}
+.is-headline .moment-masthead {
+  background: var(--sport-primary, var(--family));
+  border-bottom: 4px solid var(--sport-secondary, #fff);
+}
+.is-headline .moment-masthead strong {
+  font-size: 22px;
+}
+.is-headline h2 {
+  font-size: 40px;
+  text-align: center;
+  margin: 22px 26px 12px;
+}
+.is-headline > p {
+  margin-inline: 26px;
+  text-align: center;
+  font-size: 15px;
+}
+.is-headline > footer {
+  margin-inline: 26px;
+}
+@keyframes moment-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+@keyframes moment-fade {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .moment-window,
+  .moment-backdrop {
+    animation: none;
+  }
+}
+
 @media (max-width: 850px) {
   .event-popup.dock-left,
   .event-popup.dock-right {
@@ -228,6 +376,28 @@
     width: auto;
     max-height: 70vh;
     overflow-y: auto;
+  }
+  .moment-window.dock-left,
+  .moment-window.dock-right {
+    position: fixed;
+    top: auto;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .moment-backdrop {
+    position: fixed;
+    padding: 12px;
+  }
+  .moment-window.is-headline {
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+  }
+  .is-headline h2 {
+    font-size: 28px;
   }
   .moment-toasts {
     position: fixed;

@@ -1,5 +1,6 @@
 import type { BrowserWindow } from "electron";
 import type { LeagueActionKind } from "../sim";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /** Grow the existing focused Tuvalu market naturally, then exercise all three league actions. */
 export async function verifyLeagues(
@@ -49,6 +50,7 @@ export async function verifyLeagues(
   const advance = async () => {
     const before = await state();
     await close();
+    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await assert(
       '!document.querySelector("[data-testid=end-turn]").disabled',
       "Campaign ended before league smoke finished",
