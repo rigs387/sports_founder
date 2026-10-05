@@ -20,6 +20,9 @@ export interface MapHover {
   x: number;
   y: number;
 }
+/** The tradition pennant's color (GDD v1.22). */
+const PENNANT = 0xd8b23a;
+
 interface Props {
   countryNames: Record<string, string>;
   snapshot: TurnSnapshot;
@@ -216,6 +219,32 @@ function MapScene(props: SceneProps) {
             .stroke({ width: 1 / viewport.scale.x, color: 0xf4ffff });
         }
       }
+      // A pennant where the player's fans keep traditions (GDD v1.22); the country card names them.
+      const held = new Set(
+        latest.current.snapshot.culture.traditions.flatMap((tradition) =>
+          tradition.lost === null ? tradition.followers : [],
+        ),
+      );
+      const unit = 1 / viewport.scale.x;
+      for (const id of held) {
+        const market = geometry.markets[id];
+        if (!market) continue;
+        const [x, y] = market.center;
+        markers
+          .moveTo(x + 5 * unit, y - 3 * unit)
+          .lineTo(x + 5 * unit, y - 17 * unit)
+          .stroke({ width: 1.5 * unit, color: 0x3a2a10 })
+          .poly([
+            x + 5 * unit,
+            y - 17 * unit,
+            x + 14 * unit,
+            y - 14 * unit,
+            x + 5 * unit,
+            y - 11 * unit,
+          ])
+          .fill(PENNANT);
+      }
+      host.dataset.traditionMarkers = String(held.size);
       const selected = latest.current.selected ? geometry.markets[latest.current.selected] : null;
       for (const { id, label } of countryLabels) {
         const market = geometry.markets[id];

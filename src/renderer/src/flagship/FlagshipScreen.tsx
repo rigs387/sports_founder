@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, ClubSnapshot, MatchResult, TurnSnapshot } from "../../../sim";
+import { TrophyCard } from "../culture/TrophyCard";
+import { useTraditionWords } from "../culture/traditions";
 import { Emblem } from "../identity/Emblem";
 import { useTermVars } from "../identity/terms";
 import "./flagship.css";
@@ -91,6 +93,7 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
         </div>
         <div className="flagship-side">
           <LatestRound results={flagship.lastRound} clubName={clubName} nouns={nouns} />
+          <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} />
           <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           <Champions snapshot={snapshot} clubName={clubName} country={country} />
         </div>
@@ -114,6 +117,16 @@ function LeagueTable({
   const leaders = new Map(snapshot.flagship.leaders.map((leader) => [leader.clubId, leader]));
   const termVars = useTermVars(snapshot.identity.terms);
   const playerName = (id: number) => snapshot.flagship.players.find((p) => p.id === id)?.name;
+  const words = useTraditionWords(snapshot);
+  // Living traditions of this league's clubs (GDD v1.22), tagged on their rows.
+  const living = snapshot.culture.traditions.filter(
+    (tradition) => tradition.lost === null && tradition.countryId === snapshot.flagship.countryId,
+  );
+  const tags = (clubId: number) =>
+    living.filter(
+      (tradition) =>
+        ["derby", "rite", "venue"].includes(tradition.type) && tradition.clubIds.includes(clubId),
+    );
   const columns = [
     ["played", "playedFull"],
     ["won", "wonFull"],
@@ -178,6 +191,17 @@ function LeagueTable({
                         {t("flagship.founding")}
                       </small>
                     )}
+                    {tags(row.clubId).map((tradition) => (
+                      <small
+                        key={tradition.id}
+                        className="culture-tag"
+                        title={words.name(tradition)}
+                        data-testid="flagship-tradition-tag"
+                        data-type={tradition.type}
+                      >
+                        {t(`culture.tags.${tradition.type}`)}
+                      </small>
+                    ))}
                     {titles > 0 && (
                       <small className="titles">
                         <span aria-hidden="true">&#9733;</span>
@@ -341,6 +365,11 @@ function Seat({
     .sort((a, b) => country(a?.countryId ?? "").localeCompare(country(b?.countryId ?? "")));
   const valid = targets.some((c) => c?.countryId === target);
   const open = snapshot.seasonalWindowOpen;
+  const words = useTraditionWords(snapshot);
+  const { i18n } = useTranslation();
+  const leaving = snapshot.culture.traditions.filter((tradition) =>
+    flagship.leaveTraditions.includes(tradition.id),
+  );
 
   return (
     <section className="flagship-card flagship-seat" aria-labelledby="flagship-seat-heading">
@@ -403,6 +432,14 @@ function Seat({
                   country: country(flagship.countryId),
                 })}
               </p>
+              {leaving.length > 0 && (
+                <p className="warning" data-testid="flagship-seat-traditions">
+                  {t("culture.leaving", {
+                    count: leaving.length,
+                    names: new Intl.ListFormat(i18n.language).format(leaving.map(words.name)),
+                  })}
+                </p>
+              )}
               <div>
                 <button
                   type="button"

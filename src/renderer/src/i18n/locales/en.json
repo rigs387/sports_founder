@@ -263,12 +263,12 @@
       },
       "tradition-born": {
         "title": "A tradition is born: {{name}}",
-        "body_derby": "{{clubA}} and {{clubB}} finished on top together in {{count}} of the last {{span}} seasons. Their fans now call it {{name}}.",
-        "body_rite": "{{club}} won their first title. Before every home {{match}} their fans now keep {{name}}.",
-        "body_legacy": "{{player}} retired after {{count}} seasons as a star. In {{country}} people now call that way of playing {{name}}.",
+        "body_derby": "{{clubA}} and {{clubB}} finished on top together in {{count}} of the last {{span}} {{seasonsNoun}}. Their fans now call it {{name}}.",
+        "body_rite": "{{club}} won their first title. Before every home {{matchOne}} their fans now keep {{name}}.",
+        "body_legacy": "{{player}} retired after a great career as a star. In {{country}} people now call that way of playing {{name}}.",
         "body_nationalName": "The league in {{country}} has turned Professional, and people there have their own name for the sport: {{name}}.",
         "body_venue": "{{ground}} has seen {{count}} titles and finals. It is now one of the famous grounds of the sport.",
-        "body_trophy": "The first {{season}} of the league in {{country}} is over, and its champions lifted {{name}}. You can give the trophy its name now, free."
+        "body_trophy": "The first {{seasonNoun}} of the league in {{country}} is over, and its champions lifted {{name}}. You can give the trophy its own name now, free, on the flagship screen."
       },
       "tradition-lost": {
         "title": "A tradition is lost: {{name}}",
@@ -1323,6 +1323,75 @@
       "nationalName": "national names",
       "venue": "famous grounds",
       "trophy": "trophies"
-    }
+    },
+    "heading": "Traditions",
+    "intro": "Traditions are born only from what happened. They make fans hold on longer and resist rival pull, and they push back against changes that break them.",
+    "none": "No traditions yet. They are born from what happens: repeated finals, first titles, great careers, famous grounds.",
+    "typeHome": "{{type}}",
+    "typeAbroad": "{{type}}, held from {{country}}",
+    "strength": "{{name}}: {{word}}",
+    "strengthWords": {
+      "strong": "strong",
+      "steady": "steady",
+      "fading": "fading"
+    },
+    "effect": "Fans who keep traditions here hold on longer and resist rival pull.",
+    "rivalHeading": "Rival traditions",
+    "rivalLine": "{{name}} · {{type}} of {{sport}}",
+    "names": {
+      "derby": "the {{a}}–{{b}} derby",
+      "derby_same": "the {{place}} derby",
+      "legacy": "the {{player}} style",
+      "trophy": "the {{ground}} Cup"
+    },
+    "facts": {
+      "derby": "Born {{year}}: {{clubA}} and {{clubB}} on top together in {{count}} {{seasonsNoun}}.",
+      "rite": "Born {{year}}: the first title of {{club}}.",
+      "legacy": "Born {{year}}: {{player}} retired after a great career.",
+      "nationalName": "Born {{year}}: the league in {{country}} turned Professional.",
+      "venue": "Born {{year}}: titles and finals at the ground of {{club}}.",
+      "trophy": "Born {{year}}: first played for in {{country}}."
+    },
+    "lost": {
+      "faded": "Faded away in {{year}}.",
+      "folded": "Lost with its league in {{year}}.",
+      "broken": "Broken by a rule change in {{year}}.",
+      "renamed": "Renamed in {{year}}."
+    },
+    "byType": {
+      "derby": "Derbies",
+      "rite": "Club rites",
+      "legacy": "Star legacies",
+      "nationalName": "National names",
+      "venue": "Famous grounds",
+      "trophy": "Trophies"
+    },
+    "offends": "Fans of {{name}} hold to these rules: {{rules}}.",
+    "offended_one": "Offends {{count}} tradition: {{names}}.",
+    "offended_other": "Offends {{count}} traditions: {{names}}.",
+    "leaving_one": "Leaving breaks faith with {{count}} tradition here: {{names}}.",
+    "leaving_other": "Leaving breaks faith with {{count}} traditions here: {{names}}.",
+    "tags": {
+      "derby": "Derby",
+      "rite": "Rite",
+      "venue": "Famous ground"
+    },
+    "trophy": {
+      "heading": "The trophy",
+      "named": "The champions lift {{name}}.",
+      "nameNow": "Name the trophy, free while its first champion card is open.",
+      "nameLabel": "Trophy name",
+      "name": "Name the trophy",
+      "rename": "Rename the trophy",
+      "renameReview": "Renaming ends {{name}} as a tradition. {{count, number}} hardcore fans who held to it would turn casual.",
+      "confirmRename": "Rename it",
+      "cancel": "Keep the name",
+      "blockers": {
+        "window": "The trophy can be renamed only in the seasonal window.",
+        "naming": "Give the newborn trophy its name first.",
+        "trophy": "The league at the seat has no trophy yet."
+      }
+    },
+    "marker": "{{count}} traditions held here"
   }
 }

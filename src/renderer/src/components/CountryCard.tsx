@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
-import type { CountrySnapshot } from "../../../sim";
+import type { CountrySnapshot, CultureSnapshot } from "../../../sim";
+import { TraditionList } from "../culture/traditions";
 import { geometry } from "../map/model";
 import type { HistoryPoint } from "../state/history";
 
@@ -15,6 +16,8 @@ interface Props {
   onLocate: () => void;
   children?: ReactNode;
   leagueControls?: ReactNode;
+  /** Traditions (GDD v1.22): the ones held here, and rivals' flavor traditions here. */
+  culture?: CultureSnapshot;
 }
 export function CountryCard({
   country,
@@ -26,6 +29,7 @@ export function CountryCard({
   onLocate,
   children,
   leagueControls,
+  culture,
 }: Props) {
   const { t, i18n } = useTranslation();
   const compact = (value: number) => t("format.compact", { value });
@@ -47,6 +51,10 @@ export function CountryCard({
   const defending = strongestRival && ["defending", "entrenched"].includes(strongestRival.level);
   const moves = strongestRival?.countermoves.map((move) => t(`rivals.moves.${move}`)) ?? [];
   const moveList = new Intl.ListFormat(i18n.language, { style: "short" }).format(moves);
+  const held = (culture?.traditions ?? []).filter(
+    (tradition) => tradition.lost === null && tradition.followers.includes(country.countryId),
+  );
+  const rivalHeld = (culture?.rivals ?? []).filter((r) => r.countryId === country.countryId);
   return (
     <aside
       className="country-card"
@@ -180,6 +188,33 @@ export function CountryCard({
             <small>{moves.length ? moveList : t("map.roomToGrow")}</small>
           </div>
         </div>
+        {(held.length > 0 || rivalHeld.length > 0) && (
+          <section className="culture-section" data-testid="country-traditions">
+            <h3>{t("culture.heading")}</h3>
+            {held.length > 0 && (
+              <>
+                <TraditionList traditions={held} countryId={country.countryId} />
+                <p className="culture-note">{t("culture.effect")}</p>
+              </>
+            )}
+            {rivalHeld.length > 0 && (
+              <>
+                <small>{t("culture.rivalHeading")}</small>
+                <ul className="culture-note">
+                  {rivalHeld.map((rival) => (
+                    <li key={`${rival.sportId}/${rival.id}`}>
+                      {t("culture.rivalLine", {
+                        name: rival.name,
+                        type: t(`culture.types.${rival.type}`),
+                        sport: names.sports[rival.sportId] ?? rival.sportId,
+                      })}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </section>
+        )}
         <button
           type="button"
           className="card-action"

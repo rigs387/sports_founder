@@ -885,3 +885,90 @@ export function renameTrophy(state: GameState, world: World, name: string): Game
     ],
   };
 }
+
+// ---- Snapshot (GDD v1.22: what the player sees) -----------------------------------------------
+
+/** A tradition as the UI shows it: recorded facts and a strength bar. Effects stay in the sim. */
+export interface TraditionSnapshot {
+  id: number;
+  type: TraditionType;
+  countryId: string;
+  clubIds: number[];
+  playerId: number | null;
+  name: string | null;
+  /** The flagship seasons whose facts made it. */
+  seasons: number[];
+  bornYear: number;
+  strength: number;
+  followers: string[];
+  lost: { year: number; reason: TraditionLossReason } | null;
+  /** The rules it was born under: amending away from one offends it. */
+  rules: { axis: AxisId; option: string }[];
+}
+
+export interface CultureSnapshot {
+  traditions: TraditionSnapshot[];
+  /** The newborn trophy the player may name for free now, or null. */
+  naming: number | null;
+  /** Renaming the seat's trophy: its id, why it cannot be renamed now, and the purists it costs. */
+  rename: {
+    trophyId: number;
+    blocker: Exclude<RenameTrophyBlocker, "name" | "same"> | null;
+    hardcore: number;
+  } | null;
+  nameLimits: { min: number; max: number };
+  /** The derby rule the cards quote: meetings needed within how many seasons. */
+  derby: { meetings: number; seasons: number };
+  /** Rivals' traditions (flavor from content): shown, with no effect. */
+  rivals: { sportId: string; id: string; type: TraditionType; countryId: string; name: string }[];
+}
+
+export function cultureSnapshot(
+  state: GameState,
+  world: World,
+  windowOpen: boolean,
+): CultureSnapshot {
+  const year = (quarter: number) => yearOfQuarter(quarter, world.config);
+  const trophy = seatTrophy(state);
+  const renameBlocker = trophy ? renameTrophyBlocker(state, world, "Valid Name", windowOpen) : null;
+  const renameCost = trophy
+    ? renameShares(state, world, trophy).reduce(
+        (sum, share, i) =>
+          sum + Math.floor((state.countries[i]?.fans[PLAYER_INDEX]?.hardcore ?? 0) * share),
+        0,
+      )
+    : 0;
+  const { identity, culture } = world.config;
+  return {
+    traditions: state.culture.traditions.map((t) => ({
+      id: t.id,
+      type: t.type,
+      countryId: t.countryId,
+      clubIds: t.clubIds,
+      playerId: t.playerId,
+      name: t.name,
+      seasons: t.seasons,
+      bornYear: year(t.bornQuarter),
+      strength: t.strength,
+      followers: t.followers,
+      lost: t.lost ? { year: year(t.lost.quarter), reason: t.lost.reason } : null,
+      rules: RULE_AXES.flatMap((axis) => {
+        const option = t.rules[axis];
+        return option === undefined ? [] : [{ axis, option }];
+      }),
+    })),
+    naming: state.culture.naming,
+    rename: trophy
+      ? {
+          trophyId: trophy.id,
+          blocker: renameBlocker === "name" || renameBlocker === "same" ? null : renameBlocker,
+          hardcore: renameCost,
+        }
+      : null,
+    nameLimits: { min: identity.nameMinLength, max: identity.trophyNameMaxLength },
+    derby: { meetings: culture.derby.meetings, seasons: culture.derby.seasons },
+    rivals: Object.entries(world.names.traditions.rivals).flatMap(([sportId, list]) =>
+      list.map((t) => ({ sportId, ...t })),
+    ),
+  };
+}

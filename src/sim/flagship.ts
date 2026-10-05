@@ -1,5 +1,5 @@
 import { costMultiplier, QUARTERS_PER_YEAR, seasonalWindowOpen, yearOfQuarter } from "./calendar";
-import { ethosFactor, traditionWeights } from "./culture";
+import { clubGround, ethosFactor, traditionWeights } from "./culture";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
@@ -1458,6 +1458,8 @@ export interface ClubSnapshot {
   countryId: string;
   place: string;
   nickname: string;
+  /** The club's ground (GDD v1.22). */
+  ground: string;
   active: boolean;
   /** Championships won in every season played. */
   titles: number;
@@ -1563,6 +1565,7 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
       countryId: club.countryId,
       place: club.place,
       nickname: club.nickname,
+      ground: clubGround(club, state.identity, world),
       active: club.active,
       titles: titles.get(club.id) ?? 0,
     })),

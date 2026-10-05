@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { EventEffect } from "../../../content";
 import type { EventRecord } from "../../../sim";
+import { useTraditionWords } from "../culture/traditions";
 import { PLAIN_TERMS, useTermVars } from "../identity/terms";
 import { useGameStore } from "../state/game-store";
 import { ActionFeedback } from "./ActionFeedback";
@@ -66,6 +67,7 @@ export function EventBoard() {
   const [review, setReview] = useState<string | null>(null);
   const busy = status !== "ready";
   const termVars = useTermVars(snapshot?.identity.terms ?? PLAIN_TERMS);
+  const words = useTraditionWords(snapshot);
   useEffect(() => {
     if (open) dialog.current?.showModal();
     else dialog.current?.close();
@@ -88,10 +90,30 @@ export function EventBoard() {
   };
   const player = (id: number | null | undefined) =>
     snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
+  // Tradition cards (GDD v1.22) name the tradition and the facts that made it.
+  const traditionText = (event: EventRecord) => {
+    const told = event.facts.tradition;
+    const tradition = snapshot.culture.traditions.find((item) => item.id === told?.traditionId);
+    if (!told || !tradition) return {};
+    const born = event.templateId === "tradition-born";
+    return {
+      ...termVars({ seasons: born ? snapshot.culture.derby.seasons : tradition.seasons.length }),
+      name: words.name(tradition),
+      club: club(tradition.clubIds[0]),
+      clubA: club(tradition.clubIds[0]),
+      clubB: club(tradition.clubIds[1]),
+      ground: snapshot.flagship.clubs.find((c) => c.id === tradition.clubIds[0])?.ground ?? "",
+      player: player(tradition.playerId),
+      country: country(tradition.countryId),
+      count: tradition.seasons.length,
+      span: snapshot.culture.derby.seasons,
+      context: born ? tradition.type : (tradition.lost?.reason ?? "faded"),
+    };
+  };
   // Star cards (GDD v1.16) name the player and clubs from the record.
   const starText = (event: EventRecord) => {
     const star = event.facts.star;
-    if (!star) return {};
+    if (!star) return traditionText(event);
     return {
       player: player(star.playerId),
       club: club(star.clubId),

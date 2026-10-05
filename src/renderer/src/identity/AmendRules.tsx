@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, AxisId, TurnSnapshot } from "../../../sim";
+import { useTraditionWords } from "../culture/traditions";
 import { useTermVars } from "./terms";
 
 // Rules evolution, first build (GDD v1.20): amend one rule trait a year in the seasonal window,
@@ -18,7 +19,9 @@ interface Props {
 }
 
 export function AmendRules({ snapshot, names, busy, onAction }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const words = useTraditionWords(snapshot);
+  const list = (items: string[]) => new Intl.ListFormat(i18n.language).format(items);
   const nouns = useTermVars(snapshot.identity.terms)();
   const rules = snapshot.rules;
   const [axis, setAxis] = useState<AxisId | null>(null);
@@ -132,6 +135,18 @@ export function AmendRules({ snapshot, names, busy, onAction }: Props) {
           <p className={choice.backlash > 0 ? "warning" : undefined}>
             {t("rules.reviewLoss", { count: choice.backlash })}
           </p>
+          {choice.offended.length > 0 && (
+            <p className="warning" data-testid="amend-offended">
+              {t("culture.offended", {
+                count: choice.offended.length,
+                names: list(
+                  snapshot.culture.traditions
+                    .filter((tradition) => choice.offended.includes(tradition.id))
+                    .map(words.name),
+                ),
+              })}
+            </p>
+          )}
           <p>{t("rules.reviewTiming", nouns)}</p>
           <h5>{t("rules.hintsHeading")}</h5>
           <ul className="amend-hints">

@@ -287,6 +287,7 @@ export function App() {
             history={history[selected.countryId] ?? []}
             anchor={snapshot.anchorCountryId}
             turn={snapshot.turn}
+            culture={snapshot.culture}
             onClose={() => selectCountry(null)}
             onLocate={() => navigate("locate", selected.countryId)}
             leagueControls={

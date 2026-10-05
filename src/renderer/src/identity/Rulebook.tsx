@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, TurnSnapshot } from "../../../sim";
+import { TraditionsSection } from "../culture/traditions";
 import { AmendRules } from "./AmendRules";
 import { Emblem } from "./Emblem";
 import { FieldDiagram } from "./FieldDiagram";
@@ -8,7 +9,8 @@ import { useTerms } from "./terms";
 
 // The Rulebook (GDD v1.18): the sport as an almanac page. Its name and emblem, how it was founded,
 // its character, every genome trait as a sentence, the odd pairings' deadpan lines, the sport's
-// terms, and the field diagram. Rule amendments join it with rules evolution.
+// terms, and the field diagram. Rule amendments join it with rules evolution, and the sport's
+// traditions with Culture (GDD v1.22).
 
 /** Visiting players are drawn in a neutral color so the founding club stands out. */
 export const VISITORS = "#8f99a6";
@@ -118,6 +120,7 @@ export function Rulebook({
         </div>
       </div>
       <AmendRules snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
+      <TraditionsSection snapshot={snapshot} />
     </section>
   );
 }

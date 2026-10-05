@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { RULE_AXES, TRADITION_TYPES } from "../src/content";
+import en from "../src/renderer/src/i18n/locales/en.json";
 import {
   applyAction,
   type EventRecord,
@@ -7,6 +9,7 @@ import {
   offerEvents,
   PLAYER_INDEX,
   seasonFacts,
+  snapshot,
   updateCulture,
 } from "../src/sim";
 import { clubIds, fresh, ofType, withSeason, withTradition } from "./culture-helpers";
@@ -123,6 +126,40 @@ describe("the Culture category: reach", () => {
     for (const id of followers?.slice(1) ?? []) {
       const links = world.inbound[index.get(id) ?? -1] ?? [];
       expect(links.some((l) => l.proximity > 0 && followerIndexes.has(l.source))).toBe(true);
+    }
+  });
+});
+
+describe("what the player sees", () => {
+  it("snapshots traditions, the trophy's rename cost and rivals' flavor traditions", () => {
+    const state = fresh();
+    const [, a = 0, b = 0] = clubIds(state);
+    const view = snapshot(updateCulture(withSeason(state, a, b), world), world);
+    const [trophy] = view.culture.traditions;
+    expect(trophy).toMatchObject({
+      type: "trophy",
+      lost: null,
+      followers: [state.anchorCountryId],
+    });
+    expect(trophy?.rules.map((r) => r.axis)).toEqual(RULE_AXES);
+    expect(view.culture.naming).toBe(trophy?.id);
+    expect(view.culture.rename).toMatchObject({ trophyId: trophy?.id, blocker: "naming" });
+    expect(view.culture.rivals.length).toBeGreaterThan(0);
+    expect(view.flagship.clubs.every((club) => club.ground.length > 0)).toBe(true);
+  });
+
+  it("has words for every tradition type, origin fact, loss and card", () => {
+    const culture = en.culture as unknown as Record<string, Record<string, string>>;
+    const cards = en.events.cards as unknown as Record<string, Record<string, string>>;
+    for (const type of TRADITION_TYPES) {
+      expect(culture.types?.[type]).toBeTruthy();
+      expect(culture.byType?.[type]).toBeTruthy();
+      expect(culture.facts?.[type]).toBeTruthy();
+      expect(cards["tradition-born"]?.[`body_${type}`]).toBeTruthy();
+    }
+    for (const reason of ["faded", "folded", "broken", "renamed"]) {
+      expect(culture.lost?.[reason]).toBeTruthy();
+      expect(cards["tradition-lost"]?.[`body_${reason}`]).toBeTruthy();
     }
   });
 });

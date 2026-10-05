@@ -2,6 +2,7 @@ import type { NodeEffect } from "../content";
 import { focusCostFromExposure } from "./actions";
 import { seasonalWindowOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
 import { mediaRevenueFactor } from "./countermoves";
+import { type CultureSnapshot, cultureSnapshot } from "./culture";
 import { type EventSnapshot, eventSnapshots } from "./events";
 import type { EventState } from "./events-state";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
@@ -151,6 +152,8 @@ export interface TurnSnapshot {
   identity: IdentitySnapshot;
   /** The rule traits, their amendment options with price, backlash and hints (GDD v1.20). */
   rules: RulesSnapshot;
+  /** Traditions, the trophy's name and rivals' flavor traditions (GDD v1.22). */
+  culture: CultureSnapshot;
 }
 
 export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeSnapshot[] {
@@ -293,5 +296,6 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     flagship: flagshipSnapshot(state, world),
     identity: identitySnapshot(state, world),
     rules: rulesSnapshot(state, world),
+    culture: cultureSnapshot(state, world, seasonalWindowOpen(state, world.config)),
   };
 }
