@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { healthLevelSchema, leagueTierSchema, timedEventEffectSchema } from "../content";
+import {
+  healthLevelSchema,
+  leagueTierSchema,
+  timedEventEffectSchema,
+  traditionTypeSchema,
+} from "../content";
 
 /** The recorded flagship season a season card tells (GDD v1.15). */
 export const seasonFactsSchema = z.strictObject({
@@ -36,6 +41,12 @@ export const starFactsSchema = z.strictObject({
   seasons: z.int().nonnegative(),
 });
 
+/** The tradition a tradition card tells (GDD v1.22): its id and type, as recorded. */
+export const traditionFactsSchema = z.strictObject({
+  traditionId: z.int().positive(),
+  type: traditionTypeSchema,
+});
+
 export const eventRecordSchema = z.strictObject({
   id: z.int().positive(),
   templateId: z.string(),
@@ -50,6 +61,7 @@ export const eventRecordSchema = z.strictObject({
     rivalId: z.string().nullable(),
     season: seasonFactsSchema.nullable(),
     star: starFactsSchema.nullable(),
+    tradition: traditionFactsSchema.nullable(),
   }),
   resolution: z
     .strictObject({
@@ -82,6 +94,7 @@ export const eventStateSchema = z.strictObject({
 export type EventRecord = z.infer<typeof eventRecordSchema>;
 export type SeasonFacts = z.infer<typeof seasonFactsSchema>;
 export type StarFacts = z.infer<typeof starFactsSchema>;
+export type TraditionFacts = z.infer<typeof traditionFactsSchema>;
 export type EventState = z.infer<typeof eventStateSchema>;
 export const emptyEvents = (landmarkCursor: number): EventState => ({
   nextId: 1,

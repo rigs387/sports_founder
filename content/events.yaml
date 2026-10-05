@@ -346,7 +346,8 @@ cards:
         effects:
           - { type: conversion, target: hardcore, factor: 1.2, quarters: 4 }
           - { type: leagueHealth, steps: -1 }
-      # No effect yet: the answer is recorded for the derby tradition (GDD v1.15).
+          # One extra meeting toward a derby between the two clubs (GDD v1.22).
+          - { type: derbyStoke }
       - { id: cool-it, cost: 6, effects: [] }
       - { id: hold, cost: 0, effects: [] }
   - id: season-underdog
@@ -431,6 +432,42 @@ cards:
   # and come after the season cards. Unanswered decisions take their free default: the backed star
   # retires without honors or a successor, the backed star's move stands, the drop is ridden out.
   # Kept subtle on purpose: stars are a story first.
+  # Traditions (GDD v1.22): a moment for every tradition born or lost, told from the facts recorded
+  # on the tradition. Each uses a moment slot; a birth pays culture.birthPP by its type (config).
+  - id: tradition-born
+    kind: moment
+    tone: positive
+    priority: 200
+    trigger: tradition
+    tradition: born
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: tradition-lost
+    kind: moment
+    tone: pressure
+    priority: 200
+    trigger: tradition
+    tradition: lost
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   - id: star-breakout
     kind: moment
     tone: positive

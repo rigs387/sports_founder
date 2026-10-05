@@ -16,7 +16,14 @@ import {
   serializeSave,
   stepQuarter,
 } from "../src/sim";
-import { cardless, countryIndex, setupFor, withConfig, world } from "./helpers";
+import {
+  cardless,
+  countryIndex,
+  setupFor,
+  withConfig,
+  withoutTraditionEvents,
+  world,
+} from "./helpers";
 
 // Leading players (GDD v1.16, tech plan 2.6 step 2).
 
@@ -144,7 +151,8 @@ describe("save format 11", () => {
     // A format 10 save has no players, tallies or top scorers.
     const { players: _p, nextPlayerId: _n, tallies: _t, ...rest } = played.flagship;
     const flagship = { ...rest, seasons: rest.seasons.map(({ topScorer: _s, ...s }) => s) };
-    const v10 = JSON.stringify({ formatVersion: 10, state: { ...played, flagship } });
+    const events = withoutTraditionEvents(played.events);
+    const v10 = JSON.stringify({ formatVersion: 10, state: { ...played, flagship, events } });
     const loaded = deserializeSave(v10, world);
     const active = activeClubs(loaded.flagship).map((club) => club.id);
     expect(loaded.flagship.players.map((p) => p.clubId)).toEqual(active);

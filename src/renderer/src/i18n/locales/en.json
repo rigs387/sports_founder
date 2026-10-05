@@ -60,7 +60,8 @@
       "clubRating_field_other": "Every other club {{count, number(signDisplay: always)}} rating steps (hidden club strength).",
       "starHonors": "Retire them with honors: their influence fades over {{seasons, number}} {{seasonsNoun}} instead of stopping.",
       "starMentor": "{{candidate}} gets a lift to their scoring this {{seasonNoun}}, then takes the backing with {{share, number(style: percent)}} of the influence.",
-      "starKeep": "Costs the league {{cash, number(maximumFractionDigits: 0)}} in cash. The move is cancelled."
+      "starKeep": "Costs the league {{cash, number(maximumFractionDigits: 0)}} in cash. The move is cancelled.",
+      "derbyStoke": "Counts as one more meeting toward a derby between these two clubs."
     },
     "blockers": {
       "missing": "This story has already been resolved.",
@@ -259,6 +260,22 @@
       "rival-championship": {
         "title": "The world tunes in to {{rival}}",
         "body": "This year belongs to {{tournament}}. For a year {{rival}} pulls new fans in every country, even in {{country}}, before the excitement fades."
+      },
+      "tradition-born": {
+        "title": "A tradition is born: {{name}}",
+        "body_derby": "{{clubA}} and {{clubB}} finished on top together in {{count}} of the last {{span}} seasons. Their fans now call it {{name}}.",
+        "body_rite": "{{club}} won their first title. Before every home {{match}} their fans now keep {{name}}.",
+        "body_legacy": "{{player}} retired after {{count}} seasons as a star. In {{country}} people now call that way of playing {{name}}.",
+        "body_nationalName": "The league in {{country}} has turned Professional, and people there have their own name for the sport: {{name}}.",
+        "body_venue": "{{ground}} has seen {{count}} titles and finals. It is now one of the famous grounds of the sport.",
+        "body_trophy": "The first {{season}} of the league in {{country}} is over, and its champions lifted {{name}}. You can give the trophy its name now, free."
+      },
+      "tradition-lost": {
+        "title": "A tradition is lost: {{name}}",
+        "body_faded": "Nothing has happened in years to keep {{name}} alive, and fans in {{country}} have let it go.",
+        "body_folded": "The league in {{country}} folded, and {{name}} went with it.",
+        "body_broken": "{{name}} did not survive the change to the rules. Its fans in {{country}} no longer keep it.",
+        "body_renamed": "{{name}} is history: the trophy has a new name."
       }
     },
     "arrived": "Already landed, whatever you choose:",

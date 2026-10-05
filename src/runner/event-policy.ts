@@ -27,6 +27,7 @@ import {
 //   leagueHealth       rungs climbed
 //   clubRating         rating steps closed between the champion and the mean of the rest of
 //                      the field (flagship season cards: competitive balance)
+//   derbyStoke         a share of a derby's shelter against hardcore turnover (GDD v1.22)
 //   pp                 PP gained, at the bot's PP price
 // The price is cost × ppPrice ÷ the PP cost multiplier, because PP income grows with the sport as
 // fast as prices do.
@@ -155,6 +156,12 @@ function effectValue(
         balance * weights.balance -
         (keepCost(state, world, countryId) / league.cash) * weights.league
       );
+    }
+    case "derbyStoke": {
+      // A share of a derby (GDD v1.22): one meeting of those it needs, at its starting strength,
+      // as the hardcore turnover it would spare at full weight.
+      const { derby, startStrength, turnoverCut, weightCap } = world.config.culture;
+      return (startStrength / weightCap / derby.meetings) * turnoverCut * weights.hardcore;
     }
     case "clubRating": {
       const clubs = activeClubs(state.flagship);

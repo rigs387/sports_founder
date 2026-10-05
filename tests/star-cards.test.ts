@@ -260,10 +260,12 @@ describe("save format 15", () => {
     }
     // A version 14 save has no star cards and no star landmarks it could not have made.
     raw.state.events.pending = raw.state.events.pending.filter(
-      (e: { templateId: string }) => !e.templateId.startsWith("star-"),
+      (e: { templateId: string }) =>
+        !e.templateId.startsWith("star-") && !e.templateId.startsWith("tradition-"),
     );
     raw.state.events.history = raw.state.events.history.filter(
-      (e: { templateId: string }) => !e.templateId.startsWith("star-"),
+      (e: { templateId: string }) =>
+        !e.templateId.startsWith("star-") && !e.templateId.startsWith("tradition-"),
     );
     raw.state.landmarks = raw.state.landmarks.filter(
       (l: { kind: string }) =>

@@ -184,6 +184,7 @@ export function offerStarCards(
         rivalId: null,
         season: null,
         star: fact.facts,
+        tradition: null,
       },
       resolution: null,
     });

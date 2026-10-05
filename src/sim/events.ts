@@ -12,6 +12,7 @@ import {
   starEffectBlocker,
   takesNoSlot,
 } from "./star-cards";
+import { birthPP, offerTraditionCards } from "./tradition-cards";
 import { type GameState, HEALTH_LEVELS, PLAYER_INDEX, type World } from "./types";
 
 export function eventFactors(
@@ -74,6 +75,7 @@ function offerSeasonCards(
           rivalId: null,
           season: facts,
           star: null,
+          tradition: null,
         },
         resolution: null,
       });
@@ -148,11 +150,20 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
     moment: caps.moment - used("moment", seasonEvents.pending),
     decision: caps.decision - used("decision", seasonEvents.pending),
   });
-  const pending = [...starEvents.pending];
+  // Tradition moments (GDD v1.22) follow, in the moment slots left.
+  const traditionEvents = offerTraditionCards(
+    state,
+    world,
+    recent,
+    starEvents,
+    caps.moment - used("moment", starEvents.pending),
+  );
+  const pending = [...traditionEvents.pending];
   const offered = { ...state.events.offered };
-  let nextId = starEvents.nextId;
+  let nextId = traditionEvents.nextId;
   for (const card of [...world.events.cards].sort((a, b) => b.priority - a.priority)) {
-    if (card.trigger === "seasonEnd" || card.trigger === "star") continue;
+    if (card.trigger === "seasonEnd" || card.trigger === "star" || card.trigger === "tradition")
+      continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
     for (const { country } of ranked) {
       // The champion and breakout moments never take a moment slot; a season story counts as a
@@ -209,6 +220,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
           rivalId: fact && "sportId" in fact ? fact.sportId : null,
           season: null,
           star: null,
+          tradition: null,
         },
         resolution: null,
       });
@@ -218,7 +230,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   return {
     ...state,
     events: {
-      ...starEvents,
+      ...traditionEvents,
       pending,
       offered,
       nextId,
@@ -242,6 +254,8 @@ export function eventEffects(
     return card.choices.find((choice) => choice.id === choiceId)?.effects ?? [];
   if (card.star === "breakout")
     return [{ type: "pp", amount: breakoutPP(world, event) }, ...card.effects];
+  if (card.tradition === "born")
+    return [{ type: "pp", amount: birthPP(world, event) }, ...card.effects];
   if (card.story !== "champion") return card.effects;
   const base = world.config.flagship.stories.championPP[event.facts.leagueTier ?? "amateur"];
   const fame = Math.min(1, venueStrength(state, event.countryId));
@@ -322,6 +336,20 @@ function applyEffects(
       effect.type === "starKeep"
     ) {
       next = applyStarEffect(next, world, event, effect);
+      continue;
+    }
+    if (effect.type === "derbyStoke") {
+      // One extra meeting toward a derby between the season's top two (GDD v1.22).
+      const season = event.facts.season;
+      if (!season) throw new Error("Derby stoke without a season");
+      const clubIds = [season.championId, season.runnerUpId].sort((a, b) => a - b);
+      next = {
+        ...next,
+        culture: {
+          ...next.culture,
+          stokes: [...next.culture.stokes, { clubIds, season: season.season }],
+        },
+      };
       continue;
     }
     if (effect.type === "clubRating") {
@@ -483,6 +511,11 @@ export function eventProblems(state: GameState, world: World): string[] {
       problems.push("Season facts on the wrong card");
     const star = event.facts.star;
     if ((card.star !== null) !== (star !== null)) problems.push("Star facts on the wrong card");
+    const told = event.facts.tradition;
+    if ((card.tradition !== null) !== (told !== null))
+      problems.push("Tradition facts on the wrong card");
+    if (told && told.traditionId >= state.culture.nextId)
+      problems.push("Event names an unknown tradition");
     if (
       star &&
       (star.playerId >= state.flagship.nextPlayerId ||

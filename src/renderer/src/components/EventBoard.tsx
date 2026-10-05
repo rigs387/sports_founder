@@ -46,6 +46,7 @@ function Effect({ effect, star = {} }: { effect: EventEffect; star?: StarValues 
     return <li>{t(effect.steps > 0 ? "events.effects.healthUp" : "events.effects.healthDown")}</li>;
   if (effect.type === "clubRating")
     return <li>{t(`events.effects.clubRating_${effect.target}`, { count: effect.steps })}</li>;
+  if (effect.type === "derbyStoke") return <li>{t("events.effects.derbyStoke")}</li>;
   return (
     <li className={effect.type === "hardcoreDemotion" ? "event-tradeoff" : undefined}>
       {t(`events.effects.${effect.type === "fanShift" ? effect.target : effect.type}`, {

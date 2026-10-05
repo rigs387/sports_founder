@@ -479,10 +479,21 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
   17: (save, world) => {
     const flagship = save.state.flagship as FlagshipState;
     const landmarks = Array.isArray(save.state.landmarks) ? save.state.landmarks : [];
+    // Recorded events tell no tradition.
+    const events = save.state.events as Record<string, unknown>;
+    const told = (list: unknown) =>
+      (Array.isArray(list) ? list : []).map((event: Record<string, unknown>) => ({
+        ...event,
+        facts: {
+          ...(event.facts as Record<string, unknown>),
+          tradition: (event.facts as Record<string, unknown>).tradition ?? null,
+        },
+      }));
     return {
       formatVersion: 18,
       state: {
         ...save.state,
+        events: { ...events, pending: told(events.pending), history: told(events.history) },
         culture: newCulture(
           Number(save.state.seed),
           flagship.season,

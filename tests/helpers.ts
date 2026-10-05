@@ -101,3 +101,10 @@ export function cardless(base: World): World {
     },
   };
 }
+
+/** The events without tradition cards: what a save older than format 18 could hold. */
+export function withoutTraditionEvents(events: GameState["events"]): GameState["events"] {
+  const keep = (list: GameState["events"]["pending"]) =>
+    list.filter((event) => event.facts.tradition === null);
+  return { ...events, pending: keep(events.pending), history: keep(events.history) };
+}

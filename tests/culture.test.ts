@@ -11,7 +11,7 @@ import {
   endTurn,
   serializeSave,
 } from "../src/sim";
-import { setupFor, world } from "./helpers";
+import { setupFor, withoutTraditionEvents, world } from "./helpers";
 
 // Culture, first build (GDD v1.22).
 
@@ -65,7 +65,8 @@ describe("state and saves", () => {
   it("migrates a version 17 save with no traditions and no retroactive history", () => {
     let state = createCampaign(world, setupFor(7));
     for (let i = 0; i < 12; i += 1) state = endTurn(state, world);
-    const { culture: _c, ...v17 } = state;
+    const { culture: _c, ...rest } = state;
+    const v17 = { ...rest, events: withoutTraditionEvents(state.events) };
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 17, state: v17 }), world);
     expect(loaded.culture.traditions).toEqual([]);
     expect(loaded.culture.startSeason).toBe(state.flagship.season);

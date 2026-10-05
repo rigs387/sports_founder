@@ -41,7 +41,12 @@ export const eventEffectSchema = z.union([
   z.strictObject({ type: z.literal("starHonors") }),
   z.strictObject({ type: z.literal("starMentor") }),
   z.strictObject({ type: z.literal("starKeep") }),
+  // The repeat-final card only (GDD v1.22): one extra meeting toward a derby between the two clubs.
+  z.strictObject({ type: z.literal("derbyStoke") }),
 ]);
+/** The tradition facts a card can tell (GDD v1.22): a tradition born or lost. */
+export const TRADITION_CARDS = ["born", "lost"] as const;
+export type TraditionCard = (typeof TRADITION_CARDS)[number];
 /** The flagship star facts a card can tell (GDD v1.16). */
 export const STAR_CARDS = [
   "breakout",
@@ -93,11 +98,14 @@ const template = z
       "leaguePressure",
       "seasonEnd",
       "star",
+      "tradition",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),
     /** star cards only: the star fact the card tells. */
     star: z.enum(STAR_CARDS).nullable().default(null),
+    /** tradition cards only: whether the card tells a birth or a loss. */
+    tradition: z.enum(TRADITION_CARDS).nullable().default(null),
     minQuarter: z.int().nonnegative(),
     minFans: z.int().nonnegative(),
     minHardcore: z.int().nonnegative(),
@@ -131,6 +139,15 @@ const template = z
     if (season !== (card.story !== null)) issue("Season stories need the seasonEnd trigger");
     const star = card.trigger === "star";
     if (star !== (card.star !== null)) issue("Star cards need the star trigger");
+    const tradition = card.trigger === "tradition";
+    if (tradition !== (card.tradition !== null))
+      issue("Tradition cards need the tradition trigger");
+    if (tradition) {
+      if (card.kind !== "moment" || card.cooldownTurns !== null)
+        issue("Tradition cards are moments that follow recorded facts: no cooldown");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("Tradition cards tell their own country: campaign scope, no anchor or health filter");
+    }
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");
     if (star) {
@@ -159,6 +176,8 @@ const template = z
         !["leaguePressure", "leagueFormed", "leaguePromoted", "seasonEnd"].includes(card.trigger)
       )
         issue("Health effects require a league fact");
+      if (effect.type === "derbyStoke" && card.story !== "repeatFinal")
+        issue("derbyStoke belongs to the repeat-final season card only");
       if (effect.type === "clubRating" && !season)
         issue("Club rating effects belong to flagship season cards only");
       if (
@@ -196,6 +215,13 @@ export const eventsFileSchema = z
         code: "custom",
         path: ["cards"],
         message: "Two cards tell the same season story",
+      });
+    const told = data.cards.flatMap((c) => (c.tradition === null ? [] : [c.tradition]));
+    if (new Set(told).size !== told.length)
+      ctx.addIssue({
+        code: "custom",
+        path: ["cards"],
+        message: "Two cards tell the same tradition fact",
       });
     const stars = data.cards.flatMap((c) => (c.star === null ? [] : [c.star]));
     if (new Set(stars).size !== stars.length)
