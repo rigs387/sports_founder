@@ -638,6 +638,21 @@ export const configFileSchema = z.strictObject({
     }),
   }),
   seasonalWindow: z.strictObject({ quarterOfYear: z.int().min(1).max(4) }),
+  /** Rules evolution, first build (GDD v1.20). */
+  rulesEvolution: z.strictObject({
+    basePrice: z.number().min(0),
+    /** Jumps for traits whose options have no order; others count steps between options. */
+    fixedJump: z.record(z.string(), z.int().min(1)),
+    backlash: z.strictObject({
+      sharePerJump: unitInterval,
+      fullAgeYears: z.number().positive(),
+      anchorFactor: z.number().min(1),
+      fitWeight: z.number().min(0),
+      maxShare: unitInterval,
+    }),
+    /** Markets besides the anchor whose fit hints a review shows. */
+    previewMarkets: z.int().min(0),
+  }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({
     nameMinLength: z.int().min(1),

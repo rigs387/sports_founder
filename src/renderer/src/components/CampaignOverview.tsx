@@ -64,7 +64,7 @@ export function CampaignOverview({
       {view === "sport" && <ActionFeedback />}
       {view === "sport" && (
         <>
-          <Rulebook snapshot={snapshot} names={names} />
+          <Rulebook snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           <p>
             {t("campaign.meta", { seed: snapshot.seed, country: name(snapshot.anchorCountryId) })}
           </p>

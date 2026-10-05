@@ -91,7 +91,10 @@ names; generic leagues/orgs/teams, all in one moddable names file. Rivals hold t
 real starting shares are home, they never spread or grow past it on their own, and they lose ground
 only to the player.
 
-**Rules Evolution:** PP cost, seasonal window only, max 1/year. Backlash scales with hardcore base
+**Rules Evolution:** PP cost, seasonal window only, max 1/year. First build (v1.20): one rule trait
+per amendment, priced and punished by the jump; purists turn casual everywhere, more in the anchor,
+where the old rule fit better and the older the rule; the review shows price, loss and hints for
+the anchor and top five markets; dated amendments in the Rulebook; world proposals come with deals. Backlash scales with hardcore base
 and rule age (tradition). Global rulebook. Proposals from player, broadcasters, sponsors,
 league directors.
 

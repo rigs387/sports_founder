@@ -94,7 +94,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     i === 0 ? setup.anchorCountryId : null,
   );
 
-  const founded: Omit<GameState, "identity"> = {
+  const founded: Omit<GameState, "identity" | "rules"> = {
     seed: setup.seed,
     rng: createRngState(setup.seed),
     anchorCountryId: setup.anchorCountryId,
@@ -132,7 +132,8 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
       genome.data.scoring,
     ),
   };
-  return foundSport(founded, world, identitySetup);
+  // Key order follows the save schema, so a new campaign re-serializes byte-identically.
+  return { ...foundSport(founded, world, identitySetup), rules: { amendments: [] } };
 }
 
 /** The default genome: the first quick-start preset in content. */

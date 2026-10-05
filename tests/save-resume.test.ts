@@ -78,7 +78,10 @@ describe("save and resume", () => {
     expect(resumed).toStrictEqual(uninterrupted);
     expect(serializeSave(resumed)).toBe(serializeSave(uninterrupted));
     // The save must have carried real genome, focus, spread, league and history state.
-    expect(midway.genome).toStrictEqual(setup.genome);
+    // The bot may amend rules (GDD v1.20): the genome is the setup's with each amendment applied.
+    const amended = { ...setup.genome };
+    for (const a of midway.rules.amendments) Object.assign(amended, { [a.axis]: a.to });
+    expect(midway.genome).toStrictEqual(amended);
     expect(midway.focus.length).toBeGreaterThanOrEqual(1);
     expect(
       uninterrupted.countries.filter((c) => (c.fans[0]?.casual ?? 0) > 0).length,
@@ -325,6 +328,7 @@ describe("saves with the growth tree (format 5)", () => {
       seasonFormat: _s,
       flagship: _f,
       identity: _i,
+      rules: _r,
       ...v4State
     } = withoutTree;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 4, state: v4State }), world);
@@ -334,6 +338,7 @@ describe("saves with the growth tree (format 5)", () => {
         ...withoutTree,
         events: emptyEvents(withoutTree.landmarks.length),
         ...migratedFlagship(withoutTree),
+        rules: { amendments: [] },
       }),
     );
     const later = playWithPolicy(loaded, 6);

@@ -349,6 +349,37 @@ the game's calendar, not the sport's season). Renamed terms each get a full sent
 Rulebook. Save format 16. `tests/identity.test.ts`; smoke screenshots the founding page and the
 Rulebook in both layouts.
 
+
+### 2.9 Build Plan: Rules Evolution, First Build (GDD v1.20)
+
+Every number is config (`rulesEvolution`).
+
+1. **Amendments in the simulation.** `GameState.rules`: the amendments made (turn, quarter, year,
+   axis, from, to, jump, hardcore fans who turned casual) and the year of the last one. The
+   `amendRule` action through `applyAction` with typed blockers (window, already amended this
+   year, identity trait, same option, PP); the genome changes at once; the flagship's season rule
+   already follows the genome at each season's start. Landmark `ruleAmended`. Save format 17;
+   format 16 migrates with no amendments.
+2. **Backlash.** Per country: share = base × jump × min(1, rule age ÷ full age) × (anchor factor
+   in the anchor) × (1 + fit weight × how much worse the new option fits there, if it does),
+   capped; hardcore fans above the turnover floor turn casual. A preview in the snapshot: per rule
+   option, the price, the hardcore fans who would turn casual, and fit hints for the anchor and
+   the five biggest markets.
+3. **Bots.** The builder amends when the change's fit gain across its fans' markets beats its
+   backlash by a margin; other bots never amend. Measure once with `--experiment pacing`.
+4. **Screen.** The Rulebook gains "Amend the rules": each rule trait with its option and how long
+   it has stood; in the window, pick a trait and option, review, confirm. Outside the window or
+   after this year's amendment the controls say why. Amendments listed with dates.
+5. **Smoke and docs.** Smoke amends a rule in the window through the review step and checks the
+   Rulebook lists it; tests cover price, jump, blockers, backlash, timing, save and migration.
+
+*Built 2026-10-04.* Base price 100 PP; backlash 3% per jump at full age (40 years), anchor × 2, fit
+weight 2, cap 25%. The builder amends a median 3–4 times per campaign, first around turn 45. Pacing
+(builder, 12 anchors × 6 seeds): amendments dropped #1 lost before the win from 53% to 34% (the
+leader pulls clear faster on a better-fitting rulebook), so world championships went one step
+stronger (casual × 1.26, hardcore × 1.9, home + 2.6%), giving 34/68 (50%); first win median turn
+167–170. The price is small against late-game PP; the backlash is the real cost. Save format 17.
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)

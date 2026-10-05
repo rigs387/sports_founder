@@ -4,6 +4,7 @@ import { eventProblems } from "./events";
 import { flagshipProblems } from "./flagship";
 import { forkOf } from "./growth";
 import { identityStateProblems } from "./identity";
+import { rulesProblems } from "./rules";
 import {
   ESCALATION_LEVELS,
   type GameState,
@@ -24,6 +25,7 @@ export function invariantsOf(state: GameState, world: World): string[] {
     ...eventProblems(state, world),
     ...flagshipProblems(state, world),
     ...identityStateProblems(state, world),
+    ...rulesProblems(state),
   ];
 
   if (!Number.isInteger(state.turn) || state.turn < 1)

@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-04",
-  design: "GDD v1.19",
+  design: "GDD v1.20",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -13,12 +13,12 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-04",
-    tests: 416,
-    files: 37,
-    note: "npm run check passed after sport identity (type checks, Biome, purity, 416 tests in 37 files). Lint has existing visual-study warnings.",
+    tests: 425,
+    files: 38,
+    note: "npm run check passed after rules evolution (type checks, Biome, purity, 425 tests in 38 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-04",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms and opens the soccer world championship card; save/resume continued identically.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; save/resume continued identically.",
   },
   eventDeck: { current: 26, target: "40–60" },
   phases: [
@@ -76,7 +76,7 @@ window.SF_PROGRESS = {
     },
     {
       title: "The #1 hold is now a contest",
-      text: "Lead lost before the win in 36 of 68 campaigns (53%), on target, after rival world championships and reclaim (was 33%). Builder, 12 typical anchors × 6 seeds, 200 turns. Reclaim adds little; championships carry it. Remeasure when new pressure lands.",
+      text: "Lead lost before the win in 34 of 68 campaigns (50%), on target, after amendments (which made it 34%) and one step stronger world championships. Builder, 12 typical anchors × 6 seeds, 200 turns. Reclaim adds little; championships carry it. Remeasure when new pressure lands.",
       date: "2026-10-04",
       system: "rivals",
     },
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-04",
+      type: "Built",
+      title: "Rules evolution, first build",
+      text: "GDD v1.20, tech plan 2.9: amend one rule trait a year in the seasonal window through a review step (price, the purists who will turn casual, fit hints for the anchor and top five markets). Backlash grows with the rule's age and the jump, doubles in the anchor and rises where the old rule fit better. Dated amendments in the Rulebook. The builder bot amends 3–4 times a campaign; championships strengthened one step to keep the #1 contest at 50%. Save format 17.",
+    },
     {
       date: "2026-10-04",
       type: "Design",
@@ -470,14 +476,26 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 8",
       icon: "09",
-      summary: "Keep the inventor role alive after creation, with changes that have consequences.",
-      next: "Add a seasonal rule-change action, PP cost, yearly limit and dated amendments.",
+      summary:
+        "Amend one rule a year in the seasonal window; purists push back, and the Rulebook keeps the dates.",
+      next: "Proposals from broadcasters, sponsors and directors with the deals build; traditions feed backlash with Culture.",
       depends: ["creation"],
-      sources: [["Rules evolution design", "../../sports-founder-gdd.md#progression--economy"]],
+      sources: [
+        ["Rules evolution design", "../../sports-founder-gdd.md#progression--economy"],
+        ["Rules evolution", "../rules/README.md"],
+        ["Rules tests", "../../tests/rules.test.ts"],
+        [
+          "Rules build plan",
+          "../../sports-founder-tech-plan.md#29-build-plan-rules-evolution-first-build-gdd-v120",
+        ],
+      ],
       items: [
-        ["planned", "Player changes to evolvable traits in seasonal windows"],
-        ["planned", "PP costs, annual limits and rulebook amendments"],
-        ["planned", "Backlash based on hardcore fans, rule age and traditions"],
+        ["built", "Player changes to evolvable traits in seasonal windows, with a review step"],
+        ["built", "PP costs, annual limits and dated rulebook amendments"],
+        [
+          "partial",
+          "Backlash by hardcore base, rule age, jump, anchor and fit lost; traditions wait for Culture",
+        ],
         ["planned", "Rule proposals from sponsors, broadcasters and directors"],
       ],
     },

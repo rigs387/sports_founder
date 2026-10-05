@@ -757,7 +757,8 @@
       "bailoutLeague": "Funded a bailout in {{country}}.",
       "moveSeat": "After this season the seat will be in {{country}}.",
       "backStar": "You now back {{player}}. Their influence grows each season they play at the seat.",
-      "dropStar": "You no longer back {{player}}."
+      "dropStar": "You no longer back {{player}}.",
+      "amendRule": "{{trait}} is now {{option}}. The amendment is in the rulebook."
     }
   },
   "map": {
@@ -1186,8 +1187,7 @@
         "large-team-small-field": "Large sides on a small field leave little room to move.",
         "gear-no-contact": "Players wear protective gear in a game without contact, just in case.",
         "ice-marathon": "An endurance game on ice, played long: spectators are advised to bring soup."
-      },
-      "amendments": "Amendments to these rules will be recorded here."
+      }
     },
     "diagram": {
       "heading": "The field",
@@ -1207,5 +1207,48 @@
         "ice": "ice"
       }
     }
+  },
+  "rules": {
+    "heading": "Amend the rules",
+    "intro": "Once a year, in the seasonal window, you may change one rule. Purists push back: some hardcore fans turn casual, more the older the rule, the bigger the change, in {{anchor}}, and where the old rule suited fans better.",
+    "closed": "Rules can be amended only in the seasonal window.",
+    "done": "The rules have been amended this year. The next amendment waits for next year's window.",
+    "open": "The seasonal window is open: you may amend one rule this year.",
+    "trait": "Rule",
+    "current": "Now",
+    "since": "Since {{year}}",
+    "change": "Change {{trait}}",
+    "choose": "Change {{trait}} to",
+    "option": "{{option}}",
+    "optionCost": "{{price, number(maximumFractionDigits: 1)}} PP · {{lost, number}} hardcore fans turn casual",
+    "review": "Review the amendment",
+    "reviewText": "Change {{trait}} from {{from}} to {{to}} for {{price, number(maximumFractionDigits: 1)}} PP?",
+    "reviewLoss_zero": "No hardcore fans will object.",
+    "reviewLoss_one": "{{count, number}} hardcore fan will turn casual in protest, now.",
+    "reviewLoss_other": "{{count, number}} hardcore fans will turn casual in protest, now.",
+    "reviewTiming": "Fans feel the new rule from next quarter; the flagship plays it from its next {{seasonNoun}}.",
+    "hintsHeading": "How it fits where you are strongest",
+    "hintsNote": "Only your birthplace and five biggest markets are shown. Elsewhere you find out on the map.",
+    "confirm": "Amend the rulebook",
+    "back": "Keep the rule",
+    "blockers": {
+      "window": "Rules can be amended only in the seasonal window.",
+      "thisYear": "The rules have already been amended this year.",
+      "identity": "Identity traits never change.",
+      "same": "That is already the rule.",
+      "pp": "Needs {{price, number(maximumFractionDigits: 1)}} PP; you have {{pp, number(maximumFractionDigits: 1)}}."
+    },
+    "amendmentsHeading": "Amendments",
+    "amendment": "{{trait}}: {{from}} to {{to}}, amended {{year}}.",
+    "amendmentObjection": "{{trait}}: {{from}} to {{to}}, amended {{year}}, over purist objection.",
+    "hintLabels": {
+      "strong": "strong gain",
+      "good": "gain",
+      "poor": "loss",
+      "neutral": "no change"
+    },
+    "inForce": "In force",
+    "amend": "Amend",
+    "changeShort": "Change"
   }
 }

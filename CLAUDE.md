@@ -137,6 +137,11 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   emblem. Option lists are ids in `content/identity.yaml`; words are in the locale file. Defaults
   come from the seed on their own random stream; identity never touches the simulation's numbers.
   League text uses the sport's terms through `useTermVars` (`src/renderer/src/identity/terms.ts`).
+- Rules evolution (GDD v1.20) lives in `src/sim/rules.ts`: the `amendRule` action (seasonal
+  window, once a year, rule traits only), price by jump and tier, purist backlash (hardcore →
+  casual everywhere, by rule age and jump, heavier in the anchor and where the old rule fit
+  better), `GameState.rules` and the review snapshot. The genome is the setup's with each
+  amendment applied; invariants check it.
 - The win lives in `GameState.win` (`src/sim/win.ts`), never in `outcome`: winning must not end a
   campaign. Checked once per turn after the tier track: #1 by global Fandom Score held
   `win.holdTurns` turns at PP tier `win.requiredTier`. After the win an anchor collapse folds the
@@ -201,6 +206,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   Format 14 migrates with no star facts, no players named, no honors or mentees, moves unbacked.
 - Save format 16 adds sport identity (GDD v1.18): `GameState.identity`. Format 15 migrates to
   the seed's defaults with the anchor's oldest club founding the sport under its own name.
+- Save format 17 adds rules evolution (GDD v1.20): `GameState.rules.amendments`. Format 16
+  migrates with no amendments.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

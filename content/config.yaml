@@ -343,8 +343,8 @@ rivalAI:
   # × (1 + boost) and the level it rebuilds toward is home × (1 + homeLift); that ground ages away
   # afterward. Stacks with the rival's own countermoves.
   tournaments:
-    - { sportId: soccer, firstYear: 2026, everyYears: 4, startQuarterOfYear: 2, quarters: 4, casualConversionBoost: 0.18, hardcoreConversionBoost: 0.6, homeLift: 0.018 }
-    - { sportId: cricket, firstYear: 2027, everyYears: 4, startQuarterOfYear: 4, quarters: 4, casualConversionBoost: 0.18, hardcoreConversionBoost: 0.6, homeLift: 0.018 }
+    - { sportId: soccer, firstYear: 2026, everyYears: 4, startQuarterOfYear: 2, quarters: 4, casualConversionBoost: 0.26, hardcoreConversionBoost: 0.9, homeLift: 0.026 }
+    - { sportId: cricket, firstYear: 2027, everyYears: 4, startQuarterOfYear: 4, quarters: 4, casualConversionBoost: 0.26, hardcoreConversionBoost: 0.9, homeLift: 0.026 }
 
 # Anchor genome hints (GDD Campaign setup): an option's net lever delta at the anchor country
 # (affinity + accessibility + depth) maps to ++ / + / − by these thresholds.
@@ -462,6 +462,24 @@ leagues:
 # window is open for a turn whose quarters include this quarter of the year.
 seasonalWindow:
   quarterOfYear: 3
+
+# Rules evolution, first build (GDD v1.20). In the seasonal window the player may amend one rule
+# trait a year to any of its options. The jump is the number of steps between the options, or
+# fixedJump for traits whose options have no order. Price = basePrice × the peak tier's cost
+# multiplier × jump. Purist backlash: in every country a share of the player's hardcore fans turn
+# casual: sharePerJump × jump × min(1, the rule's age in years ÷ fullAgeYears), × anchorFactor in
+# the anchor, × (1 + fitWeight × how much the new option's net lever delta there falls short of the
+# old one's), capped at maxShare. A review shows fit hints for the anchor and previewMarkets more.
+rulesEvolution:
+  basePrice: 100
+  fixedJump: { structure: 2 }
+  backlash:
+    sharePerJump: 0.03
+    fullAgeYears: 40
+    anchorFactor: 2
+    fitWeight: 2
+    maxShare: 0.25
+  previewMarkets: 5
 
 # Sport identity (GDD v1.18): limits on the names typed at setup (the sport, the founding club's
 # name and its ground), counted after trimming.

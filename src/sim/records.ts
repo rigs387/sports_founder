@@ -111,6 +111,14 @@ export const landmarks = {
     from: EscalationLevel,
     to: EscalationLevel,
   ): Landmark => ({ kind: "rivalDeescalated", turn, quarter, countryId, sportId, from, to }),
+  ruleAmended: (
+    turn: number,
+    quarter: number,
+    axis: AxisId,
+    from: string,
+    to: string,
+    demoted: number,
+  ): Landmark => ({ kind: "ruleAmended", turn, quarter, axis, from, to, demoted }),
   rivalTournament: (turn: number, quarter: number, sportId: string, year: number): Landmark => ({
     kind: "rivalTournament",
     turn,

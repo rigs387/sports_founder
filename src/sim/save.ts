@@ -23,7 +23,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 16;
+export const SAVE_FORMAT_VERSION = 17;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -102,6 +102,15 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     sportId: z.string().min(1),
     from: escalationLevelSchema,
     to: escalationLevelSchema,
+  }),
+  z.strictObject({
+    kind: z.literal("ruleAmended"),
+    turn: z.int().min(1),
+    quarter: count,
+    axis: axisSchema,
+    from: z.string().min(1),
+    to: z.string().min(1),
+    demoted: count,
   }),
   z.strictObject({
     kind: z.literal("rivalTournament"),
@@ -383,6 +392,20 @@ const gameStateSchema = z.strictObject({
       secondary: z.string().min(1),
     }),
   }),
+  rules: z.strictObject({
+    amendments: z.array(
+      z.strictObject({
+        turn: z.int().min(1),
+        quarter: count,
+        year: z.int(),
+        axis: axisSchema,
+        from: z.string().min(1),
+        to: z.string().min(1),
+        jump: z.int().min(1),
+        demoted: count,
+      }),
+    ),
+  }),
 });
 
 const saveFileSchema = z.strictObject({
@@ -401,6 +424,11 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 16 → 17: rules evolution (GDD v1.20). No amendments yet; every rule has stood since the start.
+  16: (save) => ({
+    formatVersion: 17,
+    state: { ...save.state, rules: { amendments: [] } },
+  }),
   // 15 → 16: sport identity (GDD v1.18). Generated defaults from the seed; the anchor's oldest
   // club becomes the founding club with its place and name unchanged, its ground named after its
   // town.

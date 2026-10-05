@@ -8,6 +8,7 @@ import { verifyFlagship } from "./flagship-smoke";
 import { verifyRulebook } from "./identity-smoke";
 import { verifyLeagues } from "./league-smoke";
 import { verifyMap } from "./map-smoke";
+import { verifyAmendment } from "./rules-smoke";
 import type { FilePrompts } from "./save-files";
 import { verifySaves } from "./save-smoke";
 import { verifySeasonCards } from "./season-smoke";
@@ -137,6 +138,7 @@ async function run(
   const seasonCards = await verifySeasonCards(win, screenshot);
   const starCards = await verifyStarCards(win, screenshot);
   const starsPanel = await verifyStarsPanel(win, screenshot);
+  const amendment = await verifyAmendment(win, screenshot);
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
@@ -156,6 +158,7 @@ async function run(
     seasonCards,
     starCards,
     starsPanel,
+    amendment,
     saves,
     errors,
     remoteRequests,

@@ -40,6 +40,7 @@ import {
   median,
   nodeOutcomesCsv,
   optionOutcomesCsv,
+  rulesAggregate,
   type TurnRow,
   turnsCsv,
 } from "./report";
@@ -738,6 +739,15 @@ function main(): number {
     );
     console.log(
       `  Stars: made per campaign median ${fmt(flagship.starsMade.median)}; backed median ${fmt(flagship.starsBacked.median)} (in ${flagship.backedIn}/${results.length} campaigns), first backed at turn median ${fmt(flagship.firstBackTurn.median)}`,
+    );
+    const rules = rulesAggregate(results);
+    console.log(
+      `  Rules: amendments per campaign median ${fmt(rules.perCampaign.median)}, max ${fmt(rules.perCampaign.max)} (in ${rules.amendedIn}/${results.length} campaigns), first at turn median ${fmt(rules.firstTurn.median)}; hardcore turned casual per amendment median ${fmt(rules.demoted.median)}, max ${fmt(rules.demoted.max)}; most common ${
+        rules.changes
+          .slice(0, 5)
+          .map(([change, n]) => `${change} ${n}`)
+          .join(", ") || "none"
+      }`,
     );
   }
   console.log(`  invalid campaigns: ${agg.campaignsWithInvariantViolations}`);

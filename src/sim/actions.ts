@@ -1,3 +1,4 @@
+import { AXIS_IDS, GENOME_AXES } from "../content";
 import { costMultiplier, seasonalWindowOpen } from "./calendar";
 import { eventBlocker, resolveEvent } from "./events";
 import { backBlocker, backStar, dropBlocker, dropStar, seatBlocker } from "./flagship";
@@ -11,8 +12,9 @@ import {
   runningCostPerQuarter,
 } from "./leagues";
 import { landmarks } from "./records";
+import { amendBlocker, amendmentJump, amendmentPrice, amendRule } from "./rules";
 import { computeExposure } from "./spread";
-import { type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } from "./types";
+import { type AxisId, type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } from "./types";
 
 // The player's legal actions. Every action, from the UI or a bot, goes through applyAction, which
 // validates legality first, so nothing can bypass the rules.
@@ -27,6 +29,7 @@ import { type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } from "./types"
 //                   the current seat's country cancels a pending move.
 //   backStar        back a flagship star, in the seasonal window, for a one-time PP price
 //   dropStar        drop a backed star, in the seasonal window; their influence is lost
+//   amendRule       change one rule trait, in the seasonal window, once a year (GDD v1.20)
 
 export type Action =
   | { type: "collectMoment"; eventId: number }
@@ -39,7 +42,8 @@ export type Action =
   | { type: "bailoutLeague"; countryId: string }
   | { type: "moveSeat"; countryId: string }
   | { type: "backStar"; playerId: number }
-  | { type: "dropStar"; playerId: number };
+  | { type: "dropStar"; playerId: number }
+  | { type: "amendRule"; axis: AxisId; option: string };
 
 export class IllegalActionError extends Error {
   override name = "IllegalActionError";
@@ -141,6 +145,28 @@ export function checkAction(state: GameState, world: World, action: Action): str
     return null;
   }
 
+  if (action.type === "amendRule") {
+    if (!(AXIS_IDS as readonly string[]).includes(action.axis))
+      return `unknown trait "${action.axis}"`;
+    if (!(GENOME_AXES[action.axis].options as readonly string[]).includes(action.option))
+      return `"${action.option}" is not an option of ${action.axis}`;
+    switch (amendBlocker(state, world, action.axis, action.option)) {
+      case "window":
+        return "rules can only be amended in the seasonal window";
+      case "thisYear":
+        return "the rules have already been amended this year";
+      case "identity":
+        return `${action.axis} is an identity trait and never changes`;
+      case "same":
+        return `${action.axis} is already ${action.option}`;
+      case "pp": {
+        const jump = amendmentJump(action.axis, state.genome[action.axis], action.option, world);
+        return `not enough PP: costs ${money(amendmentPrice(state, world, jump))}, you have ${money(state.pp)}`;
+      }
+      case null:
+        return null;
+    }
+  }
   if (action.type === "backStar") return backBlocker(state, world, action.playerId);
   if (action.type === "dropStar") return dropBlocker(state, world, action.playerId);
 
@@ -265,6 +291,8 @@ export function applyAction(state: GameState, world: World, action: Action): Gam
           ),
         };
       });
+    case "amendRule":
+      return amendRule(state, world, action.axis, action.option);
     case "backStar":
       return backStar(state, world, action.playerId);
     case "dropStar":

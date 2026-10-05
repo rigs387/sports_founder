@@ -26,6 +26,9 @@ export function ActionFeedback() {
             ? (names?.countries[lastAction.countryId] ?? lastAction.countryId)
             : "",
         slot: "slot" in lastAction ? lastAction.slot + 1 : 0,
+        trait: "axis" in lastAction ? t(`genome.axes.${lastAction.axis}`) : "",
+        option:
+          "axis" in lastAction ? t(`genome.options.${lastAction.axis}.${lastAction.option}`) : "",
         player:
           "playerId" in lastAction
             ? (snapshot?.flagship.players.find((p) => p.id === lastAction.playerId)?.name ?? "")

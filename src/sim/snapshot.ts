@@ -11,6 +11,7 @@ import { growthFactorsAt, type NodeBlocker, nodeBlocker, nodeCost } from "./grow
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
 import { type LeagueActions, leagueActions } from "./league-actions";
 import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
+import { type RulesSnapshot, rulesSnapshot } from "./rules";
 import { computeExposure } from "./spread";
 import { tierStatus } from "./tiers";
 import {
@@ -146,6 +147,8 @@ export interface TurnSnapshot {
   flagship: FlagshipSnapshot;
   /** The sport's name, founding club and ground, character, terms and emblem (GDD v1.18). */
   identity: IdentitySnapshot;
+  /** The rule traits, their amendment options with price, backlash and hints (GDD v1.20). */
+  rules: RulesSnapshot;
 }
 
 export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeSnapshot[] {
@@ -285,5 +288,6 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     landmarkCount: state.landmarks.length,
     flagship: flagshipSnapshot(state, world),
     identity: identitySnapshot(state, world),
+    rules: rulesSnapshot(state, world),
   };
 }

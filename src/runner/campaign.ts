@@ -367,6 +367,11 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           firstBackTurn,
         };
       })(),
+      amendments: state.rules.amendments.map(({ turn, axis, from, to, demoted }) => ({
+        turn,
+        change: `${axis} ${from}→${to}`,
+        demoted,
+      })),
       forkChoices: Object.fromEntries(
         world.growthTree.forks.map((fork) => [
           fork.id,

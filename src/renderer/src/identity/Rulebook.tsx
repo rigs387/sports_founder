@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
-import type { TurnSnapshot } from "../../../sim";
+import type { Action, TurnSnapshot } from "../../../sim";
+import { AmendRules } from "./AmendRules";
 import { Emblem } from "./Emblem";
 import { FieldDiagram } from "./FieldDiagram";
 import { useTerms } from "./terms";
@@ -22,7 +23,17 @@ const AXIS_SENTENCES = [
   "structure",
 ] as const;
 
-export function Rulebook({ snapshot, names }: { snapshot: TurnSnapshot; names: Names }) {
+export function Rulebook({
+  snapshot,
+  names,
+  busy,
+  onAction,
+}: {
+  snapshot: TurnSnapshot;
+  names: Names;
+  busy: boolean;
+  onAction: (action: Action) => void;
+}) {
   const { t } = useTranslation();
   const { identity, genome } = snapshot;
   const terms = useTerms(identity.terms);
@@ -94,7 +105,6 @@ export function Rulebook({ snapshot, names }: { snapshot: TurnSnapshot; names: N
               ))}
             </ul>
           )}
-          <p className="rulebook-note">{t("identity.rulebook.amendments")}</p>
         </div>
         <div className="rulebook-field">
           <h4>{t("identity.diagram.heading")}</h4>
@@ -107,6 +117,7 @@ export function Rulebook({ snapshot, names }: { snapshot: TurnSnapshot; names: N
           />
         </div>
       </div>
+      <AmendRules snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
     </section>
   );
 }

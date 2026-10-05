@@ -112,6 +112,8 @@ export interface CampaignResult {
     starsBacked: number;
     firstBackTurn: number | null;
   };
+  /** Rule amendments made (GDD v1.20): when, which change, hardcore fans who turned casual. */
+  amendments: { turn: number; change: string; demoted: number }[];
   /** Per fork id: the node chosen, or null if the fork was never decided. */
   forkChoices: Record<string, string | null>;
   /** PP banked and cumulative PP spent on nodes after the sampled turns that were played. */
@@ -333,6 +335,23 @@ export function flagshipAggregate(results: CampaignResult[]) {
     firstBackTurn: distribution(
       results.flatMap((r) => (r.flagship.firstBackTurn === null ? [] : [r.flagship.firstBackTurn])),
     ),
+  };
+}
+
+/** Rule amendments across campaigns (GDD v1.20): how many, which, and what they cost in fans. */
+export function rulesAggregate(results: CampaignResult[]) {
+  const changes: Record<string, number> = {};
+  for (const r of results)
+    for (const a of r.amendments) changes[a.change] = (changes[a.change] ?? 0) + 1;
+  const all = results.flatMap((r) => r.amendments);
+  return {
+    perCampaign: distribution(results.map((r) => r.amendments.length)),
+    amendedIn: results.filter((r) => r.amendments.length > 0).length,
+    firstTurn: distribution(
+      results.flatMap((r) => (r.amendments[0] ? [r.amendments[0].turn] : [])),
+    ),
+    demoted: distribution(all.map((a) => a.demoted)),
+    changes: Object.entries(changes).sort((a, b) => b[1] - a[1]),
   };
 }
 

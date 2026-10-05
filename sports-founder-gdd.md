@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.19 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel)*
+*Version 1.20 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook)*
 
 ---
 
@@ -890,6 +890,32 @@ lengths — lives in config files. No balance values in code.
 - **Proposals come from the player and the world.** The player can change any rule trait in the
   window. Broadcasters, sponsors, and league directors also propose changes via decision cards
   (accepted proposals count toward the yearly limit). Rival rule copying keeps it two-sided.
+- **First build (decided 2026-10-04, v1.20).** The player's own amendments end to end: the
+  seasonal-window action with a review step, the PP price, purist backlash, dated amendments in
+  the Rulebook, and bots that amend. Proposals from broadcasters, sponsors and league directors
+  arrive with the deals build, since those are the proposers.
+  - *One amendment changes one rule trait* to any of its options. Its size is the jump: one step
+    along contact, team size, match length, scoring or complexity counts 1, two steps count 2,
+    and changing the play structure always counts 2.
+  - *Timing:* fans and spread feel the new rule from the next quarter; the flagship plays it from
+    its next season (as with the scoring rule); the backlash lands at once. At most one amendment
+    per in-game year.
+  - *Price:* a base PP price × the peak tier's cost multiplier × the jump, with no upkeep.
+  - *Purist backlash (choose pain):* in every country a share of the player's hardcore fans turn
+    casual. The share grows with the rule's age (how long that trait has stood, capped) and the
+    jump; it is heavier in the anchor (standing in for anchor resentment until that is built) and
+    in countries where the old option suited fans better than the new one. Early tinkering is
+    nearly free; amending a rule that has stood for decades is a real loss. Traditions feed
+    backlash once Culture exists.
+  - *Before deciding* the player sees the price, how many hardcore fans would turn casual, and
+    +/− fit hints for the anchor and the five biggest markets only; where else the change helps is
+    discovered on the map.
+  - *The Rulebook* lists every amendment with its date ("Match length: standard to short, amended
+    2031, over purist objection"), and its prose always describes the current rules.
+  - *Built 2026-10-04:* 100 PP × tier multiplier × jump; backlash 3% per jump at full age (40
+    years), anchor × 2, fit weight 2, capped at 25%. A better-fitting rulebook lets the leader pull
+    clear, so the world championships were strengthened one step to keep the #1 contest at about
+    half (34 of 68).
 
 **History & Records:** Stories and retrospectives may only claim what the simulation retained.
 

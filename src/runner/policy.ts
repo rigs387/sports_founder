@@ -1,26 +1,34 @@
 import { uniformFloat64 } from "pure-rand/distribution/uniformFloat64";
 import { uniformInt } from "pure-rand/distribution/uniformInt";
 import { xoroshiro128plus } from "pure-rand/generator/xoroshiro128plus";
+import { GENOME_AXES, RULE_AXES } from "../content";
 import {
   type Action,
+  amendedThisYear,
+  amendmentJump,
+  amendmentPrice,
   applyAction,
   backingPrice,
+  backlashTotal,
   bailoutTerms,
   categoryUnlockTier,
   checkAction,
   computeExposure,
   effectValue,
+  fandomScore,
   type GameState,
   growthFactorsAt,
   growthNode,
   leverMultipliers,
   mediaRevenueFactor,
   nodeCost,
+  optionNetDelta,
   PLAYER_INDEX,
   promotionTerms,
   revenuePerQuarter,
   runningCostPerQuarter,
   SEED_WARM_UP_DRAWS,
+  seasonalWindowOpen,
   seatStars,
   type World,
 } from "../sim";
@@ -39,7 +47,10 @@ import { chooseEvents, EVENT_WEIGHTS, type EventWeights } from "./event-policy";
 //                  rescues any league in trouble with a bailout, or a step-down at Near-Collapse.
 //                  Nodes: keeps one bailout's PP in reserve, then buys the node with the best value
 //                  per PP (value: each effect's size in every country, weighted by its Fandom
-//                  Score there), skipping nodes worth nothing to it. The competent bot used for pacing.
+//                  Score there), skipping nodes worth nothing to it. Amends a rule in the
+//                  seasonal window when the change's fit gain across its fans' markets beats the
+//                  backlash by a margin (GDD v1.20); no other bot amends. The competent bot used
+//                  for pacing.
 //   anchor-turtle  keeps a slot on the anchor, fills the rest next door, promotes the anchor only
 //                  with a wide margin, rescues the anchor with bailouts and step-downs. Nodes: keeps
 //                  two bailouts' PP in reserve, then buys the cheapest node worth something in the
@@ -89,6 +100,11 @@ const RANDOM_ACTION_CHANCE = 0.5;
 const BUILDER_MARGIN = 1.1;
 /** PP kept back for rescues, in bailouts: builder and media-rush, then anchor-turtle. */
 const BUILDER_RESERVE_BAILOUTS = 1;
+/**
+ * Builder amends a rule only when the change's fit gain (net lever delta, weighted by its Fandom
+ * Score in each market) beats the share of its hardcore fans it would lose by this margin.
+ */
+const AMEND_MARGIN = 0.05;
 const TURTLE_RESERVE_BAILOUTS = 2;
 
 export interface BotStep {
@@ -345,10 +361,56 @@ function backStars(step: BotStep, world: World, reserve: number): void {
   }
 }
 
+/**
+ * Amends the rule whose change fits the bot's fans best (GDD v1.20): the fit gain in every market,
+ * weighted by its Fandom Score there, less the share of hardcore fans the backlash would turn
+ * casual. Only when that beats AMEND_MARGIN and the price leaves `reserve` PP.
+ */
+function amendRules(step: BotStep, world: World, reserve: number): void {
+  const state = step.state;
+  if (!seasonalWindowOpen(state, world.config) || amendedThisYear(state, world)) return;
+  const { casualWeight } = world.config.fandomScore;
+  const weights = state.countries.map((country) => {
+    const fans = country.fans[PLAYER_INDEX];
+    return fans ? fandomScore(fans.casual, fans.hardcore, casualWeight) : 0;
+  });
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  const hardcore = state.countries.reduce(
+    (sum, c) => sum + (c.fans[PLAYER_INDEX]?.hardcore ?? 0),
+    0,
+  );
+  if (total <= 0 || hardcore <= 0) return;
+  let best: Action | null = null;
+  let bestValue = AMEND_MARGIN;
+  for (const axis of RULE_AXES) {
+    const current = state.genome[axis];
+    for (const option of GENOME_AXES[axis].options as readonly string[]) {
+      if (option === current) continue;
+      const jump = amendmentJump(axis, current, option, world);
+      if (state.pp - amendmentPrice(state, world, jump) < reserve) continue;
+      let gain = 0;
+      weights.forEach((weight, index) => {
+        if (weight <= 0) return;
+        gain +=
+          weight *
+          (optionNetDelta(world, axis, option, index) -
+            optionNetDelta(world, axis, current, index));
+      });
+      const value = gain / total - backlashTotal(state, world, axis, option) / hardcore;
+      if (value > bestValue) {
+        bestValue = value;
+        best = { type: "amendRule", axis, option };
+      }
+    }
+  }
+  if (best) attempt(step, world, best);
+}
+
 function builderTurn(state: GameState, world: World): BotStep {
   const spread = spreadFocus(state, world, countriesByFit(state, world));
   const step: BotStep = { state: spread.state, actions: [...spread.actions] };
   manageLeagues(step, world);
+  amendRules(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   backStars(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   buyNodes(
     step,

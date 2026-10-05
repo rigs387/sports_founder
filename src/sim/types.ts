@@ -368,6 +368,16 @@ export type Landmark =
     }
   /** A rival's world championship began (GDD v1.17): it lifts the rival everywhere for a while. */
   | { kind: "rivalTournament"; turn: number; quarter: number; sportId: string; year: number }
+  /** The player amended a rule (GDD v1.20); `demoted` hardcore fans turned casual in protest. */
+  | {
+      kind: "ruleAmended";
+      turn: number;
+      quarter: number;
+      axis: AxisId;
+      from: string;
+      to: string;
+      demoted: number;
+    }
   | {
       kind: "rivalCountermove";
       turn: number;
@@ -517,6 +527,27 @@ export interface SportIdentity {
   emblem: Emblem;
 }
 
+// ---- Rules evolution (GDD v1.20; src/sim/rules.ts) -------------------------------------------
+
+/** One amendment to the rulebook: a rule trait changed from one option to another. */
+export interface Amendment {
+  turn: number;
+  /** The quarter it was made in (the rule's age counts from here). */
+  quarter: number;
+  year: number;
+  axis: AxisId;
+  from: string;
+  to: string;
+  jump: number;
+  /** Hardcore fans who turned casual in protest. */
+  demoted: number;
+}
+
+export interface RulesState {
+  /** Every amendment made, oldest first. */
+  amendments: Amendment[];
+}
+
 export interface GameState {
   seed: number;
   /** Seeded generator state; part of the save so a resumed game rolls identically. */
@@ -551,6 +582,8 @@ export interface GameState {
   flagship: FlagshipState;
   /** The sport's name, founding club and ground, founding character, terms and emblem. */
   identity: SportIdentity;
+  /** The rulebook's amendments (GDD v1.20). */
+  rules: RulesState;
 }
 
 export interface CampaignSetup {
