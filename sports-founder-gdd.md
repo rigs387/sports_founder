@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.21 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules)*
+*Version 1.22 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category)*
 
 ---
 
@@ -110,7 +110,7 @@ turn. Longer turns change how often the player decides, not the economy's math.
      for a famous venue. It plays like any club: its strength is rolled as founding clubs' are.
    - *Founding character:* a birthplace (schoolyard, factory, beach, barracks, village green,
      docks) and an ethos (gentleman's game, working-class game, rebel game, family game), chosen
-     at setup now. Until Culture is built they appear only in the rulebook and card text.
+     at setup now. Since v1.22 birthplace biases which traditions form and ethos how fans take betrayal (Culture).
    - *Terms:* what a score, a match and a season are called, chosen from preset nouns that carry
      singular, plural and title forms in the locale file; used only as nouns inside complete
      templates. Free text terms are not offered (they read badly in templates).
@@ -217,7 +217,8 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
     struggling league plays worse. Stars plug into this rating when they arrive.
   - *The purist cost of moving the seat (decided 2026-10-02).* The country the seat leaves loses
     a config share of its player hardcore fans to casual, a larger share when it leaves the
-    anchor. Anchor resentment can replace this once it exists. The return home after a folded
+    anchor, and more where traditions are held (v1.22). Anchor resentment can replace the anchor share
+    once it exists. The return home after a folded
     flagship costs nothing.
   - *Every other league* stays on the simple model: fan buckets, one cash line, the League Health
     Ladder, promotion and bailouts.
@@ -746,6 +747,97 @@ purchased traits and percentage modifiers alone do not make culture.
     flagship it is a sponsor option: loyal and demand-free, but smaller than outside sponsors.
   - *Fame comes only from facts.* The player can build capacity, name the trophy, and nurture an
     existing artifact through the Culture category, but cannot buy fame.
+- **Culture, first build (decided 2026-10-04, v1.22).** Every number is config (`culture`).
+  - *Scope.* Six types: four traditions born from facts (*derby*, *club rite*, *star legacy*,
+    *national name*) and two artifacts (*famous venue*, *the trophy*). Chants and anthems come
+    later (they overlap derby and rite); the homegrown gear brand comes with deals, since it is a
+    sponsor option. Betrayal through deals (naming rights on a famous ground, demands that cheapen
+    a tradition) is recorded as a hook and built with the deals system; the first build's
+    betrayals are rule changes, the seat move and renaming the trophy.
+  - *Births (fame comes only from facts).*
+    - *Derby:* the same two clubs finish first and second, or meet in the final, in 3 of 5
+      seasons. Answering "Stoke it" on the repeat-final card counts as one extra meeting; it
+      advances a derby but cannot make one without the facts. Renewed by another such meeting.
+    - *Club rite:* the founding club's first title. A founding club that never wins has no rite
+      (choose pain). Renewed by its titles. Named from a pool keyed by birthplace.
+    - *Star legacy:* a star retires after at least 4 star seasons or holding the all-time scoring
+      record; retiring with honors starts it stronger. Named after the star ("the Okafor style").
+      Renewed when a star of the same club breaks out.
+    - *National name:* a country's league is first promoted to Professional (the anchor too). One
+      per country, named from a pool keyed by language sphere; it never spreads. Renewed by the
+      league's further promotions and each year it stays Professional or better.
+    - *Famous venue:* every club has a ground, named from invented ground names in the names file
+      with the club's real town. A ground becomes famous after a config count of fame facts:
+      titles won by its club and finals hosted (American format, higher seed at home). The
+      founding ground starts with one fact. Record crowds wait for the venue build.
+    - *The trophy:* born at the flagship's first season end; the player names it on the champion
+      card (default after the founding club or its ground). It belongs to the league that named
+      it: when the seat moves, the new flagship names its own trophy at its first season's end,
+      and the old trophy stays with its followers and fades without renewal. Renewed each season
+      its league plays for it.
+    - Followers start in the tradition's home country (the flagship's, or the league's for a
+      national name) and spread abroad only through Culture nodes.
+  - *Strength and loss (choose pain).* Each tradition has a strength from 0 to 1: born at a
+    starting value, raised by each renewal fact, decaying each year without one. It is lost when
+    its strength reaches zero, its source disappears (its club folds, its league collapses) or a
+    betrayal breaks it. Every birth and every loss is a landmark.
+  - *What they do.* A country's tradition weight is the sum of the strengths held there, capped
+    (e.g. 2). Scaled by that weight: generational turnover of the player's hardcore fans is cut by
+    up to a share (e.g. a third), and rival poaching and reclaim of them by up to a share (e.g.
+    40%); world championships are unchanged. Only the famous venue has extras: a small casual pull
+    into its country from countries where the player has fans (pilgrimage), and a multiplier on
+    the champion moment's PP. Traditions help only the player's sport. Tuning keeps them felt
+    without settling the #1 contest: if stickiness pushes "#1 lost before the win" well below
+    half, the numbers are cut rather than rivals strengthened.
+  - *Rival flavor traditions.* Rivals carry content-defined traditions (a famous ground, a
+    trophy, a derby) as data in the same type vocabulary, with generic names in the names file so
+    mods can rename them. Shown on the map and in tooltips; no mechanical effect; never born or
+    lost in play.
+  - *Betrayal.* Each tradition remembers the rulebook it was born under.
+    - An amendment that moves a trait away from a tradition's rule offends it; a move back toward
+      it does not. In each country, backlash × (1 + weight × the strength of the offended
+      traditions held there); the anchor's ×2 stays as anchor resentment's stand-in and the cap
+      stays. An offending amendment also cuts the tradition's strength by a share per jump; at zero
+      it is broken (lost, with a landmark).
+    - Moving the seat: the cost to the country left × (1 + weight × its tradition weight). Its
+      flagship traditions stop renewing while its clubs are dormant, and renew again if the seat
+      returns.
+    - Renaming the trophy ends the old trophy tradition (landmark) and turns a share × its
+      strength of hardcore fans in its follower countries casual; the new name starts a fresh
+      trophy.
+    - The amendment, seat move and rename reviews list the traditions offended and the hardcore
+      fans their followers would lose.
+  - *Founding character.* Birthplace sets per-type multipliers on birth thresholds and starting
+    strength (e.g. factory and docks: derbies; village green: rite and trophy; schoolyard and
+    beach: star legacy; barracks: rite and venue). Ethos sets multipliers on the three betrayals
+    (e.g. gentleman's game: rules ×1.3, seat ×0.9; rebel game: rules ×0.7, seat ×1.3;
+    working-class game: seat ×1.3, rename ×1.2; family game: rename ×1.3, rules ×0.9). Character
+    shifts how easily a type is born, never creates one. Content validation keeps each
+    birthplace's and ethos's multipliers near 1 on average (geometric mean within a config band):
+    character changes a campaign's shape, not its difficulty. It belongs to the sport, so it
+    applies in every country.
+  - *What the player sees.* The map: a small pennant marker on countries holding traditions; the
+    country card lists each one (name, type, strength bar, origin fact), rivals' flavor
+    traditions under the rival. The Rulebook gains a Traditions section by type: name, born-on
+    date and fact, followers, strength bar, the rule traits that would offend it; lost traditions
+    greyed with their end date. The flagship screen tags derby pairings, famous grounds and the
+    rite on club rows and names the trophy in the champions line. A birth moment for every new
+    tradition (moment slot, PP by type) quoting its facts; a loss is a landmark and a moment.
+    Strength shows as a bar, never a number; effects are described in words. The snapshot carries
+    each tradition's id, type, name parts, origin facts, followers, strength, lost flag and
+    offending traits; effect multipliers stay in the sim.
+  - *The Culture growth category (tier 4; nurture, never create).* Four new effects in the closed
+    vocabulary, each optionally limited to one tradition type: `traditionStrength` (slower decay,
+    bigger renewals), `traditionReach` (followers spread), `traditionProtection` (less strength
+    lost to offending amendments and seat moves) and `traditionHold` (bigger stickiness and
+    resistance per unit of weight). Reach: once a year a tradition at full home strength may gain
+    a follower country linked to a follower by a proximity or language channel with a player
+    hardcore share above a floor, held at a share of home strength; with no reach nodes the
+    chance is zero. About 8 nodes (Derby days, Club museum, Hall of legends, Supporters' trusts,
+    Travelling support, Twinned towns, Heritage listing, Oral history) and one fork: *Heritage
+    trust* (more protection and hold, but higher amendment backlash in tradition countries) or
+    *Living game* (more reach and strength gain, less protection). Prices follow the other
+    categories; bots get Culture weights and the options experiment checks no node dominates.
 
 **Stars (decided 2026-09-26, GDD v1.12):** Stars are how a league becomes a sport people love.
 - **Where they come from:** the flagship carries full squads; every other league carries a few
@@ -932,7 +1024,7 @@ lengths — lives in config files. No balance values in code.
     jump; it is heavier in the anchor (standing in for anchor resentment until that is built) and
     in countries where the old option suited fans better than the new one. Early tinkering is
     nearly free; amending a rule that has stood for decades is a real loss. Traditions feed
-    backlash once Culture exists.
+    backlash (v1.22, Culture: offended traditions multiply it).
   - *Before deciding* the player sees the price, how many hardcore fans would turn casual, and
     +/− fit hints for the anchor and the five biggest markets only; where else the change helps is
     discovered on the map.

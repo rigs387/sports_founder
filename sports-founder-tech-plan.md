@@ -68,6 +68,7 @@ surface before playtesting or during it.
 | 2026-10-03 | Season card list (GDD v1.15): champion, dynasty, underdog, first title, close finish, repeat final, runaway and foregone-league cards with config starting values; pressure drains land on arrival and paying never cancels them; fixed priority (pressure, then rarest); season-card cooldowns counted in seasons; American runaway needs the playoff champion to top the table; bot weights for every card, then remeasure the win contest | Decided |
 | 2026-10-03 | Testing is time-boxed: concise tests whose results we see over thorough ones that never finish. Unit tests have a 30 s timeout (suite ~30 s); the runner states its plan, prints progress and stops early when projected past `--max-minutes` (default 5). Experiment defaults cut to finish in minutes (12 sampled anchors with 5 seeds each, 40 genomes per anchor, 15 naive-bot seeds, 3 bots); `--anchors all` removed. A 5-anchor sample was tried and misread the win contest (19% vs 36%): spread beats repetition. Replaces the 250-genome size above | Decided |
 | 2026-10-03 | Flagship stars (GDD v1.16): one named leading player per club (born in real places, invented per-language-sphere names, hidden skill on a career curve; full squads deferred); every score credited to the leading player or the squad; a score is the sport's one scoring unit and the scoring frequency trait sets match chances; a season's top scorer becomes a star by taking a config share of their club's scores when a star place is open (1/2/3/4 by league tier); stars add club strength, backed stars add casual conversion at home and media reach out of the flagship; careers peak, decline and announce retirement a season ahead; stars move up within the flagship; backing slots by PP tier, window only, one-time PP price, influence over seasons, honorable endings and a cash price to keep a backed star; star cards; save format 10. Build plan: 2.6 | Decided |
+| 2026-10-04 | Culture, first build (GDD v1.22): six types from recorded facts (derby, club rite, star legacy, national name, famous venue, trophy); strength renews and decays, loss by facts or betrayal, landmarks both ways; weight cuts the player's hardcore turnover and rival poaching/reclaim; venue pilgrimage and champion PP; each tradition remembers its rulebook and offending amendments multiply backlash and wear it; seat moves and trophy renames cost more where traditions are held; birthplace biases births, ethos betrayals, balanced near 1; rivals carry flavor-only content traditions; Culture tree category (strength, reach, protection, hold; Heritage trust / Living game fork). Save format 18. Build plan: 2.11 | Decided |
 
 ---
 
@@ -394,6 +395,43 @@ groups (`wealthLevels`) weigh Prestige income and rival market value (`rivalAI.m
 Measured: pacing passes (first win 163–169), #1 lost before the win 53% after scaling the world
 championships back, differentiation 5 of 6 as invented. `tests/markets.test.ts`; docs in
 `docs/markets/README.md`.
+
+### 2.11 Build Plan: Culture, First Build (GDD v1.22)
+
+Every number is config (`culture` in `content/config.yaml`); founding-character multipliers are in
+`content/identity.yaml`, names in `content/names.yaml`. The sim lives in `src/sim/culture.ts`.
+
+1. **State, content and save.** `GameState.culture`: traditions (stable id, type, name parts,
+   home country, followers with their strength, strength, the rule traits at birth, origin facts,
+   born and lost dates and reason), progress counters (derby meetings by club pair, fame facts by
+   ground, trophies by league) and the next id. Every club gets a ground name from invented ground
+   names (the founding club keeps the identity's ground), rolled on the culture's own random
+   stream so the world's sequence never depends on it. Zod schemas for the config block, the
+   birthplace and ethos multipliers (with the balance guard), name pools and rival flavor
+   traditions. Save format 18; format 17 migrates with no traditions, no counters (no retroactive
+   history) and ground names for existing clubs.
+2. **Births, renewal, decay and loss.** Read facts where they are recorded: the season summary
+   (derby, rite, venue, trophy), star retirement (star legacy), league promotion (national name),
+   club and league folds (loss). Yearly decay without renewal. Landmarks `traditionBorn` and
+   `traditionLost`. Tests for every birth rule and the founding-character multipliers.
+3. **Effects.** Tradition weight per country; the factor on the player's generational turnover
+   (`quarter.ts`) and on poaching and reclaim (`poaching.ts`, `rivals.ts`); the venue's
+   pilgrimage pull and the champion moment's PP multiplier. Invariants: strengths in 0–1, weight
+   capped.
+4. **Betrayal.** Offended traditions in the amendment backlash and its preview (`rules.ts`), the
+   seat move's cost and preview, trophy naming (`nameTrophy`: on the first champion card, free)
+   and renaming (`renameTrophy`: window only, ends the old trophy) through `applyAction`.
+5. **Cards.** A birth moment per tradition (PP by type) and a loss moment, built only from the
+   facts recorded on the tradition.
+6. **The Culture growth category.** The four effects in the closed vocabulary with the optional
+   `traditionType`, reach's yearly roll on the culture stream, the 8 nodes and the fork; bot
+   weights.
+7. **Snapshot and screens.** Traditions in the `TurnSnapshot`; the map marker and country card
+   list; the Rulebook's Traditions section; flagship tags and the trophy name; the trophy-naming
+   input; offended traditions in the three reviews. i18n for every string.
+8. **Smoke, measure and docs.** The smoke test plays until a tradition is born and screenshots it
+   in both layouts. Pacing on seeds 1–3 and 4–6 (must pass; #1 lost before the win about half)
+   and differentiation as invented. `docs/culture/README.md`, `docs/progress/data.js`, CLAUDE.md.
 
 ---
 

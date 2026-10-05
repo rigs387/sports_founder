@@ -129,6 +129,14 @@ that exist. Artifacts are traditions that are things: famous venues (earned from
 record crowds, never bought; fans resist naming rights and moves; can be lost), the named trophy,
 chants, and a homegrown gear brand (a small, demand-free sponsor at the flagship). Founding character at creation (birthplace, ethos, colors and emblem, the sport's own
 terms) seeds which traditions form, never affinity.
+First build (v1.22): derby (3 of 5 top-two finishes), club rite (founding club's first title),
+star legacy (long star career or all-time record), national name (first Professional league),
+famous venue (titles and finals at a ground) and the trophy (named on the first champion card).
+Strength 0–1 renews from facts and decays; loss is a landmark. Weight cuts hardcore turnover and
+rival poaching/reclaim. Each tradition remembers its rulebook: offending amendments multiply
+backlash and wear it down; seat moves and trophy renames cost more. Birthplace biases births,
+ethos the betrayals (balanced to ~1). Rivals have flavor-only content traditions. Culture tree
+(tier 4): strength, reach, protection, hold; fork Heritage trust / Living game.
 
 **Stars:** Full squads at the flagship (later; Phase 1 has one named leading player per club,
 whose scores are recorded); a few lazily named standouts in every other league. A season's top
