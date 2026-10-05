@@ -677,6 +677,17 @@ export function traditionShelter(weight: number, world: World) {
   return { turnover: 1 - turnoverCut * level, poaching: 1 - poachCut * level };
 }
 
+/** The strength of the living famous venues at home in each country (content order). */
+export function venueStrengths(state: Pick<GameState, "culture">, world: World): number[] {
+  const strengths = world.countries.map(() => 0);
+  for (const t of state.culture.traditions) {
+    if (t.type !== "venue" || !living(t)) continue;
+    const i = world.countries.findIndex((country) => country.id === t.countryId);
+    if (i >= 0) strengths[i] = (strengths[i] ?? 0) + t.strength;
+  }
+  return strengths;
+}
+
 /** The strength of the living famous venues at home in a country. */
 export function venueStrength(state: Pick<GameState, "culture">, countryId: string): number {
   return state.culture.traditions

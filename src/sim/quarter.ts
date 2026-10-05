@@ -1,6 +1,6 @@
 import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { reclaimShare, rivalConversionBoosts } from "./countermoves";
-import { traditionShelter, traditionWeights, venueStrength } from "./culture";
+import { traditionShelter, traditionWeights, venueStrengths } from "./culture";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
 import { backingEffects, stepFlagshipQuarter } from "./flagship";
@@ -89,6 +89,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
   const found: Landmark[] = [];
   const backing = backingEffects(state.flagship, world);
   const traditions = traditionWeights(state, world);
+  const venues = venueStrengths(state, world);
   const tournaments = new Map(
     state.sports.map((sport) => [sport.id, activeTournament(sport.id, state.quarter, config)]),
   );
@@ -134,7 +135,7 @@ export function stepQuarter(state: GameState, world: World): GameState {
         eventRates.casual *
         (country.id === backing.countryId ? backing.casualConversion : 1) *
         // Pilgrimage to a famous ground (GDD v1.22).
-        (1 + config.culture.pilgrimage * venueStrength(state, country.id)),
+        (1 + config.culture.pilgrimage * (venues[index] ?? 0)),
       casualChurn:
         (config.dynamics.player.casualChurnRate +
           config.dynamics.player.casualDecayRate *
