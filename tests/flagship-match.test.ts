@@ -9,7 +9,7 @@ import {
   scoringRate,
   stepQuarter,
 } from "../src/sim";
-import { baseGenome, migratedCulture, setupFor, world } from "./helpers";
+import { baseGenome, cardless, migratedCulture, setupFor, world } from "./helpers";
 
 // Scoring frequency in the flagship's matches (GDD v1.16, tech plan 2.6 step 1).
 
@@ -100,15 +100,7 @@ describe("the season's scoring rule", () => {
   });
 
   it("never touches the world: the world's dice and fans match under every rule", () => {
-    const noSeasonCards = {
-      ...world,
-      events: {
-        ...world.events,
-        cards: world.events.cards.filter(
-          (card) => card.trigger !== "seasonEnd" && card.trigger !== "star",
-        ),
-      },
-    };
+    const noSeasonCards = cardless(world);
     const base = withScoring("medium", 5);
     const played = SCORING_OPTIONS.map((scoring) =>
       runTurns({ ...base, flagship: { ...base.flagship, scoring } }, noSeasonCards, 30),

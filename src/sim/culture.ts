@@ -1,21 +1,24 @@
 import { LEAGUE_TIERS, RULE_AXES, TRADITION_TYPES, type TraditionType } from "../content";
 import { yearOfQuarter } from "./calendar";
+import { tidyName } from "./identity";
+import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState } from "./rng";
-import type {
-  AxisId,
-  Club,
-  CultureState,
-  GameState,
-  Genome,
-  Landmark,
-  LeagueTierId,
-  Player,
-  SeasonSummary,
-  SportIdentity,
-  Tradition,
-  TraditionLossReason,
-  World,
+import {
+  type AxisId,
+  type Club,
+  type CultureState,
+  type GameState,
+  type Genome,
+  type Landmark,
+  type LeagueTierId,
+  PLAYER_INDEX,
+  type Player,
+  type SeasonSummary,
+  type SportIdentity,
+  type Tradition,
+  type TraditionLossReason,
+  type World,
 } from "./types";
 
 // Culture, first build (GDD v1.22). Culture is never bought: traditions are born only from
@@ -602,21 +605,10 @@ export function traditionWeights(
   state: Pick<GameState, "culture" | "growthNodes">,
   world: World,
 ): number[] {
-  const { weightCap, reach } = world.config.culture;
-  const weights = world.countries.map(() => 0);
-  if (state.culture.traditions.length === 0) return weights;
-  const index = new Map(world.countries.map((country, i) => [country.id, i]));
-  for (const tradition of state.culture.traditions) {
-    if (!living(tradition)) continue;
-    const { hold } = cultureFactors(world, state.growthNodes, tradition.type);
-    tradition.followers.forEach((countryId, f) => {
-      const i = index.get(countryId);
-      if (i === undefined) return;
-      const share = f === 0 ? 1 : reach.followerShare;
-      weights[i] = (weights[i] ?? 0) + tradition.strength * share * hold;
-    });
-  }
-  return weights.map((weight) => Math.min(weightCap, weight));
+  const { weightCap } = world.config.culture;
+  return heldStrength(state.culture.traditions, state, world).map((weight) =>
+    Math.min(weightCap, weight),
+  );
 }
 
 /** How much of the player's hardcore loss to aging, poaching and reclaim remains at a weight. */
@@ -631,4 +623,195 @@ export function venueStrength(state: Pick<GameState, "culture">, countryId: stri
   return state.culture.traditions
     .filter((t) => t.type === "venue" && living(t) && t.countryId === countryId)
     .reduce((sum, t) => sum + t.strength, 0);
+}
+
+/**
+ * The strength each country's fans hold of these traditions (content order, uncapped): home at
+ * full strength, abroad at reach.followerShare, × the Culture nodes' hold on each type.
+ */
+export function heldStrength(
+  traditions: readonly Tradition[],
+  state: Pick<GameState, "growthNodes">,
+  world: World,
+): number[] {
+  const held = world.countries.map(() => 0);
+  const index = new Map(world.countries.map((country, i) => [country.id, i]));
+  for (const tradition of traditions) {
+    if (!living(tradition)) continue;
+    const { hold } = cultureFactors(world, state.growthNodes, tradition.type);
+    tradition.followers.forEach((countryId, f) => {
+      const i = index.get(countryId);
+      if (i === undefined) return;
+      const share = f === 0 ? 1 : world.config.culture.reach.followerShare;
+      held[i] = (held[i] ?? 0) + tradition.strength * share * hold;
+    });
+  }
+  return held;
+}
+
+/**
+ * Wears traditions down by betrayal (GDD v1.22): each loses `damage(tradition)` × the Culture
+ * nodes' protection on its type; one worn to nothing is broken, with a landmark.
+ */
+export function wearTraditions(
+  state: GameState,
+  world: World,
+  ids: readonly number[],
+  damage: (tradition: Tradition) => number,
+): GameState {
+  if (ids.length === 0) return state;
+  const found: Landmark[] = [];
+  const traditions = state.culture.traditions.map((tradition) => {
+    if (!ids.includes(tradition.id) || !living(tradition)) return tradition;
+    const { protection } = cultureFactors(world, state.growthNodes, tradition.type);
+    const strength = Math.max(0, tradition.strength - damage(tradition) * protection);
+    if (strength > 1e-9) return { ...tradition, strength };
+    found.push(
+      landmarks.traditionLost(
+        state.turn,
+        state.quarter,
+        tradition.countryId,
+        tradition.id,
+        tradition.type,
+        "broken",
+      ),
+    );
+    return {
+      ...tradition,
+      strength: 0,
+      lost: { turn: state.turn, quarter: state.quarter, reason: "broken" as const },
+    };
+  });
+  return {
+    ...state,
+    culture: { ...state.culture, traditions },
+    landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
+  };
+}
+
+// ---- The trophy's name (GDD v1.22) ------------------------------------------------------------
+
+/** The living trophy of the league at the seat, if it has one. */
+export function seatTrophy(state: Pick<GameState, "culture" | "flagship">): Tradition | undefined {
+  return state.culture.traditions.find(
+    (t) => t.type === "trophy" && living(t) && t.countryId === state.flagship.countryId,
+  );
+}
+
+function nameProblem(world: World, name: string): boolean {
+  const tidy = tidyName(name);
+  const { nameMinLength, trophyNameMaxLength } = world.config.identity;
+  return tidy.length < nameMinLength || tidy.length > trophyNameMaxLength;
+}
+
+/** Why the trophy cannot be named for free now ("none": no naming open; "name": bad name). */
+export type NameTrophyBlocker = "none" | "name";
+export function nameTrophyBlocker(
+  state: Pick<GameState, "culture">,
+  world: World,
+  name: string,
+): NameTrophyBlocker | null {
+  if (state.culture.naming === null) return "none";
+  return nameProblem(world, name) ? "name" : null;
+}
+
+/** Names the newborn trophy, free, while its champion card is open (checked by the caller). */
+export function nameTrophy(state: GameState, name: string): GameState {
+  const traditions = state.culture.traditions.map((t) =>
+    t.id === state.culture.naming ? { ...t, name: tidyName(name) } : t,
+  );
+  return { ...state, culture: { ...state.culture, traditions } };
+}
+
+/**
+ * The share of each country's player hardcore fans who turn casual if the trophy is renamed
+ * (content order): renameShare × its strength × the ethos × the Culture hold, abroad at the
+ * follower share.
+ */
+export function renameShares(state: GameState, world: World, trophy: Tradition): number[] {
+  const factor = world.config.culture.renameShare * ethosFactor(world, state.identity, "rename");
+  return heldStrength([trophy], state, world).map((held) => Math.min(1, factor * held));
+}
+
+/** Why the trophy cannot be renamed now, or null when it can. */
+export type RenameTrophyBlocker = "window" | "trophy" | "name" | "same" | "naming";
+export function renameTrophyBlocker(
+  state: GameState,
+  world: World,
+  name: string,
+  windowOpen: boolean,
+): RenameTrophyBlocker | null {
+  const trophy = seatTrophy(state);
+  if (!trophy) return "trophy";
+  if (state.culture.naming === trophy.id) return "naming";
+  if (!windowOpen) return "window";
+  if (nameProblem(world, name)) return "name";
+  if (trophy.name !== null && tidyName(name) === trophy.name) return "same";
+  return null;
+}
+
+/**
+ * Renames the seat's trophy (checked by the caller): the old trophy tradition ends (renamed, a
+ * landmark), its followers' purists turn casual, and the new name is born as a fresh trophy.
+ */
+export function renameTrophy(state: GameState, world: World, name: string): GameState {
+  const trophy = seatTrophy(state);
+  if (!trophy) throw new Error("No trophy to rename");
+  const shares = renameShares(state, world, trophy);
+  const countries = state.countries.map((country, i) => {
+    const share = shares[i] ?? 0;
+    if (share <= 0) return country;
+    return {
+      ...country,
+      fans: country.fans.map((fans, f) =>
+        f === PLAYER_INDEX ? demoteHardcore(fans, share) : fans,
+      ),
+    };
+  });
+  const year = yearOfQuarter(state.quarter, world.config);
+  const fresh: Tradition = {
+    ...trophy,
+    id: state.culture.nextId,
+    name: tidyName(name),
+    seasons: [],
+    rules: ruleTraits(state.genome),
+    bornTurn: state.turn,
+    bornQuarter: state.quarter,
+    strength: Math.min(
+      1,
+      world.config.culture.startStrength * birthEase(world, state.identity, "trophy"),
+    ),
+    renewedYear: year,
+    followers: [trophy.countryId],
+    lost: null,
+  };
+  const traditions = [
+    ...state.culture.traditions.map((t) =>
+      t.id === trophy.id
+        ? {
+            ...t,
+            strength: 0,
+            lost: { turn: state.turn, quarter: state.quarter, reason: "renamed" as const },
+          }
+        : t,
+    ),
+    fresh,
+  ];
+  return {
+    ...state,
+    countries,
+    culture: { ...state.culture, traditions, nextId: fresh.id + 1 },
+    landmarks: [
+      ...state.landmarks,
+      landmarks.traditionLost(
+        state.turn,
+        state.quarter,
+        trophy.countryId,
+        trophy.id,
+        "trophy",
+        "renamed",
+      ),
+      landmarks.traditionBorn(state.turn, state.quarter, fresh.countryId, fresh.id, "trophy"),
+    ],
+  };
 }

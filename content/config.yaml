@@ -565,6 +565,8 @@ identity:
   sportNameMaxLength: 24
   clubNameMaxLength: 20
   groundNameMaxLength: 32
+  # The trophy's name (GDD v1.22), given on the first champion card or in a rename.
+  trophyNameMaxLength: 32
 
 # The flagship league (GDD v1.11 commissioner's seat, v1.14 flagship season). The player runs one
 # league in depth: named clubs, a season a year that ends in the seasonal window, a champion. Its

@@ -21,7 +21,7 @@ import {
   stepQuarter,
   totalRounds,
 } from "../src/sim";
-import { countryIndex, setupFor, withConfig, world } from "./helpers";
+import { cardless, countryIndex, setupFor, withConfig, world } from "./helpers";
 
 const start = (format: "european" | "american" = "european", anchor = "brazil", seed = 11) =>
   createCampaign(world, { ...setupFor(seed, anchor), seasonFormat: format });
@@ -54,15 +54,7 @@ function toWindow(state: GameState): GameState {
   return current;
 }
 
-const withoutSeasonCards = {
-  ...world,
-  events: {
-    ...world.events,
-    cards: world.events.cards.filter(
-      (card) => card.trigger !== "seasonEnd" && card.trigger !== "star",
-    ),
-  },
-};
+const withoutSeasonCards = cardless(world);
 
 describe("the flagship at campaign start", () => {
   it("seats the anchor with eight clubs in real places of the anchor and distinct nicknames", () => {

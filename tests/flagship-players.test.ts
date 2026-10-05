@@ -16,7 +16,7 @@ import {
   serializeSave,
   stepQuarter,
 } from "../src/sim";
-import { countryIndex, setupFor, withConfig, world } from "./helpers";
+import { cardless, countryIndex, setupFor, withConfig, world } from "./helpers";
 
 // Leading players (GDD v1.16, tech plan 2.6 step 2).
 
@@ -60,15 +60,7 @@ const identities = (players: readonly Player[]) =>
     peakSkill,
   }));
 
-const withoutSeasonCards = {
-  ...world,
-  events: {
-    ...world.events,
-    cards: world.events.cards.filter(
-      (card) => card.trigger !== "seasonEnd" && card.trigger !== "star",
-    ),
-  },
-};
+const withoutSeasonCards = cardless(world);
 
 describe("leading players", () => {
   it("gives every founding club one, born in a real place of the market", () => {
@@ -132,7 +124,7 @@ describe("leading players", () => {
     const older = withConfig(world, (config) => {
       config.flagship.players.foundingAge = { min: 30, max: 34 };
     });
-    const olderNoCards = { ...older, events: withoutSeasonCards.events };
+    const olderNoCards = cardless(older);
     const a = runTurns(start("brazil", 5), withoutSeasonCards, 30);
     const b = runTurns(createCampaign(older, setupFor(5, "brazil")), olderNoCards, 30);
     expect(b.flagship.players).not.toStrictEqual(a.flagship.players);

@@ -283,9 +283,7 @@ function stepCountryFans(
     const agedOut = drawFlow(
       rng,
       Math.max(0, fans.hardcore - poached - turnoverFloor),
-      sport.kind === "other"
-        ? 0
-        : turnoverRate * (sport.kind === "player" ? shelter.turnover : 1),
+      sport.kind === "other" ? 0 : turnoverRate * (sport.kind === "player" ? shelter.turnover : 1),
       noise,
     );
     const hardcoreLoss = poached + agedOut;

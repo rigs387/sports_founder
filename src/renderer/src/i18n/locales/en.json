@@ -758,7 +758,9 @@
       "moveSeat": "After this season the seat will be in {{country}}.",
       "backStar": "You now back {{player}}. Their influence grows each season they play at the seat.",
       "dropStar": "You no longer back {{player}}.",
-      "amendRule": "{{trait}} is now {{option}}. The amendment is in the rulebook."
+      "amendRule": "{{trait}} is now {{option}}. The amendment is in the rulebook.",
+      "nameTrophy": "The trophy is now called {{name}}.",
+      "renameTrophy": "The trophy is now called {{name}}. Its old name is history."
     }
   },
   "map": {

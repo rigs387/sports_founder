@@ -80,3 +80,24 @@ export function migratedCulture(state: GameState) {
     world,
   );
 }
+
+/**
+ * The world without the flagship's ways of reaching fans: no season, star or tradition cards and
+ * no tradition effects (GDD v1.15, v1.16, v1.22). Its matches alone must leave the world as it was.
+ */
+export function cardless(base: World): World {
+  const { culture } = base.config;
+  return {
+    ...base,
+    config: {
+      ...base.config,
+      culture: { ...culture, turnoverCut: 0, poachCut: 0, pilgrimage: 0, seatWeight: 0 },
+    },
+    events: {
+      ...base.events,
+      cards: base.events.cards.filter(
+        (card) => !["seasonEnd", "star", "tradition"].includes(card.trigger),
+      ),
+    },
+  };
+}

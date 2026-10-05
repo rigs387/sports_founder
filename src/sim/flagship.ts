@@ -1,4 +1,5 @@
 import { costMultiplier, QUARTERS_PER_YEAR, seasonalWindowOpen, yearOfQuarter } from "./calendar";
+import { ethosFactor, traditionWeights } from "./culture";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
@@ -1027,23 +1028,39 @@ export function seatEligible(league: LeagueState | null, world: World): boolean 
   return league !== null && world.config.flagship.seatEligibleTiers.includes(league.tier);
 }
 
-/** Moves the seat now. `purist` applies the purist cost to the country left behind. */
+/**
+ * The share of a country's player hardcore fans who turn casual when the seat leaves it (GDD
+ * v1.14, v1.22): a config share, larger at the anchor, × (1 + seat weight × the ethos × the
+ * tradition weight there), at most all of them.
+ */
+export function seatLeaveShare(
+  state: Pick<GameState, "anchorCountryId" | "culture" | "growthNodes" | "identity">,
+  world: World,
+  countryId: string,
+): number {
+  const { seatMove } = world.config.flagship;
+  const base =
+    countryId === state.anchorCountryId
+      ? seatMove.anchorHardcoreDemotionShare
+      : seatMove.hardcoreDemotionShare;
+  const weight = traditionWeights(state, world)[indexOf(world, countryId)] ?? 0;
+  const held = world.config.culture.seatWeight * ethosFactor(world, state.identity, "seat");
+  return Math.min(1, base * (1 + held * weight));
+}
+
+/** Moves the seat now. `purist` is the share of hardcore fans the country left behind loses. */
 function moveSeat(
   flagship: FlagshipState,
   countries: CountryState[],
   world: World,
-  anchorCountryId: string,
   to: string,
-  purist: boolean,
+  purist: number,
 ): { flagship: FlagshipState; countries: CountryState[] } {
   const from = flagship.countryId;
   let next = countries;
-  if (purist) {
+  if (purist > 0) {
     const index = indexOf(world, from);
-    const share =
-      from === anchorCountryId
-        ? world.config.flagship.seatMove.anchorHardcoreDemotionShare
-        : world.config.flagship.seatMove.hardcoreDemotionShare;
+    const share = purist;
     const country = countries[index];
     if (country) {
       next = [...countries];
@@ -1076,7 +1093,17 @@ function moveSeat(
  * country has no league, no rounds are played and the season ends without a champion.
  */
 export function stepFlagshipQuarter(
-  state: Pick<GameState, "turn" | "anchorCountryId" | "genome" | "seasonFormat" | "flagship">,
+  state: Pick<
+    GameState,
+    | "turn"
+    | "anchorCountryId"
+    | "genome"
+    | "seasonFormat"
+    | "flagship"
+    | "culture"
+    | "growthNodes"
+    | "identity"
+  >,
   countries: CountryState[],
   world: World,
   quarter: number,
@@ -1211,9 +1238,8 @@ export function stepFlagshipQuarter(
           flagship,
           nextCountries,
           world,
-          state.anchorCountryId,
           pending,
-          true,
+          seatLeaveShare(state, world, from),
         );
         flagship = moved.flagship;
         nextCountries = moved.countries;
@@ -1246,14 +1272,7 @@ export function returnSeatIfFolded(state: GameState, world: World): GameState {
     return dormantClubs(state, world);
   }
   const rng = restoreRng(flagship.rng);
-  const moved = moveSeat(
-    flagship,
-    state.countries,
-    world,
-    state.anchorCountryId,
-    state.anchorCountryId,
-    false,
-  );
+  const moved = moveSeat(flagship, state.countries, world, state.anchorCountryId, 0);
   let next = moved.flagship;
   const anchorLeague = state.countries[indexOf(world, state.anchorCountryId)]?.league ?? null;
   if (anchorLeague !== null) next = fitClubs(next, world, rng, anchorLeague.tier);
@@ -1507,6 +1526,8 @@ export interface FlagshipSnapshot {
   seatTargets: string[];
   /** Share of the seat country's hardcore fans who turn casual if the seat moves away. */
   leaveCost: number;
+  /** The living traditions held in the seat's country, which a move would leave (GDD v1.22). */
+  leaveTraditions: number[];
   /** Every leading player the campaign has known, by id: names only (skill stays hidden). */
   players: { id: number; name: string; clubId: number }[];
   /** The rules star cards quote: honors' fading seasons and the mentor's influence share. */
@@ -1560,10 +1581,10 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
           country.countryId !== flagship.countryId && seatEligible(country.league, world),
       )
       .map((country) => country.countryId),
-    leaveCost:
-      flagship.countryId === state.anchorCountryId
-        ? world.config.flagship.seatMove.anchorHardcoreDemotionShare
-        : world.config.flagship.seatMove.hardcoreDemotionShare,
+    leaveCost: seatLeaveShare(state, world, flagship.countryId),
+    leaveTraditions: state.culture.traditions
+      .filter((t) => t.lost === null && t.followers.includes(flagship.countryId))
+      .map((t) => t.id),
     players: flagship.players.map(({ id, name, clubId }) => ({ id, name, clubId })),
     starRules: {
       afterglowSeasons: world.config.flagship.stars.afterglowSeasons,

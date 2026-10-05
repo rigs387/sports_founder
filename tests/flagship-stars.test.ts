@@ -14,7 +14,7 @@ import {
   stepQuarter,
   type World,
 } from "../src/sim";
-import { migratedCulture, setupFor, withConfig, world } from "./helpers";
+import { cardless, migratedCulture, setupFor, withConfig, world } from "./helpers";
 
 // Stars and careers (GDD v1.16, tech plan 2.6 step 4).
 
@@ -132,15 +132,6 @@ describe("careers", () => {
   it("never touches the world: the world's dice and fans match with stronger stars", () => {
     const strong = withConfig(world, (config) => {
       config.flagship.stars.strengthPerSkill = 1;
-    });
-    const cardless = (base: World) => ({
-      ...base,
-      events: {
-        ...base.events,
-        cards: base.events.cards.filter(
-          (card) => card.trigger !== "seasonEnd" && card.trigger !== "star",
-        ),
-      },
     });
     const a = runTurns(start(world, 5), cardless(world), 30);
     const b = runTurns(start(strong, 5), cardless(strong), 30);

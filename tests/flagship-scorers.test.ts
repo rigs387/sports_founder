@@ -12,7 +12,7 @@ import {
   totalRounds,
   type World,
 } from "../src/sim";
-import { setupFor, withConfig, world } from "./helpers";
+import { cardless, setupFor, withConfig, world } from "./helpers";
 
 // Credited scores and career lines (GDD v1.16, tech plan 2.6 step 3).
 
@@ -100,15 +100,6 @@ describe("credited scores", () => {
   });
 
   it("never touches the world: the world's dice and fans match whoever scores", () => {
-    const cardless = (base: World) => ({
-      ...base,
-      events: {
-        ...base.events,
-        cards: base.events.cards.filter(
-          (card) => card.trigger !== "seasonEnd" && card.trigger !== "star",
-        ),
-      },
-    });
     const a = runTurns(start("european", world, 5), cardless(world), 30);
     const b = runTurns(start("european", creditAll(1), 5), cardless(creditAll(1)), 30);
     expect(b.flagship.players).not.toStrictEqual(a.flagship.players);

@@ -798,6 +798,7 @@ export const configFileSchema = z.strictObject({
     sportNameMaxLength: z.int().min(1),
     clubNameMaxLength: z.int().min(1),
     groundNameMaxLength: z.int().min(1),
+    trophyNameMaxLength: z.int().min(1),
   }),
   flagship: z.strictObject({
     clubs: z.strictObject({

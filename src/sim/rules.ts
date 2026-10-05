@@ -1,5 +1,6 @@
 import { GENOME_AXES, RULE_AXES } from "../content";
 import { costMultiplier, seasonalWindowOpen, yearOfQuarter } from "./calendar";
+import { ethosFactor, heldStrength, living, wearTraditions } from "./culture";
 import { fandomScore } from "./fandom";
 import { optionNetDelta } from "./hints";
 import { demoteHardcore } from "./leagues";
@@ -10,6 +11,7 @@ import {
   type GameState,
   type Genome,
   PLAYER_INDEX,
+  type Tradition,
   type World,
 } from "./types";
 
@@ -20,7 +22,8 @@ import {
 // country a share of the player's hardcore fans turn casual, growing with the jump and the rule's
 // age, heavier in the anchor and where the old option suited fans better. Fans and spread feel the
 // new rule from the next quarter; the flagship plays it from its next season. Every number is
-// config (`rulesEvolution`).
+// config (`rulesEvolution`). Traditions born under the old rule (GDD v1.22, src/sim/culture.ts)
+// make their followers protest harder and are worn down by the change, perhaps broken.
 
 const QUARTERS_PER_YEAR = 4;
 
@@ -112,6 +115,10 @@ export function backlashShares(
   const founding = foundingRule(state, axis);
   const drift = driftSteps(axis, founding, option, world);
   const homeward = drift < driftSteps(axis, founding, from, world);
+  // Offended traditions make their followers protest harder (GDD v1.22), by the ethos.
+  const offended = heldStrength(offendedTraditions(state, world, axis, option), state, world);
+  const tradition =
+    world.config.culture.backlashWeight * ethosFactor(world, state.identity, "rules");
   const base =
     backlash.sharePerJump *
     jump *
@@ -125,7 +132,26 @@ export function backlashShares(
       optionNetDelta(world, axis, from, index) - optionNetDelta(world, axis, option, index),
     );
     const anchor = country.countryId === state.anchorCountryId ? backlash.anchorFactor : 1;
-    return Math.min(backlash.maxShare, base * anchor * (1 + backlash.fitWeight * fitLoss));
+    const held = 1 + tradition * (offended[index] ?? 0);
+    return Math.min(backlash.maxShare, base * anchor * (1 + backlash.fitWeight * fitLoss) * held);
+  });
+}
+
+/**
+ * The living traditions an amendment would offend (GDD v1.22): those born under a rule the change
+ * moves away from. A move back toward a tradition's rule never offends it.
+ */
+export function offendedTraditions(
+  state: Pick<GameState, "culture" | "genome">,
+  world: World,
+  axis: AxisId,
+  option: string,
+): Tradition[] {
+  const from = state.genome[axis];
+  return state.culture.traditions.filter((tradition) => {
+    const rule = tradition.rules[axis];
+    if (!living(tradition) || rule === undefined) return false;
+    return driftSteps(axis, rule, option, world) > driftSteps(axis, rule, from, world);
   });
 }
 
@@ -144,6 +170,7 @@ export function amendRule(state: GameState, world: World, axis: AxisId, option: 
   const from = state.genome[axis];
   const jump = amendmentJump(axis, from, option, world);
   const shares = backlashShares(state, world, axis, option);
+  const offended = offendedTraditions(state, world, axis, option).map((t) => t.id);
   let demoted = 0;
   const countries = state.countries.map((country, i) => {
     const share = shares[i] ?? 0;
@@ -168,8 +195,15 @@ export function amendRule(state: GameState, world: World, axis: AxisId, option: 
     jump,
     demoted,
   };
+  // Each offended tradition is worn down by the jump; one worn to nothing is broken.
+  const worn = wearTraditions(
+    state,
+    world,
+    offended,
+    () => world.config.culture.amendmentDamage * jump,
+  );
   return {
-    ...state,
+    ...worn,
     pp: state.pp - amendmentPrice(state, world, jump),
     genome: { ...state.genome, [axis]: option } as Genome,
     countries,
@@ -177,6 +211,8 @@ export function amendRule(state: GameState, world: World, axis: AxisId, option: 
     landmarks: [
       ...state.landmarks,
       landmarks.ruleAmended(state.turn, state.quarter, axis, from, option, demoted),
+      // Traditions the amendment broke.
+      ...worn.landmarks.slice(state.landmarks.length),
     ],
   };
 }
@@ -221,6 +257,8 @@ export interface RuleOptionSnapshot {
   /** Hardcore fans who would turn casual. */
   backlash: number;
   blocker: AmendBlocker | null;
+  /** The traditions the change would offend (GDD v1.22), by id. */
+  offended: number[];
   /** Fit hints in the preview markets, in the same order as `RulesSnapshot.previewMarkets`. */
   hints: ("++" | "+" | "-" | null)[];
 }
@@ -255,6 +293,7 @@ export function rulesSnapshot(state: GameState, world: World): RulesSnapshot {
               price: amendmentPrice(state, world, jump),
               backlash: backlashTotal(state, world, axis, option),
               blocker: amendBlocker(state, world, axis, option),
+              offended: offendedTraditions(state, world, axis, option).map((t) => t.id),
               hints: markets.map((index) => changeHint(world, axis, current, option, index)),
             };
           }),

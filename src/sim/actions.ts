@@ -1,5 +1,6 @@
 import { AXIS_IDS, GENOME_AXES } from "../content";
 import { costMultiplier, seasonalWindowOpen } from "./calendar";
+import { nameTrophy, nameTrophyBlocker, renameTrophy, renameTrophyBlocker } from "./culture";
 import { eventBlocker, resolveEvent } from "./events";
 import { backBlocker, backStar, dropBlocker, dropStar, seatBlocker } from "./flagship";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
@@ -30,6 +31,10 @@ import { type AxisId, type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } f
 //   backStar        back a flagship star, in the seasonal window, for a one-time PP price
 //   dropStar        drop a backed star, in the seasonal window; their influence is lost
 //   amendRule       change one rule trait, in the seasonal window, once a year (GDD v1.20)
+//   nameTrophy      name the flagship's newborn trophy, free, while its champion card is open
+//                   (GDD v1.22)
+//   renameTrophy    rename the seat's trophy in the seasonal window: the old trophy tradition
+//                   ends and its followers' purists turn casual (GDD v1.22)
 
 export type Action =
   | { type: "collectMoment"; eventId: number }
@@ -43,7 +48,9 @@ export type Action =
   | { type: "moveSeat"; countryId: string }
   | { type: "backStar"; playerId: number }
   | { type: "dropStar"; playerId: number }
-  | { type: "amendRule"; axis: AxisId; option: string };
+  | { type: "amendRule"; axis: AxisId; option: string }
+  | { type: "nameTrophy"; name: string }
+  | { type: "renameTrophy"; name: string };
 
 export class IllegalActionError extends Error {
   override name = "IllegalActionError";
@@ -163,6 +170,33 @@ export function checkAction(state: GameState, world: World, action: Action): str
         const jump = amendmentJump(action.axis, state.genome[action.axis], action.option, world);
         return `not enough PP: costs ${money(amendmentPrice(state, world, jump))}, you have ${money(state.pp)}`;
       }
+      case null:
+        return null;
+    }
+  }
+  if (action.type === "nameTrophy") {
+    switch (nameTrophyBlocker(state, world, action.name)) {
+      case "none":
+        return "there is no newborn trophy to name";
+      case "name":
+        return "the trophy's name is too short or too long";
+      case null:
+        return null;
+    }
+  }
+  if (action.type === "renameTrophy") {
+    const open = seasonalWindowOpen(state, world.config);
+    switch (renameTrophyBlocker(state, world, action.name, open)) {
+      case "trophy":
+        return "the league at the seat has no trophy";
+      case "naming":
+        return "the newborn trophy is named for free (nameTrophy)";
+      case "window":
+        return "the trophy can only be renamed in the seasonal window";
+      case "name":
+        return "the trophy's name is too short or too long";
+      case "same":
+        return "the trophy already has that name";
       case null:
         return null;
     }
@@ -293,6 +327,10 @@ export function applyAction(state: GameState, world: World, action: Action): Gam
       });
     case "amendRule":
       return amendRule(state, world, action.axis, action.option);
+    case "nameTrophy":
+      return nameTrophy(state, action.name);
+    case "renameTrophy":
+      return renameTrophy(state, world, action.name);
     case "backStar":
       return backStar(state, world, action.playerId);
     case "dropStar":
