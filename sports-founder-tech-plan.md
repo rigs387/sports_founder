@@ -433,6 +433,16 @@ Every number is config (`culture` in `content/config.yaml`); founding-character 
    in both layouts. Pacing on seeds 1–3 and 4–6 (must pass; #1 lost before the win about half)
    and differentiation as invented. `docs/culture/README.md`, `docs/progress/data.js`, CLAUDE.md.
 
+*Built 2026-10-04.* Culture runs once per turn after the league evaluation (`updateCulture` in
+`src/sim/turn.ts`), reading landmarks and season summaries since its cursor; reach rolls on its
+own stream. Event records gained tradition facts (format 18 sets them null on older records).
+The flagship isolation tests switch tradition effects off with the season cards
+(`tests/helpers.ts` `cardless`). Measured with the builder over 12 typical anchors, 200 turns:
+pacing passes on seeds 1–3 and 4–6 (the latter run as 4–5 and 6 to fit the budget); #1 lost
+before the win 36/70 (51%); differentiation 5 of 6 as invented, unchanged. A campaign takes about
+14% longer. The builder never buys Culture nodes (its value-per-PP rule prefers grassroots, as
+with Media); the options experiment (340 campaigns, about 20 minutes) was not run.
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)

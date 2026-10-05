@@ -838,6 +838,17 @@ purchased traits and percentage modifiers alone do not make culture.
     trust* (more protection and hold, but higher amendment backlash in tradition countries) or
     *Living game* (more reach and strength gain, less protection). Prices follow the other
     categories; bots get Culture weights and the options experiment checks no node dominates.
+  - *Built 2026-10-04 (calls made at build).* Strength starts at 0.5, renews +0.25, decays 0.05 a
+    year (a first try at 0.4 / 0.2 / 0.1 let legacies fade four years after retirement); most
+    traditions live 10–30 years. The club rite is born once only (a later title cannot be a first
+    title). Every club's ground is its town and a ground word. Hold raises weight for betrayal as
+    well as for stickiness, so Heritage trust's higher backlash needs no separate effect. Reach may
+    name a channel (Travelling support: borders and sea; Twinned towns: language). Losses by fold
+    take every tradition at home in that league's country. National names arise in most markets
+    as leagues professionalize, which is the decided rule; their effect is watched in the contest.
+    Measured: pacing passes, #1 lost before the win 51% (36 of 70), differentiation 5 of 6 as
+    invented, and with amendments the sports now stay distinct (purists defending traditions slow
+    the drift toward the giants). Builder amendments fell from 3–4 to 1–2 a campaign.
 
 **Stars (decided 2026-09-26, GDD v1.12):** Stars are how a league becomes a sport people love.
 - **Where they come from:** the flagship carries full squads; every other league carries a few

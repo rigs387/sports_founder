@@ -2,25 +2,25 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-04",
-  design: "GDD v1.21",
+  design: "GDD v1.22",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
   summary:
-    "Creation, global growth, rival pressure, league management, events and saving are playable, and the flagship league has clubs, seasons and stars. Next, the sport's own identity: names, a rulebook and founding character.",
+    "Creation, global growth, rival pressure, league management, events and saving are playable; the flagship league has clubs, seasons and stars; the sport has its identity and rulebook; and traditions are born from what happens, shelter fans and resist betrayal.",
   milestone: "A flagship season the player remembers",
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-04",
-    tests: 430,
-    files: 39,
-    note: "npm run check passed after big and rich markets (type checks, Biome, purity, 430 tests in 39 files). Lint has existing visual-study warnings.",
+    tests: 464,
+    files: 44,
+    note: "npm run check passed after Culture (type checks, Biome, purity, 464 tests in 44 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-04",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; save/resume continued identically.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the seasonal window, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically.",
   },
-  eventDeck: { current: 26, target: "40–60" },
+  eventDeck: { current: 28, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -32,7 +32,7 @@ window.SF_PROGRESS = {
       name: "Phase 1",
       title: "Make it matter",
       state: "Current",
-      text: "Flagship, people, deals, evolving rules and traditions. The flagship and its stars are built.",
+      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution and the first traditions are built; deals are next.",
     },
     {
       name: "Phase 2",
@@ -61,9 +61,9 @@ window.SF_PROGRESS = {
       tag: "Then",
     },
     {
-      system: "culture",
-      title: "Make history change decisions",
-      text: "Earned traditions that help fans stay, and make deals or rule changes hurt.",
+      system: "business",
+      title: "Deals that can betray traditions",
+      text: "Traditions now resist rule changes, seat moves and renamed trophies (GDD v1.22). Flagship sponsor and TV deals with demands bring the naming-rights dilemma at famous grounds and the homegrown gear brand.",
       tag: "Then",
     },
   ],
@@ -76,7 +76,7 @@ window.SF_PROGRESS = {
     },
     {
       title: "The #1 hold is now a contest",
-      text: "Lead lost before the win in 37 of 70 campaigns (53%), on target, after amendments, big and rich markets and retuned world championships. Builder, 12 typical anchors × 6 seeds, 200 turns. Reclaim adds little; championships and rich-market defense carry it. Remeasure when new pressure lands.",
+      text: "Lead lost before the win in 36 of 70 campaigns (51%), on target, after Culture (traditions shelter the player's hardcore fans from rivals). Builder, 12 typical anchors × 6 seeds, 200 turns. Championships and rich-market defense carry it. Remeasure when new pressure lands.",
       date: "2026-10-04",
       system: "rivals",
     },
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-04",
+      type: "Built",
+      title: "Culture and traditions",
+      text: "GDD v1.22: derbies, club rites, star legacies, national names, famous grounds and the trophy are born from recorded facts, renewed or faded, and lost with landmarks and cards. They cut hardcore turnover and rival pull, raise backlash from rule changes and seat moves, and the trophy's name is the player's. Birthplace and ethos bias them; ten Culture nodes nurture them. Pacing passes, #1 contest 51%, differentiation 5 of 6 as invented. Save format 18.",
+    },
     {
       date: "2026-10-04",
       type: "Built",
@@ -326,7 +332,7 @@ window.SF_PROGRESS = {
       icon: "03",
       summary:
         "Invent the rules, then found the sport: its name, first club, ground, character, terms and emblem, read back as a Rulebook.",
-      next: "Country difficulty and recommended starts; let Culture read birthplace and ethos.",
+      next: "Country difficulty, recommended starts and difficulty presets.",
       depends: ["foundation"],
       sources: [
         ["Campaign setup", "../campaign-setup/README.md"],
@@ -345,8 +351,8 @@ window.SF_PROGRESS = {
         ["planned", "Country difficulty, recommended starts and difficulty presets"],
         ["built", "Generated prose rulebook and field diagram"],
         [
-          "partial",
-          "Birthplace, ethos, emblem and terms built; birthplace and ethos wait for Culture to matter",
+          "built",
+          "Birthplace, ethos, emblem and terms; birthplace biases which traditions form, ethos how fans take betrayal",
         ],
       ],
     },
@@ -368,7 +374,8 @@ window.SF_PROGRESS = {
         ["built", "Prerequisites, tier locks and sport-size price scaling"],
         ["built", "Live board with effect details and fork confirmation"],
         ["partial", "Meaningful build diversity: five early nodes remain over-selected"],
-        ["planned", "Infrastructure, Culture and Global categories"],
+        ["built", "Culture category: ten nodes nurturing traditions, with one fork"],
+        ["planned", "Infrastructure and Global categories"],
       ],
     },
     {
@@ -486,7 +493,7 @@ window.SF_PROGRESS = {
       icon: "09",
       summary:
         "Amend one rule a year in the seasonal window; purists push back, and the Rulebook keeps the dates.",
-      next: "Proposals from broadcasters, sponsors and directors with the deals build; traditions feed backlash with Culture.",
+      next: "Proposals from broadcasters, sponsors and directors with the deals build.",
       depends: ["creation"],
       sources: [
         ["Rules evolution design", "../../sports-founder-gdd.md#progression--economy"],
@@ -501,8 +508,8 @@ window.SF_PROGRESS = {
         ["built", "Player changes to evolvable traits in seasonal windows, with a review step"],
         ["built", "PP costs, annual limits and dated rulebook amendments"],
         [
-          "partial",
-          "Backlash by hardcore base, rule age, jump, anchor and fit lost; traditions wait for Culture",
+          "built",
+          "Backlash by hardcore base, rule age, jump, anchor, fit lost and the traditions offended",
         ],
         ["planned", "Rule proposals from sponsors, broadcasters and directors"],
       ],
@@ -557,17 +564,27 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD v1.12 · emergent traditions",
       icon: "11",
-      summary: "Fans inherit traditions from real events. Those traditions help and constrain.",
-      next: "Start with a few fact-backed traditions; make their loyalty matter to rules and deals.",
+      summary:
+        "Derbies, club rites, star legacies, national names, famous grounds and the trophy are born from what happened; they shelter fans and resist betrayal.",
+      next: "Chants and anthems; with deals, naming rights at famous grounds and the homegrown gear brand. Watch whether bots ever buy Culture nodes.",
       depends: ["leagues", "stars", "creation"],
       sources: [
         ["Culture and artifacts design", "../../sports-founder-gdd.md#progression--economy"],
+        ["Culture and traditions", "../culture/README.md"],
+        ["Culture tests", "../../tests/culture-births.test.ts"],
+        [
+          "Culture build plan",
+          "../../sports-founder-tech-plan.md#211-build-plan-culture-first-build-gdd-v122",
+        ],
       ],
       items: [
-        ["planned", "Traditions with stable IDs, origin facts and local followers"],
-        ["planned", "Fan stickiness and resistance to betraying traditions"],
-        ["planned", "Famous grounds, trophies, chants and homegrown gear brands"],
-        ["planned", "Culture upgrades nurture existing traditions; never buy fame"],
+        ["built", "Traditions with stable IDs, origin facts and local followers"],
+        ["built", "Fan stickiness and resistance to betraying traditions"],
+        [
+          "partial",
+          "Famous grounds and the trophy built; chants, anthems and homegrown gear brands later",
+        ],
+        ["built", "Culture upgrades nurture existing traditions; never buy fame"],
       ],
     },
     {
