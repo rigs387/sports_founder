@@ -12,11 +12,11 @@ never fully retires (rules can always be revisited).
 **Turn Structure:** Turn length set by PP tier — quarters at tier 1 (inventor era), up to years at
 the top (operator era). The sim always steps quarterly underneath. Turns always complete; league
 health moves at most one step per turn, so collapse always gets a warning turn.
-Living time (v1.24): Play / Pause with three speeds; the date ticks quarter by quarter and the game
-pauses itself for decisions, resuming after. Cards pop up at the quarter they happened as event
-windows over the map (presentation only; a true mid-turn stop is parked). Once a year the
-offseason screen pauses on the season review, then all league business in one place (stars,
-rules, promotions, the seat, the trophy; sponsors and TV later), prices against PP on hand.
+Turns stay turns (v1.25): a Play / Pause clock was built and dropped after playtest (choppy,
+jarring stops). Next Turn stays, the date is the bottom bar's headline. After each turn its
+decisions pop up one at a time as event windows over the map, in the order they happened. Once a
+year the offseason screen opens on the season review, then all league business in one place
+(stars, rules, promotions, the seat, the trophy; sponsors and TV later), prices against PP on hand.
 
 **Win Condition:** #1 sport by global Fandom Score (hardcore + weighted casual fans, raw
 population), held for X turns (30) at PP tier 5 — a turn below #1 or below tier 5 restarts the

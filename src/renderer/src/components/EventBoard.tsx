@@ -59,7 +59,7 @@ function Effect({ effect, star = {} }: { effect: EventEffect; star?: StarValues 
 
 export function EventBoard() {
   const { t } = useTranslation();
-  const { snapshot, names, status, dispatchAction, clock, replay } = useGameStore();
+  const { snapshot, names, status, dispatchAction } = useGameStore();
   const dialog = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"pending" | "history">("pending");
@@ -75,20 +75,6 @@ export function EventBoard() {
   useEffect(() => {
     if (review) dialog.current?.querySelector<HTMLButtonElement>(".event-confirm button")?.focus();
   }, [review]);
-  // The clock stopped for a decision (GDD v1.24): once the turn's replay is over, open on it.
-  // When the answer sets the clock running again, the board gets out of the way.
-  const stoppedFor = clock.pausedFor.includes("decision") && !replay;
-  const firstDecision = snapshot?.events.find((event) => event.kind === "decision")?.id ?? null;
-  useEffect(() => {
-    if (!stoppedFor || firstDecision === null) return;
-    setOpen(true);
-    setTab("pending");
-    setSelectedId(firstDecision);
-    setReview(null);
-  }, [stoppedFor, firstDecision]);
-  useEffect(() => {
-    if (clock.playing) setOpen(false);
-  }, [clock.playing]);
   if (!snapshot) return null;
   const pending = snapshot.events;
   const history = [...snapshot.eventHistory].reverse();

@@ -176,34 +176,6 @@ export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeS
   });
 }
 
-/**
- * One simulated quarter as the clock replays it (GDD v1.24): the date and each country's player
- * share (Fandom Score ÷ population, as the map's heat reads it), by country id.
- */
-export interface QuarterFrame {
-  quarter: number;
-  year: number;
-  quarterOfYear: number;
-  shares: Record<string, number>;
-}
-
-export function quarterFrame(state: GameState, world: World): QuarterFrame {
-  const { casualWeight } = world.config.fandomScore;
-  const shares: Record<string, number> = {};
-  state.countries.forEach((countryState, index) => {
-    const country = world.countries[index];
-    const fans = countryState.fans[PLAYER_INDEX];
-    if (!country || !fans) return;
-    shares[country.id] = fandomScore(fans.casual, fans.hardcore, casualWeight) / country.population;
-  });
-  return {
-    quarter: state.quarter,
-    year: yearOfQuarter(state.quarter, world.config),
-    quarterOfYear: (state.quarter % QUARTERS_PER_YEAR) + 1,
-    shares,
-  };
-}
-
 export function snapshot(state: GameState, world: World): TurnSnapshot {
   const exposure = computeExposure(state, world);
   const { casualWeight } = world.config.fandomScore;

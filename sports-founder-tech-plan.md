@@ -71,6 +71,7 @@ surface before playtesting or during it.
 | 2026-10-04 | Culture, first build (GDD v1.22): six types from recorded facts (derby, club rite, star legacy, national name, famous venue, trophy); strength renews and decays, loss by facts or betrayal, landmarks both ways; weight cuts the player's hardcore turnover and rival poaching/reclaim; venue pilgrimage and champion PP; each tradition remembers its rulebook and offending amendments multiply backlash and wear it; seat moves and trophy renames cost more where traditions are held; birthplace biases births, ethos betrayals, balanced near 1; rivals carry flavor-only content traditions; Culture tree category (strength, reach, protection, hold; Heritage trust / Living game fork). Save format 18. Build plan: 2.11 | Decided |
 | 2026-10-05 | Flagship broadcast (GDD v1.23): the seat league multiplies media reach out of its country by (1 + tier ceiling × season interest × health); interest is read from the last season summary (gripping, ordinary, dynasty, runaway/foregone); a season-end pulse on the same channel, none after runaways; a Near-Collapse flagship drains casual fans where its reach lands; stacks with backed stars; balance target 5–15% of world media exposure and one win-contest remeasure. Talent pull parked until other leagues have named players. Build plan: 2.12 | Decided |
 | 2026-10-05 | Living time and the offseason (GDD v1.24), after the first playtest: Play / Pause with three speeds over End Turn, the date ticking quarter by quarter, auto-pause on the interrupt list and decisions with resume after answering; cards revealed at their fact's quarter as event windows over the map (presentation only; a mid-turn sim stop is parked); the seasonal window renamed the offseason, opening on the first turn after the season ends, with one screen for the season review and all league business, prices against PP on hand; backing stays 60 PP. Build plan: 2.13 | Decided |
+| 2026-10-05 | The clock is dropped after playtest (GDD v1.25): built as step 3 and played, the quarter-by-quarter replay was choppy and the self-pauses jarring; reverted the same day. Next Turn stays with tier-scaled lengths, the date heads the bottom bar, and cards pop up over the map after each turn in the order they happened. Build plan 2.13 revised | Decided |
 
 ---
 
@@ -467,9 +468,10 @@ Every number is config (`flagship.broadcast` in `content/config.yaml`). The sim 
    against the target; pacing on seeds 1–3 (must pass; #1 lost before the win about half).
    `docs/flagship/README.md`, `docs/progress/data.js`, CLAUDE.md.
 
-### 2.13 Build Plan: Living Time and the Offseason (GDD v1.24)
+### 2.13 Build Plan: Living Time and the Offseason (GDD v1.24, revised v1.25)
 
-Mostly renderer work. Every number is config (speeds, the interrupt list, pop-up pacing).
+Mostly renderer work. Revised 2026-10-05 (v1.25): the clock (step 3) was built, played and
+removed; turns stay Next Turn, and cards pop up after each turn.
 
 1. **Offseason timing (sim).** Rename the seasonal window to the offseason in code, config, the
    snapshot and the locale. The offseason opens on the first turn that starts after a season
@@ -478,17 +480,17 @@ Mostly renderer work. Every number is config (speeds, the interrupt list, pop-up
    possible, otherwise a format step. Pacing on seeds 1–3 and the win contest remeasured once.
 2. **Quarter facts on cards (sim).** Every offered card carries the quarter its fact happened, so
    the renderer can reveal it there. No change to what is offered or when it resolves.
-3. **The clock (renderer).** Play / Pause, three speeds and step; the date as the headline; the
-   heatmap blending per quarter from per-quarter snapshots of the turn (the worker returns them);
-   auto-pause on the interrupt list and decisions, resume after answering.
-4. **Event windows.** One card at a time over the map at its quarter, country highlighted, choice
-   buttons with one-line effects and hover detail, a confirm only for PP costs; moments as map
-   pickups and toasts; the board becomes the journal.
+3. **The clock (removed).** Built and reverted the same day (v1.25). Kept from it: the date as the
+   bottom bar's headline.
+4. **Event windows.** After Next Turn, the turn's decisions one at a time over the map in the
+   order their facts happened (the card's quarter), country highlighted, choice buttons with
+   one-line effects and hover detail, a confirm only for PP costs; moments as map pickups and
+   toasts; the board becomes the journal.
 5. **The offseason screen.** Season review, then stars, rules, promotions, the seat and the trophy
    in one place with prices against PP on hand; the amend, backing and seat controls move here
    from their tabs (tabs keep read-only views).
-6. **Smoke and docs.** The smoke plays with the clock to the first offseason, backs or prices a
-   star there, answers a pop-up decision and checks resume; screenshots in both layouts.
+6. **Smoke and docs.** The smoke plays to the first offseason, backs or prices a star there and
+   answers a pop-up decision; screenshots in both layouts.
    `docs/progress/data.js`, CLAUDE.md.
 
 *Step 1 built 2026-10-05.* `FlagshipState.offseason` (save format 19), read through
@@ -501,17 +503,8 @@ over 12 typical anchors × seeds 1–3, 200 turns: pacing passes (tier 5 median 
 *Step 2 built 2026-10-05.* An event record's `quarter` is now when its fact happened: the
 landmark's quarter for season, star, tradition, rival and league cards, the turn's end for audience
 and league-pressure cards (judged then). The field already existed, so the save format is
-unchanged; records from before keep the turn's end. The snapshot passes it through.
-
-*Step 3 built 2026-10-05.* The clock lives in the renderer store; speeds (2 s, 1 s, 0.4 s a
-quarter) and the interrupt list are in `content/map.yaml` (presentation settings). `endTurn` takes
-an `onQuarter` callback, and the worker returns a `QuarterFrame` per quarter (date and every
-country's share). The replay never blocks: a step plays at the current speed and any action skips
-it; Play waits for it before the next turn. Interrupts are judged by comparing the turn's snapshots
-(decision, offseason opening, tier change, anchor and focus-country health, a rival's escalation or
-new countermove in a focus country, the win hold starting, the win). The event board opens on the
-decision that stopped play and closes when an answer resumes it. Heat blends over 60% of a
-quarter's time. Until step 4, cards still appear on the board after the turn.
+unchanged; records from before keep the turn's end. The snapshot passes it through. With the
+clock gone, the pop-ups use it to order a turn's cards and to date them.
 
 ---
 

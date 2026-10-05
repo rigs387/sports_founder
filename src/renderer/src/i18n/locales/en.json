@@ -377,25 +377,6 @@
       "american": "American: the top clubs play off"
     }
   },
-  "clock": {
-    "play": "Play",
-    "pause": "Pause",
-    "speed": "Speed",
-    "speedTitle": "One quarter every {{seconds}} s",
-    "step": "Next turn",
-    "stepTitle": "Play one turn",
-    "pausedFor": "Paused: {{reasons}}",
-    "interrupts": {
-      "decision": "a decision needs you",
-      "offseason": "the offseason is open",
-      "tierChange": "your PP tier changed",
-      "anchorHealth": "your home league's health changed",
-      "focusHealth": "a league in a focus country changed health",
-      "focusRival": "a rival moved in a focus country",
-      "winHold": "you hold #1 at the top tier",
-      "win": "your sport is the world's #1"
-    }
-  },
   "status": {
     "loading": "Setting up the backyard…",
     "simulating": "Simulating…",

@@ -184,7 +184,7 @@ describe("the worker round-trip", () => {
     let snap = api.newCampaign(setupFor(11, "brazil"));
     for (let turn = 0; turn < 20; turn += 1) {
       if (snap.offseasonOpen && snap.flagship.stars.some((s) => s.backBlocker === null)) break;
-      snap = api.endTurn().snapshot;
+      snap = api.endTurn();
     }
     const star = snap.flagship.stars.find((s) => s.backBlocker === null);
     if (!star) throw new Error("No backable star within 20 turns");

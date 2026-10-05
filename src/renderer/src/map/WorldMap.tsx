@@ -1,7 +1,7 @@
 // Pixi's CSP-compatible shader helpers avoid dynamic code generation; CSP stays strict.
 import "pixi.js/unsafe-eval";
 import { Application, useApplication } from "@pixi/react";
-import { Color, Container, type FederatedPointerEvent, Graphics, Text, Texture } from "pixi.js";
+import { Container, type FederatedPointerEvent, Graphics, Text, Texture } from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -26,10 +26,6 @@ const PENNANT = 0xd8b23a;
 interface Props {
   countryNames: Record<string, string>;
   snapshot: TurnSnapshot;
-  /** While a turn replays (GDD v1.24): each country's share at the quarter shown, by id. */
-  shares: Record<string, number> | null;
-  /** How long a change of heat blends over, in ms; 0 changes at once. */
-  blendMs: number;
   selected: string | null;
   command: MapCommand;
   patterns: boolean;
@@ -43,10 +39,7 @@ interface SceneProps extends Props {
 }
 interface MapController {
   update: (
-    state: Pick<
-      Props,
-      "snapshot" | "shares" | "blendMs" | "selected" | "patterns" | "rivals" | "countryNames"
-    >,
+    state: Pick<Props, "snapshot" | "selected" | "patterns" | "rivals" | "countryNames">,
   ) => void;
   command: (command: MapCommand) => void;
 }
@@ -114,8 +107,8 @@ function MapScene(props: SceneProps) {
     const settings = mapSettings.camera;
     const styles = getComputedStyle(host);
     const color = (name: string) => styles.getPropertyValue(name).trim();
-    const palette = mapSettings.heatBands.map((_, i) => new Color(color(`--heat-${i}`)).toNumber());
-    palette.push(new Color(color(`--heat-${mapSettings.heatBands.length}`)).toNumber());
+    const palette = mapSettings.heatBands.map((_, i) => color(`--heat-${i}`));
+    palette.push(color(`--heat-${mapSettings.heatBands.length}`));
     const textures = new Map(
       mapSettings.heatBands.map((_, index) => [index + 1, patternTexture(index + 1)]),
     );
@@ -155,32 +148,15 @@ function MapScene(props: SceneProps) {
         shape.polygons,
         shape.market ? undefined : textures.get(3),
       );
-      const tint = palette[0] ?? 0xb8d89c;
-      face.tint = shape.market ? tint : color("--neutral-land");
+      face.tint = shape.market ? (palette[0] ?? "#b8d89c") : color("--neutral-land");
       lands.addChild(face);
       for (const polygon of shape.polygons) {
         edges.poly(polygon.outer).stroke({ color: color("--land-edge"), width: 0.8, alpha: 0.9 });
         for (const hole of polygon.holes)
           edges.poly(hole).stroke({ color: color("--land-edge"), width: 0.8, alpha: 0.9 });
       }
-      // A market's heat colour blends from `from` to `to` (GDD v1.24 replay).
-      return { shape, face, pattern: -1, from: tint, to: tint };
+      return { shape, face, pattern: -1 };
     });
-    const mix = (a: number, b: number, t: number) => {
-      const channel = (shift: number) =>
-        Math.round(((a >> shift) & 255) + (((b >> shift) & 255) - ((a >> shift) & 255)) * t);
-      return (channel(16) << 16) | (channel(8) << 8) | channel(0);
-    };
-    let blend = { start: 0, ms: 0 };
-    let blendFrame = 0;
-    const blendStep = () => {
-      blendFrame = 0;
-      const t = blend.ms > 0 ? Math.min(1, (performance.now() - blend.start) / blend.ms) : 1;
-      for (const entry of entries)
-        if (entry.shape.market) entry.face.tint = t >= 1 ? entry.to : mix(entry.from, entry.to, t);
-      invalidate();
-      if (t < 1 && !disposed) blendFrame = requestAnimationFrame(blendStep);
-    };
     for (const layer of [depths, lands, edges]) {
       layer.eventMode = "none";
       viewport.addChild(layer);
@@ -378,8 +354,7 @@ function MapScene(props: SceneProps) {
       for (const entry of entries) {
         if (!entry.shape.market) continue;
         const country = countries.get(entry.shape.market);
-        const share = current.shares?.[entry.shape.market] ?? country?.share ?? 0;
-        const bin = heatBand(share, mapSettings.heatBands);
+        const bin = heatBand(country?.share ?? 0, mapSettings.heatBands);
         const pattern = current.patterns && bin > 0 ? bin : -1;
         if (entry.pattern !== pattern) {
           drawShape(
@@ -389,11 +364,7 @@ function MapScene(props: SceneProps) {
           );
           entry.pattern = pattern;
         }
-        const target = palette[bin] ?? palette[0] ?? 0xb8d89c;
-        if (target !== entry.to) {
-          entry.from = Number(entry.face.tint);
-          entry.to = target;
-        }
+        entry.face.tint = palette[bin] ?? palette[0] ?? "#b8d89c";
         if (entry.shape.market === current.selected) {
           for (const polygon of entry.shape.polygons)
             selectedLand.poly(polygon.outer).stroke({ color: color("--accent"), width: 2 });
@@ -411,10 +382,6 @@ function MapScene(props: SceneProps) {
           if (market)
             rivalMarks.circle(...market.center, 5).stroke({ color: color("--warning"), width: 2 });
         }
-      // Most of a quarter's time on screen goes to the blend, so each quarter's heat is seen.
-      blend = { start: performance.now(), ms: current.blendMs * 0.6 };
-      cancelAnimationFrame(blendFrame);
-      blendStep();
       host.dataset.turn = String(current.snapshot.turn);
       host.dataset.patterns = String(current.patterns);
       host.dataset.rivals = String(current.rivals);
@@ -450,7 +417,6 @@ function MapScene(props: SceneProps) {
     return () => {
       disposed = true;
       cancelAnimationFrame(frame);
-      cancelAnimationFrame(blendFrame);
       observer.disconnect();
       controller.current = null;
       delete host.dataset.ready;
@@ -462,22 +428,12 @@ function MapScene(props: SceneProps) {
   useEffect(() => {
     controller.current?.update({
       snapshot: props.snapshot,
-      shares: props.shares,
-      blendMs: props.blendMs,
       countryNames: props.countryNames,
       selected: props.selected,
       patterns: props.patterns,
       rivals: props.rivals,
     });
-  }, [
-    props.snapshot,
-    props.shares,
-    props.blendMs,
-    props.selected,
-    props.patterns,
-    props.rivals,
-    props.countryNames,
-  ]);
+  }, [props.snapshot, props.selected, props.patterns, props.rivals, props.countryNames]);
   useEffect(() => {
     controller.current?.command(props.command);
   }, [props.command]);

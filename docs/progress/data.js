@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-05",
-  design: "GDD v1.24",
+  design: "GDD v1.25",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-05",
-    tests: 473,
-    files: 45,
-    note: "npm run check passed after the clock (type checks, Biome, purity, 473 tests in 45 files). Lint has existing visual-study warnings.",
+    tests: 468,
+    files: 44,
+    note: "npm run check passed after cards were dated by their facts (type checks, Biome, purity, 468 tests in 44 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-05",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "foundation",
       title: "Living time and the offseason",
-      text: "The first playtest loved the game but found turn clicking flat and the seasonal window never usable. Decided (GDD v1.24): Play / Pause with speeds, cards popping up as they happen, and an offseason screen for all league business. Steps 1–3 are built: the offseason opens right after each season, every card knows the quarter it happened, and time runs with Play / Pause and three speeds, stopping itself for decisions, the offseason and other big moments. Next, cards as event windows over the map (step 4).",
+      text: "The first playtest loved the game but found the choice board stiff and the seasonal window never usable. Built: the offseason opens right after each season, and every card knows when it happened. A Play / Pause clock was tried and dropped (GDD v1.25): Next Turn stays. Next, decisions pop up over the map after each turn (tech plan 2.13 step 4), then the offseason screen.",
       tag: "Next build",
     },
     {
@@ -96,9 +96,9 @@ window.SF_PROGRESS = {
   history: [
     {
       date: "2026-10-05",
-      type: "Built",
-      title: "Time runs: the clock",
-      text: "Tech plan 2.13 step 3 (GDD v1.24): Play / Pause with three speeds and a one-turn step. The date is the headline and ticks quarter by quarter while the map's heat blends; the replay never blocks the player. Play stops itself for decisions, the offseason, tier changes, league health at home and in focus countries, rival moves in focus countries and the win, says why, opens the board on a decision and resumes once it is answered.",
+      type: "Review",
+      title: "The clock is dropped",
+      text: "GDD v1.25: the Play / Pause clock (tech plan 2.13 step 3) was built and played the same day. The quarter-by-quarter replay was choppy and the self-pauses jarring, so it was reverted: Next Turn stays with tier-scaled turns, the date heads the bottom bar, and decisions will pop up over the map after each turn in the order they happened.",
     },
     {
       date: "2026-10-05",
@@ -321,11 +321,6 @@ window.SF_PROGRESS = {
       ],
       items: [
         ["built", "Quarterly simulation and variable-length turns"],
-        [
-          "built",
-          "The clock: Play / Pause, three speeds, a quarter-by-quarter replay, self-pausing (GDD v1.24)",
-        ],
-        ["planned", "Cards as event windows over the map at the quarter they happened"],
         ["built", "Seeded randomness and headless strategy bots"],
         ["built", "Content validation and isolated simulation core"],
         ["built", "Five-tier progression and demotion warnings"],

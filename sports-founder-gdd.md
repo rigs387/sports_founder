@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.24 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen)*
+*Version 1.25 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn)*
 
 ---
 
@@ -47,7 +47,7 @@ turn. Longer turns change how often the player decides, not the economy's math.
 - **The offseason (renamed from the seasonal window, v1.24):** one per in-game year, opening on
   the first turn that starts after the flagship season ends. At quarter-length turns it is one
   turn in four; at year-length turns every turn starts with one.
-- **Auto-advance (superseded by v1.24 below):** an optional "advance until something happens" control that
+- **Auto-advance (dropped 2026-10-05, v1.25; see Living time below):** an optional "advance until something happens" control that
   always stops for decision cards, offseasons, League Health Ladder changes (anchor always;
   others in focus countries), PP tier-ups, rival moves in focus countries, and the start of the win
   hold / the win. Interrupt list lives in config.
@@ -69,29 +69,24 @@ turn. Longer turns change how often the player decides, not the economy's math.
   usable. Measured in the real game: the window opened on turns 3 and 7, but the first star
   arrived on turn 4 (the season ends inside the window's turn, so its cards land after it
   closes), nothing announced the window, and on turn 7 backing cost 60 PP against about 39.
-  - *Time runs, Crusader Kings style.* Play / Pause with speeds is the main control. The date is
-    the headline and ticks visibly quarter by quarter, with the heatmap blending between
-    quarters, also inside year-long turns. Turns stay inside the simulation (pacing, the
-    decision cap, End Turn defaults and the win hold still count turns); a step button plays one
-    turn. Three speeds in config, starting at one quarter every 2 s, 1 s and 0.4 s.
-  - *It pauses itself and resumes.* The game starts paused. It stops on the interrupt list
-    (config) and on every decision; after the player answers the card it stopped for, it resumes
-    at the same speed if it was playing.
-  - *Choices pop up as they happen.* While the clock animates a turn, each card appears at the
-    quarter its fact happened, not as a batch at the end. A decision is an event window over the
-    map, one at a time, with its country highlighted: the story, then two or three choice buttons,
-    each with a one-line effect and the full detail on hover. No separate review step, except a
-    confirm when a choice costs PP. Moments without a choice are map pickups and toasts that do
-    not pause. The board becomes the journal of past cards.
-  - *Presentation only for now (choose the cheap step first).* The sim still simulates the whole
-    turn before the cards appear, and answers take effect from the next turn, as before. Late in
-    the game an answer to a card from a year-long turn's first quarter cannot change the rest of
-    that year. Parked: a sim that really stops mid-turn (see the parking lot).
-  - *The offseason screen.* When the offseason opens, time pauses on one screen in a set order:
+  - *Turns stay turns (revised 2026-10-05, v1.25).* A Crusader Kings clock was built (Play /
+    Pause, three speeds, the date ticking quarter by quarter with the heat blending, self-pausing
+    on an interrupt list and resuming after an answer) and played. It was removed the same day:
+    the quarter-by-quarter replay was choppy and the self-pauses were jarring. The game keeps
+    Next Turn with tier-scaled turn lengths (no balance change). What stays: the date is the
+    headline of the bottom bar (the turn number below it), and the v1.19 auto-advance idea is
+    dropped with the clock.
+  - *Choices pop up after each turn.* After Next Turn, the turn's decisions appear one at a time
+    as event windows over the map, with their country highlighted, in the order their facts
+    happened (each card records its quarter): the story, then two or three choice buttons, each
+    with a one-line effect and the full detail on hover. No separate review step, except a confirm
+    when a choice costs PP. Moments without a choice are map pickups and toasts. The board becomes
+    the journal of past cards. Answers take effect from the next turn, as before.
+  - *The offseason screen.* When the offseason opens, the turn opens on one screen in a set order:
     the season review (champion, new star, stories), then everything the offseason allows in one
     place — back or drop stars, amend a rule, promote leagues, move the seat, name or rename the
     trophy — each showing its price against the PP the player has ("60 PP · you have 39"). It
-    stays open until the player resumes. It is the home of future league business: sponsors, TV
+    stays open until the player plays the next turn. It is the home of future league business: sponsors, TV
     deals and the rest of the business layer arrive here. With it, locked controls elsewhere need
     no countdowns.
   - *Offseason timing.* The offseason opens on the first turn that starts after the season ends,
@@ -108,8 +103,8 @@ turn. Longer turns change how often the player decides, not the economy's math.
   - *The backing price stays (choose pain).* 60 PP base: the first star is usually not affordable
     in their first offseason, and the screen shows the gap as a goal to save toward.
 
-**Turn anatomy:** (v1.24: with time running, the recap is the animated clock, decisions pop up
-at their quarter and global actions happen while paused; the offseason gathers league business.)
+**Turn anatomy:** (v1.25: decisions pop up over the map after Next Turn, in the order they
+happened; the offseason gathers league business on its own screen.)
 1. **Recap** — map animates the elapsed quarters; pickups appear; headlines.
 2. **Decisions** — 0–3 decision cards.
 3. **Global** — spend PP on growth nodes, reassign focus slots, change rules.
@@ -1500,10 +1495,6 @@ Items flagged during the interview that need further discussion in future sessio
 - Flagship talent pull (parked 2026-10-05, v1.23): the flagship should work like the Premier
   League or the NBA, a top flight that draws the world's best players. Foreign stars moving in
   need named standouts in other leagues first; build it with them, not with the broadcast.
-- A sim that stops mid-turn (parked 2026-10-05, v1.24): cards offered the quarter their fact
-  happens and answers applied from the next quarter, a true Crusader Kings pause. It changes the
-  turn contract (decision cap, End Turn defaults, pacing). Build it if v1.24's presentation-only
-  pop-ups read as staged.
 - Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to
   handle missed matches; deferred from the Phase 1 stars build.
 - Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship

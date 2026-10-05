@@ -128,14 +128,6 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   full year, so seasons end on turn boundaries). A bare `stepQuarter` closes it first, as a
   quarter-length turn would; `endTurn` holds one that opens mid-turn. League business (promotion,
   amendments, backing, the seat, the trophy) happens only while it is open.
-- The clock (GDD v1.24) is renderer state (`clock`, `replay` in `create-game-store.ts`): Play /
-  Pause with three speeds (`content/map.yaml` `clock`). The worker's `endTurn` returns the final
-  snapshot plus one `QuarterFrame` per simulated quarter (`endTurn`'s `onQuarter` callback); the
-  map and date replay them without blocking the player (any action or step skips the replay).
-  While playing, the next turn starts when the replay ends; `turnInterrupts`
-  (`src/renderer/src/state/clock.ts`) compares a turn's snapshots against the configured interrupt
-  list and stops play, and unanswered decisions always stop it. Stopped for a decision alone,
-  answering the last one resumes play. Event records' `quarter` is when the card's fact happened.
 - Flagship seasons reach the player as event cards (GDD v1.15): `src/sim/season-stories.ts` reads
   the recorded `SeasonSummary` (thresholds in `config.flagship.stories`), and `offerSeasonCards` in
   `src/sim/events.ts` offers the champion moment and at most one story card before other cards.
