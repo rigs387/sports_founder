@@ -1,4 +1,5 @@
 import { turnLengthQuarters } from "./calendar";
+import { updateCulture } from "./culture";
 import { offerEvents, settleEvents } from "./events";
 import { returnSeatIfFolded } from "./flagship";
 import { evaluateLeagues } from "./leagues";
@@ -19,7 +20,9 @@ export class CampaignOverError extends Error {
  *    and an anchor collapse ends the campaign unless the sport has already won; a folded
  *    flagship sends the commissioner's seat home to the anchor;
  * 4. the PP tier track is checked; a tier change takes effect from the next turn;
- * 5. the win hold is checked (src/sim/win.ts). Winning never ends the campaign.
+ * 5. the win hold is checked (src/sim/win.ts). Winning never ends the campaign;
+ * 6. culture reads the turn's facts: traditions are born, renewed, decay and are lost
+ *    (src/sim/culture.ts).
  * Turns always complete. Refuses to play a campaign that has already ended.
  */
 export function endTurn(state: GameState, world: World): GameState {
@@ -47,6 +50,8 @@ export function endTurn(state: GameState, world: World): GameState {
   next = returnSeatIfFolded(next, world);
   next = updateTierTrack(next, world);
   next = updateWinTrack(next, world);
+  // Traditions read the turn's recorded facts (GDD v1.22).
+  next = updateCulture(next, world);
   return offerEvents({ ...next, turn: start.turn + 1 }, world, quarters);
 }
 

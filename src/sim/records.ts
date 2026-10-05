@@ -5,6 +5,8 @@ import type {
   Landmark,
   LeagueTierId,
   TimedCountermoveKind,
+  TraditionLossReason,
+  TraditionType,
   YearlySnapshot,
 } from "./types";
 
@@ -211,6 +213,21 @@ export const landmarks = {
     season: number,
     playerId: number,
   ): Landmark => ({ kind: "starDropped", turn, quarter, countryId, season, playerId }),
+  traditionBorn: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    traditionId: number,
+    type: TraditionType,
+  ): Landmark => ({ kind: "traditionBorn", turn, quarter, countryId, traditionId, type }),
+  traditionLost: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    traditionId: number,
+    type: TraditionType,
+    reason: TraditionLossReason,
+  ): Landmark => ({ kind: "traditionLost", turn, quarter, countryId, traditionId, type, reason }),
   seatMoved: (
     turn: number,
     quarter: number,

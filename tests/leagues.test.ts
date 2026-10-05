@@ -217,7 +217,11 @@ describe("League Health Ladder", () => {
     let current = state;
     while (current.outcome === null) current = endTurn(current, w);
     expect(current.outcome).toMatchObject({ kind: "anchorCollapse", countryId: ANCHOR });
-    expect(current.landmarks.at(-1)).toMatchObject({ kind: "anchorCollapse", countryId: ANCHOR });
+    // Traditions at home are lost with the league (GDD v1.22); the collapse is the last other fact.
+    expect(current.landmarks.filter((l) => l.kind !== "traditionLost").at(-1)).toMatchObject({
+      kind: "anchorCollapse",
+      countryId: ANCHOR,
+    });
     expect(() => endTurn(current, w)).toThrow(CampaignOverError);
     expect(checkAction(current, w, { type: "assignFocus", slot: 0, countryId: OTHER })).toMatch(
       /campaign has ended/,

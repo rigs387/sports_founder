@@ -521,13 +521,13 @@ rulesEvolution:
 culture:
   # Strength runs 0-1: born at startStrength × the birthplace's ease (honored star legacies add
   # honorsBonus), + renewal per renewing fact, − decayPerYear for each year without one. Lost at 0.
-  startStrength: 0.4
-  renewal: 0.2
-  decayPerYear: 0.1
+  startStrength: 0.5
+  renewal: 0.25
+  decayPerYear: 0.05
   honorsBonus: 0.2
   # Births. Thresholds are divided by the birthplace's ease for the type and rounded (at least 1).
   # Facts count only from culture.startSeason (no retroactive history for older saves).
-  derby: { meetings: 3, window: 5 }
+  derby: { meetings: 3, seasons: 5 }
   legacy: { starSeasons: 4 }
   venue: { fameFacts: 3, foundingFacts: 1 }
   # Effects. A country's weight is the strength its traditions hold there (abroad at

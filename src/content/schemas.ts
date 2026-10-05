@@ -771,7 +771,7 @@ export const configFileSchema = z.strictObject({
     renewal: unitInterval,
     decayPerYear: unitInterval,
     honorsBonus: unitInterval,
-    derby: z.strictObject({ meetings: z.int().min(1), window: z.int().min(1) }),
+    derby: z.strictObject({ meetings: z.int().min(1), seasons: z.int().min(1) }),
     legacy: z.strictObject({ starSeasons: z.int().min(1) }),
     venue: z.strictObject({ fameFacts: z.int().min(1), foundingFacts: z.int().min(0) }),
     weightCap: z.number().positive(),
