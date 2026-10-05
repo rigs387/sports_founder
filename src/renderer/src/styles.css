@@ -698,23 +698,6 @@ h2 {
 .band-6 {
   background: var(--heat-6);
 }
-.replay-date {
-  border-left: 1px solid var(--line);
-  padding-left: 25px;
-  min-width: 130px;
-  text-transform: uppercase;
-}
-.replay-date span {
-  display: block;
-  color: var(--muted);
-  font-size: 9px;
-}
-.replay-date b {
-  display: block;
-  font-size: 15px;
-  margin-top: 4px;
-  letter-spacing: 0.06em;
-}
 .map-options {
   display: flex;
   gap: 22px;

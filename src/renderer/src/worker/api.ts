@@ -10,12 +10,20 @@ import {
   type GameState,
   IllegalActionError,
   MAX_SEED,
+  type QuarterFrame,
+  quarterFrame,
   snapshot,
   suggestSportName,
   type TurnSnapshot,
 } from "../../../sim";
 import type { CountryHistory } from "../state/history";
 import { readSession, writeSession } from "../state/session-save";
+
+/** A played turn: the final snapshot and one frame per simulated quarter for the replay. */
+export interface TurnResult {
+  snapshot: TurnSnapshot;
+  frames: QuarterFrame[];
+}
 
 export type ActionResult =
   | { ok: true; snapshot: TurnSnapshot }
@@ -82,10 +90,11 @@ export function createSimWorkerApi(world: World) {
       state = createCampaign(world, setup);
       return snapshot(state, world);
     },
-    endTurn(): TurnSnapshot {
+    endTurn(): TurnResult {
       if (!state) throw new Error("No campaign in progress");
-      state = endTurn(state, world);
-      return snapshot(state, world);
+      const frames: QuarterFrame[] = [];
+      state = endTurn(state, world, (quarter) => frames.push(quarterFrame(quarter, world)));
+      return { snapshot: snapshot(state, world), frames };
     },
     applyAction(action: Action): ActionResult {
       if (!state) throw new Error("No campaign in progress");

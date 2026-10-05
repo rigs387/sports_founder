@@ -24,9 +24,14 @@ export class CampaignOverError extends Error {
  * 5. the win hold is checked (src/sim/win.ts). Winning never ends the campaign;
  * 6. culture reads the turn's facts: traditions are born, renewed, decay and are lost
  *    (src/sim/culture.ts).
- * Turns always complete. Refuses to play a campaign that has already ended.
+ * Turns always complete. Refuses to play a campaign that has already ended. `onQuarter` sees the
+ * state after each simulated quarter (the clock's replay, GDD v1.24); it must not change it.
  */
-export function endTurn(state: GameState, world: World): GameState {
+export function endTurn(
+  state: GameState,
+  world: World,
+  onQuarter?: (state: GameState) => void,
+): GameState {
   if (state.outcome !== null) {
     throw new CampaignOverError(
       `The campaign ended on turn ${state.outcome.turn} (${state.outcome.kind}); no more turns can be played`,
@@ -35,7 +40,10 @@ export function endTurn(state: GameState, world: World): GameState {
   const start = closeOffseason(applyDefaultSlotDrops(settleEvents(state, world)), world);
   const quarters = turnLengthQuarters(start.ppTier, world.config);
   let next = start;
-  for (let i = 0; i < quarters; i += 1) next = stepQuarter(next, world, { holdOffseason: true });
+  for (let i = 0; i < quarters; i += 1) {
+    next = stepQuarter(next, world, { holdOffseason: true });
+    onQuarter?.(next);
+  }
 
   const evaluation = evaluateLeagues(start, next, world, quarters);
   next = {

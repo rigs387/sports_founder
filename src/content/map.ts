@@ -1,6 +1,19 @@
 import { parse } from "yaml";
 import { z } from "zod";
 
+/** What can pause the clock (GDD v1.24). A decision always does. */
+export const CLOCK_INTERRUPTS = [
+  "decision",
+  "offseason",
+  "tierChange",
+  "anchorHealth",
+  "focusHealth",
+  "focusRival",
+  "winHold",
+  "win",
+] as const;
+export type ClockInterrupt = (typeof CLOCK_INTERRUPTS)[number];
+
 const point = z.tuple([z.number().finite(), z.number().finite()]);
 const bounds = z.tuple([
   z.number().finite(),
@@ -23,6 +36,17 @@ export const mapSettingsSchema = z.object({
   establishedThreshold: z.number().positive().max(1),
   historyLimit: z.int().min(2),
   labels: z.array(z.string()).refine((ids) => new Set(ids).size === ids.length),
+  clock: z
+    .strictObject({
+      quarterMs: z.array(z.int().min(50).max(10_000)).length(3),
+      defaultSpeed: z.int().min(0).max(2),
+      interrupts: z
+        .array(z.enum(CLOCK_INTERRUPTS))
+        .refine((ids) => new Set(ids).size === ids.length && ids.includes("decision")),
+    })
+    .refine((clock) =>
+      clock.quarterMs.every((ms, i) => i === 0 || ms < (clock.quarterMs[i - 1] ?? 0)),
+    ),
   camera: z
     .object({
       minZoom: z.number().positive(),

@@ -8,6 +8,7 @@ import { EventBoard } from "./components/EventBoard";
 import { FocusControls } from "./components/FocusControls";
 import { LeagueControls } from "./components/LeagueControls";
 import { SaveLoadControls } from "./components/SaveLoadControls";
+import { TurnClock, useClockLoop, useReplayFrame } from "./components/TurnClock";
 import { FlagshipScreen } from "./flagship/FlagshipScreen";
 import { BackedStars } from "./flagship/StarsPanel";
 import { GrowthScreen } from "./growth/GrowthScreen";
@@ -26,11 +27,13 @@ export function App() {
     selectedCountryId,
     error,
     loadSetup,
-    endTurn,
     selectCountry,
     dispatchAction,
     campaignRevision,
+    replay,
   } = useGameStore();
+  const frame = useReplayFrame();
+  useClockLoop();
   const [command, setCommand] = useState<MapCommand>({ kind: "home", serial: 0 });
   const [hover, setHover] = useState<MapHover | null>(null);
   const [patterns, setPatterns] = useState(false);
@@ -182,6 +185,8 @@ export function App() {
           <WorldMap
             countryNames={names?.countries ?? {}}
             snapshot={snapshot}
+            shares={frame?.shares ?? null}
+            blendMs={replay?.quarterMs ?? 0}
             selected={selectedCountryId}
             command={command}
             patterns={patterns}
@@ -435,14 +440,6 @@ export function App() {
             </small>
           </div>
         </div>
-        <div className="replay-date">
-          <span>
-            {snapshot
-              ? t("turn.date", { quarter: snapshot.quarterOfYear, year: snapshot.year })
-              : ""}
-          </span>
-          <b>{t("turn.label", { turn: snapshot?.turn ?? 1 })}</b>
-        </div>
         <div className="map-options" hidden={fullPage}>
           <label>
             <input
@@ -462,16 +459,7 @@ export function App() {
           </label>
         </div>
         <EventBoard key={campaignRevision} />
-        <button
-          type="button"
-          className="advance-turn"
-          data-testid="end-turn"
-          disabled={status !== "ready" || !!snapshot?.outcome}
-          onClick={() => void endTurn()}
-        >
-          <span>{t(status === "simulating" ? "status.simulating" : "map.nextTurn")}</span>
-          <b aria-hidden="true">&#8594;</b>
-        </button>
+        <TurnClock frame={frame} />
       </footer>
       <div className="sr-only" role="status" aria-live="polite">
         {snapshot

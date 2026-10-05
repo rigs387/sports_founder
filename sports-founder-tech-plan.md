@@ -503,6 +503,16 @@ landmark's quarter for season, star, tradition, rival and league cards, the turn
 and league-pressure cards (judged then). The field already existed, so the save format is
 unchanged; records from before keep the turn's end. The snapshot passes it through.
 
+*Step 3 built 2026-10-05.* The clock lives in the renderer store; speeds (2 s, 1 s, 0.4 s a
+quarter) and the interrupt list are in `content/map.yaml` (presentation settings). `endTurn` takes
+an `onQuarter` callback, and the worker returns a `QuarterFrame` per quarter (date and every
+country's share). The replay never blocks: a step plays at the current speed and any action skips
+it; Play waits for it before the next turn. Interrupts are judged by comparing the turn's snapshots
+(decision, offseason opening, tier change, anchor and focus-country health, a rival's escalation or
+new countermove in a focus country, the win hold starting, the win). The event board opens on the
+decision that stopped play and closes when an answer resumes it. Heat blends over 60% of a
+quarter's time. Until step 4, cards still appear on the board after the turn.
+
 ---
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)

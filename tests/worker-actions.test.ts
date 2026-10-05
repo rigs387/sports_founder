@@ -29,7 +29,7 @@ describe("worker action boundary", () => {
       snapshot: bought.snapshot,
     });
     const expected = applyAction(createCampaign(funded, setupFor(12)), funded, action);
-    expect(api.endTurn()).toEqual(snapshot(endTurn(expected, funded), funded));
+    expect(api.endTurn().snapshot).toEqual(snapshot(endTurn(expected, funded), funded));
   });
 
   it("quotes authoritative focus costs, replaces the selected slot, and rejects a duplicate", () => {
@@ -55,7 +55,7 @@ describe("worker action boundary", () => {
     expect(assigned.snapshot.turn).toBe(before.turn);
     expect(api.applyAction(action).ok).toBe(false);
     expect(api.applyAction({ ...action, slot: 999 }).snapshot).toEqual(assigned.snapshot);
-    expect(api.endTurn().focus).toEqual(["tuvalu"]);
+    expect(api.endTurn().snapshot.focus).toEqual(["tuvalu"]);
   });
 
   it("enforces prerequisite, tier, fork and budget rules without damaging the campaign", () => {
@@ -85,7 +85,7 @@ describe("worker action boundary", () => {
     expect(
       poor.applyAction({ type: "assignFocus", slot: 0, countryId: "tuvalu" }).snapshot,
     ).toEqual(empty);
-    expect(poor.endTurn().turn).toBe(2);
+    expect(poor.endTurn().snapshot.turn).toBe(2);
   });
 
   it("lets the player choose the slot to lose after a demotion", () => {
@@ -97,7 +97,7 @@ describe("worker action boundary", () => {
     const api = createSimWorkerApi(demoting);
     api.newCampaign(setupFor(4));
     api.applyAction({ type: "assignFocus", slot: 1, countryId: "tuvalu" });
-    const demoted = api.endTurn();
+    const demoted = api.endTurn().snapshot;
     expect(demoted.tierTrack.slotsToDrop).toBe(1);
     const dropped = api.applyAction({ type: "dropFocusSlot", slot: 0 });
     expect(dropped.ok).toBe(true);

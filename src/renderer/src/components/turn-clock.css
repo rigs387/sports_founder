@@ -1,0 +1,107 @@
+/* The clock (GDD v1.24): the date as the headline, Play / Pause, speeds and a one-turn step. */
+.turn-clock {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-left: auto;
+}
+.clock-date {
+  min-width: 112px;
+  text-transform: uppercase;
+}
+.clock-date b {
+  display: block;
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+.clock-date small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 2px;
+}
+.clock-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.clock-play {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 104px;
+  padding: 10px 14px;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--surface);
+  border: 2px solid #2d5482;
+  border-radius: 8px;
+}
+.clock-play[aria-pressed="true"] {
+  color: #fff;
+  background: #2d5482;
+}
+.clock-speeds {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.clock-speeds button {
+  min-width: 34px;
+  padding: 10px 6px;
+  font-weight: 800;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.clock-speeds button:first-child {
+  border-radius: 8px 0 0 8px;
+}
+.clock-speeds button:last-child {
+  border-radius: 0 8px 8px 0;
+}
+.clock-speeds button[aria-pressed="true"] {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.turn-clock .clock-step {
+  margin-left: 0;
+  min-width: 132px;
+}
+.clock-paused {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 18px);
+  margin: 0;
+  padding: 8px 12px;
+  max-width: 420px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+}
+@media (max-width: 850px) {
+  .turn-clock {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .turn-clock .clock-step {
+    min-width: 110px;
+  }
+  .clock-paused {
+    position: static;
+    order: -1;
+    flex-basis: 100%;
+    max-width: none;
+    box-shadow: none;
+  }
+}
