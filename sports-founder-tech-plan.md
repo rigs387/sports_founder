@@ -69,6 +69,7 @@ surface before playtesting or during it.
 | 2026-10-03 | Testing is time-boxed: concise tests whose results we see over thorough ones that never finish. Unit tests have a 30 s timeout (suite ~30 s); the runner states its plan, prints progress and stops early when projected past `--max-minutes` (default 5). Experiment defaults cut to finish in minutes (12 sampled anchors with 5 seeds each, 40 genomes per anchor, 15 naive-bot seeds, 3 bots); `--anchors all` removed. A 5-anchor sample was tried and misread the win contest (19% vs 36%): spread beats repetition. Replaces the 250-genome size above | Decided |
 | 2026-10-03 | Flagship stars (GDD v1.16): one named leading player per club (born in real places, invented per-language-sphere names, hidden skill on a career curve; full squads deferred); every score credited to the leading player or the squad; a score is the sport's one scoring unit and the scoring frequency trait sets match chances; a season's top scorer becomes a star by taking a config share of their club's scores when a star place is open (1/2/3/4 by league tier); stars add club strength, backed stars add casual conversion at home and media reach out of the flagship; careers peak, decline and announce retirement a season ahead; stars move up within the flagship; backing slots by PP tier, window only, one-time PP price, influence over seasons, honorable endings and a cash price to keep a backed star; star cards; save format 10. Build plan: 2.6 | Decided |
 | 2026-10-04 | Culture, first build (GDD v1.22): six types from recorded facts (derby, club rite, star legacy, national name, famous venue, trophy); strength renews and decays, loss by facts or betrayal, landmarks both ways; weight cuts the player's hardcore turnover and rival poaching/reclaim; venue pilgrimage and champion PP; each tradition remembers its rulebook and offending amendments multiply backlash and wear it; seat moves and trophy renames cost more where traditions are held; birthplace biases births, ethos betrayals, balanced near 1; rivals carry flavor-only content traditions; Culture tree category (strength, reach, protection, hold; Heritage trust / Living game fork). Save format 18. Build plan: 2.11 | Decided |
+| 2026-10-05 | Flagship broadcast (GDD v1.23): the seat league multiplies media reach out of its country by (1 + tier ceiling × season interest × health); interest is read from the last season summary (gripping, ordinary, dynasty, runaway/foregone); a season-end pulse on the same channel, none after runaways; a Near-Collapse flagship drains casual fans where its reach lands; stacks with backed stars; balance target 5–15% of world media exposure and one win-contest remeasure. Talent pull parked until other leagues have named players. Build plan: 2.12 | Decided |
 
 ---
 
@@ -442,6 +443,28 @@ pacing passes on seeds 1–3 and 4–6 (the latter run as 4–5 and 6 to fit the
 before the win 36/70 (51%); differentiation 5 of 6 as invented, unchanged. A campaign takes about
 14% longer. The builder never buys Culture nodes (its value-per-PP rule prefers grassroots, as
 with Media); the options experiment (340 campaigns, about 20 minutes) was not run.
+
+### 2.12 Build Plan: The Flagship's Broadcast (GDD v1.23)
+
+Every number is config (`flagship.broadcast` in `content/config.yaml`). The sim lives in
+`src/sim/flagship.ts` beside `backingEffects`; spread reads it in `src/sim/spread.ts`.
+
+1. **Config and interest.** Schema for tier ceilings, interest by season kind, health factors,
+   pulse size, story multiplier and fade, ripple share. A pure `seasonInterest` reads the last
+   finished season summary with the story thresholds in `flagship.stories` (no new saved state
+   if the summary carries enough; otherwise a save format step). Tests on both formats.
+2. **Broadcast and pulse.** `broadcastEffects` returns the seat country and its media reach
+   multiplier (ceiling × interest × health, plus the fading pulse since the season ended);
+   `computeExposure` multiplies it with backing on the seat country's outbound media links.
+   Invariant: multiplier ≥ 1, 1 when no league holds the seat.
+3. **Ripple.** At Near-Collapse, a casual drain each quarter in countries with a media link from
+   the seat, scaled by link strength relative to the strongest, never the seat country itself
+   (`quarter.ts`). Tests: drain only at Near-Collapse, hardcore untouched.
+4. **Snapshot and screens.** The broadcast's share in the country tooltip and the interest word
+   with health on the flagship screen; i18n for every string. Screenshot both layouts.
+5. **Measure and docs.** The runner reports the flagship's share of world media reach exposure
+   against the target; pacing on seeds 1–3 (must pass; #1 lost before the win about half).
+   `docs/flagship/README.md`, `docs/progress/data.js`, CLAUDE.md.
 
 ---
 

@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.22 | October 4, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category)*
+*Version 1.23 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails)*
 
 ---
 
@@ -588,7 +588,7 @@ the game does not stop that, it makes them play differently.
     of the field's, by config steps. It is valid only on flagship season cards (validated at
     load) and is the player's first lever on competitive balance.
   - *Effects stay in the flagship country,* like every other card. How the flagship feeds global
-    spread is designed separately, not decided by a card.
+    spread is designed separately, not decided by a card (see The flagship's broadcast, v1.23).
   - *Caps:* the story card counts against the per-turn decision cap but is offered first in the
     turn it arrives.
   - *Pressure lands when the card appears (choose pain).* The casual drain applies at once;
@@ -615,6 +615,42 @@ the game does not stop that, it makes them play differently.
 
   - *Bots* answer every season card by their own weights, and the win contest is remeasured once
     the cards are built.
+
+- **The flagship's broadcast (decided 2026-10-05, GDD v1.23).** How the flagship feeds the
+  global map without competing with it. Before this, only backed stars and famous grounds linked
+  the flagship to spread; a flagship with no backed star did nothing for the world. Every number
+  is config.
+  - *The flagship broadcasts on its own, and the audience is earned (choose pain).* While a
+    league holds the seat, media reach out of its country is multiplied by (1 + ceiling ×
+    interest × health). The ceiling rises with the league's tier (e.g. Amateur 0.05, Semi-Pro
+    0.1, Professional 0.25, Elite 0.4), so the long Amateur stretch barely carries abroad.
+  - *Interest comes from the last finished season's recorded facts.* A gripping season (a close
+    finish, a first title, an underdog champion) earns the full ceiling; an ordinary season earns
+    part of it (e.g. 0.7); a dynasty less (e.g. 0.5), a runaway or a foregone league little (e.g.
+    0.25). It is read from the season summary with the story thresholds already in config, so
+    the `clubRating` cards, the one lever on competitive balance, now matter on the world map.
+    A newly seated flagship with no finished season counts as ordinary.
+  - *Health scales it.* Healthy 1, Struggling 0.5, Near-Collapse 0.
+  - *Big seasons send a pulse.* At a season's end, media reach out of the seat country gets an
+    extra temporary boost (e.g. the tier's ceiling × 1, fading over 4 quarters). Gripping seasons
+    pulse larger (e.g. ×1.5); runaway and foregone seasons send no pulse.
+  - *The reach follows the seat country's media reach links.* Both the broadcast and the pulse
+    multiply the existing channel, so large media markets and countries sharing its media sphere
+    hear the most. Where the seat sits is a geographic choice, not only a tier choice: a flagship
+    in a big media market carries further. Rival broadcast deals still block the channel.
+  - *Troubles ripple out (choose pain).* While the flagship is at Near-Collapse, the countries its
+    media reach lands in lose a small share of the player's casual fans each quarter (e.g. 0.5%),
+    scaled by each country's link from the seat relative to the strongest; the seat country
+    itself already pays through its own league. Hardcore fans are never touched.
+  - *It stacks with backed stars:* both multiply the same channel. Only the league holding the
+    seat broadcasts; the broadcast moves with the seat.
+  - *Guard (the map stays the game).* A balance target keeps the flagship's share of the
+    player's world media reach exposure modest (e.g. 5–15%), reported by the runner. The win
+    contest is remeasured once; if "#1 lost before the win" falls well below half, the flagship
+    numbers are cut rather than rivals strengthened.
+  - *On screen:* the map tooltip names a "Flagship broadcast" line where it reaches, and the
+    flagship screen shows the season's interest as a word with the health effect. No new map lens.
+  - *Talent pull is separate (parked):* see the parking lot.
 
 **PP Growth Tree:**
 - **Structure:** a small branching tree per category (~8–12 nodes each) with prerequisites inside
@@ -1416,6 +1452,9 @@ Items flagged during the interview that need further discussion in future sessio
 - Water as a genome surface option (parked 2026-09-13).
 - Women's sports (parked 2026-10-03): a women's version of the player's sport, as an option built
   much later. Until then every sport is men's (players, name pools, text).
+- Flagship talent pull (parked 2026-10-05, v1.23): the flagship should work like the Premier
+  League or the NBA, a top flight that draws the world's best players. Foreign stars moving in
+  need named standouts in other leagues first; build it with them, not with the broadcast.
 - Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to
   handle missed matches; deferred from the Phase 1 stars build.
 - Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship

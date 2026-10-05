@@ -1,8 +1,8 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-04",
-  design: "GDD v1.22",
+  updated: "2026-10-05",
+  design: "GDD v1.23",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Make the flagship season matter",
-      text: "The emerging-star milestone is built (tech plan 2.6): stars on the flagship screen, backed through a review step, named on the map. Next, decide how the flagship feeds global spread.",
+      text: "How the flagship feeds global spread is decided (GDD v1.23): it broadcasts on its own, earned by season interest and league health, pulses after big seasons and ripples when it fails. Next, build it (tech plan 2.12).",
       tag: "Next build",
     },
     {
@@ -88,6 +88,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-05",
+      type: "Design",
+      title: "The flagship's broadcast",
+      text: "GDD v1.23: the seat league multiplies media reach out of its country by its tier's ceiling × the last season's interest × league health, so competitive balance matters on the world map; season ends pulse abroad (none after runaways); a Near-Collapse flagship drains casual fans where it is watched. Guarded at 5–15% of world media exposure. Talent pull, Premier League or NBA style, is parked until other leagues have named players. Build plan 2.12.",
+    },
     {
       date: "2026-10-04",
       type: "Built",
@@ -385,7 +391,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
       summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
-      next: "Decide how the flagship feeds global spread beyond backed stars.",
+      next: "Build the flagship broadcast (tech plan 2.12): interest, pulse, ripple and the 5–15% guard.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
@@ -400,6 +406,8 @@ window.SF_PROGRESS = {
         ["built", "Flagship screen: stars, table, results, champions and the seat"],
         ["built", "European or American format chosen on the creation screen"],
         ["built", "Season cards: champion, story and pressure cards; club strength"],
+        ["planned", "Flagship broadcast: media reach by season interest and health, pulses, ripple (GDD v1.23)"],
+        ["planned", "Talent pull toward the flagship (parked until other leagues have named players)"],
         ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
         ["planned", "Standing policies and hired league directors"],
         ["planned", "Anchor purist resentment from neglect, rule changes and seat moves"],
