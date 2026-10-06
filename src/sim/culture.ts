@@ -678,14 +678,77 @@ export function traditionShelter(weight: number, world: World) {
 }
 
 /** The strength of the living famous venues at home in each country (content order). */
-export function venueStrengths(state: Pick<GameState, "culture">, world: World): number[] {
+export function venueStrengths(
+  state: Pick<GameState, "culture" | "flagship">,
+  world: World,
+): number[] {
   const strengths = world.countries.map(() => 0);
+  const named = namedGrounds(state.flagship);
+  const { pilgrimageCut } = world.config.flagship.deals.namingRights;
   for (const t of state.culture.traditions) {
     if (t.type !== "venue" || !living(t)) continue;
     const i = world.countries.findIndex((country) => country.id === t.countryId);
-    if (i >= 0) strengths[i] = (strengths[i] ?? 0) + t.strength;
+    // A sponsor's name on the ground cuts its pilgrimage while the deal pays (GDD v1.28).
+    const cut = t.clubIds.some((id) => named.has(id)) ? 1 - pilgrimageCut : 1;
+    if (i >= 0) strengths[i] = (strengths[i] ?? 0) + t.strength * cut;
   }
   return strengths;
+}
+
+/** The grounds (by club id) carrying a sponsor's name: paying naming-rights deals (GDD v1.28). */
+export function namedGrounds(flagship: GameState["flagship"]): Set<number> {
+  return new Set(
+    flagship.deals.signed
+      .filter(
+        (deal) =>
+          deal.slot === "namingRights" &&
+          deal.firstSeason <= flagship.season &&
+          deal.lastSeason >= flagship.season,
+      )
+      .map((deal) => deal.position),
+  );
+}
+
+/**
+ * Naming rights betray (GDD v1.28): signing them on a famous ground offends its venue tradition,
+ * and on the founding ground the club rite. Each wears by traditionWear, and hardcoreDemotionShare
+ * × their held strength in the seat country × the ethos's rename factor of hardcore fans there
+ * turn casual, as a trophy rename does.
+ */
+export function betrayGround(state: GameState, world: World, clubId: number): GameState {
+  const seat = world.countries.findIndex((country) => country.id === state.flagship.countryId);
+  const betrayed = state.culture.traditions.filter(
+    (t) =>
+      living(t) &&
+      t.countryId === state.flagship.countryId &&
+      ((t.type === "venue" && t.clubIds.includes(clubId)) ||
+        (t.type === "rite" &&
+          clubId === state.identity.foundingClubId &&
+          t.clubIds.includes(clubId))),
+  );
+  if (betrayed.length === 0 || seat < 0) return state;
+  const settings = world.config.flagship.deals.namingRights;
+  const held = heldStrength(betrayed, state, world)[seat] ?? 0;
+  const share = Math.min(
+    1,
+    settings.hardcoreDemotionShare * held * ethosFactor(world, state.identity, "rename"),
+  );
+  const countries = [...state.countries];
+  const country = countries[seat];
+  if (country && share > 0) {
+    countries[seat] = {
+      ...country,
+      fans: country.fans.map((fans, f) =>
+        f === PLAYER_INDEX ? demoteHardcore(fans, share) : fans,
+      ),
+    };
+  }
+  return wearTraditions(
+    { ...state, countries },
+    world,
+    betrayed.map((t) => t.id),
+    () => settings.traditionWear,
+  );
 }
 
 /** The strength of the living famous venues at home in a country. */

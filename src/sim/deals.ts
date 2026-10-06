@@ -3,6 +3,7 @@ import { offseasonOpen, tierEntry } from "./calendar";
 import { hasCountermove, mediaRevenueFactor } from "./countermoves";
 import { growthFactorsAt } from "./growth";
 import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
+import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import type {
   CountryState,
@@ -407,6 +408,89 @@ export function leagueIncomePerQuarter(
     revenue.media * flagshipMediaShare(state.flagship, world) +
     dealIncomePerQuarter(state.flagship)
   );
+}
+
+/**
+ * Whether a signed deal's demand is broken now (GDD v1.28). A tier floor breaks when the seat
+ * league falls below it or folds; a seat lock when the seat leaves the country; a rule demand
+ * when the offseason before its due season closes without the rule amended (`closing`).
+ * Exclusivity never breaks: it only cuts the broadcast's lift.
+ */
+function broken(state: GameState, world: World, deal: Deal, closing: boolean): boolean {
+  const demand = deal.demand;
+  if (!demand) return false;
+  const { flagship } = state;
+  switch (demand.kind) {
+    case "tierFloor": {
+      const league = state.countries[indexOf(world, flagship.countryId)]?.league ?? null;
+      return (
+        league === null || LEAGUE_TIERS.indexOf(league.tier) < LEAGUE_TIERS.indexOf(demand.tier)
+      );
+    }
+    case "seatLock":
+      return flagship.countryId !== demand.countryId;
+    case "ruleChange":
+      return (
+        closing &&
+        flagship.season === demand.dueSeason &&
+        state.genome[demand.axis] !== demand.option
+      );
+    case "exclusivity":
+      return false;
+  }
+}
+
+/**
+ * Ends every signed deal whose demand is broken (GDD v1.28): demands never block, doing the thing
+ * breaks the deal, and a forced breach counts too. Its remaining value is lost, the league that
+ * signed it pays penaltySeasons × its annual value in cash (the seat's league if that one is
+ * gone), the partner shuns the sport for shunSeasons, and a landmark records it. Called after
+ * every action, when the offseason closes (`closing`: rule deadlines, a seat move) and after the
+ * turn's league evaluation (a fold, a seat sent home).
+ */
+export function breakDeals(state: GameState, world: World, closing = false): GameState {
+  const { flagship } = state;
+  const breaking = flagship.deals.signed.filter((deal) => broken(state, world, deal, closing));
+  if (breaking.length === 0) return state;
+  const { penaltySeasons, shunSeasons } = world.config.flagship.deals.breach;
+  const countries = [...state.countries];
+  const found = breaking.map((deal) => {
+    const penalty = penaltySeasons * deal.annualValue;
+    const signedAt = indexOf(world, deal.countryId);
+    const at = countries[signedAt]?.league ? signedAt : indexOf(world, flagship.countryId);
+    const country = countries[at];
+    const league = country?.league ?? null;
+    if (country && league) {
+      countries[at] = { ...country, league: { ...league, cash: league.cash - penalty } };
+    }
+    return landmarks.dealBroken(
+      state.turn,
+      state.quarter,
+      deal.countryId,
+      deal.id,
+      deal.partnerId,
+      deal.demand?.kind ?? "exclusivity",
+      league ? penalty : 0,
+    );
+  });
+  const ids = new Set(breaking.map((deal) => deal.id));
+  const partners = new Set(breaking.map((deal) => deal.partnerId));
+  const shunned = [
+    ...flagship.deals.shunned.filter((entry) => !partners.has(entry.partnerId)),
+    ...breaking.map((deal) => ({
+      partnerId: deal.partnerId,
+      untilSeason: flagship.season + shunSeasons,
+    })),
+  ];
+  return {
+    ...withDeals(state, {
+      ...flagship.deals,
+      signed: flagship.deals.signed.filter((deal) => !ids.has(deal.id)),
+      shunned,
+    }),
+    countries,
+    landmarks: [...state.landmarks, ...found],
+  };
 }
 
 /** Offers lapse when the offseason closes (src/sim/flagship.ts closeOffseason). */

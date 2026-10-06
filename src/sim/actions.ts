@@ -1,7 +1,13 @@
 import { AXIS_IDS, GENOME_AXES } from "../content";
 import { costMultiplier, offseasonOpen } from "./calendar";
-import { nameTrophy, nameTrophyBlocker, renameTrophy, renameTrophyBlocker } from "./culture";
-import { signBlocker, signDeal } from "./deals";
+import {
+  betrayGround,
+  nameTrophy,
+  nameTrophyBlocker,
+  renameTrophy,
+  renameTrophyBlocker,
+} from "./culture";
+import { breakDeals, signBlocker, signDeal } from "./deals";
 import { eventBlocker, resolveEvent } from "./events";
 import { backBlocker, backStar, dropBlocker, dropStar, seatBlocker } from "./flagship";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
@@ -255,11 +261,17 @@ export function checkAction(state: GameState, world: World, action: Action): str
   return leagueActionReason(options[action.type].blocker);
 }
 
-/** Applies a legal action. Throws IllegalActionError otherwise. Pure: returns a new state. */
+/**
+ * Applies a legal action. Throws IllegalActionError otherwise. Pure: returns a new state. A deal
+ * whose demand the action breaks (a step-down below a tier floor) ends at once (GDD v1.28).
+ */
 export function applyAction(state: GameState, world: World, action: Action): GameState {
   const reason = checkAction(state, world, action);
   if (reason !== null) throw new IllegalActionError(action, reason);
+  return breakDeals(applyLegal(state, world, action), world);
+}
 
+function applyLegal(state: GameState, world: World, action: Action): GameState {
   switch (action.type) {
     case "collectMoment":
       return resolveEvent(state, world, action.eventId, null);
@@ -347,8 +359,12 @@ export function applyAction(state: GameState, world: World, action: Action): Gam
       return renameTrophy(state, world, action.name);
     case "backStar":
       return backStar(state, world, action.playerId);
-    case "signDeal":
-      return signDeal(state, action.offerId);
+    case "signDeal": {
+      // Naming rights on a famous or founding ground betray it (GDD v1.28).
+      const offer = state.flagship.deals.offers.find((o) => o.id === action.offerId);
+      const signed = signDeal(state, action.offerId);
+      return offer?.slot === "namingRights" ? betrayGround(signed, world, offer.position) : signed;
+    }
     case "dropStar":
       return dropStar(state, world, action.playerId);
     case "moveSeat":

@@ -658,6 +658,21 @@ many famous grounds and many hardcore fans). Bots do not sign yet (step 6): with
 line a builder's flagship still never collapsed (albania, sweden, 3 seeds, 150 turns, against the
 build before).
 
+*Step 4 built 2026-10-06.* `breakDeals` (`src/sim/deals.ts`) ends every signed deal whose demand
+is broken: a tier floor when the seat league falls below it or folds, a seat lock when the seat
+leaves the country, a rule demand when the offseason of its due season closes with the rule
+unamended; exclusivity never breaks. It runs after every action (`applyAction`), when the
+offseason closes (a seat move, rule deadlines) and after the turn's league evaluation (a fold, a
+seat sent home). A breach charges `penaltySeasons` × the annual value to the league that signed
+it (the seat's if that one is gone; nothing if neither has a league), shuns the partner for
+`shunSeasons` and records a `dealBroken` landmark (step 5's news reads it; added to save format
+20). Naming rights betray in `src/sim/culture.ts`: `betrayGround` wears a famous ground's venue
+tradition (and the club rite on the founding ground) by `traditionWear` through the Culture
+nodes' protection, and demotes seat-country hardcore fans by `hardcoreDemotionShare` × their held
+strength × the ethos's rename factor; `venueStrengths` cuts a named ground's pilgrimage while the
+deal pays. Tests: each demand kind with forced breaches, the rule deadline met and missed, the
+penalty, shunning, both betrayals, and the landmark's save round-trip.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

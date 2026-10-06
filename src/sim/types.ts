@@ -1,5 +1,6 @@
 import type {
   AxisId,
+  DealDemand,
   DealSlot,
   EscalationLevel,
   Genome,
@@ -514,6 +515,20 @@ export type Landmark =
       countryId: string;
       season: number;
       playerId: number;
+    }
+  /**
+   * A flagship deal's demand was broken (GDD v1.28): the deal ended, its remaining value lost, a
+   * cash penalty paid by the league that signed it, and the partner shuns the sport.
+   */
+  | {
+      kind: "dealBroken";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      dealId: number;
+      partnerId: string;
+      demand: DealDemand;
+      penalty: number;
     }
   /** The commissioner's seat moved: by the player, or home after a flagship folded. */
   | {

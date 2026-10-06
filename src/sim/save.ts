@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   AXIS_IDS,
   type AxisId,
+  dealDemandSchema,
   dealSlotSchema,
   escalationLevelSchema,
   formatPath,
@@ -188,6 +189,16 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     countryId: z.string().min(1),
     season: z.int().min(1),
     playerId: z.int().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal("dealBroken"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    dealId: z.int().min(1),
+    partnerId: z.string().min(1),
+    demand: dealDemandSchema,
+    penalty: z.number().min(0),
   }),
   z.strictObject({
     kind: z.literal("seatMoved"),

@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import { GEAR_BRAND_ID } from "../src/content";
 import {
   applyAction,
+  breakDeals,
   broadcastEffects,
   checkAction,
   checkInvariants,
   createCampaign,
+  type DealDemandTerms,
   dealCap,
   dealIncomePerQuarter,
   dealSlateShare,
@@ -13,6 +15,7 @@ import {
   endTurn,
   type GameState,
   LEAGUE_TIERS,
+  type LeagueState,
   leagueIncomePerQuarter,
   newDeals,
   offerDeals,
@@ -22,8 +25,10 @@ import {
   runTurns,
   serializeSave,
   stepQuarter,
+  venueStrengths,
   type World,
 } from "../src/sim";
+import { withTradition } from "./culture-helpers";
 import { countryIndex, setupFor, withConfig, world } from "./helpers";
 
 // Flagship deals, step 2 (GDD v1.28, tech plan 2.15): offers, signing, lapsing and saves.
@@ -369,5 +374,203 @@ describe("revenue (step 3)", () => {
         expect(share, `${anchor} ${tier}`).toBeLessThanOrEqual(high);
       }
     }
+  });
+});
+
+describe("demands and breaches (step 4)", () => {
+  /** The state with one offer turned into a `demand` and signed. */
+  function signedWith(state: GameState, demand: DealDemandTerms | null, slot = "tv") {
+    const offer = state.flagship.deals.offers.find((o) => o.slot === slot);
+    if (!offer) throw new Error(`No ${slot} offer`);
+    const deals = {
+      ...state.flagship.deals,
+      offers: state.flagship.deals.offers.map((o) => (o.id === offer.id ? { ...o, demand } : o)),
+    };
+    const withOffer = { ...state, flagship: { ...state.flagship, deals } };
+    return { state: applyAction(withOffer, world, { type: "signDeal", offerId: offer.id }), offer };
+  }
+  const setLeague = (state: GameState, change: (league: LeagueState) => LeagueState | null) => {
+    const countries = [...state.countries];
+    const country = countries[brazil];
+    if (!country?.league) throw new Error("No Brazil league");
+    countries[brazil] = { ...country, league: change(country.league) };
+    return { ...state, countries };
+  };
+  const cashOf = (state: GameState) => state.countries[brazil]?.league?.cash ?? 0;
+
+  it("a step-down below a tier floor breaks the deal: value lost, a penalty, the partner shuns", () => {
+    const pro = setLeague(atOffers(), (l) => ({
+      ...l,
+      tier: "professional",
+      health: "near-collapse",
+    }));
+    const { state, offer } = signedWith(pro, { kind: "tierFloor", tier: "professional" });
+    const cash = cashOf(state);
+    const after = applyAction(state, world, { type: "stepDownLeague", countryId: "brazil" });
+    const { penaltySeasons, shunSeasons } = world.config.flagship.deals.breach;
+    expect(after.flagship.deals.signed).toEqual([]);
+    expect(cashOf(after)).toBeCloseTo(cash - penaltySeasons * offer.annualValue, 6);
+    expect(after.flagship.deals.shunned).toContainEqual({
+      partnerId: offer.partnerId,
+      untilSeason: state.flagship.season + shunSeasons,
+    });
+    expect(after.landmarks.at(-1)).toMatchObject({
+      kind: "dealBroken",
+      partnerId: offer.partnerId,
+      demand: "tierFloor",
+      penalty: penaltySeasons * offer.annualValue,
+    });
+    expect(checkInvariants(after, world)).toEqual([]);
+    // A shunned partner makes no offers until its shunning ends.
+    for (let seed = 1; seed <= 10; seed += 1) {
+      const offers = reoffer(after, world, seed).flagship.deals.offers;
+      expect(offers.some((o) => o.partnerId === offer.partnerId)).toBe(false);
+    }
+  });
+
+  it("forced breaches count: a folded league breaks a tier floor, a seat moved away a seat lock", () => {
+    const base = atOffers();
+    const floor = signedWith(base, { kind: "tierFloor", tier: "amateur" }).state;
+    expect(breakDeals(floor, world).flagship.deals.signed).toHaveLength(1);
+    const folded = breakDeals(
+      setLeague(floor, () => null),
+      world,
+    );
+    expect(folded.flagship.deals.signed).toEqual([]);
+    // With no league to charge, the breach costs nothing in cash.
+    expect(folded.landmarks.at(-1)).toMatchObject({ kind: "dealBroken", penalty: 0 });
+
+    const lock = signedWith(base, { kind: "seatLock", countryId: "brazil" }).state;
+    const moved = { ...lock, flagship: { ...lock.flagship, countryId: "argentina" } };
+    expect(breakDeals(moved, world).flagship.deals.signed).toEqual([]);
+    // Exclusivity never breaks.
+    const exclusive = signedWith(base, { kind: "exclusivity" }).state;
+    expect(
+      breakDeals(
+        setLeague(exclusive, () => null),
+        world,
+      ).flagship.deals.signed,
+    ).toHaveLength(1);
+  });
+
+  it("a rule demand breaks when its deadline offseason closes unamended, and holds if amended", () => {
+    const content = withConfig(world, (config) => {
+      config.flagship.deals.seasons = { min: 5, max: 5 };
+    });
+    let base = createCampaign(content, setupFor(11, "brazil"));
+    while (base.flagship.deals.offers.length === 0) base = step(base, content);
+    base = { ...base, pp: 1_000_000 };
+    const tv = base.flagship.deals.offers.find((o) => o.slot === "tv");
+    if (!tv) throw new Error("No TV offer");
+    const option = base.genome.matchLength === "short" ? "standard" : "short";
+    const due = base.flagship.season + content.config.flagship.deals.ruleDemand.dueOffseasons;
+    const deals = {
+      ...base.flagship.deals,
+      offers: base.flagship.deals.offers.map((o) =>
+        o.id === tv.id
+          ? {
+              ...o,
+              demand: {
+                kind: "ruleChange" as const,
+                axis: "matchLength" as const,
+                option,
+                dueSeason: due,
+              },
+            }
+          : o,
+      ),
+    };
+    const state = applyAction({ ...base, flagship: { ...base.flagship, deals } }, content, {
+      type: "signDeal",
+      offerId: tv.id,
+    });
+    /** Plays until the offseason of `season` is open. */
+    const toOffseason = (from: GameState, season: number) => {
+      let next = from;
+      while (!(next.flagship.offseason && next.flagship.season === season)) {
+        next = step(next, content);
+      }
+      return next;
+    };
+    const brokenAt = (s: GameState) =>
+      s.landmarks.some((l) => l.kind === "dealBroken" && l.dealId === tv.id);
+    const atDeadline = toOffseason(state, due);
+    expect(atDeadline.flagship.deals.signed.some((d) => d.id === tv.id)).toBe(true);
+    const missed = step(atDeadline, content);
+    expect(brokenAt(missed)).toBe(true);
+    expect(missed.flagship.deals.signed.some((d) => d.id === tv.id)).toBe(false);
+
+    // Amended in the first offseason after signing: the deal holds through the deadline.
+    const first = toOffseason(state, state.flagship.season + 1);
+    const amended = applyAction(first, content, { type: "amendRule", axis: "matchLength", option });
+    const kept = step(toOffseason(amended, due), content);
+    expect(brokenAt(kept)).toBe(false);
+    expect(kept.flagship.deals.signed.some((d) => d.id === tv.id)).toBe(true);
+  });
+
+  it("naming rights on a famous ground betray it; on the founding ground they offend the rite", () => {
+    const base = atOffers();
+    const settings = world.config.flagship.deals.namingRights;
+    const hardcore = (s: GameState) => s.countries[brazil]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
+    const club = base.flagship.clubs.find(
+      (c) => c.active && c.countryId === "brazil" && c.id !== base.identity.foundingClubId,
+    );
+    if (!club) throw new Error("No second club");
+    const famous = reoffer(
+      withTradition(base, "venue", "brazil", { clubIds: [club.id] }),
+      world,
+      2,
+    );
+    const venue = famous.culture.traditions.at(-1);
+    const offer = famous.flagship.deals.offers.find(
+      (o) => o.slot === "namingRights" && o.position === club.id,
+    );
+    if (!venue || !offer) throw new Error("No naming offer for the famous ground");
+    const signed = applyAction(famous, world, { type: "signDeal", offerId: offer.id });
+    expect(signed.culture.traditions.find((t) => t.id === venue.id)?.strength).toBeCloseTo(
+      1 - settings.traditionWear,
+      9,
+    );
+    expect(hardcore(signed)).toBeLessThan(hardcore(famous));
+    // The ground's pilgrimage is cut while the name stands.
+    expect(venueStrengths(signed, world)[brazil]).toBeCloseTo(
+      (1 - settings.traditionWear) * (1 - settings.pilgrimageCut),
+      9,
+    );
+
+    const founding = base.identity.foundingClubId;
+    const withRite = reoffer(
+      withTradition(base, "rite", "brazil", { clubIds: [founding] }),
+      world,
+      2,
+    );
+    const rite = withRite.culture.traditions.at(-1);
+    const naming = withRite.flagship.deals.offers.find(
+      (o) => o.slot === "namingRights" && o.position === founding,
+    );
+    if (!rite || !naming) throw new Error("No naming offer for the founding ground");
+    const offended = applyAction(withRite, world, { type: "signDeal", offerId: naming.id });
+    expect(offended.culture.traditions.find((t) => t.id === rite.id)?.strength).toBeCloseTo(
+      1 - settings.traditionWear,
+      9,
+    );
+    expect(hardcore(offended)).toBeLessThan(hardcore(withRite));
+    // Without a tradition to betray, naming the founding ground costs no fans.
+    const plain = base.flagship.deals.offers.find((o) => o.slot === "namingRights");
+    if (!plain) throw new Error("No naming offer");
+    const quiet = applyAction(base, world, { type: "signDeal", offerId: plain.id });
+    expect(hardcore(quiet)).toBe(hardcore(base));
+  });
+
+  it("a broken deal's landmark round-trips through a save", () => {
+    const base = atOffers();
+    const lock = signedWith(base, { kind: "seatLock", countryId: "brazil" }).state;
+    const broken = breakDeals(
+      { ...lock, flagship: { ...lock.flagship, countryId: "chile" } },
+      world,
+    );
+    const back = { ...broken, flagship: { ...broken.flagship, countryId: "brazil" } };
+    const text = serializeSave(back);
+    expect(serializeSave(deserializeSave(text, world))).toBe(text);
   });
 });

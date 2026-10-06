@@ -1,6 +1,6 @@
 import { turnLengthQuarters } from "./calendar";
 import { updateCulture } from "./culture";
-import { offerDeals } from "./deals";
+import { breakDeals, offerDeals } from "./deals";
 import { offerEvents, settleEvents } from "./events";
 import { closeOffseason, returnSeatIfFolded } from "./flagship";
 import { evaluateLeagues } from "./leagues";
@@ -34,7 +34,13 @@ export function endTurn(state: GameState, world: World): GameState {
       `The campaign ended on turn ${state.outcome.turn} (${state.outcome.kind}); no more turns can be played`,
     );
   }
-  const start = closeOffseason(applyDefaultSlotDrops(settleEvents(state, world)), world);
+  const opened = state.flagship.offseason;
+  // Closing the offseason may move the seat or pass a rule demand's deadline (GDD v1.28).
+  const start = breakDeals(
+    closeOffseason(applyDefaultSlotDrops(settleEvents(state, world)), world),
+    world,
+    opened,
+  );
   const quarters = turnLengthQuarters(start.ppTier, world.config);
   let next = start;
   for (let i = 0; i < quarters; i += 1) next = stepQuarter(next, world, { holdOffseason: true });
@@ -51,6 +57,8 @@ export function endTurn(state: GameState, world: World): GameState {
   };
   // A folded flagship sends the seat home (GDD v1.13).
   next = returnSeatIfFolded(next, world);
+  // A fold or a seat sent home can break a deal's demand (GDD v1.28).
+  next = breakDeals(next, world);
   next = updateTierTrack(next, world);
   next = updateWinTrack(next, world);
   // Traditions read the turn's recorded facts (GDD v1.22).

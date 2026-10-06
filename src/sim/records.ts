@@ -1,5 +1,6 @@
 import type {
   AxisId,
+  DealDemand,
   EscalationLevel,
   GameState,
   Landmark,
@@ -228,6 +229,24 @@ export const landmarks = {
     type: TraditionType,
     reason: TraditionLossReason,
   ): Landmark => ({ kind: "traditionLost", turn, quarter, countryId, traditionId, type, reason }),
+  dealBroken: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    dealId: number,
+    partnerId: string,
+    demand: DealDemand,
+    penalty: number,
+  ): Landmark => ({
+    kind: "dealBroken",
+    turn,
+    quarter,
+    countryId,
+    dealId,
+    partnerId,
+    demand,
+    penalty,
+  }),
   seatMoved: (
     turn: number,
     quarter: number,
