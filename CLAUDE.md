@@ -157,6 +157,15 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   of `TurnSnapshot`; it carries player names, and recorded facts and backing for the Stars panel. Star cards' free defaults have no
   effect: a backed star's move stands unless kept, a backed star's backing ends at retirement
   unless honored or passed to a mentored successor.
+- The flagship's broadcast (GDD v1.23, revised v1.27) is `broadcastEffects` in
+  `src/sim/flagship.ts`: while a league holds the seat, all media reach into every market the
+  seat's media reaches is multiplied by 1 + (tier ceiling × last season's interest × health +
+  a fading season-end pulse) × link ÷ strongest (`computeExposure`, `CountryExposure.broadcast`).
+  Interest is read from the season summaries (`seasonInterest`); no saved state. A Near-Collapse
+  flagship ripples extra casual churn where it airs (`quarter.ts`). Small media markets reach
+  nowhere. The runner reports its share of world media exposure against
+  `balanceTargets.flagshipBroadcastShare` (seats in large media markets only). `cardless` switches
+  it off for the flagship isolation tests.
 - Sport identity (GDD v1.18) lives in `src/sim/identity.ts` and `GameState.identity`: the sport's
   name, founding club (a real flagship club at the anchor) and ground, birthplace, ethos, terms and
   emblem. Option lists are ids in `content/identity.yaml`; words are in the locale file. Defaults

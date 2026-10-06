@@ -746,6 +746,15 @@ function main(): number {
     console.log(
       `  Stars: made per campaign median ${fmt(flagship.starsMade.median)}; backed median ${fmt(flagship.starsBacked.median)} (in ${flagship.backedIn}/${results.length} campaigns), first backed at turn median ${fmt(flagship.firstBackTurn.median)}`,
     );
+    const [low, high] = world.config.balanceTargets.flagshipBroadcastShare;
+    const broadcast = flagship.broadcastShare;
+    const inTarget =
+      broadcast.median !== null && broadcast.median >= low && broadcast.median <= high;
+    console.log(
+      flagship.broadcastReaches === 0
+        ? `  Broadcast: no campaign's seat was in a large media market; target ${pct(low)}–${pct(high)} not measured`
+        : `  Broadcast (${flagship.broadcastReaches}/${results.length} campaigns with a seat in a large media market): share of world media reach exposure median ${pct(broadcast.median ?? 0)} (min ${pct(broadcast.min ?? 0)}, max ${pct(broadcast.max ?? 0)}); target ${pct(low)}–${pct(high)}: ${inTarget ? "met" : "MISSED"}`,
+    );
     const rules = rulesAggregate(results);
     console.log(
       `  Rules: amendments per campaign median ${fmt(rules.perCampaign.median)}, max ${fmt(rules.perCampaign.max)} (in ${rules.amendedIn}/${results.length} campaigns), first at turn median ${fmt(rules.firstTurn.median)}; hardcore turned casual per amendment median ${fmt(rules.demoted.median)}, max ${fmt(rules.demoted.max)}; most common ${

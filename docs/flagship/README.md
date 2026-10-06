@@ -258,3 +258,58 @@ the league has a star, screenshots the panel in both layouts (`runs/smoke/36-sta
 (`38-stars-review.png`, `39-stars-backed.png`) and finds them in the map tooltip
 (`40-stars-tooltip.png`). The drop review at full influence is covered by the tests; the smoke
 campaign does not reach full influence.
+
+## The broadcast
+
+![The Broadcast card on the flagship screen: last season's interest, league health and reach.](broadcast.png)
+
+Built October 5, 2026 (GDD v1.23, revised v1.27; tech plan 2.12). While a league holds the seat,
+the flagship airs abroad. In every market the seat country's media reaches (its media reach links:
+63 large media markets for a seat in one, none for a small one), all media reach into that market
+is multiplied by 1 + lift × the market's link from the seat ÷ the strongest, where
+
+- **lift** = the league tier's ceiling (Amateur 0.05, Semi-Pro 0.07, Professional 0.1, Elite 0.16)
+  × the last season's **interest** × the league's **health**, plus a season-end **pulse**;
+- **interest** is read from the last finished season at the seat with the story thresholds: a
+  runaway or foregone league 0.25, a dynasty 0.5, a gripping season (close finish, first title or
+  underdog champion) 1, anything else 0.7. A seat with no finished season yet is ordinary;
+- **health** is Healthy 1, Struggling 0.5, Near-Collapse 0;
+- the **pulse** at a season's end is ceiling × story (gripping 1.5, ordinary and dynasty 1, runaway
+  0) × health, fading to nothing over 4 quarters.
+
+At Near-Collapse the league is off the air and its troubles **ripple**: each market it reaches loses
+up to 0.5% of the player's casual fans a quarter (extra casual churn, scaled by the link). Hardcore
+fans are not touched; the seat country pays through its own league. Backed stars still lift media
+out of the seat country; both apply. Every number is `flagship.broadcast` in `content/config.yaml`.
+
+**Why all media where it airs (v1.27):** as first written the broadcast multiplied only the seat
+country's own outbound media, so its weight followed that country's share of the sport's world
+fans. Built and measured, it was 0–5% of world media exposure and fell to about 0.1% by tiers 4–5,
+even at Elite after a gripping season.
+
+On screen, the **Broadcast** card names the last season's interest with its reason, the health
+effect and how far it carries (or that a small media market keeps it at home). The map tooltip of
+a market it reaches shows "Flagship broadcast: media reach here +N%", or that casual fans drift
+away while the flagship is at Near-Collapse. There is no new map layer.
+
+![The United States tooltip naming the flagship broadcast from Brazil's seat.](broadcast-tooltip.png)
+
+`broadcastEffects`, `seasonInterest` and `mediaReachFrom` are in `src/sim/flagship.ts`;
+`computeExposure` (`src/sim/spread.ts`) applies the lift and reports its part as
+`CountryExposure.broadcast`; the ripple is casual churn in `src/sim/quarter.ts`. The snapshot
+carries `TurnSnapshot.flagship.broadcast` and each country's `broadcastLift` and
+`broadcastRipple`. The invariant: the lift is never negative, and zero when no league holds the
+seat.
+
+`tests/flagship-broadcast.test.ts` covers the interest order, the lift by tier, interest and
+health, the lift on media from every source and only where the seat airs, the pulse and its fade,
+no pulse after a runaway, and the ripple (abroad only, at Near-Collapse only). The flagship
+isolation tests switch the broadcast off with the cards (`cardless` in `tests/helpers.ts`).
+`npm run smoke` checks the Broadcast card and hovers the United States for the tooltip line
+(`runs/smoke/32-flagship.png`, `34-broadcast-tooltip.png`).
+
+**Measured** (builder, 12 typical anchors × seeds 1–3, 200 turns): the broadcast is 9–12% of the
+player's world media reach exposure for every seat in a large media market (Sweden, Kazakhstan,
+Australia), inside the 5–15% target; the other nine anchors are small media markets and never
+broadcast, since the bots never move the seat. Pacing passes on the three seeds pooled (tier 2 at
+turn 31, tier 5 at 121.5, first win at 159); #1 lost before the win 20/36 (56%).

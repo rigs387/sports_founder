@@ -3,7 +3,7 @@ import { reclaimShare, rivalConversionBoosts } from "./countermoves";
 import { traditionShelter, traditionWeights, venueStrengths } from "./culture";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
-import { backingEffects, closeOffseason, stepFlagshipQuarter } from "./flagship";
+import { backingEffects, broadcastEffects, closeOffseason, stepFlagshipQuarter } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { type GrowthFactors, growthFactors } from "./growth";
 import { stepLeagueQuarter } from "./leagues";
@@ -96,6 +96,7 @@ export function stepQuarter(
   const quarter = state.quarter + 1;
   const found: Landmark[] = [];
   const backing = backingEffects(state.flagship, world);
+  const broadcast = broadcastEffects(state, world);
   const traditions = traditionWeights(state, world);
   const venues = venueStrengths(state, world);
   const tournaments = new Map(
@@ -148,7 +149,9 @@ export function stepQuarter(
         (config.dynamics.player.casualChurnRate +
           config.dynamics.player.casualDecayRate *
             (1 - Math.min(1, countryExposure.total / config.exposure.retentionSaturation))) *
-        factors.churn,
+          factors.churn +
+        // A Near-Collapse flagship's troubles, heard where its media reaches (GDD v1.23).
+        (broadcast.ripple.get(index) ?? 0),
       hardcoreConversion:
         config.dynamics.player.hardcoreConversionRate *
         levers.depth *

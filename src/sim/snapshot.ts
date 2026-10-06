@@ -6,7 +6,7 @@ import { type CultureSnapshot, cultureSnapshot } from "./culture";
 import { type EventSnapshot, eventSnapshots } from "./events";
 import type { EventState } from "./events-state";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
-import { type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
+import { broadcastEffects, type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { growthFactorsAt, type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
@@ -57,6 +57,10 @@ export interface CountrySnapshot {
   /** Current PP price of assigning a slot here, computed from organic exposure. */
   focusCost: number;
   exposure: number;
+  /** The flagship broadcast's lift on media reach here, 0 where it does not air (GDD v1.27). */
+  broadcastLift: number;
+  /** Casual fans lost here each quarter to a Near-Collapse flagship's troubles (GDD v1.23). */
+  broadcastRipple: number;
   affinity: number;
   accessibility: number;
   depth: number;
@@ -178,6 +182,7 @@ export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeS
 
 export function snapshot(state: GameState, world: World): TurnSnapshot {
   const exposure = computeExposure(state, world);
+  const broadcast = broadcastEffects(state, world);
   const { casualWeight } = world.config.fandomScore;
   const countries = state.countries.map((countryState, index): CountrySnapshot => {
     const country = world.countries[index];
@@ -198,6 +203,8 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
       focused: exposure[index]?.focused ?? false,
       focusCost: focusCostFromExposure(exposure[index]?.organic ?? 0, state, world, index),
       exposure: exposure[index]?.total ?? 0,
+      broadcastLift: broadcast.boost * (broadcast.reach.get(index) ?? 0),
+      broadcastRipple: broadcast.ripple.get(index) ?? 0,
       affinity: levers.affinity,
       accessibility: levers.accessibility,
       depth: levers.depth,

@@ -93,12 +93,70 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
           />
         </div>
         <div className="flagship-side">
+          <Broadcast snapshot={snapshot} seatName={seatName} nouns={nouns} />
           <LatestRound results={flagship.lastRound} clubName={clubName} nouns={nouns} />
           <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} readOnly />
           <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
           <Champions snapshot={snapshot} clubName={clubName} country={country} />
         </div>
       </div>
+    </section>
+  );
+}
+
+/**
+ * The flagship's broadcast (GDD v1.23): how gripping last season was, what the league's health
+ * lets through, and how far the seat's media carries.
+ */
+function Broadcast({
+  snapshot,
+  seatName,
+  nouns,
+}: {
+  snapshot: TurnSnapshot;
+  seatName: string;
+  nouns: Record<string, string>;
+}) {
+  const { t } = useTranslation();
+  const broadcast = snapshot.flagship.broadcast;
+  const vars = { ...nouns, country: seatName };
+  return (
+    <section
+      className="flagship-card flagship-broadcast"
+      aria-labelledby="flagship-broadcast-heading"
+      data-testid="flagship-broadcast"
+      data-interest={broadcast.interest}
+    >
+      <h2 id="flagship-broadcast-heading">{t("flagship.broadcast.heading")}</h2>
+      <p className="broadcast-interest">
+        <strong>{t(`flagship.broadcast.interest.${broadcast.interest}`)}</strong>{" "}
+        {t(`flagship.broadcast.why.${broadcast.interest}`, vars)}
+      </p>
+      {broadcast.health === null ? (
+        <p>{t("flagship.broadcast.noLeague", vars)}</p>
+      ) : (
+        <p>
+          <strong>{t(`league.healthLevels.${broadcast.health}`)}</strong>{" "}
+          {t(`flagship.broadcast.health.${broadcast.health}`, vars)}
+        </p>
+      )}
+      {broadcast.reaches === 0 ? (
+        <p className="broadcast-reach">{t("flagship.broadcast.smallMarket", vars)}</p>
+      ) : broadcast.ripple ? (
+        <p className="broadcast-reach broadcast-ripple">
+          {t("flagship.broadcast.ripple", { ...vars, count: broadcast.reaches })}
+        </p>
+      ) : (
+        <p className="broadcast-reach">
+          {t("flagship.broadcast.reach", {
+            ...vars,
+            boost: broadcast.boost,
+            count: broadcast.reaches,
+          })}
+          {broadcast.pulse > 0 &&
+            ` ${t("flagship.broadcast.pulse", { ...vars, pulse: broadcast.pulse })}`}
+        </p>
+      )}
     </section>
   );
 }

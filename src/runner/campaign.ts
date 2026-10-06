@@ -1,9 +1,11 @@
 import { performance } from "node:perf_hooks";
 import {
   type Action,
+  broadcastEffects,
   COUNTERMOVES,
   type CountermoveKind,
   checkInvariants,
+  computeExposure,
   createCampaign,
   ESCALATION_LEVELS,
   endTurn,
@@ -13,6 +15,7 @@ import {
   PLAYER_INDEX,
   QUARTERS_PER_YEAR,
   snapshot,
+  turnLengthQuarters,
   type World,
 } from "../sim";
 import { type BotId, runBot } from "./policy";
@@ -106,9 +109,27 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   let anchorOvertakeYears: number | null = null;
   let firstTopTurn: number | null = null;
   let longestTopStreak = 0;
+  /** Per observed turn: the flagship broadcast's share of world media reach exposure. */
+  const broadcastShares: number[] = [];
+  let broadcastReaches = false;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
   const observe = (current: GameState, turn: number) => {
+    // Over the next turn's quarters, as the fans stand now: the season-end pulse fades within a
+    // turn, and seasons end on turn boundaries at long turns.
+    let media = 0;
+    let broadcast = 0;
+    for (let k = 0; k < turnLengthQuarters(current.ppTier, world.config); k += 1) {
+      computeExposure({ ...current, quarter: current.quarter + k }, world).forEach(
+        (exposure, i) => {
+          const population = world.countries[i]?.population ?? 0;
+          media += exposure.media * population;
+          broadcast += exposure.broadcast * population;
+        },
+      );
+    }
+    broadcastShares.push(media > 0 ? broadcast / media : 0);
+    broadcastReaches ||= broadcastEffects(current, world).reach.size > 0;
     const rivalWorldHardcore = rivalSports.map(() => 0);
     current.countries.forEach((country, i) => {
       const population = world.countries[i]?.population ?? 1;
@@ -350,6 +371,10 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       anchorHardcoreShare:
         (state.countries[anchorIndex]?.fans[PLAYER_INDEX]?.hardcore ?? 0) / anchorPopulation,
       peakPlayerHardcoreShare: peakPlayerShare,
+      broadcastShare:
+        broadcastShares.reduce((sum, share) => sum + share, 0) /
+        Math.max(1, broadcastShares.length),
+      broadcastReaches,
       anchorOvertakeYears,
       nodesBought,
       ppSpentOnNodes,

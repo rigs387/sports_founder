@@ -82,9 +82,10 @@ using a closed list of effect types. Negative events grow with tier.
 Each flagship season ends in a champion moment and at most one story decision (dynasty, underdog,
 first title, close finish, repeat final); runaway champions raise pressure cards. Club strength is
 the one effect only season cards use.
-**Flagship broadcast (v1.23):** the seat league multiplies media reach out of its country by its
-tier's ceiling × the last season's interest (gripping full, ordinary part, dynasty/runaway/foregone
-little) × health (Near-Collapse none). Season ends pulse more abroad (none after runaways). A
+**Flagship broadcast (v1.23, v1.27):** where the seat's media reaches, the seat league multiplies
+all media reach by its tier's ceiling × the last season's interest (gripping full, ordinary part,
+dynasty/runaway/foregone little) × health (Near-Collapse none), most where the link is strongest;
+a seat in a small media market reaches nowhere. Season ends pulse more abroad (none after runaways). A
 Near-Collapse flagship drains casual fans where its reach lands. Kept to ~5–15% of world media
 exposure. Talent pull (Premier League/NBA-style) is parked until other leagues have named players.
 Pressure drains land on arrival (paying fixes the league, never the drain); season-card cooldowns

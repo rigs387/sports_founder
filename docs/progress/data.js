@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-05",
-  design: "GDD v1.26",
+  design: "GDD v1.27",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -13,12 +13,12 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-05",
-    tests: 468,
-    files: 44,
-    note: "npm run check passed after cards were dated by their facts (type checks, Biome, purity, 468 tests in 44 files). Lint has existing visual-study warnings.",
+    tests: 476,
+    files: 46,
+    note: "npm run check passed after the flagship broadcast (type checks, Biome, purity, 476 tests in 46 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-05",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat.",
   },
   eventDeck: { current: 28, target: "40–60" },
   phases: [
@@ -57,8 +57,8 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Make the flagship season matter",
-      text: "How the flagship feeds global spread is decided (GDD v1.23): it broadcasts on its own, earned by season interest and league health, pulses after big seasons and ripples when it fails. Next, build it (tech plan 2.12).",
-      tag: "Next build",
+      text: "Built (tech plan 2.12, GDD v1.23, revised v1.27): the flagship airs in every market its seat's media reaches, lifting all media reach there by its tier's ceiling × last season's interest × league health, pulsing after big seasons and rippling casual losses when it nears collapse. 9–12% of world media exposure for seats in large media markets; small markets keep it at home. Talent pull waits for named players in other leagues.",
+      tag: "Done",
     },
     {
       system: "creation",
@@ -70,7 +70,7 @@ window.SF_PROGRESS = {
       system: "business",
       title: "Deals that can betray traditions",
       text: "Traditions now resist rule changes, seat moves and renamed trophies (GDD v1.22). Flagship sponsor and TV deals with demands bring the naming-rights dilemma at famous grounds and the homegrown gear brand.",
-      tag: "Then",
+      tag: "Next build",
     },
   ],
   watch: [
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-05",
+      type: "Built",
+      title: "The flagship's broadcast",
+      text: "Tech plan 2.12 (GDD v1.23, revised v1.27): while a league holds the seat it airs in every market the seat's media reaches, lifting all media reach there by its tier's ceiling × last season's interest (gripping, ordinary, dynasty, runaway) × league health, with a fading pulse after big seasons and none after runaways; at Near-Collapse its troubles cost casual fans where it aired. As first written it multiplied only the seat's own outbound media and measured 0–5%, fading to 0.1% late, so it now lifts all media where it airs. Measured: 9–12% of world media exposure for seats in large media markets (target 5–15%); pacing passes on seeds 1–3; #1 contest 56%. A Broadcast card on the flagship screen and a tooltip line on the map.",
+    },
     {
       date: "2026-10-05",
       type: "Built",
@@ -433,7 +439,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
       summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
-      next: "Build the flagship broadcast (tech plan 2.12): interest, pulse, ripple and the 5–15% guard.",
+      next: "Talent pull waits for named players in other leagues; next, flagship sponsor and TV deals.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
@@ -454,8 +460,8 @@ window.SF_PROGRESS = {
         ["built", "European or American format chosen on the creation screen"],
         ["built", "Season cards: champion, story and pressure cards; club strength"],
         [
-          "planned",
-          "Flagship broadcast: media reach by season interest and health, pulses, ripple (GDD v1.23)",
+          "built",
+          "Flagship broadcast: media reach where it airs by season interest and health, pulses, ripple (GDD v1.23, v1.27)",
         ],
         [
           "planned",

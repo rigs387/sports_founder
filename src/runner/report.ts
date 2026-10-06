@@ -93,6 +93,13 @@ export interface CampaignResult {
   anchorHardcoreShare: number;
   /** The player's highest hardcore share of any country's population, observed after every turn. */
   peakPlayerHardcoreShare: WhereAndWhen;
+  /**
+   * The flagship broadcast's share of the player's world media reach exposure (people-weighted),
+   * averaged over the turns played (GDD v1.23).
+   */
+  broadcastShare: number;
+  /** The seat's media reached other markets at some point (a seat in a large media market). */
+  broadcastReaches: boolean;
   /** In-game years until the player's hardcore fans outnumbered every rival's in the anchor. */
   anchorOvertakeYears: number | null;
   /** Growth tree nodes bought, in order, with the turn and the PP paid. */
@@ -332,6 +339,11 @@ export function flagshipAggregate(results: CampaignResult[]) {
     starsMade: distribution(results.map((r) => r.flagship.starsMade)),
     starsBacked: distribution(results.map((r) => r.flagship.starsBacked)),
     backedIn: results.filter((r) => r.flagship.starsBacked > 0).length,
+    // Judged where the seat could broadcast: a small media market reaches nowhere by design.
+    broadcastShare: distribution(
+      results.filter((r) => r.broadcastReaches).map((r) => r.broadcastShare),
+    ),
+    broadcastReaches: results.filter((r) => r.broadcastReaches).length,
     firstBackTurn: distribution(
       results.flatMap((r) => (r.flagship.firstBackTurn === null ? [] : [r.flagship.firstBackTurn])),
     ),
@@ -628,6 +640,7 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     "peak_player_hardcore_share",
     "peak_player_hardcore_country",
     "peak_player_hardcore_turn",
+    "broadcast_share",
     "anchor_overtake_years",
     "nodes_bought",
     "pp_spent_on_nodes",
@@ -678,6 +691,7 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     round(r.peakPlayerHardcoreShare.value, 5),
     r.peakPlayerHardcoreShare.countryId,
     r.peakPlayerHardcoreShare.turn,
+    round(r.broadcastShare, 5),
     r.anchorOvertakeYears,
     r.nodesBought.length,
     Math.round(r.ppSpentOnNodes),

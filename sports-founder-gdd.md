@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.26 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier)*
+*Version 1.27 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs)*
 
 ---
 
@@ -686,7 +686,7 @@ the game does not stop that, it makes them play differently.
   the flagship to spread; a flagship with no backed star did nothing for the world. Every number
   is config.
   - *The flagship broadcasts on its own, and the audience is earned (choose pain).* While a
-    league holds the seat, media reach out of its country is multiplied by (1 + ceiling ×
+    league holds the seat, media reach where it airs is multiplied by (1 + ceiling ×
     interest × health). The ceiling rises with the league's tier (e.g. Amateur 0.05, Semi-Pro
     0.1, Professional 0.25, Elite 0.4), so the long Amateur stretch barely carries abroad.
   - *Interest comes from the last finished season's recorded facts.* A gripping season (a close
@@ -696,18 +696,25 @@ the game does not stop that, it makes them play differently.
     the `clubRating` cards, the one lever on competitive balance, now matter on the world map.
     A newly seated flagship with no finished season counts as ordinary.
   - *Health scales it.* Healthy 1, Struggling 0.5, Near-Collapse 0.
-  - *Big seasons send a pulse.* At a season's end, media reach out of the seat country gets an
+  - *Big seasons send a pulse.* At a season's end, media reach where the league airs gets an
     extra temporary boost (e.g. the tier's ceiling × 1, fading over 4 quarters). Gripping seasons
     pulse larger (e.g. ×1.5); runaway and foregone seasons send no pulse.
-  - *The reach follows the seat country's media reach links.* Both the broadcast and the pulse
-    multiply the existing channel, so large media markets and countries sharing its media sphere
-    hear the most. Where the seat sits is a geographic choice, not only a tier choice: a flagship
-    in a big media market carries further. Rival broadcast deals still block the channel.
+  - *The reach follows the seat country's media reach links (revised 2026-10-05, v1.27).* Where
+    the seat's media reaches, the broadcast and the pulse multiply *all* media reach into that
+    market, from every source, scaled by the market's link from the seat relative to the
+    strongest: (1 + (ceiling × interest × health + pulse) × link ÷ strongest). Large media
+    markets and countries sharing the seat's media sphere hear the most. Where the seat sits is a
+    geographic choice, not only a tier choice: a seat in a small media market reaches nowhere.
+    Rival broadcast deals still block the channel. *Why revised:* as first written (v1.23) the
+    broadcast multiplied only the seat country's own outbound media, so its weight followed the
+    seat country's share of the sport's world fans; built and measured, it was 0–5% of world
+    media exposure and fell to about 0.1% by tiers 4–5, even at Elite after a gripping season.
   - *Troubles ripple out (choose pain).* While the flagship is at Near-Collapse, the countries its
     media reach lands in lose a small share of the player's casual fans each quarter (e.g. 0.5%),
     scaled by each country's link from the seat relative to the strongest; the seat country
     itself already pays through its own league. Hardcore fans are never touched.
-  - *It stacks with backed stars:* both multiply the same channel. Only the league holding the
+  - *It stacks with backed stars:* backed stars lift media out of the seat country, the broadcast
+    lifts media into the markets it reaches; both apply. Only the league holding the
     seat broadcasts; the broadcast moves with the seat.
   - *Guard (the map stays the game).* A balance target keeps the flagship's share of the
     player's world media reach exposure modest (e.g. 5–15%), reported by the runner. The win

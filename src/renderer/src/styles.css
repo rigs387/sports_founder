@@ -633,6 +633,15 @@ h2 {
 .quick-stars span {
   color: #c08a00;
 }
+.quick-broadcast {
+  margin: 8px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.quick-broadcast.ripple {
+  color: var(--warning);
+}
 .quick-footer {
   display: flex;
   justify-content: space-between;

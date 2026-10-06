@@ -70,6 +70,7 @@ surface before playtesting or during it.
 | 2026-10-03 | Flagship stars (GDD v1.16): one named leading player per club (born in real places, invented per-language-sphere names, hidden skill on a career curve; full squads deferred); every score credited to the leading player or the squad; a score is the sport's one scoring unit and the scoring frequency trait sets match chances; a season's top scorer becomes a star by taking a config share of their club's scores when a star place is open (1/2/3/4 by league tier); stars add club strength, backed stars add casual conversion at home and media reach out of the flagship; careers peak, decline and announce retirement a season ahead; stars move up within the flagship; backing slots by PP tier, window only, one-time PP price, influence over seasons, honorable endings and a cash price to keep a backed star; star cards; save format 10. Build plan: 2.6 | Decided |
 | 2026-10-04 | Culture, first build (GDD v1.22): six types from recorded facts (derby, club rite, star legacy, national name, famous venue, trophy); strength renews and decays, loss by facts or betrayal, landmarks both ways; weight cuts the player's hardcore turnover and rival poaching/reclaim; venue pilgrimage and champion PP; each tradition remembers its rulebook and offending amendments multiply backlash and wear it; seat moves and trophy renames cost more where traditions are held; birthplace biases births, ethos betrayals, balanced near 1; rivals carry flavor-only content traditions; Culture tree category (strength, reach, protection, hold; Heritage trust / Living game fork). Save format 18. Build plan: 2.11 | Decided |
 | 2026-10-05 | Flagship broadcast (GDD v1.23): the seat league multiplies media reach out of its country by (1 + tier ceiling × season interest × health); interest is read from the last season summary (gripping, ordinary, dynasty, runaway/foregone); a season-end pulse on the same channel, none after runaways; a Near-Collapse flagship drains casual fans where its reach lands; stacks with backed stars; balance target 5–15% of world media exposure and one win-contest remeasure. Talent pull parked until other leagues have named players. Build plan: 2.12 | Decided |
+| 2026-10-05 | Broadcast revised after measuring (GDD v1.27): the flagship lifts all media reach into the markets its seat's media reaches (× link ÷ strongest), not only the seat's own outbound media, which measured 0–5% and faded to 0.1% late. Ceilings 0.05 / 0.07 / 0.1 / 0.16; 9–12% for seats in large media markets | Decided |
 | 2026-10-05 | Living time and the offseason (GDD v1.24), after the first playtest: Play / Pause with three speeds over End Turn, the date ticking quarter by quarter, auto-pause on the interrupt list and decisions with resume after answering; cards revealed at their fact's quarter as event windows over the map (presentation only; a mid-turn sim stop is parked); the seasonal window renamed the offseason, opening on the first turn after the season ends, with one screen for the season review and all league business, prices against PP on hand; backing stays 60 PP. Build plan: 2.13 | Decided |
 | 2026-10-05 | Moments have weight (GDD v1.26): minor (toast), big (back-page window) and headline (front page over a dimmed map) per card in content; big flagship moments become headlines at Professional and Elite; card families look different; big moments come first and cannot be skipped (Next Turn waits); auto-collect for minor moments parked. Build plan: 2.14 | Decided |
 | 2026-10-05 | The clock is dropped after playtest (GDD v1.25): built as step 3 and played, the quarter-by-quarter replay was choppy and the self-pauses jarring; reverted the same day. Next Turn stays with tier-scaled lengths, the date heads the bottom bar, and cards pop up over the map after each turn in the order they happened. Build plan 2.13 revised | Decided |
@@ -468,6 +469,22 @@ Every number is config (`flagship.broadcast` in `content/config.yaml`). The sim 
 5. **Measure and docs.** The runner reports the flagship's share of world media reach exposure
    against the target; pacing on seeds 1–3 (must pass; #1 lost before the win about half).
    `docs/flagship/README.md`, `docs/progress/data.js`, CLAUDE.md.
+
+*Built 2026-10-05.* `seasonInterest`, `broadcastEffects` and `mediaReachFrom` in
+`src/sim/flagship.ts`; `computeExposure` applies the lift and reports it as
+`CountryExposure.broadcast`; the ripple is extra casual churn in `quarter.ts`. No save format
+step: interest and the pulse are read from the season summaries. Step 2 changed after measuring
+(GDD v1.27): multiplying the seat's own outbound media gave 0–5% of world media exposure, about
+0.1% by tiers 4–5, so the broadcast now lifts all media reach into the markets the seat's media
+reaches, by link ÷ the strongest. Ceilings retuned to Amateur 0.05, Semi-Pro 0.07, Professional
+0.1, Elite 0.16. The tooltip shows the lift ("media reach here +N%"), not a share of exposure,
+which was too small to read. The runner averages the share over each turn's quarters (the pulse
+fades within a turn) and judges the target only where the seat is in a large media market.
+Measured with the builder over 12 typical anchors, seeds 1–3 (run as 1–2 and 3 to fit the
+budget), 200 turns: 9–12% for Sweden, Kazakhstan and Australia (target 5–15%); the other nine
+anchors are small media markets and never broadcast. Pacing passes pooled (tier 2 at turn 31,
+tier 5 at 121.5, first win at 159; seed 3 alone misses tiers 2 and 4, exactly as without the
+broadcast); #1 lost before the win 20/36 (56%).
 
 ### 2.13 Build Plan: Living Time and the Offseason (GDD v1.24, revised v1.25)
 

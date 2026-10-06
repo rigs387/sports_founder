@@ -911,6 +911,8 @@
     "liveTurn": "Live campaign",
     "totalFans": "Total fans",
     "clickToPin": "Click to pin +",
+    "broadcast": "Flagship broadcast: media reach here +{{lift, number(style: percent; maximumFractionDigits: 0)}}",
+    "broadcastRipple": "Flagship in trouble: casual fans here drift away",
     "bigPicture": "The big picture",
     "objectiveChasing": "A world to win. Ranked #{{rank}}.",
     "objectiveLeading": "Your sport leads the world.",
@@ -998,6 +1000,31 @@
       "runnerUp": "Runner-up: {{club}}",
       "final": "Final: {{home}} {{homeScore}}–{{awayScore}} {{away}}",
       "abroad": "Played in {{country}}"
+    },
+    "broadcast": {
+      "heading": "Broadcast",
+      "interest": {
+        "gripping": "A gripping {{seasonNoun}}.",
+        "ordinary": "An ordinary {{seasonNoun}}.",
+        "dynasty": "A dynasty.",
+        "runaway": "A foregone result."
+      },
+      "why": {
+        "gripping": "A close finish, a first title or an underdog: the world tunes in.",
+        "ordinary": "Nothing to tell: part of the audience abroad watches.",
+        "dynasty": "The same champion again: viewers abroad drift away.",
+        "runaway": "Decided long before the end: few abroad keep watching, and its end sends no pulse."
+      },
+      "health": {
+        "healthy": "The league is on the air in full.",
+        "struggling": "A struggling league reaches half its audience.",
+        "near-collapse": "Off the air. Its troubles are news: casual fans drift away wherever it was watched."
+      },
+      "noLeague": "No league plays in {{country}}: nothing is broadcast.",
+      "smallMarket": "{{country}} is a small media market: the league is barely seen abroad. A seat in a big media market carries further.",
+      "reach": "It airs in {{count}} markets, lifting media reach there by up to +{{boost, number(style: percent; maximumFractionDigits: 0)}}, most where {{country}}'s media is strongest.",
+      "pulse": "Of which +{{pulse, number(style: percent; maximumFractionDigits: 0)}} from the {{seasonNoun}}'s end, fading.",
+      "ripple": "{{count}} markets that watched the league lose casual fans each quarter until it recovers."
     },
     "seat": {
       "heading": "The seat",

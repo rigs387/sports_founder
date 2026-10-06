@@ -729,6 +729,26 @@ flagship:
     # Underdog: the champion was among the weakest floor(clubs ÷ underdogDivisor) clubs by rating
     # when the season began.
     underdogDivisor: 3
+  # The flagship's broadcast (GDD v1.23, tech plan 2.12). While a league holds the seat, media
+  # reach out of its country is multiplied by
+  #   1 + ceiling[league tier] × interest[last season] × health[league health] + pulse
+  # Interest is read from the last finished season at the seat with the story thresholds above:
+  # runaway (a runaway or a foregone league), dynasty, gripping (a close finish, a first title or
+  # an underdog champion) or ordinary, in that order; a seat with no finished season is ordinary.
+  # The pulse at a season's end is ceiling × pulse.size × pulse.story[last season] × health,
+  # fading linearly to nothing over pulse.fadeQuarters. At Near-Collapse every country the seat's
+  # media reaches loses rippleShare of the player's casual fans a quarter (extra casual churn) ×
+  # its media link from the seat ÷ the strongest; the seat pays through its own league. It
+  # multiplies with backed stars on the same channel.
+  broadcast:
+    ceiling: { amateur: 0.05, semi-pro: 0.07, professional: 0.1, elite: 0.16 }
+    interest: { gripping: 1, ordinary: 0.7, dynasty: 0.5, runaway: 0.25 }
+    health: { healthy: 1, struggling: 0.5, near-collapse: 0 }
+    pulse:
+      size: 1
+      fadeQuarters: 4
+      story: { gripping: 1.5, ordinary: 1, dynasty: 1, runaway: 0 }
+    rippleShare: 0.005
 
 # Win condition (GDD Win condition, Post-win play): the player's sport wins by ending holdTurns
 # turns in a row as #1 by global Fandom Score among modeled sports (player + rivals; the "other"
@@ -779,6 +799,12 @@ balanceTargets:
   experimentAnchors: 12
   # The signature hard anchor for the "hard anchors are winnable" criterion (GDD Map and markets).
   hardAnchor: tuvalu
+  # The flagship broadcast's share of the player's world media reach exposure (GDD v1.23): the
+  # population-weighted media exposure the broadcast and pulse add, ÷ all media exposure, averaged
+  # over a campaign's turns (each over its quarters). Judged on campaigns whose seat is in a large
+  # media market; a seat in a small one reaches nowhere by design. The map stays the game: the
+  # flagship helps, it does not carry.
+  flagshipBroadcastShare: [ 0.05, 0.15 ]
   # Growth node dominance is judged strategy by strategy (decided 2026-09-21). One bot answers the
   # tree the same way every time, so the nodes it always buys read as dominant when they are only
   # that bot's signature: builder takes the grassroots spine, media-rush the media branch,

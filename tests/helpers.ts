@@ -82,16 +82,19 @@ export function migratedCulture(state: GameState) {
 }
 
 /**
- * The world without the flagship's ways of reaching fans: no season, star or tradition cards and
- * no tradition effects (GDD v1.15, v1.16, v1.22). Its matches alone must leave the world as it was.
+ * The world without the flagship's ways of reaching fans: no season, star or tradition cards, no
+ * tradition effects and no broadcast (GDD v1.15, v1.16, v1.22, v1.23). Its matches alone must
+ * leave the world as it was.
  */
 export function cardless(base: World): World {
-  const { culture } = base.config;
+  const { culture, flagship } = base.config;
+  const silent = { amateur: 0, "semi-pro": 0, professional: 0, elite: 0 };
   return {
     ...base,
     config: {
       ...base.config,
       culture: { ...culture, turnoverCut: 0, poachCut: 0, pilgrimage: 0, seatWeight: 0 },
+      flagship: { ...flagship, broadcast: { ...flagship.broadcast, ceiling: silent } },
     },
     events: {
       ...base.events,

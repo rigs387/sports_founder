@@ -1,7 +1,7 @@
 import { mediaReachBlocked } from "./countermoves";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
-import { backingEffects } from "./flagship";
+import { backingEffects, broadcastEffects } from "./flagship";
 import { growthFactors } from "./growth";
 import { type GameState, PLAYER_INDEX, type World } from "./types";
 
@@ -13,7 +13,8 @@ import { type GameState, PLAYER_INDEX, type World } from "./types";
 // exclusive broadcast deal blocks the media reach channel into a country (GDD Rival AI), less the
 // share the player's countermove resistance holds open. Growth tree nodes multiply each inbound
 // channel in the target country (src/sim/growth.ts). Backed flagship stars multiply the media
-// reach channel out of the flagship country (src/sim/flagship.ts).
+// reach channel out of the flagship country; the flagship's broadcast multiplies all media reach
+// into the markets the seat's media reaches (GDD v1.23, v1.27; src/sim/flagship.ts).
 
 export interface CountryExposure {
   /** Word of mouth: localWeight × player Fandom Score ÷ population. */
@@ -25,6 +26,8 @@ export interface CountryExposure {
   proximity: number;
   language: number;
   media: number;
+  /** The part of `media` the flagship's broadcast and its pulse add (GDD v1.23). */
+  broadcast: number;
   /** Direct outreach from a focus slot. */
   outreach: number;
   /** Local + inbound before any focus effects: what an unfocused country would have. */
@@ -72,6 +75,7 @@ export function computeExposure(
   const focused = new Set(state.focus.filter((id): id is string => id !== null));
   const backing = backingEffects(state.flagship, world);
   const backingSource = world.countries.findIndex((country) => country.id === backing.countryId);
+  const broadcast = broadcastEffects(state, world);
 
   return state.countries.map((countryState, target) => {
     const country = world.countries[target];
@@ -93,12 +97,21 @@ export function computeExposure(
       const perCapita = strength / population;
       proximity += link.proximity * perCapita;
       language += link.language * perCapita;
-      media += link.media * perCapita * (link.source === backingSource ? backing.mediaReach : 1);
+      if (link.media <= 0) continue;
+      let reach = link.media * perCapita;
+      if (link.source === backingSource) reach *= backing.mediaReach;
+      media += reach;
     }
     proximity *= factors.proximity * eventRates.proximity;
     language *= factors.language * eventRates.language;
-    media *= factors.media * eventRates.media;
-    if (mediaReachBlocked(countryState)) media *= 1 - factors.countermoveEffect;
+    const mediaFactor =
+      factors.media *
+      eventRates.media *
+      (mediaReachBlocked(countryState) ? 1 - factors.countermoveEffect : 1);
+    // The flagship's broadcast lifts all media reach where it airs (GDD v1.27).
+    const broadcastLift = broadcast.boost * (broadcast.reach.get(target) ?? 0);
+    const broadcastMedia = media * mediaFactor * broadcastLift;
+    media *= mediaFactor * (1 + broadcastLift);
     const local = (settings.localWeight * (strengths[target] ?? 0)) / population;
     const organic = local + proximity + language + media;
     const outreach = isFocused ? focusSettings.outreachPeople / population : 0;
@@ -111,6 +124,7 @@ export function computeExposure(
       proximity: proximity * inboundMultiplier,
       language: language * inboundMultiplier,
       media: media * inboundMultiplier,
+      broadcast: broadcastMedia * inboundMultiplier,
       outreach,
       organic,
       total,

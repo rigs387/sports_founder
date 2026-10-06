@@ -423,6 +423,12 @@ export const LEAGUE_TIERS = leagueTierSchema.options;
 export type LeagueTierId = z.infer<typeof leagueTierSchema>;
 
 /** Standing League Health Ladder rungs. "Collapsed" is not a standing rung: the league folds. */
+/** How gripping the flagship's last season was, for its broadcast (GDD v1.23). */
+export const seasonInterestSchema = z.enum(["gripping", "ordinary", "dynasty", "runaway"]);
+export type SeasonInterest = z.infer<typeof seasonInterestSchema>;
+const seasonInterestMap = <T extends z.ZodType>(value: T) =>
+  z.strictObject({ gripping: value, ordinary: value, dynasty: value, runaway: value });
+
 export const healthLevelSchema = z.enum(["healthy", "struggling", "near-collapse"]);
 export const HEALTH_LEVELS = healthLevelSchema.options;
 export type HealthLevel = z.infer<typeof healthLevelSchema>;
@@ -928,6 +934,27 @@ export const configFileSchema = z.strictObject({
         (s) => s.foregoneTitles > s.dynastyTitles,
         "foregoneTitles must exceed dynastyTitles (a foregone league replaces a dynasty)",
       ),
+    /** The flagship's broadcast (GDD v1.23): media reach out of the seat country. */
+    broadcast: z.strictObject({
+      ceiling: z.strictObject({
+        amateur: z.number().min(0),
+        "semi-pro": z.number().min(0),
+        professional: z.number().min(0),
+        elite: z.number().min(0),
+      }),
+      interest: seasonInterestMap(unitInterval),
+      health: z.strictObject({
+        healthy: unitInterval,
+        struggling: unitInterval,
+        "near-collapse": unitInterval,
+      }),
+      pulse: z.strictObject({
+        size: z.number().min(0),
+        fadeQuarters: z.int().min(1),
+        story: seasonInterestMap(z.number().min(0)),
+      }),
+      rippleShare: unitInterval,
+    }),
   }),
   tierTrack: z.strictObject({
     telegraphTurns: z.int().min(0),
@@ -952,6 +979,8 @@ export const configFileSchema = z.strictObject({
     nodeDominanceGenomesPerBot: z.int().min(1),
     experimentAnchors: z.int().min(1),
     hardAnchor: z.string().min(1),
+    /** The flagship broadcast's share of the player's world media reach exposure (GDD v1.23). */
+    flagshipBroadcastShare: z.tuple([unitInterval, unitInterval]),
   }),
 });
 

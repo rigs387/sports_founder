@@ -405,6 +405,17 @@ export function App() {
             {snapshot && hovered.countryId === snapshot.flagship.countryId && (
               <BackedStars stars={snapshot.flagship.stars} />
             )}
+            {hovered.broadcastRipple > 0 ? (
+              <p className="quick-broadcast ripple" data-testid="map-tooltip-broadcast">
+                {t("map.broadcastRipple")}
+              </p>
+            ) : (
+              hovered.broadcastLift >= 0.005 && (
+                <p className="quick-broadcast" data-testid="map-tooltip-broadcast">
+                  {t("map.broadcast", { lift: hovered.broadcastLift })}
+                </p>
+              )
+            )}
             <div className="quick-footer">
               <span>
                 {hovered.league

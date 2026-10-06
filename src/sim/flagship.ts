@@ -1,14 +1,17 @@
+import type { SeasonInterest } from "../content";
 import { costMultiplier, offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights } from "./culture";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
+import { seasonStories } from "./season-stories";
 import {
   type CareerLine,
   type Club,
   type CountryState,
   type FlagshipState,
   type GameState,
+  type HealthLevel,
   type Landmark,
   type LeagueState,
   type LeagueTierId,
@@ -369,6 +372,124 @@ export function backingEffects(flagship: FlagshipState, world: World) {
     countryId: flagship.countryId,
     casualConversion: 1 + casualConversion * influence,
     mediaReach: 1 + mediaReach * influence,
+  };
+}
+
+/**
+ * How gripping a finished season was, for the broadcast (GDD v1.23): read from its stories in
+ * priority order, so a runaway or a foregone league outweighs a close finish.
+ */
+export function seasonInterest(
+  seasons: readonly SeasonSummary[],
+  index: number,
+  world: World,
+): SeasonInterest {
+  const stories = seasonStories(seasons, index, world);
+  if (stories.includes("foregone") || stories.includes("runaway")) return "runaway";
+  if (stories.includes("dynasty")) return "dynasty";
+  if (stories.some((story) => ["closeFinish", "firstTitle", "underdog"].includes(story))) {
+    return "gripping";
+  }
+  return "ordinary";
+}
+
+/** What the flagship's broadcast does now (GDD v1.23, v1.27). */
+export interface BroadcastEffects {
+  /** The seat country, or null when no league holds the seat: nothing broadcasts. */
+  countryId: string | null;
+  /** The last finished season at the seat; ordinary before the first. */
+  interest: SeasonInterest;
+  /** The seat league's health factor, 0–1. */
+  health: number;
+  /**
+   * The lift on media reach where the league airs at full strength, ≥ 0: ceiling × interest ×
+   * health plus the fading pulse. A market gets boost × its link from the seat ÷ the strongest.
+   */
+  boost: number;
+  /** The fading season-end pulse alone, included in boost. */
+  pulse: number;
+  /** Each market the seat's media reaches, by country index: its link ÷ the strongest, 0–1. */
+  reach: ReadonlyMap<number, number>;
+  /** Extra casual churn per quarter by country index, at Near-Collapse only. */
+  ripple: ReadonlyMap<number, number>;
+}
+
+const reachCache = new WeakMap<World, Map<number, ReadonlyMap<number, number>>>();
+
+/**
+ * The markets a country's media reaches (GDD v1.23): every media link out of it, by target, as a
+ * share of the strongest. Empty for a small media market.
+ */
+export function mediaReachFrom(world: World, source: number): ReadonlyMap<number, number> {
+  let bySource = reachCache.get(world);
+  if (!bySource) {
+    bySource = new Map();
+    reachCache.set(world, bySource);
+  }
+  const cached = bySource.get(source);
+  if (cached) return cached;
+  const links = world.inbound.flatMap((inbound, target) =>
+    inbound
+      .filter((link) => link.source === source && link.media > 0)
+      .map((link) => ({ target, media: link.media })),
+  );
+  const strongest = Math.max(0, ...links.map((link) => link.media));
+  const reach = new Map(links.map((link) => [link.target, link.media / strongest]));
+  bySource.set(source, reach);
+  return reach;
+}
+
+const NOWHERE: ReadonlyMap<number, number> = new Map();
+
+/**
+ * The flagship's broadcast (GDD v1.23, revised v1.27): while a league holds the seat, media reach
+ * into every market its media reaches is multiplied by 1 + (ceiling × interest × health + a pulse
+ * fading from the last season's end) × the market's link from the seat ÷ the strongest. A league
+ * at Near-Collapse ripples instead: casual churn where it airs. The seat country is never a target
+ * of its own links: it pays for a failing league through the league.
+ */
+export function broadcastEffects(
+  state: Pick<GameState, "flagship" | "countries" | "quarter">,
+  world: World,
+): BroadcastEffects {
+  const settings = world.config.flagship.broadcast;
+  const { flagship } = state;
+  const seat = indexOf(world, flagship.countryId);
+  const league = state.countries[seat]?.league ?? null;
+  const last = flagship.seasons.length - 1;
+  // A newly seated flagship has no finished season of its own: ordinary, and no pulse.
+  const own = last >= 0 && flagship.seasons[last]?.countryId === flagship.countryId;
+  const interest = own ? seasonInterest(flagship.seasons, last, world) : "ordinary";
+  if (league === null) {
+    return {
+      countryId: null,
+      interest,
+      health: 0,
+      boost: 0,
+      pulse: 0,
+      reach: NOWHERE,
+      ripple: NOWHERE,
+    };
+  }
+
+  const ceiling = settings.ceiling[league.tier];
+  const health = settings.health[league.health];
+  const since = own ? state.quarter - (flagship.seasons[last]?.quarter ?? 0) : Infinity;
+  const fade = Math.max(0, 1 - since / settings.pulse.fadeQuarters);
+  const pulse = ceiling * settings.pulse.size * settings.pulse.story[interest] * health * fade;
+  const reach = mediaReachFrom(world, seat);
+  const ripple =
+    league.health === "near-collapse"
+      ? new Map([...reach].map(([target, link]) => [target, settings.rippleShare * link]))
+      : NOWHERE;
+  return {
+    countryId: flagship.countryId,
+    interest,
+    health,
+    boost: ceiling * settings.interest[interest] * health + pulse,
+    pulse,
+    reach,
+    ripple,
   };
 }
 
@@ -1381,6 +1502,13 @@ export function flagshipProblems(state: GameState, world: World): string[] {
       problems.push("flagship seat move targets the seat it already holds");
     }
   }
+  if (known(flagship.countryId)) {
+    const broadcast = broadcastEffects(state, world);
+    if (!(broadcast.boost >= 0)) problems.push("flagship broadcast weakens media reach");
+    if (broadcast.countryId === null && broadcast.boost !== 0) {
+      problems.push("flagship broadcasts with no league holding the seat");
+    }
+  }
   const ids = new Set<number>();
   for (const club of flagship.clubs) {
     if (ids.has(club.id) || club.id >= flagship.nextClubId) {
@@ -1576,6 +1704,19 @@ export interface FlagshipSnapshot {
   /** Stars at the seat and every backed player still playing, stars first, newest star first. */
   stars: StarSnapshot[];
   backing: BackingSnapshot;
+  /**
+   * The broadcast (GDD v1.23): the last season's interest, the seat league's health, and the
+   * boost to media reach out of the seat (0 is none), of which the fading pulse.
+   */
+  broadcast: {
+    interest: SeasonInterest;
+    health: HealthLevel | null;
+    boost: number;
+    pulse: number;
+    ripple: boolean;
+    /** Countries the seat's media reaches; none from a small media market. */
+    reaches: number;
+  };
   /** Each active club's leading player and their scores this season (null when untallied). */
   leaders: { clubId: number; playerId: number; scores: number | null }[];
 }
@@ -1634,6 +1775,17 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
     },
     stars: starSnapshots(state, world),
     backing: backingSnapshot(state, world),
+    broadcast: (() => {
+      const broadcast = broadcastEffects(state, world);
+      return {
+        interest: broadcast.interest,
+        health: state.countries[indexOf(world, flagship.countryId)]?.league?.health ?? null,
+        boost: broadcast.boost,
+        pulse: broadcast.pulse,
+        ripple: broadcast.ripple.size > 0,
+        reaches: mediaReachFrom(world, indexOf(world, flagship.countryId)).size,
+      };
+    })(),
     leaders: activeClubs(flagship).flatMap((club) => {
       const player = leadingPlayer(flagship, club.id);
       if (!player) return [];
