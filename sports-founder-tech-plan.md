@@ -621,6 +621,15 @@ random stream.
    Near-Collapse rate against the build before deals. `docs/deals/README.md`,
    `docs/progress/data.js`, CLAUDE.md.
 
+*Step 1 built 2026-10-05.* `flagship.deals` in config with its schema (`dealsSchema`,
+`DealSlot`, `DealDemand` in `src/content/schemas.ts`) and `balanceTargets.dealSlateShare`;
+`names.dealPartners` (10 invented broadcasters, 20 sponsors by sector). `checkDeals` in
+`src/content/load.ts` validates rule wishes against the genome's rule traits, the TV fork's node
+ids, one cap per PP tier, a share per sponsor slot, and distinct partners numerous enough for an
+offseason. The schema requires at least two offers per slot, so a slot always keeps an offer
+without a rule demand (step 2 puts the one rule demand only where another offer stands). Values
+are starting points; step 3 tunes them to the slate target.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

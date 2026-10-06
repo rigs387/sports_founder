@@ -488,4 +488,53 @@ describe("flagship content validation", () => {
     editYaml(dir, "config.yaml", ["flagship", "clubs", "elite"], setValue(6));
     expect(loadError(dir).message).toContain("flagship.clubs: club counts must not shrink");
   });
+
+  it("deal rule demands ask only for a real step of a rule trait (GDD v1.28)", () => {
+    const dir = copyOfContent();
+    const wishes = ["flagship", "deals", "ruleDemand", "wishes"];
+    editYaml(
+      dir,
+      "config.yaml",
+      [...wishes, "tv", 0],
+      setValue({ axis: "surface", toward: "ice" }),
+    );
+    editYaml(
+      dir,
+      "config.yaml",
+      [...wishes, "sponsor", 0],
+      setValue({ axis: "contact", toward: "brutal" }),
+    );
+    editYaml(
+      dir,
+      "config.yaml",
+      ["flagship", "deals", "tvFork", "satellite-dish"],
+      setValue({ value: 1, exclusivityChance: 1 }),
+    );
+    const message = loadError(dir).message;
+    expect(message).toContain('ruleDemand.wishes.tv[0]: "surface" is not a rule trait');
+    expect(message).toContain('ruleDemand.wishes.sponsor[0]: "brutal" is not an option of contact');
+    expect(message).toContain("tvFork.satellite-dish: unknown growth node");
+  });
+
+  it("every deal slot keeps an offer without a rule demand: at least two offers", () => {
+    const dir = copyOfContent();
+    editYaml(dir, "config.yaml", ["flagship", "deals", "offersPerSlot", "min"], setValue(1));
+    expect(loadError(dir).message).toContain("flagship.deals.offersPerSlot.min");
+  });
+
+  it("deal partners are distinct and enough for an offseason's offers", () => {
+    const dir = copyOfContent();
+    editYaml(
+      dir,
+      "names.yaml",
+      ["dealPartners", "broadcasters"],
+      setValue([
+        { id: "one", name: "One TV" },
+        { id: "one", name: "One TV" },
+      ]),
+    );
+    const message = loadError(dir).message;
+    expect(message).toContain("dealPartners: has duplicate ids");
+    expect(message).toContain("dealPartners.broadcasters: needs at least 6");
+  });
 });

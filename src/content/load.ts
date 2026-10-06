@@ -3,7 +3,7 @@ import type { ZodType } from "zod";
 import { deriveWorld, startingRivalFanCounts, startingSportCulture, type World } from "./derive";
 import { eventsFileSchema } from "./events";
 import { optionNetDeltaAt } from "./genome";
-import { AXIS_IDS, GENOME_AXES } from "./genome-axes";
+import { AXIS_IDS, type AxisId, GENOME_AXES } from "./genome-axes";
 import {
   COUNTERMOVES,
   configFileSchema,
@@ -625,6 +625,7 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
 
   checkSources(world, sources, issues);
   checkGrowthTree(world, sources, issues);
+  checkDeals(world, sources, issues);
   world.events.cards.forEach((card, index) => {
     if (!world.config.ppTiers.some((tier) => tier.tier === card.minTier))
       issue(sources.events, `cards[${index}].minTier`, "unknown PP tier");
@@ -696,6 +697,53 @@ function checkSources(world: World, sources: ContentSources, issues: ContentIssu
 }
 
 /** Growth tree cross-references: categories, prerequisites (no cycles), effects and forks. */
+/** Flagship deals (GDD v1.28): rule wishes, the TV fork, tables by tier and partner pools. */
+function checkDeals(world: World, sources: ContentSources, issues: ContentIssue[]): void {
+  const { deals } = world.config.flagship;
+  const config = (field: string, message: string) =>
+    issues.push({ file: sources.config.path, field: `flagship.deals.${field}`, message });
+  for (const [kind, wishes] of Object.entries(deals.ruleDemand.wishes)) {
+    wishes.forEach((wish, i) => {
+      const field = `ruleDemand.wishes.${kind}[${i}]`;
+      const axis = GENOME_AXES[wish.axis as AxisId];
+      if (axis?.kind !== "rule") config(field, `"${wish.axis}" is not a rule trait`);
+      else if (!(axis.options as readonly string[]).includes(wish.toward)) {
+        config(field, `"${wish.toward}" is not an option of ${wish.axis}`);
+      }
+    });
+  }
+  const nodeIds = new Set(world.growthTree.nodes.map((node) => node.id));
+  for (const nodeId of Object.keys(deals.tvFork)) {
+    if (!nodeIds.has(nodeId)) config(`tvFork.${nodeId}`, "unknown growth node");
+  }
+  if (deals.capByPpTier.length !== world.config.ppTiers.length) {
+    config("capByPpTier", `needs one entry per PP tier (${world.config.ppTiers.length})`);
+  }
+  const mostSponsors = Math.max(...Object.values(deals.sponsorSlots));
+  if (deals.value.sponsorSlotShares.length < mostSponsors) {
+    config("value.sponsorSlotShares", `needs a share for each of up to ${mostSponsors} slots`);
+  }
+
+  // Partners: unique ids and names, and enough of them for an offseason's offers after shunning.
+  const { broadcasters, sponsors } = world.names.dealPartners;
+  const names = (field: string, message: string) =>
+    issues.push({
+      file: sources.names.path,
+      field: field ? `dealPartners.${field}` : "dealPartners",
+      message,
+    });
+  const all = [...broadcasters, ...sponsors];
+  if (new Set(all.map((p) => p.id)).size !== all.length) names("", "has duplicate ids");
+  if (new Set(all.map((p) => p.name)).size !== all.length) names("", "has duplicate names");
+  const most = deals.offersPerSlot.max;
+  if (broadcasters.length < 2 * most) {
+    names("broadcasters", `needs at least ${2 * most} (two offseasons of TV offers)`);
+  }
+  if (sponsors.length < most * (mostSponsors + 2)) {
+    names("sponsors", `needs at least ${most * (mostSponsors + 2)} (sponsor and naming offers)`);
+  }
+}
+
 function checkGrowthTree(world: World, sources: ContentSources, issues: ContentIssue[]): void {
   const tree = world.growthTree;
   const issue = (field: string, message: string) =>

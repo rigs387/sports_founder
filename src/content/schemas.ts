@@ -255,6 +255,14 @@ export const namesFileSchema = z.strictObject({
     first: z.array(z.string().min(1)).min(1),
     second: z.array(z.string().min(1)).min(1),
   }),
+  /**
+   * Flagship deal partners (GDD v1.28): invented names, never real brands or broadcasters. Ids are
+   * stable (a shunned partner is remembered by id).
+   */
+  dealPartners: z.strictObject({
+    broadcasters: z.array(z.strictObject({ id, name: z.string().min(1) })).min(1),
+    sponsors: z.array(z.strictObject({ id, name: z.string().min(1), sector: id })).min(1),
+  }),
   /** The default founding ground is the club's town and one of these words. */
   groundWords: z.array(z.string().min(1)).min(1),
   /** Culture (GDD v1.22): tradition name pools and the rivals' flavor traditions. */
@@ -428,6 +436,97 @@ export const seasonInterestSchema = z.enum(["gripping", "ordinary", "dynasty", "
 export type SeasonInterest = z.infer<typeof seasonInterestSchema>;
 const seasonInterestMap = <T extends z.ZodType>(value: T) =>
   z.strictObject({ gripping: value, ordinary: value, dynasty: value, runaway: value });
+
+/** A flagship deal slot's kind (GDD v1.28). */
+export const dealSlotSchema = z.enum(["tv", "sponsor", "namingRights"]);
+export type DealSlot = z.infer<typeof dealSlotSchema>;
+/** What a deal can demand (GDD v1.28). Demands never block: doing the thing breaks the deal. */
+export const dealDemandSchema = z.enum(["ruleChange", "tierFloor", "seatLock", "exclusivity"]);
+export type DealDemand = z.infer<typeof dealDemandSchema>;
+
+const byLeagueTier = <T extends z.ZodType>(value: T) =>
+  z.strictObject({ amateur: value, "semi-pro": value, professional: value, elite: value });
+/** A rule a partner wants: one step of `axis` toward `toward`. Checked against the genome at load. */
+const ruleWishSchema = z.strictObject({ axis: z.string().min(1), toward: z.string().min(1) });
+
+const dealsSchema = z
+  .strictObject({
+    /** Share of today's media line the flagship keeps with no deals. */
+    baselineShare: unitInterval,
+    /** Sponsor slots by the flagship league's tier; the first is the main sponsor. */
+    sponsorSlots: byLeagueTier(z.int().min(1)),
+    /** Offers per open slot each offseason. At least 2, so one is always without a rule demand. */
+    offersPerSlot: z.strictObject({ min: z.int().min(2), max: z.int().min(2) }),
+    /** Deal lengths in seasons. */
+    seasons: z.strictObject({ min: z.int().min(1), max: z.int().min(1) }),
+    /**
+     * An ordinary offer's annual value, before demands and the cap, × the league tier's revenue
+     * multiplier and the PP tier's media revenue multiplier, × uniform(1 ± spread):
+     *   tv           = casual × tvPerCasual × media market factor
+     *   sponsor      = (casual + hardcore) × sponsorPerFan × wealth factor × slot share
+     *   namingRights = hardcore × namingPerHardcore × wealth factor
+     */
+    value: z.strictObject({
+      tvPerCasual: z.number().min(0),
+      sponsorPerFan: z.number().min(0),
+      namingPerHardcore: z.number().min(0),
+      /** Each sponsor slot's share of the full sponsor value, main sponsor first. */
+      sponsorSlotShares: z.array(z.number().min(0)).min(1),
+      spread: unitInterval,
+    }),
+    /** An offer is at most this × the league's annual running cost, by PP tier (1 first). */
+    capByPpTier: z.array(z.number().min(0)).min(1),
+    /** Each demand's chance on an offer and its premium on the value. One demand per offer. */
+    demands: z.strictObject({
+      tierFloor: z.strictObject({ chance: unitInterval, premium: z.number().min(0) }),
+      seatLock: z.strictObject({ chance: unitInterval, premium: z.number().min(0) }),
+      exclusivity: z.strictObject({ chance: unitInterval, premium: z.number().min(0) }),
+      ruleChange: z.strictObject({ premium: z.number().min(0) }),
+    }),
+    /** No tier floor below this league tier: an Amateur floor would be no demand. */
+    tierFloorMinTier: leagueTierSchema,
+    /**
+     * Rule demands are rare and never required (GDD v1.28): at most one offer with one per
+     * offseason, only with chancePerOffseason, none while a signed deal's rule demand is due. It is
+     * due by the close of the deal's dueOffseasons-th offseason. Wishes by partner kind.
+     */
+    ruleDemand: z.strictObject({
+      chancePerOffseason: unitInterval,
+      dueOffseasons: z.int().min(1),
+      wishes: z.strictObject({
+        tv: z.array(ruleWishSchema).min(1),
+        sponsor: z.array(ruleWishSchema).min(1),
+      }),
+    }),
+    /** A breach: penaltySeasons × the annual value in cash; the partner shuns for shunSeasons. */
+    breach: z.strictObject({ penaltySeasons: z.number().min(0), shunSeasons: z.int().min(0) }),
+    /** A renewal from the current partner: today's value × (1 + edge). */
+    renewalEdge: z.number().min(0),
+    /** The homegrown gear brand: a demand-free main-sponsor offer at valueShare of an ordinary one. */
+    gearBrand: z.strictObject({ valueShare: z.number().min(0), renewalEdge: z.number().min(0) }),
+    /** The growth tree's TV fork shapes TV offers (node ids checked at load). */
+    tvFork: z.record(
+      z.string().min(1),
+      z.strictObject({ value: z.number().min(0), exclusivityChance: z.number().min(0) }),
+    ),
+    /** TV exclusivity cuts the broadcast's lift by this share while it runs. */
+    exclusivityLiftCut: unitInterval,
+    /** A rival's sponsor lockout in the seat country: sponsor offers × value, offersCut fewer. */
+    sponsorLockout: z.strictObject({ value: unitInterval, offersCut: z.int().min(0) }),
+    /**
+     * Naming rights on a famous ground betray it (GDD v1.28): hardcoreDemotionShare × the
+     * tradition's weight × ethos of seat-country hardcore fans turn casual, the tradition wears by
+     * traditionWear, and its pilgrimage is cut by pilgrimageCut while the name stands. On the
+     * founding ground the club rite is offended the same way.
+     */
+    namingRights: z.strictObject({
+      hardcoreDemotionShare: unitInterval,
+      traditionWear: unitInterval,
+      pilgrimageCut: unitInterval,
+    }),
+  })
+  .refine((d) => d.offersPerSlot.max >= d.offersPerSlot.min, "offersPerSlot.max is below min")
+  .refine((d) => d.seasons.max >= d.seasons.min, "seasons.max is below min");
 
 export const healthLevelSchema = z.enum(["healthy", "struggling", "near-collapse"]);
 export const HEALTH_LEVELS = healthLevelSchema.options;
@@ -955,6 +1054,8 @@ export const configFileSchema = z.strictObject({
       }),
       rippleShare: unitInterval,
     }),
+    /** Flagship deals (GDD v1.28, tech plan 2.15). */
+    deals: dealsSchema,
   }),
   tierTrack: z.strictObject({
     telegraphTurns: z.int().min(0),
@@ -981,6 +1082,8 @@ export const configFileSchema = z.strictObject({
     hardAnchor: z.string().min(1),
     /** The flagship broadcast's share of the player's world media reach exposure (GDD v1.23). */
     flagshipBroadcastShare: z.tuple([unitInterval, unitInterval]),
+    /** A full slate of ordinary deals as a share of the media line it replaces (GDD v1.28). */
+    dealSlateShare: z.tuple([z.number().min(0), z.number().min(0)]),
   }),
 });
 

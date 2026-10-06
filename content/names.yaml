@@ -271,6 +271,43 @@ traditions:
       - { id: border-derby, type: derby, countryId: india, name: the Border Derby }
       - { id: maidan-game, type: nationalName, countryId: india, name: the Maidan Game }
 
+# Flagship deal partners (GDD v1.28): invented broadcasters and sponsors, never real brands or
+# broadcasters. Ids are stable (a shunned partner is remembered by id). Naming-rights partners are
+# drawn from the sponsors. The homegrown gear brand is named from the sport (locale), not here.
+dealPartners:
+  broadcasters:
+    - { id: lantern-sports, name: Lantern Sports Network }
+    - { id: meridian-vision, name: Meridian Vision }
+    - { id: kestrel-tv, name: Kestrel TV }
+    - { id: harbourlight, name: Harbourlight Broadcasting }
+    - { id: tallgrass-media, name: Tallgrass Media }
+    - { id: pennant-vision, name: Pennant Vision }
+    - { id: larkspur-sports, name: Larkspur Sports }
+    - { id: copperline-tv, name: Copperline TV }
+    - { id: fieldhouse-network, name: Fieldhouse Network }
+    - { id: signal-hill, name: Signal Hill Media }
+  sponsors:
+    - { id: ashgrove-bank, name: Ashgrove Bank, sector: bank }
+    - { id: ironbridge-mutual, name: Ironbridge Mutual, sector: bank }
+    - { id: tumbleweed-cola, name: Tumbleweed Cola, sector: drinks }
+    - { id: brightwater-springs, name: Brightwater Springs, sector: drinks }
+    - { id: glasshouse-lager, name: Glasshouse Lager, sector: drinks }
+    - { id: swiftwing-air, name: Swiftwing Air, sector: airline }
+    - { id: cobalt-airways, name: Cobalt Airways, sector: airline }
+    - { id: relaylink, name: Relaylink, sector: telecom }
+    - { id: tinplate-mobile, name: Tinplate Mobile, sector: telecom }
+    - { id: halden-motors, name: Halden Motors, sector: motors }
+    - { id: ridgeway-autos, name: Ridgeway Autos, sector: motors }
+    - { id: steadfast-assurance, name: Steadfast Assurance, sector: insurance }
+    - { id: oakmere-insurance, name: Oakmere Insurance, sector: insurance }
+    - { id: sunvale-energy, name: Sunvale Energy, sector: energy }
+    - { id: pylon-power, name: Pylon Power, sector: energy }
+    - { id: corner-basket, name: Corner Basket Grocers, sector: retail }
+    - { id: larder-and-lamp, name: Larder & Lamp, sector: retail }
+    - { id: quayside-freight, name: Quayside Freight, sector: logistics }
+    - { id: wrenfield-foods, name: Wrenfield Foods, sector: food }
+    - { id: candlewick-hotels, name: Candlewick Hotels, sector: travel }
+
 # Invented flagship club nicknames (GDD v1.14). Clubs are based in real places (places.yaml); only
 # the nickname is made up, e.g. "Glasgow Comets". Needs at least as many entries as the largest
 # flagship has clubs.
