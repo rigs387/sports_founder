@@ -265,6 +265,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   landmarks recorded from then on read; older event records tell no tradition.
 - Save format 19 adds the offseason (GDD v1.24): `FlagshipState.offseason`. Format 18 migrates with
   it closed and the season under way playing on (open only if the saved season had run out).
+- Save format 20 adds flagship deals (GDD v1.28): `FlagshipState.deals` (signed deals, offers on
+  the table, shunned partners, the deals' own random stream). Format 19 migrates with none and no
+  offers made, so the media baseline cut waits for the next offseason's offers.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

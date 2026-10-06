@@ -853,7 +853,8 @@
       "dropStar": "You no longer back {{player}}.",
       "amendRule": "{{trait}} is now {{option}}. The amendment is in the rulebook.",
       "nameTrophy": "The trophy is now called {{name}}.",
-      "renameTrophy": "The trophy is now called {{name}}. Its old name is history."
+      "renameTrophy": "The trophy is now called {{name}}. Its old name is history.",
+      "signDeal": "Deal signed. It pays from the next season."
     }
   },
   "map": {

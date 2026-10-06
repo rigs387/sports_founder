@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   AXIS_IDS,
   type AxisId,
+  dealSlotSchema,
   escalationLevelSchema,
   formatPath,
   GENOME_AXES,
@@ -14,6 +15,7 @@ import {
 } from "../content";
 import { tierEntry } from "./calendar";
 import { newCulture } from "./culture";
+import { newDeals } from "./deals";
 import { emptyEvents, eventStateSchema } from "./events-state";
 import { newFlagship, staffFlagship } from "./flagship";
 import { defaultGroundName, defaultIdentitySetup, foundingClubOf } from "./identity";
@@ -25,7 +27,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 19;
+export const SAVE_FORMAT_VERSION = 20;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -249,6 +251,43 @@ const tallyFields = {
   finalScores: count,
 };
 const seasonFormatSchema = z.enum(["european", "american"]);
+const dealTermsFields = {
+  id: z.int().min(1),
+  slot: dealSlotSchema,
+  position: count,
+  partnerId: z.string().min(1),
+  annualValue: z.number().min(0),
+  seasons: z.int().min(1),
+  demand: z
+    .discriminatedUnion("kind", [
+      z.strictObject({ kind: z.literal("tierFloor"), tier: leagueTierSchema }),
+      z.strictObject({ kind: z.literal("seatLock"), countryId: z.string().min(1) }),
+      z.strictObject({ kind: z.literal("exclusivity") }),
+      z.strictObject({
+        kind: z.literal("ruleChange"),
+        axis: z.enum(AXIS_IDS as [AxisId, ...AxisId[]]),
+        option: z.string().min(1),
+        dueSeason: z.int().min(1),
+      }),
+    ])
+    .nullable(),
+  renewal: z.boolean(),
+};
+const dealsSchema = z.strictObject({
+  rng: z.array(z.number()).min(1),
+  signed: z.array(
+    z.strictObject({
+      ...dealTermsFields,
+      firstSeason: z.int().min(1),
+      lastSeason: z.int().min(1),
+      countryId: z.string().min(1),
+    }),
+  ),
+  offers: z.array(z.strictObject(dealTermsFields)),
+  shunned: z.array(z.strictObject({ partnerId: z.string().min(1), untilSeason: z.int().min(1) })),
+  nextId: z.int().min(1),
+  offeredSeason: z.int().min(1).nullable(),
+});
 const scoringSchema = z.enum(GENOME_AXES.scoring.options);
 const flagshipSchema = z.strictObject({
   countryId: z.string().min(1),
@@ -321,6 +360,7 @@ const flagshipSchema = z.strictObject({
       newStarId: z.int().min(1).nullable(),
     }),
   ),
+  deals: dealsSchema,
 });
 
 const gameStateSchema = z.strictObject({
@@ -475,6 +515,19 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 19 → 20: flagship deals (GDD v1.28). Nothing signed and no offers made: the media baseline
+  // cut starts at the next offseason, when the first offers arrive. An offseason already open
+  // makes none: the next End Turn closes it before offers are made.
+  19: (save) => {
+    const flagship = save.state.flagship as Omit<FlagshipState, "deals">;
+    return {
+      formatVersion: 20,
+      state: {
+        ...save.state,
+        flagship: { ...flagship, deals: newDeals(Number(save.state.seed)) },
+      },
+    };
+  },
   // 18 → 19: the offseason (GDD v1.24). The season under way plays on; the offseason first opens
   // when it ends. A save made just after a season ended keeps the season already started; one
   // whose season has run its quarters without a new one starting is in the offseason.

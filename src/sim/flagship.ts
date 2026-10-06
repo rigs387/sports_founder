@@ -1,6 +1,7 @@
 import type { SeasonInterest } from "../content";
 import { costMultiplier, offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights } from "./culture";
+import { lapseOffers, newDeals } from "./deals";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
@@ -918,6 +919,7 @@ export function newFlagship(
     startRatings: [],
     lastRound: [],
     seasons: [],
+    deals: newDeals(seed),
   };
   const fitted = fitClubs(empty, world, rng, tier);
   return { ...startSeason(fitted, world, quarter, scoring), rng: saveRng(rng) };
@@ -1444,7 +1446,8 @@ export function closeOffseason(state: GameState, world: World): GameState {
   }
   const seatLeague = countries[indexOf(world, flagship.countryId)]?.league ?? null;
   if (seatLeague !== null) flagship = fitClubs(flagship, world, rng, seatLeague.tier);
-  flagship = startSeason(flagship, world, state.quarter, state.genome.scoring, true);
+  // Unsigned deal offers lapse (GDD v1.28).
+  flagship = lapseOffers(startSeason(flagship, world, state.quarter, state.genome.scoring, true));
   return {
     ...state,
     flagship: { ...flagship, rng: saveRng(rng) },

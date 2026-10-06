@@ -1,5 +1,6 @@
 import { turnLengthQuarters } from "./calendar";
 import { updateCulture } from "./culture";
+import { offerDeals } from "./deals";
 import { offerEvents, settleEvents } from "./events";
 import { closeOffseason, returnSeatIfFolded } from "./flagship";
 import { evaluateLeagues } from "./leagues";
@@ -23,7 +24,8 @@ export class CampaignOverError extends Error {
  * 4. the PP tier track is checked; a tier change takes effect from the next turn;
  * 5. the win hold is checked (src/sim/win.ts). Winning never ends the campaign;
  * 6. culture reads the turn's facts: traditions are born, renewed, decay and are lost
- *    (src/sim/culture.ts).
+ *    (src/sim/culture.ts);
+ * 7. an open offseason gets its deal offers, once (src/sim/deals.ts).
  * Turns always complete. Refuses to play a campaign that has already ended.
  */
 export function endTurn(state: GameState, world: World): GameState {
@@ -53,6 +55,8 @@ export function endTurn(state: GameState, world: World): GameState {
   next = updateWinTrack(next, world);
   // Traditions read the turn's recorded facts (GDD v1.22).
   next = updateCulture(next, world);
+  // An open offseason's deal offers, once, after culture so new famous grounds count (GDD v1.28).
+  next = offerDeals(next, world);
   return offerEvents({ ...next, turn: start.turn + 1 }, world, quarters);
 }
 

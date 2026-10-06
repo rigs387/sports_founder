@@ -1,6 +1,7 @@
 import { AXIS_IDS, GENOME_AXES } from "../content";
 import { costMultiplier, offseasonOpen } from "./calendar";
 import { nameTrophy, nameTrophyBlocker, renameTrophy, renameTrophyBlocker } from "./culture";
+import { signBlocker, signDeal } from "./deals";
 import { eventBlocker, resolveEvent } from "./events";
 import { backBlocker, backStar, dropBlocker, dropStar, seatBlocker } from "./flagship";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
@@ -35,6 +36,8 @@ import { type AxisId, type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } f
 //                   (GDD v1.22)
 //   renameTrophy    rename the seat's trophy in the offseason: the old trophy tradition
 //                   ends and its followers' purists turn casual (GDD v1.22)
+//   signDeal        sign a flagship deal offer, in the offseason; the slot's other offers are
+//                   withdrawn (GDD v1.28)
 
 export type Action =
   | { type: "collectMoment"; eventId: number }
@@ -50,7 +53,8 @@ export type Action =
   | { type: "dropStar"; playerId: number }
   | { type: "amendRule"; axis: AxisId; option: string }
   | { type: "nameTrophy"; name: string }
-  | { type: "renameTrophy"; name: string };
+  | { type: "renameTrophy"; name: string }
+  | { type: "signDeal"; offerId: number };
 
 export class IllegalActionError extends Error {
   override name = "IllegalActionError";
@@ -202,6 +206,16 @@ export function checkAction(state: GameState, world: World, action: Action): str
     }
   }
   if (action.type === "backStar") return backBlocker(state, world, action.playerId);
+  if (action.type === "signDeal") {
+    switch (signBlocker(state, action.offerId)) {
+      case "window":
+        return "deals are signed only in the offseason";
+      case "offer":
+        return `no deal offer #${action.offerId} is on the table`;
+      case null:
+        return null;
+    }
+  }
   if (action.type === "dropStar") return dropBlocker(state, world, action.playerId);
 
   if (action.type === "moveSeat") {
@@ -333,6 +347,8 @@ export function applyAction(state: GameState, world: World, action: Action): Gam
       return renameTrophy(state, world, action.name);
     case "backStar":
       return backStar(state, world, action.playerId);
+    case "signDeal":
+      return signDeal(state, action.offerId);
     case "dropStar":
       return dropStar(state, world, action.playerId);
     case "moveSeat":

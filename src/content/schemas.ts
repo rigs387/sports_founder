@@ -437,6 +437,8 @@ export type SeasonInterest = z.infer<typeof seasonInterestSchema>;
 const seasonInterestMap = <T extends z.ZodType>(value: T) =>
   z.strictObject({ gripping: value, ordinary: value, dynasty: value, runaway: value });
 
+/** The homegrown gear brand's partner id (GDD v1.28): reserved, never in names.yaml. */
+export const GEAR_BRAND_ID = "gear-brand";
 /** A flagship deal slot's kind (GDD v1.28). */
 export const dealSlotSchema = z.enum(["tv", "sponsor", "namingRights"]);
 export type DealSlot = z.infer<typeof dealSlotSchema>;
@@ -460,8 +462,9 @@ const dealsSchema = z
     /** Deal lengths in seasons. */
     seasons: z.strictObject({ min: z.int().min(1), max: z.int().min(1) }),
     /**
-     * An ordinary offer's annual value, before demands and the cap, × the league tier's revenue
-     * multiplier and the PP tier's media revenue multiplier, × uniform(1 ± spread):
+     * An ordinary offer's value a quarter (× 4 for its annual value), before demands and the cap,
+     * like today's media line: × the league tier's revenue multiplier and the PP tier's media
+     * revenue multiplier, × uniform(1 ± spread):
      *   tv           = casual × tvPerCasual × media market factor
      *   sponsor      = (casual + hardcore) × sponsorPerFan × wealth factor × slot share
      *   namingRights = hardcore × namingPerHardcore × wealth factor

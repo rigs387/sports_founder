@@ -10,6 +10,7 @@ import {
   eventSnapshots,
   type GameState,
   landmarks,
+  newDeals,
   offerEvents,
   PLAYER_INDEX,
   runTurns,
@@ -360,7 +361,12 @@ describe("season cards in play", () => {
     const { seasonOffered: _offered, ...events } = played.events;
     const strip = (records: GameState["events"]["pending"]) =>
       records.map(({ facts: { season: _season, ...facts }, ...record }) => ({ ...record, facts }));
-    const { startRatings: _ratings, scoring: _scoring, ...flagship } = played.flagship;
+    const {
+      startRatings: _ratings,
+      scoring: _scoring,
+      deals: _deals,
+      ...flagship
+    } = played.flagship;
     const v8 = {
       ...played,
       events: { ...events, pending: strip(events.pending), history: strip(events.history) },
@@ -385,6 +391,8 @@ describe("season cards in play", () => {
             scoring: "medium",
             startRatings: [],
           })),
+          // Deals came with format 20: none signed or offered (GDD v1.28).
+          deals: newDeals(played.seed),
         },
         culture: migratedCulture(played),
       }),

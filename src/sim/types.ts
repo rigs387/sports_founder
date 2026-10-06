@@ -1,5 +1,6 @@
 import type {
   AxisId,
+  DealSlot,
   EscalationLevel,
   Genome,
   HealthLevel,
@@ -18,6 +19,8 @@ export type {
   CountermoveKind,
   Country,
   CountryDerived,
+  DealDemand,
+  DealSlot,
   EscalationLevel,
   Genome,
   GrowthCategory,
@@ -335,6 +338,64 @@ export interface FlagshipState {
   /** The most recent round's results (disposable: replaced every round). */
   lastRound: MatchResult[];
   seasons: SeasonSummary[];
+  /** Sponsor and TV deals (GDD v1.28). */
+  deals: DealsState;
+}
+
+/** What a deal demands (GDD v1.28). Demands never block: doing the thing breaks the deal. */
+export type DealDemandTerms =
+  /** The flagship league stays at this tier or above. */
+  | { kind: "tierFloor"; tier: LeagueTierId }
+  /** The seat stays in this country. */
+  | { kind: "seatLock"; countryId: string }
+  /** Pay-TV exclusivity: the broadcast's lift is cut while it runs. */
+  | { kind: "exclusivity" }
+  /** One step of a rule trait, amended by the close of the offseason before `dueSeason`. */
+  | { kind: "ruleChange"; axis: AxisId; option: string; dueSeason: number };
+
+export interface DealTerms {
+  slot: DealSlot;
+  /** The sponsor slot (0 is the main sponsor), the named ground's club id, or 0 for TV. */
+  position: number;
+  /** A partner id from names.yaml, or GEAR_BRAND_ID for the homegrown gear brand. */
+  partnerId: string;
+  /** Cash a season, locked for the term. */
+  annualValue: number;
+  seasons: number;
+  demand: DealDemandTerms | null;
+  /** Offered by the partner whose deal in this slot just ended. */
+  renewal: boolean;
+}
+
+export interface DealOffer extends DealTerms {
+  id: number;
+}
+
+export interface Deal extends DealTerms {
+  id: number;
+  /** The first and last flagship seasons it pays for. */
+  firstSeason: number;
+  lastSeason: number;
+  /** The seat's country when it was signed. */
+  countryId: string;
+}
+
+/**
+ * The flagship's deals (GDD v1.28). Offers are made once an offseason, on the deals' own random
+ * stream, and lapse when it closes.
+ */
+export interface DealsState {
+  rng: number[];
+  signed: Deal[];
+  offers: DealOffer[];
+  /** Partners who will not deal until after `untilSeason` (a breach). */
+  shunned: { partnerId: string; untilSeason: number }[];
+  nextId: number;
+  /**
+   * The flagship season whose offseason last made offers, or null before the first. The media
+   * baseline cut applies once offers have been made.
+   */
+  offeredSeason: number | null;
 }
 
 /** A permanent history fact (GDD History & Records). Plain data: no text. */

@@ -630,6 +630,20 @@ offseason. The schema requires at least two offers per slot, so a slot always ke
 without a rule demand (step 2 puts the one rule demand only where another offer stands). Values
 are starting points; step 3 tunes them to the slate target.
 
+*Step 2 built 2026-10-05.* `src/sim/deals.ts`: `newDeals`, `dealSlots`, `ordinaryDealValue`,
+`dealCap`, `offerDeals`, `signDeal`/`signBlocker`, `lapseOffers` and `dealProblems` (invariants).
+Deals roll on their own stream (`DealsState.rng`), so neither the world's sequence nor the
+flagship's matches move. Offers are made once an offseason at the end of `endTurn`, after
+culture (a ground made famous that turn gets its naming-rights slot), and lapse in
+`closeOffseason`. A deal signed in the offseason pays from the coming season
+(`flagship.season` is already the next season then). The partner whose deal just ended offers a
+demand-free renewal (not through a sponsor lockout); the gear brand always offers for the main
+sponsor. `offeredSeason` marks the offseason that made offers; the media baseline cut (step 3)
+applies once it is set. Save format 20; format 19 migrates with none and no offers made.
+`tests/deals.test.ts` covers slots, counts, the gear brand, the cap, stream independence, once
+an offseason, lapsing, signing, renewal, the rule-demand limits over 60 draws, countermoves, the
+TV fork and saves.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

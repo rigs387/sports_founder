@@ -756,7 +756,8 @@ flagship:
   # slots by league tier (the first is the main sponsor, where the homegrown gear brand always
   # offers), and a naming-rights slot for the founding ground and each famous ground. Values are
   # starting points, tuned so a full slate of ordinary offers is 100–120% of the media line it
-  # replaces (balanceTargets.dealSlateShare).
+  # replaces (balanceTargets.dealSlateShare). The value rates are a quarter's worth, like the media
+  # line's mediaPerCasual; a deal's annual value is four quarters.
   deals:
     baselineShare: 0.4
     sponsorSlots: { amateur: 1, semi-pro: 1, professional: 2, elite: 3 }

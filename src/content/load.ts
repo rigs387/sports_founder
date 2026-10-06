@@ -10,6 +10,7 @@ import {
   countriesFileSchema,
   ESCALATION_LEVELS,
   FAN_FIELD_PREFIX,
+  GEAR_BRAND_ID,
   genomeFileSchema,
   growthTreeFileSchema,
   identityFileSchema,
@@ -734,6 +735,7 @@ function checkDeals(world: World, sources: ContentSources, issues: ContentIssue[
     });
   const all = [...broadcasters, ...sponsors];
   if (new Set(all.map((p) => p.id)).size !== all.length) names("", "has duplicate ids");
+  if (all.some((p) => p.id === GEAR_BRAND_ID)) names("", `"${GEAR_BRAND_ID}" is reserved`);
   if (new Set(all.map((p) => p.name)).size !== all.length) names("", "has duplicate names");
   const most = deals.offersPerSlot.max;
   if (broadcasters.length < 2 * most) {
