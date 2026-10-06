@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.27 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs)*
+*Version 1.28 | October 5, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare)*
 
 ---
 
@@ -1208,6 +1208,74 @@ under standing policies; whether they later gain individual deals is open.
   annual value, and sometimes a demand (rule-change proposal, exclusivity, "stay Professional or
   above"). Standing policy accepts or rejects outside focus countries. Long deals trade security
   for locked terms.
+- **Flagship deals (decided 2026-10-05, v1.28).** Every number is config.
+  - *Scope:* the flagship only. Other leagues keep the Phase 0 combined revenue line.
+  - *What a deal pays against (choose pain):* without deals the flagship keeps only a share of
+    today's media line (e.g. 40%). A deal pays a fixed annual value, set at signing from the market
+    then (TV: casual fans × media market; sponsor: all fans × wealth) and capped by PP tier. Fixed
+    both ways: it pays if fans fall and misses growth if they rise.
+  - *Slots:* one TV deal; sponsor slots growing with the league tier (e.g. Amateur 1, Semi-Pro 1,
+    Professional 2, Elite 3), the first being the main sponsor, where the homegrown gear brand is
+    an option; and a naming-rights slot for each eligible ground (the founding ground or a famous
+    one), the betrayal tradition stickiness expects.
+  - *Offers:* only in the offseason, on its screen. Each open slot gets 2–3 offers drawn on the
+    flagship's own random stream, so the world's sequence never depends on deals. A slot may stay
+    empty (the reduced baseline).
+  - *Length and renewal:* 1–5 seasons with the value locked for the term. At expiry the current
+    partner offers a renewal at today's market value with a loyalty edge, beside fresh offers. No
+    early exit: a deal ends early only by breaking its demand, at a penalty.
+  - *Demands (first build):* a *rule change* (a broadcaster wants shorter matches, a sponsor more
+    scoring; this is how broadcasters' and sponsors' rule proposals arrive), a *tier floor* ("stay
+    Professional or above"), a *seat lock* (the league stays in this country) and *TV exclusivity*
+    (pay-TV: pays more, but the broadcast's lift is cut while it runs).
+  - *Demands never block (choose pain).* Doing the thing breaks the deal. A rule demand is met by
+    amending that rule before the deal's second offseason closes. A forced breach counts too: an
+    unavoidable step-down, or a seat sent home when a flagship folds.
+  - *A breach costs:* the deal ends and its remaining value is lost, a cash penalty of about one
+    season's value, and the partner makes no offers for a few seasons.
+  - *Demands pay:* each demand raises an offer (e.g. +30–60%). Demand-free offers are smaller; the
+    homegrown gear brand is always demand-free and smallest, with a bigger loyalty edge at renewal.
+  - *Naming rights betray:* signing them on a famous ground wears down that ground's tradition and
+    turns hardcore fans casual in the seat country (by tradition weight and ethos, as a trophy
+    rename does), and cuts its pilgrimage while the name stands; on the founding ground it offends
+    the club rite. Rule demands need nothing new: amendments already offend traditions.
+  - *Rivals:* signed deals keep paying through countermoves (locked terms are the security). In
+    the seat country a rival sponsor lockout makes new sponsor offers fewer and smaller and blocks
+    sponsor renewals while it runs; a rival broadcast deal leaves no TV offers at all (choose pain).
+  - *The TV fork shapes TV offers:* Pay-TV Exclusivity owners get bigger TV offers, more often
+    exclusive; Free-to-Air owners get smaller ones and never exclusivity. The nodes keep their
+    effects.
+  - *No new cash spend yet.* Cash feeds health, promotion, keeping stars and breach penalties;
+    venues and youth programs come later (parked). Guard: a full slate of ordinary offers is worth
+    about 100–120% of today's media line, so going without hurts and signing everything does not
+    make the flagship unsinkable.
+  - *Rule demands* come from the partner's kind and move a rule one step (e.g. TV: shorter
+    matches, more scoring, fewer stoppages; sponsors: less contact, simpler rules; lists in
+    config), never toward the rule already in place. The Rulebook marks a demanded rule "due by
+    season N".
+  - *Rule demands are rare, never required.* Every open slot, TV included, always has at least
+    one offer without a rule demand. At most one offer with a rule demand per offseason across
+    all slots, none while a signed deal's rule demand is still due, and only a modest chance of
+    one in any offseason (config). A deal never needs a rule change to be had.
+  - *Bots* take the highest-value offer per slot, demands included, and play on as usual; the
+    runner reports deals signed, demands met and breaches by kind.
+  - *On screen:* a Deals section on the offseason screen (each slot's signed deal with value,
+    seasons left and demand with its due season; 2–3 offer cards per open slot with value, length,
+    the demand in plain words and a betrayal warning on naming rights). Signing confirms only for
+    a demand or a betrayal; unsigned offers lapse when the offseason closes. A read-only Deals card
+    on the Flagship tab.
+  - *News:* a breach is a big moment (a back page) with its cost; a rule demand due this offseason
+    is flagged on the offseason screen; a renewal from the current partner is marked; a deal ending
+    at term is a minor toast.
+  - *Partners* have invented names from pools (never real brands or broadcasters) and a kind
+    (broadcaster, or a sponsor by sector); the gear brand is named from the sport's identity.
+  - *Saves:* format 20 adds the flagship's deals (signed, on the table, partners who shun you).
+    A format 19 save migrates with none; the reduced baseline starts at its next offseason, when
+    the first offers arrive.
+  - *Guard:* a full slate of ordinary offers is worth 100–120% of the media line it replaces, by
+    league tier; pacing passes and the #1 contest stays about half; the flagship's Near-Collapse
+    rate is reported against the build before deals; deal share of flagship revenue and breach
+    rates are reported only.
 - **Cash can build fans locally and indirectly.** Cash funds venues and youth programs that
   accelerate casual → hardcore conversion in that country. Cash never produces PP directly.
 - **No transfers between countries.** A league in trouble can receive an **emergency bailout paid

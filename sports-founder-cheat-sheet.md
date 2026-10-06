@@ -66,6 +66,20 @@ collected as clickable map pickups. Costs rise per tier. All numbers in config.
 
 **Business Layer:** Per-country cash. Gate (hardcore × wealth, venue-capped), TV (casual ×
 media market), sponsors (reach × wealth); multi-year deals in offseasons, some with demands.
+Flagship deals (v1.28): flagship only; no deal = a share of today's media line; a deal
+locks a value set at signing (capped by PP tier) for 1–5 seasons; TV + sponsor slots by league
+tier (main sponsor first; gear brand an option) + naming rights per famous or founding ground;
+2–3 offers per open slot each offseason; renewal at market value with a loyalty edge; no early
+exit except by breaking a demand. Demands: rule change, tier floor, seat lock, TV exclusivity;
+they never block, doing the thing breaks the deal (forced breaches count): remaining value lost,
+~a season's value in cash penalty, the partner shuns you. Demands raise offers; the gear brand is
+demand-free and smallest. Naming rights on a famous or founding ground is a betrayal. Signed deals
+survive rival countermoves; a lockout shrinks new sponsor offers, a rival broadcast deal leaves no
+TV offers. Pay-TV fork = bigger, often exclusive TV offers; Free-to-Air = smaller, never
+exclusive. No new cash spend yet; a full ordinary slate ≈ 100–120% of today's media line. Rule
+demands move one rule one step by partner kind, and are rare: every slot always has an offer
+without one, at most one per offseason, none while one is due. Bots take the best offer per slot.
+Offseason screen Deals section; breach = big moment; partners invented; save format 20.
 Costs: payroll, operations, venues. Cash builds local hardcore via venues/youth, never PP. No
 cross-country transfers; PP-funded bailouts. Phase 0: gate + one media/sponsor line.
 

@@ -71,6 +71,10 @@ surface before playtesting or during it.
 | 2026-10-04 | Culture, first build (GDD v1.22): six types from recorded facts (derby, club rite, star legacy, national name, famous venue, trophy); strength renews and decays, loss by facts or betrayal, landmarks both ways; weight cuts the player's hardcore turnover and rival poaching/reclaim; venue pilgrimage and champion PP; each tradition remembers its rulebook and offending amendments multiply backlash and wear it; seat moves and trophy renames cost more where traditions are held; birthplace biases births, ethos betrayals, balanced near 1; rivals carry flavor-only content traditions; Culture tree category (strength, reach, protection, hold; Heritage trust / Living game fork). Save format 18. Build plan: 2.11 | Decided |
 | 2026-10-05 | Flagship broadcast (GDD v1.23): the seat league multiplies media reach out of its country by (1 + tier ceiling × season interest × health); interest is read from the last season summary (gripping, ordinary, dynasty, runaway/foregone); a season-end pulse on the same channel, none after runaways; a Near-Collapse flagship drains casual fans where its reach lands; stacks with backed stars; balance target 5–15% of world media exposure and one win-contest remeasure. Talent pull parked until other leagues have named players. Build plan: 2.12 | Decided |
 | 2026-10-05 | Broadcast revised after measuring (GDD v1.27): the flagship lifts all media reach into the markets its seat's media reaches (× link ÷ strongest), not only the seat's own outbound media, which measured 0–5% and faded to 0.1% late. Ceilings 0.05 / 0.07 / 0.1 / 0.16; 9–12% for seats in large media markets | Decided |
+| 2026-10-05 | Flagship deals, topic 1 (GDD v1.28): flagship only; without deals a share of today's media line; a deal locks a value set at signing (PP-tier cap) for 1–5 seasons; one TV slot, sponsor slots by league tier (main first, gear brand an option), naming rights per founding or famous ground; 2–3 offers per open slot each offseason on the flagship's stream; renewal at market value with a loyalty edge; no early exit but a broken demand. Demands, links and guard still to decide; no build plan yet | Decided |
+| 2026-10-05 | Flagship deals, topic 2 (GDD v1.28): demands are rule change, tier floor, seat lock and TV exclusivity; they never block, doing the thing (or a forced breach) breaks the deal: remaining value lost, ~one season's value in cash, the partner shuns you for a few seasons; demands raise offers, the gear brand is demand-free and smallest; naming rights on a famous or founding ground is a betrayal on signing | Decided |
+| 2026-10-05 | Flagship deals, topic 3 (GDD v1.28): signed deals survive countermoves; a seat-country lockout shrinks new sponsor offers and blocks renewals, a rival broadcast deal leaves no TV offers; the TV fork shapes TV offers (Pay-TV bigger and often exclusive, Free-to-Air smaller, never exclusive); no new cash spend, a full ordinary slate ≈ 100–120% of today's media line; rule demands one step by partner kind, Rulebook shows the due season; bots take the best offer per slot, runner reports signings, demands met and breaches | Decided |
+| 2026-10-05 | Flagship deals, topic 4 (GDD v1.28): Deals section on the offseason screen, read-only card on the Flagship tab; a breach is a big moment, due rule demands flagged, renewals marked, term endings toasts; invented partner names; save format 20 (format 19 migrates with none, baseline cut from its next offseason); guard: a full ordinary slate 100–120% of the replaced media line by tier, pacing and contest, Near-Collapse rate reported. Rule demands rare and never required: every slot always has an offer without one, at most one per offseason, none while one is due. Build plan: 2.15 | Decided |
 | 2026-10-05 | Living time and the offseason (GDD v1.24), after the first playtest: Play / Pause with three speeds over End Turn, the date ticking quarter by quarter, auto-pause on the interrupt list and decisions with resume after answering; cards revealed at their fact's quarter as event windows over the map (presentation only; a mid-turn sim stop is parked); the seasonal window renamed the offseason, opening on the first turn after the season ends, with one screen for the season review and all league business, prices against PP on hand; backing stays 60 PP. Build plan: 2.13 | Decided |
 | 2026-10-05 | Moments have weight (GDD v1.26): minor (toast), big (back-page window) and headline (front page over a dimmed map) per card in content; big flagship moments become headlines at Professional and Elite; card families look different; big moments come first and cannot be skipped (Next Turn waits); auto-collect for minor moments parked. Build plan: 2.14 | Decided |
 | 2026-10-05 | The clock is dropped after playtest (GDD v1.25): built as step 3 and played, the quarter-by-quarter replay was choppy and the self-pauses jarring; reverted the same day. Next Turn stays with tier-scaled lengths, the date heads the bottom bar, and cards pop up over the map after each turn in the order they happened. Build plan 2.13 revised | Decided |
@@ -574,6 +578,48 @@ from the map it leads back there; the offseason screen opens once the season's n
 Smoke steps collect news through `COLLECT_NEWS`.
 
 ---
+
+### 2.15 Build Plan: Flagship Deals (GDD v1.28)
+
+Every number is config (`flagship.deals` in `content/config.yaml`); partner name pools are in
+`content/names.yaml`. The sim lives in a new `src/sim/deals.ts`; offers roll on the flagship's own
+random stream.
+
+1. **Content and config.** Schema for the baseline media share, slots by league tier, offers per
+   open slot, lengths, the valuation (TV: casual fans × media market; sponsor: all fans × wealth;
+   PP-tier cap), demand premiums and chances, the rule-demand limits (at most one per offseason,
+   none while one is due, every slot always offering one without), rule-demand lists by partner
+   kind, breach penalty and shun seasons, loyalty edges (larger for the gear brand), the TV fork's
+   and countermoves' effects on offers. Partner name pools by kind. Validation: rule-demand steps
+   exist on the genome axes; every pool is large enough.
+2. **State, offers and signing.** `FlagshipState.deals`: signed deals, offers on the table, shunned
+   partners. Offers are made when the offseason opens (renewals beside fresh offers, naming rights
+   only for the founding or a famous ground) and lapse when it closes. A `signDeal` action
+   (offseason only, through `applyAction`); `dealBlocker` gives typed reasons. Save format 20 with
+   the format 19 migration (no deals; the baseline cut from the next offseason). Tests: offers on
+   both formats, the rule-demand limits over many offseasons, determinism, save round-trip.
+3. **Revenue.** The flagship's media line becomes baseline share × today's formula + signed deals'
+   annual values ÷ 4 a quarter; other leagues are unchanged. TV exclusivity cuts the broadcast's
+   lift while it runs. Tests: the no-deal flagship earns the baseline share; a full slate lands in
+   the target band at each tier on fixed fan counts.
+4. **Demands and breaches.** Checked where they can break: a tier change, a seat move or a seat
+   sent home, the offseason closing past a rule demand's due season. A breach ends the deal, loses
+   its remaining value, charges the cash penalty and shuns the partner. Naming rights on a famous
+   ground wears its tradition down, demotes hardcore fans in the seat country (tradition weight ×
+   ethos) and cuts its pilgrimage while it stands; on the founding ground it offends the club
+   rite (`culture.ts`). Tests for each demand kind, forced breaches included.
+5. **Events.** The breach moment (big), the deal-ended toast, renewal marking and the due-rule flag
+   in the snapshot; card words in the locale.
+6. **Bots and runner.** Bots sign the highest-value offer per slot. The runner reports deals
+   signed, demands met, breaches by kind, deal share of flagship revenue, the slate-value ratio by
+   tier against the target, and the flagship's Near-Collapse rate.
+7. **Screens.** The Deals section on the offseason screen (slots, offer cards, confirm for demands
+   and betrayals), a read-only Deals card on the Flagship tab, "due by season N" in the Rulebook;
+   i18n for every string. The smoke signs a deal on the offseason screen; screenshots in both
+   layouts.
+8. **Measure and docs.** Pacing on seeds 1–3 (must pass), the #1 contest (about half), the
+   Near-Collapse rate against the build before deals. `docs/deals/README.md`,
+   `docs/progress/data.js`, CLAUDE.md.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 

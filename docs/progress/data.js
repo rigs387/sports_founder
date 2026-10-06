@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-05",
-  design: "GDD v1.27",
+  design: "GDD v1.28",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-05",
+      type: "Design",
+      title: "Flagship deals",
+      text: "GDD v1.28: the flagship signs a TV deal, sponsors (slots grow with its tier; the homegrown gear brand is one) and naming rights on its founding or famous grounds, from 2–3 offers per open slot each offseason. Without deals it keeps only a share of today's media line; a deal locks a value set at signing for 1–5 seasons. Demands (rule change, tier floor, seat lock, TV exclusivity) pay more and never block: doing the thing breaks the deal at a cost. Rule demands are rare and never required. Naming rights on a famous ground is a betrayal. Build plan 2.15.",
+    },
     {
       date: "2026-10-05",
       type: "Built",
@@ -544,7 +550,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 7",
       icon: "08",
       summary: "Local cash works; multi-year deals with demands are still ahead.",
-      next: "Introduce flagship sponsor and TV offers with duration, value and explicit obligations.",
+      next: "Build flagship deals (tech plan 2.15): offers, locked terms, demands and breaches.",
       depends: ["leagues"],
       sources: [
         ["Current league finances", "../league-management/README.md"],
