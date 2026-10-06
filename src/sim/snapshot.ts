@@ -1,17 +1,17 @@
 import type { NodeEffect } from "../content";
 import { focusCostFromExposure } from "./actions";
 import { offseasonOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
-import { mediaRevenueFactor } from "./countermoves";
 import { type CultureSnapshot, cultureSnapshot } from "./culture";
+import { leagueIncomePerQuarter } from "./deals";
 import { type EventSnapshot, eventSnapshots } from "./events";
 import type { EventState } from "./events-state";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
 import { broadcastEffects, type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
-import { growthFactorsAt, type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
+import { type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
 import { type LeagueActions, leagueActions } from "./league-actions";
-import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
+import { runningCostPerQuarter } from "./leagues";
 import { type RulesSnapshot, rulesSnapshot } from "./rules";
 import { computeExposure } from "./spread";
 import { tierStatus } from "./tiers";
@@ -222,18 +222,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
             actions: leagueActions(state, world, index) as LeagueActions,
             health: league.health,
             cash: league.cash,
-            revenuePerQuarter: revenuePerQuarter(
-              world,
-              index,
-              league.tier,
-              fans,
-              state.ppTier,
-              mediaRevenueFactor(
-                countryState,
-                world.config,
-                growthFactorsAt(world, state.growthNodes, index).countermoveEffect,
-              ),
-            ).total,
+            revenuePerQuarter: leagueIncomePerQuarter(state, world, index),
             runningCostPerQuarter: runningCostPerQuarter(
               world,
               index,

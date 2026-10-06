@@ -1,9 +1,11 @@
 import { type AxisId, type DealSlot, GEAR_BRAND_ID, GENOME_AXES, LEAGUE_TIERS } from "../content";
 import { offseasonOpen, tierEntry } from "./calendar";
-import { hasCountermove } from "./countermoves";
-import { runningCostPerQuarter } from "./leagues";
+import { hasCountermove, mediaRevenueFactor } from "./countermoves";
+import { growthFactorsAt } from "./growth";
+import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import type {
+  CountryState,
   Deal,
   DealDemandTerms,
   DealOffer,
@@ -11,6 +13,7 @@ import type {
   FlagshipState,
   GameState,
   LeagueState,
+  LeagueTierId,
   World,
 } from "./types";
 import { PLAYER_INDEX } from "./types";
@@ -144,6 +147,28 @@ export function dealCap(state: GameState, world: World): number {
   const { capByPpTier } = world.config.flagship.deals;
   const share = capByPpTier[state.ppTier - 1] ?? capByPpTier[capByPpTier.length - 1] ?? 0;
   return share * 4 * runningCostPerQuarter(world, seat, league.tier, state.growthNodes);
+}
+
+/**
+ * The balance guard's measure (GDD v1.28): a full slate of ordinary offers at the seat now, one
+ * in every slot with no demand, plus the baseline share, as a share of the media line it replaces.
+ * Before the PP tier's cap unless `capped` (the cap is a separate lever: it trims windfalls while
+ * the sport is young). Null without a seat league or media income.
+ */
+export function dealSlateShare(state: GameState, world: World, capped = false): number | null {
+  const seat = indexOf(world, state.flagship.countryId);
+  const country = state.countries[seat];
+  const league = country?.league ?? null;
+  const fans = country?.fans[PLAYER_INDEX];
+  if (!country || !league || !fans) return null;
+  const media = revenuePerQuarter(world, seat, league.tier, fans, state.ppTier).media;
+  if (media <= 0) return null;
+  const cap = capped ? dealCap(state, world) : Number.POSITIVE_INFINITY;
+  const slate = dealSlots(state, world, league).reduce(
+    (sum, ref) => sum + Math.min(cap, ordinaryDealValue(state, world, ref)) / 4,
+    0,
+  );
+  return world.config.flagship.deals.baselineShare + slate / media;
 }
 
 /** The rule one step from the genome's current option toward `toward`, or null if already there. */
@@ -323,6 +348,65 @@ export function offerDeals(state: GameState, world: World): GameState {
 
 function withDeals(state: GameState, deals: DealsState): GameState {
   return { ...state, flagship: { ...state.flagship, deals } };
+}
+
+/** The signed deals paying in the flagship's current season. */
+export function payingDeals(flagship: FlagshipState): Deal[] {
+  return flagship.deals.signed.filter(
+    (deal) => deal.firstSeason <= flagship.season && deal.lastSeason >= flagship.season,
+  );
+}
+
+/** Deal income a quarter at the flagship: a quarter of each paying deal's annual value. */
+export function dealIncomePerQuarter(flagship: FlagshipState): number {
+  return payingDeals(flagship).reduce((sum, deal) => sum + deal.annualValue / 4, 0);
+}
+
+/**
+ * The share of the media line the flagship keeps (GDD v1.28): the baseline once deals have been
+ * offered, all of it before the first offers (a new campaign's first season, an older save).
+ */
+export function flagshipMediaShare(flagship: FlagshipState, world: World): number {
+  return flagship.deals.offeredSeason === null ? 1 : world.config.flagship.deals.baselineShare;
+}
+
+/** A paying TV deal with exclusivity cuts the broadcast's lift (GDD v1.28). */
+export function exclusiveTv(flagship: FlagshipState): boolean {
+  return payingDeals(flagship).some((deal) => deal.demand?.kind === "exclusivity");
+}
+
+/**
+ * A league's income a quarter: gate plus the media line, cut by a rival's sponsor lockout. At
+ * the flagship the media line keeps only its baseline share and signed deals pay on top; they are
+ * locked, so no countermove cuts them (GDD v1.28). `country` and `tier` default to the state's.
+ */
+export function leagueIncomePerQuarter(
+  state: Pick<GameState, "countries" | "flagship" | "ppTier" | "growthNodes">,
+  world: World,
+  index: number,
+  country: CountryState | undefined = state.countries[index],
+  tier: LeagueTierId | undefined = country?.league?.tier,
+): number {
+  const fans = country?.fans[PLAYER_INDEX];
+  if (!country || !fans || tier === undefined) return 0;
+  const revenue = revenuePerQuarter(
+    world,
+    index,
+    tier,
+    fans,
+    state.ppTier,
+    mediaRevenueFactor(
+      country,
+      world.config,
+      growthFactorsAt(world, state.growthNodes, index).countermoveEffect,
+    ),
+  );
+  if (world.countries[index]?.id !== state.flagship.countryId) return revenue.total;
+  return (
+    revenue.gate +
+    revenue.media * flagshipMediaShare(state.flagship, world) +
+    dealIncomePerQuarter(state.flagship)
+  );
 }
 
 /** Offers lapse when the offseason closes (src/sim/flagship.ts closeOffseason). */

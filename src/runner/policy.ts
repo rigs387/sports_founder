@@ -18,17 +18,15 @@ import {
   effectValue,
   fandomScore,
   type GameState,
-  growthFactorsAt,
   growthNode,
   heldStrength,
+  leagueIncomePerQuarter,
   leverMultipliers,
-  mediaRevenueFactor,
   nodeCost,
   offseasonOpen,
   optionNetDelta,
   PLAYER_INDEX,
   promotionTerms,
-  revenuePerQuarter,
   runningCostPerQuarter,
   SEED_WARM_UP_DRAWS,
   seatStars,
@@ -345,18 +343,7 @@ function manageLeagues(step: BotStep, world: World): void {
     const owned = step.state.growthNodes;
     const terms = promotionTerms(world, index, league.tier, owned);
     if (!terms) continue;
-    const revenue = revenuePerQuarter(
-      world,
-      index,
-      terms.to,
-      fans,
-      step.state.ppTier,
-      mediaRevenueFactor(
-        current,
-        world.config,
-        growthFactorsAt(world, owned, index).countermoveEffect,
-      ),
-    ).total;
+    const revenue = leagueIncomePerQuarter(step.state, world, index, current, terms.to);
     const cost = runningCostPerQuarter(world, index, terms.to, owned);
     if (revenue < cost * BUILDER_MARGIN) continue;
     if (league.cash < terms.reserveNeeded + terms.cost) continue;

@@ -12,6 +12,7 @@ import {
   endTurn,
   escalationIndex,
   type GameState,
+  leagueIncomePerQuarter,
   mediaRevenueFactor,
   PLAYER_INDEX,
   revenuePerQuarter,
@@ -537,8 +538,17 @@ describe("each countermove has its effect", () => {
     expect(openRevenue.media).toBeGreaterThan(0);
     expect(lockedRevenue.gate).toBe(openRevenue.gate);
     expect(lockedRevenue.media).toBeCloseTo(openRevenue.media * (1 - cut), 9);
-    const cashOpen = stepLeagueQuarter(open, index, world, state, 1).country.league?.cash ?? 0;
-    const cashLocked = stepLeagueQuarter(locked, index, world, state, 1).country.league?.cash ?? 0;
+    const cash = (country: typeof open) =>
+      stepLeagueQuarter(
+        country,
+        index,
+        world,
+        state,
+        1,
+        leagueIncomePerQuarter(state, world, index, country),
+      ).country.league?.cash ?? 0;
+    const cashOpen = cash(open);
+    const cashLocked = cash(locked);
     expect(cashOpen - cashLocked).toBeCloseTo(openRevenue.media * cut, 9);
   });
 

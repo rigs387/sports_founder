@@ -2,17 +2,26 @@ import { describe, expect, it } from "vitest";
 import { GEAR_BRAND_ID } from "../src/content";
 import {
   applyAction,
+  broadcastEffects,
   checkAction,
   checkInvariants,
   createCampaign,
   dealCap,
+  dealIncomePerQuarter,
+  dealSlateShare,
   deserializeSave,
   endTurn,
   type GameState,
+  LEAGUE_TIERS,
+  leagueIncomePerQuarter,
   newDeals,
   offerDeals,
   ordinaryDealValue,
+  PLAYER_INDEX,
+  revenuePerQuarter,
+  runTurns,
   serializeSave,
+  stepQuarter,
   type World,
 } from "../src/sim";
 import { countryIndex, setupFor, withConfig, world } from "./helpers";
@@ -245,5 +254,120 @@ describe("saves", () => {
     );
     expect(loaded.flagship.deals).toEqual(newDeals(state.seed));
     expect(loaded.flagship.deals.offeredSeason).toBeNull();
+  });
+});
+
+describe("revenue (step 3)", () => {
+  const media = (state: GameState) => {
+    const country = state.countries[brazil];
+    const league = country?.league;
+    const fans = country?.fans[PLAYER_INDEX];
+    if (!league || !fans) throw new Error("No Brazil league");
+    return revenuePerQuarter(world, brazil, league.tier, fans, state.ppTier);
+  };
+
+  it("the flagship keeps all its media line until offers are made, then the baseline share", () => {
+    const start = createCampaign(world, setupFor(11, "brazil"));
+    expect(leagueIncomePerQuarter(start, world, brazil)).toBeCloseTo(media(start).total, 9);
+    const state = atOffers();
+    const { gate, media: line } = media(state);
+    const { baselineShare } = world.config.flagship.deals;
+    expect(leagueIncomePerQuarter(state, world, brazil)).toBeCloseTo(
+      gate + line * baselineShare,
+      9,
+    );
+    // Every other league keeps its combined line.
+    const other = state.countries.findIndex((c, i) => i !== brazil && c.league !== null);
+    if (other >= 0) {
+      const country = state.countries[other];
+      const fans = country?.fans[PLAYER_INDEX];
+      if (!country?.league || !fans) throw new Error("No other league");
+      expect(leagueIncomePerQuarter(state, world, other)).toBeCloseTo(
+        revenuePerQuarter(world, other, country.league.tier, fans, state.ppTier).total,
+        9,
+      );
+    }
+  });
+
+  it("signed deals pay a quarter of their value through their seasons, then stop", () => {
+    const state = atOffers();
+    const tv = state.flagship.deals.offers.find((offer) => offer.slot === "tv");
+    if (!tv) throw new Error("No TV offer");
+    const signed = applyAction(state, world, { type: "signDeal", offerId: tv.id });
+    expect(dealIncomePerQuarter(signed.flagship)).toBeCloseTo(tv.annualValue / 4, 9);
+    const last = signed.flagship.season + tv.seasons - 1;
+    const at = (season: number) => ({ ...signed.flagship, season });
+    expect(dealIncomePerQuarter(at(last))).toBeCloseTo(tv.annualValue / 4, 9);
+    expect(dealIncomePerQuarter(at(last + 1))).toBe(0);
+    expect(dealIncomePerQuarter(at(signed.flagship.season - 1))).toBe(0);
+
+    // The league's cash moves by income less running cost.
+    const before = signed.countries[brazil]?.league?.cash ?? 0;
+    const unsigned = state.countries[brazil]?.league?.cash ?? 0;
+    const cashAfter = (s: GameState) => stepQuarter(s, world).countries[brazil]?.league?.cash ?? 0;
+    expect(cashAfter(signed) - before - (cashAfter(state) - unsigned)).toBeCloseTo(
+      tv.annualValue / 4,
+      6,
+    );
+  });
+
+  it("a sponsor lockout cuts the media line, never a signed deal", () => {
+    const state = atOffers();
+    const tv = state.flagship.deals.offers.find((offer) => offer.slot === "tv");
+    if (!tv) throw new Error("No TV offer");
+    const signed = applyAction(state, world, { type: "signDeal", offerId: tv.id });
+    const countries = [...signed.countries];
+    const country = countries[brazil];
+    if (!country) throw new Error("No Brazil");
+    countries[brazil] = {
+      ...country,
+      countermoves: [{ kind: "sponsorLockout", sportId: "soccer", endQuarter: signed.quarter + 8 }],
+    };
+    const locked = { ...signed, countries };
+    const { mediaRevenueCut } = world.config.rivalAI.countermoves.sponsorLockout;
+    const { baselineShare } = world.config.flagship.deals;
+    const line = media(signed).media;
+    expect(
+      leagueIncomePerQuarter(signed, world, brazil) - leagueIncomePerQuarter(locked, world, brazil),
+    ).toBeCloseTo(line * baselineShare * mediaRevenueCut, 6);
+  });
+
+  it("a paying exclusive TV deal cuts the broadcast's lift", () => {
+    const state = atOffers();
+    const tv = state.flagship.deals.offers.find((offer) => offer.slot === "tv");
+    if (!tv) throw new Error("No TV offer");
+    const exclusive = {
+      ...state,
+      flagship: {
+        ...state.flagship,
+        deals: {
+          ...state.flagship.deals,
+          offers: [{ ...tv, demand: { kind: "exclusivity" as const } }],
+        },
+      },
+    };
+    const signed = applyAction(exclusive, world, { type: "signDeal", offerId: tv.id });
+    const { exclusivityLiftCut } = world.config.flagship.deals;
+    expect(broadcastEffects(signed, world).boost).toBeCloseTo(
+      broadcastEffects(state, world).boost * (1 - exclusivityLiftCut),
+      9,
+    );
+  });
+
+  it("a full slate of ordinary offers is 100–120% of the media line it replaces, at every tier", () => {
+    const [low, high] = world.config.balanceTargets.dealSlateShare;
+    for (const anchor of ["brazil", "sweden"]) {
+      const state = runTurns(createCampaign(world, setupFor(1, anchor)), world, 40);
+      const seat = countryIndex(world, anchor);
+      for (const tier of LEAGUE_TIERS) {
+        const countries = [...state.countries];
+        const country = countries[seat];
+        if (!country?.league) throw new Error(`No ${anchor} league`);
+        countries[seat] = { ...country, league: { ...country.league, tier } };
+        const share = dealSlateShare({ ...state, countries }, world) ?? 0;
+        expect(share, `${anchor} ${tier}`).toBeGreaterThanOrEqual(low);
+        expect(share, `${anchor} ${tier}`).toBeLessThanOrEqual(high);
+      }
+    }
   });
 });

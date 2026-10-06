@@ -1,5 +1,4 @@
 import { costMultiplier, tierEntry } from "./calendar";
-import { mediaRevenueFactor } from "./countermoves";
 import { growthFactorsAt } from "./growth";
 import { landmarks } from "./records";
 import {
@@ -196,6 +195,8 @@ export function stepLeagueQuarter(
   world: World,
   state: Pick<GameState, "turn" | "ppTier" | "growthNodes">,
   quarter: number,
+  /** The league's income this quarter (leagueIncomePerQuarter in src/sim/deals.ts). */
+  income: number,
 ): QuarterLeagueResult {
   const fans = country.fans[PLAYER_INDEX];
   if (!fans) throw new Error(`No player fans in "${country.countryId}"`);
@@ -218,18 +219,6 @@ export function stepLeagueQuarter(
   }
 
   const league = country.league;
-  const income = revenuePerQuarter(
-    world,
-    countryIndex,
-    league.tier,
-    fans,
-    state.ppTier,
-    mediaRevenueFactor(
-      country,
-      world.config,
-      growthFactorsAt(world, state.growthNodes, countryIndex).countermoveEffect,
-    ),
-  ).total;
   const cost = runningCostPerQuarter(world, countryIndex, league.tier, state.growthNodes);
   return {
     country: { ...country, league: { ...league, cash: league.cash + income - cost } },

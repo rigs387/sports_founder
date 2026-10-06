@@ -1,7 +1,7 @@
 import type { SeasonInterest } from "../content";
 import { costMultiplier, offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights } from "./culture";
-import { lapseOffers, newDeals } from "./deals";
+import { exclusiveTv, lapseOffers, newDeals } from "./deals";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
@@ -487,7 +487,10 @@ export function broadcastEffects(
     countryId: flagship.countryId,
     interest,
     health,
-    boost: ceiling * settings.interest[interest] * health + pulse,
+    // A paying exclusive TV deal keeps the league on pay-TV: its lift is cut (GDD v1.28).
+    boost:
+      (ceiling * settings.interest[interest] * health + pulse) *
+      (exclusiveTv(flagship) ? 1 - world.config.flagship.deals.exclusivityLiftCut : 1),
     pulse,
     reach,
     ripple,

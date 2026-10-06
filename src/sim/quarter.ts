@@ -1,6 +1,7 @@
 import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { reclaimShare, rivalConversionBoosts } from "./countermoves";
 import { traditionShelter, traditionWeights, venueStrengths } from "./culture";
+import { leagueIncomePerQuarter } from "./deals";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
 import { backingEffects, broadcastEffects, closeOffseason, stepFlagshipQuarter } from "./flagship";
@@ -172,7 +173,14 @@ export function stepQuarter(
       config,
       rng,
     );
-    const business = stepLeagueQuarter(moved, index, world, state, quarter);
+    const business = stepLeagueQuarter(
+      moved,
+      index,
+      world,
+      state,
+      quarter,
+      leagueIncomePerQuarter(state, world, index, moved),
+    );
     if (business.landmark) found.push(business.landmark);
     return business.country;
   });

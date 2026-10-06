@@ -644,6 +644,20 @@ applies once it is set. Save format 20; format 19 migrates with none and no offe
 an offseason, lapsing, signing, renewal, the rule-demand limits over 60 draws, countermoves, the
 TV fork and saves.
 
+*Step 3 built 2026-10-06.* `leagueIncomePerQuarter` (`src/sim/deals.ts`) is every league's
+income, used by the quarter step, the snapshot and the builder's promotion check: at the seat the
+media line keeps `baselineShare` once offers have been made (all of it before), and paying deals
+add a quarter of their annual value; a rival's sponsor lockout cuts the media line, never a signed
+deal. A paying exclusive TV deal cuts the broadcast's lift by `exclusivityLiftCut`. Tuned with
+`dealSlateShare` over builder campaigns at five anchors (seed 1, 150 turns, every offseason):
+medians before the PP-tier cap Amateur 1.05, Semi-Pro 1.03, Professional 1.06, Elite 1.19 (target
+1–1.2). The cap is judged separately: it trims a rich Semi-Pro flagship's windfall at PP tier 2
+(0.76 after it) and never bound at Elite. Value rates: TV 0.575 of the media line per casual fan,
+sponsors and naming rights much smaller; naming rights was first 40× too rich (late campaigns have
+many famous grounds and many hardcore fans). Bots do not sign yet (step 6): with 40% of its media
+line a builder's flagship still never collapsed (albania, sweden, 3 seeds, 150 turns, against the
+build before).
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

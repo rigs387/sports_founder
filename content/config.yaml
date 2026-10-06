@@ -764,13 +764,16 @@ flagship:
     offersPerSlot: { min: 2, max: 3 }
     seasons: { min: 1, max: 5 }
     value:
-      tvPerCasual: 0.00003
-      sponsorPerFan: 0.000008
-      namingPerHardcore: 0.0002
+      tvPerCasual: 0.00002875
+      sponsorPerFan: 0.000005
+      namingPerHardcore: 0.000003
       sponsorSlotShares: [ 0.5, 0.3, 0.2 ]
       spread: 0.15
-    # A sport's PP tier caps what partners will pay (GDD: sponsors take a maturing sport seriously).
-    capByPpTier: [ 0.6, 0.8, 1, 1.3, 1.6 ]
+    # A sport's PP tier caps what partners will pay (GDD: sponsors take a maturing sport seriously),
+    # as a share of the league's annual running cost per offer. It bites at PP tier 1 and trims the
+    # windfall of a rich Semi-Pro flagship at tier 2 (measured 2026-10-06: a Semi-Pro flagship
+    # earned 1.3–6× its running cost when the builder promoted it); it never bound at Elite.
+    capByPpTier: [ 0.6, 1.2, 1.4, 1.6, 2 ]
     demands:
       tierFloor: { chance: 0.15, premium: 0.3 }
       seatLock: { chance: 0.15, premium: 0.4 }
@@ -857,8 +860,11 @@ balanceTargets:
   # flagship helps, it does not carry.
   flagshipBroadcastShare: [ 0.05, 0.15 ]
   # Flagship deals (GDD v1.28): a full slate of ordinary offers (no demands) at each league tier,
-  # as a share of the media line it replaces. Going without hurts; signing everything does not make
-  # the flagship unsinkable.
+  # as a share of the media line it replaces, before the PP tier's cap (a separate lever, reported
+  # beside it). Going without hurts; signing everything does not make the flagship unsinkable.
+  # Tuned 2026-10-06 over builder campaigns at five anchors (brazil, sweden, albania, kazakhstan,
+  # mauritius), seed 1, 150 turns, at each offseason: medians before the cap Amateur 1.05,
+  # Semi-Pro 1.03, Professional 1.06, Elite 1.19; after it 1.01, 0.76, 1.06, 1.19.
   dealSlateShare: [ 1, 1.2 ]
   # Growth node dominance is judged strategy by strategy (decided 2026-09-21). One bot answers the
   # tree the same way every time, so the nodes it always buys read as dominant when they are only
