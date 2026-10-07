@@ -798,6 +798,45 @@ wobble; it is now met while fans stay within `clauses.fansTolerance` below the m
 seeds 1–2: 2% made it 99% met (free money); 0.5% gives fans 81%, star 80%, balance 86%; pacing
 passes. GDD and cheat sheet updated.
 
+### 2.17 Build Plan: Venues and Payroll (GDD v1.30)
+
+Every number is config (`leagues.venue`, `flagship.payroll`). The flagship only: other leagues
+keep the Phase 0 model, no cap, no payroll detail. Standing policies and ticket pricing are parked.
+
+1. **Config, state and save.** Venue levels 1–5: capacity as a population share per level,
+   price in quarters of the league's running cost per level, build seasons per level, upkeep
+   share, conversion boost per level and its overflow fade, the record-crowd margin, the
+   modernization level and wear. Payroll: the baseline share of running cost, a star's wage in
+   quarters of running cost, its growth per season as a star and with influence. Each league
+   holds `venue` (level, a build under way and the season it opens, the attendance record), so a
+   level stays with its country when the seat moves. Season summaries carry the season's crowd and
+   whether it set a record. Save format 22: format 21 migrates every league to level 1, nothing
+   building, no record; past seasons carry no crowd.
+2. **Money.** At the seat, gate is paid only on hardcore fans up to capacity. The flagship's
+   running cost is operations plus payroll (the baseline share, so a league without stars costs
+   what it does today) plus star wages plus venue upkeep; a wage ends when the star retires or
+   moves. Snapshot: the cost lines, capacity against hardcore, each star's wage (never skill).
+   Tests: the cap, the unchanged total without stars, a wage's growth by season and influence, a
+   move ending it, the seat moving to a level-1 country.
+3. **Building, fans and culture.** The `buildVenue` action (offseason, the seat's league, one
+   level at a time, cash on hand, nothing already building) pays the price; the level opens when
+   the offseason that ends its build closes, with a `venueOpened` landmark. Hardcore conversion in
+   the seat country rises per level and fades while hardcore fans overflow capacity. A level past
+   the modernization level betrays famous grounds (the `betrayGround` pattern, every famous venue
+   in the seat country). A season whose crowd beats the record by the margin is a fame fact for
+   the champion's ground (European) or the final's host (American), counted in `updateCulture`.
+   Tests: legality and price, the open, the boost and its fade, modernization, the record fact.
+4. **Screens and news.** A Venue section on the offseason screen (level, capacity against
+   hardcore, price, build time, upkeep, the modernization warning) through a review step; a
+   read-only venue card on the Flagship tab; finances split operations, payroll and upkeep; wages
+   in the Stars panel. Moments: a level opens (big at the modernization level), a record crowd.
+   i18n for every string; smoke screenshots.
+5. **Bots, runner and measure.** The builder bot builds when hardcore overflow is near and cash
+   covers the price with a reserve; the others never build. The runner reports gate lost to the
+   cap, venue levels by league tier, payroll's share of running cost and wages per star. Measure
+   pacing, the #1 contest and the flagship's Near-Collapse rate on seeds 1–3; tune capacity so
+   level 1 bites around Semi-Pro. Docs: a `docs/venues/README.md`, progress, CLAUDE.md, cheat sheet.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

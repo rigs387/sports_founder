@@ -83,6 +83,13 @@ Offseason screen Deals section; breach = big moment; partners invented; save for
 Clauses (v1.29): TV wants competitive balance (no runaway/foregone season), sponsors a star at
 the seat, any partner fans not falling (0.5% tolerance); judged each season end: met = bonus and a bigger renewal
 edge, two misses in a row = the partner walks (no penalty). Rule demands kept at half the chance.
+Venues (v1.30): flagship only, levels 1–5; gate paid only up to capacity (a population share);
+built with cash in the offseason over seasons, upkeep when open; conversion boost fades when
+overflowing; record crowds are fame facts, past level 3 offends famous venues; levels stay with
+their country's league. Youth programs parked. Payroll (v1.30): flagship running cost splits into
+operations + payroll (same total without stars); each star adds a wage rising with seasons as a
+star and backed influence, shown in the Stars panel, never from skill; letting a star move saves it.
+Standing policies parked (nothing to delegate); flagship ticket pricing parked until the cap is measured.
 Costs: payroll, operations, venues. Cash builds local hardcore via venues/youth, never PP. No
 cross-country transfers; PP-funded bailouts. Phase 0: gate + one media/sponsor line.
 

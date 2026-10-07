@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-07",
-  design: "GDD v1.29",
+  design: "GDD v1.30",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-07",
+      type: "Design",
+      title: "Venues and payroll",
+      text: "GDD v1.30: the flagship gets a venue level 1–5. Gate is paid only on hardcore fans up to its capacity (a share of the population), so a growing flagship stalls until it builds; levels are bought with cash in the offseason, take seasons to build, add upkeep and a conversion boost that fades while fans overflow. Record crowds are fame facts; building past level 3 offends famous grounds; levels stay with their country when the seat moves. Payroll splits the flagship's running cost and adds star wages that rise with careers. Youth programs, standing policies and ticket pricing are parked. Build plan 2.17.",
+    },
     {
       date: "2026-10-06",
       type: "Built",
@@ -563,7 +569,7 @@ window.SF_PROGRESS = {
       icon: "08",
       summary:
         "The flagship signs TV, sponsor and naming-rights deals with demands; other leagues keep one media line.",
-      next: "Payroll, venue upkeep and standing policies with the venues build.",
+      next: "Build venues and payroll (tech plan 2.17): a hard gate cap, venue levels built over seasons, star wages.",
       depends: ["leagues"],
       sources: [
         ["Current league finances", "../league-management/README.md"],
@@ -578,7 +584,8 @@ window.SF_PROGRESS = {
           "Flagship TV, sponsor and naming-rights deals, offered each offseason (GDD v1.28)",
         ],
         ["built", "Deal demands, exclusivity, breaches, renewals and the naming-rights betrayal"],
-        ["planned", "Detailed payroll, venue upkeep and policy-driven business"],
+        ["planned", "Flagship venues: a gate cap, levels built over seasons, upkeep (GDD v1.30)"],
+        ["planned", "Flagship payroll: star wages rising with careers (GDD v1.30)"],
       ],
     },
     {
