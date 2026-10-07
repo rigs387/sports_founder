@@ -1256,7 +1256,9 @@ under standing policies; whether they later gain individual deals is open.
   - *Rule demands are rare, never required.* Every open slot, TV included, always has at least
     one offer without a rule demand. At most one offer with a rule demand per offseason across
     all slots, none while a signed deal's rule demand is still due, and only a modest chance of
-    one in any offseason (config). A deal never needs a rule change to be had.
+    one in any offseason (config). A deal never needs a rule change to be had. A rule demand comes
+    only on a deal still running at its deadline (found in play, 2026-10-06: a one-season deal
+    would have paid the premium for a demand that could never break).
   - *Bots* take the highest-value offer per slot, demands included, and play on as usual; the
     runner reports deals signed, demands met and breaches by kind.
   - *On screen:* a Deals section on the offseason screen (each slot's signed deal with value,

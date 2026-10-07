@@ -2,10 +2,11 @@ import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, TurnSnapshot } from "../../../sim";
 import { TraditionsSection } from "../culture/traditions";
+import { useDealPartnerName } from "../deals/partners";
 import { AmendRules } from "./AmendRules";
 import { Emblem } from "./Emblem";
 import { FieldDiagram } from "./FieldDiagram";
-import { useTerms } from "./terms";
+import { useTerms, useTermVars } from "./terms";
 
 // The Rulebook (GDD v1.18): the sport as an almanac page. Its name and emblem, how it was founded,
 // its character, every genome trait as a sentence, the odd pairings' deadpan lines, the sport's
@@ -120,7 +121,34 @@ export function Rulebook({
         </div>
       </div>
       <AmendRules snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
+      <RuleDemands snapshot={snapshot} names={names} />
       <TraditionsSection snapshot={snapshot} />
     </section>
+  );
+}
+
+/** Rule changes that signed deals still ask for, with the season they are due by (GDD v1.28). */
+function RuleDemands({ snapshot, names }: { snapshot: TurnSnapshot; names: Names }) {
+  const { t } = useTranslation();
+  const nouns = useTermVars(snapshot.identity.terms)();
+  const partner = useDealPartnerName(names, snapshot.identity.sportName);
+  const open = snapshot.flagship.deals.signed.filter((deal) => deal.ruleOpen);
+  if (open.length === 0) return null;
+  return (
+    <ul className="rulebook-demands" data-testid="rulebook-demands">
+      {open.map((deal) =>
+        deal.demand?.kind === "ruleChange" ? (
+          <li key={deal.id} className={deal.ruleDueNow ? "deal-due" : undefined}>
+            {t("deals.rulebookDue", {
+              ...nouns,
+              partner: partner(deal.partnerId),
+              trait: t(`genome.axes.${deal.demand.axis}`),
+              option: t(`genome.options.${deal.demand.axis}.${deal.demand.option}`),
+              season: deal.demand.dueSeason,
+            })}
+          </li>
+        ) : null,
+      )}
+    </ul>
   );
 }

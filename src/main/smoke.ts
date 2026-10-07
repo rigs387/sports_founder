@@ -4,6 +4,7 @@ import { app, type BrowserWindow } from "electron";
 import { verifyActions } from "./action-smoke";
 import { verifyChampionshipCard } from "./contest-smoke";
 import { verifyTraditions } from "./culture-smoke";
+import { verifyDeals } from "./deals-smoke";
 import { verifyEvents } from "./event-smoke";
 import { verifyFlagship } from "./flagship-smoke";
 import { verifyRulebook } from "./identity-smoke";
@@ -143,6 +144,7 @@ async function run(
   const seasonCards = await verifySeasonCards(win, screenshot);
   const starCards = await verifyStarCards(win, screenshot);
   const starsPanel = await verifyStarsPanel(win, screenshot);
+  const deals = await verifyDeals(win, screenshot);
   const amendment = await verifyAmendment(win, screenshot);
   const traditions = await verifyTraditions(win, screenshot);
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
@@ -165,6 +167,7 @@ async function run(
     seasonCards,
     starCards,
     starsPanel,
+    deals,
     amendment,
     traditions,
     saves,

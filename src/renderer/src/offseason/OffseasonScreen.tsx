@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, CountrySnapshot, TurnSnapshot } from "../../../sim";
 import { TrophyCard } from "../culture/TrophyCard";
+import { DealsPanel } from "../deals/DealsPanel";
 import { Seat } from "../flagship/FlagshipScreen";
 import { StarsPanel } from "../flagship/StarsPanel";
 import { AmendRules } from "../identity/AmendRules";
@@ -21,8 +22,8 @@ interface Props {
 }
 
 // The offseason (GDD v1.24): once a year, after the flagship season ends, one screen holds the
-// season in review and then all league business — stars, the rules, promotions, the seat and the
-// trophy — each priced against the PP on hand. Sponsors and TV deals will join it. The tabs keep
+// season in review and then all league business — stars, deals (GDD v1.28), the rules,
+// promotions, the seat and the trophy — each priced against the PP on hand. The tabs keep
 // read-only views; legality and prices stay in the simulation.
 export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWorld }: Props) {
   const { t } = useTranslation();
@@ -123,6 +124,7 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
             clubName={clubName}
             onAction={onAction}
           />
+          <DealsPanel snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           <div className="flagship-card">
             <AmendRules snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           </div>

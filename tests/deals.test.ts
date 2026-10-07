@@ -88,9 +88,16 @@ describe("offers", () => {
     // The gear brand always offers for the main sponsor, demand-free.
     const gear = deals.offers.find((offer) => offer.partnerId === GEAR_BRAND_ID);
     expect(gear).toMatchObject({ slot: "sponsor", position: 0, demand: null });
-    // Every offer is within the cap, and no partner offers twice.
-    for (const offer of deals.offers)
-      expect(offer.annualValue).toBeLessThanOrEqual(dealCap(state, world));
+    // The cap bounds an offer's ordinary value; its spread and premium apply after. No partner
+    // offers twice.
+    const { spread } = world.config.flagship.deals.value;
+    const premiums = Object.values(world.config.flagship.deals.demands).map((d) => d.premium);
+    for (const offer of deals.offers) {
+      const ordinary = Math.min(dealCap(state, world), ordinaryDealValue(state, world, offer));
+      expect(offer.annualValue).toBeLessThanOrEqual(
+        ordinary * (1 + spread) * (1 + Math.max(...premiums)) + 1e-9,
+      );
+    }
     expect(new Set(deals.offers.map((o) => o.partnerId)).size).toBe(deals.offers.length);
     // Offers never touch the world's or the matches' random streams.
     const again = offerDeals(
@@ -173,12 +180,17 @@ describe("offers", () => {
         offered.flagship.deals.offers.filter((o) => slotKey(o) === slotKey(rule)).length,
       ).toBeGreaterThanOrEqual(2);
       expect(rule.demand.option).not.toBe(offered.genome[rule.demand.axis]);
+      // The deal still runs at its deadline: no premium for a demand that cannot break.
+      expect(rule.seasons).toBeGreaterThanOrEqual(
+        content.config.flagship.deals.ruleDemand.dueOffseasons + 1,
+      );
       expect(rule.demand.dueSeason).toBe(
         state.flagship.season + content.config.flagship.deals.ruleDemand.dueOffseasons,
       );
       expect(checkInvariants(offered, content)).toEqual([]);
     }
-    expect(seen).toBeGreaterThan(40);
+    // With the chance at 1, most offseasons have an eligible offer (at least 3 seasons long).
+    expect(seen).toBeGreaterThan(30);
 
     // With a signed rule demand still due, no offer demands another.
     const offered = reoffer(state, content, 3);
@@ -189,6 +201,29 @@ describe("offers", () => {
       const again = reoffer(signed, content, seed);
       expect(again.flagship.deals.offers.some((o) => o.demand?.kind === "ruleChange")).toBe(false);
     }
+  });
+});
+
+describe("the cap", () => {
+  it("bounds the ordinary value; capped offers still differ, the gear brand smaller", () => {
+    const tight = withConfig(world, (config) => {
+      config.flagship.deals.capByPpTier = config.flagship.deals.capByPpTier.map(() => 1e-7);
+    });
+    const state = atOffers(tight);
+    const cap = dealCap(state, tight);
+    const main = state.flagship.deals.offers.filter(
+      (o) => o.slot === "sponsor" && o.position === 0,
+    );
+    const gear = main.find((o) => o.partnerId === GEAR_BRAND_ID);
+    const other = main.find((o) => o.partnerId !== GEAR_BRAND_ID && o.demand === null);
+    // The cap binds here: the ordinary value is above it.
+    expect(ordinaryDealValue(state, tight, { slot: "sponsor", position: 0 })).toBeGreaterThan(cap);
+    expect(gear?.annualValue).toBeCloseTo(
+      cap * tight.config.flagship.deals.gearBrand.valueShare,
+      12,
+    );
+    expect(other?.annualValue ?? 0).toBeGreaterThan(gear?.annualValue ?? 0);
+    expect(new Set(state.flagship.deals.offers.map((o) => o.annualValue)).size).toBeGreaterThan(1);
   });
 });
 

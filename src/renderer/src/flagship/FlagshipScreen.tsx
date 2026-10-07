@@ -4,6 +4,8 @@ import type { Names } from "../../../content";
 import type { Action, ClubSnapshot, MatchResult, TurnSnapshot } from "../../../sim";
 import { TrophyCard } from "../culture/TrophyCard";
 import { useTraditionWords } from "../culture/traditions";
+import { DealsPanel } from "../deals/DealsPanel";
+import { useDealPartnerName } from "../deals/partners";
 import { Emblem } from "../identity/Emblem";
 import { useTermVars } from "../identity/terms";
 import "./flagship.css";
@@ -94,6 +96,7 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
         </div>
         <div className="flagship-side">
           <Broadcast snapshot={snapshot} seatName={seatName} nouns={nouns} />
+          <DealsPanel snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
           <LatestRound results={flagship.lastRound} clubName={clubName} nouns={nouns} />
           <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} readOnly />
           <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
@@ -432,6 +435,9 @@ export function Seat({
   const leaving = snapshot.culture.traditions.filter((tradition) =>
     flagship.leaveTraditions.includes(tradition.id),
   );
+  // Deals that demand the seat stays: moving breaks them (GDD v1.28).
+  const partner = useDealPartnerName(names, snapshot.identity.sportName);
+  const locked = flagship.deals.signed.filter((deal) => deal.demand?.kind === "seatLock");
 
   return (
     <section className="flagship-card flagship-seat" aria-labelledby="flagship-seat-heading">
@@ -498,6 +504,17 @@ export function Seat({
                   country: country(flagship.countryId),
                 })}
               </p>
+              {locked.length > 0 && (
+                <p className="warning" data-testid="flagship-seat-deals">
+                  {t("deals.warnSeat", {
+                    count: locked.length,
+                    partners: new Intl.ListFormat(i18n.language).format(
+                      locked.map((deal) => partner(deal.partnerId)),
+                    ),
+                    country: country(flagship.countryId),
+                  })}
+                </p>
+              )}
               {leaving.length > 0 && (
                 <p className="warning" data-testid="flagship-seat-traditions">
                   {t("culture.leaving", {

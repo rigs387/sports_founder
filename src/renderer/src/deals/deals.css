@@ -1,0 +1,109 @@
+/* Flagship deals (GDD v1.28): slots, signed deals and this offseason's offers. */
+.deals-baseline {
+  font-weight: 700;
+}
+.deals-slots {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.deal-slot {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.deal-slot h3 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+}
+/* A rule demand due this offseason (the deal breaks if the offseason closes without it). */
+.deal-due {
+  color: var(--warning);
+  font-weight: 800;
+}
+.deal-signed {
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+}
+.deal-signed small {
+  color: var(--muted);
+}
+.deal-signed small.deal-due {
+  color: var(--warning);
+}
+.deal-offers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.deal-offer {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.deal-offer-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+.deal-tag {
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--second);
+  border: 1px solid var(--second);
+  border-radius: 999px;
+}
+.flagship-card .deal-offer p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.flagship-card .deal-value {
+  font-weight: 800;
+}
+.flagship-card .deal-demand {
+  color: #8a5a12;
+  font-weight: 700;
+}
+.flagship-card .deal-quiet {
+  color: var(--muted);
+}
+.flagship-card .deal-betrayal {
+  color: var(--warning);
+}
+.deal-offer .action-button {
+  justify-self: start;
+  margin-top: 4px;
+}
+.deal-review {
+  display: grid;
+  gap: 6px;
+  margin-top: 4px;
+}
+.deal-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.deals-shunned {
+  color: var(--muted);
+}
+.deal-warning {
+  color: var(--warning);
+  font-weight: 700;
+}

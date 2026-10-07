@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LEAGUE_TIERS } from "../../../content";
 import type {
   Action,
   CountrySnapshot,
@@ -7,6 +8,8 @@ import type {
   LeagueActionKind,
   TurnSnapshot,
 } from "../../../sim";
+import { useDealPartnerName } from "../deals/partners";
+import { useGameStore } from "../state/game-store";
 import { ActionFeedback } from "./ActionFeedback";
 import "./league-controls.css";
 
@@ -22,8 +25,20 @@ const kinds: LeagueActionKind[] = ["promoteLeague", "stepDownLeague", "bailoutLe
 
 /** One set of real quotes and controls, shared by the map card and league overview. */
 export function LeagueControls({ country, countryName, snapshot, busy, onAction }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [pending, setPending] = useState<LeagueActionKind | null>(null);
+  const { names } = useGameStore();
+  const partner = useDealPartnerName(names, snapshot.identity.sportName);
+  // Flagship deals whose tier floor a step-down here would break (GDD v1.28).
+  const floors =
+    country.countryId === snapshot.flagship.countryId && country.league
+      ? snapshot.flagship.deals.signed.filter(
+          (deal) =>
+            deal.demand?.kind === "tierFloor" &&
+            country.league !== null &&
+            LEAGUE_TIERS.indexOf(deal.demand.tier) >= LEAGUE_TIERS.indexOf(country.league.tier),
+        )
+      : [];
   const dialog = useRef<HTMLDialogElement>(null);
   const league = country.league;
   const hasLeague = !!league;
@@ -146,6 +161,16 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
             </li>
             <li>{t("league.manage.restructureCash")}</li>
             <li>{t("league.manage.restructureHealth")}</li>
+            {floors.length > 0 && (
+              <li className="deal-warning" data-testid="league-deal-warning">
+                {t("deals.warnStepDown", {
+                  count: floors.length,
+                  partners: new Intl.ListFormat(i18n.language).format(
+                    floors.map((deal) => partner(deal.partnerId)),
+                  ),
+                })}
+              </li>
+            )}
           </ul>
         )
       );

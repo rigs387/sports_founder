@@ -697,6 +697,21 @@ sponsor terms; 11 of 20 rule demands broken (the builder amends by its own fit, 
 deal income 19% of the flagship's income; no Near-Collapse; slate before the cap 105% at Amateur,
 Semi-Pro and Professional, 117% at Elite (Semi-Pro 93% after the cap).
 
+*Step 7 built 2026-10-06.* `src/renderer/src/deals/`: `DealsPanel` on the offseason screen (each
+slot with its signed deal or this offseason's offer cards: partner, value, length, the demand in
+plain words, Renewal and Homegrown tags, the betrayal warning on a famous ground or the founding
+rite; signing asks first only for a demand or a betrayal, and the review states a breach's cost
+for demands that can break), read-only on the Flagship tab; `useDealPartnerName` shared with the
+event cards. Warnings where actions break deals: the seat review (seat locks) and the step-down
+confirmation (tier floors); the Rulebook lists open rule demands with their due season. Two sim
+fixes found in the running game: the PP-tier cap now bounds an offer's ordinary value before its
+spread, gear-brand share and premium (a capped Amateur flagship had shown every offer, the gear
+brand included, at the same value), and a rule demand comes only on a deal of at least
+`dueOffseasons + 1` seasons (a one-season deal paid the premium for a demand that could never
+break). The smoke (`src/main/deals-smoke.ts`) signs an offer on the offseason screen through the
+review, checks the slot, both layouts and the read-only tab: `runs/smoke/41-deals.png` to
+`44-deals-narrow.png`.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

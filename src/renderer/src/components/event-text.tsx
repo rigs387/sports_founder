@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { type EventEffect, GEAR_BRAND_ID } from "../../../content";
+import type { EventEffect } from "../../../content";
 import type { EventRecord } from "../../../sim";
 import { useTraditionWords } from "../culture/traditions";
+import { useDealPartnerName } from "../deals/partners";
 import { PLAIN_TERMS, useTermVars } from "../identity/terms";
 import { useGameStore } from "../state/game-store";
 
@@ -63,6 +64,7 @@ export function useEventText() {
   const { snapshot, names } = useGameStore();
   const termVars = useTermVars(snapshot?.identity.terms ?? PLAIN_TERMS);
   const words = useTraditionWords(snapshot);
+  const dealPartnerName = useDealPartnerName(names, snapshot?.identity.sportName ?? "");
   if (!snapshot) return null;
   const country = (id: string) => names?.countries[id] ?? id;
   const club = (id: number | undefined) => {
@@ -71,14 +73,6 @@ export function useEventText() {
   };
   const player = (id: number | null | undefined) =>
     snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
-  /** A deal partner's invented name; the gear brand is named from the sport (GDD v1.28). */
-  const dealPartnerName = (id: string) =>
-    id === GEAR_BRAND_ID
-      ? t("deals.gearBrand", { sport: snapshot.identity.sportName })
-      : ([
-          ...(names?.dealPartners.broadcasters ?? []),
-          ...(names?.dealPartners.sponsors ?? []),
-        ].find((partner) => partner.id === id)?.name ?? id);
   // Deal cards (GDD v1.28) name the partner, the slot and what a breach cost.
   const dealText = (event: EventRecord) => {
     const deal = event.facts.deal;

@@ -25,7 +25,8 @@ import { PLAYER_INDEX } from "./types";
 // world's sequence nor the flagship's matches depend on them. A signed deal pays a value locked
 // at signing for its term. Offers lapse when the offseason closes. Demands never block: doing the
 // thing breaks the deal (step 4). Rule demands are rare and never required: at most one offer
-// with one per offseason, only where its slot has another offer, none while one is due.
+// with one per offseason, only where its slot has another offer, only on a deal still running at
+// its deadline, none while one is due.
 
 const DEALS_STREAM = 0x6a09_e667;
 
@@ -140,7 +141,10 @@ export function ordinaryDealValue(state: GameState, world: World, ref: DealSlotR
   return 4 * quarter * multiplier;
 }
 
-/** The most any offer is worth a season now: the PP tier's cap × the league's annual running cost. */
+/**
+ * The most an ordinary offer is worth a season now, before its own spread, share and premium: the
+ * PP tier's cap × the league's annual running cost.
+ */
 export function dealCap(state: GameState, world: World): number {
   const seat = indexOf(world, state.flagship.countryId);
   const league = state.countries[seat]?.league ?? null;
@@ -268,7 +272,7 @@ export function offerDeals(state: GameState, world: World): GameState {
       id,
       ...ref,
       partnerId,
-      annualValue: Math.min(cap, value * (1 + premium)),
+      annualValue: value * (1 + premium),
       seasons: between(rng, settings.seasons.min, settings.seasons.max),
       demand,
       renewal,
@@ -284,7 +288,9 @@ export function offerDeals(state: GameState, world: World): GameState {
       between(rng, settings.offersPerSlot.min, settings.offersPerSlot.max) -
         (sponsorKind && lockout ? settings.sponsorLockout.offersCut : 0),
     );
-    const ordinaryValue = ordinaryDealValue(state, world, ref);
+    // The PP tier's cap bounds the ordinary value; each offer's own spread, share and premium apply
+    // after it, so capped offers still differ and a demand still pays more.
+    const ordinaryValue = Math.min(cap, ordinaryDealValue(state, world, ref));
     let made = 0;
 
     // The partner whose deal here just ended offers to renew (not through a sponsor lockout).
@@ -337,6 +343,9 @@ export function offerDeals(state: GameState, world: World): GameState {
   if (roll < settings.ruleDemand.chancePerOffseason && dueRuleDemand(state) === null) {
     const candidates = offers.flatMap((candidate) => {
       if (candidate.slot === "namingRights" || candidate.renewal) return [];
+      // Only a deal still running at the deadline: a shorter one would end before its demand
+      // could break, a premium for nothing.
+      if (candidate.seasons < settings.ruleDemand.dueOffseasons + 1) return [];
       if (candidate.partnerId === GEAR_BRAND_ID) return [];
       if (offers.filter((other) => sameSlot(other, candidate)).length < 2) return [];
       const wishes = settings.ruleDemand.wishes[candidate.slot === "tv" ? "tv" : "sponsor"]
@@ -357,10 +366,7 @@ export function offerDeals(state: GameState, world: World): GameState {
         option: wish.option,
         dueSeason: season + settings.ruleDemand.dueOffseasons,
       };
-      chosen.candidate.annualValue = Math.min(
-        cap,
-        value * (1 + settings.demands.ruleChange.premium),
-      );
+      chosen.candidate.annualValue = value * (1 + settings.demands.ruleChange.premium);
     }
   }
 
