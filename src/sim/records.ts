@@ -1,5 +1,6 @@
 import type {
   AxisId,
+  DealClause,
   DealDemand,
   DealSlot,
   EscalationLevel,
@@ -249,6 +250,24 @@ export const landmarks = {
     slot,
     demand,
     penalty,
+  }),
+  dealWalked: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    dealId: number,
+    partnerId: string,
+    slot: DealSlot,
+    clause: DealClause,
+  ): Landmark => ({
+    kind: "dealWalked",
+    turn,
+    quarter,
+    countryId,
+    dealId,
+    partnerId,
+    slot,
+    clause,
   }),
   dealEnded: (
     turn: number,

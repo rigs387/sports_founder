@@ -457,6 +457,7 @@ export const dealDemandSchema = z.enum([
  * miss is no breach; enough misses in a row and the partner walks.
  */
 export const DEAL_CLAUSES = ["balance", "star", "fans"] as const;
+export const dealClauseSchema = z.enum(DEAL_CLAUSES);
 export type DealClause = (typeof DEAL_CLAUSES)[number];
 export type DealDemand = z.infer<typeof dealDemandSchema>;
 

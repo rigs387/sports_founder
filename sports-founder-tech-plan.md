@@ -760,6 +760,18 @@ made plain at its plain value. A signed deal records `clauseMet`, `clauseMisses`
 the review, how it is judged (bonus, the walk) instead of a breach's cost. Tests: draws by slot
 kind with a plain offer kept, clauses never breaking, the format 20 migration.
 
+*Step 2 built 2026-10-06.* `judgeClauses` (`src/sim/deal-clauses.ts`, kept out of deals.ts to
+avoid an import cycle with flagship.ts) runs once an offseason in `endTurn`, just before
+`offerDeals`, so a deal in its final season is judged before it ends. For every deal with a
+clause that paid in the season just finished: balance is met unless that season's interest was
+runaway (foregone included); star while a star plays at the seat; fans while the seat country's
+fans are at least the deal's mark (then the mark moves to now). Met: `bonusShare` of the annual
+value to the seat's league, one more season met, misses cleared. Missed: one more miss; at
+`walkAfterMisses` the partner walks (deal removed, no penalty, no shunning, a `dealWalked`
+landmark, in save format 21). A renewal's edge grows by `renewalEdgePerMet` for every season met.
+Tests: met with its bonus, missed twice to the walk, balance after a runaway or a calm season,
+star with and without a star at the seat, the grown renewal edge.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

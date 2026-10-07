@@ -8,6 +8,7 @@ import {
   checkAction,
   checkInvariants,
   createCampaign,
+  type Deal,
   type DealDemandTerms,
   dealCap,
   dealIncomePerQuarter,
@@ -17,6 +18,7 @@ import {
   endTurn,
   eventSnapshots,
   type GameState,
+  judgeClauses,
   LEAGUE_TIERS,
   type LeagueState,
   leagueIncomePerQuarter,
@@ -816,5 +818,129 @@ describe("clauses (GDD v1.29, tech plan 2.16 step 1)", () => {
       clauseMisses: 0,
       fansMark: (fans?.casual ?? 0) + (fans?.hardcore ?? 0),
     });
+  });
+});
+
+describe("judging clauses (tech plan 2.16 step 2)", () => {
+  /** An open offseason not yet offered, holding one signed deal with `demand` paid last season. */
+  function judging(content: World, demand: DealDemandTerms, extra: Partial<Deal> = {}) {
+    const state = atOffers(content);
+    const tv = state.flagship.deals.offers.find((o) => o.slot === "tv");
+    if (!tv) throw new Error("No TV offer");
+    const season = state.flagship.season;
+    const deal: Deal = {
+      ...tv,
+      demand,
+      firstSeason: season - 1,
+      lastSeason: season + 2,
+      countryId: "brazil",
+      clauseMet: 0,
+      clauseMisses: 0,
+      fansMark: 0,
+      ...extra,
+    };
+    return {
+      ...state,
+      flagship: {
+        ...state.flagship,
+        deals: { ...state.flagship.deals, signed: [deal], offers: [], offeredSeason: null },
+      },
+    };
+  }
+  const cash = (s: GameState) => s.countries[brazil]?.league?.cash ?? 0;
+  const only = (s: GameState) => s.flagship.deals.signed[0];
+  const { bonusShare, renewalEdgePerMet } = world.config.flagship.deals.clauses;
+  const fansNow = (s: GameState) =>
+    (s.countries[brazil]?.fans[PLAYER_INDEX]?.casual ?? 0) +
+    (s.countries[brazil]?.fans[PLAYER_INDEX]?.hardcore ?? 0);
+
+  it("met: a bonus of the annual value, one more season met, misses cleared", () => {
+    const state = judging(world, { kind: "fans" }, { clauseMisses: 1 });
+    const judged = judgeClauses(state, world);
+    const deal = only(state);
+    expect(cash(judged) - cash(state)).toBeCloseTo(bonusShare * (deal?.annualValue ?? 0), 9);
+    expect(only(judged)).toMatchObject({ clauseMet: 1, clauseMisses: 0, fansMark: fansNow(state) });
+    // Once an offseason: judged again after its offers, nothing changes.
+    expect(judgeClauses(offerDeals(judged, world), world).flagship.deals.signed).toEqual(
+      offerDeals(judged, world).flagship.deals.signed,
+    );
+  });
+
+  it("missed twice in a row: the partner walks, without penalty or shunning", () => {
+    const state = judging(world, { kind: "fans" }, { fansMark: Number.MAX_SAFE_INTEGER });
+    const once = judgeClauses(state, world);
+    expect(only(once)).toMatchObject({ clauseMisses: 1, fansMark: fansNow(state) });
+    expect(cash(once)).toBe(cash(state));
+    const again = judgeClauses(
+      {
+        ...once,
+        flagship: {
+          ...once.flagship,
+          deals: {
+            ...once.flagship.deals,
+            signed: once.flagship.deals.signed.map((d) => ({
+              ...d,
+              fansMark: Number.MAX_SAFE_INTEGER,
+            })),
+          },
+        },
+      },
+      world,
+    );
+    expect(again.flagship.deals.signed).toEqual([]);
+    expect(again.flagship.deals.shunned).toEqual(state.flagship.deals.shunned);
+    expect(cash(again)).toBe(cash(state));
+    expect(again.landmarks.at(-1)).toMatchObject({ kind: "dealWalked", clause: "fans" });
+    expect(checkInvariants(again, world)).toEqual([]);
+  });
+
+  it("balance is missed after a runaway or foregone season; a star is met while one plays", () => {
+    const runaways = withConfig(world, (config) => {
+      config.flagship.stories.runawayShare = 0;
+    });
+    expect(only(judgeClauses(judging(runaways, { kind: "balance" }), runaways))?.clauseMisses).toBe(
+      1,
+    );
+    const calm = withConfig(world, (config) => {
+      config.flagship.stories.runawayShare = 1_000;
+      config.flagship.stories.foregoneTitles = 1_000;
+      config.flagship.stories.dynastyTitles = 999;
+    });
+    expect(only(judgeClauses(judging(calm, { kind: "balance" }), calm))?.clauseMet).toBe(1);
+
+    const state = judging(world, { kind: "star" });
+    const noStars = {
+      ...state,
+      flagship: {
+        ...state.flagship,
+        players: state.flagship.players.map((p) => ({ ...p, starSince: null })),
+      },
+    };
+    expect(only(judgeClauses(noStars, world))?.clauseMisses).toBe(1);
+    const seatClub = state.flagship.clubs.find((c) => c.active && c.countryId === "brazil");
+    const withStar = {
+      ...noStars,
+      flagship: {
+        ...noStars.flagship,
+        players: noStars.flagship.players.map((p) =>
+          p.clubId === seatClub?.id && p.retiredSeason === null ? { ...p, starSince: 1 } : p,
+        ),
+      },
+    };
+    expect(only(judgeClauses(withStar, world))?.clauseMet).toBe(1);
+  });
+
+  it("a deal judged in its final season renews with an edge grown by every season met", () => {
+    const state = judging(
+      world,
+      { kind: "fans" },
+      { clauseMet: 2, lastSeason: atOffers().flagship.season - 1 },
+    );
+    const offered = offerDeals(judgeClauses(state, world), world);
+    const renewal = offered.flagship.deals.offers.find((o) => o.renewal && o.slot === "tv");
+    const ref = { slot: "tv" as const, position: 0 };
+    const ordinary = Math.min(dealCap(offered, world), ordinaryDealValue(offered, world, ref));
+    const edge = world.config.flagship.deals.renewalEdge + renewalEdgePerMet * 3;
+    expect(renewal?.annualValue).toBeCloseTo(ordinary * (1 + edge), 6);
   });
 });

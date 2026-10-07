@@ -1,5 +1,6 @@
 import { turnLengthQuarters } from "./calendar";
 import { updateCulture } from "./culture";
+import { judgeClauses } from "./deal-clauses";
 import { breakDeals, offerDeals } from "./deals";
 import { offerEvents, settleEvents } from "./events";
 import { closeOffseason, returnSeatIfFolded } from "./flagship";
@@ -64,7 +65,8 @@ export function endTurn(state: GameState, world: World): GameState {
   // Traditions read the turn's recorded facts (GDD v1.22).
   next = updateCulture(next, world);
   // An open offseason's deal offers, once, after culture so new famous grounds count (GDD v1.28).
-  next = offerDeals(next, world);
+  // Clauses are judged first, so a deal in its final season is judged before it ends (v1.29).
+  next = offerDeals(judgeClauses(next, world), world);
   return offerEvents({ ...next, turn: start.turn + 1 }, world, quarters);
 }
 

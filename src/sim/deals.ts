@@ -302,7 +302,10 @@ export function offerDeals(state: GameState, world: World): GameState {
       !(sponsorKind && lockout)
     ) {
       const gear = previous.partnerId === GEAR_BRAND_ID;
-      const edge = gear ? settings.gearBrand.renewalEdge : settings.renewalEdge;
+      // Each season its clause was met earns the partner's renewal a larger edge (GDD v1.29).
+      const edge =
+        (gear ? settings.gearBrand.renewalEdge : settings.renewalEdge) +
+        settings.clauses.renewalEdgePerMet * previous.clauseMet;
       const share = gear ? settings.gearBrand.valueShare : 1;
       offer(ref, previous.partnerId, ordinaryValue * share * (1 + edge), null, true);
       used.add(previous.partnerId);

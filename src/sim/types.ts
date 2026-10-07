@@ -1,5 +1,6 @@
 import type {
   AxisId,
+  DealClause,
   DealDemand,
   DealSlot,
   EscalationLevel,
@@ -20,6 +21,7 @@ export type {
   CountermoveKind,
   Country,
   CountryDerived,
+  DealClause,
   DealDemand,
   DealSlot,
   EscalationLevel,
@@ -541,6 +543,20 @@ export type Landmark =
       slot: DealSlot;
       demand: DealDemand;
       penalty: number;
+    }
+  /**
+   * A partner walked after its clause was missed too many seasons in a row (GDD v1.29): the rest
+   * of the deal is lost, with no penalty and no shunning.
+   */
+  | {
+      kind: "dealWalked";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      dealId: number;
+      partnerId: string;
+      slot: DealSlot;
+      clause: DealClause;
     }
   /** A flagship deal ran its term (GDD v1.28); its slot is open in the offseason. */
   | {
