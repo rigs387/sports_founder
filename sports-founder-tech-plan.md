@@ -75,6 +75,7 @@ surface before playtesting or during it.
 | 2026-10-05 | Flagship deals, topic 2 (GDD v1.28): demands are rule change, tier floor, seat lock and TV exclusivity; they never block, doing the thing (or a forced breach) breaks the deal: remaining value lost, ~one season's value in cash, the partner shuns you for a few seasons; demands raise offers, the gear brand is demand-free and smallest; naming rights on a famous or founding ground is a betrayal on signing | Decided |
 | 2026-10-05 | Flagship deals, topic 3 (GDD v1.28): signed deals survive countermoves; a seat-country lockout shrinks new sponsor offers and blocks renewals, a rival broadcast deal leaves no TV offers; the TV fork shapes TV offers (Pay-TV bigger and often exclusive, Free-to-Air smaller, never exclusive); no new cash spend, a full ordinary slate ≈ 100–120% of today's media line; rule demands one step by partner kind, Rulebook shows the due season; bots take the best offer per slot, runner reports signings, demands met and breaches | Decided |
 | 2026-10-05 | Flagship deals, topic 4 (GDD v1.28): Deals section on the offseason screen, read-only card on the Flagship tab; a breach is a big moment, due rule demands flagged, renewals marked, term endings toasts; invented partner names; save format 20 (format 19 migrates with none, baseline cut from its next offseason); guard: a full ordinary slate 100–120% of the replaced media line by tier, pacing and contest, Near-Collapse rate reported. Rule demands rare and never required: every slot always has an offer without one, at most one per offseason, none while one is due. Build plan: 2.15 | Decided |
+| 2026-10-06 | Deal clauses (GDD v1.29): rule demands measured a bust (bots broke 97%), kept at half the chance; partners want the product through soft clauses: competitive balance for TV (no runaway or foregone season), a star at the seat for sponsors, fans not falling for any partner; judged each season end: met = bonus and a bigger renewal edge, two misses in a row = the partner walks without penalty; a chance and a premium per offer, a clause-free offer always available. Build plan: 2.16 | Decided |
 | 2026-10-05 | Living time and the offseason (GDD v1.24), after the first playtest: Play / Pause with three speeds over End Turn, the date ticking quarter by quarter, auto-pause on the interrupt list and decisions with resume after answering; cards revealed at their fact's quarter as event windows over the map (presentation only; a mid-turn sim stop is parked); the seasonal window renamed the offseason, opening on the first turn after the season ends, with one screen for the season review and all league business, prices against PP on hand; backing stays 60 PP. Build plan: 2.13 | Decided |
 | 2026-10-05 | Moments have weight (GDD v1.26): minor (toast), big (back-page window) and headline (front page over a dimmed map) per card in content; big flagship moments become headlines at Professional and Elite; card families look different; big moments come first and cannot be skipped (Next Turn waits); auto-collect for minor moments parked. Build plan: 2.14 | Decided |
 | 2026-10-05 | The clock is dropped after playtest (GDD v1.25): built as step 3 and played, the quarter-by-quarter replay was choppy and the self-pauses jarring; reverted the same day. Next Turn stays with tier-scaled lengths, the date heads the bottom bar, and cards pop up over the map after each turn in the order they happened. Build plan 2.13 revised | Decided |
@@ -723,6 +724,29 @@ greedy-spread, 12 anchors, seed 1): the flagship spent 13.3% of turns Struggling
 0.2% at Near-Collapse (none) and one anchor collapsed (Sweden; none before): harder for careless
 play, never unsinkable. Bots broke 362 of the 374 rule demands they signed (they take the premium
 and amend by their own fit); reported, not judged. Docs: `docs/deals/README.md`.
+
+### 2.16 Build Plan: Deal Clauses (GDD v1.29)
+
+Every number is config (`flagship.deals.clauses`). Builds on 2.15's demand machinery.
+
+1. **Config, kinds and save.** Three clause kinds beside the demands (`balance` on TV offers,
+   `star` on sponsor offers, `fans` on any offer), each with a chance and a premium; the bonus
+   share and renewal-edge growth when met; misses in a row before a partner walks. One demand or
+   clause per offer; a slot keeps a clause-free offer. Rule demands' chance halved. A deal records
+   its clause's seasons met and misses in a row, and the fans it is judged against. Save format
+   21 (format 20 deals migrate with no record yet).
+2. **Judging.** At each season's end a paying deal's clause is judged: balance by the season's
+   interest (not runaway), star by a star playing at the seat, fans by the seat country's fans
+   against the last judgement (signing for the first). Met: the bonus share of the annual value
+   to the league and a larger renewal edge; missed: a miss; two in a row: the partner walks (the
+   deal ends, no penalty, no shunning, a `dealWalked` landmark). Tests: each kind met and missed,
+   the bonus, the walk, the renewal edge, determinism.
+3. **News and screens.** A walk is a big business moment; a first miss is flagged on the Deals
+   panel ("one more miss and they walk"); offer cards and signed deals state their clause; the
+   renewal offer shows its grown edge. i18n for every string; smoke screenshots.
+4. **Bots, runner and measure.** Bots sign as before. The runner reports clauses signed, met,
+   missed and walks by kind. Pacing on seeds 1–3, the #1 contest, the slate (clauses are not in
+   the ordinary slate). Docs: `docs/deals/README.md`, progress, CLAUDE.md.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 

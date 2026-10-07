@@ -80,6 +80,9 @@ exclusive. No new cash spend yet; a full ordinary slate ≈ 100–120% of today'
 demands move one rule one step by partner kind, and are rare: every slot always has an offer
 without one, at most one per offseason, none while one is due. Bots take the best offer per slot.
 Offseason screen Deals section; breach = big moment; partners invented; save format 20.
+Clauses (v1.29): TV wants competitive balance (no runaway/foregone season), sponsors a star at
+the seat, any partner fans not falling; judged each season end: met = bonus and a bigger renewal
+edge, two misses in a row = the partner walks (no penalty). Rule demands kept at half the chance.
 Costs: payroll, operations, venues. Cash builds local hardcore via venues/youth, never PP. No
 cross-country transfers; PP-funded bailouts. Phase 0: gate + one media/sponsor line.
 
