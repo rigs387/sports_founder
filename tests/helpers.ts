@@ -81,6 +81,11 @@ export function migratedCulture(state: GameState) {
   );
 }
 
+/** Seasons as an older save gains them on loading (format 22): no crowd, no record. */
+export function crowdless(seasons: GameState["flagship"]["seasons"]) {
+  return seasons.map((season) => ({ ...season, crowd: null, recordCrowd: false }));
+}
+
 /**
  * The world without the flagship's ways of reaching fans: no season, star or tradition cards, no
  * tradition effects and no broadcast (GDD v1.15, v1.16, v1.22, v1.23). Its matches alone must

@@ -10,7 +10,7 @@ import {
   scoringRate,
   stepQuarter,
 } from "../src/sim";
-import { baseGenome, cardless, migratedCulture, setupFor, world } from "./helpers";
+import { baseGenome, cardless, crowdless, migratedCulture, setupFor, world } from "./helpers";
 
 // Scoring frequency in the flagship's matches (GDD v1.16, tech plan 2.6 step 1).
 
@@ -133,7 +133,7 @@ describe("save format 10", () => {
       flagship: {
         ...played.flagship,
         scoring: "medium",
-        seasons: played.flagship.seasons.map((s) => ({ ...s, scoring: "medium" })),
+        seasons: crowdless(played.flagship.seasons).map((s) => ({ ...s, scoring: "medium" })),
       },
       culture: migratedCulture(played),
     });

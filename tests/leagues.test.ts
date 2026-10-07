@@ -18,6 +18,7 @@ import {
   stepQuarter,
   type World,
 } from "../src/sim";
+import { newVenue } from "../src/sim/venues";
 import { countryIndex, setupFor, withConfig, world } from "./helpers";
 
 // League promises tested through their consequences (GDD League tiers, Business Layer, League
@@ -56,6 +57,7 @@ function withCountry(
         hardcoreAtLastEval: fans[PLAYER_INDEX]?.hardcore ?? 0,
         formedQuarter: 0,
         bailoutReadyQuarter: 0,
+        venue: newVenue(),
         ...country.league,
         ...change.league,
       };

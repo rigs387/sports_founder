@@ -28,6 +28,7 @@ import {
   type TopScorer,
   type World,
 } from "./types";
+import { seatedCrowd } from "./venues";
 
 // The flagship league (GDD v1.11 commissioner's seat, v1.13 seat rules, v1.14 flagship season).
 // The player runs one league in depth: named clubs based in real places, one season a year ending
@@ -1338,6 +1339,8 @@ export function stepFlagshipQuarter(
         startRatings: flagship.startRatings,
         topScorer: tallies === null ? null : topScorer(flagship, tallies),
         newStarId: null,
+        crowd: seasonCrowd(nextCountries, world, flagship.countryId),
+        recordCrowd: false,
       };
       if (tallies !== null) flagship = closeCareers(flagship, tallies);
       const ended = playersSeasonEnd(
@@ -1876,4 +1879,13 @@ function backingSnapshot(state: GameState, world: World): BackingSnapshot {
         ? { factor: drain.factor, quarters: drain.quarters }
         : null,
   };
+}
+
+/** Hardcore fans seated at the seat's venue now (GDD v1.30): the season's crowd. */
+function seasonCrowd(countries: CountryState[], world: World, countryId: string): number {
+  const index = indexOf(world, countryId);
+  const country = countries[index];
+  if (!country?.league) return 0;
+  const hardcore = country.fans[PLAYER_INDEX]?.hardcore ?? 0;
+  return seatedCrowd(world, index, country.league.venue.level, hardcore);
 }

@@ -18,7 +18,7 @@ import {
   stepQuarter,
   type World,
 } from "../src/sim";
-import { countryIndex, migratedCulture, setupFor, withConfig, world } from "./helpers";
+import { countryIndex, crowdless, migratedCulture, setupFor, withConfig, world } from "./helpers";
 
 // Backing stars (GDD v1.16, tech plan 2.6 step 5).
 
@@ -184,7 +184,11 @@ describe("bots and saves", () => {
     };
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 13, state: v13 }), content);
     expect(serializeSave(loaded)).toBe(
-      serializeSave({ ...state, culture: migratedCulture(state) }),
+      serializeSave({
+        ...state,
+        flagship: { ...state.flagship, seasons: crowdless(state.flagship.seasons) },
+        culture: migratedCulture(state),
+      }),
     );
   });
 });

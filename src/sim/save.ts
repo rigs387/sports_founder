@@ -29,7 +29,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 21;
+export const SAVE_FORMAT_VERSION = 22;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -48,6 +48,13 @@ const leagueSchema = z.strictObject({
   hardcoreAtLastEval: count,
   formedQuarter: count,
   bailoutReadyQuarter: count,
+  venue: z.strictObject({
+    level: z.int().min(1).max(5),
+    building: z
+      .strictObject({ level: z.int().min(2).max(5), opensSeason: z.int().min(1) })
+      .nullable(),
+    record: count.nullable(),
+  }),
 });
 
 const lossReasonSchema = z.enum(["faded", "folded", "broken", "renamed"]);
@@ -396,6 +403,8 @@ const flagshipSchema = z.strictObject({
         .strictObject({ playerId: z.int().min(1), clubId: z.int().min(1), scores: count })
         .nullable(),
       newStarId: z.int().min(1).nullable(),
+      crowd: count.nullable(),
+      recordCrowd: z.boolean(),
     }),
   ),
   deals: dealsSchema,
@@ -553,6 +562,36 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 21 → 22: venues (GDD v1.30). Every league starts at level 1 with nothing building and no
+  // record crowd; past seasons carry no crowd and set no record.
+  21: (save) => {
+    const flagship = save.state.flagship as FlagshipState;
+    return {
+      formatVersion: 22,
+      state: {
+        ...save.state,
+        countries: rawCountries(save.state).map((country) =>
+          country.league
+            ? {
+                ...country,
+                league: {
+                  ...(country.league as object),
+                  venue: { level: 1, building: null, record: null },
+                },
+              }
+            : country,
+        ),
+        flagship: {
+          ...flagship,
+          seasons: flagship.seasons.map((summary) => ({
+            ...summary,
+            crowd: null,
+            recordCrowd: false,
+          })),
+        },
+      },
+    };
+  },
   // 20 → 21: deal clauses (GDD v1.29). Signed deals start with no clause record, judged against
   // the seat country's fans now.
   20: (save) => {

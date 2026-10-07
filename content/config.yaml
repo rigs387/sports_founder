@@ -462,6 +462,30 @@ leagues:
     ppCost: 25
     cashQuarters: 8
     cooldownQuarters: 16
+  # Venues (GDD v1.30): the flagship's league has a capacity level 1–5; other leagues stay at 1 and
+  # are never capped. At the seat, gate is paid only on hardcore fans up to capacity =
+  # capacityShare[level − 1] × population (the shares sit just above the promotion thresholds, so
+  # level 1 bites through Semi-Pro and each level carries the league toward the next promotion).
+  # Building level L (offseason only, one at a time, the seat's league) costs
+  # priceQuarters[L − 2] × the league's running cost in league cash and opens when the offseason
+  # closes buildSeasons[L − 2] seasons later. Upkeep per quarter = upkeepShare × (level − 1) × the
+  # league's running cost. Hardcore conversion in the seat country × (1 + conversionBoost × level
+  # × min(1, capacity ÷ hardcore)): the boost fades while fans overflow (no seat, no habit). A
+  # season's crowd (hardcore fans seated at its end) beating the league's record by recordMargin is
+  # a fame fact for the champion's ground (European) or the final's host (American). Opening a
+  # level above modernize.fromLevel − 1 modernizes the grounds: it betrays every famous venue in
+  # the seat country as naming rights do (hardcoreDemotionShare, traditionWear).
+  venue:
+    capacityShare: [0.0025, 0.008, 0.02, 0.04, 0.08]
+    priceQuarters: [4, 8, 14, 20]
+    buildSeasons: [1, 2, 2, 3]
+    upkeepShare: 0.04
+    conversionBoost: 0.04
+    recordMargin: 0.1
+    modernize:
+      fromLevel: 4
+      hardcoreDemotionShare: 0.02
+      traditionWear: 0.15
 
 # The flagship season ends in this quarter of the year, and the offseason opens (GDD v1.24): league
 # business happens in it, once a year. It stays open from the season's end until the next turn ends,
@@ -692,6 +716,16 @@ flagship:
   # Dropping resets it; retiring ends the backing. Each backed star playing at the seat
   # multiplies casual conversion in the flagship country by (1 + casualConversion × influence)
   # and media reach out of it by (1 + mediaReach × influence); off the seat both pause.
+  # Payroll (GDD v1.30): the flagship league's running cost is operations plus payroll, where
+  # payroll is baselineShare of the running cost (the leading players; the total is unchanged for a
+  # league without stars) plus each star's wage per quarter = wageShare × the running cost × (1 +
+  # perSeason × seasons as a star after the first) × (1 + perInfluence × backed influence). A wage
+  # ends when the star retires or moves. Never from skill.
+  payroll:
+    baselineShare: 0.3
+    wageShare: 0.06
+    perSeason: 0.15
+    perInfluence: 0.5
   backing:
     basePrice: 60
     influenceSeasons: 4

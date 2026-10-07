@@ -20,7 +20,7 @@ import {
   stepQuarter,
   type World,
 } from "../src/sim";
-import { migratedCulture, setupFor, withConfig, world } from "./helpers";
+import { crowdless, migratedCulture, setupFor, withConfig, world } from "./helpers";
 
 // Rules evolution, first build (GDD v1.20, tech plan 2.9).
 
@@ -196,7 +196,11 @@ describe("the review and saves", () => {
     const { rules: _r, ...v16 } = state;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 16, state: v16 }), content);
     expect(serializeSave(loaded)).toBe(
-      serializeSave({ ...state, culture: migratedCulture(state) }),
+      serializeSave({
+        ...state,
+        flagship: { ...state.flagship, seasons: crowdless(state.flagship.seasons) },
+        culture: migratedCulture(state),
+      }),
     );
   });
 

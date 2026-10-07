@@ -851,6 +851,25 @@ export const configFileSchema = z.strictObject({
       cashQuarters: z.number().min(0),
       cooldownQuarters: z.int().min(0),
     }),
+    /** Venues (GDD v1.30): levels 1–5; price, build time per level from 2. */
+    venue: z.strictObject({
+      capacityShare: z
+        .array(unitInterval)
+        .length(5)
+        .refine((shares) => shares.every((v, i) => i === 0 || v > (shares[i - 1] ?? 0)), {
+          message: "capacity must rise with the level",
+        }),
+      priceQuarters: z.array(z.number().min(0)).length(4),
+      buildSeasons: z.array(z.int().min(1)).length(4),
+      upkeepShare: z.number().min(0),
+      conversionBoost: z.number().min(0),
+      recordMargin: z.number().min(0),
+      modernize: z.strictObject({
+        fromLevel: z.int().min(2).max(5),
+        hardcoreDemotionShare: unitInterval,
+        traditionWear: unitInterval,
+      }),
+    }),
   }),
   offseason: z.strictObject({ seasonEndQuarter: z.int().min(1).max(4) }),
   /**
@@ -976,6 +995,13 @@ export const configFileSchema = z.strictObject({
     }),
     /** A new club's place is drawn with weight population ^ placeWeightExponent. */
     placeWeightExponent: z.number().min(0),
+    /** Payroll (GDD v1.30): star wages as shares of the league's running cost. */
+    payroll: z.strictObject({
+      baselineShare: unitInterval,
+      wageShare: z.number().min(0),
+      perSeason: z.number().min(0),
+      perInfluence: z.number().min(0),
+    }),
     /** Backing stars (GDD v1.16). */
     backing: z.strictObject({
       basePrice: z.number().min(0),

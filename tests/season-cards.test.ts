@@ -20,7 +20,15 @@ import {
   settleEvents,
   type TableRow,
 } from "../src/sim";
-import { countryIndex, migratedCulture, setupFor, sweepAnchors, withWorld, world } from "./helpers";
+import {
+  countryIndex,
+  crowdless,
+  migratedCulture,
+  setupFor,
+  sweepAnchors,
+  withWorld,
+  world,
+} from "./helpers";
 
 // The flagship season as cards (GDD v1.15).
 
@@ -65,6 +73,8 @@ function summary(
     startRatings: [1, 2, 3, 4, 5, 6, 7, 8].map((clubId) => ({ clubId, rating: 40 + clubId })),
     topScorer: null,
     newStarId: null,
+    crowd: null,
+    recordCrowd: false,
     ...options,
   };
 }
@@ -386,7 +396,7 @@ describe("season cards in play", () => {
         flagship: {
           ...played.flagship,
           scoring: "medium",
-          seasons: played.flagship.seasons.map((s) => ({
+          seasons: crowdless(played.flagship.seasons).map((s) => ({
             ...s,
             scoring: "medium",
             startRatings: [],

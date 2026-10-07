@@ -16,6 +16,7 @@ import {
   type SportFans,
   type World,
 } from "./types";
+import { newVenue } from "./venues";
 
 // Abstract leagues (GDD League tiers, Business Layer Phase 0 subset, League Health Ladder).
 // One top league per country. Cash is per country, accrues per quarter, and never produces PP.
@@ -120,6 +121,7 @@ export function newLeague(
     hardcoreAtLastEval: hardcore,
     formedQuarter: quarter,
     bailoutReadyQuarter: quarter,
+    venue: newVenue(),
   };
 }
 

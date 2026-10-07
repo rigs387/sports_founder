@@ -57,6 +57,8 @@ export function withSeason(
     startRatings: [],
     topScorer: null,
     newStarId: options.newStarId ?? null,
+    crowd: null,
+    recordCrowd: false,
   };
   return {
     ...state,

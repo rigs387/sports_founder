@@ -48,6 +48,8 @@ function summary(season: number, championId: number, runnerUpId: number, gap: nu
     startRatings: [1, 2, 3, 4, 5, 6, 7, 8].map((clubId) => ({ clubId, rating: 40 + clubId })),
     topScorer: null,
     newStarId: null,
+    crowd: null,
+    recordCrowd: false,
   } satisfies SeasonSummary;
 }
 const interest = (seasons: SeasonSummary[]) => seasonInterest(seasons, seasons.length - 1, world);

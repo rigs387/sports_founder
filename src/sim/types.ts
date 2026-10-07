@@ -79,6 +79,18 @@ export interface LeagueState {
   formedQuarter: number;
   /** Earliest quarter a PP bailout is legal again. */
   bailoutReadyQuarter: number;
+  /** The league's venue (GDD v1.30). Only the flagship's league builds; others stay at level 1. */
+  venue: VenueState;
+}
+
+/** A league's venue capacity level (GDD v1.30): no individual stadiums. */
+export interface VenueState {
+  /** 1–5. Capacity caps the flagship's gate. */
+  level: number;
+  /** A level under construction, opening when the offseason before `opensSeason` closes. */
+  building: { level: number; opensSeason: number } | null;
+  /** The best season crowd at this league's flagship seasons; null before the first. */
+  record: number | null;
 }
 
 /** One rival's defense posture in one country (GDD Rival AI escalation ladder). */
@@ -295,6 +307,10 @@ export interface SeasonSummary {
   topScorer: TopScorer | null;
   /** The player the season made a star, if any (null before save format 13). */
   newStarId: number | null;
+  /** Hardcore fans seated at the season's end (GDD v1.30); null before save format 22. */
+  crowd: number | null;
+  /** Whether the crowd set the league's attendance record: a fame fact for a ground. */
+  recordCrowd: boolean;
 }
 
 /**
