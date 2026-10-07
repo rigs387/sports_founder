@@ -1,7 +1,7 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-06",
+  updated: "2026-10-07",
   design: "GDD v1.29",
   stage: "Phase 1 · make it matter",
   markets: 213,
@@ -98,7 +98,7 @@ window.SF_PROGRESS = {
       date: "2026-10-06",
       type: "Built",
       title: "Deal clauses",
-      text: "Tech plan 2.16 (GDD v1.29): rule demands proved a bust (bots broke 97%) and are kept at half the chance; partners now mostly want the product. TV wants competitive balance (no runaway or foregone season), sponsors a star at the seat, any partner fans not falling. Judged at every season's end: met pays a bonus and a better renewal, two misses in a row and the partner walks (big news), no penalty. Clauses come only on deals long enough for a walk to cost something. Pacing passes, #1 contest 56%; balance met 89% of seasons, star 75%, fans 60%.",
+      text: "Tech plan 2.16 (GDD v1.29): rule demands proved a bust (bots broke 97%) and are kept at half the chance; partners now mostly want the product. TV wants competitive balance (no runaway or foregone season), sponsors a star at the seat, any partner fans not falling. Judged at every season's end: met pays a bonus and a better renewal, two misses in a row and the partner walks (big news), no penalty. Clauses come only on deals long enough for a walk to cost something. Pacing passes, #1 contest 56%. The fans clause first measured 60% met (fan counts wobble); with a 0.5% tolerance: fans 81%, star 80%, balance 86% of seasons.",
     },
     {
       date: "2026-10-06",
@@ -457,7 +457,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
       summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
-      next: "Talent pull waits for named players in other leagues; next, flagship sponsor and TV deals.",
+      next: "Talent pull waits for named players in other leagues; venues (upkeep, payroll, standing policies) come with the business layer.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
