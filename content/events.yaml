@@ -500,6 +500,25 @@ cards:
     effects: []
     choices: []
     defaultChoice: null
+  # Clauses (GDD v1.29): a partner walking after its clause was missed too often is big news.
+  - id: deal-walked
+    kind: moment
+    weight: big
+    tone: pressure
+    priority: 200
+    trigger: deal
+    deal: walked
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   - id: deal-ended
     kind: moment
     weight: minor

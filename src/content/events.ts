@@ -47,7 +47,7 @@ export const eventEffectSchema = z.union([
 /** The tradition facts a card can tell (GDD v1.22): a tradition born or lost. */
 export const TRADITION_CARDS = ["born", "lost"] as const;
 /** The deal facts a deal card tells (GDD v1.28): a breach, or a deal that ran its term. */
-export const DEAL_CARDS = ["broken", "ended"] as const;
+export const DEAL_CARDS = ["broken", "ended", "walked"] as const;
 export type DealCard = (typeof DEAL_CARDS)[number];
 export type TraditionCard = (typeof TRADITION_CARDS)[number];
 /** The flagship star facts a card can tell (GDD v1.16). */

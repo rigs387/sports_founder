@@ -263,6 +263,7 @@ export function offerDeals(state: GameState, world: World): GameState {
     value: number,
     demand: DealDemandTerms | null,
     renewal: boolean,
+    seasons: number = between(rng, settings.seasons.min, settings.seasons.max),
   ) => {
     const id = nextId;
     nextId += 1;
@@ -273,7 +274,7 @@ export function offerDeals(state: GameState, world: World): GameState {
       ...ref,
       partnerId,
       annualValue: value * (1 + premium),
-      seasons: between(rng, settings.seasons.min, settings.seasons.max),
+      seasons,
       demand,
       renewal,
     });
@@ -324,8 +325,12 @@ export function offerDeals(state: GameState, world: World): GameState {
       const [partner] = pool.splice(Math.floor(nextFloat(rng) * pool.length), 1);
       const spread = 1 + settings.value.spread * (2 * nextFloat(rng) - 1);
       const roll = nextFloat(rng);
+      const seasons = between(rng, settings.seasons.min, settings.seasons.max);
       if (!partner) break;
       used.add(partner.id);
+      // A clause only where a walk could cost something: the deal runs past walkAfterMisses
+      // seasons (GDD v1.29; a shorter one would pay the premium for nothing).
+      const clauses = seasons >= settings.clauses.walkAfterMisses + 1 ? 1 : 0;
       // One demand or clause, by cumulative chance in config order (GDD v1.28, v1.29).
       const { tierFloor, seatLock, exclusivity, balance, star, fans } = settings.demands;
       const draws: [number, DealDemandTerms][] = [
@@ -335,9 +340,9 @@ export function offerDeals(state: GameState, world: World): GameState {
           ref.slot === "tv" ? exclusivity.chance * fork.exclusivityChance : 0,
           { kind: "exclusivity" },
         ],
-        [ref.slot === "tv" ? balance.chance : 0, { kind: "balance" }],
-        [ref.slot === "sponsor" ? star.chance : 0, { kind: "star" }],
-        [fans.chance, { kind: "fans" }],
+        [ref.slot === "tv" ? balance.chance * clauses : 0, { kind: "balance" }],
+        [ref.slot === "sponsor" ? star.chance * clauses : 0, { kind: "star" }],
+        [fans.chance * clauses, { kind: "fans" }],
       ];
       let demand: DealDemandTerms | null = null;
       let edge = 0;
@@ -348,7 +353,7 @@ export function offerDeals(state: GameState, world: World): GameState {
           break;
         }
       }
-      offer(ref, partner.id, ordinaryValue * spread, demand, false);
+      offer(ref, partner.id, ordinaryValue * spread, demand, false, seasons);
     }
     // Every slot keeps an offer with no demand or clause (GDD v1.29): if all demand something,
     // the last fresh offer asks nothing, at its plain value.

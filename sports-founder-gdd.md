@@ -1275,7 +1275,9 @@ under standing policies; whether they later gain individual deals is open.
       row and the partner walks: the rest of the deal is lost, with no cash penalty and no
       shunning. Still pain, not a cliff.
     - *Like other demands:* a chance per offer and a premium; one demand or clause per offer; a
-      slot always keeps an offer without one. Every number is config.
+      slot always keeps an offer without one. Every number is config. A clause comes only on a
+      deal long enough for a walk to cost something (found in play, 2026-10-06: one-season clause
+      deals paid the premium for almost no risk).
   - *On screen:* a Deals section on the offseason screen (each slot's signed deal with value,
     seasons left and demand with its due season; 2–3 offer cards per open slot with value, length,
     the demand in plain words and a betrayal warning on naming rights). Signing confirms only for

@@ -299,6 +299,12 @@
         "body_seatLockFree": "The seat left {{country}}, where {{partner}} signed to stay. The {{slot}} deal is over: the rest of its money is lost, and {{partner}} will not deal with the sport for {{seasons}} {{seasonsNoun}}.",
         "body_ruleChange": "The rule change {{partner}} asked for never came. The {{slot}} deal is over: the rest of its money is lost, the league paid {{penalty, number(maximumFractionDigits: 0)}} in cash, and {{partner}} will not deal with the sport for {{seasons}} {{seasonsNoun}}."
       },
+      "deal-walked": {
+        "title": "{{partner}} has had enough",
+        "body_balance": "{{partner}} paid for a watchable league and got another foregone {{seasonNoun}}. It has ended its {{slot}} deal: the rest of its money is lost.",
+        "body_star": "{{partner}} wanted a star to sell the league, and again there was none. It has ended its {{slot}} deal: the rest of its money is lost.",
+        "body_fans": "Fans in {{country}} fell again, and {{partner}} has ended its {{slot}} deal: the rest of its money is lost."
+      },
       "deal-ended": {
         "title": "{{partner}}'s deal has run its term",
         "body": "The {{slot}} deal with {{partner}} is over. The slot is open in the offseason, where {{partner}} may offer to renew."
@@ -857,6 +863,11 @@
     },
     "due": "Due now: change {{trait}} to {{option}} this offseason, or the deal breaks.",
     "met": "Demand met.",
+    "clauseRecord_one": "Clause met {{count}} {{seasonNoun}} so far: a bonus each time, and a better renewal.",
+    "clauseRecord_other": "Clause met {{count}} {{seasonsNoun}} so far: a bonus each time, and a better renewal.",
+    "clauseWarning_one": "Missed last {{seasonNoun}}: one more miss and {{partner}} walks.",
+    "clauseWarning_other": "Missed {{misses}} {{seasonsNoun}} in a row: {{count}} more and {{partner}} walks.",
+    "renewalLoyal": "Renews at a better price for each {{seasonNoun}} its clause was met.",
     "clauseTerms_one": "Judged at every {{seasonNoun}}'s end: met pays a bonus of {{bonus, number(maximumFractionDigits: 0)}} and earns a better renewal; one miss and {{partner}} walks, the rest of the deal lost.",
     "clauseTerms_other": "Judged at every {{seasonNoun}}'s end: met pays a bonus of {{bonus, number(maximumFractionDigits: 0)}} and earns a better renewal; {{count}} misses in a row and {{partner}} walks, the rest of the deal lost.",
     "breach": "Break a demand and the deal ends: the rest of its money is lost, the league pays {{penalty, number(maximumFractionDigits: 0)}} in cash, and {{partner}} will not deal with the sport for {{seasons}} {{seasonsNoun}}.",

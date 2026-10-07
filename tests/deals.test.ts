@@ -764,13 +764,16 @@ describe("clauses (GDD v1.29, tech plan 2.16 step 1)", () => {
       config.flagship.deals.ruleDemand.chancePerOffseason = 0;
     });
     const state = atOffers(forced);
-    for (let seed = 1; seed <= 10; seed += 1) {
+    const longest = forced.config.flagship.deals.clauses.walkAfterMisses + 1;
+    const seen = new Map<string, Set<string | undefined>>();
+    for (let seed = 1; seed <= 20; seed += 1) {
       const offers = reoffer(state, forced, seed).flagship.deals.offers;
-      const kinds = (slot: string) =>
-        new Set(offers.filter((o) => o.slot === slot && o.demand).map((o) => o.demand?.kind));
-      expect(kinds("tv")).toEqual(new Set(["balance"]));
-      expect(kinds("sponsor")).toEqual(new Set(["star"]));
-      expect(kinds("namingRights")).toEqual(new Set(["fans"]));
+      for (const offer of offers) {
+        if (!offer.demand) continue;
+        seen.set(offer.slot, (seen.get(offer.slot) ?? new Set()).add(offer.demand.kind));
+        // A clause only on a deal long enough for a walk to cost something.
+        expect(offer.seasons).toBeGreaterThanOrEqual(longest);
+      }
       for (const key of new Set(offers.map(slotKey))) {
         expect(
           offers.some((o) => slotKey(o) === key && o.demand === null),
@@ -778,6 +781,9 @@ describe("clauses (GDD v1.29, tech plan 2.16 step 1)", () => {
         ).toBe(true);
       }
     }
+    expect(seen.get("tv")).toEqual(new Set(["balance"]));
+    expect(seen.get("sponsor")).toEqual(new Set(["star"]));
+    expect(seen.get("namingRights")).toEqual(new Set(["fans"]));
   });
 
   it("clauses never break a deal; a format 20 save's deals start with no clause record", () => {
@@ -928,6 +934,23 @@ describe("judging clauses (tech plan 2.16 step 2)", () => {
       },
     };
     expect(only(judgeClauses(withStar, world))?.clauseMet).toBe(1);
+  });
+
+  it("a walk is big business news the next turn, told by its clause", () => {
+    const missed = { kind: "fans" as const };
+    const state = judging(world, missed, {
+      clauseMisses: world.config.flagship.deals.clauses.walkAfterMisses - 1,
+      fansMark: Number.MAX_SAFE_INTEGER,
+    });
+    const walked = judgeClauses(state, world);
+    expect(walked.flagship.deals.signed).toEqual([]);
+    const next = endTurn(offerDeals(walked, world), world);
+    const card = eventSnapshots(next, world).find((e) => e.templateId === "deal-walked");
+    expect(card).toMatchObject({
+      weight: "big",
+      family: "business",
+      facts: { deal: { demand: "fans", penalty: 0 } },
+    });
   });
 
   it("a deal judged in its final season renews with an edge grown by every season met", () => {

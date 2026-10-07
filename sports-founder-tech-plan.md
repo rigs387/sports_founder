@@ -772,6 +772,17 @@ landmark, in save format 21). A renewal's edge grows by `renewalEdgePerMet` for 
 Tests: met with its bonus, missed twice to the walk, balance after a runaway or a calm season,
 star with and without a star at the seat, the grown renewal edge.
 
+*Step 3 built 2026-10-06.* A `deal-walked` moment (big, the business family, worded by the
+clause: balance, star or fans), told from the `dealWalked` landmark by `src/sim/deal-cards.ts`;
+the deck is 31 cards. The Deals panel shows a signed clause's record (seasons met) and, after a
+miss, "one more miss and they walk"; the review states how a clause is judged (bonus, the walk);
+the Renewal tag explains the loyalty price. The renewal's grown edge is in its value, not shown as
+a number: the offer does not carry the old deal's record. Found in play: one-season clause deals
+paid the premium for almost no risk, so clauses now come only on deals of at least
+`walkAfterMisses + 1` seasons (an offer's length is drawn before its demand; GDD updated). The
+smoke prefers a breakable demand, then a clause (its review must say how it is judged). The
+clause record and warning are not reached by the smoke campaign; their snapshot fields are tested.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

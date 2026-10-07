@@ -82,7 +82,13 @@ export function useEventText() {
       slot: t(`deals.slots.${deal.slot}`),
       penalty: deal.penalty,
       seasons: snapshot.flagship.deals.breach.shunSeasons,
-      context: deal.demand ? `${deal.demand}${deal.penalty > 0 ? "" : "Free"}` : undefined,
+      // A walk is told by its clause; a breach by its demand and whether a penalty was paid.
+      context:
+        event.templateId === "deal-walked"
+          ? (deal.demand ?? undefined)
+          : deal.demand
+            ? `${deal.demand}${deal.penalty > 0 ? "" : "Free"}`
+            : undefined,
     };
   };
   // Tradition cards (GDD v1.22) name the tradition and the facts that made it.

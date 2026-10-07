@@ -107,6 +107,24 @@ export function DealsPanel({ snapshot, names, busy, onAction, readOnly = false }
               : demandText(deal.demand)}
         </small>
       )}
+      {deal.demand && CLAUSES.includes(deal.demand.kind) && deal.clauseMisses > 0 && (
+        <small className="deal-due" data-testid="deal-clause-warning">
+          {t("deals.clauseWarning", {
+            ...termVars({ seasons: deal.clauseMisses }),
+            misses: deal.clauseMisses,
+            count: deals.clauses.walkAfterMisses - deal.clauseMisses,
+            partner: partner(deal.partnerId),
+          })}
+        </small>
+      )}
+      {deal.demand && CLAUSES.includes(deal.demand.kind) && deal.clauseMet > 0 && (
+        <small data-testid="deal-clause-record">
+          {t("deals.clauseRecord", {
+            ...termVars({ seasons: deal.clauseMet }),
+            count: deal.clauseMet,
+          })}
+        </small>
+      )}
     </div>
   );
 
@@ -127,7 +145,11 @@ export function DealsPanel({ snapshot, names, busy, onAction, readOnly = false }
       >
         <div className="deal-offer-head">
           <strong>{partner(offer.partnerId)}</strong>
-          {offer.renewal && <span className="deal-tag">{t("deals.renewal")}</span>}
+          {offer.renewal && (
+            <span className="deal-tag" title={t("deals.renewalLoyal", nouns)}>
+              {t("deals.renewal")}
+            </span>
+          )}
           {offer.partnerId === GEAR_BRAND_ID && (
             <span className="deal-tag">{t("deals.homegrown")}</span>
           )}

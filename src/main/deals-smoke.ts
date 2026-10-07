@@ -48,12 +48,13 @@ export async function verifyDeals(win: BrowserWindow, screenshot: (name: string)
   await evaluate(`document.querySelector('${PANEL}').scrollIntoView()`);
   await screenshot("41-deals.png");
 
-  // Prefer an offer whose demand can break, to see the breach in the review; then exclusivity
-  // (reviewed, nothing to break); else any offer.
+  // Prefer an offer whose demand can break, to see the breach in the review; then a clause (how
+  // it is judged); then exclusivity (reviewed, nothing to break); else any offer.
   const pick = await evaluate<{ offer: string; demand: string; slot: string }>(`(() => {
     const all = [...document.querySelectorAll('${OFFSEASON} [data-testid="deal-offer"]')];
     const chosen =
-      all.find((o) => !['none', 'exclusivity'].includes(o.dataset.demand)) ??
+      all.find((o) => ['tierFloor', 'seatLock', 'ruleChange'].includes(o.dataset.demand)) ??
+      all.find((o) => ['balance', 'star', 'fans'].includes(o.dataset.demand)) ??
       all.find((o) => o.dataset.demand === 'exclusivity') ??
       all[0];
     return {
@@ -71,9 +72,13 @@ export async function verifyDeals(win: BrowserWindow, screenshot: (name: string)
   if (pick.demand !== "none") {
     await wait(`!!document.querySelector('${OFFER} [data-testid="deal-sign-confirm"]')`);
     review = await evaluate<string>(`document.querySelector('${OFFER} .deal-review').textContent`);
-    const breakable = pick.demand !== "exclusivity";
+    // A demand that can break states a breach's cost; a clause how it is judged (GDD v1.29).
+    const breakable = ["tierFloor", "seatLock", "ruleChange"].includes(pick.demand);
+    const clause = ["balance", "star", "fans"].includes(pick.demand);
     if (/deal ends/.test(review) !== breakable)
       throw new Error(`Only a demand that can break states a breach's cost: ${review}`);
+    if (/Judged at every/.test(review) !== clause)
+      throw new Error(`Only a clause states how it is judged: ${review}`);
     await evaluate(`document.querySelector('${OFFER}').scrollIntoView()`);
     await screenshot("42-deals-review.png");
     await click(`${OFFER} [data-testid="deal-sign-confirm"]`);
