@@ -514,6 +514,8 @@ const dealsSchema = z
       bonusShare: z.number().min(0),
       renewalEdgePerMet: z.number().min(0),
       walkAfterMisses: z.int().min(1),
+      /** The fans clause is met while fans stay within this share below the mark. */
+      fansTolerance: unitInterval,
     }),
     /** No tier floor below this league tier: an Amateur floor would be no demand. */
     tierFloorMinTier: leagueTierSchema,

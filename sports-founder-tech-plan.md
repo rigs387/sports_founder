@@ -793,6 +793,11 @@ band at every tier (Amateur 105%, Semi-Pro 103–105%, Professional 105–107%, 
 Near-Collapse. Balance met 89% of seasons judged (9 of 192 partners walked), star 75% (137 of
 416), fans 60% (336 of 866). Rule demands at half the chance: 186 signed, 181 broken.
 
+*Fans tolerance 2026-10-06.* The fans clause was a coin flip because season-to-season fan counts
+wobble; it is now met while fans stay within `clauses.fansTolerance` below the mark. Measured on
+seeds 1–2: 2% made it 99% met (free money); 0.5% gives fans 81%, star 80%, balance 86%; pacing
+passes. GDD and cheat sheet updated.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

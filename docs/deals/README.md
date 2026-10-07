@@ -30,8 +30,8 @@ A deal pays a fixed sum each season for its term, 1–5 seasons, whatever happen
 
 - **Clauses** (GDD v1.29) are what partners want of the product, judged at every season's end
   the deal pays: *competitive balance* (TV: no runaway or foregone season), *a star* (sponsors: a
-  star playing at the seat) and *fans* (any partner: the seat country's fans no fewer than at the
-  last season's end). Met: a bonus of 10% of the annual value and a better renewal. Missed: two in
+  star playing at the seat) and *fans* (any partner: the seat country's fans not more than 0.5%
+  below the last season's end). Met: a bonus of 10% of the annual value and a better renewal. Missed: two in
   a row and the partner walks (big news), the rest of the deal lost, with no penalty. Clauses
   come only on deals of three seasons or more, where a walk can cost something.
 

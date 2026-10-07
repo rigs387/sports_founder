@@ -5,8 +5,8 @@ import { type Deal, type GameState, type Landmark, PLAYER_INDEX, type World } fr
 
 // Deal clauses (GDD v1.29): what partners want of the product, judged softly at each season's
 // end. Competitive balance (TV): the season was no runaway or foregone league. A star
-// (sponsors): a star plays at the seat. Fans (any partner): the seat country's fans are no fewer
-// than at the last judgement. Met: a bonus to the seat's league and one more season met (a larger
+// (sponsors): a star plays at the seat. Fans (any partner): the seat country's fans have not
+// fallen meaningfully (beyond a tolerance) since the last judgement. Met: a bonus to the seat's league and one more season met (a larger
 // renewal edge, src/sim/deals.ts). Missed: one more miss in a row; enough and the partner walks,
 // with the rest of the deal lost but no penalty and no shunning. Runs once an offseason, before
 // its offers are made (src/sim/turn.ts), so a deal in its final season is judged before it ends.
@@ -26,7 +26,8 @@ export function clauseMet(state: GameState, world: World, deal: Deal, fans: numb
     case "star":
       return seatStars(flagship).length > 0;
     case "fans":
-      return fans >= deal.fansMark;
+      // A meaningful drop misses, not a wobble (GDD v1.29).
+      return fans >= deal.fansMark * (1 - world.config.flagship.deals.clauses.fansTolerance);
     default:
       return true;
   }

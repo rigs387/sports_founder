@@ -790,7 +790,11 @@ flagship:
     # Clauses are judged at each season's end a deal pays. Met: bonusShare of the annual value that
     # season, and renewalEdgePerMet more on the partner's renewal edge. walkAfterMisses misses in a
     # row and the partner walks: the rest of the deal is lost, with no penalty and no shunning.
-    clauses: { bonusShare: 0.1, renewalEdgePerMet: 0.03, walkAfterMisses: 2 }
+    # The fans clause is met while the seat country's fans stay within fansTolerance below the
+    # mark: a meaningful drop, not a wobble (measured 2026-10-06, builder, 12 typical anchors, seeds
+    # 1–2: with no tolerance fans was met 61% of seasons judged; 2% made it 99%, free money; 0.5%
+    # gives 81%, beside star 80% and balance 86%).
+    clauses: { bonusShare: 0.1, renewalEdgePerMet: 0.03, walkAfterMisses: 2, fansTolerance: 0.005 }
     tierFloorMinTier: semi-pro
     # Rule demands are rare and never required: every slot always has an offer without one.
     ruleDemand:

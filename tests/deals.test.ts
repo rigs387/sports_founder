@@ -937,6 +937,18 @@ describe("judging clauses (tech plan 2.16 step 2)", () => {
     expect(only(judgeClauses(withStar, world))?.clauseMet).toBe(1);
   });
 
+  it("the fans clause forgives a wobble within its tolerance, not a real drop", () => {
+    const { fansTolerance } = world.config.flagship.deals.clauses;
+    const now = fansNow(judging(world, { kind: "fans" }));
+    // Fans now sit just inside, then just outside, the tolerance below the mark.
+    const inside = now / (1 - fansTolerance * 0.9);
+    const outside = now / (1 - fansTolerance * 1.1);
+    const at = (mark: number) =>
+      only(judgeClauses(judging(world, { kind: "fans" }, { fansMark: mark }), world));
+    expect(at(inside)).toMatchObject({ clauseMet: 1, clauseMisses: 0 });
+    expect(at(outside)).toMatchObject({ clauseMet: 0, clauseMisses: 1 });
+  });
+
   it("a walk is big business news the next turn, told by its clause", () => {
     const missed = { kind: "fans" as const };
     const state = judging(world, missed, {

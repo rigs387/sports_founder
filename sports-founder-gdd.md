@@ -1269,7 +1269,9 @@ under standing policies; whether they later gain individual deals is open.
       interest). The club-rating season cards, the one lever on balance, now matter for money.
     - *A star (sponsors):* a star playing at the seat, backed or not.
     - *Fans (any partner):* the seat country's fans at a season's end no fewer than at the
-      previous season's end (at signing for the first).
+      previous season's end (at signing for the first), within a small tolerance (e.g. 0.5%): a
+      meaningful drop misses, not a wobble (revised after measuring: with none it was met only
+      60% of seasons and 39% of its partners walked; 2% made it free).
     - *Soft, because dice decide them:* each clause is judged at every season's end the deal pays.
       Met: a small bonus that season and a larger renewal edge. Missed: nothing. Two misses in a
       row and the partner walks: the rest of the deal is lost, with no cash penalty and no

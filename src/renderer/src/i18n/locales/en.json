@@ -858,7 +858,7 @@
       "exclusivity": "Pay-TV exclusive: the league's broadcast abroad is halved while it runs.",
       "balance": "Wants a watchable league: no runaway champion and no foregone title in any {{seasonNoun}} of the deal.",
       "star": "Wants a star playing in the league at every {{seasonNoun}}'s end.",
-      "fans": "Wants the sport's fans in {{country}} never to fall from one {{seasonNoun}}'s end to the next.",
+      "fans": "Wants the sport's fans in {{country}} not to fall from one {{seasonNoun}}'s end to the next.",
       "ruleChange": "Demands {{trait}} becomes {{option}} by the end of the {{seasonNoun}} {{season}} offseason."
     },
     "due": "Due now: change {{trait}} to {{option}} this offseason, or the deal breaks.",
