@@ -34,6 +34,7 @@ import {
   type CountryRow,
   campaignsCsv,
   countriesCsv,
+  dealsAggregate,
   eventAggregate,
   flagshipAggregate,
   growthAggregate,
@@ -754,6 +755,24 @@ function main(): number {
       flagship.broadcastReaches === 0
         ? `  Broadcast: no campaign's seat was in a large media market; target ${pct(low)}–${pct(high)} not measured`
         : `  Broadcast (${flagship.broadcastReaches}/${results.length} campaigns with a seat in a large media market): share of world media reach exposure median ${pct(broadcast.median ?? 0)} (min ${pct(broadcast.min ?? 0)}, max ${pct(broadcast.max ?? 0)}); target ${pct(low)}–${pct(high)}: ${inTarget ? "met" : "MISSED"}`,
+    );
+    const deals = dealsAggregate(results, world.config.balanceTargets.dealSlateShare);
+    const counts = (record: Record<string, number>) =>
+      Object.entries(record)
+        .map(([key, n]) => `${key} ${n}`)
+        .join(", ") || "none";
+    console.log(
+      `  Deals: signed per campaign median ${fmt(deals.signedPerCampaign.median)} (${counts(deals.signed)}); demands signed ${counts(deals.demandsSigned)}; breaches ${counts(deals.breaches)}; deal income's share of the flagship's income median ${pct(deals.incomeShare.median ?? 0)}; turns at Near-Collapse median ${pct(deals.nearCollapseShare.median ?? 0)}, max ${pct(deals.nearCollapseShare.max ?? 0)}`,
+    );
+    const [slateLow, slateHigh] = world.config.balanceTargets.dealSlateShare;
+    console.log(
+      `  Deal slate before the PP-tier cap (target ${pct(slateLow)}–${pct(slateHigh)}), median by league tier: ${deals.slates
+        .filter((s) => s.samples > 0)
+        .map(
+          (s) =>
+            `${s.tier} ${pct(s.before ?? 0)} ${s.met ? "met" : "MISSED"} (after the cap ${pct(s.after ?? 0)}, n ${s.samples})`,
+        )
+        .join("; ")}`,
     );
     const rules = rulesAggregate(results);
     console.log(

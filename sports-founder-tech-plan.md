@@ -685,6 +685,18 @@ signed deals (paying, rule demand open, due this offseason), offers with renewal
 seat's slots, shunned partners, the media share kept and deal income. Tests: breach news next
 turn, term-end toast and renewal, the due flag at the deadline offseason, and the migration.
 
+*Step 6 built 2026-10-06.* Every strategy bot (greedy-spread, builder, anchor-turtle, media-rush)
+signs the highest-value offer in each slot in the offseason (`signDeals` in
+`src/runner/policy.ts`), demands included, and plays on as usual; the random bot does not sign.
+Each campaign records deals signed by slot and demand, breaches by demand, deal income's share of
+the flagship's income, the slate share before and after the cap at every offseason (by league
+tier) and the share of turns at Near-Collapse; `dealsAggregate` prints them and judges the slate
+by tier against `balanceTargets.dealSlateShare`; campaigns.csv gains four columns. First read
+(builder, sweden, 3 seeds, 200 turns): about 300 deals signed a campaign, mostly short naming and
+sponsor terms; 11 of 20 rule demands broken (the builder amends by its own fit, not its deals);
+deal income 19% of the flagship's income; no Near-Collapse; slate before the cap 105% at Amateur,
+Semi-Pro and Professional, 117% at Elite (Semi-Pro 93% after the cap).
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

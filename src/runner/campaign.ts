@@ -7,11 +7,14 @@ import {
   checkInvariants,
   computeExposure,
   createCampaign,
+  dealIncomePerQuarter,
+  dealSlateShare,
   ESCALATION_LEVELS,
   endTurn,
   escalationIndex,
   type GameState,
   type Genome,
+  leagueIncomePerQuarter,
   PLAYER_INDEX,
   QUARTERS_PER_YEAR,
   snapshot,
@@ -112,6 +115,15 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   /** Per observed turn: the flagship broadcast's share of world media reach exposure. */
   const broadcastShares: number[] = [];
   let broadcastReaches = false;
+  // Flagship deals (GDD v1.28).
+  const dealsSigned: Record<string, number> = {};
+  const demandsSigned: Record<string, number> = {};
+  /** Per offseason, by the seat league's tier: the slate share before and after the cap. */
+  const slates: CampaignResult["deals"]["slates"] = [];
+  let slateSeason: number | null = null;
+  const dealIncomeShares: number[] = [];
+  let nearCollapseTurns = 0;
+  let seatTurns = 0;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
   const observe = (current: GameState, turn: number) => {
@@ -130,6 +142,22 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     }
     broadcastShares.push(media > 0 ? broadcast / media : 0);
     broadcastReaches ||= broadcastEffects(current, world).reach.size > 0;
+    const seat = world.countries.findIndex((c) => c.id === current.flagship.countryId);
+    const seatLeague = current.countries[seat]?.league ?? null;
+    if (seatLeague) {
+      seatTurns += 1;
+      if (seatLeague.health === "near-collapse") nearCollapseTurns += 1;
+      const income = leagueIncomePerQuarter(current, world, seat);
+      if (income > 0) dealIncomeShares.push(dealIncomePerQuarter(current.flagship) / income);
+      if (current.flagship.offseason && slateSeason !== current.flagship.season) {
+        slateSeason = current.flagship.season;
+        const before = dealSlateShare(current, world);
+        const after = dealSlateShare(current, world, true);
+        if (before !== null && after !== null) {
+          slates.push({ tier: seatLeague.tier, before, after });
+        }
+      }
+    }
     const rivalWorldHardcore = rivalSports.map(() => 0);
     current.countries.forEach((country, i) => {
       const population = world.countries[i]?.population ?? 1;
@@ -185,8 +213,18 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     const tally = (key: string) => {
       eventAnswers[key] = (eventAnswers[key] ?? 0) + 1;
     };
+    let offers = state.flagship.deals.offers;
     for (const action of step.actions) {
       if (action.type === "backStar") firstBackTurn ??= state.turn;
+      if (action.type === "signDeal") {
+        const offer = offers.find((o) => o.id === action.offerId);
+        if (offer) {
+          dealsSigned[offer.slot] = (dealsSigned[offer.slot] ?? 0) + 1;
+          const demand = offer.demand?.kind ?? "none";
+          demandsSigned[demand] = (demandsSigned[demand] ?? 0) + 1;
+          offers = offers.filter((o) => o.slot !== offer.slot || o.position !== offer.position);
+        }
+      }
       if (action.type !== "chooseEvent") continue;
       const event = state.events.pending.find((e) => e.id === action.eventId);
       tally(`${event?.templateId}/${action.choiceId}`);
@@ -394,6 +432,21 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           firstBackTurn,
         };
       })(),
+      deals: {
+        signed: dealsSigned,
+        demandsSigned,
+        breaches: state.landmarks.reduce<Record<string, number>>((counts, landmark) => {
+          if (landmark.kind === "dealBroken") {
+            counts[landmark.demand] = (counts[landmark.demand] ?? 0) + 1;
+          }
+          return counts;
+        }, {}),
+        incomeShare:
+          dealIncomeShares.reduce((sum, share) => sum + share, 0) /
+          Math.max(1, dealIncomeShares.length),
+        slates,
+        nearCollapseShare: nearCollapseTurns / Math.max(1, seatTurns),
+      },
       amendments: state.rules.amendments.map(({ turn, axis, from, to, demoted }) => ({
         turn,
         change: `${axis} ${from}→${to}`,

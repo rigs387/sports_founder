@@ -6,6 +6,7 @@ import {
   type EscalationLevel,
   GENOME_AXES,
   type Genome,
+  LEAGUE_TIERS,
   type LeagueTierId,
 } from "../content";
 import type { SportTotals } from "../sim";
@@ -118,6 +119,20 @@ export interface CampaignResult {
     starsMade: number;
     starsBacked: number;
     firstBackTurn: number | null;
+  };
+  /** Flagship deals (GDD v1.28). */
+  deals: {
+    /** Deals signed by slot, and by the demand they carried ("none" for none). */
+    signed: Record<string, number>;
+    demandsSigned: Record<string, number>;
+    /** Breaches by the demand broken. */
+    breaches: Record<string, number>;
+    /** Deal income's share of the flagship league's income, averaged over the turns played. */
+    incomeShare: number;
+    /** At each offseason: the seat league's tier and its slate share before and after the cap. */
+    slates: { tier: LeagueTierId; before: number; after: number }[];
+    /** Share of turns the flagship league spent at Near-Collapse. */
+    nearCollapseShare: number;
   };
   /** Rule amendments made (GDD v1.20): when, which change, hardcore fans who turned casual. */
   amendments: { turn: number; change: string; demoted: number }[];
@@ -347,6 +362,39 @@ export function flagshipAggregate(results: CampaignResult[]) {
     firstBackTurn: distribution(
       results.flatMap((r) => (r.flagship.firstBackTurn === null ? [] : [r.flagship.firstBackTurn])),
     ),
+  };
+}
+
+/** Flagship deals across campaigns (GDD v1.28): signings, breaches, income and the slate guard. */
+export function dealsAggregate(results: CampaignResult[], target: readonly [number, number]) {
+  const sum = (pick: (r: CampaignResult) => Record<string, number>) => {
+    const total: Record<string, number> = {};
+    for (const r of results)
+      for (const [key, n] of Object.entries(pick(r))) total[key] = (total[key] ?? 0) + n;
+    return total;
+  };
+  const [low, high] = target;
+  const slates = LEAGUE_TIERS.map((tier) => {
+    const at = results.flatMap((r) => r.deals.slates.filter((s) => s.tier === tier));
+    const before = median(at.map((s) => s.before));
+    return {
+      tier,
+      samples: at.length,
+      before,
+      after: median(at.map((s) => s.after)),
+      met: before === null ? null : before >= low && before <= high,
+    };
+  });
+  return {
+    signedPerCampaign: distribution(
+      results.map((r) => Object.values(r.deals.signed).reduce((a, b) => a + b, 0)),
+    ),
+    signed: sum((r) => r.deals.signed),
+    demandsSigned: sum((r) => r.deals.demandsSigned),
+    breaches: sum((r) => r.deals.breaches),
+    incomeShare: distribution(results.map((r) => r.deals.incomeShare)),
+    nearCollapseShare: distribution(results.map((r) => r.deals.nearCollapseShare)),
+    slates,
   };
 }
 
@@ -641,6 +689,10 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     "peak_player_hardcore_country",
     "peak_player_hardcore_turn",
     "broadcast_share",
+    "deals_signed",
+    "deal_breaches",
+    "deal_income_share",
+    "flagship_near_collapse_share",
     "anchor_overtake_years",
     "nodes_bought",
     "pp_spent_on_nodes",
@@ -692,6 +744,10 @@ export function campaignsCsv(results: CampaignResult[], tierCount: number): stri
     r.peakPlayerHardcoreShare.countryId,
     r.peakPlayerHardcoreShare.turn,
     round(r.broadcastShare, 5),
+    Object.values(r.deals.signed).reduce((a, b) => a + b, 0),
+    Object.values(r.deals.breaches).reduce((a, b) => a + b, 0),
+    round(r.deals.incomeShare, 5),
+    round(r.deals.nearCollapseShare, 5),
     r.anchorOvertakeYears,
     r.nodesBought.length,
     Math.round(r.ppSpentOnNodes),

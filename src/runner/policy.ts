@@ -64,6 +64,8 @@ import { chooseEvents, EVENT_WEIGHTS, type EventWeights } from "./event-policy";
 //   random         each turn, maybe one random legal action, and a random legal answer to each
 //                  decision card. Its dice are separate from the simulation's RNG, so it never
 //                  changes the world's random sequence.
+// Every bot except random and none signs flagship deals in the offseason (GDD v1.28): the
+// highest-value offer in each slot, demands included, then plays on as usual.
 // Every bot except random and none first answers decision cards (event-policy.ts): greedy-spread
 // values any upside and spends freely, builder weighs effects evenly, anchor-turtle prizes hardcore
 // fans and league health, media-rush prizes casual fans and media and language spread. They keep
@@ -272,6 +274,7 @@ function greedySpreadTurn(state: GameState, world: World): BotStep {
     attempt(step, world, { type: "promoteLeague", countryId: country.id });
   }
   backStars(step, world, 0);
+  signDeals(step, world);
   buyNodes(step, world, 0, cheapest(step, world));
   return step;
 }
@@ -368,6 +371,20 @@ function backStars(step: BotStep, world: World, reserve: number): void {
 }
 
 /**
+ * Signs the highest-value offer in each slot (GDD v1.28), demands included; ties go to the
+ * earliest offer. Bots play on as usual, so their demands are kept or broken by their plans.
+ */
+function signDeals(step: BotStep, world: World): void {
+  if (!offseasonOpen(step.state)) return;
+  for (;;) {
+    const best = [...step.state.flagship.deals.offers].sort(
+      (a, b) => b.annualValue - a.annualValue || a.id - b.id,
+    )[0];
+    if (!best || !attempt(step, world, { type: "signDeal", offerId: best.id })) return;
+  }
+}
+
+/**
  * Amends the rule whose change fits the bot's fans best (GDD v1.20): the fit gain in every market,
  * weighted by its Fandom Score there, less the share of hardcore fans the backlash would turn
  * casual. Only when that beats AMEND_MARGIN and the price leaves `reserve` PP.
@@ -424,6 +441,7 @@ function builderTurn(state: GameState, world: World, options: BotOptions): BotSt
   if (options.amend)
     amendRules(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   backStars(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
+  signDeals(step, world);
   buyNodes(
     step,
     world,
@@ -490,6 +508,7 @@ function anchorTurtleTurn(state: GameState, world: World): BotStep {
 
   const pickCheapest = cheapest(step, world);
   backStars(step, world, bailoutReserve(step.state, world, TURTLE_RESERVE_BAILOUTS));
+  signDeals(step, world);
   buyNodes(step, world, bailoutReserve(step.state, world, TURTLE_RESERVE_BAILOUTS), (candidates) =>
     pickCheapest(candidates.filter((id) => nodeValue(step.state, world, id, anchorIndex) > 0)),
   );
@@ -530,6 +549,7 @@ function mediaRushTurn(state: GameState, world: World): BotStep {
     });
   const reserve = bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS);
   backStars(step, world, reserve);
+  signDeals(step, world);
   const pickCheapest = cheapest(step, world);
   buyNodes(step, world, reserve, (candidates) =>
     pickCheapest(candidates.filter((id) => wanted.includes(id))),

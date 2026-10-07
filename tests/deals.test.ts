@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { GEAR_BRAND_ID } from "../src/content";
+import { builder } from "../src/runner/policy";
 import {
   applyAction,
   breakDeals,
@@ -687,5 +688,22 @@ describe("news and the snapshot (step 5)", () => {
     const all = [...loaded.events.pending, ...loaded.events.history];
     expect(all.length).toBeGreaterThan(0);
     expect(all.every((event) => event.facts.deal === null)).toBe(true);
+  });
+});
+
+describe("bots (step 6)", () => {
+  it("sign the highest-value offer in every slot, demands included", () => {
+    const state = atOffers();
+    const played = builder(state, world);
+    const signed = played.actions.flatMap((a) => (a.type === "signDeal" ? [a.offerId] : []));
+    const slots = new Set(state.flagship.deals.offers.map(slotKey));
+    expect(signed).toHaveLength(slots.size);
+    for (const key of slots) {
+      const best = state.flagship.deals.offers
+        .filter((o) => slotKey(o) === key)
+        .sort((a, b) => b.annualValue - a.annualValue || a.id - b.id)[0];
+      expect(signed).toContain(best?.id);
+    }
+    expect(played.state.flagship.deals.offers).toEqual([]);
   });
 });

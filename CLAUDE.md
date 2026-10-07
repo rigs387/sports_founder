@@ -51,7 +51,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   `--max-minutes` (default 5), saying how to shrink it (`src/runner/budget.ts`). Raise the budget
   only when the user asks for a long run. Bots answer event decisions by their own weights
   (`src/runner/event-policy.ts`); the run prints how often each choice was taken, the win contest
-  (#1 lost before the win), and the flagship's title spread.
+  (#1 lost before the win), and the flagship's title spread. Bots sign the best deal offer per
+  slot (GDD v1.28); every run prints deals signed, demands and breaches, deal income's share, turns
+  at Near-Collapse and the deal slate by league tier against `balanceTargets.dealSlateShare`.
 - `npm run sim -- --experiment pacing --turns 200`: one balance experiment (12 anchors × 5 seeds,
   about 3 minutes; it also gives the win contest). Experiments: differentiation, collapse, hard-anchor, pacing, options, rivals,
   benchmark. Misses are reported, never counted as passes. Defaults are sized to finish in minutes:
