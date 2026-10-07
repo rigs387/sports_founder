@@ -84,7 +84,7 @@ Clauses (v1.29): TV wants competitive balance (no runaway/foregone season), spon
 the seat, any partner fans not falling (0.5% tolerance); judged each season end: met = bonus and a bigger renewal
 edge, two misses in a row = the partner walks (no penalty). Rule demands kept at half the chance.
 Venues (v1.30): flagship only, levels 1–5; gate paid only up to capacity (a population share);
-built with cash in the offseason over seasons, upkeep when open; conversion boost fades when
+built with cash in the offseason over seasons, priced by the tier each level serves, upkeep when open; conversion boost fades when
 overflowing; record crowds are fame facts, past level 3 offends famous venues; levels stay with
 their country's league; promotion at the seat needs venue level 1/2/3 for Semi-Pro/Pro/Elite,
 and its review shows costs against capped revenue. Youth programs parked. Payroll (v1.30): flagship running cost splits into
