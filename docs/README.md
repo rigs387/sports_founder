@@ -19,6 +19,7 @@ Start with the [world map's current direction](world-map/README.md): **Matchday 
 - [Events: the Clubhouse story board, decisions and moments](events/README.md)
 - [The flagship league: table, results, champions and the commissioner's seat](flagship/README.md)
 - [Flagship deals: TV, sponsors, naming rights, demands and breaches](deals/README.md)
+- [Venues and payroll: the gate cap, building levels, star wages](venues/README.md)
 - [Growth tree visual studies](growth-tree/README.md)
 - [World map implementation brief](world-map/brief.html)
 - [Earlier visual studies](world-map/README.md#earlier-studies)

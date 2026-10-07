@@ -184,6 +184,17 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   before its offers: met pays a bonus and grows the renewal edge; enough misses in a row and the
   partner walks (`dealWalked`), no penalty. The UI is `src/renderer/src/deals/`; signing happens
   only on the offseason screen (the Flagship tab is read-only).
+- Venues and payroll (GDD v1.30) are the flagship's only: `LeagueState.venue` (level 1–5, a build,
+  the record crowd) on every league, built only at the seat. `src/sim/venues.ts` (capacity, the
+  conversion lift), `src/sim/venue-actions.ts` (`buildVenue` in the offseason; `openVenues` when
+  `closeOffseason` runs; levels 4–5 betray famous grounds via `modernizeGrounds`), and
+  `src/sim/league-costs.ts` (`leagueCosts`: running cost, upkeep, and at the seat the payroll
+  split and star wages; `stepLeagueQuarter` takes it from its caller). The seat's gate is paid on
+  seated fans only (`leagueIncomePerQuarter`). Promotion at the seat needs venue level
+  `promotionLevel`. A level is priced by the tier it serves (`venueCostBasis`). Record crowds are
+  fame facts and `recordCrowd` landmarks; venue news is `src/sim/venue-cards.ts`. The UI is
+  `src/renderer/src/venues/VenueCard.tsx` (building only on the offseason screen). Youth programs,
+  standing policies and ticket pricing are parked.
 - Sport identity (GDD v1.18) lives in `src/sim/identity.ts` and `GameState.identity`: the sport's
   name, founding club (a real flagship club at the anchor) and ground, birthplace, ethos, terms and
   emblem. Option lists are ids in `content/identity.yaml`; words are in the locale file. Defaults
@@ -288,6 +299,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   offers made, so the media baseline cut waits for the next offseason's offers.
 - Save format 21 adds deal clauses (GDD v1.29): each signed deal's `clauseMet`, `clauseMisses`
   and `fansMark`. Format 20 migrates with no record, judged against the seat country's fans now.
+- Save format 22 adds venues (GDD v1.30): each league's `venue`, each season summary's `crowd` and
+  `recordCrowd`, venue facts on event records. Format 21 migrates with level 1 venues, nothing
+  building, no record, crowdless seasons and no venue facts.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

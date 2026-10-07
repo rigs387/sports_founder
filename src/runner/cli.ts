@@ -44,6 +44,7 @@ import {
   rulesAggregate,
   type TurnRow,
   turnsCsv,
+  venuesAggregate,
 } from "./report";
 
 const EXPERIMENTS = [
@@ -771,6 +772,15 @@ function main(): number {
       )
       .join("; ");
     console.log(`  Deal clauses: ${clauseLine || "none signed"}`);
+    const venues = venuesAggregate(results);
+    console.log(
+      `  Venues: gate lost to the cap median ${pct(venues.gateLost.median ?? 0)} (max ${pct(venues.gateLost.max ?? 0)}); level at the offseason by league tier ${venues.levels
+        .filter((l) => l.samples > 0)
+        .map((l) => `${l.tier} ${fmt(l.level)} (n ${l.samples})`)
+        .join(
+          ", ",
+        )}; levels opened ${venues.opened}, modernized ${venues.modernized}; record crowds ${venues.records}; payroll baseline ${pct(venues.payrollShare.median ?? 0)} and star wages ${pct(venues.wagesShare.median ?? 0)} of the seat's costs (median)`,
+    );
     const [slateLow, slateHigh] = world.config.balanceTargets.dealSlateShare;
     console.log(
       `  Deal slate before the PP-tier cap (target ${pct(slateLow)}–${pct(slateHigh)}), median by league tier: ${deals.slates

@@ -12,15 +12,15 @@ window.SF_PROGRESS = {
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
-    date: "2026-10-05",
-    tests: 503,
-    files: 47,
-    note: "npm run check passed after flagship deals (type checks, Biome, purity, 503 tests in 47 files). Lint has existing visual-study warnings.",
-    smokeDate: "2026-10-06",
+    date: "2026-10-07",
+    tests: 526,
+    files: 48,
+    note: "npm run check passed after venues and payroll (type checks, Biome, purity, 526 tests in 48 files). Lint has existing visual-study warnings.",
+    smokeDate: "2026-10-07",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only.",
   },
-  eventDeck: { current: 31, target: "40–60" },
+  eventDeck: { current: 34, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -32,7 +32,7 @@ window.SF_PROGRESS = {
       name: "Phase 1",
       title: "Make it matter",
       state: "Current",
-      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution, the first traditions and flagship deals are built.",
+      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution, the first traditions, flagship deals, venues and payroll are built.",
     },
     {
       name: "Phase 2",
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-07",
+      type: "Built",
+      title: "Venues and payroll",
+      text: "Tech plan 2.17 (GDD v1.30): the flagship's gate is paid only on hardcore fans its venue seats (1/3/8/15/30% of the population for levels 1–5). Levels are built with league cash in the offseason, priced by the tier they serve, and open seasons later; promotion at the seat needs levels 1/2/3 (without it the naive bot folded Austria's anchor in 6 of 8 seeds). Each level lifts hardcore conversion, fading on overflow; record crowds make grounds famous; levels 4–5 betray famous grounds. Stars draw wages that rise with their careers. A venue card on the offseason screen, cost lines, wages, venue news. Pacing passes, #1 contest 56%; the cap costs 6% of the seat's gate on average.",
+    },
     {
       date: "2026-10-07",
       type: "Design",
@@ -568,13 +574,14 @@ window.SF_PROGRESS = {
       gdd: "GDD system 7",
       icon: "08",
       summary:
-        "The flagship signs TV, sponsor and naming-rights deals with demands; other leagues keep one media line.",
-      next: "Build venues and payroll (tech plan 2.17): a hard gate cap, venue levels built over seasons, star wages.",
+        "The flagship signs TV, sponsor and naming-rights deals with demands, builds its venue and pays its stars; other leagues keep one media line.",
+      next: "Watch the Elite deal slate (at 120%, the top of its band); youth programs, standing policies and ticket pricing are parked.",
       depends: ["leagues"],
       sources: [
         ["Current league finances", "../league-management/README.md"],
         ["Business design", "../../sports-founder-gdd.md#progression--economy"],
         ["Flagship deals", "../deals/README.md"],
+        ["Venues and payroll", "../venues/README.md"],
       ],
       items: [
         ["built", "Gate and combined media/sponsor income"],
@@ -584,8 +591,8 @@ window.SF_PROGRESS = {
           "Flagship TV, sponsor and naming-rights deals, offered each offseason (GDD v1.28)",
         ],
         ["built", "Deal demands, exclusivity, breaches, renewals and the naming-rights betrayal"],
-        ["planned", "Flagship venues: a gate cap, levels built over seasons, upkeep (GDD v1.30)"],
-        ["planned", "Flagship payroll: star wages rising with careers (GDD v1.30)"],
+        ["built", "Flagship venues: a gate cap, levels built over seasons, upkeep (GDD v1.30)"],
+        ["built", "Flagship payroll: star wages rising with careers (GDD v1.30)"],
       ],
     },
     {

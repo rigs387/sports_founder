@@ -15,9 +15,11 @@ import {
   escalationIndex,
   type GameState,
   type Genome,
+  leagueCosts,
   leagueIncomePerQuarter,
   PLAYER_INDEX,
   QUARTERS_PER_YEAR,
+  seatedCrowd,
   snapshot,
   turnLengthQuarters,
   type World,
@@ -133,6 +135,12 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   };
   const CLAUSE_KINDS = ["balance", "star", "fans"];
   let seatTurns = 0;
+  // Venues and payroll at the seat (GDD v1.30).
+  let gateLost = 0;
+  let payrollShare = 0;
+  let wagesShare = 0;
+  const venueLevels: CampaignResult["venues"]["levels"] = [];
+  let levelSeason: number | null = null;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
   const observe = (current: GameState, turn: number) => {
@@ -158,6 +166,20 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       if (seatLeague.health === "near-collapse") nearCollapseTurns += 1;
       const income = leagueIncomePerQuarter(current, world, seat);
       if (income > 0) dealIncomeShares.push(dealIncomePerQuarter(current.flagship) / income);
+      const hardcore = current.countries[seat]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
+      if (hardcore > 0) {
+        const seated = seatedCrowd(world, seat, seatLeague.venue.level, hardcore);
+        gateLost += 1 - seated / hardcore;
+      }
+      const costs = leagueCosts(current, world, seat);
+      if (costs.total > 0) {
+        payrollShare += costs.payroll / costs.total;
+        wagesShare += costs.wages / costs.total;
+      }
+      if (current.flagship.offseason && levelSeason !== current.flagship.season) {
+        levelSeason = current.flagship.season;
+        venueLevels.push({ tier: seatLeague.tier, level: seatLeague.venue.level });
+      }
       if (current.flagship.offseason && slateSeason !== current.flagship.season) {
         slateSeason = current.flagship.season;
         const before = dealSlateShare(current, world);
@@ -482,6 +504,15 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         slates,
         nearCollapseShare: nearCollapseTurns / Math.max(1, seatTurns),
         clauses,
+      },
+      venues: {
+        gateLost: gateLost / Math.max(1, seatTurns),
+        payrollShare: payrollShare / Math.max(1, seatTurns),
+        wagesShare: wagesShare / Math.max(1, seatTurns),
+        levels: venueLevels,
+        opened: state.landmarks.filter((l) => l.kind === "venueOpened").length,
+        modernized: state.landmarks.filter((l) => l.kind === "venueOpened" && l.modernized).length,
+        records: state.landmarks.filter((l) => l.kind === "recordCrowd").length,
       },
       amendments: state.rules.amendments.map(({ turn, axis, from, to, demoted }) => ({
         turn,

@@ -873,6 +873,17 @@ for 235 cash, so a level's price and upkeep now use the running cost of the tier
 league's own if higher (`venueCostBasis`). Smoke: builds a level on the offseason screen
 (screenshots 51–54) and checks the Flagship card is read-only.
 
+*Step 5 built 2026-10-07.* The runner prints a Venues line: gate lost to the cap, the seat's
+level at each offseason by league tier, levels opened and modernized, record crowds, and payroll
+and wages as shares of the seat's costs. Measured with the builder over 12 typical anchors, seeds
+1–3 (run as 1–2 and 3), 200 turns: pacing passes pooled (tier 2 at turn 33, tier 3 44, tier 4 76,
+tier 5 122.5, first win 161); #1 lost before the win 20/36 (56%); no Near-Collapse; gate lost 6%
+(max 32%); level 1 through Semi-Pro, 2 at Professional, 5 for most of Elite; payroll 25% and wages
+7–8% of costs. More famous grounds lifted the Elite slate to 122%: `namingPerHardcore` 0.000003 →
+0.0000025 and the third sponsor slot 0.1 → 0.07 bring it to 120% (seeds 1–2), the top of the band.
+Greedy-spread from Austria, 8 seeds: none collapsed, tier 5 at turn 102.5. Docs:
+`docs/venues/README.md`.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

@@ -797,7 +797,9 @@ flagship:
   # offers), and a naming-rights slot for the founding ground and each famous ground. Values are
   # starting points, tuned so a full slate of ordinary offers is 100–120% of the media line it
   # replaces (balanceTargets.dealSlateShare). The value rates are a quarter's worth, like the media
-  # line's mediaPerCasual; a deal's annual value is four quarters.
+  # line's mediaPerCasual; a deal's annual value is four quarters. Venues (2026-10-07) made more
+  # grounds famous (record crowds) and lifted the Elite slate to 122%; naming rights (0.000003 →
+  # 0.0000025) and the third sponsor slot (0.1 → 0.07) were trimmed to bring it back to 120%.
   deals:
     baselineShare: 0.4
     sponsorSlots: { amateur: 1, semi-pro: 1, professional: 2, elite: 3 }
@@ -806,8 +808,8 @@ flagship:
     value:
       tvPerCasual: 0.00002875
       sponsorPerFan: 0.000005
-      namingPerHardcore: 0.000003
-      sponsorSlotShares: [ 0.5, 0.25, 0.1 ]
+      namingPerHardcore: 0.0000025
+      sponsorSlotShares: [ 0.5, 0.25, 0.07 ]
       spread: 0.15
     # A sport's PP tier caps what partners will pay (GDD: sponsors take a maturing sport seriously),
     # as a share of the league's annual running cost: it bounds an offer's ordinary value, and the

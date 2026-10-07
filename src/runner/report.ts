@@ -136,6 +136,19 @@ export interface CampaignResult {
     /** Clause judgements by kind (GDD v1.29): seasons met and missed, partners who walked. */
     clauses: Record<string, { met: number; missed: number; walked: number }>;
   };
+  /** Venues and payroll at the seat (GDD v1.30), averaged over the turns the seat had a league. */
+  venues: {
+    /** Share of the seat's gate lost to the cap (hardcore fans without a seat). */
+    gateLost: number;
+    /** Payroll baseline and star wages as shares of the seat league's costs. */
+    payrollShare: number;
+    wagesShare: number;
+    /** At each offseason: the seat league's tier and venue level. */
+    levels: { tier: LeagueTierId; level: number }[];
+    opened: number;
+    modernized: number;
+    records: number;
+  };
   /** Rule amendments made (GDD v1.20): when, which change, hardcore fans who turned casual. */
   amendments: { turn: number; change: string; demoted: number }[];
   /** Per fork id: the node chosen, or null if the fork was never decided. */
@@ -364,6 +377,25 @@ export function flagshipAggregate(results: CampaignResult[]) {
     firstBackTurn: distribution(
       results.flatMap((r) => (r.flagship.firstBackTurn === null ? [] : [r.flagship.firstBackTurn])),
     ),
+  };
+}
+
+/** Venues and payroll across campaigns (GDD v1.30). */
+export function venuesAggregate(results: CampaignResult[]) {
+  const levels = LEAGUE_TIERS.map((tier) => {
+    const at = results.flatMap((r) => r.venues.levels.filter((l) => l.tier === tier));
+    return { tier, level: median(at.map((l) => l.level)), samples: at.length };
+  });
+  const total = (pick: (r: CampaignResult) => number) =>
+    results.reduce((sum, r) => sum + pick(r), 0);
+  return {
+    gateLost: distribution(results.map((r) => r.venues.gateLost)),
+    payrollShare: distribution(results.map((r) => r.venues.payrollShare)),
+    wagesShare: distribution(results.map((r) => r.venues.wagesShare)),
+    levels,
+    opened: total((r) => r.venues.opened),
+    modernized: total((r) => r.venues.modernized),
+    records: total((r) => r.venues.records),
   };
 }
 
