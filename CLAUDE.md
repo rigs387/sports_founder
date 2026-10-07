@@ -179,8 +179,11 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   Demands never block: `breakDeals` ends a broken deal (after every action, when the offseason
   closes, after the league evaluation) with a cash penalty, shunning and a `dealBroken` landmark.
   Rule demands are rare, never a slot's only offer, only on deals running at their deadline.
-  Naming rights betray (`betrayGround`, culture.ts). The UI is `src/renderer/src/deals/`; signing
-  happens only on the offseason screen (the Flagship tab is read-only).
+  Naming rights betray (`betrayGround`, culture.ts). Clauses (GDD v1.29: balance, star, fans) are
+  demand kinds judged softly by `judgeClauses` (`src/sim/deal-clauses.ts`) once an offseason
+  before its offers: met pays a bonus and grows the renewal edge; enough misses in a row and the
+  partner walks (`dealWalked`), no penalty. The UI is `src/renderer/src/deals/`; signing happens
+  only on the offseason screen (the Flagship tab is read-only).
 - Sport identity (GDD v1.18) lives in `src/sim/identity.ts` and `GameState.identity`: the sport's
   name, founding club (a real flagship club at the anchor) and ground, birthplace, ethos, terms and
   emblem. Option lists are ids in `content/identity.yaml`; words are in the locale file. Defaults

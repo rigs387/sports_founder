@@ -5,6 +5,7 @@ import {
   COUNTERMOVES,
   type CountermoveKind,
   checkInvariants,
+  clauseMet,
   computeExposure,
   createCampaign,
   dealIncomePerQuarter,
@@ -123,6 +124,14 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   let slateSeason: number | null = null;
   const dealIncomeShares: number[] = [];
   let nearCollapseTurns = 0;
+  /** Clause judgements by kind (GDD v1.29): seasons met, seasons missed, partners who walked. */
+  const clauses: CampaignResult["deals"]["clauses"] = {};
+  const tallyClause = (kind: string, field: "met" | "missed" | "walked") => {
+    const entry = clauses[kind] ?? { met: 0, missed: 0, walked: 0 };
+    entry[field] += 1;
+    clauses[kind] = entry;
+  };
+  const CLAUSE_KINDS = ["balance", "star", "fans"];
   let seatTurns = 0;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
@@ -241,7 +250,33 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       ppSpentOnNodes += landmark.cost;
     }
     const tierBefore = step.state.ppTier;
+    const before = step.state;
     state = endTurn(step.state, world);
+    // Clause judgements this turn: changes on deals still running, the final judgement of a
+    // deal that ended at its term (judged just before it expired, in the same turn), walks.
+    {
+      const fresh = state.landmarks.slice(before.landmarks.length);
+      const now = new Map(state.flagship.deals.signed.map((deal) => [deal.id, deal]));
+      const seat = state.countries.find((c) => c.countryId === state.flagship.countryId);
+      const fans =
+        (seat?.fans[PLAYER_INDEX]?.casual ?? 0) + (seat?.fans[PLAYER_INDEX]?.hardcore ?? 0);
+      for (const deal of before.flagship.deals.signed) {
+        const kind = deal.demand?.kind ?? "";
+        if (!CLAUSE_KINDS.includes(kind)) continue;
+        const after = now.get(deal.id);
+        if (after) {
+          if (after.clauseMet > deal.clauseMet) tallyClause(kind, "met");
+          else if (after.clauseMisses > deal.clauseMisses) tallyClause(kind, "missed");
+          continue;
+        }
+        if (fresh.some((l) => l.kind === "dealWalked" && l.dealId === deal.id)) {
+          tallyClause(kind, "missed");
+          tallyClause(kind, "walked");
+        } else if (fresh.some((l) => l.kind === "dealEnded" && l.dealId === deal.id)) {
+          tallyClause(kind, clauseMet(state, world, deal, fans) ? "met" : "missed");
+        }
+      }
+    }
     if (state.ppTier > tierBefore && tierReached[state.ppTier] === undefined) {
       tierReached[state.ppTier] = { turnsCompleted: t + 1, quartersElapsed: state.quarter };
     }
@@ -446,6 +481,7 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           Math.max(1, dealIncomeShares.length),
         slates,
         nearCollapseShare: nearCollapseTurns / Math.max(1, seatTurns),
+        clauses,
       },
       amendments: state.rules.amendments.map(({ turn, axis, from, to, demoted }) => ({
         turn,

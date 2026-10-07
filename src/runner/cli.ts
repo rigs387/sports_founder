@@ -764,6 +764,13 @@ function main(): number {
     console.log(
       `  Deals: signed per campaign median ${fmt(deals.signedPerCampaign.median)} (${counts(deals.signed)}); demands signed ${counts(deals.demandsSigned)}; breaches ${counts(deals.breaches)}; deal income's share of the flagship's income median ${pct(deals.incomeShare.median ?? 0)}; turns at Near-Collapse median ${pct(deals.nearCollapseShare.median ?? 0)}, max ${pct(deals.nearCollapseShare.max ?? 0)}`,
     );
+    const clauseLine = Object.entries(deals.clauses)
+      .map(
+        ([kind, n]) =>
+          `${kind} met ${n.met} of ${n.met + n.missed} seasons judged (${pct(n.met / Math.max(1, n.met + n.missed))}), ${n.walked} walked`,
+      )
+      .join("; ");
+    console.log(`  Deal clauses: ${clauseLine || "none signed"}`);
     const [slateLow, slateHigh] = world.config.balanceTargets.dealSlateShare;
     console.log(
       `  Deal slate before the PP-tier cap (target ${pct(slateLow)}–${pct(slateHigh)}), median by league tier: ${deals.slates

@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-06",
-  design: "GDD v1.28",
+  design: "GDD v1.29",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-06",
+      type: "Built",
+      title: "Deal clauses",
+      text: "Tech plan 2.16 (GDD v1.29): rule demands proved a bust (bots broke 97%) and are kept at half the chance; partners now mostly want the product. TV wants competitive balance (no runaway or foregone season), sponsors a star at the seat, any partner fans not falling. Judged at every season's end: met pays a bonus and a better renewal, two misses in a row and the partner walks (big news), no penalty. Clauses come only on deals long enough for a walk to cost something. Pacing passes, #1 contest 56%; balance met 89% of seasons, star 75%, fans 60%.",
+    },
     {
       date: "2026-10-06",
       type: "Built",

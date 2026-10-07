@@ -11,8 +11,12 @@ import { type Deal, type GameState, type Landmark, PLAYER_INDEX, type World } fr
 // with the rest of the deal lost but no penalty and no shunning. Runs once an offseason, before
 // its offers are made (src/sim/turn.ts), so a deal in its final season is judged before it ends.
 
-/** Whether a deal's clause was met in the season just finished. */
-function met(state: GameState, world: World, deal: Deal, fans: number): boolean {
+/**
+ * Whether a deal's clause was met in the season just finished, against the seat country's
+ * player fans now (`fans`). Exported for the runner, which counts the final judgement of a deal
+ * that expires in the same turn.
+ */
+export function clauseMet(state: GameState, world: World, deal: Deal, fans: number): boolean {
   const { flagship } = state;
   switch (deal.demand?.kind) {
     case "balance": {
@@ -56,7 +60,7 @@ export function judgeClauses(state: GameState, world: World): GameState {
       signed.push(deal);
       continue;
     }
-    if (met(state, world, deal, fans)) {
+    if (clauseMet(state, world, deal, fans)) {
       bonus += settings.bonusShare * deal.annualValue;
       signed.push({ ...deal, clauseMet: deal.clauseMet + 1, clauseMisses: 0, fansMark: fans });
       continue;

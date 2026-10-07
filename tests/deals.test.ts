@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { GEAR_BRAND_ID } from "../src/content";
+import { playCampaign } from "../src/runner/campaign";
 import { builder } from "../src/runner/policy";
 import {
   applyAction,
@@ -35,7 +36,7 @@ import {
   type World,
 } from "../src/sim";
 import { withTradition } from "./culture-helpers";
-import { countryIndex, setupFor, withConfig, world } from "./helpers";
+import { baseGenome, countryIndex, setupFor, withConfig, world } from "./helpers";
 
 // Flagship deals, step 2 (GDD v1.28, tech plan 2.15): offers, signing, lapsing and saves.
 
@@ -965,5 +966,28 @@ describe("judging clauses (tech plan 2.16 step 2)", () => {
     const ordinary = Math.min(dealCap(offered, world), ordinaryDealValue(offered, world, ref));
     const edge = world.config.flagship.deals.renewalEdge + renewalEdgePerMet * 3;
     expect(renewal?.annualValue).toBeCloseTo(ordinary * (1 + edge), 6);
+  });
+});
+
+describe("the runner's clause report (tech plan 2.16 step 4)", () => {
+  it("counts every judgement, the final season's included, and every walk", () => {
+    const { result } = playCampaign(world, {
+      seed: 1,
+      anchorCountryId: "brazil",
+      genome: baseGenome,
+      genomeLabel: "base",
+      bot: "builder",
+      turns: 60,
+    });
+    const entries = Object.values(result.deals.clauses);
+    expect(entries.reduce((sum, n) => sum + n.met + n.missed, 0)).toBeGreaterThan(0);
+    for (const n of entries) expect(n.walked).toBeLessThanOrEqual(n.missed);
+    // No clause judged more seasons than clause deals were signed for at most five each.
+    const signed = ["balance", "star", "fans"].reduce(
+      (sum, kind) => sum + (result.deals.demandsSigned[kind] ?? 0),
+      0,
+    );
+    const judged = entries.reduce((sum, n) => sum + n.met + n.missed, 0);
+    expect(judged).toBeLessThanOrEqual(signed * world.config.flagship.deals.seasons.max);
   });
 });

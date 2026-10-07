@@ -28,6 +28,13 @@ A deal pays a fixed sum each season for its term, 1–5 seasons, whatever happen
   the name stands and turn some hardcore fans casual in the seat country; on the founding ground
   they offend the club rite.
 
+- **Clauses** (GDD v1.29) are what partners want of the product, judged at every season's end
+  the deal pays: *competitive balance* (TV: no runaway or foregone season), *a star* (sponsors: a
+  star playing at the seat) and *fans* (any partner: the seat country's fans no fewer than at the
+  last season's end). Met: a bonus of 10% of the annual value and a better renewal. Missed: two in
+  a row and the partner walks (big news), the rest of the deal lost, with no penalty. Clauses
+  come only on deals of three seasons or more, where a walk can cost something.
+
 ![Reviewing a deal with a demand: what a breach would cost.](review.png)
 
 Signing asks first only for a demand or a betrayal. The Flagship tab shows the same panel
@@ -43,7 +50,9 @@ and the Rulebook lists open rule demands with their due season.
 snapshot and the bots), breaks (`breakDeals`, after every action, when the offseason closes and
 after the league evaluation) and snapshots (`dealsSnapshot`). Naming-rights betrayal is
 `betrayGround` in `src/sim/culture.ts`; deal news is `src/sim/deal-cards.ts`. Save format 20.
-Every number is `flagship.deals` in `content/config.yaml`.
+Clauses are judged by `judgeClauses` (`src/sim/deal-clauses.ts`) once an offseason before its
+offers are made; a walk is `dealWalked`. Save format 21. Every number is `flagship.deals` in
+`content/config.yaml`.
 
 `tests/deals.test.ts` (24 tests) covers offers, signing, lapsing, renewal, the rule-demand limits,
 countermoves, the TV fork, the cap, revenue, the slate band, every demand kind and forced breach,
@@ -60,3 +69,9 @@ greedy-spread bot (12 anchors, seed 1) the flagship spent 13% of turns Strugglin
 before deals, 0.2% at Near-Collapse against none, and one anchor collapsed (Sweden) against none:
 deals make careless play harder, not the flagship unsinkable. Bots break almost every rule demand
 they sign (362 of 374): they take the premium and amend rules by their own fit.
+
+**Clauses measured** (same campaigns, after GDD v1.29, rule demands at half the chance): pacing
+passes pooled (tier 2 at turn 33, tier 5 at 120, first win at 158); #1 lost before the win 20/36
+(56%); the slate stays in the band. Balance was met 89% of seasons judged (5% of its partners
+walked), star 75% (33% walked), fans 60% (39% walked). Bots still broke 181 of the 186 rule
+demands they signed.

@@ -133,6 +133,8 @@ export interface CampaignResult {
     slates: { tier: LeagueTierId; before: number; after: number }[];
     /** Share of turns the flagship league spent at Near-Collapse. */
     nearCollapseShare: number;
+    /** Clause judgements by kind (GDD v1.29): seasons met and missed, partners who walked. */
+    clauses: Record<string, { met: number; missed: number; walked: number }>;
   };
   /** Rule amendments made (GDD v1.20): when, which change, hardcore fans who turned casual. */
   amendments: { turn: number; change: string; demoted: number }[];
@@ -394,6 +396,19 @@ export function dealsAggregate(results: CampaignResult[], target: readonly [numb
     breaches: sum((r) => r.deals.breaches),
     incomeShare: distribution(results.map((r) => r.deals.incomeShare)),
     nearCollapseShare: distribution(results.map((r) => r.deals.nearCollapseShare)),
+    clauses: results.reduce<Record<string, { met: number; missed: number; walked: number }>>(
+      (total, r) => {
+        for (const [kind, n] of Object.entries(r.deals.clauses)) {
+          const entry = total[kind] ?? { met: 0, missed: 0, walked: 0 };
+          entry.met += n.met;
+          entry.missed += n.missed;
+          entry.walked += n.walked;
+          total[kind] = entry;
+        }
+        return total;
+      },
+      {},
+    ),
     slates,
   };
 }

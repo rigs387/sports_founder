@@ -783,6 +783,16 @@ paid the premium for almost no risk, so clauses now come only on deals of at lea
 smoke prefers a breakable demand, then a clause (its review must say how it is judged). The
 clause record and warning are not reached by the smoke campaign; their snapshot fields are tested.
 
+*Step 4 built 2026-10-06.* The runner counts clause judgements by kind (seasons met, missed,
+partners who walked): changes on deals still running, the final judgement of a deal that ended at
+its term (re-judged with the exported `clauseMet` on the post-turn state, which judging saw), and
+walks from their landmarks; every run prints them. Measured with the builder over 12 typical
+anchors, seeds 1–3 (run as 1–2 and 3), 200 turns: pacing passes pooled (tier 2 at turn 33, tier 3
+43.5, tier 4 76.5, tier 5 120, first win 158); #1 lost before the win 20/36 (56%); slate in the
+band at every tier (Amateur 105%, Semi-Pro 103–105%, Professional 105–107%, Elite 118%); no
+Near-Collapse. Balance met 89% of seasons judged (9 of 192 partners walked), star 75% (137 of
+416), fans 60% (336 of 866). Rule demands at half the chance: 186 signed, 181 broken.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.
