@@ -712,6 +712,18 @@ break). The smoke (`src/main/deals-smoke.ts`) signs an offer on the offseason sc
 review, checks the slot, both layouts and the read-only tab: `runs/smoke/41-deals.png` to
 `44-deals-narrow.png`.
 
+*Step 8 measured 2026-10-06.* Builder, 12 typical anchors, seeds 1–3 (run as 1–2 and 3 to fit
+the budget), 200 turns: pacing passes pooled (tier 2 at turn 33, tier 3 43.5, tier 4 76.5, tier 5
+120.5, first win 159; seed 3 alone misses tiers 2 and 4 as it did before deals); #1 lost before
+the win 21/36 (58%); deal income 14% of the flagship's income; the flagship never reached
+Near-Collapse. The slate read 1.20–1.21 at Elite on these anchors, so the second and third
+sponsor shares were cut to 0.25 and 0.1: Elite 1.18–1.19, Professional 1.05–1.08, Semi-Pro
+1.03–1.04, Amateur 1.05, all inside 1–1.2. Against the build before deals (b3b91b6, same script,
+greedy-spread, 12 anchors, seed 1): the flagship spent 13.3% of turns Struggling (1.8% before),
+0.2% at Near-Collapse (none) and one anchor collapsed (Sweden; none before): harder for careless
+play, never unsinkable. Bots broke 362 of the 374 rule demands they signed (they take the premium
+and amend by their own fit); reported, not judged. Docs: `docs/deals/README.md`.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

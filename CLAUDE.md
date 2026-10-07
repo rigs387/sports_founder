@@ -170,6 +170,17 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   nowhere. The runner reports its share of world media exposure against
   `balanceTargets.flagshipBroadcastShare` (seats in large media markets only). `cardless` switches
   it off for the flagship isolation tests.
+- Flagship deals (GDD v1.28) live in `src/sim/deals.ts` and `FlagshipState.deals`. Only the
+  flagship signs deals: one TV slot, sponsor slots by league tier, naming rights at the founding
+  and famous grounds. `offerDeals` makes 2–3 offers per open slot once an offseason (end of
+  `endTurn`, on the deals' own random stream); they lapse when it closes; `signDeal` locks the
+  value for the term. `leagueIncomePerQuarter` is every league's income: at the seat the media
+  line keeps `baselineShare` once offers have been made, and paying deals add their value.
+  Demands never block: `breakDeals` ends a broken deal (after every action, when the offseason
+  closes, after the league evaluation) with a cash penalty, shunning and a `dealBroken` landmark.
+  Rule demands are rare, never a slot's only offer, only on deals running at their deadline.
+  Naming rights betray (`betrayGround`, culture.ts). The UI is `src/renderer/src/deals/`; signing
+  happens only on the offseason screen (the Flagship tab is read-only).
 - Sport identity (GDD v1.18) lives in `src/sim/identity.ts` and `GameState.identity`: the sport's
   name, founding club (a real flagship club at the anchor) and ground, birthplace, ethos, terms and
   emblem. Option lists are ids in `content/identity.yaml`; words are in the locale file. Defaults

@@ -1,7 +1,7 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-05",
+  updated: "2026-10-06",
   design: "GDD v1.28",
   stage: "Phase 1 · make it matter",
   markets: 213,
@@ -13,12 +13,12 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-05",
-    tests: 476,
-    files: 46,
-    note: "npm run check passed after the flagship broadcast (type checks, Biome, purity, 476 tests in 46 files). Lint has existing visual-study warnings.",
-    smokeDate: "2026-10-05",
+    tests: 503,
+    files: 47,
+    note: "npm run check passed after flagship deals (type checks, Biome, purity, 503 tests in 47 files). Lint has existing visual-study warnings.",
+    smokeDate: "2026-10-06",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only.",
   },
   eventDeck: { current: 30, target: "40–60" },
   phases: [
@@ -32,7 +32,7 @@ window.SF_PROGRESS = {
       name: "Phase 1",
       title: "Make it matter",
       state: "Current",
-      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution and the first traditions are built; deals are next.",
+      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution, the first traditions and flagship deals are built.",
     },
     {
       name: "Phase 2",
@@ -64,13 +64,13 @@ window.SF_PROGRESS = {
       system: "creation",
       title: "Make the start a choice",
       text: "The sport now has its identity (GDD v1.18). Next: country difficulty, recommended starts and difficulty presets.",
-      tag: "Then",
+      tag: "Next build",
     },
     {
       system: "business",
       title: "Deals that can betray traditions",
-      text: "Traditions now resist rule changes, seat moves and renamed trophies (GDD v1.22). Flagship sponsor and TV deals with demands bring the naming-rights dilemma at famous grounds and the homegrown gear brand.",
-      tag: "Next build",
+      text: "Built (tech plan 2.15, GDD v1.28): TV, sponsor and naming-rights deals at the flagship, offered each offseason with locked values; demands that break deals, rare rule demands, the gear brand and the naming-rights betrayal. Pacing passes; a full ordinary slate is 103–119% of the media line it replaces.",
+      tag: "Done",
     },
   ],
   watch: [
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-06",
+      type: "Built",
+      title: "Flagship deals",
+      text: "Tech plan 2.15 (GDD v1.28): each offseason the flagship gets 2–3 offers per slot (TV, sponsors by league tier, naming rights at the founding and famous grounds) from invented partners; signed values are locked for 1–5 seasons, and without deals the league keeps 40% of its media line. Demands (tier floor, seat lock, rule change, TV exclusivity) pay more and never block: breaking one costs the rest of the deal, a season's value and the partner. Rule demands are rare and never required. Naming rights betray famous grounds. Deal news on The Business Pages; a Deals section on the offseason screen. Pacing passes, #1 contest 58%; the naive bot's flagship struggles more than before, never less.",
+    },
     {
       date: "2026-10-05",
       type: "Design",
@@ -549,18 +555,23 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 7",
       icon: "08",
-      summary: "Local cash works; multi-year deals with demands are still ahead.",
-      next: "Build flagship deals (tech plan 2.15): offers, locked terms, demands and breaches.",
+      summary:
+        "The flagship signs TV, sponsor and naming-rights deals with demands; other leagues keep one media line.",
+      next: "Payroll, venue upkeep and standing policies with the venues build.",
       depends: ["leagues"],
       sources: [
         ["Current league finances", "../league-management/README.md"],
         ["Business design", "../../sports-founder-gdd.md#progression--economy"],
+        ["Flagship deals", "../deals/README.md"],
       ],
       items: [
         ["built", "Gate and combined media/sponsor income"],
         ["built", "Tier-based operating costs and PP-funded emergency cash"],
-        ["planned", "Seasonal multi-year TV and sponsorship contracts"],
-        ["planned", "Deal demands, exclusivity and renewal decisions"],
+        [
+          "built",
+          "Flagship TV, sponsor and naming-rights deals, offered each offseason (GDD v1.28)",
+        ],
+        ["built", "Deal demands, exclusivity, breaches, renewals and the naming-rights betrayal"],
         ["planned", "Detailed payroll, venue upkeep and policy-driven business"],
       ],
     },
@@ -572,7 +583,7 @@ window.SF_PROGRESS = {
       icon: "09",
       summary:
         "Amend one rule a year in the seasonal window; purists push back, and the Rulebook keeps the dates.",
-      next: "Proposals from broadcasters, sponsors and directors with the deals build.",
+      next: "Proposals from league directors, with standing policies.",
       depends: ["creation"],
       sources: [
         ["Rules evolution design", "../../sports-founder-gdd.md#progression--economy"],
@@ -590,7 +601,8 @@ window.SF_PROGRESS = {
           "built",
           "Backlash by hardcore base, rule age, jump, anchor, fit lost and the traditions offended",
         ],
-        ["planned", "Rule proposals from sponsors, broadcasters and directors"],
+        ["built", "Rule demands from broadcasters and sponsors, with deals (GDD v1.28)"],
+        ["planned", "Rule proposals from league directors"],
       ],
     },
     {
