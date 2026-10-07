@@ -464,8 +464,9 @@ leagues:
     cooldownQuarters: 16
   # Venues (GDD v1.30): the flagship's league has a capacity level 1–5; other leagues stay at 1 and
   # are never capped. At the seat, gate is paid only on hardcore fans up to capacity =
-  # capacityShare[level − 1] × population (the shares sit just above the promotion thresholds, so
-  # level 1 bites through Semi-Pro and each level carries the league toward the next promotion).
+  # capacityShare[level − 1] × population. Keyed to measured anchor hardcore shares (builder, four
+  # anchors, 2026-10-07: Semi-Pro 0.5–2%, Professional 3–5%, Elite 5% rising to 15–36%): level 1
+  # bites in mid Semi-Pro, 2 in Professional, 3 early in Elite, 4 and 5 late.
   # Building level L (offseason only, one at a time, the seat's league) costs
   # priceQuarters[L − 2] × the league's running cost in league cash and opens when the offseason
   # closes buildSeasons[L − 2] seasons later. Upkeep per quarter = upkeepShare × (level − 1) × the
@@ -476,12 +477,15 @@ leagues:
   # level above modernize.fromLevel − 1 modernizes the grounds: it betrays every famous venue in
   # the seat country as naming rights do (hardcoreDemotionShare, traditionWear).
   venue:
-    capacityShare: [0.0025, 0.008, 0.02, 0.04, 0.08]
+    capacityShare: [0.01, 0.03, 0.08, 0.15, 0.3]
     priceQuarters: [4, 8, 14, 20]
     buildSeasons: [1, 2, 2, 3]
     upkeepShare: 0.04
     conversionBoost: 0.04
     recordMargin: 0.1
+    # At the seat, promotion into a tier needs at least this venue level (decided 2026-10-07):
+    # without it a careless promotion outran capacity and folded the anchor.
+    promotionLevel: { semi-pro: 1, professional: 2, elite: 3 }
     modernize:
       fromLevel: 4
       hardcoreDemotionShare: 0.02

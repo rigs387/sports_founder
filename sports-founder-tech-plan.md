@@ -831,11 +831,33 @@ keep the Phase 0 model, no cap, no payroll detail. Standing policies and ticket 
    read-only venue card on the Flagship tab; finances split operations, payroll and upkeep; wages
    in the Stars panel. Moments: a level opens (big at the modernization level), a record crowd.
    i18n for every string; smoke screenshots.
-5. **Bots, runner and measure.** The builder bot builds when hardcore overflow is near and cash
-   covers the price with a reserve; the others never build. The runner reports gate lost to the
+5. **Bots, runner and measure.** Every bot builds (see step 3's note). The runner reports gate lost to the
    cap, venue levels by league tier, payroll's share of running cost and wages per star. Measure
    pacing, the #1 contest and the flagship's Near-Collapse rate on seeds 1–3; tune capacity so
    level 1 bites around Semi-Pro. Docs: a `docs/venues/README.md`, progress, CLAUDE.md, cheat sheet.
+
+*Step 1 built 2026-10-07.* `LeagueState.venue` (level, building, record) on every league
+(`src/sim/venues.ts`: `newVenue`, `venueCapacity`, `seatedCrowd`); season summaries carry `crowd`
+and `recordCrowd`. Config `leagues.venue` and `flagship.payroll`. Save format 22.
+
+*Steps 2–3 built 2026-10-07.* The seat's gate is paid on `seatedCrowd` (in
+`leagueIncomePerQuarter`). `leagueCosts` (`src/sim/league-costs.ts`) is every league's cost a
+quarter: running cost, upkeep on levels above 1 anywhere, and at the seat the payroll split and
+star wages (`starWage` in flagship.ts); `stepLeagueQuarter` takes it from the caller as it takes
+income, and league quotes and the snapshot use it. `venue-actions.ts`: `venueTerms`,
+`venueBlocker`, `buildVenue` (the `buildVenue` action) and `openVenues` (run by
+`closeOffseason`; `venueOpened` landmark; at the modernization level `modernizeGrounds`, the
+naming-rights betrayal shared through `betrayGrounds`). `venueConversion` lifts hardcore
+conversion at the seat. A season's crowd sets the league's first record; beating the record by
+`recordMargin` is a record crowd, one more fame fact for the champion's ground or the final's host.
+Found in measurement: capacity keyed to the promotion thresholds (0.25–8%) cut Austria's gate to
+1.5% of its old value, since anchors hold 3–5% hardcore at Professional and 15–36% in Elite;
+shares are now 1/3/8/15/30%. Even then the naive bot outran its venue and folded the anchor in 6 of
+8 Austria seeds (0 before the cap), so promotion at the seat now needs venue level 1/2/3 for
+Semi-Pro/Professional/Elite (`promotionLevel`, a `venue` blocker; decided with the user), which
+brought it to 0 of 8 with tier 5 at turn 103 (102.5 before). Every bot builds, not only the
+builder: when its seats are full (the builder at 80%, keeping 4 quarters of costs). Promotion
+terms carry the revenue at the new tier with today's venue, for the review (step 4).
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 

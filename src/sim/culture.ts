@@ -190,6 +190,12 @@ function finalHost(summary: SeasonSummary): number | null {
   return summary.format === "american" ? (summary.playoffs.at(-1)?.homeId ?? null) : null;
 }
 
+/** The ground a record crowd is credited to (GDD v1.30): the final's host, else the champion's. */
+function recordGround(summary: SeasonSummary): number | null {
+  if (!summary.recordCrowd) return null;
+  return finalHost(summary) ?? summary.championId;
+}
+
 /** A name from a pool, picked by a stable key (never a random stream). */
 function poolName(pool: readonly string[] | undefined, key: string): string | null {
   if (!pool || pool.length === 0) return null;
@@ -356,11 +362,12 @@ class CultureUpdate {
     // The derby: the same two clubs first and second (or in the final).
     this.derby([summary.championId, summary.runnerUpId], countryId, summary.season, year);
 
-    // Famous grounds: titles won and finals hosted.
+    // Famous grounds: titles won, finals hosted and record crowds (one more fact each).
     const host = finalHost(summary);
     const clubsHere = summary.standings.map((row) => row.clubId);
     for (const clubId of clubsHere) {
-      const fact = summary.championId === clubId || host === clubId;
+      const fact =
+        summary.championId === clubId || host === clubId || recordGround(summary) === clubId;
       const venue = this.livingOf("venue", (t) => t.clubIds[0] === clubId);
       if (venue) {
         if (fact) this.renew(venue, year);
@@ -369,10 +376,19 @@ class CultureUpdate {
       if (!fact) continue;
       const since = this.lostSince("venue", (t) => t.clubIds[0] === clubId);
       const factSeasons = leagueSeasons
-        .filter((s) => s.season >= since && (s.championId === clubId || finalHost(s) === clubId))
+        .filter(
+          (s) =>
+            s.season >= since &&
+            (s.championId === clubId || finalHost(s) === clubId || recordGround(s) === clubId),
+        )
         .map((s) => s.season);
+      const records = leagueSeasons.filter(
+        (s) => s.season >= since && recordGround(s) === clubId,
+      ).length;
       const facts =
-        factSeasons.length + (clubId === foundingClubId ? this.config.venue.foundingFacts : 0);
+        factSeasons.length +
+        records +
+        (clubId === foundingClubId ? this.config.venue.foundingFacts : 0);
       const threshold = birthThreshold(world, state.identity, "venue", this.config.venue.fameFacts);
       if (facts >= threshold)
         this.born("venue", countryId, { clubIds: [clubId], seasons: factSeasons }, year);
@@ -726,17 +742,42 @@ export function betrayGround(state: GameState, world: World, clubId: number): Ga
           clubId === state.identity.foundingClubId &&
           t.clubIds.includes(clubId))),
   );
-  if (betrayed.length === 0 || seat < 0) return state;
-  const settings = world.config.flagship.deals.namingRights;
-  const held = heldStrength(betrayed, state, world)[seat] ?? 0;
+  return betrayGrounds(state, world, seat, betrayed, world.config.flagship.deals.namingRights);
+}
+
+/**
+ * Modernizing the grounds (GDD v1.30): opening a venue level at or past `modernize.fromLevel`
+ * betrays every famous venue in the country, as naming rights do.
+ */
+export function modernizeGrounds(state: GameState, world: World, index: number): GameState {
+  const countryId = world.countries[index]?.id;
+  const betrayed = state.culture.traditions.filter(
+    (t) => living(t) && t.type === "venue" && t.countryId === countryId,
+  );
+  return betrayGrounds(state, world, index, betrayed, world.config.leagues.venue.modernize);
+}
+
+/**
+ * Grounds betrayed in a country: each tradition wears by traditionWear, and hardcoreDemotionShare
+ * × their held strength there × the ethos's rename factor of hardcore fans there turn casual.
+ */
+function betrayGrounds(
+  state: GameState,
+  world: World,
+  index: number,
+  betrayed: Tradition[],
+  settings: { hardcoreDemotionShare: number; traditionWear: number },
+): GameState {
+  if (betrayed.length === 0 || index < 0) return state;
+  const held = heldStrength(betrayed, state, world)[index] ?? 0;
   const share = Math.min(
     1,
     settings.hardcoreDemotionShare * held * ethosFactor(world, state.identity, "rename"),
   );
   const countries = [...state.countries];
-  const country = countries[seat];
+  const country = countries[index];
   if (country && share > 0) {
-    countries[seat] = {
+    countries[index] = {
       ...country,
       fans: country.fans.map((fans, f) =>
         f === PLAYER_INDEX ? demoteHardcore(fans, share) : fans,

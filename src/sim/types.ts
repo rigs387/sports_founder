@@ -593,6 +593,15 @@ export type Landmark =
       countryId: string;
       reason: "moved" | "returned";
     }
+  /** A venue level opened (GDD v1.30); at the modernization level it betrayed famous grounds. */
+  | {
+      kind: "venueOpened";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      level: number;
+      modernized: boolean;
+    }
   /** A tradition was born from recorded facts (GDD v1.22). */
   | {
       kind: "traditionBorn";

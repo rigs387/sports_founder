@@ -22,7 +22,7 @@ import {
   stepQuarter,
   totalRounds,
 } from "../src/sim";
-import { cardless, countryIndex, setupFor, withConfig, world } from "./helpers";
+import { cardless, countryIndex, setupFor, venueless, withConfig, world } from "./helpers";
 
 const start = (format: "european" | "american" = "european", anchor = "brazil", seed = 11) =>
   createCampaign(world, { ...setupFor(seed, anchor), seasonFormat: format });
@@ -280,7 +280,7 @@ describe("saves before the flagship", () => {
     expect(loaded.seasonFormat).toBe("european");
     expect(loaded.flagship.countryId).toBe(played.anchorCountryId);
     expect(loaded.flagship.seasons).toEqual([]);
-    expect(loaded.countries).toStrictEqual(played.countries);
+    expect(loaded.countries).toStrictEqual(venueless(played));
     expect(checkInvariants(runTurns(loaded, world, 8), world)).toEqual([]);
   });
 });

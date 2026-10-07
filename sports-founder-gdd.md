@@ -1122,6 +1122,11 @@ purchased traits and percentage modifiers alone do not make culture.
     capacity. Capacity at levels 1–5 is a share of the country's population, keyed roughly to the
     promotion thresholds, so level 1 bites around Semi-Pro and a growing flagship stalls on gate
     until it builds.
+  - *Promotion needs the venue (decided 2026-10-07, after measurement):* at the seat, promotion
+    to Semi-Pro, Professional and Elite needs venue level 1, 2 and 3 (config), a blocker beside
+    hardcore and reserve. Without it a careless promotion outran capacity and folded the anchor
+    (the naive bot from Austria: 6 of 8 seeds; with the gate 0 of 8, pacing unchanged). The
+    promotion review also shows the new tier's costs against revenue at today's capacity.
   - *Building:* bought with cash in the offseason, one level at a time; a level's price is quarters
     of the league's running cost, rising with the level, and it takes several seasons to build.
     The old capacity keeps working while it builds. Upkeep joins the running cost when a level

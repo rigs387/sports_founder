@@ -14,7 +14,15 @@ import {
   stepQuarter,
   type World,
 } from "../src/sim";
-import { cardless, crowdless, migratedCulture, setupFor, withConfig, world } from "./helpers";
+import {
+  cardless,
+  crowdless,
+  migratedCulture,
+  setupFor,
+  venueless,
+  withConfig,
+  world,
+} from "./helpers";
 
 // Stars and careers (GDD v1.16, tech plan 2.6 step 4).
 
@@ -163,6 +171,7 @@ describe("save format 13", () => {
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 12, state: v12 }), world);
     const expected: GameState = {
       ...played,
+      countries: venueless(played),
       flagship: {
         ...played.flagship,
         players: plain,

@@ -18,7 +18,15 @@ import {
   stepQuarter,
   type World,
 } from "../src/sim";
-import { countryIndex, crowdless, migratedCulture, setupFor, withConfig, world } from "./helpers";
+import {
+  countryIndex,
+  crowdless,
+  migratedCulture,
+  setupFor,
+  venueless,
+  withConfig,
+  world,
+} from "./helpers";
 
 // Backing stars (GDD v1.16, tech plan 2.6 step 5).
 
@@ -186,6 +194,7 @@ describe("bots and saves", () => {
     expect(serializeSave(loaded)).toBe(
       serializeSave({
         ...state,
+        countries: venueless(state),
         flagship: { ...state.flagship, seasons: crowdless(state.flagship.seasons) },
         culture: migratedCulture(state),
       }),

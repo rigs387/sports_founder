@@ -176,6 +176,13 @@ export function invariantsOf(state: GameState, world: World): string[] {
       if (!LEAGUE_TIERS.includes(league.tier)) problems.push(`${country.id}: bad league tier`);
       if (!HEALTH_LEVELS.includes(league.health)) problems.push(`${country.id}: bad league health`);
       if (!Number.isFinite(league.cash)) problems.push(`${country.id}: league cash is not finite`);
+      const { level, building } = league.venue;
+      if (!Number.isInteger(level) || level < 1 || level > 5) {
+        problems.push(`${country.id}: bad venue level`);
+      }
+      if (building && building.level !== level + 1) {
+        problems.push(`${country.id}: a venue build skips a level`);
+      }
       if (league.formedQuarter > state.quarter) {
         problems.push(`${country.id}: league formed in the future`);
       }

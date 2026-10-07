@@ -81,6 +81,18 @@ export function migratedCulture(state: GameState) {
   );
 }
 
+/** Leagues as an older save gains them on loading (format 22): level 1, nothing built, no record. */
+export function venueless(state: GameState): GameState["countries"] {
+  return state.countries.map((country) =>
+    country.league
+      ? {
+          ...country,
+          league: { ...country.league, venue: { level: 1, building: null, record: null } },
+        }
+      : country,
+  );
+}
+
 /** Seasons as an older save gains them on loading (format 22): no crowd, no record. */
 export function crowdless(seasons: GameState["flagship"]["seasons"]) {
   return seasons.map((season) => ({ ...season, crowd: null, recordCrowd: false }));
@@ -88,7 +100,7 @@ export function crowdless(seasons: GameState["flagship"]["seasons"]) {
 
 /**
  * The world without the flagship's ways of reaching fans: no season, star or tradition cards, no
- * tradition effects and no broadcast (GDD v1.15, v1.16, v1.22, v1.23). Its matches alone must
+ * tradition effects, no broadcast and no star wages (GDD v1.15, v1.16, v1.22, v1.23, v1.30). Its matches alone must
  * leave the world as it was.
  */
 export function cardless(base: World): World {
@@ -99,7 +111,11 @@ export function cardless(base: World): World {
     config: {
       ...base.config,
       culture: { ...culture, turnoverCut: 0, poachCut: 0, pilgrimage: 0, seatWeight: 0 },
-      flagship: { ...flagship, broadcast: { ...flagship.broadcast, ceiling: silent } },
+      flagship: {
+        ...flagship,
+        broadcast: { ...flagship.broadcast, ceiling: silent },
+        payroll: { ...flagship.payroll, wageShare: 0 },
+      },
     },
     events: {
       ...base.events,

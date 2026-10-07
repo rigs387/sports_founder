@@ -284,6 +284,13 @@ export const landmarks = {
     countryId: string,
     reason: "moved" | "returned",
   ): Landmark => ({ kind: "seatMoved", turn, quarter, from, countryId, reason }),
+  venueOpened: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    level: number,
+    modernized: boolean,
+  ): Landmark => ({ kind: "venueOpened", turn, quarter, countryId, level, modernized }),
   rivalRuleCopied: (
     turn: number,
     quarter: number,

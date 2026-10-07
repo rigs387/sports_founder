@@ -20,7 +20,7 @@ import {
   snapshot,
   stepQuarter,
 } from "../src/sim";
-import { setupFor, withConfig, world } from "./helpers";
+import { setupFor, venueless, withConfig, world } from "./helpers";
 
 const start = () => createCampaign(world, setupFor(424242, "brazil"));
 function firstDecision() {
@@ -164,7 +164,7 @@ describe("event triggers and settlement", () => {
     const { events: _events, ...rest } = old;
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 6, state: rest }), world);
     expect(loaded.events).toStrictEqual(emptyEvents(loaded.landmarks.length));
-    expect(loaded.countries).toStrictEqual(old.countries);
+    expect(loaded.countries).toStrictEqual(venueless(old));
   });
 });
 

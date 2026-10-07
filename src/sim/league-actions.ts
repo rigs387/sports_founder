@@ -1,5 +1,7 @@
 import { offseasonOpen } from "./calendar";
-import { bailoutTerms, leagueTierIndex, promotionTerms, runningCostPerQuarter } from "./leagues";
+import { leagueIncomePerQuarter } from "./deals";
+import { leagueCosts } from "./league-costs";
+import { bailoutTerms, leagueTierIndex, promotionTerms } from "./leagues";
 import {
   type GameState,
   type HealthLevel,
@@ -15,6 +17,7 @@ export type LeagueActionBlocker =
   | { kind: "window" }
   | { kind: "topTier"; tier: LeagueTierId }
   | { kind: "hardcore"; to: LeagueTierId; needed: number; current: number }
+  | { kind: "venue"; to: LeagueTierId; needed: number; current: number }
   | { kind: "reserve"; to: LeagueTierId; needed: number; current: number }
   | { kind: "notNearCollapse"; health: HealthLevel }
   | { kind: "bottomTier" }
@@ -31,6 +34,8 @@ export interface LeagueActions {
       reserveNeeded: number;
       cost: number;
       runningCostPerQuarter: number;
+      /** Income a quarter at the new tier with today's fans and venue (GDD v1.30). */
+      revenuePerQuarter: number;
     } | null;
   };
   stepDownLeague: {
@@ -61,6 +66,10 @@ export function leagueActions(state: GameState, world: World, index: number): Le
   const hardcore = country.fans[PLAYER_INDEX]?.hardcore ?? 0;
   const promotion = promotionTerms(world, index, league.tier, state.growthNodes);
   const to = LEAGUE_TIERS[leagueTierIndex(league.tier) - 1];
+  // At the seat, promotion needs the venue (GDD v1.30).
+  const atSeat = world.countries[index]?.id === state.flagship.countryId;
+  const levels: Partial<Record<LeagueTierId, number>> = world.config.leagues.venue.promotionLevel;
+  const venueNeeded = atSeat && promotion ? (levels[promotion.to] ?? 1) : 1;
   const bailout = bailoutTerms(state, world, index);
   const remainingQuarters = Math.max(0, league.bailoutReadyQuarter - state.quarter);
   const ended: LeagueActionBlocker | null = state.outcome ? { kind: "ended" } : null;
@@ -77,14 +86,16 @@ export function leagueActions(state: GameState, world: World, index: number): Le
               needed: promotion.hardcoreNeeded,
               current: hardcore,
             }
-          : league.cash < promotion.reserveNeeded
-            ? {
-                kind: "reserve",
-                to: promotion.to,
-                needed: promotion.reserveNeeded,
-                current: league.cash,
-              }
-            : null);
+          : venueNeeded > league.venue.level
+            ? { kind: "venue", to: promotion.to, needed: venueNeeded, current: league.venue.level }
+            : league.cash < promotion.reserveNeeded
+              ? {
+                  kind: "reserve",
+                  to: promotion.to,
+                  needed: promotion.reserveNeeded,
+                  current: league.cash,
+                }
+              : null);
   const stepDownBlocker: LeagueActionBlocker | null =
     ended ??
     (league.health !== "near-collapse"
@@ -107,12 +118,8 @@ export function leagueActions(state: GameState, world: World, index: number): Le
       terms: promotion
         ? {
             ...promotion,
-            runningCostPerQuarter: runningCostPerQuarter(
-              world,
-              index,
-              promotion.to,
-              state.growthNodes,
-            ),
+            runningCostPerQuarter: leagueCosts(state, world, index, undefined, promotion.to).total,
+            revenuePerQuarter: leagueIncomePerQuarter(state, world, index, undefined, promotion.to),
           }
         : null,
     },
@@ -125,7 +132,7 @@ export function leagueActions(state: GameState, world: World, index: number): Le
             hardcoreDemoted: Math.floor(
               hardcore * world.config.leagues.stepDown.hardcoreDemotionShare,
             ),
-            runningCostPerQuarter: runningCostPerQuarter(world, index, to, state.growthNodes),
+            runningCostPerQuarter: leagueCosts(state, world, index, undefined, to).total,
           }
         : null,
     },
@@ -152,6 +159,8 @@ export function leagueActionReason(blocker: LeagueActionBlocker | null): string 
       return `the league is already ${blocker.tier}, the top tier`;
     case "hardcore":
       return `not enough hardcore fans for ${blocker.to}: needs ${blocker.needed}, has ${blocker.current}`;
+    case "venue":
+      return `${blocker.to} at the seat needs venue level ${blocker.needed}, it is ${blocker.current}`;
     case "reserve":
       return `not enough cash reserve for ${blocker.to}: needs ${blocker.needed.toFixed(1)}, has ${blocker.current.toFixed(1)}`;
     case "notNearCollapse":

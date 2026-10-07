@@ -23,6 +23,7 @@ import { landmarks } from "./records";
 import { amendBlocker, amendmentJump, amendmentPrice, amendRule } from "./rules";
 import { computeExposure } from "./spread";
 import { type AxisId, type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } from "./types";
+import { buildVenue, venueBlocker } from "./venue-actions";
 
 // The player's legal actions. Every action, from the UI or a bot, goes through applyAction, which
 // validates legality first, so nothing can bypass the rules.
@@ -44,6 +45,8 @@ import { type AxisId, type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } f
 //                   ends and its followers' purists turn casual (GDD v1.22)
 //   signDeal        sign a flagship deal offer, in the offseason; the slot's other offers are
 //                   withdrawn (GDD v1.28)
+//   buildVenue      start building the seat's next venue level with league cash, in the
+//                   offseason, one level at a time (GDD v1.30)
 
 export type Action =
   | { type: "collectMoment"; eventId: number }
@@ -60,7 +63,8 @@ export type Action =
   | { type: "amendRule"; axis: AxisId; option: string }
   | { type: "nameTrophy"; name: string }
   | { type: "renameTrophy"; name: string }
-  | { type: "signDeal"; offerId: number };
+  | { type: "signDeal"; offerId: number }
+  | { type: "buildVenue" };
 
 export class IllegalActionError extends Error {
   override name = "IllegalActionError";
@@ -223,6 +227,22 @@ export function checkAction(state: GameState, world: World, action: Action): str
     }
   }
   if (action.type === "dropStar") return dropBlocker(state, world, action.playerId);
+  if (action.type === "buildVenue") {
+    switch (venueBlocker(state, world)) {
+      case "window":
+        return "venues are built only in the offseason";
+      case "league":
+        return "the seat's country has no league";
+      case "top":
+        return "the venue is already at the top level";
+      case "building":
+        return "a venue level is already being built";
+      case "cash":
+        return "the league cannot afford the next venue level";
+      case null:
+        return null;
+    }
+  }
 
   if (action.type === "moveSeat") {
     if (countryIndexOf(world, action.countryId) < 0) return `unknown country "${action.countryId}"`;
@@ -367,6 +387,8 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
     }
     case "dropStar":
       return dropStar(state, world, action.playerId);
+    case "buildVenue":
+      return buildVenue(state, world);
     case "moveSeat":
       return {
         ...state,

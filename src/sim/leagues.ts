@@ -199,6 +199,8 @@ export function stepLeagueQuarter(
   quarter: number,
   /** The league's income this quarter (leagueIncomePerQuarter in src/sim/deals.ts). */
   income: number,
+  /** The league's costs this quarter (leagueCosts in src/sim/league-costs.ts). */
+  cost: number,
 ): QuarterLeagueResult {
   const fans = country.fans[PLAYER_INDEX];
   if (!fans) throw new Error(`No player fans in "${country.countryId}"`);
@@ -221,7 +223,6 @@ export function stepLeagueQuarter(
   }
 
   const league = country.league;
-  const cost = runningCostPerQuarter(world, countryIndex, league.tier, state.growthNodes);
   return {
     country: { ...country, league: { ...league, cash: league.cash + income - cost } },
     landmark: null,

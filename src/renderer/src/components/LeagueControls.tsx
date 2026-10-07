@@ -62,6 +62,12 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
           needed: blocker.needed,
           current: blocker.current,
         });
+      case "venue":
+        return t("league.manage.blockers.venue", {
+          tier: tier(blocker.to),
+          needed: blocker.needed,
+          current: blocker.current,
+        });
       case "reserve":
         return t("league.manage.blockers.reserve", {
           needed: blocker.needed,

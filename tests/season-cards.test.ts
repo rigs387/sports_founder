@@ -26,6 +26,7 @@ import {
   migratedCulture,
   setupFor,
   sweepAnchors,
+  venueless,
   withWorld,
   world,
 } from "./helpers";
@@ -393,6 +394,7 @@ describe("season cards in play", () => {
     expect(serializeSave(loaded)).toBe(
       serializeSave({
         ...played,
+        countries: venueless(played),
         flagship: {
           ...played.flagship,
           scoring: "medium",

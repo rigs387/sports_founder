@@ -16,7 +16,12 @@ export function withSeason(
   state: GameState,
   championId: number,
   runnerUpId: number,
-  options: { format?: "european" | "american"; host?: number; newStarId?: number } = {},
+  options: {
+    format?: "european" | "american";
+    host?: number;
+    newStarId?: number;
+    recordCrowd?: boolean;
+  } = {},
 ): GameState {
   const clubs = activeClubs(state.flagship);
   const order = [championId, runnerUpId, ...clubs.map((c) => c.id)].filter(
@@ -58,7 +63,7 @@ export function withSeason(
     topScorer: null,
     newStarId: options.newStarId ?? null,
     crowd: null,
-    recordCrowd: false,
+    recordCrowd: options.recordCrowd ?? false,
   };
   return {
     ...state,

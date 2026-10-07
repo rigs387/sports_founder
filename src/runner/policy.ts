@@ -20,6 +20,7 @@ import {
   type GameState,
   growthNode,
   heldStrength,
+  leagueCosts,
   leagueIncomePerQuarter,
   leverMultipliers,
   nodeCost,
@@ -27,9 +28,11 @@ import {
   optionNetDelta,
   PLAYER_INDEX,
   promotionTerms,
-  runningCostPerQuarter,
   SEED_WARM_UP_DRAWS,
   seatStars,
+  venueBlocker,
+  venueCapacity,
+  venueTerms,
   type World,
 } from "../sim";
 import { chooseEvents, EVENT_WEIGHTS, type EventWeights } from "./event-policy";
@@ -107,6 +110,13 @@ const BUILDER_RESERVE_BAILOUTS = 1;
  * Score in each market) beats the share of its hardcore fans it would lose by this margin.
  */
 const AMEND_MARGIN = 0.05;
+/**
+ * Venues (GDD v1.30): every bot builds the seat's next level once its hardcore fans fill this
+ * share of capacity and the price leaves this many quarters of the league's costs in cash. The
+ * builder plans ahead; the others build when the seats are already full.
+ */
+const VENUE_FULL = { builder: 0.8, other: 1 };
+const VENUE_RESERVE_QUARTERS = { builder: 4, other: 0 };
 const TURTLE_RESERVE_BAILOUTS = 2;
 
 export interface BotStep {
@@ -274,6 +284,7 @@ function greedySpreadTurn(state: GameState, world: World): BotStep {
     attempt(step, world, { type: "promoteLeague", countryId: country.id });
   }
   backStars(step, world, 0);
+  buildVenues(step, world, VENUE_FULL.other, VENUE_RESERVE_QUARTERS.other);
   signDeals(step, world);
   buyNodes(step, world, 0, cheapest(step, world));
   return step;
@@ -347,7 +358,7 @@ function manageLeagues(step: BotStep, world: World): void {
     const terms = promotionTerms(world, index, league.tier, owned);
     if (!terms) continue;
     const revenue = leagueIncomePerQuarter(step.state, world, index, current, terms.to);
-    const cost = runningCostPerQuarter(world, index, terms.to, owned);
+    const cost = leagueCosts(step.state, world, index, current, terms.to).total;
     if (revenue < cost * BUILDER_MARGIN) continue;
     if (league.cash < terms.reserveNeeded + terms.cost) continue;
     attempt(step, world, { type: "promoteLeague", countryId: country.id });
@@ -382,6 +393,21 @@ function signDeals(step: BotStep, world: World): void {
     )[0];
     if (!best || !attempt(step, world, { type: "signDeal", offerId: best.id })) return;
   }
+}
+
+/** Builds the seat's next venue level when its seats fill to `full` and cash keeps a reserve. */
+function buildVenues(step: BotStep, world: World, full: number, reserveQuarters: number): void {
+  if (venueBlocker(step.state, world) !== null) return;
+  const terms = venueTerms(step.state, world);
+  const index = indexOf(world, step.state.flagship.countryId);
+  const country = step.state.countries[index];
+  const league = country?.league;
+  const hardcore = country?.fans[PLAYER_INDEX]?.hardcore ?? 0;
+  if (!terms || !league) return;
+  if (hardcore < full * venueCapacity(world, index, league.venue.level)) return;
+  const reserve = reserveQuarters * leagueCosts(step.state, world, index).total;
+  if (league.cash - terms.price < reserve) return;
+  attempt(step, world, { type: "buildVenue" });
 }
 
 /**
@@ -441,6 +467,7 @@ function builderTurn(state: GameState, world: World, options: BotOptions): BotSt
   if (options.amend)
     amendRules(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   backStars(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
+  buildVenues(step, world, VENUE_FULL.builder, VENUE_RESERVE_QUARTERS.builder);
   signDeals(step, world);
   buyNodes(
     step,
@@ -508,6 +535,7 @@ function anchorTurtleTurn(state: GameState, world: World): BotStep {
 
   const pickCheapest = cheapest(step, world);
   backStars(step, world, bailoutReserve(step.state, world, TURTLE_RESERVE_BAILOUTS));
+  buildVenues(step, world, VENUE_FULL.other, VENUE_RESERVE_QUARTERS.other);
   signDeals(step, world);
   buyNodes(step, world, bailoutReserve(step.state, world, TURTLE_RESERVE_BAILOUTS), (candidates) =>
     pickCheapest(candidates.filter((id) => nodeValue(step.state, world, id, anchorIndex) > 0)),
@@ -549,6 +577,7 @@ function mediaRushTurn(state: GameState, world: World): BotStep {
     });
   const reserve = bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS);
   backStars(step, world, reserve);
+  buildVenues(step, world, VENUE_FULL.other, VENUE_RESERVE_QUARTERS.other);
   signDeals(step, world);
   const pickCheapest = cheapest(step, world);
   buyNodes(step, world, reserve, (candidates) =>

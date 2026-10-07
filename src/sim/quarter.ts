@@ -7,6 +7,7 @@ import { fandomScore } from "./fandom";
 import { backingEffects, broadcastEffects, closeOffseason, stepFlagshipQuarter } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { type GrowthFactors, growthFactors } from "./growth";
+import { leagueCosts } from "./league-costs";
 import { stepLeagueQuarter } from "./leagues";
 import { poachableHardcore, poachingRates } from "./poaching";
 import { landmarks, yearlySnapshot } from "./records";
@@ -24,6 +25,7 @@ import {
   type SportState,
   type World,
 } from "./types";
+import { venueConversion } from "./venues";
 
 // Quarterly simulation (GDD Fan Model, Sport Genome, Spread Model, Rival AI, Business Layer). Every
 // rate is config.
@@ -160,7 +162,8 @@ export function stepQuarter(
         rivalry.hardcoreFactor *
         (countryExposure.focused ? config.focus.conversionMultiplier : 1) *
         factors.hardcoreConversion *
-        eventRates.hardcore,
+        eventRates.hardcore *
+        venueConversion(state, world, index),
     };
     const moved = stepCountryFans(
       countryState,
@@ -180,6 +183,7 @@ export function stepQuarter(
       state,
       quarter,
       leagueIncomePerQuarter(state, world, index, moved),
+      leagueCosts(state, world, index, moved).total,
     );
     if (business.landmark) found.push(business.landmark);
     return business.country;

@@ -547,6 +547,7 @@
         "window": "Promotion is only available during the offseason.",
         "topTier": "{{tier}} is the highest league tier.",
         "hardcore": "Not enough hardcore fans: {{current, number}} of {{needed, number}} required.",
+        "venue": "{{tier}} needs a level {{needed}} venue; this one is level {{current}}. Build it in the offseason.",
         "reserve": "Not enough local cash: {{current, number(maximumFractionDigits: 1)}} of {{needed, number(maximumFractionDigits: 1)}} required.",
         "notNearCollapse": "Restructuring requires Near-Collapse health. This league is {{health}}.",
         "bottomTier": "An Amateur league cannot step down further.",
@@ -934,7 +935,8 @@
       "amendRule": "{{trait}} is now {{option}}. The amendment is in the rulebook.",
       "nameTrophy": "The trophy is now called {{name}}.",
       "renameTrophy": "The trophy is now called {{name}}. Its old name is history.",
-      "signDeal": "Deal signed. It pays from the next season."
+      "signDeal": "Deal signed. It pays from the next season.",
+      "buildVenue": "Building has started. The new level opens in a later offseason."
     }
   },
   "map": {

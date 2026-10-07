@@ -18,6 +18,7 @@ import type {
   World,
 } from "./types";
 import { PLAYER_INDEX } from "./types";
+import { seatedCrowd } from "./venues";
 
 // Flagship deals (GDD v1.28, tech plan 2.15). Only the flagship signs deals. Each offseason every
 // open slot (one TV slot, sponsor slots by league tier, a naming-rights slot for the founding
@@ -434,8 +435,9 @@ export function exclusiveTv(flagship: FlagshipState): boolean {
 
 /**
  * A league's income a quarter: gate plus the media line, cut by a rival's sponsor lockout. At
- * the flagship the media line keeps only its baseline share and signed deals pay on top; they are
- * locked, so no countermove cuts them (GDD v1.28). `country` and `tier` default to the state's.
+ * the flagship the gate is paid only on the hardcore fans its venue seats (GDD v1.30), the media
+ * line keeps only its baseline share and signed deals pay on top; they are locked, so no
+ * countermove cuts them (GDD v1.28). `country` and `tier` default to the state's.
  */
 export function leagueIncomePerQuarter(
   state: Pick<GameState, "countries" | "flagship" | "ppTier" | "growthNodes">,
@@ -444,8 +446,11 @@ export function leagueIncomePerQuarter(
   country: CountryState | undefined = state.countries[index],
   tier: LeagueTierId | undefined = country?.league?.tier,
 ): number {
-  const fans = country?.fans[PLAYER_INDEX];
-  if (!country || !fans || tier === undefined) return 0;
+  const all = country?.fans[PLAYER_INDEX];
+  if (!country || !all || tier === undefined) return 0;
+  const atSeat = world.countries[index]?.id === state.flagship.countryId;
+  const level = country.league?.venue.level ?? 1;
+  const fans = atSeat ? { ...all, hardcore: seatedCrowd(world, index, level, all.hardcore) } : all;
   const revenue = revenuePerQuarter(
     world,
     index,
@@ -458,7 +463,7 @@ export function leagueIncomePerQuarter(
       growthFactorsAt(world, state.growthNodes, index).countermoveEffect,
     ),
   );
-  if (world.countries[index]?.id !== state.flagship.countryId) return revenue.total;
+  if (!atSeat) return revenue.total;
   return (
     revenue.gate +
     revenue.media * flagshipMediaShare(state.flagship, world) +

@@ -11,7 +11,7 @@ import { leverMultipliers, similarityEffect } from "./genome";
 import { type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
 import { type LeagueActions, leagueActions } from "./league-actions";
-import { runningCostPerQuarter } from "./leagues";
+import { type LeagueCosts, leagueCosts } from "./league-costs";
 import { type RulesSnapshot, rulesSnapshot } from "./rules";
 import { computeExposure } from "./spread";
 import { tierStatus } from "./tiers";
@@ -28,6 +28,7 @@ import {
   type TimedCountermoveKind,
   type World,
 } from "./types";
+import { seatedCrowd, venueCapacity } from "./venues";
 import { countsTowardHold, standing } from "./win";
 
 const QUARTERS_PER_YEAR = 4;
@@ -38,8 +39,20 @@ export interface LeagueSnapshot {
   health: HealthLevel;
   cash: number;
   revenuePerQuarter: number;
+  /** Every cost a quarter: running cost, payroll, star wages and venue upkeep. */
   runningCostPerQuarter: number;
+  /** The cost lines (GDD v1.30): payroll and wages only at the seat. */
+  costs: LeagueCosts;
   lastFlowPerQuarter: number | null;
+  /** The venue (GDD v1.30): capacity caps the gate only at the seat. */
+  venue: {
+    level: number;
+    capacity: number;
+    /** Hardcore fans seated now. */
+    seated: number;
+    building: { level: number; opensSeason: number } | null;
+    record: number | null;
+  };
 }
 
 /** One country as the UI sees it: the player's standing there and why it is moving. */
@@ -191,6 +204,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     const levers = leverMultipliers(world, state.genome, index);
     const score = fandomScore(fans.casual, fans.hardcore, casualWeight);
     const league = countryState.league;
+    const costs = leagueCosts(state, world, index);
     return {
       countryId: country.id,
       population: country.population,
@@ -223,13 +237,16 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
             health: league.health,
             cash: league.cash,
             revenuePerQuarter: leagueIncomePerQuarter(state, world, index),
-            runningCostPerQuarter: runningCostPerQuarter(
-              world,
-              index,
-              league.tier,
-              state.growthNodes,
-            ),
+            runningCostPerQuarter: costs.total,
+            costs,
             lastFlowPerQuarter: league.lastFlowPerQuarter,
+            venue: {
+              level: league.venue.level,
+              capacity: venueCapacity(world, index, league.venue.level),
+              seated: seatedCrowd(world, index, league.venue.level, fans.hardcore),
+              building: league.venue.building,
+              record: league.venue.record,
+            },
           }
         : null,
       rivals: countryState.defense.map((front) => ({

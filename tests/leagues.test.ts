@@ -105,8 +105,8 @@ describe("league formation", () => {
     const at = withCountry(base, world, OTHER, { hardcore: threshold });
     const country = (s: GameState) => s.countries[index];
     // No league yet: there is no income to count.
-    const short = stepLeagueQuarter(country(below) as never, index, world, below, 1, 0);
-    const reached = stepLeagueQuarter(country(at) as never, index, world, at, 1, 0);
+    const short = stepLeagueQuarter(country(below) as never, index, world, below, 1, 0, 0);
+    const reached = stepLeagueQuarter(country(at) as never, index, world, at, 1, 0, 0);
     expect(short.country.league).toBeNull();
     expect(short.landmark).toBeNull();
     expect(reached.country.league?.tier).toBe("amateur");
@@ -154,8 +154,8 @@ describe("league formation", () => {
       leaguesFolded: 1,
       formationReadyQuarter: 18,
     };
-    expect(stepLeagueQuarter(country, index, world, folded, 17, 0).country.league).toBeNull();
-    const reformed = stepLeagueQuarter(country, index, world, folded, 18, 0);
+    expect(stepLeagueQuarter(country, index, world, folded, 17, 0, 0).country.league).toBeNull();
+    const reformed = stepLeagueQuarter(country, index, world, folded, 18, 0, 0);
     expect(reformed.country.league).not.toBeNull();
     expect(reformed.landmark).toMatchObject({ kind: "leagueFormed", reformed: true });
   });

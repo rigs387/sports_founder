@@ -237,6 +237,14 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     reason: z.enum(["moved", "returned"]),
   }),
   z.strictObject({
+    kind: z.literal("venueOpened"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    level: z.int().min(2).max(5),
+    modernized: z.boolean(),
+  }),
+  z.strictObject({
     kind: z.literal("traditionBorn"),
     turn: z.int().min(1),
     quarter: count,

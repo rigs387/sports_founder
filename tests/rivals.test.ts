@@ -27,6 +27,7 @@ import {
   stepRivals,
   type World,
 } from "../src/sim";
+import { leagueCosts } from "../src/sim/league-costs";
 import { countryIndex, presetGenome, setupFor, withConfig, withWorld, world } from "./helpers";
 
 // Rival defense (GDD Rival AI) tested through its consequences: escalation follows the player's
@@ -546,6 +547,7 @@ describe("each countermove has its effect", () => {
         state,
         1,
         leagueIncomePerQuarter(state, world, index, country),
+        leagueCosts(state, world, index, country).total,
       ).country.league?.cash ?? 0;
     const cashOpen = cash(open);
     const cashLocked = cash(locked);

@@ -17,7 +17,7 @@ import {
   SaveError,
   serializeSave,
 } from "../src/sim";
-import { firstAnchor, migratedCulture, presetGenome, setupFor, world } from "./helpers";
+import { firstAnchor, migratedCulture, presetGenome, setupFor, venueless, world } from "./helpers";
 
 /** What a format 7 → 8 migration adds: a European flagship at the anchor, starting now. */
 function migratedFlagship(
@@ -183,7 +183,7 @@ describe("save and resume", () => {
     }
     expect(loaded.countries.map((c) => c.fans)).toStrictEqual(current.countries.map((c) => c.fans));
     expect(loaded.countries.map((c) => c.league)).toStrictEqual(
-      current.countries.map((c) => c.league),
+      venueless(current).map((c) => c.league),
     );
     expect(loaded.landmarks).toStrictEqual(current.landmarks);
     expect(loaded.tierTrack).toStrictEqual(current.tierTrack);
@@ -336,6 +336,7 @@ describe("saves with the growth tree (format 5)", () => {
     expect(serializeSave(loaded)).toBe(
       serializeSave({
         ...withoutTree,
+        countries: venueless(withoutTree),
         events: emptyEvents(withoutTree.landmarks.length),
         ...migratedFlagship(withoutTree),
         rules: { amendments: [] },
@@ -362,6 +363,7 @@ describe("saves with the growth tree (format 5)", () => {
     expect(loaded.win).toStrictEqual({ atTop: false, turnsHeld: 0, won: null });
     const migrated = {
       ...current,
+      countries: venueless(current),
       events: emptyEvents(current.landmarks.length),
       ...migratedFlagship(current),
       rules: { amendments: [] },

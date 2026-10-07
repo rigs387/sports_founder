@@ -2,7 +2,7 @@ import type { SeasonInterest } from "../content";
 import { costMultiplier, offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights } from "./culture";
 import { type DealsSnapshot, dealsSnapshot, exclusiveTv, lapseOffers, newDeals } from "./deals";
-import { demoteHardcore } from "./leagues";
+import { demoteHardcore, runningCostPerQuarter } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { seasonStories } from "./season-stories";
@@ -28,6 +28,7 @@ import {
   type TopScorer,
   type World,
 } from "./types";
+import { openVenues } from "./venue-actions";
 import { seatedCrowd } from "./venues";
 
 // The flagship league (GDD v1.11 commissioner's seat, v1.13 seat rules, v1.14 flagship season).
@@ -323,6 +324,23 @@ export function starStrength(flagship: FlagshipState, clubId: number, world: Wor
   const player = leadingPlayer(flagship, clubId);
   if (!player || player.starSince === null) return 0;
   return world.config.flagship.stars.strengthPerSkill * player.skill;
+}
+
+/**
+ * A star's wage a quarter at a league with running cost `running` (GDD v1.30): rising with each
+ * season as a star after the first and with backed influence. Never from skill.
+ */
+export function starWage(
+  player: Player,
+  flagship: FlagshipState,
+  running: number,
+  world: World,
+): number {
+  if (player.starSince === null) return 0;
+  const { wageShare, perSeason, perInfluence } = world.config.flagship.payroll;
+  const seasons = Math.max(0, flagship.season - player.starSince - 1);
+  const influence = player.backing?.influence ?? 0;
+  return wageShare * running * (1 + perSeason * seasons) * (1 + perInfluence * influence);
 }
 
 /** The stars at the seat's active clubs: the ones holding the league's star places. */
@@ -1254,7 +1272,7 @@ export function stepFlagshipQuarter(
     ...state.flagship,
     quartersPlayed: state.flagship.quartersPlayed + 1,
   };
-  const nextCountries = countries;
+  let nextCountries = countries;
   const league = () => nextCountries[indexOf(world, flagship.countryId)]?.league ?? null;
 
   const clubs = new Map(activeClubs(flagship).map((club) => [club.id, club]));
@@ -1342,6 +1360,9 @@ export function stepFlagshipQuarter(
         crowd: seasonCrowd(nextCountries, world, flagship.countryId),
         recordCrowd: false,
       };
+      const crowd = recordCrowd(nextCountries, world, flagship.countryId, summary.crowd ?? 0);
+      nextCountries = crowd.countries;
+      summary.recordCrowd = crowd.record;
       if (tallies !== null) flagship = closeCareers(flagship, tallies);
       const ended = playersSeasonEnd(
         flagship,
@@ -1454,12 +1475,16 @@ export function closeOffseason(state: GameState, world: World): GameState {
   if (seatLeague !== null) flagship = fitClubs(flagship, world, rng, seatLeague.tier);
   // Unsigned deal offers lapse (GDD v1.28).
   flagship = lapseOffers(startSeason(flagship, world, state.quarter, state.genome.scoring, true));
-  return {
-    ...state,
-    flagship: { ...flagship, rng: saveRng(rng) },
-    countries,
-    landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
-  };
+  // Venue levels due by the new season open (GDD v1.30).
+  return openVenues(
+    {
+      ...state,
+      flagship: { ...flagship, rng: saveRng(rng) },
+      countries,
+      landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
+    },
+    world,
+  );
 }
 
 /**
@@ -1665,6 +1690,8 @@ export interface StarSnapshot {
   /** Why backing or dropping them is not possible now, or null when it is. */
   backBlocker: BackBlocker | null;
   dropBlocker: DropBlocker | null;
+  /** League cash a quarter the star's wage costs (GDD v1.30); 0 away from the seat. */
+  wage: number;
 }
 
 /** Backing slots, the price and what a drop at full influence costs (GDD v1.16). */
@@ -1815,7 +1842,12 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
 
 function starSnapshots(state: GameState, world: World): StarSnapshot[] {
   const flagship = state.flagship;
-  const shown = new Set([...seatStars(flagship), ...backedStars(flagship)]);
+  const atSeat = new Set(seatStars(flagship));
+  const shown = new Set([...atSeat, ...backedStars(flagship)]);
+  const seat = indexOf(world, flagship.countryId);
+  const tier = state.countries[seat]?.league?.tier;
+  const running =
+    tier === undefined ? 0 : runningCostPerQuarter(world, seat, tier, state.growthNodes);
   return [...shown]
     .sort(
       (a, b) =>
@@ -1862,6 +1894,7 @@ function starSnapshots(state: GameState, world: World): StarSnapshot[] {
         },
         backBlocker: backStarBlocker(state, world, player.id),
         dropBlocker: dropStarBlocker(state, world, player.id),
+        wage: atSeat.has(player) ? starWage(player, flagship, running, world) : 0,
       };
     });
 }
@@ -1879,6 +1912,28 @@ function backingSnapshot(state: GameState, world: World): BackingSnapshot {
         ? { factor: drain.factor, quarters: drain.quarters }
         : null,
   };
+}
+
+/**
+ * A season's crowd against the seat league's record (GDD v1.30): the first season sets it; a
+ * crowd beating it by recordMargin is a new record, a fame fact for a ground.
+ */
+function recordCrowd(
+  countries: CountryState[],
+  world: World,
+  countryId: string,
+  crowd: number,
+): { countries: CountryState[]; record: boolean } {
+  const index = indexOf(world, countryId);
+  const country = countries[index];
+  const league = country?.league;
+  if (!country || !league) return { countries, record: false };
+  const best = league.venue.record;
+  const record = best !== null && crowd >= best * (1 + world.config.leagues.venue.recordMargin);
+  if (best !== null && !record) return { countries, record };
+  const next = [...countries];
+  next[index] = { ...country, league: { ...league, venue: { ...league.venue, record: crowd } } };
+  return { countries: next, record };
 }
 
 /** Hardcore fans seated at the seat's venue now (GDD v1.30): the season's crowd. */

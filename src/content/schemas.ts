@@ -864,6 +864,11 @@ export const configFileSchema = z.strictObject({
       upkeepShare: z.number().min(0),
       conversionBoost: z.number().min(0),
       recordMargin: z.number().min(0),
+      promotionLevel: z.strictObject({
+        "semi-pro": z.int().min(1).max(5),
+        professional: z.int().min(1).max(5),
+        elite: z.int().min(1).max(5),
+      }),
       modernize: z.strictObject({
         fromLevel: z.int().min(2).max(5),
         hardcoreDemotionShare: unitInterval,
