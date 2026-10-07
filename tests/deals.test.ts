@@ -125,6 +125,12 @@ describe("offers", () => {
         firstSeason: state.flagship.season,
         lastSeason: state.flagship.season + tv.seasons - 1,
         countryId: "brazil",
+        // A fresh clause record, judged against the seat country's fans at signing (GDD v1.29).
+        clauseMet: 0,
+        clauseMisses: 0,
+        fansMark:
+          (state.countries[brazil]?.fans[PLAYER_INDEX]?.casual ?? 0) +
+          (state.countries[brazil]?.fans[PLAYER_INDEX]?.hardcore ?? 0),
       },
     ]);
     expect(signed.flagship.deals.offers.some((offer) => offer.slot === "tv")).toBe(false);
@@ -740,5 +746,75 @@ describe("bots (step 6)", () => {
       expect(signed).toContain(best?.id);
     }
     expect(played.state.flagship.deals.offers).toEqual([]);
+  });
+});
+
+describe("clauses (GDD v1.29, tech plan 2.16 step 1)", () => {
+  it("TV offers draw balance, sponsors a star, any slot fans; every slot keeps a plain offer", () => {
+    const forced = withConfig(world, (config) => {
+      const { demands } = config.flagship.deals;
+      demands.tierFloor.chance = 0;
+      demands.seatLock.chance = 0;
+      demands.exclusivity.chance = 0;
+      demands.balance.chance = 1;
+      demands.star.chance = 1;
+      demands.fans.chance = 1;
+      config.flagship.deals.ruleDemand.chancePerOffseason = 0;
+    });
+    const state = atOffers(forced);
+    for (let seed = 1; seed <= 10; seed += 1) {
+      const offers = reoffer(state, forced, seed).flagship.deals.offers;
+      const kinds = (slot: string) =>
+        new Set(offers.filter((o) => o.slot === slot && o.demand).map((o) => o.demand?.kind));
+      expect(kinds("tv")).toEqual(new Set(["balance"]));
+      expect(kinds("sponsor")).toEqual(new Set(["star"]));
+      expect(kinds("namingRights")).toEqual(new Set(["fans"]));
+      for (const key of new Set(offers.map(slotKey))) {
+        expect(
+          offers.some((o) => slotKey(o) === key && o.demand === null),
+          key,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it("clauses never break a deal; a format 20 save's deals start with no clause record", () => {
+    const base = atOffers();
+    const tv = base.flagship.deals.offers.find((o) => o.slot === "tv");
+    if (!tv) throw new Error("No TV offer");
+    const deals = {
+      ...base.flagship.deals,
+      offers: base.flagship.deals.offers.map((o) =>
+        o.id === tv.id ? { ...o, demand: { kind: "balance" as const } } : o,
+      ),
+    };
+    const signed = applyAction({ ...base, flagship: { ...base.flagship, deals } }, world, {
+      type: "signDeal",
+      offerId: tv.id,
+    });
+    const folded = signed.countries.map((c, i) => (i === brazil ? { ...c, league: null } : c));
+    expect(breakDeals({ ...signed, countries: folded }, world).flagship.deals.signed).toHaveLength(
+      1,
+    );
+
+    const v20 = {
+      ...signed,
+      flagship: {
+        ...signed.flagship,
+        deals: {
+          ...signed.flagship.deals,
+          signed: signed.flagship.deals.signed.map(
+            ({ clauseMet: _m, clauseMisses: _x, fansMark: _f, ...deal }) => deal,
+          ),
+        },
+      },
+    };
+    const loaded = deserializeSave(JSON.stringify({ formatVersion: 20, state: v20 }), world);
+    const fans = signed.countries[brazil]?.fans[PLAYER_INDEX];
+    expect(loaded.flagship.deals.signed[0]).toMatchObject({
+      clauseMet: 0,
+      clauseMisses: 0,
+      fansMark: (fans?.casual ?? 0) + (fans?.hardcore ?? 0),
+    });
   });
 });

@@ -14,6 +14,10 @@ import { useTermVars } from "../identity/terms";
 import { useDealPartnerName } from "./partners";
 import "./deals.css";
 
+/** Demands that break a deal when broken (GDD v1.28); clauses are judged softly (v1.29). */
+const BREAKABLE: readonly string[] = ["tierFloor", "seatLock", "ruleChange"];
+const CLAUSES: readonly string[] = ["balance", "star", "fans"];
+
 interface Props {
   snapshot: TurnSnapshot;
   names: Names;
@@ -53,14 +57,15 @@ export function DealsPanel({ snapshot, names, busy, onAction, readOnly = false }
         ? t("deals.demand.seatLock", {
             country: names.countries[demand.countryId] ?? demand.countryId,
           })
-        : demand.kind === "exclusivity"
-          ? t("deals.demand.exclusivity")
-          : t("deals.demand.ruleChange", {
+        : demand.kind === "ruleChange"
+          ? t("deals.demand.ruleChange", {
               ...nouns,
               trait: t(`genome.axes.${demand.axis}`),
               option: t(`genome.options.${demand.axis}.${demand.option}`),
               season: demand.dueSeason,
-            });
+            })
+          : // Exclusivity, and the clauses (GDD v1.29).
+            t(`deals.demand.${demand.kind}`, { ...nouns, country });
   /**
    * The living tradition a naming deal on this ground would betray, if any (GDD v1.28): its fame
    * first, then the founding club's rite.
@@ -149,13 +154,23 @@ export function DealsPanel({ snapshot, names, busy, onAction, readOnly = false }
         )}
         {reviewing === offer.id ? (
           <div className="deal-review">
-            {offer.demand && offer.demand.kind !== "exclusivity" && (
+            {offer.demand && BREAKABLE.includes(offer.demand.kind) && (
               <p>
                 {t("deals.breach", {
                   ...termVars({ seasons: deals.breach.shunSeasons }),
                   penalty: offer.annualValue * deals.breach.penaltySeasons,
                   partner: partner(offer.partnerId),
                   seasons: deals.breach.shunSeasons,
+                })}
+              </p>
+            )}
+            {offer.demand && CLAUSES.includes(offer.demand.kind) && (
+              <p>
+                {t("deals.clauseTerms", {
+                  ...nouns,
+                  bonus: offer.annualValue * deals.clauses.bonusShare,
+                  count: deals.clauses.walkAfterMisses,
+                  partner: partner(offer.partnerId),
                 })}
               </p>
             )}

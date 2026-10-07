@@ -323,15 +323,37 @@ export function offerDeals(state: GameState, world: World): GameState {
       const roll = nextFloat(rng);
       if (!partner) break;
       used.add(partner.id);
+      // One demand or clause, by cumulative chance in config order (GDD v1.28, v1.29).
+      const { tierFloor, seatLock, exclusivity, balance, star, fans } = settings.demands;
+      const draws: [number, DealDemandTerms][] = [
+        [tierFloorAllowed ? tierFloor.chance : 0, { kind: "tierFloor", tier: league.tier }],
+        [seatLock.chance, { kind: "seatLock", countryId: flagship.countryId }],
+        [
+          ref.slot === "tv" ? exclusivity.chance * fork.exclusivityChance : 0,
+          { kind: "exclusivity" },
+        ],
+        [ref.slot === "tv" ? balance.chance : 0, { kind: "balance" }],
+        [ref.slot === "sponsor" ? star.chance : 0, { kind: "star" }],
+        [fans.chance, { kind: "fans" }],
+      ];
       let demand: DealDemandTerms | null = null;
-      const { tierFloor, seatLock, exclusivity } = settings.demands;
-      const floor = tierFloorAllowed ? tierFloor.chance : 0;
-      const exclusive = ref.slot === "tv" ? exclusivity.chance * fork.exclusivityChance : 0;
-      if (roll < floor) demand = { kind: "tierFloor", tier: league.tier };
-      else if (roll < floor + seatLock.chance) {
-        demand = { kind: "seatLock", countryId: flagship.countryId };
-      } else if (roll < floor + seatLock.chance + exclusive) demand = { kind: "exclusivity" };
+      let edge = 0;
+      for (const [chance, terms] of draws) {
+        edge += chance;
+        if (roll < edge) {
+          demand = terms;
+          break;
+        }
+      }
       offer(ref, partner.id, ordinaryValue * spread, demand, false);
+    }
+    // Every slot keeps an offer with no demand or clause (GDD v1.29): if all demand something,
+    // the last fresh offer asks nothing, at its plain value.
+    const here = offers.filter((candidate) => sameSlot(candidate, ref));
+    const last = here[here.length - 1];
+    if (last && here.every((candidate) => candidate.demand !== null)) {
+      last.demand = null;
+      last.annualValue = ordinary.get(last.id) ?? last.annualValue;
     }
   }
 
@@ -461,7 +483,12 @@ function broken(state: GameState, world: World, deal: Deal, closing: boolean): b
         flagship.season === demand.dueSeason &&
         state.genome[demand.axis] !== demand.option
       );
+    // Exclusivity and clauses never break: exclusivity cuts the broadcast's lift, clauses are
+    // judged at season's end (GDD v1.29).
     case "exclusivity":
+    case "balance":
+    case "star":
+    case "fans":
       return false;
   }
 }
@@ -544,6 +571,8 @@ export interface DealsSnapshot {
   incomePerQuarter: number;
   /** What a breach costs: seasons of value in cash, seasons shunned. */
   breach: { penaltySeasons: number; shunSeasons: number };
+  /** How clauses are judged (GDD v1.29): the bonus share, the edge per season met, the walk. */
+  clauses: { bonusShare: number; renewalEdgePerMet: number; walkAfterMisses: number };
 }
 
 export function dealsSnapshot(state: GameState, world: World): DealsSnapshot {
@@ -570,6 +599,7 @@ export function dealsSnapshot(state: GameState, world: World): DealsSnapshot {
     mediaShare: flagshipMediaShare(flagship, world),
     incomePerQuarter: dealIncomePerQuarter(flagship),
     breach: world.config.flagship.deals.breach,
+    clauses: world.config.flagship.deals.clauses,
   };
 }
 
@@ -595,11 +625,16 @@ export function signDeal(state: GameState, offerId: number): GameState {
   const { flagship } = state;
   const offer = flagship.deals.offers.find((candidate) => candidate.id === offerId);
   if (!offer) throw new Error(`No deal offer #${offerId}`);
+  const seat = state.countries.find((country) => country.countryId === flagship.countryId);
+  const fans = seat?.fans[PLAYER_INDEX];
   const deal: Deal = {
     ...offer,
     firstSeason: flagship.season,
     lastSeason: flagship.season + offer.seasons - 1,
     countryId: flagship.countryId,
+    clauseMet: 0,
+    clauseMisses: 0,
+    fansMark: fans ? fans.casual + fans.hardcore : 0,
   };
   return withDeals(state, {
     ...flagship.deals,
@@ -617,6 +652,11 @@ export function dealProblems(state: GameState, world: World): string[] {
   if (ids.some((id) => id >= deals.nextId)) problems.push("a deal id is not below nextId");
   if (deals.offers.length > 0 && !offseasonOpen(state)) {
     problems.push("deal offers stand outside the offseason");
+  }
+  for (const deal of deals.signed) {
+    if (deal.clauseMet < 0 || deal.clauseMisses < 0 || deal.fansMark < 0) {
+      problems.push(`deal #${deal.id} has an invalid clause record`);
+    }
   }
   for (const deal of [...deals.signed, ...deals.offers]) {
     if (!Number.isFinite(deal.annualValue) || deal.annualValue < 0) {

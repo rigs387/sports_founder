@@ -352,7 +352,13 @@ export type DealDemandTerms =
   /** Pay-TV exclusivity: the broadcast's lift is cut while it runs. */
   | { kind: "exclusivity" }
   /** One step of a rule trait, amended by the close of the offseason before `dueSeason`. */
-  | { kind: "ruleChange"; axis: AxisId; option: string; dueSeason: number };
+  | { kind: "ruleChange"; axis: AxisId; option: string; dueSeason: number }
+  /** Clauses (GDD v1.29), judged at each season's end: no runaway or foregone season (TV). */
+  | { kind: "balance" }
+  /** A star playing at the seat (sponsors). */
+  | { kind: "star" }
+  /** The seat country's fans no fewer than at the last judgement (any partner). */
+  | { kind: "fans" };
 
 export interface DealTerms {
   slot: DealSlot;
@@ -379,6 +385,11 @@ export interface Deal extends DealTerms {
   lastSeason: number;
   /** The seat's country when it was signed. */
   countryId: string;
+  /** Its clause's record (GDD v1.29): seasons met, misses in a row. */
+  clauseMet: number;
+  clauseMisses: number;
+  /** The seat country's player fans at the last judgement (at signing before the first). */
+  fansMark: number;
 }
 
 /**

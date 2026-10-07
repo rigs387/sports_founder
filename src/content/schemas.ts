@@ -443,7 +443,21 @@ export const GEAR_BRAND_ID = "gear-brand";
 export const dealSlotSchema = z.enum(["tv", "sponsor", "namingRights"]);
 export type DealSlot = z.infer<typeof dealSlotSchema>;
 /** What a deal can demand (GDD v1.28). Demands never block: doing the thing breaks the deal. */
-export const dealDemandSchema = z.enum(["ruleChange", "tierFloor", "seatLock", "exclusivity"]);
+export const dealDemandSchema = z.enum([
+  "ruleChange",
+  "tierFloor",
+  "seatLock",
+  "exclusivity",
+  "balance",
+  "star",
+  "fans",
+]);
+/**
+ * Clauses (GDD v1.29): what a partner wants of the product, judged at each season's end. Soft: a
+ * miss is no breach; enough misses in a row and the partner walks.
+ */
+export const DEAL_CLAUSES = ["balance", "star", "fans"] as const;
+export type DealClause = (typeof DEAL_CLAUSES)[number];
 export type DealDemand = z.infer<typeof dealDemandSchema>;
 
 const byLeagueTier = <T extends z.ZodType>(value: T) =>
@@ -485,6 +499,20 @@ const dealsSchema = z
       seatLock: z.strictObject({ chance: unitInterval, premium: z.number().min(0) }),
       exclusivity: z.strictObject({ chance: unitInterval, premium: z.number().min(0) }),
       ruleChange: z.strictObject({ premium: z.number().min(0) }),
+      /** Clauses (GDD v1.29): balance on TV offers, star on sponsor offers, fans on any. */
+      balance: z.strictObject({ chance: unitInterval, premium: z.number().min(0) }),
+      star: z.strictObject({ chance: unitInterval, premium: z.number().min(0) }),
+      fans: z.strictObject({ chance: unitInterval, premium: z.number().min(0) }),
+    }),
+    /**
+     * Judging clauses at each season's end (GDD v1.29): met pays bonusShare of the annual value
+     * and adds renewalEdgePerMet to the partner's renewal edge; walkAfterMisses misses in a row and
+     * the partner walks.
+     */
+    clauses: z.strictObject({
+      bonusShare: z.number().min(0),
+      renewalEdgePerMet: z.number().min(0),
+      walkAfterMisses: z.int().min(1),
     }),
     /** No tier floor below this league tier: an Amateur floor would be no demand. */
     tierFloorMinTier: leagueTierSchema,

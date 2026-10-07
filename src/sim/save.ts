@@ -28,7 +28,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 20;
+export const SAVE_FORMAT_VERSION = 21;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -284,6 +284,9 @@ const dealTermsFields = {
       z.strictObject({ kind: z.literal("tierFloor"), tier: leagueTierSchema }),
       z.strictObject({ kind: z.literal("seatLock"), countryId: z.string().min(1) }),
       z.strictObject({ kind: z.literal("exclusivity") }),
+      z.strictObject({ kind: z.literal("balance") }),
+      z.strictObject({ kind: z.literal("star") }),
+      z.strictObject({ kind: z.literal("fans") }),
       z.strictObject({
         kind: z.literal("ruleChange"),
         axis: z.enum(AXIS_IDS as [AxisId, ...AxisId[]]),
@@ -302,6 +305,9 @@ const dealsSchema = z.strictObject({
       firstSeason: z.int().min(1),
       lastSeason: z.int().min(1),
       countryId: z.string().min(1),
+      clauseMet: count,
+      clauseMisses: count,
+      fansMark: z.number().min(0),
     }),
   ),
   offers: z.array(z.strictObject(dealTermsFields)),
@@ -536,6 +542,34 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 20 → 21: deal clauses (GDD v1.29). Signed deals start with no clause record, judged against
+  // the seat country's fans now.
+  20: (save) => {
+    const flagship = save.state.flagship as FlagshipState;
+    const seat = rawCountries(save.state).find((c) => c.countryId === flagship.countryId) as
+      | { fans?: { casual: number; hardcore: number }[] }
+      | undefined;
+    const fans = seat?.fans?.[0];
+    const mark = fans ? fans.casual + fans.hardcore : 0;
+    return {
+      formatVersion: 21,
+      state: {
+        ...save.state,
+        flagship: {
+          ...flagship,
+          deals: {
+            ...flagship.deals,
+            signed: flagship.deals.signed.map((deal) => ({
+              ...deal,
+              clauseMet: 0,
+              clauseMisses: 0,
+              fansMark: mark,
+            })),
+          },
+        },
+      },
+    };
+  },
   // 19 → 20: flagship deals (GDD v1.28). Nothing signed and no offers made: the media baseline
   // cut starts at the next offseason, when the first offers arrive. An offseason already open
   // makes none: the next End Turn closes it before offers are made. Recorded events tell no deal.

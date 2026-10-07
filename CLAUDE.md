@@ -283,6 +283,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 20 adds flagship deals (GDD v1.28): `FlagshipState.deals` (signed deals, offers on
   the table, shunned partners, the deals' own random stream). Format 19 migrates with none and no
   offers made, so the media baseline cut waits for the next offseason's offers.
+- Save format 21 adds deal clauses (GDD v1.29): each signed deal's `clauseMet`, `clauseMisses`
+  and `fansMark`. Format 20 migrates with no record, judged against the seat country's fans now.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

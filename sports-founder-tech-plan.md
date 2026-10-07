@@ -748,6 +748,18 @@ Every number is config (`flagship.deals.clauses`). Builds on 2.15's demand machi
    missed and walks by kind. Pacing on seeds 1–3, the #1 contest, the slate (clauses are not in
    the ordinary slate). Docs: `docs/deals/README.md`, progress, CLAUDE.md.
 
+*Step 1 built 2026-10-06.* The clauses are demand kinds (`balance`, `star`, `fans` in
+`dealDemandSchema`), so they share the one-per-offer draw (config order, cumulative chances:
+balance on TV offers, star on sponsor offers, fans on any) and the premium machinery, and never
+break (`breakDeals`). `flagship.deals.clauses` holds the judging rules (bonus 10% of the annual
+value, renewal edge +3% per season met, a walk after 2 misses in a row); demand chances were
+trimmed (tier floor and seat lock 0.12, exclusivity 0.2) and the rule-demand chance halved to 0.1.
+Every slot now keeps an offer with no demand or clause: if all draw one, the last fresh offer is
+made plain at its plain value. A signed deal records `clauseMet`, `clauseMisses` and `fansMark`
+(the seat country's fans at signing). Save format 21. The Deals panel states each clause and, in
+the review, how it is judged (bonus, the walk) instead of a breach's cost. Tests: draws by slot
+kind with a plain offer kept, clauses never breaking, the format 20 migration.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.
