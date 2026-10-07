@@ -673,6 +673,18 @@ strength × the ethos's rename factor; `venueStrengths` cuts a named ground's pi
 deal pays. Tests: each demand kind with forced breaches, the rule deadline met and missed, the
 penalty, shunning, both betrayals, and the landmark's save round-trip.
 
+*Step 5 built 2026-10-06.* A `deal` trigger with two moments in `content/events.yaml`:
+`deal-broken` (big, pressure) and `deal-ended` (minor), told by `src/sim/deal-cards.ts` from the
+`dealBroken` and the new `dealEnded` landmark (recorded when `offerDeals` ends a deal at its
+term). Event records carry `facts.deal` (partner, slot, broken demand, penalty); format 20's
+migration sets it null on older records. Deal cards take no moment slot (`takesNoSlot`) and form
+a new card family, "business" (The Business Pages, its own accent). Card words in the locale, by
+the broken demand and whether a penalty was paid; the gear brand is named from the sport
+("{sport} Supply Co."). `dealsSnapshot` (on `TurnSnapshot.flagship.deals`) gives the screens the
+signed deals (paying, rule demand open, due this offseason), offers with renewals marked, the
+seat's slots, shunned partners, the media share kept and deal income. Tests: breach news next
+turn, term-end toast and renewal, the due flag at the deadline offseason, and the migration.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

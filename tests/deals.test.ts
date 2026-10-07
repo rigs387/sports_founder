@@ -11,8 +11,10 @@ import {
   dealCap,
   dealIncomePerQuarter,
   dealSlateShare,
+  dealsSnapshot,
   deserializeSave,
   endTurn,
+  eventSnapshots,
   type GameState,
   LEAGUE_TIERS,
   type LeagueState,
@@ -25,6 +27,7 @@ import {
   runTurns,
   serializeSave,
   stepQuarter,
+  takesNoSlot,
   venueStrengths,
   type World,
 } from "../src/sim";
@@ -572,5 +575,117 @@ describe("demands and breaches (step 4)", () => {
     const back = { ...broken, flagship: { ...broken.flagship, countryId: "brazil" } };
     const text = serializeSave(back);
     expect(serializeSave(deserializeSave(text, world))).toBe(text);
+  });
+});
+
+describe("news and the snapshot (step 5)", () => {
+  const seasonsOne = withConfig(world, (config) => {
+    config.flagship.deals.seasons = { min: 1, max: 1 };
+  });
+
+  it("a broken deal is big business news the next turn, telling its cost; it takes no slot", () => {
+    const base = atOffers();
+    const tv = base.flagship.deals.offers.find((o) => o.slot === "tv");
+    if (!tv) throw new Error("No TV offer");
+    const deals = {
+      ...base.flagship.deals,
+      offers: base.flagship.deals.offers.map((o) =>
+        o.id === tv.id
+          ? { ...o, demand: { kind: "tierFloor" as const, tier: "amateur" as const } }
+          : o,
+      ),
+    };
+    const signed = applyAction({ ...base, flagship: { ...base.flagship, deals } }, world, {
+      type: "signDeal",
+      offerId: tv.id,
+    });
+    // The league folds: a forced breach of the tier floor, recorded as a landmark. The next turn
+    // (league restored, so the turn plays on) tells it.
+    const folded = signed.countries.map((c, i) => (i === brazil ? { ...c, league: null } : c));
+    const broken = breakDeals({ ...signed, countries: folded }, world);
+    const next = endTurn({ ...broken, countries: signed.countries }, world);
+    const card = eventSnapshots(next, world).find((e) => e.templateId === "deal-broken");
+    expect(card).toMatchObject({
+      kind: "moment",
+      weight: "big",
+      family: "business",
+      facts: { deal: { dealId: tv.id, partnerId: tv.partnerId, slot: "tv", demand: "tierFloor" } },
+    });
+    const template = world.events.cards.find((c) => c.id === "deal-broken");
+    expect(takesNoSlot(template)).toBe(true);
+  });
+
+  it("a deal that ran its term is a minor toast, and its partner's renewal is marked", () => {
+    const state = atOffers(seasonsOne);
+    const tv = state.flagship.deals.offers.find((o) => o.slot === "tv");
+    if (!tv) throw new Error("No TV offer");
+    let next = applyAction(state, seasonsOne, { type: "signDeal", offerId: tv.id });
+    const season = next.flagship.season;
+    while (next.flagship.deals.offeredSeason === season) next = step(next, seasonsOne);
+    expect(next.landmarks.some((l) => l.kind === "dealEnded" && l.dealId === tv.id)).toBe(true);
+    const card = eventSnapshots(next, seasonsOne).find((e) => e.templateId === "deal-ended");
+    expect(card).toMatchObject({ weight: "minor", family: "business" });
+    const snapshotDeals = dealsSnapshot(next, seasonsOne);
+    expect(snapshotDeals.offers.find((o) => o.renewal)).toMatchObject({
+      partnerId: tv.partnerId,
+      slot: "tv",
+    });
+    expect(snapshotDeals.slots.find((s) => s.slot === "tv")?.dealId).toBeNull();
+  });
+
+  it("the snapshot flags a rule demand due this offseason", () => {
+    const content = withConfig(world, (config) => {
+      config.flagship.deals.seasons = { min: 5, max: 5 };
+    });
+    let base = createCampaign(content, setupFor(11, "brazil"));
+    while (base.flagship.deals.offers.length === 0) base = step(base, content);
+    const tv = base.flagship.deals.offers.find((o) => o.slot === "tv");
+    if (!tv) throw new Error("No TV offer");
+    const option = base.genome.matchLength === "short" ? "standard" : "short";
+    const due = base.flagship.season + content.config.flagship.deals.ruleDemand.dueOffseasons;
+    const deals = {
+      ...base.flagship.deals,
+      offers: base.flagship.deals.offers.map((o) =>
+        o.id === tv.id
+          ? {
+              ...o,
+              demand: {
+                kind: "ruleChange" as const,
+                axis: "matchLength" as const,
+                option,
+                dueSeason: due,
+              },
+            }
+          : o,
+      ),
+    };
+    let next = applyAction({ ...base, flagship: { ...base.flagship, deals } }, content, {
+      type: "signDeal",
+      offerId: tv.id,
+    });
+    const flag = (s: GameState) => dealsSnapshot(s, content).signed.find((d) => d.id === tv.id);
+    expect(flag(next)).toMatchObject({ paying: true, ruleOpen: true, ruleDueNow: false });
+    while (!(next.flagship.offseason && next.flagship.season === due)) next = step(next, content);
+    expect(flag(next)).toMatchObject({ ruleOpen: true, ruleDueNow: true });
+  });
+
+  it("a version 19 save's events tell no deal", () => {
+    const state = atOffers();
+    const { deals: _deals, ...flagship } = state.flagship;
+    const strip = (list: GameState["events"]["pending"]) =>
+      list.map(({ facts: { deal: _deal, ...facts }, ...event }) => ({ ...event, facts }));
+    const v19 = {
+      ...state,
+      flagship,
+      events: {
+        ...state.events,
+        pending: strip(state.events.pending),
+        history: strip(state.events.history),
+      },
+    };
+    const loaded = deserializeSave(JSON.stringify({ formatVersion: 19, state: v19 }), world);
+    const all = [...loaded.events.pending, ...loaded.events.history];
+    expect(all.length).toBeGreaterThan(0);
+    expect(all.every((event) => event.facts.deal === null)).toBe(true);
   });
 });

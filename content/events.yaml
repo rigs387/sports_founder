@@ -480,6 +480,44 @@ cards:
     effects: []
     choices: []
     defaultChoice: null
+  # Deals (GDD v1.28): a broken deal is big news telling what the breach cost; a deal that ran its
+  # term is a toast. Told from the landmark recorded at the time; neither takes a moment slot.
+  - id: deal-broken
+    kind: moment
+    weight: big
+    tone: pressure
+    priority: 200
+    trigger: deal
+    deal: broken
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: deal-ended
+    kind: moment
+    weight: minor
+    tone: positive
+    priority: 200
+    trigger: deal
+    deal: ended
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   - id: star-breakout
     kind: moment
     weight: big

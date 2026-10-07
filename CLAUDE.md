@@ -142,7 +142,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Moments have weight (GDD v1.26): every moment card in `content/events.yaml` has `weight` (minor,
   big, headline); `eventSnapshots` resolves it (big flagship cards become headlines at
   `settings.flagshipHeadlineTiers`; the first star's breakout is a headline) and adds a `family`
-  (season, star, tradition, rival, sport) for the card's look. Big and headline moments show first
+  (season, star, tradition, rival, business, sport) for the card's look. Deal news
+  (`src/sim/deal-cards.ts`, GDD v1.28) is told from the `dealBroken` and `dealEnded` landmarks and
+  takes no moment slot. Big and headline moments show first
   as `MomentWindow`s (headline: a front page over a dimmed map) and cannot be skipped: Next Turn
   waits (`data-news`). Smoke steps run `COLLECT_NEWS` (`src/main/smoke-news.ts`) before ending a
   turn or checking that Next Turn is enabled.

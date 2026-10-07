@@ -36,6 +36,7 @@
       "star": "Player Profile",
       "tradition": "Heritage",
       "rival": "World News",
+      "business": "The Business Pages",
       "sport": "The {{sport}} Gazette"
     },
     "newsFirst_one": "Collect the news first: {{count}} story waits",
@@ -289,6 +290,18 @@
         "body_nationalName": "The league in {{country}} has turned Professional, and people there have their own name for the sport: {{name}}.",
         "body_venue": "{{ground}} has seen {{count}} titles and finals. It is now one of the famous grounds of the sport.",
         "body_trophy": "The first {{seasonNoun}} of the league in {{country}} is over, and its champions lifted {{name}}. You can give the trophy its own name now, free, on the flagship screen."
+      },
+      "deal-broken": {
+        "title": "{{partner}} walks away",
+        "body_tierFloor": "The league fell below the tier {{partner}} signed for, and the {{slot}} deal is over. The rest of its money is lost, the league paid {{penalty, number(maximumFractionDigits: 0)}} in cash, and {{partner}} will not deal with the sport for {{seasons}} {{seasonsNoun}}.",
+        "body_tierFloorFree": "The league folded below the tier {{partner}} signed for, and the {{slot}} deal is over. The rest of its money is lost, and {{partner}} will not deal with the sport for {{seasons}} {{seasonsNoun}}.",
+        "body_seatLock": "The seat left {{country}}, where {{partner}} signed to stay. The {{slot}} deal is over: the rest of its money is lost, the league paid {{penalty, number(maximumFractionDigits: 0)}} in cash, and {{partner}} will not deal with the sport for {{seasons}} {{seasonsNoun}}.",
+        "body_seatLockFree": "The seat left {{country}}, where {{partner}} signed to stay. The {{slot}} deal is over: the rest of its money is lost, and {{partner}} will not deal with the sport for {{seasons}} {{seasonsNoun}}.",
+        "body_ruleChange": "The rule change {{partner}} asked for never came. The {{slot}} deal is over: the rest of its money is lost, the league paid {{penalty, number(maximumFractionDigits: 0)}} in cash, and {{partner}} will not deal with the sport for {{seasons}} {{seasonsNoun}}."
+      },
+      "deal-ended": {
+        "title": "{{partner}}'s deal has run its term",
+        "body": "The {{slot}} deal with {{partner}} is over. The slot is open in the offseason, where {{partner}} may offer to renew."
       },
       "tradition-lost": {
         "title": "A tradition is lost: {{name}}",
@@ -803,6 +816,14 @@
     "share": "Share",
     "affinity": "Affinity",
     "focusedName": "{{name}} ★"
+  },
+  "deals": {
+    "gearBrand": "{{sport}} Supply Co.",
+    "slots": {
+      "tv": "TV",
+      "sponsor": "sponsorship",
+      "namingRights": "naming-rights"
+    }
   },
   "format": {
     "count": "{{value, number(maximumFractionDigits: 0)}}",

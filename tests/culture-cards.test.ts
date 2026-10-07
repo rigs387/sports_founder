@@ -77,6 +77,7 @@ describe("stoking a repeat final", () => {
         season: seasonFacts(seasons, seasons.length - 1, state.flagship.players),
         star: null,
         tradition: null,
+        deal: null,
       },
       resolution: null,
     };

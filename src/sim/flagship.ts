@@ -1,7 +1,7 @@
 import type { SeasonInterest } from "../content";
 import { costMultiplier, offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights } from "./culture";
-import { exclusiveTv, lapseOffers, newDeals } from "./deals";
+import { type DealsSnapshot, dealsSnapshot, exclusiveTv, lapseOffers, newDeals } from "./deals";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
@@ -1725,6 +1725,8 @@ export interface FlagshipSnapshot {
   };
   /** Each active club's leading player and their scores this season (null when untallied). */
   leaders: { clubId: number; playerId: number; scores: number | null }[];
+  /** Sponsor and TV deals (GDD v1.28). */
+  deals: DealsSnapshot;
 }
 
 /** How many finished seasons the snapshot carries. */
@@ -1781,6 +1783,7 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
     },
     stars: starSnapshots(state, world),
     backing: backingSnapshot(state, world),
+    deals: dealsSnapshot(state, world),
     broadcast: (() => {
       const broadcast = broadcastEffects(state, world);
       return {

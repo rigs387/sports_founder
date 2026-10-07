@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { EventEffect } from "../../../content";
+import { type EventEffect, GEAR_BRAND_ID } from "../../../content";
 import type { EventRecord } from "../../../sim";
 import { useTraditionWords } from "../culture/traditions";
 import { PLAIN_TERMS, useTermVars } from "../identity/terms";
@@ -71,9 +71,30 @@ export function useEventText() {
   };
   const player = (id: number | null | undefined) =>
     snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
+  /** A deal partner's invented name; the gear brand is named from the sport (GDD v1.28). */
+  const dealPartnerName = (id: string) =>
+    id === GEAR_BRAND_ID
+      ? t("deals.gearBrand", { sport: snapshot.identity.sportName })
+      : ([
+          ...(names?.dealPartners.broadcasters ?? []),
+          ...(names?.dealPartners.sponsors ?? []),
+        ].find((partner) => partner.id === id)?.name ?? id);
+  // Deal cards (GDD v1.28) name the partner, the slot and what a breach cost.
+  const dealText = (event: EventRecord) => {
+    const deal = event.facts.deal;
+    if (!deal) return {};
+    return {
+      partner: dealPartnerName(deal.partnerId),
+      slot: t(`deals.slots.${deal.slot}`),
+      penalty: deal.penalty,
+      seasons: snapshot.flagship.deals.breach.shunSeasons,
+      context: deal.demand ? `${deal.demand}${deal.penalty > 0 ? "" : "Free"}` : undefined,
+    };
+  };
   // Tradition cards (GDD v1.22) name the tradition and the facts that made it.
   const traditionText = (event: EventRecord) => {
     const told = event.facts.tradition;
+    if (!told) return dealText(event);
     const tradition = snapshot.culture.traditions.find((item) => item.id === told?.traditionId);
     if (!told || !tradition) return {};
     const born = event.templateId === "tradition-born";

@@ -197,8 +197,18 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     countryId: z.string().min(1),
     dealId: z.int().min(1),
     partnerId: z.string().min(1),
+    slot: dealSlotSchema,
     demand: dealDemandSchema,
     penalty: z.number().min(0),
+  }),
+  z.strictObject({
+    kind: z.literal("dealEnded"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    dealId: z.int().min(1),
+    partnerId: z.string().min(1),
+    slot: dealSlotSchema,
   }),
   z.strictObject({
     kind: z.literal("seatMoved"),
@@ -528,13 +538,20 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
   // 19 → 20: flagship deals (GDD v1.28). Nothing signed and no offers made: the media baseline
   // cut starts at the next offseason, when the first offers arrive. An offseason already open
-  // makes none: the next End Turn closes it before offers are made.
+  // makes none: the next End Turn closes it before offers are made. Recorded events tell no deal.
   19: (save) => {
     const flagship = save.state.flagship as Omit<FlagshipState, "deals">;
+    const events = save.state.events as Record<string, unknown>;
+    const told = (list: unknown) =>
+      (Array.isArray(list) ? list : []).map((event: Record<string, unknown>) => ({
+        ...event,
+        facts: { ...(event.facts as Record<string, unknown>), deal: null },
+      }));
     return {
       formatVersion: 20,
       state: {
         ...save.state,
+        events: { ...events, pending: told(events.pending), history: told(events.history) },
         flagship: { ...flagship, deals: newDeals(Number(save.state.seed)) },
       },
     };

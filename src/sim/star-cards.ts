@@ -140,7 +140,8 @@ function starFact(
 
 /** Whether a card is offered without taking a slot (the season's champion and a star's breakout). */
 export function takesNoSlot(card: EventTemplate | undefined): boolean {
-  return card?.story === "champion" || card?.star === "breakout";
+  // Deal news never waits for a slot: a breach must reach the player (GDD v1.28).
+  return card?.story === "champion" || card?.star === "breakout" || card?.deal != null;
 }
 
 /**
@@ -186,6 +187,7 @@ export function offerStarCards(
         season: null,
         star: fact.facts,
         tradition: null,
+        deal: null,
       },
       resolution: null,
     });

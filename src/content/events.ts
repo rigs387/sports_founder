@@ -46,6 +46,9 @@ export const eventEffectSchema = z.union([
 ]);
 /** The tradition facts a card can tell (GDD v1.22): a tradition born or lost. */
 export const TRADITION_CARDS = ["born", "lost"] as const;
+/** The deal facts a deal card tells (GDD v1.28): a breach, or a deal that ran its term. */
+export const DEAL_CARDS = ["broken", "ended"] as const;
+export type DealCard = (typeof DEAL_CARDS)[number];
 export type TraditionCard = (typeof TRADITION_CARDS)[number];
 /** The flagship star facts a card can tell (GDD v1.16). */
 export const STAR_CARDS = [
@@ -102,6 +105,7 @@ const template = z
       "seasonEnd",
       "star",
       "tradition",
+      "deal",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),
@@ -109,6 +113,8 @@ const template = z
     star: z.enum(STAR_CARDS).nullable().default(null),
     /** tradition cards only: whether the card tells a birth or a loss. */
     tradition: z.enum(TRADITION_CARDS).nullable().default(null),
+    /** deal cards only: whether the card tells a breach or a deal's end (GDD v1.28). */
+    deal: z.enum(DEAL_CARDS).nullable().default(null),
     minQuarter: z.int().nonnegative(),
     minFans: z.int().nonnegative(),
     minHardcore: z.int().nonnegative(),
@@ -154,6 +160,14 @@ const template = z
         issue("Tradition cards are moments that follow recorded facts: no cooldown");
       if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
         issue("Tradition cards tell their own country: campaign scope, no anchor or health filter");
+    }
+    const deal = card.trigger === "deal";
+    if (deal !== (card.deal !== null)) issue("Deal cards need the deal trigger");
+    if (deal) {
+      if (card.kind !== "moment" || card.cooldownTurns !== null)
+        issue("Deal cards are moments that follow recorded facts: no cooldown");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("Deal cards belong to the flagship: campaign scope, no anchor or health filter");
     }
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");

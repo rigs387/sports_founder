@@ -1,5 +1,7 @@
 import { z } from "zod";
 import {
+  dealDemandSchema,
+  dealSlotSchema,
   healthLevelSchema,
   leagueTierSchema,
   timedEventEffectSchema,
@@ -47,6 +49,17 @@ export const traditionFactsSchema = z.strictObject({
   type: traditionTypeSchema,
 });
 
+/** The deal a deal card tells (GDD v1.28), as recorded when it broke or ended. */
+export const dealFactsSchema = z.strictObject({
+  dealId: z.int().positive(),
+  partnerId: z.string().min(1),
+  slot: dealSlotSchema,
+  /** The broken demand; null for a deal that ran its term. */
+  demand: dealDemandSchema.nullable(),
+  /** Cash the breach cost the league (0 for a deal that ran its term). */
+  penalty: z.number().nonnegative(),
+});
+
 export const eventRecordSchema = z.strictObject({
   id: z.int().positive(),
   templateId: z.string(),
@@ -66,6 +79,7 @@ export const eventRecordSchema = z.strictObject({
     season: seasonFactsSchema.nullable(),
     star: starFactsSchema.nullable(),
     tradition: traditionFactsSchema.nullable(),
+    deal: dealFactsSchema.nullable(),
   }),
   resolution: z
     .strictObject({
@@ -99,6 +113,7 @@ export type EventRecord = z.infer<typeof eventRecordSchema>;
 export type SeasonFacts = z.infer<typeof seasonFactsSchema>;
 export type StarFacts = z.infer<typeof starFactsSchema>;
 export type TraditionFacts = z.infer<typeof traditionFactsSchema>;
+export type DealFacts = z.infer<typeof dealFactsSchema>;
 export type EventState = z.infer<typeof eventStateSchema>;
 export const emptyEvents = (landmarkCursor: number): EventState => ({
   nextId: 1,

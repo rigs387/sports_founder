@@ -216,7 +216,27 @@ export function offerDeals(state: GameState, world: World): GameState {
     shunned,
     offeredSeason: season,
   };
-  if (!country || !league) return withDeals(state, base);
+  // Deals that ran their term are news (GDD v1.28).
+  const recorded =
+    ended.length === 0
+      ? state
+      : {
+          ...state,
+          landmarks: [
+            ...state.landmarks,
+            ...ended.map((deal) =>
+              landmarks.dealEnded(
+                state.turn,
+                state.quarter,
+                deal.countryId,
+                deal.id,
+                deal.partnerId,
+                deal.slot,
+              ),
+            ),
+          ],
+        };
+  if (!country || !league) return withDeals(recorded, base);
 
   const rng = restoreRng(flagship.deals.rng);
   const shunnedIds = new Set(shunned.map((entry) => entry.partnerId));
@@ -344,7 +364,7 @@ export function offerDeals(state: GameState, world: World): GameState {
     }
   }
 
-  return withDeals(state, { ...base, rng: saveRng(rng), offers, nextId });
+  return withDeals(recorded, { ...base, rng: saveRng(rng), offers, nextId });
 }
 
 function withDeals(state: GameState, deals: DealsState): GameState {
@@ -469,6 +489,7 @@ export function breakDeals(state: GameState, world: World, closing = false): Gam
       deal.countryId,
       deal.id,
       deal.partnerId,
+      deal.slot,
       deal.demand?.kind ?? "exclusivity",
       league ? penalty : 0,
     );
@@ -490,6 +511,59 @@ export function breakDeals(state: GameState, world: World, closing = false): Gam
     }),
     countries,
     landmarks: [...state.landmarks, ...found],
+  };
+}
+
+/** A signed deal as the UI sees it (GDD v1.28). */
+export interface SignedDealSnapshot extends Deal {
+  /** It pays this season. */
+  paying: boolean;
+  /** Its rule demand is still unmet. */
+  ruleOpen: boolean;
+  /** Its rule demand's deadline is this offseason's close: amend now or the deal breaks. */
+  ruleDueNow: boolean;
+}
+
+/** What the UI shows of the flagship's deals (GDD v1.28). Prices and legality stay here. */
+export interface DealsSnapshot {
+  signed: SignedDealSnapshot[];
+  /** Offers on the table, renewals marked (`renewal`). Empty outside the offseason. */
+  offers: DealOffer[];
+  /** The seat league's slots now, with the signed deal in each (null when open). */
+  slots: { slot: DealSlot; position: number; dealId: number | null }[];
+  shunned: { partnerId: string; untilSeason: number }[];
+  /** Share of the media line kept: the baseline once offers have been made, else all of it. */
+  mediaShare: number;
+  /** Paying deals' income a quarter. */
+  incomePerQuarter: number;
+  /** What a breach costs: seasons of value in cash, seasons shunned. */
+  breach: { penaltySeasons: number; shunSeasons: number };
+}
+
+export function dealsSnapshot(state: GameState, world: World): DealsSnapshot {
+  const { flagship } = state;
+  const league = state.countries[indexOf(world, flagship.countryId)]?.league ?? null;
+  const paying = new Set(payingDeals(flagship).map((deal) => deal.id));
+  return {
+    signed: flagship.deals.signed.map((deal) => {
+      const rule = deal.demand?.kind === "ruleChange" ? deal.demand : null;
+      const ruleOpen = rule !== null && state.genome[rule.axis] !== rule.option;
+      return {
+        ...deal,
+        paying: paying.has(deal.id),
+        ruleOpen,
+        ruleDueNow: ruleOpen && flagship.offseason && rule?.dueSeason === flagship.season,
+      };
+    }),
+    offers: flagship.deals.offers,
+    slots: (league ? dealSlots(state, world, league) : []).map((ref) => ({
+      ...ref,
+      dealId: flagship.deals.signed.find((deal) => sameSlot(deal, ref))?.id ?? null,
+    })),
+    shunned: flagship.deals.shunned,
+    mediaShare: flagshipMediaShare(flagship, world),
+    incomePerQuarter: dealIncomePerQuarter(flagship),
+    breach: world.config.flagship.deals.breach,
   };
 }
 

@@ -527,8 +527,19 @@ export type Landmark =
       countryId: string;
       dealId: number;
       partnerId: string;
+      slot: DealSlot;
       demand: DealDemand;
       penalty: number;
+    }
+  /** A flagship deal ran its term (GDD v1.28); its slot is open in the offseason. */
+  | {
+      kind: "dealEnded";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      dealId: number;
+      partnerId: string;
+      slot: DealSlot;
     }
   /** The commissioner's seat moved: by the player, or home after a flagship folded. */
   | {
