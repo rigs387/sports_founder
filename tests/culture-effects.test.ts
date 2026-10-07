@@ -139,6 +139,7 @@ describe("famous venues", () => {
         star: null,
         tradition: null,
         deal: null,
+        venue: null,
       },
     };
     const pp = (s: GameState) => {

@@ -1,6 +1,6 @@
 import { offseasonOpen } from "./calendar";
 import { modernizeGrounds } from "./culture";
-import { runningCostPerQuarter } from "./leagues";
+import { venueCostBasis } from "./leagues";
 import { landmarks } from "./records";
 import type { GameState, Landmark, World } from "./types";
 import { venueCapacity } from "./venues";
@@ -37,14 +37,14 @@ export function venueTerms(state: GameState, world: World): VenueTerms | null {
   const priceQuarters = settings.priceQuarters[level - 2];
   const seasons = settings.buildSeasons[level - 2];
   if (priceQuarters === undefined || seasons === undefined) return null;
-  const running = runningCostPerQuarter(world, index, league.tier, state.growthNodes);
+  const basis = venueCostBasis(world, index, league.tier, level, state.growthNodes);
   return {
     level,
-    price: priceQuarters * running,
+    price: priceQuarters * basis,
     seasons,
     opensSeason: state.flagship.season + seasons,
     capacity: venueCapacity(world, index, level),
-    upkeep: settings.upkeepShare * running,
+    upkeep: settings.upkeepShare * basis,
     modernizes: level >= settings.modernize.fromLevel,
   };
 }

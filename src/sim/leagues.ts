@@ -51,6 +51,43 @@ export function runningCostPerQuarter(
   return base * factor;
 }
 
+/**
+ * The running cost a venue level is priced against (GDD v1.30): that of the tier the level serves
+ * (the lowest whose promotion needs it, else the top), or the league's own when higher, so a
+ * league cannot build its big venue cheaply while it is small.
+ */
+export function venueCostBasis(
+  world: World,
+  countryIndex: number,
+  tier: LeagueTierId,
+  level: number,
+  owned: readonly string[],
+): number {
+  const needs = world.config.leagues.venue.promotionLevel;
+  const served =
+    LEAGUE_TIERS.find((t) => t !== "amateur" && needs[t] >= level) ??
+    LEAGUE_TIERS[LEAGUE_TIERS.length - 1] ??
+    tier;
+  const basis = leagueTierIndex(served) > leagueTierIndex(tier) ? served : tier;
+  return runningCostPerQuarter(world, countryIndex, basis, owned);
+}
+
+/** Upkeep a quarter on every venue level above 1 (GDD v1.30), each at its own cost basis. */
+export function venueUpkeep(
+  world: World,
+  countryIndex: number,
+  tier: LeagueTierId,
+  level: number,
+  owned: readonly string[],
+): number {
+  let upkeep = 0;
+  for (let built = 2; built <= level; built += 1)
+    upkeep +=
+      world.config.leagues.venue.upkeepShare *
+      venueCostBasis(world, countryIndex, tier, built, owned);
+  return upkeep;
+}
+
 export interface Revenue {
   gate: number;
   media: number;

@@ -34,5 +34,6 @@ export * from "./tradition-cards";
 export * from "./turn";
 export * from "./types";
 export * from "./venue-actions";
+export * from "./venue-cards";
 export * from "./venues";
 export * from "./win";

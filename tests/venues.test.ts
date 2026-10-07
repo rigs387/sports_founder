@@ -9,8 +9,10 @@ import {
   deserializeSave,
   endTurn,
   type GameState,
+  landmarks,
   leagueCosts,
   leagueIncomePerQuarter,
+  offerVenueCards,
   PLAYER_INDEX,
   runningCostPerQuarter,
   seatedCrowd,
@@ -173,9 +175,16 @@ describe("money (tech plan 2.17 step 2)", () => {
     expect(costs.total).toBeCloseTo(running, 9);
     expect(costs.wages).toBe(0);
     expect(costs.payroll).toBeCloseTo(world.config.flagship.payroll.baselineShare * running, 9);
-    // Upkeep for every level above 1, wherever the league is.
+    // Upkeep for every level above 1, wherever the league is, each priced by the tier it serves
+    // (level 2 Professional, level 3 Elite) while the league is smaller.
     const upkeep = leagueCosts(atLevel(noStars, brazil, 3), world, brazil).upkeep;
-    expect(upkeep).toBeCloseTo(2 * world.config.leagues.venue.upkeepShare * running, 9);
+    const at = (t: "professional" | "elite") =>
+      runningCostPerQuarter(world, brazil, t, noStars.growthNodes);
+    expect(tier).toBe("amateur");
+    expect(upkeep).toBeCloseTo(
+      world.config.leagues.venue.upkeepShare * (at("professional") + at("elite")),
+      9,
+    );
   });
 
   it("a star's wage rises with seasons as a star and influence, and ends when they leave the seat", () => {
@@ -239,8 +248,9 @@ describe("building, fans and culture (tech plan 2.17 step 3)", () => {
     expect(state.flagship.offseason).toBe(true);
     const terms = venueTerms(state, world);
     if (!terms) throw new Error("No venue terms");
-    const tier = state.countries[brazil]?.league?.tier ?? "amateur";
-    const running = runningCostPerQuarter(world, brazil, tier, state.growthNodes);
+    // Level 2 serves Professional: priced at its running cost, not the Amateur league's.
+    expect(state.countries[brazil]?.league?.tier).toBe("amateur");
+    const running = runningCostPerQuarter(world, brazil, "professional", state.growthNodes);
     expect(terms).toMatchObject({ level: 2, seasons: world.config.leagues.venue.buildSeasons[0] });
     expect(terms.price).toBeCloseTo(
       (world.config.leagues.venue.priceQuarters[0] ?? 0) * running,
@@ -353,5 +363,36 @@ describe("building, fans and culture (tech plan 2.17 step 3)", () => {
         countryId: "brazil",
       }),
     ).toBeNull();
+  });
+});
+
+describe("venue news (tech plan 2.17 step 4)", () => {
+  it("tells a level opening, a modernizing one and a record crowd from their landmarks", () => {
+    const state = afterFirstSeason();
+    const recent = [
+      landmarks.venueOpened(state.turn, state.quarter, "brazil", 2, false),
+      landmarks.venueOpened(state.turn, state.quarter, "brazil", 4, true),
+      landmarks.recordCrowd(state.turn, state.quarter, "brazil", 3, 5000, 7, 2),
+    ];
+    const offered = offerVenueCards(state, world, recent, state.events);
+    const told = offered.pending.slice(state.events.pending.length);
+    expect(told.map((e) => e.templateId)).toEqual([
+      "venue-opened",
+      "venue-modernized",
+      "venue-record",
+    ]);
+    expect(told.map((e) => e.facts.venue)).toEqual([
+      { level: 2, crowd: null, clubId: null },
+      { level: 4, crowd: null, clubId: null },
+      { level: 2, crowd: 5000, clubId: 7 },
+    ]);
+    const weights = world.events.cards
+      .filter((c) => c.trigger === "venue")
+      .map((c) => [c.venue, c.weight]);
+    expect(weights).toEqual([
+      ["opened", "minor"],
+      ["modernized", "big"],
+      ["record", "minor"],
+    ]);
   });
 });

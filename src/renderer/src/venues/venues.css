@@ -1,0 +1,34 @@
+/* The seat's venue (GDD v1.30): capacity against hardcore fans, a level building, the next one. */
+.venue-card p {
+  margin: 6px 0;
+}
+.venue-card .warning {
+  color: var(--warning);
+  font-weight: 700;
+}
+.venue-meter {
+  height: 10px;
+  margin: 8px 0;
+  overflow: hidden;
+  background: #e3ecf7;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+.venue-meter span {
+  display: block;
+  height: 100%;
+  background: var(--heat-4);
+}
+.venue-meter-full span {
+  background: var(--warning);
+}
+.venue-record {
+  color: var(--muted);
+}
+.venue-building {
+  font-weight: 700;
+  color: var(--second);
+}
+.venue-card .action-button {
+  margin-top: 6px;
+}

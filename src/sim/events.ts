@@ -15,6 +15,7 @@ import {
 } from "./star-cards";
 import { birthPP, offerTraditionCards } from "./tradition-cards";
 import { type GameState, HEALTH_LEVELS, PLAYER_INDEX, type World } from "./types";
+import { offerVenueCards } from "./venue-cards";
 
 export function eventFactors(
   state: Pick<GameState, "events" | "quarter">,
@@ -79,6 +80,7 @@ function offerSeasonCards(
           star: null,
           tradition: null,
           deal: null,
+          venue: null,
         },
         resolution: null,
       });
@@ -161,8 +163,13 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
     starEvents,
     caps.moment - used("moment", starEvents.pending),
   );
-  // Deal news (GDD v1.28) takes no slot.
-  const dealEvents = offerDealCards(state, world, recent, traditionEvents);
+  // Deal news (GDD v1.28) and venue news (GDD v1.30) take no slot.
+  const dealEvents = offerVenueCards(
+    state,
+    world,
+    recent,
+    offerDealCards(state, world, recent, traditionEvents),
+  );
   const pending = [...dealEvents.pending];
   const offered = { ...state.events.offered };
   let nextId = dealEvents.nextId;
@@ -171,7 +178,8 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
       card.trigger === "seasonEnd" ||
       card.trigger === "star" ||
       card.trigger === "tradition" ||
-      card.trigger === "deal"
+      card.trigger === "deal" ||
+      card.trigger === "venue"
     )
       continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
@@ -234,6 +242,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
           star: null,
           tradition: null,
           deal: null,
+          venue: null,
         },
         resolution: null,
       });
@@ -476,7 +485,7 @@ export function settleEvents(state: GameState, world: World): GameState {
 /** Which news section a card belongs to (GDD v1.26): each family has its own look. */
 export type EventFamily = "season" | "star" | "tradition" | "rival" | "business" | "sport";
 function eventFamily(event: EventRecord): EventFamily {
-  if (event.facts.deal) return "business";
+  if (event.facts.deal || event.facts.venue) return "business";
   if (event.facts.season) return "season";
   if (event.facts.star) return "star";
   if (event.facts.tradition) return "tradition";

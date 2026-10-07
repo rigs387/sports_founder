@@ -602,6 +602,18 @@ export type Landmark =
       level: number;
       modernized: boolean;
     }
+  /** A flagship season's crowd set the league's attendance record (GDD v1.30). */
+  | {
+      kind: "recordCrowd";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      crowd: number;
+      /** The ground credited: the final's host, else the champion's. */
+      clubId: number;
+      level: number;
+    }
   /** A tradition was born from recorded facts (GDD v1.22). */
   | {
       kind: "traditionBorn";

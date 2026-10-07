@@ -28,7 +28,13 @@ import {
   type TopScorer,
   type World,
 } from "./types";
-import { openVenues } from "./venue-actions";
+import {
+  openVenues,
+  type VenueBlocker,
+  type VenueTerms,
+  venueBlocker,
+  venueTerms,
+} from "./venue-actions";
 import { seatedCrowd } from "./venues";
 
 // The flagship league (GDD v1.11 commissioner's seat, v1.13 seat rules, v1.14 flagship season).
@@ -1363,6 +1369,21 @@ export function stepFlagshipQuarter(
       const crowd = recordCrowd(nextCountries, world, flagship.countryId, summary.crowd ?? 0);
       nextCountries = crowd.countries;
       summary.recordCrowd = crowd.record;
+      if (crowd.record) {
+        // Credited to the final's host, else the champion's ground (GDD v1.30).
+        const ground = summary.playoffs.at(-1)?.homeId ?? summary.championId;
+        found.push(
+          landmarks.recordCrowd(
+            state.turn,
+            newQuarter,
+            flagship.countryId,
+            summary.season,
+            summary.crowd ?? 0,
+            ground,
+            current.venue.level,
+          ),
+        );
+      }
       if (tallies !== null) flagship = closeCareers(flagship, tallies);
       const ended = playersSeasonEnd(
         flagship,
@@ -1757,6 +1778,8 @@ export interface FlagshipSnapshot {
   leaders: { clubId: number; playerId: number; scores: number | null }[];
   /** Sponsor and TV deals (GDD v1.28). */
   deals: DealsSnapshot;
+  /** The seat's next venue level and why it cannot be built now (GDD v1.30). */
+  venue: { terms: VenueTerms | null; blocker: VenueBlocker | null };
 }
 
 /** How many finished seasons the snapshot carries. */
@@ -1814,6 +1837,7 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
     stars: starSnapshots(state, world),
     backing: backingSnapshot(state, world),
     deals: dealsSnapshot(state, world),
+    venue: { terms: venueTerms(state, world), blocker: venueBlocker(state, world) },
     broadcast: (() => {
       const broadcast = broadcastEffects(state, world);
       return {
@@ -1915,8 +1939,9 @@ function backingSnapshot(state: GameState, world: World): BackingSnapshot {
 }
 
 /**
- * A season's crowd against the seat league's record (GDD v1.30): the first season sets it; a
- * crowd beating it by recordMargin is a new record, a fame fact for a ground.
+ * A season's crowd against the seat league's record (GDD v1.30): the record is the best crowd
+ * yet, which the first season sets; a crowd beating it by recordMargin is a record crowd, a fame
+ * fact for a ground.
  */
 function recordCrowd(
   countries: CountryState[],
@@ -1930,7 +1955,7 @@ function recordCrowd(
   if (!country || !league) return { countries, record: false };
   const best = league.venue.record;
   const record = best !== null && crowd >= best * (1 + world.config.leagues.venue.recordMargin);
-  if (best !== null && !record) return { countries, record };
+  if (best !== null && crowd <= best) return { countries, record };
   const next = [...countries];
   next[index] = { ...country, league: { ...league, venue: { ...league.venue, record: crowd } } };
   return { countries: next, record };

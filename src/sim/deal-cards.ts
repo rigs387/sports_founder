@@ -61,6 +61,7 @@ export function offerDealCards(
                 : null,
           penalty: landmark.kind === "dealBroken" ? landmark.penalty : 0,
         },
+        venue: null,
       },
       resolution: null,
     });

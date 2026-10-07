@@ -859,6 +859,20 @@ brought it to 0 of 8 with tier 5 at turn 103 (102.5 before). Every bot builds, n
 builder: when its seats are full (the builder at 80%, keeping 4 quarters of costs). Promotion
 terms carry the revenue at the new tier with today's venue, for the review (step 4).
 
+*Step 4 built 2026-10-07.* `VenueCard` (`src/renderer/src/venues/`): level and capacity, a seats
+bar (red when fans overflow), the record crowd (the best crowd yet; beating it by the margin is a
+record crowd), the promotion's venue need, a level being built, the next level's terms; building
+through a review step (price, cash, when it opens, the modernization warning naming famous
+grounds) on the offseason screen only, read-only on the Flagship tab. League finances list
+operations, payroll, star wages and upkeep; promotion reviews (league panel and offseason screen)
+show income at the new tier and warn of a shortfall; the Stars panel shows wages. Venue news
+(`src/sim/venue-cards.ts`, trigger `venue`, facts `venue` in format 22): a level opening (minor),
+a modernizing one (big), a record crowd (minor, from a `recordCrowd` landmark naming the ground);
+the deck is 34 cards. Found in play: priced by the current tier, an Amateur league built level 2
+for 235 cash, so a level's price and upkeep now use the running cost of the tier it serves, or the
+league's own if higher (`venueCostBasis`). Smoke: builds a level on the offseason screen
+(screenshots 51–54) and checks the Flagship card is read-only.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

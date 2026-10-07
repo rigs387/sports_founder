@@ -1,5 +1,5 @@
 import { seatStars, starWage } from "./flagship";
-import { runningCostPerQuarter } from "./leagues";
+import { runningCostPerQuarter, venueUpkeep } from "./leagues";
 import type { CountryState, GameState, LeagueTierId, World } from "./types";
 
 // A league's costs a quarter (GDD v1.30). Every league pays its running cost (tier × wealth ×
@@ -34,7 +34,7 @@ export function leagueCosts(
   const league = country?.league;
   if (!league || tier === undefined) return NO_COSTS;
   const running = runningCostPerQuarter(world, index, tier, state.growthNodes);
-  const upkeep = world.config.leagues.venue.upkeepShare * (league.venue.level - 1) * running;
+  const upkeep = venueUpkeep(world, index, tier, league.venue.level, state.growthNodes);
   if (world.countries[index]?.id !== state.flagship.countryId) {
     return { operations: running, payroll: 0, wages: 0, upkeep, total: running + upkeep };
   }

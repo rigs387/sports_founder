@@ -245,6 +245,16 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     modernized: z.boolean(),
   }),
   z.strictObject({
+    kind: z.literal("recordCrowd"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    crowd: count,
+    clubId: z.int().min(1),
+    level: z.int().min(1).max(5),
+  }),
+  z.strictObject({
     kind: z.literal("traditionBorn"),
     turn: z.int().min(1),
     quarter: count,
@@ -571,13 +581,20 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
   // 21 → 22: venues (GDD v1.30). Every league starts at level 1 with nothing building and no
-  // record crowd; past seasons carry no crowd and set no record.
+  // record crowd; past seasons carry no crowd and set no record; recorded events tell no venue.
   21: (save) => {
     const flagship = save.state.flagship as FlagshipState;
+    const events = save.state.events as Record<string, unknown>;
+    const told = (list: unknown) =>
+      (Array.isArray(list) ? list : []).map((event: Record<string, unknown>) => ({
+        ...event,
+        facts: { ...(event.facts as Record<string, unknown>), venue: null },
+      }));
     return {
       formatVersion: 22,
       state: {
         ...save.state,
+        events: { ...events, pending: told(events.pending), history: told(events.history) },
         countries: rawCountries(save.state).map((country) =>
           country.league
             ? {

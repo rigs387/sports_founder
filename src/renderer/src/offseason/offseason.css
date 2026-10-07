@@ -107,3 +107,7 @@
     align-items: flex-start;
   }
 }
+.offseason-promotions small.warning {
+  color: var(--warning);
+  font-weight: 700;
+}

@@ -49,6 +49,9 @@ export const TRADITION_CARDS = ["born", "lost"] as const;
 /** The deal facts a deal card tells (GDD v1.28): a breach, or a deal that ran its term. */
 export const DEAL_CARDS = ["broken", "ended", "walked"] as const;
 export type DealCard = (typeof DEAL_CARDS)[number];
+/** The venue facts a card can tell (GDD v1.30): a level opening, a modernizing one, a record. */
+export const VENUE_CARDS = ["opened", "modernized", "record"] as const;
+export type VenueCard = (typeof VENUE_CARDS)[number];
 export type TraditionCard = (typeof TRADITION_CARDS)[number];
 /** The flagship star facts a card can tell (GDD v1.16). */
 export const STAR_CARDS = [
@@ -106,6 +109,7 @@ const template = z
       "star",
       "tradition",
       "deal",
+      "venue",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),
@@ -115,6 +119,8 @@ const template = z
     tradition: z.enum(TRADITION_CARDS).nullable().default(null),
     /** deal cards only: whether the card tells a breach or a deal's end (GDD v1.28). */
     deal: z.enum(DEAL_CARDS).nullable().default(null),
+    /** venue cards only: which venue fact the card tells (GDD v1.30). */
+    venue: z.enum(VENUE_CARDS).nullable().default(null),
     minQuarter: z.int().nonnegative(),
     minFans: z.int().nonnegative(),
     minHardcore: z.int().nonnegative(),
@@ -168,6 +174,14 @@ const template = z
         issue("Deal cards are moments that follow recorded facts: no cooldown");
       if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
         issue("Deal cards belong to the flagship: campaign scope, no anchor or health filter");
+    }
+    const venue = card.trigger === "venue";
+    if (venue !== (card.venue !== null)) issue("Venue cards need the venue trigger");
+    if (venue) {
+      if (card.kind !== "moment" || card.cooldownTurns !== null)
+        issue("Venue cards are moments that follow recorded facts: no cooldown");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("Venue cards belong to the flagship: campaign scope, no anchor or health filter");
     }
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");

@@ -188,6 +188,7 @@ export function offerStarCards(
         star: fact.facts,
         tradition: null,
         deal: null,
+        venue: null,
       },
       resolution: null,
     });

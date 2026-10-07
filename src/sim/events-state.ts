@@ -60,6 +60,14 @@ export const dealFactsSchema = z.strictObject({
   penalty: z.number().nonnegative(),
 });
 
+/** The venue fact a venue card tells (GDD v1.30): the level opened, or a record crowd. */
+export const venueFactsSchema = z.strictObject({
+  level: z.int().min(1).max(5),
+  /** A record crowd and the ground it is credited to; null for a level opening. */
+  crowd: z.int().nonnegative().nullable(),
+  clubId: z.int().positive().nullable(),
+});
+
 export const eventRecordSchema = z.strictObject({
   id: z.int().positive(),
   templateId: z.string(),
@@ -80,6 +88,7 @@ export const eventRecordSchema = z.strictObject({
     star: starFactsSchema.nullable(),
     tradition: traditionFactsSchema.nullable(),
     deal: dealFactsSchema.nullable(),
+    venue: venueFactsSchema.nullable(),
   }),
   resolution: z
     .strictObject({
@@ -114,6 +123,7 @@ export type SeasonFacts = z.infer<typeof seasonFactsSchema>;
 export type StarFacts = z.infer<typeof starFactsSchema>;
 export type TraditionFacts = z.infer<typeof traditionFactsSchema>;
 export type DealFacts = z.infer<typeof dealFactsSchema>;
+export type VenueFacts = z.infer<typeof venueFactsSchema>;
 export type EventState = z.infer<typeof eventStateSchema>;
 export const emptyEvents = (landmarkCursor: number): EventState => ({
   nextId: 1,

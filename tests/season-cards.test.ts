@@ -365,7 +365,7 @@ describe("season cards in play", () => {
   it("migrates a version 8 save: start ratings now, no season facts, nothing offered", () => {
     const noSeasonCards = withWorld(world, (content) => {
       content.events.cards = content.events.cards.filter(
-        (c) => c.trigger !== "seasonEnd" && c.trigger !== "tradition",
+        (c) => c.trigger !== "seasonEnd" && c.trigger !== "tradition" && c.trigger !== "venue",
       );
     });
     const played = runTurns(createCampaign(world, setupFor(5, "brazil")), noSeasonCards, 14);

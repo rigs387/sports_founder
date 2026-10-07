@@ -73,10 +73,22 @@ export function useEventText() {
   };
   const player = (id: number | null | undefined) =>
     snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
+  // Venue cards (GDD v1.30) name the level, and for a record crowd its size and ground.
+  const venueText = (event: EventRecord) => {
+    const venue = event.facts.venue;
+    if (!venue) return {};
+    const ground = snapshot.flagship.clubs.find((c) => c.id === venue.clubId)?.ground ?? "";
+    return {
+      level: venue.level,
+      crowd: venue.crowd ?? 0,
+      ground,
+      club: club(venue.clubId ?? undefined),
+    };
+  };
   // Deal cards (GDD v1.28) name the partner, the slot and what a breach cost.
   const dealText = (event: EventRecord) => {
     const deal = event.facts.deal;
-    if (!deal) return {};
+    if (!deal) return venueText(event);
     return {
       partner: dealPartnerName(deal.partnerId),
       slot: t(`deals.slots.${deal.slot}`),

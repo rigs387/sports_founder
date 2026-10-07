@@ -468,9 +468,11 @@ leagues:
   # anchors, 2026-10-07: Semi-Pro 0.5–2%, Professional 3–5%, Elite 5% rising to 15–36%): level 1
   # bites in mid Semi-Pro, 2 in Professional, 3 early in Elite, 4 and 5 late.
   # Building level L (offseason only, one at a time, the seat's league) costs
-  # priceQuarters[L − 2] × the league's running cost in league cash and opens when the offseason
-  # closes buildSeasons[L − 2] seasons later. Upkeep per quarter = upkeepShare × (level − 1) × the
-  # league's running cost. Hardcore conversion in the seat country × (1 + conversionBoost × level
+  # priceQuarters[L − 2] × its cost basis in league cash and opens when the offseason closes
+  # buildSeasons[L − 2] seasons later. A level's cost basis is the running cost of the tier it
+  # serves (the lowest whose promotionLevel needs it, else Elite) or the league's own tier if
+  # higher, so a small league cannot build a big venue cheaply. Upkeep per quarter = upkeepShare ×
+  # the cost basis of every level above 1. Hardcore conversion in the seat country × (1 + conversionBoost × level
   # × min(1, capacity ÷ hardcore)): the boost fades while fans overflow (no seat, no habit). A
   # season's crowd (hardcore fans seated at its end) beating the league's record by recordMargin is
   # a fame fact for the champion's ground (European) or the final's host (American). Opening a

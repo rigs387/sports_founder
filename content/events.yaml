@@ -519,6 +519,62 @@ cards:
     effects: []
     choices: []
     defaultChoice: null
+  # Venues (GDD v1.30): a level opening is a toast, a big moment when it modernizes the grounds;
+  # a record crowd is a toast naming the ground it makes famous.
+  - id: venue-opened
+    kind: moment
+    weight: minor
+    tone: positive
+    priority: 200
+    trigger: venue
+    venue: opened
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: venue-modernized
+    kind: moment
+    weight: big
+    tone: pressure
+    priority: 200
+    trigger: venue
+    venue: modernized
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: venue-record
+    kind: moment
+    weight: minor
+    tone: positive
+    priority: 200
+    trigger: venue
+    venue: record
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   - id: deal-ended
     kind: moment
     weight: minor

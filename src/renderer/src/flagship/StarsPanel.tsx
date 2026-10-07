@@ -197,6 +197,12 @@ function StarCard({
             )}
           </dd>
         </div>
+        {star.wage > 0 && (
+          <div data-testid="flagship-star-wage">
+            <dt>{t("flagship.stars.wage")}</dt>
+            <dd>{t("flagship.stars.wageValue", { value: star.wage })}</dd>
+          </div>
+        )}
       </dl>
       {star.backing && (
         <div className="star-influence">

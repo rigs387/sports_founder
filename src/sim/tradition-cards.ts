@@ -46,6 +46,7 @@ export function offerTraditionCards(
         star: null,
         tradition: { traditionId: landmark.traditionId, type: landmark.type },
         deal: null,
+        venue: null,
       },
       resolution: null,
     });

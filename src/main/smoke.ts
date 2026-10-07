@@ -19,6 +19,7 @@ import { verifySetup } from "./setup-smoke";
 import { COLLECT_NEWS } from "./smoke-news";
 import { verifyStarCards } from "./star-smoke";
 import { verifyStarsPanel } from "./stars-smoke";
+import { verifyVenue } from "./venue-smoke";
 
 // Development-only self-check, enabled by the SF_SMOKE_OUT environment variable (see
 // `npm run smoke`). It drives the real window: waits for the first campaign snapshot from the
@@ -145,6 +146,7 @@ async function run(
   const starCards = await verifyStarCards(win, screenshot);
   const starsPanel = await verifyStarsPanel(win, screenshot);
   const deals = await verifyDeals(win, screenshot);
+  const venue = await verifyVenue(win, screenshot);
   const amendment = await verifyAmendment(win, screenshot);
   const traditions = await verifyTraditions(win, screenshot);
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
@@ -168,6 +170,7 @@ async function run(
     starCards,
     starsPanel,
     deals,
+    venue,
     amendment,
     traditions,
     saves,

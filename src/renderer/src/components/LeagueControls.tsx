@@ -144,6 +144,14 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
                 next: offer.runningCostPerQuarter,
               })}
             </li>
+            <li>{t("league.manage.newIncome", { income: offer.revenuePerQuarter })}</li>
+            {offer.revenuePerQuarter < offer.runningCostPerQuarter && (
+              <li className="deal-warning" data-testid="league-promotion-shortfall">
+                {t("league.manage.shortfall", {
+                  gap: offer.runningCostPerQuarter - offer.revenuePerQuarter,
+                })}
+              </li>
+            )}
           </ul>
         )
       );
@@ -234,6 +242,11 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
           </dd>
         </div>
       </dl>
+      {league.costs.payroll + league.costs.wages + league.costs.upkeep > 0 && (
+        <p className="league-finance-note" data-testid="league-cost-lines">
+          {t("league.manage.costLines", { ...league.costs })}
+        </p>
+      )}
       <p className="league-finance-note">{t("league.manage.forecastNote")}</p>
       {country.countryId === snapshot.anchorCountryId && !snapshot.win.won && (
         <p className="league-anchor-note">{t("league.manage.anchorWarning")}</p>

@@ -8,6 +8,7 @@ import { Seat } from "../flagship/FlagshipScreen";
 import { StarsPanel } from "../flagship/StarsPanel";
 import { AmendRules } from "../identity/AmendRules";
 import { useTermVars } from "../identity/terms";
+import { VenueCard } from "../venues/VenueCard";
 import "../flagship/flagship.css";
 import "./offseason.css";
 
@@ -22,9 +23,9 @@ interface Props {
 }
 
 // The offseason (GDD v1.24): once a year, after the flagship season ends, one screen holds the
-// season in review and then all league business — stars, deals (GDD v1.28), the rules,
-// promotions, the seat and the trophy — each priced against the PP on hand. The tabs keep
-// read-only views; legality and prices stay in the simulation.
+// season in review and then all league business — stars, deals (GDD v1.28), the rules, the venue
+// (GDD v1.30), promotions, the seat and the trophy — each priced against the PP on hand. The
+// tabs keep read-only views; legality and prices stay in the simulation.
 export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWorld }: Props) {
   const { t } = useTranslation();
   const flagship = snapshot.flagship;
@@ -130,6 +131,7 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
           </div>
         </div>
         <div className="offseason-column">
+          <VenueCard snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           <Promotions snapshot={snapshot} country={country} busy={busy} onAction={onAction} />
           <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} />
@@ -195,6 +197,14 @@ function Promotions({
                       running: terms.runningCostPerQuarter,
                     })}
                   </small>
+                  {terms.revenuePerQuarter < terms.runningCostPerQuarter && (
+                    <small className="warning" data-testid="offseason-promotion-shortfall">
+                      {t("offseason.promotions.shortfall", {
+                        income: terms.revenuePerQuarter,
+                        gap: terms.runningCostPerQuarter - terms.revenuePerQuarter,
+                      })}
+                    </small>
+                  )}
                 </div>
                 {confirming === entry.countryId ? (
                   <div className="offseason-confirm">

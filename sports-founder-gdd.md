@@ -1128,7 +1128,9 @@ purchased traits and percentage modifiers alone do not make culture.
     (the naive bot from Austria: 6 of 8 seeds; with the gate 0 of 8, pacing unchanged). The
     promotion review also shows the new tier's costs against revenue at today's capacity.
   - *Building:* bought with cash in the offseason, one level at a time; a level's price is quarters
-    of the league's running cost, rising with the level, and it takes several seasons to build.
+    of the running cost of the tier it serves (or the league's own, if higher: found in play, a
+    small league built big venues for almost nothing), rising with the level, and it takes several
+    seasons to build.
     The old capacity keeps working while it builds. Upkeep joins the running cost when a level
     opens.
   - *Fans:* each level adds a modest boost to casual → hardcore conversion in the seat country; the

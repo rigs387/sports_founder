@@ -78,6 +78,7 @@ describe("stoking a repeat final", () => {
         star: null,
         tradition: null,
         deal: null,
+        venue: null,
       },
       resolution: null,
     };

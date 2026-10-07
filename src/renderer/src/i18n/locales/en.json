@@ -305,6 +305,18 @@
         "body_star": "{{partner}} wanted a star to sell the league, and again there was none. It has ended its {{slot}} deal: the rest of its money is lost.",
         "body_fans": "Fans in {{country}} fell again, and {{partner}} has ended its {{slot}} deal: the rest of its money is lost."
       },
+      "venue-opened": {
+        "title": "The venue reaches level {{level}}",
+        "body": "The new stands in {{country}} are open. More hardcore fans have a seat, and the gate grows with them."
+      },
+      "venue-modernized": {
+        "title": "Level {{level}}, and the old grounds are gone",
+        "body": "The league in {{country}} opened a modern level {{level}} venue. More fans have a seat, but supporters of the famous grounds feel betrayed: some purists have turned casual, and the grounds' traditions have worn."
+      },
+      "venue-record": {
+        "title": "A record crowd at {{ground}}",
+        "body": "{{crowd, number}} hardcore fans had a seat this {{seasonNoun}}, a league record in {{country}}. {{club}} hosted it, and the ground's fame grows."
+      },
       "deal-ended": {
         "title": "{{partner}}'s deal has run its term",
         "body": "The {{slot}} deal with {{partner}} is over. The slot is open in the offseason, where {{partner}} may offer to renew."
@@ -435,6 +447,7 @@
       "none": "No league qualifies for promotion this year.",
       "step": "{{from}} to {{to}}",
       "cost": "Costs {{cost, number(maximumFractionDigits: 0)}} of the league's {{cash, number(maximumFractionDigits: 0)}} cash; then {{running, number(maximumFractionDigits: 1)}} a quarter to run.",
+      "shortfall": "At today's fans and venue it would earn {{income, number(maximumFractionDigits: 1)}} a quarter: {{gap, number(maximumFractionDigits: 1)}} short of its costs.",
       "promote": "Promote to {{to}}",
       "confirm": "Confirm: {{to}}",
       "cancel": "Cancel",
@@ -529,6 +542,9 @@
       "reserveRequired": "Cash reserve: {{current, number(maximumFractionDigits: 1)}} / {{needed, number(maximumFractionDigits: 1)}} required before promotion.",
       "promotionDeduction": "Promotion spends {{cost, number(maximumFractionDigits: 1)}} cash, leaving {{remaining, number(maximumFractionDigits: 1)}}.",
       "newRunningCosts": "Quarterly running costs: {{current, number(maximumFractionDigits: 1)}} cash now; {{next, number(maximumFractionDigits: 1)}} after the change.",
+      "newIncome": "Quarterly income at the new tier with today's fans and venue: {{income, number(maximumFractionDigits: 1)}} cash.",
+      "shortfall": "That is {{gap, number(maximumFractionDigits: 1)}} a quarter less than it will cost to run. The league would lose cash every quarter until it grows into the tier.",
+      "costLines": "Operations {{operations, number(maximumFractionDigits: 1)}} · payroll {{payroll, number(maximumFractionDigits: 1)}} · star wages {{wages, number(maximumFractionDigits: 1)}} · venue upkeep {{upkeep, number(maximumFractionDigits: 1)}}.",
       "restructureLoss": "{{share, number(style: percent)}} of hardcore fans become casual ({{count, number}} fans). They remain fans of your sport.",
       "restructureCash": "No cash or Prestige is spent. The current cash reserve is kept.",
       "restructureHealth": "Health resets to Struggling. Recovery still depends on the league finances and following.",
@@ -823,6 +839,34 @@
     "share": "Share",
     "affinity": "Affinity",
     "focusedName": "{{name}} ★"
+  },
+  "venue": {
+    "heading": "The venue",
+    "noLeague": "{{country}} has no league to play in.",
+    "level": "Level {{level}} of 5.",
+    "capacity": "It seats {{capacity, number}} hardcore fans.",
+    "seated": "{{seated, number}} of {{capacity, number}} seats are filled; the gate is paid on every one.",
+    "overflow": "{{overflow, number}} of {{hardcore, number}} hardcore fans have no seat. They pay no gate, and without a seat the habit fades.",
+    "record": "Record crowd: {{crowd, number}}.",
+    "promotion": "{{tier}} needs a level {{level}} venue.",
+    "building": "Level {{level}} is being built. It opens before {{seasonNoun}} {{season}}.",
+    "top": "The venue is at its top level.",
+    "next_one": "Level {{level}} would seat {{capacity, number}}: {{price, number(maximumFractionDigits: 0)}} in league cash, {{count}} {{seasonNoun}} to build, then {{upkeep, number(maximumFractionDigits: 1)}} a quarter in upkeep.",
+    "next_other": "Level {{level}} would seat {{capacity, number}}: {{price, number(maximumFractionDigits: 0)}} in league cash, {{count}} {{seasonsNoun}} to build, then {{upkeep, number(maximumFractionDigits: 1)}} a quarter in upkeep.",
+    "offseasonOnly": "Venues are built on the offseason screen.",
+    "build": "Review level {{level}}",
+    "review": "The league pays {{price, number(maximumFractionDigits: 0)}} of its {{cash, number(maximumFractionDigits: 0)}} cash now. Level {{level}} opens before {{seasonNoun}} {{season}}; the old stands keep working until then.",
+    "modernize": "Level {{level}} modernizes the grounds. Supporters of {{names}} will feel betrayed: some purists turn casual, and those traditions wear.",
+    "modernizeNone": "Level {{level}} modernizes the grounds. No ground here is famous yet, so nobody minds.",
+    "confirm": "Build level {{level}}",
+    "back": "Back",
+    "blockers": {
+      "window": "Venues are built only in the offseason.",
+      "league": "The seat has no league.",
+      "top": "The venue is at its top level.",
+      "building": "A level is already being built.",
+      "cash": "The league has {{cash, number(maximumFractionDigits: 0)}} of the {{price, number(maximumFractionDigits: 0)}} cash it needs."
+    }
   },
   "deals": {
     "gearBrand": "{{sport}} Supply Co.",
@@ -1144,6 +1188,8 @@
       "born": "Born in {{place}}, {{country}}",
       "seasonTally": "This {{seasonNoun}}",
       "careerTally": "Career",
+      "wage": "Wage",
+      "wageValue": "{{value, number(maximumFractionDigits: 1)}} cash a quarter",
       "scores_one": "{{count, number}} {{scoreNoun}} in {{matches, number}} {{matchNoun}}",
       "scores_other": "{{count, number}} {{scoreNoun}} in {{matches, number}} {{matchNoun}}",
       "untallied": "Not tallied this {{seasonNoun}}",

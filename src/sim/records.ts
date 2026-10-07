@@ -291,6 +291,15 @@ export const landmarks = {
     level: number,
     modernized: boolean,
   ): Landmark => ({ kind: "venueOpened", turn, quarter, countryId, level, modernized }),
+  recordCrowd: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    season: number,
+    crowd: number,
+    clubId: number,
+    level: number,
+  ): Landmark => ({ kind: "recordCrowd", turn, quarter, countryId, season, crowd, clubId, level }),
   rivalRuleCopied: (
     turn: number,
     quarter: number,
