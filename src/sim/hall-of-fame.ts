@@ -56,7 +56,11 @@ export function hallPoints(facts: InducteeFacts, world: World): number {
 }
 
 /** Whether a landmark is the kind of fact a first is read from. */
-function firstOf(first: HallFirst, landmark: Landmark, state: Pick<GameState, "identity">) {
+function firstOf(
+  first: HallFirst,
+  landmark: Landmark,
+  state: Pick<GameState, "identity" | "landmarks">,
+) {
   switch (first) {
     case "foundingTitle":
       return (
@@ -69,7 +73,17 @@ function firstOf(first: HallFirst, landmark: Landmark, state: Pick<GameState, "i
     case "firstElite":
       return landmark.kind === "leaguePromoted" && landmark.to === "elite";
     case "firstRecordCrowd":
-      return landmark.kind === "recordCrowd";
+      // Only once its league has turned Professional (GDD v1.32).
+      return (
+        landmark.kind === "recordCrowd" &&
+        state.landmarks.some(
+          (l) =>
+            l.kind === "leaguePromoted" &&
+            l.to === "professional" &&
+            l.countryId === landmark.countryId &&
+            l.quarter <= landmark.quarter,
+        )
+      );
     case "firstRankOne":
       return landmark.kind === "rankOneTaken";
     case "won":
@@ -234,17 +248,21 @@ export function classPP(
 }
 
 /**
- * Whether a class is front-page news (GDD v1.31): the sport's first class, or one inducting a
- * holder of the all-time scoring record.
+ * Whether a class is front-page news (GDD v1.31, v1.32): the sport's first class, or one inducting
+ * the all-time scoring record holder of the day (the latest record landmark by the class's end).
  */
 export function classHeadline(state: GameState, event: Pick<EventRecord, "facts">): boolean {
   const hall = event.facts.hall;
   if (!hall) return false;
   const first = state.hallOfFame.inductees[0];
   if (first && hall.inducteeIds.includes(first.id)) return true;
-  return state.hallOfFame.inductees.some(
-    (inductee) => hall.inducteeIds.includes(inductee.id) && inductee.facts?.record === true,
-  );
+  const inductees = state.hallOfFame.inductees.filter((i) => hall.inducteeIds.includes(i.id));
+  const quarter = inductees[0]?.quarter ?? 0;
+  let holder: number | null = null;
+  for (const landmark of state.landmarks)
+    if (landmark.kind === "scoringRecord" && landmark.quarter <= quarter)
+      holder = landmark.playerId;
+  return holder !== null && inductees.some((inductee) => inductee.playerId === holder);
 }
 
 // ---- What the player sees (the Almanac, GDD v1.31) --------------------------------------------

@@ -1003,6 +1003,17 @@ standing watch item, unchanged). Docs: `docs/almanac/README.md`.
 3. **Measure and replay.** Pacing on seeds 1–3 and the #1 contest (card PP now scales); replay the
    playtest and compare front pages, toasts and offers. Docs, progress, CLAUDE.md, cheat sheet.
 
+*Step 1 built 2026-10-07.* `offerDeals` drops offers whose plain value is below
+`flagship.deals.minOfferValue` (1), then keeps a demand-free offer in every slot that still has
+offers. `momentWeight`: a champion card at `flagshipHeadlineTiers` is a headline only if its season
+tells one of `events.settings.headlineStories` (first title, underdog, dynasty, foregone); star
+cards lost the tier rule. `classHeadline` reads the latest `scoringRecord` landmark by the class's
+end. `firstRecordCrowd` needs an earlier promotion of its country's league to Professional.
+`cardPPFactor` (`costMultiplier × nodeSizeFactor`) scales every card's PP rewards and choice
+costs; the runner's event policy normalizes by it, so bot preferences are unchanged. The deal tests
+run with a minimum of 0 (Brazil's first offers are worth under 1), and the minimum has its own test;
+`tests/playtest-followups.test.ts` covers the rest.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

@@ -569,6 +569,7 @@ const dealsSchema = z
     renewalEdge: z.number().min(0),
     /** The homegrown gear brand: a demand-free main-sponsor offer at valueShare of an ordinary one. */
     gearBrand: z.strictObject({ valueShare: z.number().min(0), renewalEdge: z.number().min(0) }),
+    minOfferValue: z.number().min(0),
     /** The growth tree's TV fork shapes TV offers (node ids checked at load). */
     tvFork: z.record(
       z.string().min(1),

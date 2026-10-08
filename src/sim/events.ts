@@ -4,6 +4,7 @@ import { venueStrength } from "./culture";
 import { offerDealCards } from "./deal-cards";
 import type { EventRecord, EventState } from "./events-state";
 import { activeClubs, moveClubRatings } from "./flagship";
+import { nodeSizeFactor } from "./growth";
 import { offerHallCards } from "./hall-cards";
 import { classHeadline, classPP } from "./hall-of-fame";
 import { seasonFacts, seasonStories } from "./season-stories";
@@ -272,12 +273,36 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   };
 }
 
+/** The state a card's PP depends on: its own facts, and the sport's size and peak tier. */
+type CardState = Pick<GameState, "culture" | "hallOfFame" | "tierTrack" | "sports" | "countries">;
+
 /**
- * A card's effects for one answer. The champion moment's PP follows the league tier (config),
- * raised by the famous grounds of the league's country (GDD v1.22).
+ * Card PP grows with the sport (GDD v1.32): rewards and choice costs scale by the same factor as
+ * growth node prices, the peak tier's cost multiplier × the sport's size factor.
+ */
+export function cardPPFactor(state: CardState, world: World): number {
+  return costMultiplier(state, world.config) * nodeSizeFactor(state, world);
+}
+
+/**
+ * A card's effects for one answer, PP scaled by `cardPPFactor`. The champion moment's PP follows
+ * the league tier (config), raised by the famous grounds of the league's country (GDD v1.22).
  */
 export function eventEffects(
-  state: Pick<GameState, "culture" | "hallOfFame">,
+  state: CardState,
+  world: World,
+  card: EventTemplate,
+  event: Pick<EventRecord, "facts" | "countryId">,
+  choiceId: string | null,
+): EventEffect[] {
+  const factor = cardPPFactor(state, world);
+  return baseEffects(state, world, card, event, choiceId).map((effect) =>
+    effect.type === "pp" ? { ...effect, amount: effect.amount * factor } : effect,
+  );
+}
+
+function baseEffects(
+  state: CardState,
   world: World,
   card: EventTemplate,
   event: Pick<EventRecord, "facts" | "countryId">,
@@ -304,8 +329,7 @@ export function eventChoiceCost(
   choiceId: string | null,
 ): number {
   return (
-    (card.choices.find((choice) => choice.id === choiceId)?.cost ?? 0) *
-    costMultiplier(state, world.config)
+    (card.choices.find((choice) => choice.id === choiceId)?.cost ?? 0) * cardPPFactor(state, world)
   );
 }
 export type EventBlocker =
@@ -508,9 +532,9 @@ function eventFamily(event: EventRecord): EventFamily {
 }
 
 /**
- * A moment's weight on the world map (GDD v1.26): the card's own, raised to a headline for a big
- * flagship moment (season or star facts) while the flagship is at a headline tier, and for the
- * breakout of the sport's first star, the first Hall of Fame class (or one with a scoring record
+ * A moment's weight on the world map (GDD v1.26, v1.32): the card's own, raised to a headline for
+ * a season's champion at a headline tier when the season tells a rare story, the breakout of the
+ * sport's first star, the first Hall of Fame class (or one inducting the current scoring record
  * holder) and the anthem's birth. Decisions have none.
  */
 function momentWeight(
@@ -527,10 +551,16 @@ function momentWeight(
     const anthem = state.culture.traditions.find((t) => t.type === "chant");
     return anthem?.id === told.traditionId ? "headline" : "big";
   }
-  const flagship = event.facts.season !== null || event.facts.star !== null;
+  // A season at a headline tier is front-page news only when it tells a rare story (GDD v1.32).
+  const season = event.facts.season;
   const tier = event.facts.leagueTier;
-  if (flagship && tier && world.events.settings.flagshipHeadlineTiers.includes(tier))
-    return "headline";
+  const { flagshipHeadlineTiers, headlineStories } = world.events.settings;
+  if (season && tier && flagshipHeadlineTiers.includes(tier)) {
+    const seasons = state.flagship.seasons;
+    const index = seasons.findIndex((s) => s.season === season.season);
+    if (index >= 0 && seasonStories(seasons, index, world).some((s) => headlineStories.includes(s)))
+      return "headline";
+  }
   const first = state.landmarks.find((landmark) => landmark.kind === "firstStar");
   if (
     card.star === "breakout" &&

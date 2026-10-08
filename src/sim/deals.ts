@@ -257,6 +257,7 @@ export function offerDeals(state: GameState, world: World): GameState {
   // Ordinary values before demands, by offer id, for the rule demand placed afterwards.
   const ordinary = new Map<number, number>();
   const offers: DealOffer[] = [];
+  const slotsOffered: DealSlotRef[] = [];
 
   const offer = (
     ref: DealSlotRef,
@@ -356,8 +357,19 @@ export function offerDeals(state: GameState, world: World): GameState {
       }
       offer(ref, partner.id, ordinaryValue * spread, demand, false, seasons);
     }
-    // Every slot keeps an offer with no demand or clause (GDD v1.29): if all demand something,
-    // the last fresh offer asks nothing, at its plain value.
+    slotsOffered.push(ref);
+  }
+
+  // No worthless offers (GDD v1.32): one worth less than the minimum a season, before any demand's
+  // premium, is not made; a slot left without offers stays empty.
+  for (let i = offers.length - 1; i >= 0; i -= 1) {
+    const candidate = offers[i];
+    if (candidate && (ordinary.get(candidate.id) ?? 0) < settings.minOfferValue)
+      offers.splice(i, 1);
+  }
+  // Every slot keeps an offer with no demand or clause (GDD v1.29): if all demand something, the
+  // last fresh offer asks nothing, at its plain value.
+  for (const ref of slotsOffered) {
     const here = offers.filter((candidate) => sameSlot(candidate, ref));
     const last = here[here.length - 1];
     if (last && here.every((candidate) => candidate.demand !== null)) {

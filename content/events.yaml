@@ -10,9 +10,11 @@ settings:
   minFactor: 0.25
   maxFactor: 3
   # Moments have weight (GDD v1.26): each moment card says minor (a toast), big (a back page over
-  # the map) or headline (a front page). A big flagship moment (season or star facts) becomes a
-  # headline while the flagship league is at one of these tiers; the sport's first star always is.
+  # the map) or headline (a front page). A season's champion moment becomes a headline while the
+  # flagship league is at one of these tiers only if its season tells one of headlineStories (GDD
+  # v1.32: a playtest saw 62 front pages in 75 seasons); the sport's first star always is one.
   flagshipHeadlineTiers: [professional, elite]
+  headlineStories: [firstTitle, underdog, dynasty, foregone]
 cards:
   - id: open-doors
     kind: decision

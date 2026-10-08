@@ -3,8 +3,8 @@ import {
   type Action,
   activeClubs,
   applyAction,
+  cardPPFactor,
   checkAction,
-  costMultiplier,
   eventBlocker,
   eventChoiceCost,
   type GameState,
@@ -127,7 +127,7 @@ function effectValue(
     case "leagueHealth":
       return effect.steps * weights.league;
     case "pp":
-      return (effect.amount * weights.ppPrice) / costMultiplier(state, world.config);
+      return (effect.amount * weights.ppPrice) / cardPPFactor(state, world);
     // Star cards (GDD v1.16). Honors and mentoring keep some of a backed star's influence working
     // after they retire; keeping a star holds their strength at their old club for league cash.
     case "starHonors":
@@ -204,8 +204,7 @@ export function choiceValue(
     0,
   );
   const price =
-    (eventChoiceCost(state, world, card, choiceId) * weights.ppPrice) /
-    costMultiplier(state, world.config);
+    (eventChoiceCost(state, world, card, choiceId) * weights.ppPrice) / cardPPFactor(state, world);
   return gains - price;
 }
 

@@ -886,6 +886,10 @@ flagship:
     breach: { penaltySeasons: 1, shunSeasons: 3 }
     renewalEdge: 0.1
     gearBrand: { valueShare: 0.6, renewalEdge: 0.25 }
+    # No worthless offers (GDD v1.32): an offer (renewals and the gear brand included) worth less
+    # than this a season, before any demand's premium, is not made. A playtest found small leagues'
+    # naming rights worth hundredths, one still demanding a seat lock.
+    minOfferValue: 1
     # Pay-TV owners get bigger TV offers, exclusive twice as often; Free-to-Air owners smaller,
     # never exclusive.
     tvFork:

@@ -36,7 +36,13 @@ import {
   type World,
 } from "../src/sim";
 import { withTradition } from "./culture-helpers";
-import { baseGenome, countryIndex, setupFor, withConfig, world } from "./helpers";
+import { baseGenome, countryIndex, setupFor, world as shipped, withConfig } from "./helpers";
+
+// These tests read the deal mechanics, not the size of a market: offers of any value are made.
+// The minimum offer (GDD v1.32) has its own test with the shipped config.
+const world = withConfig(shipped, (c) => {
+  c.flagship.deals.minOfferValue = 0;
+});
 
 // Flagship deals, step 2 (GDD v1.28, tech plan 2.15): offers, signing, lapsing and saves.
 
@@ -1001,5 +1007,33 @@ describe("the runner's clause report (tech plan 2.16 step 4)", () => {
     );
     const judged = entries.reduce((sum, n) => sum + n.met + n.missed, 0);
     expect(judged).toBeLessThanOrEqual(signed * world.config.flagship.deals.seasons.max);
+  });
+});
+
+describe("the minimum offer (GDD v1.32)", () => {
+  it("makes no offer worth less than the minimum a season; a slot without one stays empty", () => {
+    const loose = atOffers(world);
+    const values = loose.flagship.deals.offers.map((o) => o.annualValue);
+    const min = Math.min(...values);
+    // Set the bar between the smallest and largest plain offers: the smallest are dropped.
+    const strict = withConfig(world, (c) => {
+      c.flagship.deals.minOfferValue = min * 1.5;
+    });
+    const state = reoffer(loose, strict, 5);
+    const ordinary = state.flagship.deals.offers;
+    expect(ordinary.length).toBeLessThan(loose.flagship.deals.offers.length);
+    for (const offer of ordinary) {
+      const premium = offer.demand
+        ? strict.config.flagship.deals.demands[offer.demand.kind].premium
+        : 0;
+      expect(offer.annualValue / (1 + premium)).toBeGreaterThanOrEqual(min * 1.5 - 1e-9);
+    }
+    // Every slot with offers still has one without a demand.
+    const slots = new Set(ordinary.map((o) => `${o.slot}:${o.position}`));
+    for (const slot of slots)
+      expect(ordinary.some((o) => `${o.slot}:${o.position}` === slot && o.demand === null)).toBe(
+        true,
+      );
+    expect(shipped.config.flagship.deals.minOfferValue).toBeGreaterThan(0);
   });
 });

@@ -248,8 +248,12 @@ export const eventsFileSchema = z
         historyLimit: z.int().positive(),
         minFactor: z.number().positive(),
         maxFactor: z.number().positive(),
-        /** A big flagship moment is a headline while the flagship is at one of these tiers. */
+        /**
+         * At these tiers, a season's champion moment is a headline when the season tells one of
+         * `headlineStories` (GDD v1.32: rare stories only).
+         */
         flagshipHeadlineTiers: z.array(leagueTierSchema),
+        headlineStories: z.array(z.enum(SEASON_STORIES)),
       })
       .refine((s) => s.minFactor <= 1 && s.maxFactor >= 1, "Factor bounds must include 1"),
     cards: z.array(template),
