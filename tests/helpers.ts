@@ -163,7 +163,7 @@ export function cardless(base: World): World {
     events: {
       ...base.events,
       cards: base.events.cards.filter(
-        (card) => !["seasonEnd", "star", "tradition"].includes(card.trigger),
+        (card) => !["seasonEnd", "star", "tradition", "award"].includes(card.trigger),
       ),
     },
   };

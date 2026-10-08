@@ -4,7 +4,7 @@ import { venueStrength } from "./culture";
 import { offerDealCards } from "./deal-cards";
 import type { EventRecord, EventState } from "./events-state";
 import { activeClubs, moveClubRatings } from "./flagship";
-import { offerHallCards } from "./hall-cards";
+import { offerAwardCards, offerHallCards } from "./hall-cards";
 import { classHeadline, classPP } from "./hall-of-fame";
 import { seasonFacts, seasonStories } from "./season-stories";
 import {
@@ -122,11 +122,11 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   const settings = world.events.settings;
   const recent = state.landmarks.slice(state.events.landmarkCursor);
   // A Hall of Fame class (GDD v1.31) follows the champion card and takes no slot.
-  const seasonEvents = offerHallCards(
+  const seasonEvents = offerAwardCards(
     state,
     world,
     recent,
-    offerSeasonCards(state, world, recent, state.events),
+    offerHallCards(state, world, recent, offerSeasonCards(state, world, recent, state.events)),
   );
   const ranked = state.countries
     .map((country, index) => ({ country, index }))
@@ -189,7 +189,8 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
       card.trigger === "tradition" ||
       card.trigger === "deal" ||
       card.trigger === "venue" ||
-      card.trigger === "hall"
+      card.trigger === "hall" ||
+      card.trigger === "award"
     )
       continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
@@ -608,7 +609,8 @@ export function eventProblems(state: GameState, world: World): string[] {
     if (event.facts.rivalId && !state.rivals.some((r) => r.sportId === event.facts.rivalId))
       problems.push("Unknown event rival");
     const season = event.facts.season;
-    if ((card.story !== null) !== (season !== null))
+    // Season cards and the first award (GDD v1.33) tell a recorded season.
+    if ((card.story !== null || card.trigger === "award") !== (season !== null))
       problems.push("Season facts on the wrong card");
     const star = event.facts.star;
     if ((card.star !== null) !== (star !== null)) problems.push("Star facts on the wrong card");

@@ -301,6 +301,10 @@
         "title": "They are singing {{name}} in {{abroad}}",
         "body": "Fans in {{abroad}} have taken up {{name}}, the song of {{club}}. Where it is sung, fans hold on longer."
       },
+      "first-award": {
+        "title": "{{Award}} goes to {{player}}",
+        "body": "For the first time the {{seasonNoun}}'s best player is named: {{player}} of {{club}} wins {{award}}."
+      },
       "hall-of-fame-class": {
         "title": "The Hall of Fame: the class of {{year}}",
         "body_one": "One name joins the Hall of Fame this year. It stays there for good.",
@@ -346,8 +350,8 @@
     },
     "arrived": "Already landed, whatever you choose:",
     "seasonLeader": "{{player}} led {{champion}}.",
-    "seasonScorer_one": "{{player}} was the {{seasonNoun}}'s top scorer, with {{count, number}} {{scoreNoun}}.",
-    "seasonScorer_other": "{{player}} was the {{seasonNoun}}'s top scorer, with {{count, number}} {{scoreNoun}}."
+    "seasonScorer_one": "{{player}} won {{crown}}: the {{seasonNoun}}'s top scorer, with {{count, number}} {{scoreNoun}}.",
+    "seasonScorer_other": "{{player}} won {{crown}}: the {{seasonNoun}}'s top scorer, with {{count, number}} {{scoreNoun}}."
   },
   "saves": {
     "menu": "Campaign",
@@ -1563,21 +1567,33 @@
       "crowd": "Record crowd: {{crowd, number(maximumFractionDigits: 0)}} in {{year}}, in {{country}}.",
       "noCrowd": "No record crowd yet.",
       "scorers": "All-time top {{scoresNoun}}",
-      "noScorers": "Nobody has scored yet."
+      "noScorers": "Nobody has scored yet.",
+      "mostAwards": "Won {{award}} most often"
     },
     "roll": {
       "heading": "Roll of champions",
       "empty": "No season has finished yet.",
-      "scorer": "Top scorer: {{player}}, {{count}} {{scoreNoun}}"
+      "scorer": "Top scorer: {{player}}, {{count}} {{scoreNoun}}",
+      "award": "{{player}} won {{award}}"
     },
     "stats": {
       "starSeasons": "Star seasons",
       "titles": "Titles",
       "topScorer": "Top scorer",
+      "awards": "Season awards",
       "scores": "Career {{scoresNoun}}"
     },
     "countryLine": "Hall of Fame: {{names}}",
     "countryNote": "Legends from here keep fans holding on longer."
+  },
+  "awards": {
+    "plain": "Player of the Season",
+    "named": "the {{name}} Medal",
+    "named_start": "The {{name}} Medal",
+    "crown": "the {{Score}} Crown",
+    "winner": "{{player}} ({{club}}) won {{award}}.",
+    "count_one": "Won {{award}} once",
+    "count_other": "Won {{award}} {{count}} times"
   },
   "hall": {
     "line": "{{player}} ({{club}}): {{count}} {{scoreNoun}} and {{seasons}} {{seasonsNoun}} as a star. Titles won: {{titles}}.",

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, CountrySnapshot, TurnSnapshot } from "../../../sim";
+import { useAwardWords } from "../awards/words";
 import { TrophyCard } from "../culture/TrophyCard";
 import { DealsPanel } from "../deals/DealsPanel";
 import { Seat } from "../flagship/FlagshipScreen";
@@ -31,6 +32,7 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
   const flagship = snapshot.flagship;
   const termVars = useTermVars(snapshot.identity.terms);
   const nouns = termVars();
+  const awards = useAwardWords(snapshot);
   const country = (id: string) => names.countries[id] ?? id;
   const clubs = new Map(flagship.clubs.map((club) => [club.id, club]));
   const clubName = (id: number) => {
@@ -93,8 +95,20 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
               <p>
                 {t("events.seasonScorer", {
                   ...termVars({ score: last.topScorer.scores }),
+                  crown: awards.crown,
                   player: playerName(last.topScorer.playerId),
                   count: last.topScorer.scores,
+                })}
+              </p>
+            )}
+            {last.playerOfSeason !== null && (
+              <p data-testid="offseason-award">
+                {t("awards.winner", {
+                  award: awards.award,
+                  player: playerName(last.playerOfSeason),
+                  club: clubName(
+                    flagship.players.find((p) => p.id === last.playerOfSeason)?.clubId ?? 0,
+                  ),
                 })}
               </p>
             )}

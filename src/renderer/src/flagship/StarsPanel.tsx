@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, StarSnapshot, TurnSnapshot } from "../../../sim";
+import { useAwardWords } from "../awards/words";
 import { useTermVars } from "../identity/terms";
 
 interface Props {
@@ -118,6 +119,7 @@ function StarCard({
   const backing = flagship.backing;
   const termVars = useTermVars(snapshot.identity.terms);
   const nouns = termVars();
+  const awards = useAwardWords(snapshot);
   const seat = country(flagship.countryId);
   const kind = star.backing ? "drop" : "back";
   const blocker = kind === "drop" ? star.dropBlocker : star.backBlocker;
@@ -162,6 +164,11 @@ function StarCard({
         <br />
         {t("flagship.stars.born", { place: star.birthplace, country: country(star.countryId) })}
       </p>
+      {star.awards > 0 && (
+        <p className="star-awards" data-testid="flagship-star-awards">
+          {t("awards.count", { count: star.awards, award: awards.award })}
+        </p>
+      )}
       <dl className="star-tallies">
         <div>
           <dt>

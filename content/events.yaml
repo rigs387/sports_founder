@@ -501,6 +501,24 @@ cards:
     effects: []
     choices: []
     defaultChoice: null
+  # Awards (GDD v1.33): the sport's first Player of the Season is a toast, once.
+  - id: first-award
+    kind: moment
+    weight: minor
+    tone: positive
+    priority: 200
+    trigger: award
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   # The Hall of Fame (GDD v1.31): one card per class, after the champion card. It takes no moment
   # slot; it pays PP per inductee by wing and tier (config hallOfFame.pp). The sport's first class,
   # or one inducting an all-time scoring record holder, is a headline.

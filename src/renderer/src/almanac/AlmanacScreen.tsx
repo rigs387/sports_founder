@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { InducteeFacts, InducteeSnapshot, TurnSnapshot } from "../../../sim";
+import { useAwardWords } from "../awards/words";
 import { Emblem } from "../identity/Emblem";
 import { useTermVars } from "../identity/terms";
 import "./almanac.css";
@@ -21,6 +22,7 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
   const { t } = useTranslation();
   const hall = snapshot.hallOfFame;
   const nouns = useTermVars(snapshot.identity.terms);
+  const awards = useAwardWords(snapshot);
   const country = (id: string) => names.countries[id] ?? id;
   const clubs = new Map(snapshot.flagship.clubs.map((club) => [club.id, club]));
   const club = (id: number | null) => {
@@ -31,7 +33,7 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
     snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
   const players = hall.inductees.filter((i) => i.wing === "players").reverse();
   const moments = hall.inductees.filter((i) => i.wing === "moments");
-  const { champions, scorers, crowd } = hall.records;
+  const { champions, scorers, crowd, mostAwards } = hall.records;
 
   return (
     <section
@@ -159,6 +161,24 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
               </ol>
             )}
           </section>
+          {mostAwards.length > 0 && (
+            <section className="almanac-card" aria-labelledby="almanac-awards-heading">
+              <h2 id="almanac-awards-heading">
+                {t("almanac.records.mostAwards", { award: awards.award })}
+              </h2>
+              <ol className="scorers" data-testid="almanac-most-awards">
+                {mostAwards.map((row) => (
+                  <li key={row.playerId}>
+                    <span>
+                      {player(row.playerId)}
+                      <small>{club(row.clubId)}</small>
+                    </span>
+                    <b>{t("format.count", { value: row.awards })}</b>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
           <section className="almanac-card" aria-labelledby="almanac-roll-heading">
             <h2 id="almanac-roll-heading">{t("almanac.roll.heading")}</h2>
             {champions.length === 0 ? (
@@ -176,6 +196,14 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
                             ...nouns({ score: season.topScorer.scores }),
                             player: player(season.topScorer.playerId),
                             count: season.topScorer.scores,
+                          })}
+                        </small>
+                      )}
+                      {season.playerOfSeason !== null && (
+                        <small>
+                          {t("almanac.roll.award", {
+                            award: awards.award,
+                            player: player(season.playerOfSeason),
                           })}
                         </small>
                       )}
@@ -214,6 +242,7 @@ function Plaque({
     [t("almanac.stats.starSeasons"), facts.starSeasons],
     [t("almanac.stats.titles"), facts.titles],
     [t("almanac.stats.topScorer"), facts.topScorerSeasons],
+    [t("almanac.stats.awards"), facts.awards],
     [t("almanac.stats.scores", { scoresNoun: nouns().scoresNoun }), facts.scores],
   ];
   return (

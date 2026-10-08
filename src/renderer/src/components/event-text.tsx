@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { EventEffect } from "../../../content";
 import type { EventRecord } from "../../../sim";
+import { useAwardWords } from "../awards/words";
 import { useTraditionWords } from "../culture/traditions";
 import { useDealPartnerName } from "../deals/partners";
 import { PLAIN_TERMS, useTermVars } from "../identity/terms";
@@ -64,6 +65,7 @@ export function useEventText() {
   const { snapshot, names } = useGameStore();
   const termVars = useTermVars(snapshot?.identity.terms ?? PLAIN_TERMS);
   const words = useTraditionWords(snapshot);
+  const awards = useAwardWords(snapshot);
   const dealPartnerName = useDealPartnerName(names, snapshot?.identity.sportName ?? "");
   if (!snapshot) return null;
   const country = (id: string) => names?.countries[id] ?? id;
@@ -164,9 +166,13 @@ export function useEventText() {
   const seasonText = (event: EventRecord) => {
     const season = event.facts.season;
     if (!season) return starText(event);
+    const winner = snapshot.flagship.players.find((p) => p.id === season.playerOfSeasonId);
     return {
       champion: club(season.championId),
       runnerUp: club(season.runnerUpId),
+      // The season's Player of the Season (GDD v1.33).
+      player: winner?.name ?? "",
+      club: club(winner?.clubId),
       season: season.season,
       streak: season.streak,
       count: season.pointsGap,
@@ -185,6 +191,7 @@ export function useEventText() {
       typeof values[key] === "number" ? (values[key] as number) : undefined;
     return {
       ...termVars({ score: number("count"), match: number("matches"), seasons: number("seasons") }),
+      ...awards,
       ...values,
     };
   };
@@ -252,10 +259,21 @@ export function useEventText() {
       lines.push(
         t("events.seasonScorer", {
           ...termVars({ score: season.topScorerScores ?? 0 }),
+          crown: awards.crown,
           player: player(season.topScorerId),
           count: season.topScorerScores ?? 0,
         }),
       );
+    if (season?.playerOfSeasonId != null) {
+      const winner = snapshot.flagship.players.find((p) => p.id === season.playerOfSeasonId);
+      lines.push(
+        t("awards.winner", {
+          award: awards.award,
+          player: winner?.name ?? "",
+          club: club(winner?.clubId),
+        }),
+      );
+    }
     return lines;
   };
   /**

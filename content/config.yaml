@@ -629,6 +629,8 @@ hallOfFame:
   moments: [foundingTitle, firstStar, firstProfessional, firstElite, firstRecordCrowd, firstRankOne, won]
   # The Almanac's all-time top scorers list.
   leaders: 10
+  # The Almanac's most Player of the Season awards list (GDD v1.33).
+  awardLeaders: 5
 
 # Sport identity (GDD v1.18): limits on the names typed at setup (the sport, the founding club's
 # name and its ground), counted after trimming.

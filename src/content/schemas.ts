@@ -1024,6 +1024,7 @@ export const configFileSchema = z.strictObject({
     }),
     moments: z.array(hallFirstSchema),
     leaders: z.int().min(1),
+    awardLeaders: z.int().min(1),
   }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({

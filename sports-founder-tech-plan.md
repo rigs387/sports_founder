@@ -1071,6 +1071,15 @@ season facts' `playerOfSeasonId` record it. `InducteeFacts.awards` counts a play
 with no winners, no award facts, inductees at 0 awards; `awardless` in `tests/helpers.ts` is that
 migration for older-save tests). `tests/awards.test.ts`.
 
+*Step 2 built 2026-10-08.* `hallSnapshot` adds `awardNamerId` (the first player inductee), each
+season's winner on the roll and `mostAwards` (top `hallOfFame.awardLeaders`); `StarSnapshot.awards`.
+`useAwardWords` (`src/renderer/src/awards/words.ts`) names the award ("Player of the Season", or
+"the {surname} Medal" after the namer's last name) and the {Score} Crown. Lines: the champion card
+and the season in review name the winner and the Crown; the Stars panel counts a star's awards;
+the Almanac's roll names winners, plaques count "Season awards", and "Won {award} most often"
+lists the most awarded. The `first-award` card (trigger `award`, minor, no slot, season facts) is
+offered once, for the first season with a winner. The deck is 37 cards; `cardless` drops it too.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

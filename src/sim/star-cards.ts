@@ -146,7 +146,8 @@ export function takesNoSlot(card: EventTemplate | undefined): boolean {
     card?.story === "champion" ||
     card?.star === "breakout" ||
     card?.deal != null ||
-    card?.trigger === "hall"
+    card?.trigger === "hall" ||
+    card?.trigger === "award"
   );
 }
 

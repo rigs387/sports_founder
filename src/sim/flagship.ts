@@ -1758,6 +1758,8 @@ export interface StarSnapshot {
   dropBlocker: DropBlocker | null;
   /** League cash a quarter the star's wage costs (GDD v1.30); 0 away from the seat. */
   wage: number;
+  /** Player of the Season awards won (GDD v1.33). */
+  awards: number;
 }
 
 /** Backing slots, the price and what a drop at full influence costs (GDD v1.16). */
@@ -1982,6 +1984,7 @@ function starSnapshots(state: GameState, world: World): StarSnapshot[] {
         backBlocker: backStarBlocker(state, world, player.id),
         dropBlocker: dropStarBlocker(state, world, player.id),
         wage: atSeat.has(player) ? starWage(player, flagship, running, world) : 0,
+        awards: flagship.seasons.filter((s) => s.playerOfSeason === player.id).length,
       };
     });
 }

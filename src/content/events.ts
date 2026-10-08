@@ -114,6 +114,7 @@ const template = z
       "deal",
       "venue",
       "hall",
+      "award",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),
@@ -193,6 +194,13 @@ const template = z
         issue("Hall of Fame cards are moments that follow recorded facts: no cooldown");
       if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
         issue("Hall of Fame cards belong to the sport: campaign scope, no anchor or health filter");
+    }
+    // The first Player of the Season (GDD v1.33): one minor moment, told from the season recorded.
+    if (card.trigger === "award") {
+      if (card.kind !== "moment" || card.weight !== "minor" || card.cooldownTurns !== null)
+        issue("The award card is a minor moment that follows a recorded season: no cooldown");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("The award card belongs to the flagship: campaign scope, no anchor or health filter");
     }
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");
@@ -277,6 +285,8 @@ export const eventsFileSchema = z
       });
     if (data.cards.filter((c) => c.trigger === "hall").length > 1)
       ctx.addIssue({ code: "custom", path: ["cards"], message: "Only one Hall of Fame card" });
+    if (data.cards.filter((c) => c.trigger === "award").length > 1)
+      ctx.addIssue({ code: "custom", path: ["cards"], message: "Only one award card" });
     const stars = data.cards.flatMap((c) => (c.star === null ? [] : [c.star]));
     if (new Set(stars).size !== stars.length)
       ctx.addIssue({

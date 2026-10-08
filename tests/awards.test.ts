@@ -3,9 +3,12 @@ import {
   createCampaign,
   deserializeSave,
   endTurn,
+  eventSnapshots,
   type GameState,
   hallPoints,
+  hallSnapshot,
   inducteeFacts,
+  offerEvents,
   type PlayerTally,
   playerOfSeason,
   serializeSave,
@@ -101,5 +104,68 @@ describe("Player of the Season", () => {
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 23, state: raw }), world);
     expect(serializeSave(loaded)).toBe(serializeSave(awardless(played)));
     expect(loaded.flagship.seasons.every((s) => s.playerOfSeason === null)).toBe(true);
+  });
+});
+
+describe("award names and lines (tech plan 2.20 step 2)", () => {
+  it("names the award after the first Hall of Fame player, and lists the most awarded", () => {
+    const played = afterFirstSeason();
+    const view = hallSnapshot(played, world);
+    expect(view.awardNamerId).toBeNull();
+    const winner = played.flagship.seasons[0]?.playerOfSeason ?? 0;
+    expect(view.records.mostAwards).toEqual([
+      expect.objectContaining({ playerId: winner, awards: 1 }),
+    ]);
+    expect(view.records.champions[0]?.playerOfSeason).toBe(winner);
+    const [first] = played.flagship.players;
+    if (!first) throw new Error("No player");
+    const inducted: GameState = {
+      ...played,
+      hallOfFame: {
+        ...played.hallOfFame,
+        inductees: [
+          {
+            id: 1,
+            wing: "players",
+            season: 1,
+            turn: 1,
+            quarter: 1,
+            countryId: first.countryId,
+            playerId: first.id,
+            facts: null,
+            first: null,
+            landmarkIndex: null,
+          },
+        ],
+        nextId: 2,
+      },
+    };
+    expect(hallSnapshot(inducted, world).awardNamerId).toBe(first.id);
+  });
+
+  it("the first award is a minor toast, offered once a campaign", () => {
+    let state = createCampaign(world, setupFor(5, "brazil"));
+    let offered = 0;
+    while (state.flagship.seasons.length < 3) {
+      state = endTurn(state, world);
+      offered += state.events.pending.filter((e) => e.templateId === "first-award").length;
+      state = {
+        ...state,
+        events: {
+          ...state.events,
+          pending: state.events.pending.filter((e) => e.templateId !== "first-award"),
+        },
+      };
+    }
+    expect(offered).toBe(1);
+    // Offered again from scratch: a minor moment naming the first winner.
+    const again = offerEvents(
+      { ...state, events: { ...state.events, offered: {}, landmarkCursor: 0 } },
+      world,
+      4,
+    );
+    const toast = eventSnapshots(again, world).find((e) => e.templateId === "first-award");
+    expect(toast?.weight).toBe("minor");
+    expect(toast?.facts.season?.playerOfSeasonId).toBe(state.flagship.seasons[0]?.playerOfSeason);
   });
 });

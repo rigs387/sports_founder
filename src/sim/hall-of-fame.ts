@@ -300,6 +300,11 @@ export interface WaitingSnapshot {
 export interface HallSnapshot {
   inductees: InducteeSnapshot[];
   waiting: WaitingSnapshot[];
+  /**
+   * The player Player of the Season is named after (GDD v1.33): the first player the Hall of Fame
+   * inducted, or null while it is still plain "Player of the Season".
+   */
+  awardNamerId: number | null;
   records: {
     /** Every finished flagship season, newest first. */
     champions: {
@@ -309,11 +314,14 @@ export interface HallSnapshot {
       championId: number;
       topScorer: { playerId: number; scores: number } | null;
       crowd: number | null;
+      playerOfSeason: number | null;
     }[];
     /** The all-time top scorers by career scores (config hallOfFame.leaders), best first. */
     scorers: { playerId: number; clubId: number; scores: number; retired: boolean }[];
     /** The best crowd any flagship season drew, if one was recorded. */
     crowd: { crowd: number; season: number; year: number; countryId: string } | null;
+    /** The most Player of the Season awards (config hallOfFame.awardLeaders), most first. */
+    mostAwards: { playerId: number; clubId: number; awards: number }[];
   };
 }
 
@@ -370,6 +378,17 @@ export function hallSnapshot(state: GameState, world: World): HallSnapshot {
     .filter((row) => row.scores > 0)
     .sort((a, b) => b.scores - a.scores || a.playerId - b.playerId)
     .slice(0, config.leaders);
+  const awards = new Map<number, number>();
+  for (const s of flagship.seasons)
+    if (s.playerOfSeason !== null)
+      awards.set(s.playerOfSeason, (awards.get(s.playerOfSeason) ?? 0) + 1);
+  const mostAwards = [...awards]
+    .map(([playerId, count]) => {
+      const player = players.get(playerId);
+      return { playerId, clubId: player ? lastClub(player) : 0, awards: count };
+    })
+    .sort((a, b) => b.awards - a.awards || a.playerId - b.playerId)
+    .slice(0, config.awardLeaders);
   let crowd: HallSnapshot["records"]["crowd"] = null;
   for (const s of flagship.seasons)
     if (s.crowd !== null && (crowd === null || s.crowd > crowd.crowd))
@@ -377,6 +396,7 @@ export function hallSnapshot(state: GameState, world: World): HallSnapshot {
   return {
     inductees,
     waiting,
+    awardNamerId: hall.inductees.find((i) => i.wing === "players")?.playerId ?? null,
     records: {
       champions: [...flagship.seasons].reverse().map((s) => ({
         season: s.season,
@@ -387,9 +407,11 @@ export function hallSnapshot(state: GameState, world: World): HallSnapshot {
           ? { playerId: s.topScorer.playerId, scores: s.topScorer.scores }
           : null,
         crowd: s.crowd,
+        playerOfSeason: s.playerOfSeason,
       })),
       scorers,
       crowd,
+      mostAwards,
     },
   };
 }
