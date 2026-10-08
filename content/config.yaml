@@ -619,6 +619,8 @@ hallOfFame:
     players: { amateur: 4, semi-pro: 6, professional: 8, elite: 12 }
     moments: { amateur: 2, semi-pro: 3, professional: 4, elite: 6 }
   moments: [foundingTitle, firstStar, firstProfessional, firstElite, firstRecordCrowd, firstRankOne, won]
+  # The Almanac's all-time top scorers list.
+  leaders: 10
 
 # Sport identity (GDD v1.18): limits on the names typed at setup (the sport, the founding club's
 # name and its ground), counted after trimming.

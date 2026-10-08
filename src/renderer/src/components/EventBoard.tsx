@@ -179,7 +179,7 @@ export function EventBoard() {
                   </span>
                   <h3>{title(selected)}</h3>
                   <p>{text.body(selected)}</p>
-                  {text.seasonLines(selected).map((line) => (
+                  {text.factLines(selected).map((line) => (
                     <p key={line}>{line}</p>
                   ))}
                   <div className="event-facts">

@@ -480,6 +480,45 @@ cards:
     effects: []
     choices: []
     defaultChoice: null
+  # Chants (GDD v1.31): a chant's first follower abroad is a toast, once.
+  - id: chant-spread
+    kind: moment
+    weight: minor
+    tone: positive
+    priority: 200
+    trigger: tradition
+    tradition: spread
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  # The Hall of Fame (GDD v1.31): one card per class, after the champion card. It takes no moment
+  # slot; it pays PP per inductee by wing and tier (config hallOfFame.pp). The sport's first class,
+  # or one inducting an all-time scoring record holder, is a headline.
+  - id: hall-of-fame-class
+    kind: moment
+    weight: big
+    tone: positive
+    priority: 200
+    trigger: hall
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   # Deals (GDD v1.28): a broken deal is big news telling what the breach cost; a deal that ran its
   # term is a toast. Told from the landmark recorded at the time; neither takes a moment slot.
   - id: deal-broken

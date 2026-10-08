@@ -73,10 +73,17 @@ export function useEventText() {
   };
   const player = (id: number | null | undefined) =>
     snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
+  // The Hall of Fame's class card (GDD v1.31) names the class's year and size.
+  const hallText = (event: EventRecord) => {
+    const hall = event.facts.hall;
+    if (!hall) return {};
+    const first = snapshot.hallOfFame.inductees.find((i) => hall.inducteeIds.includes(i.id));
+    return { year: first?.year ?? 0, count: hall.inducteeIds.length };
+  };
   // Venue cards (GDD v1.30) name the level, and for a record crowd its size and ground.
   const venueText = (event: EventRecord) => {
     const venue = event.facts.venue;
-    if (!venue) return {};
+    if (!venue) return hallText(event);
     const ground = snapshot.flagship.clubs.find((c) => c.id === venue.clubId)?.ground ?? "";
     return {
       level: venue.level,
@@ -110,6 +117,10 @@ export function useEventText() {
     const tradition = snapshot.culture.traditions.find((item) => item.id === told?.traditionId);
     if (!told || !tradition) return {};
     const born = event.templateId === "tradition-born";
+    // The first chant is the anthem (GDD v1.31).
+    const anthem =
+      tradition.type === "chant" &&
+      snapshot.culture.traditions.find((t) => t.type === "chant")?.id === tradition.id;
     return {
       ...termVars({ seasons: born ? snapshot.culture.derby.seasons : tradition.seasons.length }),
       name: words.name(tradition),
@@ -121,7 +132,15 @@ export function useEventText() {
       country: country(tradition.countryId),
       count: tradition.seasons.length,
       span: snapshot.culture.derby.seasons,
-      context: born ? tradition.type : (tradition.lost?.reason ?? "faded"),
+      // A chant's first follower abroad is the card's own country.
+      abroad: country(event.countryId),
+      context: born
+        ? anthem
+          ? "anthem"
+          : tradition.type
+        : event.templateId === "chant-spread"
+          ? undefined
+          : (tradition.lost?.reason ?? "faded"),
     };
   };
   // Star cards (GDD v1.16) name the player and clubs from the record.
@@ -186,10 +205,37 @@ export function useEventText() {
       tier: event.facts.leagueTier ? t(`league.tiers.${event.facts.leagueTier}`) : "",
       ...textVars(event),
     });
-  /** The season's leading player and top scorer, where the record names them. */
-  const seasonLines = (event: EventRecord) => {
+  /** A Hall of Fame class's inductees, one line each, from the facts recorded at induction. */
+  const hallLines = (event: EventRecord) => {
+    const hall = event.facts.hall;
+    if (!hall) return [];
+    return snapshot.hallOfFame.inductees
+      .filter((inductee) => hall.inducteeIds.includes(inductee.id))
+      .map((inductee) => {
+        if (inductee.facts)
+          return t(inductee.facts.record ? "hall.line_record" : "hall.line", {
+            ...termVars({ score: inductee.facts.scores, seasons: inductee.facts.starSeasons }),
+            player: player(inductee.playerId),
+            club: club(inductee.clubId ?? undefined),
+            count: inductee.facts.scores,
+            seasons: inductee.facts.starSeasons,
+            titles: inductee.facts.titles,
+          });
+        return t(`hall.firsts.${inductee.first}`, {
+          year: inductee.firstYear ?? inductee.year,
+          player: player(inductee.firstPlayerId),
+          club: club(inductee.firstClubId ?? undefined),
+          country: country(inductee.countryId),
+        });
+      });
+  };
+  /**
+   * The lines under a card's body: a season's leading player and top scorer, where the record
+   * names them, or a Hall of Fame class's inductees.
+   */
+  const factLines = (event: EventRecord) => {
     const season = event.facts.season;
-    const lines: string[] = [];
+    const lines: string[] = hallLines(event);
     if (season?.championPlayerId != null)
       lines.push(
         t("events.seasonLeader", {
@@ -218,5 +264,5 @@ export function useEventText() {
       year: snapshot.year - Math.floor(snapshot.quarter / 4) + Math.floor(index / 4),
     });
   };
-  return { country, club, player, title, body, seasonLines, dateOf, termVars };
+  return { country, club, player, title, body, factLines, dateOf, termVars };
 }

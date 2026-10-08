@@ -4,6 +4,8 @@ import { venueStrength } from "./culture";
 import { offerDealCards } from "./deal-cards";
 import type { EventRecord, EventState } from "./events-state";
 import { activeClubs, moveClubRatings } from "./flagship";
+import { offerHallCards } from "./hall-cards";
+import { classHeadline, classPP } from "./hall-of-fame";
 import { seasonFacts, seasonStories } from "./season-stories";
 import {
   applyStarEffect,
@@ -119,7 +121,13 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   if (state.outcome) return state;
   const settings = world.events.settings;
   const recent = state.landmarks.slice(state.events.landmarkCursor);
-  const seasonEvents = offerSeasonCards(state, world, recent, state.events);
+  // A Hall of Fame class (GDD v1.31) follows the champion card and takes no slot.
+  const seasonEvents = offerHallCards(
+    state,
+    world,
+    recent,
+    offerSeasonCards(state, world, recent, state.events),
+  );
   const ranked = state.countries
     .map((country, index) => ({ country, index }))
     .sort((a, b) => {
@@ -180,7 +188,8 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
       card.trigger === "star" ||
       card.trigger === "tradition" ||
       card.trigger === "deal" ||
-      card.trigger === "venue"
+      card.trigger === "venue" ||
+      card.trigger === "hall"
     )
       continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
@@ -268,7 +277,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
  * raised by the famous grounds of the league's country (GDD v1.22).
  */
 export function eventEffects(
-  state: Pick<GameState, "culture">,
+  state: Pick<GameState, "culture" | "hallOfFame">,
   world: World,
   card: EventTemplate,
   event: Pick<EventRecord, "facts" | "countryId">,
@@ -280,6 +289,8 @@ export function eventEffects(
     return [{ type: "pp", amount: breakoutPP(world, event) }, ...card.effects];
   if (card.tradition === "born")
     return [{ type: "pp", amount: birthPP(world, event) }, ...card.effects];
+  if (card.trigger === "hall")
+    return [{ type: "pp", amount: classPP(state, world, event) }, ...card.effects];
   if (card.story !== "champion") return card.effects;
   const base = world.config.flagship.stories.championPP[event.facts.leagueTier ?? "amateur"];
   const fame = Math.min(1, venueStrength(state, event.countryId));
@@ -485,8 +496,9 @@ export function settleEvents(state: GameState, world: World): GameState {
 }
 
 /** Which news section a card belongs to (GDD v1.26): each family has its own look. */
-export type EventFamily = "season" | "star" | "tradition" | "rival" | "business" | "sport";
+export type EventFamily = "season" | "star" | "tradition" | "hall" | "rival" | "business" | "sport";
 function eventFamily(event: EventRecord): EventFamily {
+  if (event.facts.hall) return "hall";
   if (event.facts.deal || event.facts.venue) return "business";
   if (event.facts.season) return "season";
   if (event.facts.star) return "star";
@@ -498,7 +510,8 @@ function eventFamily(event: EventRecord): EventFamily {
 /**
  * A moment's weight on the world map (GDD v1.26): the card's own, raised to a headline for a big
  * flagship moment (season or star facts) while the flagship is at a headline tier, and for the
- * breakout of the sport's first star. Decisions have none.
+ * breakout of the sport's first star, the first Hall of Fame class (or one with a scoring record
+ * holder) and the anthem's birth. Decisions have none.
  */
 function momentWeight(
   state: GameState,
@@ -507,6 +520,13 @@ function momentWeight(
   event: EventRecord,
 ): MomentWeight | null {
   if (card.weight !== "big") return card.weight;
+  // The first Hall of Fame class, or one with a scoring record holder; the anthem (GDD v1.31).
+  if (card.trigger === "hall") return classHeadline(state, event) ? "headline" : "big";
+  const told = event.facts.tradition;
+  if (card.tradition === "born" && told?.type === "chant") {
+    const anthem = state.culture.traditions.find((t) => t.type === "chant");
+    return anthem?.id === told.traditionId ? "headline" : "big";
+  }
   const flagship = event.facts.season !== null || event.facts.star !== null;
   const tier = event.facts.leagueTier;
   if (flagship && tier && world.events.settings.flagshipHeadlineTiers.includes(tier))

@@ -44,8 +44,11 @@ export const eventEffectSchema = z.union([
   // The repeat-final card only (GDD v1.22): one extra meeting toward a derby between the two clubs.
   z.strictObject({ type: z.literal("derbyStoke") }),
 ]);
-/** The tradition facts a card can tell (GDD v1.22): a tradition born or lost. */
-export const TRADITION_CARDS = ["born", "lost"] as const;
+/**
+ * The tradition facts a card can tell (GDD v1.22): a tradition born or lost, and a chant's first
+ * follower abroad (GDD v1.31).
+ */
+export const TRADITION_CARDS = ["born", "lost", "spread"] as const;
 /** The deal facts a deal card tells (GDD v1.28): a breach, or a deal that ran its term. */
 export const DEAL_CARDS = ["broken", "ended", "walked"] as const;
 export type DealCard = (typeof DEAL_CARDS)[number];
@@ -110,6 +113,7 @@ const template = z
       "tradition",
       "deal",
       "venue",
+      "hall",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),
@@ -182,6 +186,13 @@ const template = z
         issue("Venue cards are moments that follow recorded facts: no cooldown");
       if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
         issue("Venue cards belong to the flagship: campaign scope, no anchor or health filter");
+    }
+    // The Hall of Fame's class card (GDD v1.31): one moment, told from the class recorded.
+    if (card.trigger === "hall") {
+      if (card.kind !== "moment" || card.cooldownTurns !== null)
+        issue("Hall of Fame cards are moments that follow recorded facts: no cooldown");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("Hall of Fame cards belong to the sport: campaign scope, no anchor or health filter");
     }
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");
@@ -260,6 +271,8 @@ export const eventsFileSchema = z
         path: ["cards"],
         message: "Two cards tell the same tradition fact",
       });
+    if (data.cards.filter((c) => c.trigger === "hall").length > 1)
+      ctx.addIssue({ code: "custom", path: ["cards"], message: "Only one Hall of Fame card" });
     const stars = data.cards.flatMap((c) => (c.star === null ? [] : [c.star]));
     if (new Set(stars).size !== stars.length)
       ctx.addIssue({

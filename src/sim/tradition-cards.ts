@@ -2,7 +2,8 @@ import type { EventRecord, EventState } from "./events-state";
 import { type GameState, type Landmark, PLAYER_INDEX, type World } from "./types";
 
 // Traditions as cards (GDD v1.22). Every tradition born or lost is a moment, told from the facts
-// recorded on the tradition itself; it uses a moment slot. A birth pays PP by its type (config
+// recorded on the tradition itself, and so is a chant's first follower abroad (GDD v1.31, a
+// toast in the country now singing it); each uses a moment slot. A birth pays PP by its type (config
 // culture.birthPP); a loss pays nothing.
 
 /**
@@ -21,8 +22,18 @@ export function offerTraditionCards(
   let left = room;
   for (const landmark of recent) {
     if (left <= 0) break;
-    if (landmark.kind !== "traditionBorn" && landmark.kind !== "traditionLost") continue;
-    const told = landmark.kind === "traditionBorn" ? "born" : "lost";
+    if (
+      landmark.kind !== "traditionBorn" &&
+      landmark.kind !== "traditionLost" &&
+      landmark.kind !== "chantSpread"
+    )
+      continue;
+    const told =
+      landmark.kind === "traditionBorn"
+        ? "born"
+        : landmark.kind === "traditionLost"
+          ? "lost"
+          : "spread";
     const card = world.events.cards.find((c) => c.tradition === told);
     if (!card || state.ppTier < card.minTier) continue;
     const country = state.countries.find((c) => c.countryId === landmark.countryId);
@@ -44,7 +55,10 @@ export function offerTraditionCards(
         rivalId: null,
         season: null,
         star: null,
-        tradition: { traditionId: landmark.traditionId, type: landmark.type },
+        tradition: {
+          traditionId: landmark.traditionId,
+          type: landmark.kind === "chantSpread" ? "chant" : landmark.type,
+        },
         deal: null,
         venue: null,
         hall: null,

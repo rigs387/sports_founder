@@ -957,6 +957,16 @@ firsts, so chants were born in seasons 1–7 of every campaign (8–9 each). A f
 only after `historySeasons` (10) seasons of that league: 5–9 chants a campaign, the first in
 seasons 14–22, most fading when their club stops winning; 4–5 spread news a campaign.
 
+*Step 4 built 2026-10-07.* `src/sim/hall-cards.ts`: a `hall-of-fame-class` card (trigger `hall`,
+event facts `hall`: the class season and inductee ids) for each `hallOfFameClass` landmark,
+offered right after the season cards and taking no moment slot (`takesNoSlot`). `classPP`: PP per
+inductee by wing and tier; `classHeadline`: the first class or one with a scoring record holder.
+The anthem's `tradition-born` card is a headline; `chant-spread` (tradition card `spread`) is a
+minor toast in the follower country. A `hall` card family (masthead "The Hall of Fame").
+`hallSnapshot` (`TurnSnapshot.hallOfFame`): inductees with their quoted facts and firsts' subjects,
+the Waiting list, and Records (champions, the top `leaders` scorers, the best crowd). Card text:
+one line per inductee (`factLines`, which replaced `seasonLines`). The deck is 36 cards.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

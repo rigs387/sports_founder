@@ -44,6 +44,8 @@ export function useTraditionWords(snapshot: TurnSnapshot | null) {
         return club(first)?.ground ?? "";
       case "trophy":
         return tradition.name ?? t("culture.names.trophy", { ground: club(first)?.ground ?? "" });
+      case "chant":
+        return t("culture.names.chant", { song: tradition.name ?? "" });
       default:
         return tradition.name ?? "";
     }

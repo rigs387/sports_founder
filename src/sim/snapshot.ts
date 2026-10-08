@@ -9,6 +9,7 @@ import { fandomScore, type SportTotals, sportTotals } from "./fandom";
 import { broadcastEffects, type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
+import { type HallSnapshot, hallSnapshot } from "./hall-of-fame";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
 import { type LeagueActions, leagueActions } from "./league-actions";
 import { type LeagueCosts, leagueCosts } from "./league-costs";
@@ -171,6 +172,8 @@ export interface TurnSnapshot {
   rules: RulesSnapshot;
   /** Traditions, the trophy's name and rivals' flavor traditions (GDD v1.22). */
   culture: CultureSnapshot;
+  /** The Hall of Fame and the Almanac's records (GDD v1.31). */
+  hallOfFame: HallSnapshot;
 }
 
 export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeSnapshot[] {
@@ -310,5 +313,6 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     identity: identitySnapshot(state, world),
     rules: rulesSnapshot(state, world),
     culture: cultureSnapshot(state, world, offseasonOpen(state)),
+    hallOfFame: hallSnapshot(state, world),
   };
 }

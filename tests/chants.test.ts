@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   birthEase,
+  eventSnapshots,
   type GameState,
   modernizeGrounds,
+  offerEvents,
   PLAYER_INDEX,
   updateCulture,
 } from "../src/sim";
@@ -125,5 +127,30 @@ describe("chants", () => {
     const modern = modernizeGrounds(state, world, countryIndex(world, home));
     const [chant] = ofType(modern, "chant");
     expect(chant?.strength).toBeCloseTo(1 - world.config.leagues.venue.modernize.traditionWear);
+  });
+});
+
+describe("chant cards (tech plan 2.18 step 4)", () => {
+  it("the anthem's birth is a headline; a later chant's is a big moment", () => {
+    const state = fresh();
+    const [a = 0, b = 0, c = 0] = clubIds(state).filter(
+      (id) => id !== state.identity.foundingClubId,
+    );
+    const first = offerEvents(play(state, a, b), anyAge, 4);
+    const anthem = eventSnapshots(first, anyAge).find((e) => e.facts.tradition?.type === "chant");
+    expect(anthem).toMatchObject({ templateId: "tradition-born", weight: "headline" });
+    const second = offerEvents(play(first, c, a), anyAge, 4);
+    const later = eventSnapshots(second, anyAge).filter((e) => e.facts.tradition?.type === "chant");
+    expect(later.at(-1)?.weight).toBe("big");
+  });
+
+  it("a chant's first follower abroad is a toast told in that country", () => {
+    const base = hardcoreEverywhere(fresh());
+    const home = base.flagship.countryId;
+    const later = offerEvents(yearsLater(withTradition(base, "chant", home), 40), world, 4);
+    const spread = later.landmarks.find((l) => l.kind === "chantSpread");
+    const toast = eventSnapshots(later, world).find((e) => e.templateId === "chant-spread");
+    expect(toast).toMatchObject({ weight: "minor", countryId: spread?.countryId });
+    expect(toast?.facts.tradition?.type).toBe("chant");
   });
 });

@@ -1,4 +1,6 @@
-import type { HallFirst } from "../content";
+import type { HallFirst, HallWing, LeagueTierId } from "../content";
+import { yearOfQuarter } from "./calendar";
+import type { EventRecord } from "./events-state";
 import { landmarks } from "./records";
 import type {
   GameState,
@@ -214,4 +216,160 @@ export function hallProblems(state: GameState): string[] {
     }
   }
   return problems;
+}
+
+/** A class card's PP (GDD v1.31): each inductee's PP by wing at the flagship league's tier. */
+export function classPP(
+  state: Pick<GameState, "hallOfFame">,
+  world: World,
+  event: Pick<EventRecord, "facts">,
+): number {
+  const hall = event.facts.hall;
+  if (!hall) return 0;
+  const tier: LeagueTierId = event.facts.leagueTier ?? "amateur";
+  const { pp } = world.config.hallOfFame;
+  return state.hallOfFame.inductees
+    .filter((inductee) => hall.inducteeIds.includes(inductee.id))
+    .reduce((sum, inductee) => sum + pp[inductee.wing][tier], 0);
+}
+
+/**
+ * Whether a class is front-page news (GDD v1.31): the sport's first class, or one inducting a
+ * holder of the all-time scoring record.
+ */
+export function classHeadline(state: GameState, event: Pick<EventRecord, "facts">): boolean {
+  const hall = event.facts.hall;
+  if (!hall) return false;
+  const first = state.hallOfFame.inductees[0];
+  if (first && hall.inducteeIds.includes(first.id)) return true;
+  return state.hallOfFame.inductees.some(
+    (inductee) => hall.inducteeIds.includes(inductee.id) && inductee.facts?.record === true,
+  );
+}
+
+// ---- What the player sees (the Almanac, GDD v1.31) --------------------------------------------
+
+export interface InducteeSnapshot {
+  id: number;
+  wing: HallWing;
+  /** The class's season and its year. */
+  season: number;
+  year: number;
+  countryId: string;
+  playerId: number | null;
+  /** A player's last club. */
+  clubId: number | null;
+  facts: InducteeFacts | null;
+  first: HallFirst | null;
+  /** When a first happened, and the player or club it names, where it names one. */
+  firstYear: number | null;
+  firstPlayerId: number | null;
+  firstClubId: number | null;
+}
+
+/** A retired player who clears the bar and waits: for room in a class, or for their seasons. */
+export interface WaitingSnapshot {
+  playerId: number;
+  clubId: number;
+  facts: InducteeFacts;
+  retiredSeason: number;
+  /** The first class they can enter. */
+  eligibleSeason: number;
+}
+
+export interface HallSnapshot {
+  inductees: InducteeSnapshot[];
+  waiting: WaitingSnapshot[];
+  records: {
+    /** Every finished flagship season, newest first. */
+    champions: {
+      season: number;
+      year: number;
+      countryId: string;
+      championId: number;
+      topScorer: { playerId: number; scores: number } | null;
+      crowd: number | null;
+    }[];
+    /** The all-time top scorers by career scores (config hallOfFame.leaders), best first. */
+    scorers: { playerId: number; clubId: number; scores: number; retired: boolean }[];
+    /** The best crowd any flagship season drew, if one was recorded. */
+    crowd: { crowd: number; season: number; year: number; countryId: string } | null;
+  };
+}
+
+const lastClub = (player: Player) => player.career.at(-1)?.clubId ?? player.clubId;
+
+export function hallSnapshot(state: GameState, world: World): HallSnapshot {
+  const { hallOfFame: hall, flagship } = state;
+  const config = world.config.hallOfFame;
+  const year = (quarter: number) => yearOfQuarter(Math.max(0, quarter - 1), world.config);
+  const players = new Map(flagship.players.map((p) => [p.id, p]));
+  const inductees = hall.inductees.map((inductee): InducteeSnapshot => {
+    const player = inductee.playerId === null ? undefined : players.get(inductee.playerId);
+    const landmark =
+      inductee.landmarkIndex === null ? undefined : state.landmarks[inductee.landmarkIndex];
+    return {
+      id: inductee.id,
+      wing: inductee.wing,
+      season: inductee.season,
+      year: year(inductee.quarter),
+      countryId: inductee.countryId,
+      playerId: inductee.playerId,
+      clubId: player ? lastClub(player) : null,
+      facts: inductee.facts,
+      first: inductee.first,
+      firstYear: landmark ? year(landmark.quarter) : null,
+      firstPlayerId: landmark && "playerId" in landmark ? landmark.playerId : null,
+      firstClubId: landmark && "clubId" in landmark ? landmark.clubId : null,
+    };
+  });
+  const inducted = new Set(hall.inductees.map((i) => i.playerId));
+  const waiting = flagship.players
+    .filter(
+      (p) => p.retiredSeason !== null && p.retiredSeason >= hall.startSeason && !inducted.has(p.id),
+    )
+    .map((p) => ({ player: p, facts: inducteeFacts(state, p) }))
+    .filter(({ facts }) => hallPoints(facts, world) >= config.bar)
+    .map(
+      ({ player, facts }): WaitingSnapshot => ({
+        playerId: player.id,
+        clubId: lastClub(player),
+        facts,
+        retiredSeason: player.retiredSeason ?? 0,
+        eligibleSeason: (player.retiredSeason ?? 0) + config.waitSeasons,
+      }),
+    )
+    .sort((a, b) => a.eligibleSeason - b.eligibleSeason || a.playerId - b.playerId);
+  const scorers = flagship.players
+    .map((p) => ({
+      playerId: p.id,
+      clubId: lastClub(p),
+      scores: p.career.reduce((sum, line) => sum + line.scores, 0),
+      retired: p.retiredSeason !== null,
+    }))
+    .filter((row) => row.scores > 0)
+    .sort((a, b) => b.scores - a.scores || a.playerId - b.playerId)
+    .slice(0, config.leaders);
+  let crowd: HallSnapshot["records"]["crowd"] = null;
+  for (const s of flagship.seasons)
+    if (s.crowd !== null && (crowd === null || s.crowd > crowd.crowd))
+      crowd = { crowd: s.crowd, season: s.season, year: year(s.quarter), countryId: s.countryId };
+  return {
+    inductees,
+    waiting,
+    records: {
+      champions: [...flagship.seasons].reverse().map((s) => ({
+        season: s.season,
+        year: year(s.quarter),
+        countryId: s.countryId,
+        championId: s.championId,
+        topScorer: s.topScorer
+          ? { playerId: s.topScorer.playerId, scores: s.topScorer.scores }
+          : null,
+        crowd: s.crowd,
+      })),
+      scorers,
+      crowd,
+    },
+  };
 }

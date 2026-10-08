@@ -10,6 +10,7 @@ export * from "./fandom";
 export * from "./flagship";
 export * from "./genome";
 export * from "./growth";
+export * from "./hall-cards";
 export * from "./hall-of-fame";
 export * from "./hints";
 export * from "./identity";

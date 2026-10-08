@@ -93,7 +93,7 @@ export function EventLayer({
       </header>
       <h3 id="event-popup-title">{text.title(current)}</h3>
       <p>{text.body(current)}</p>
-      {text.seasonLines(current).map((line) => (
+      {text.factLines(current).map((line) => (
         <p key={line}>{line}</p>
       ))}
       {current.arrivalEffects.length > 0 && (
@@ -321,7 +321,7 @@ function MomentWindow({
       </header>
       <h2 id="moment-window-title">{text.title(event)}</h2>
       <p>{text.body(event)}</p>
-      {text.seasonLines(event).map((line) => (
+      {text.factLines(event).map((line) => (
         <p key={line}>{line}</p>
       ))}
       <footer>

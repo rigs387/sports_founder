@@ -4,12 +4,14 @@ import {
   createCampaign,
   deserializeSave,
   endTurn,
+  eventSnapshots,
   type GameState,
   hallPoints,
   hallProblems,
   inducteeFacts,
   landmarks,
   newHallOfFame,
+  offerEvents,
   type Player,
   serializeSave,
   traditionWeights,
@@ -226,5 +228,57 @@ describe("Hall of Fame classes (tech plan 2.18 step 2)", () => {
     // A country already at the cap gains nothing.
     const full = withTradition(withTradition(state, "derby", home), "rite", home);
     expect(traditionWeights(full, now)[i]).toBe(weightCap);
+  });
+});
+
+describe("Hall of Fame cards (tech plan 2.18 step 4)", () => {
+  it("a class is one card after the champion, taking no slot, paying PP per inductee by wing", () => {
+    const base = fresh();
+    const [a, b] = [0, 1].map((i) => leading(base, i));
+    if (!a || !b) throw new Error("No players");
+    // Two retired stars and the first star (a first) wait for the next class.
+    let state = retire(retire(base, a.id, -10, 1), b.id, -9, 1);
+    state = { ...state, landmarks: [...state.landmarks, firstStar(state, a)] };
+    const [x, y] = pair(state);
+    const now = withConfig(world, (c) => {
+      c.hallOfFame.waitSeasons = 0;
+    });
+    // No moment slots at all: the class card still arrives.
+    const settings = {
+      ...now.events.settings,
+      baseMoments: 0,
+      momentsPerQuarter: 0,
+      marketsPerExtraMoment: 1e9,
+    };
+    const noSlots = { ...now, events: { ...now.events, settings } };
+    state = offerEvents(seasons(state, 1, x, y, noSlots), noSlots, 4);
+    const cards = eventSnapshots(state, noSlots);
+    const champion = cards.findIndex((e) => e.story === "champion");
+    const hall = cards.findIndex((e) => e.templateId === "hall-of-fame-class");
+    expect(hall).toBeGreaterThan(champion);
+    const card = cards[hall];
+    expect(card?.facts.hall?.inducteeIds).toEqual(state.hallOfFame.inductees.map((i) => i.id));
+    expect(card?.weight).toBe("headline");
+    const tier = card?.facts.leagueTier ?? "amateur";
+    const { pp } = world.config.hallOfFame;
+    expect(card?.effects).toEqual([
+      { type: "pp", amount: 2 * pp.players[tier] + pp.moments[tier] },
+    ]);
+  });
+
+  it("a later class without a scoring record holder is a big moment", () => {
+    const base = fresh();
+    const [a, b] = [0, 1].map((i) => leading(base, i));
+    if (!a || !b) throw new Error("No players");
+    const now = withConfig(world, (c) => {
+      c.hallOfFame.waitSeasons = 0;
+      c.hallOfFame.playersPerClass = 1;
+    });
+    let state = retire(retire(base, a.id, -10, 1), b.id, -9, 1);
+    const [x, y] = pair(state);
+    state = seasons(state, 1, x, y, now);
+    state = offerEvents(seasons(state, 1, x, y, now), now, 4);
+    const classes = eventSnapshots(state, now).filter((e) => e.templateId === "hall-of-fame-class");
+    expect(classes.map((e) => e.weight)).toEqual(["headline", "big"]);
   });
 });
