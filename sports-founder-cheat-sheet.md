@@ -215,8 +215,9 @@ Weekly Challenge, ~6–10 at launch incl. 1900 start), 9x16 camera-friendly desi
 **Playtest follow-ups (v1.32):** no deal offer below a minimum value; minor news collects itself
 (option, on by default); front pages only for rare stories (first title, underdog, dynasty,
 foregone; the first star; the first Hall class or one with the current record holder); the first
-record crowd counts once its league is Professional; card PP rewards and costs scale like node
-prices (tier multiplier × sport size); the offseason shows last season's scores.
+record crowd counts once its league is Professional; the offseason shows last season's scores.
+Card PP scaling was tried and reverted (it ended the #1 contest); late rewards in what is scarce
+late are parked.
 
 **Legacy & Flavor:** Hall of Fame (auto classes from records; inductees add hardcore stickiness at
 home; v1.31 lightweight build: Players and Moments wings, players on points from star seasons,

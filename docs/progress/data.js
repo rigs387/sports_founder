@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-07",
-  design: "GDD v1.31",
+  design: "GDD v1.32",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -13,12 +13,12 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-07",
-    tests: 542,
-    files: 50,
-    note: "npm run check passed after the Hall of Fame, the Almanac and chants (type checks, Biome, purity, 542 tests in 50 files). Lint has existing visual-study warnings.",
+    tests: 548,
+    files: 51,
+    note: "npm run check passed after the playtest follow-ups (type checks, Biome, purity, 548 tests in 51 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-07",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
   },
   eventDeck: { current: 36, target: "40–60" },
   phases: [
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-08",
+      type: "Built",
+      title: "Playtest follow-ups",
+      text: "Tech plan 2.19 (GDD v1.32): no deal offer below a minimum value; minor moments collect themselves (a bottom-bar toggle, on by default); front pages only for rare stories (a champion's first title, underdog title, dynasty or foregone league; the first star; the first Hall class or one with the current record holder); the first record crowd counts once its league is Professional; the offseason shows last season's scores. Card PP scaling with the sport was built, measured (bots bought out the tree and never lost #1 before the win) and reverted; late rewards in scarce currencies are parked. Pacing passes pooled (first win 159) and the #1 contest holds at 53%. A replayed 5-minute playtest found no raw strings or worthless offers, no toasts to click, and a third as many front pages.",
+    },
     {
       date: "2026-10-07",
       type: "Review",
@@ -543,7 +549,7 @@ window.SF_PROGRESS = {
           "built",
           "Moments have weight: big back pages and headline front pages that wait for you (GDD v1.26)",
         ],
-        ["planned", "Optional auto-collect for minor moments"],
+        ["built", "Auto-collect for minor moments (on by default, GDD v1.32)"],
         [
           "partial",
           "Event library: 26 of a planned 40–60 cards (8 season, 8 star, 2 rival contest cards)",

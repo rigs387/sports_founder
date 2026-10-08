@@ -84,6 +84,7 @@ surface before playtesting or during it.
 | 2026-10-07 | What the sport remembers, topic 3 (GDD v1.31): the homegrown gear brand is not a tradition; it stays the deals' demand-free main-sponsor option, always offered | Decided |
 | 2026-10-07 | What the sport remembers, topic 4 (GDD v1.31): one induction card per class (no moment slot, big; headline for the first class or the record holder; PP per inductee by wing, tier-scaled); chants reuse the tradition cards (anthem headline, first follower abroad a toast); save format 23, no retroactive inductions; Almanac with plaques, Waiting list and Records; inductees on the country card | Decided |
 | 2026-10-07 | Playtest follow-ups (GDD v1.32): no deal offer below `minOfferValue`; minor moments auto-collect (option, on by default); front pages only for rare stories (champion: first title, underdog, dynasty, foregone; stars: the first star; Hall: the first class or the current record holder); the first record crowd needs a Professional league; card PP rewards and choice costs scale by the node price factor; the offseason shows last season's scores | Decided |
+| 2026-10-08 | Card PP scaling reverted (GDD v1.32): scaling card PP like node prices made bots buy out the tree and never lose #1 before the win (0/36; size^0.5 25%, tier only 39%, before 53%). Rewards stay unscaled, costs scale by tier; late rewards in scarce currencies parked | Decided |
 
 ---
 
@@ -1009,8 +1010,8 @@ offers. `momentWeight`: a champion card at `flagshipHeadlineTiers` is a headline
 tells one of `events.settings.headlineStories` (first title, underdog, dynasty, foregone); star
 cards lost the tier rule. `classHeadline` reads the latest `scoringRecord` landmark by the class's
 end. `firstRecordCrowd` needs an earlier promotion of its country's league to Professional.
-`cardPPFactor` (`costMultiplier × nodeSizeFactor`) scales every card's PP rewards and choice
-costs; the runner's event policy normalizes by it, so bot preferences are unchanged. The deal tests
+`cardPPFactor` (`costMultiplier × nodeSizeFactor`) scaled every card's PP rewards and choice
+costs (reverted in step 3). The deal tests
 run with a minimum of 0 (Brazil's first offers are worth under 1), and the minimum has its own test;
 `tests/playtest-followups.test.ts` covers the rest.
 
@@ -1023,6 +1024,18 @@ season just finished (from career lines), and the Stars panel says "Last season"
 records the toggle and turns it off for the early hand-collection steps; the pop-up step turns it
 on, sees a minor story collected (`runs/smoke/59-auto-collect.png`), then tests toasts with it off
 and turns it back on.
+
+*Step 3 built 2026-10-08.* Measured card PP scaling (builder, 12 typical anchors, seeds 1–3,
+200 turns): with node prices' full factor the first win came at turn 138 and #1 was never lost
+before the win (0/36, before 53%), with bots buying out the tree; size^0.5 and size^0.25 left 25%,
+the tier multiplier alone 39%. Reverted with the user: card PP is unscaled and choice costs scale
+by tier as before; late rewards in scarce currencies are parked. Shipped state: pacing passes
+pooled (tier 2 at 33, tier 3 44, tier 4 75.5, tier 5 121, first win 159; before 33, 44, 76, 120.5,
+158); #1 lost before the win 19/36 (53%). (Seed 3 ran as two halves of six anchors: one run was
+projected over the budget.) Replayed playtest (Austria, 5 minutes, 171 turns, a win in 2115): no
+raw strings, no "0 a season" offers, no toasts to click, 21 champion front pages in ~105 seasons
+(62 in 75 before), 1 star front page (20), 3 of 15 Hall classes front pages (7 of 13); the first
+class inducted the first star, and the first record crowd waited for Professional.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 

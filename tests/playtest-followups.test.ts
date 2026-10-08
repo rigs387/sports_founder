@@ -1,20 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
   applyAction,
-  cardPPFactor,
   checkAction,
-  costMultiplier,
   createCampaign,
   type EventRecord,
   endTurn,
-  eventChoiceCost,
-  eventEffects,
   eventSnapshots,
   flagshipSnapshot,
   type GameState,
   landmarks,
   minorMomentIds,
-  nodeSizeFactor,
   type Player,
   seasonFacts,
   updateCulture,
@@ -195,43 +190,6 @@ describe("Hall of Fame front pages and firsts with scale", () => {
     expect(later.hallOfFame.inductees.map((i) => i.first)).toEqual(["firstRecordCrowd"]);
   });
 });
-
-describe("card PP grows with the sport", () => {
-  it("rewards and choice costs scale by the node price factor", () => {
-    const base = fresh();
-    const big: GameState = {
-      ...base,
-      tierTrack: { ...base.tierTrack, peakTier: 4 },
-      countries: base.countries.map((c) => ({
-        ...c,
-        fans: c.fans.map((f, i) =>
-          i === 0 ? { ...f, casual: 5_000_000, hardcore: 1_000_000 } : f,
-        ),
-      })),
-    };
-    const factor = cardPPFactor(big, world);
-    expect(factor).toBeCloseTo(costMultiplier(big, world.config) * nodeSizeFactor(big, world));
-    expect(factor).toBeGreaterThan(costMultiplier(big, world.config));
-    const card = world.events.cards.find((c) =>
-      c.choices.some((choice) => choice.id === "welcome"),
-    );
-    if (!card) throw new Error("No card with the welcome choice");
-    expect(eventChoiceCost(big, world, card, "welcome")).toBeCloseTo(8 * factor);
-    const champion = world.events.cards.find((c) => c.story === "champion");
-    if (!champion) throw new Error("No champion card");
-    const record = championCard(withSeason(big, ...pairOf(big)), "amateur").events.pending[0];
-    if (!record) throw new Error("No card");
-    const [pp] = eventEffects(big, world, champion, record, null);
-    const championPP = world.config.flagship.stories.championPP.amateur;
-    expect(pp).toMatchObject({ type: "pp" });
-    expect(pp?.type === "pp" ? pp.amount : 0).toBeCloseTo(championPP * factor);
-  });
-});
-
-function pairOf(state: GameState): [number, number] {
-  const [a = 0, b = 0] = clubIds(state).filter((id) => id !== state.identity.foundingClubId);
-  return [a, b];
-}
 
 describe("presentation (tech plan 2.19 step 2)", () => {
   it("collects every minor moment at once, and only minor ones", () => {

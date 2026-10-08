@@ -981,6 +981,7 @@
     "buyNamed": "Buy {{node}} for {{cost, number(maximumFractionDigits: 1)}} PP",
     "success": {
       "collectMoment": "Moment collected. Its reward is now part of your campaign.",
+      "collectMinorMoments": "Minor stories collected. Their rewards are now part of your campaign.",
       "chooseEvent": "Decision made. Your campaign has been updated.",
       "buyNode": "Purchased {{node}}.",
       "assignFocus": "Slot {{slot}} now focuses on {{country}}.",

@@ -4,7 +4,6 @@ import { venueStrength } from "./culture";
 import { offerDealCards } from "./deal-cards";
 import type { EventRecord, EventState } from "./events-state";
 import { activeClubs, moveClubRatings } from "./flagship";
-import { nodeSizeFactor } from "./growth";
 import { offerHallCards } from "./hall-cards";
 import { classHeadline, classPP } from "./hall-of-fame";
 import { seasonFacts, seasonStories } from "./season-stories";
@@ -273,36 +272,13 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   };
 }
 
-/** The state a card's PP depends on: its own facts, and the sport's size and peak tier. */
-type CardState = Pick<GameState, "culture" | "hallOfFame" | "tierTrack" | "sports" | "countries">;
-
 /**
- * Card PP grows with the sport (GDD v1.32): rewards and choice costs scale by the same factor as
- * growth node prices, the peak tier's cost multiplier × the sport's size factor.
- */
-export function cardPPFactor(state: CardState, world: World): number {
-  return costMultiplier(state, world.config) * nodeSizeFactor(state, world);
-}
-
-/**
- * A card's effects for one answer, PP scaled by `cardPPFactor`. The champion moment's PP follows
- * the league tier (config), raised by the famous grounds of the league's country (GDD v1.22).
+ * A card's effects for one answer. The champion moment's PP follows the league tier (config),
+ * raised by the famous grounds of the league's country (GDD v1.22). Card PP does not grow with
+ * the sport (GDD v1.32: measured, any scaling that made late rewards matter ended the #1 contest).
  */
 export function eventEffects(
-  state: CardState,
-  world: World,
-  card: EventTemplate,
-  event: Pick<EventRecord, "facts" | "countryId">,
-  choiceId: string | null,
-): EventEffect[] {
-  const factor = cardPPFactor(state, world);
-  return baseEffects(state, world, card, event, choiceId).map((effect) =>
-    effect.type === "pp" ? { ...effect, amount: effect.amount * factor } : effect,
-  );
-}
-
-function baseEffects(
-  state: CardState,
+  state: Pick<GameState, "culture" | "hallOfFame">,
   world: World,
   card: EventTemplate,
   event: Pick<EventRecord, "facts" | "countryId">,
@@ -329,7 +305,8 @@ export function eventChoiceCost(
   choiceId: string | null,
 ): number {
   return (
-    (card.choices.find((choice) => choice.id === choiceId)?.cost ?? 0) * cardPPFactor(state, world)
+    (card.choices.find((choice) => choice.id === choiceId)?.cost ?? 0) *
+    costMultiplier(state, world.config)
   );
 }
 export type EventBlocker =

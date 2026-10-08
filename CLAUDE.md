@@ -134,6 +134,14 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   amendments, backing, the seat, the trophy) happens only while it is open.
 - The Almanac smoke step (`src/main/almanac-smoke.ts`) runs last and plays on until a Hall of
   Fame class is inducted.
+- Playtest follow-ups (GDD v1.32): no deal offer below `flagship.deals.minOfferValue`; minor
+  moments auto-collect (`collectMinorMoments`, the renderer's `AutoCollect` and a bottom-bar
+  toggle, on by default and remembered in local storage; the smoke turns it off after setup for the
+  hand-collection steps and the pop-up step turns it back on); a champion card is a front page at
+  the headline tiers only for `events.settings.headlineStories`; a Hall class only if it is the
+  first or inducts the current record holder; the first record crowd needs a Professional league;
+  in the offseason the flagship shows last season's scores (`shownTally`). Card PP is not scaled
+  with the sport: measured, it ended the #1 contest.
 - The offseason screen (GDD v1.24) is `src/renderer/src/offseason/OffseasonScreen.tsx`: the season
   in review, then stars, rules, promotions, the seat and the trophy, priced against PP on hand. It
   opens itself only from the world map; its nav tab shows while the offseason is open. The
