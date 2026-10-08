@@ -2,13 +2,13 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, CountrySnapshot, TurnSnapshot } from "../../../sim";
-import { useAwardWords } from "../awards/words";
 import { TrophyCard } from "../culture/TrophyCard";
 import { DealsPanel } from "../deals/DealsPanel";
 import { Seat } from "../flagship/FlagshipScreen";
 import { StarsPanel } from "../flagship/StarsPanel";
 import { AmendRules } from "../identity/AmendRules";
 import { useTermVars } from "../identity/terms";
+import { FrontPage } from "../press/FrontPage";
 import { VenueCard } from "../venues/VenueCard";
 import "../flagship/flagship.css";
 import "./offseason.css";
@@ -32,17 +32,12 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
   const flagship = snapshot.flagship;
   const termVars = useTermVars(snapshot.identity.terms);
   const nouns = termVars();
-  const awards = useAwardWords(snapshot);
   const country = (id: string) => names.countries[id] ?? id;
   const clubs = new Map(flagship.clubs.map((club) => [club.id, club]));
   const clubName = (id: number) => {
     const club = clubs.get(id);
     return club ? t("flagship.club", { place: club.place, nickname: club.nickname }) : "";
   };
-  const playerName = (id: number | null | undefined) =>
-    flagship.players.find((player) => player.id === id)?.name ?? "";
-  const last = flagship.recentSeasons[0];
-  const final = last?.playoffs.at(-1);
   const decisions = snapshot.events.filter((event) => event.kind === "decision").length;
 
   return (
@@ -71,56 +66,7 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
       )}
       <section className="flagship-card offseason-review" aria-labelledby="offseason-review">
         <h2 id="offseason-review">{t("offseason.review.heading", nouns)}</h2>
-        {last ? (
-          <>
-            <p className="offseason-champion" data-testid="offseason-champion">
-              <span aria-hidden="true">&#9733;</span>{" "}
-              {t("offseason.review.champion", {
-                ...nouns,
-                season: last.season,
-                club: clubName(last.championId),
-              })}
-            </p>
-            <p>
-              {final
-                ? t("flagship.champions.final", {
-                    home: clubName(final.homeId),
-                    away: clubName(final.awayId),
-                    homeScore: final.homeScore,
-                    awayScore: final.awayScore,
-                  })
-                : t("flagship.champions.runnerUp", { club: clubName(last.runnerUpId) })}
-            </p>
-            {last.topScorer && (
-              <p>
-                {t("events.seasonScorer", {
-                  ...termVars({ score: last.topScorer.scores }),
-                  crown: awards.crown,
-                  player: playerName(last.topScorer.playerId),
-                  count: last.topScorer.scores,
-                })}
-              </p>
-            )}
-            {last.playerOfSeason !== null && (
-              <p data-testid="offseason-award">
-                {t("awards.winner", {
-                  award: awards.award,
-                  player: playerName(last.playerOfSeason),
-                  club: clubName(
-                    flagship.players.find((p) => p.id === last.playerOfSeason)?.clubId ?? 0,
-                  ),
-                })}
-              </p>
-            )}
-            {last.newStarId !== null && (
-              <p className="offseason-star" data-testid="offseason-new-star">
-                {t("offseason.review.newStar", { player: playerName(last.newStarId) })}
-              </p>
-            )}
-          </>
-        ) : (
-          <p className="flagship-empty">{t("flagship.champions.none", nouns)}</p>
-        )}
+        <FrontPage snapshot={snapshot} clubName={clubName} />
         {decisions > 0 && (
           <p className="offseason-decisions">
             {t("offseason.review.decisions", { count: decisions })}{" "}

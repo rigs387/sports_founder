@@ -113,10 +113,14 @@
       },
       "league-arrival": {
         "title": "Put it on the fixture list",
+        "title_v1": "{{country}} gets a league of its own",
+        "title_v2": "A new league kicks off in {{country}}",
         "body": "A league formed in {{country}} during the last turn. There are {{hardcore, number}} hardcore fans here now. Another place where your sport has a home."
       },
       "moving-up": {
         "title": "A bigger stage",
+        "title_v1": "{{country}} steps up to {{tier}}",
+        "title_v2": "Promoted: the league in {{country}}",
         "body": "You promoted the league in {{country}}. Its current level is {{tier}}, backed by {{hardcore, number}} hardcore fans. That step is now part of your sport's story."
       },
       "local-airtime": {
@@ -157,6 +161,8 @@
       },
       "season-champion": {
         "title": "Champions of {{country}}",
+        "title_v1": "{{champion}} are champions of {{country}}",
+        "title_v2": "{{champion}} take the title in {{country}}",
         "body_european": "{{champion}} won {{seasonNoun}} {{season}} of the {{country}} league, with {{runnerUp}} runners-up. Another name on the trophy, another chapter in the league's story.",
         "body_american": "{{champion}} beat {{runnerUp}} in the final to win {{seasonNoun}} {{season}} of the {{country}} league. Another name on the trophy, another chapter in the league's story."
       },
@@ -229,6 +235,8 @@
       },
       "star-breakout": {
         "title": "A star is born",
+        "title_v1": "{{player}} becomes a star",
+        "title_v2": "A star rises at {{club}}",
         "body_one": "{{player}} scored {{count, number}} time in {{matches, number}} {{matchNoun}} for {{club}} in {{seasonNoun}} {{season}}: {{share, number(style: percent)}} of the club's {{scoresNoun}}. The league has a new star.",
         "body_other": "{{player}} scored {{count, number}} times in {{matches, number}} {{matchNoun}} for {{club}} in {{seasonNoun}} {{season}}: {{share, number(style: percent)}} of the club's {{scoresNoun}}. The league has a new star."
       },
@@ -287,6 +295,8 @@
       },
       "tradition-born": {
         "title": "A tradition is born: {{name}}",
+        "title_v1": "{{name}} becomes a tradition",
+        "title_v2": "Fans keep a new tradition: {{name}}",
         "body_derby": "{{clubA}} and {{clubB}} finished on top together in {{count}} of the last {{span}} {{seasonsNoun}}. Their fans now call it {{name}}.",
         "body_rite": "{{club}} won their first title. Before every home {{matchOne}} their fans now keep {{name}}.",
         "body_legacy": "{{player}} retired after a great career as a star. In {{country}} people now call that way of playing {{name}}.",
@@ -1585,6 +1595,24 @@
     },
     "countryLine": "Hall of Fame: {{names}}",
     "countryNote": "Legends from here keep fans holding on longer."
+  },
+  "press": {
+    "local": "The {{place}} {{word}}",
+    "dateline": "{{SeasonNoun}} {{season}} · {{year}}",
+    "lead": {
+      "default": "{{club}} are {{seasonNoun}} {{season}} champions",
+      "firstTitle": "{{club}} win their first title",
+      "underdog": "Against the odds: {{club}} are champions",
+      "dynasty": "{{club}} make it {{count}} in a row",
+      "foregone": "{{club}} again: {{count}} titles in a row"
+    },
+    "items": {
+      "recordCrowd": "A record crowd: {{crowd, number(maximumFractionDigits: 0)}} saw the {{seasonNoun}} out.",
+      "traditions_one": "Born at the {{seasonNoun}}'s end: {{names}}.",
+      "traditions_other": "Born at the {{seasonNoun}}'s end: {{names}}.",
+      "hall": "Into the Hall of Fame: {{names}}.",
+      "hallMoment": "The Hall of Fame remembers one of the sport's firsts."
+    }
   },
   "awards": {
     "plain": "Player of the Season",

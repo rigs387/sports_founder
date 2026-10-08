@@ -285,6 +285,14 @@ export const namesFileSchema = z.strictObject({
     second: z.array(z.string().min(1)).min(1),
   }),
   /**
+   * Press (GDD v1.33): sports-paper words for each country's invented outlet ("The {place}
+   * {word}") and the international wire rival world championships run on.
+   */
+  press: z.strictObject({
+    words: z.array(z.string().min(1)).min(1),
+    wire: z.string().min(1),
+  }),
+  /**
    * Flagship deal partners (GDD v1.28): invented names, never real brands or broadcasters. Ids are
    * stable (a shunned partner is remembered by id).
    */

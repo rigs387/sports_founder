@@ -1080,6 +1080,18 @@ the Almanac's roll names winners, plaques count "Season awards", and "Won {award
 lists the most awarded. The `first-award` card (trigger `award`, minor, no slot, season facts) is
 offered once, for the first season with a winner. The deck is 37 cards; `cardless` drops it too.
 
+*Step 3 built 2026-10-08.* `src/sim/press.ts`: `outletOf` (a country's biggest place and a
+`names.yaml press.words` word by a stable hash of seed and country, once a `leagueFormed` landmark
+exists by the story's quarter; the sport's paper before), `wireOutlet` (rival world
+championships), `leadStory` (the season's first headline story). Every event snapshot carries its
+`outlet`; the flagship snapshot's `frontPage` gives the seat outlet, the lead story and the
+traditions and inductees the season's end brought. Renderer: the moment window's masthead is the
+outlet with the family as its section; `title_v1`/`title_v2` variants on five cards picked by a
+stable hash of the event (a context title, like the anthem's, wins); `FrontPage`
+(`src/renderer/src/press/`) replaces the season review's lines on the offseason screen. Smoke: the
+front page needs an outlet masthead and no missing strings (`runs/smoke/27d-offseason.png`).
+`tests/press.test.ts`.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

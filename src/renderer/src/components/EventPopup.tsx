@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { EventSnapshot } from "../../../sim";
 import { Emblem } from "../identity/Emblem";
 import { geometry } from "../map/model";
+import { useOutletName } from "../press/outlet";
 import { useGameStore } from "../state/game-store";
 import { Effect, useEventText } from "./event-text";
 import "./event-popup.css";
@@ -335,12 +336,18 @@ function MomentWindow({
   const { t } = useTranslation();
   const { snapshot, status, dispatchAction } = useGameStore();
   const text = useEventText();
+  const outletName = useOutletName(snapshot?.identity.sportName ?? "");
   if (!snapshot || !text) return null;
   const headline = event.weight === "headline";
   const x = geometry.markets[event.countryId]?.center[0] ?? 0;
   const dock = x < geometry.width / 2 ? "dock-right" : "dock-left";
   const { identity } = snapshot;
-  const masthead = t(`events.mastheads.${event.family}`, { sport: identity.sportName });
+  // The paper the story runs in (GDD v1.33), and the card family as its section.
+  const masthead = outletName(event.outlet);
+  const section =
+    event.outlet.kind === "sport" && event.family === "sport"
+      ? null
+      : t(`events.mastheads.${event.family}`, { sport: identity.sportName });
   const page = (
     <section
       className={`moment-window family-${event.family}${headline ? " is-headline" : ` ${dock}`}${event.tone === "pressure" ? " is-pressure" : ""}`}
@@ -372,6 +379,7 @@ function MomentWindow({
           />
         )}
         <strong>{masthead}</strong>
+        {section && <span className="moment-section">{section}</span>}
         <small className="moment-dateline">
           {t("events.popup.dateline", {
             country: text.country(event.countryId),

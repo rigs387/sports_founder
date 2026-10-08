@@ -275,6 +275,14 @@ traditions:
       - { id: border-derby, type: derby, countryId: india, name: the Border Derby }
       - { id: maidan-game, type: nationalName, countryId: india, name: the Maidan Game }
 
+# Press (GDD v1.33): each country's invented outlet is its biggest place and one of these words
+# ("The Graz Matchday"), picked by a stable key. Sports-paper words keep clear of real newspapers.
+# Rival world championships run on the wire.
+press:
+  words: [Matchday, Terrace Post, Touchline, Final Whistle, Scoreboard, Sports Ledger, Back Page,
+    Fixture List, Sideline, Clubhouse News, Crowd Courier, Kickabout]
+  wire: The Worldwide Sporting Wire
+
 # Flagship deal partners (GDD v1.28): invented broadcasters and sponsors, never real brands or
 # broadcasters. Ids are stable (a shunned partner is remembered by id). Naming-rights partners are
 # drawn from the sponsors. The homegrown gear brand is named from the sport (locale), not here.

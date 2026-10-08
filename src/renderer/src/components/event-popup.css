@@ -310,6 +310,13 @@
   font-size: 18px;
   letter-spacing: 0.02em;
 }
+.moment-masthead .moment-section {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
 .moment-masthead .moment-dateline {
   margin-left: auto;
   font-size: 11px;

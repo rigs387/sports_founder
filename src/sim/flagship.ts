@@ -1,8 +1,9 @@
-import type { SeasonInterest } from "../content";
+import type { SeasonInterest, SeasonStory } from "../content";
 import { costMultiplier, offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights } from "./culture";
 import { type DealsSnapshot, dealsSnapshot, exclusiveTv, lapseOffers, newDeals } from "./deals";
 import { demoteHardcore, runningCostPerQuarter } from "./leagues";
+import { leadStory, type Outlet, outletOf } from "./press";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { seasonStories } from "./season-stories";
@@ -1795,6 +1796,16 @@ export interface FlagshipSnapshot {
   playoffClubs: number;
   /** Finished seasons, newest first, without their full tables, with the year each ended. */
   recentSeasons: (Omit<SeasonSummary, "standings" | "startRatings"> & { year: number })[];
+  /**
+   * The last season's front page (GDD v1.33): the seat outlet, the rare story it leads with (or
+   * null), and the traditions born and Hall of Fame inductees its end brought. Null before one.
+   */
+  frontPage: {
+    outlet: Outlet;
+    story: SeasonStory | null;
+    traditionIds: number[];
+    inducteeIds: number[];
+  } | null;
   /** Countries whose league could take the seat in the offseason (GDD v1.13). */
   seatTargets: string[];
   /** Share of the seat country's hardcore fans who turn casual if the seat moves away. */
@@ -1859,6 +1870,21 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
     })),
     quartersLeft: flagship.seasonQuarters - flagship.quartersPlayed,
     playoffClubs: state.seasonFormat === "american" ? bracketSize(flagship.table.length, world) : 0,
+    frontPage: (() => {
+      const index = flagship.seasons.length - 1;
+      const last = flagship.seasons[index];
+      if (!last) return null;
+      return {
+        outlet: outletOf(state, world, last.countryId, last.quarter),
+        story: leadStory(state, world, index),
+        traditionIds: state.culture.traditions
+          .filter((t) => t.bornQuarter >= last.quarter)
+          .map((t) => t.id),
+        inducteeIds: state.hallOfFame.inductees
+          .filter((i) => i.season === last.season)
+          .map((i) => i.id),
+      };
+    })(),
     recentSeasons: flagship.seasons
       .slice(-RECENT_SEASONS)
       .reverse()

@@ -5,6 +5,7 @@ import { useAwardWords } from "../awards/words";
 import { useTraditionWords } from "../culture/traditions";
 import { useDealPartnerName } from "../deals/partners";
 import { PLAIN_TERMS, useTermVars } from "../identity/terms";
+import { variantOf } from "../press/outlet";
 import { useGameStore } from "../state/game-store";
 
 // The words of event cards, shared by the board (the journal) and the pop-up event window
@@ -61,7 +62,7 @@ export function Effect({ effect, star = {} }: { effect: EventEffect; star?: Star
 
 /** Titles, bodies and named facts for event cards, read from the current snapshot. */
 export function useEventText() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { snapshot, names } = useGameStore();
   const termVars = useTermVars(snapshot?.identity.terms ?? PLAIN_TERMS);
   const words = useTraditionWords(snapshot);
@@ -195,12 +196,22 @@ export function useEventText() {
       ...values,
     };
   };
-  const title = (event: EventRecord) =>
-    t(`events.cards.${event.templateId}.title`, {
+  // Headline variety (GDD v1.33): a card may carry title_v1, title_v2…; a stable hash of the event
+  // picks one, so a card never changes on reload. A title for the card's context wins.
+  const title = (event: EventRecord) => {
+    const vars = {
       country: country(event.countryId),
       rival: names?.sports[event.facts.rivalId ?? ""] ?? "",
       ...textVars(event),
-    });
+    };
+    const base = `events.cards.${event.templateId}`;
+    const context = (vars as { context?: string }).context;
+    if (context && i18n.exists(`${base}.title_${context}`)) return t(`${base}.title`, vars);
+    let variants = 1;
+    while (i18n.exists(`${base}.title_v${variants}`)) variants += 1;
+    const pick = variantOf(event.id, variants);
+    return t(pick === 0 ? `${base}.title` : `${base}.title_v${pick}`, vars);
+  };
   const body = (event: EventRecord) =>
     t(`events.cards.${event.templateId}.body`, {
       country: country(event.countryId),

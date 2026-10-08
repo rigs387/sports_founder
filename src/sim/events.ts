@@ -6,6 +6,7 @@ import type { EventRecord, EventState } from "./events-state";
 import { activeClubs, moveClubRatings } from "./flagship";
 import { offerAwardCards, offerHallCards } from "./hall-cards";
 import { classHeadline, classPP } from "./hall-of-fame";
+import { outletOf, wireOutlet } from "./press";
 import { seasonFacts, seasonStories } from "./season-stories";
 import {
   applyStarEffect,
@@ -569,6 +570,11 @@ export function eventSnapshots(state: GameState, world: World) {
       kind: card.kind,
       weight: momentWeight(state, world, card, event),
       family: eventFamily(event),
+      // The paper the story runs in (GDD v1.33): presentation only.
+      outlet:
+        card.trigger === "rivalTournament"
+          ? wireOutlet(world)
+          : outletOf(state, world, event.countryId, event.quarter),
       tone: card.tone,
       story: card.story,
       star: card.star,
