@@ -590,12 +590,14 @@ culture:
   # geometric mean within 1 ± characterBand (character changes a campaign's shape, not difficulty).
   characterBand: 0.1
   # Chants (GDD v1.31): a club's terrace song, born from an underdog title or a club's first title
-  # won in a close finish (the season-story rules). The first chant is the anthem and starts
+  # won in a close finish (the season-story rules) once the league in that country has played
+  # historySeasons seasons (a young league's titles are all firsts: measured at build, chants were
+  # born in seasons 1-7 of every campaign without it). The first chant is the anthem and starts
   # anthemBonus stronger. Chants alone spread without Culture nodes: once a year a chant at
   # reachMinStrength or more may gain a follower with chance reachChance (+ the reach nodes' bonus),
   # by the usual reach rules, up to maxFollowers countries (home included). A follower abroad is
   # dropped when the player's hardcore share there falls below reach.minHardcoreShare.
-  chant: { anthemBonus: 0.25, reachChance: 0.25, reachMinStrength: 0.6, maxFollowers: 4 }
+  chant: { anthemBonus: 0.25, reachChance: 0.25, reachMinStrength: 0.6, maxFollowers: 4, historySeasons: 10 }
 
 # The Hall of Fame (GDD v1.31). A class each flagship season's end. Players: retired at least
 # waitSeasons seasons, retired after the Hall began (no retroactive inductions), with points from

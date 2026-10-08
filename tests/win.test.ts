@@ -253,7 +253,7 @@ describe("post-win play", () => {
     expect(fallen.countries[index]?.league).toBeNull();
     expect(fallen.countries[index]?.leaguesFolded).toBe(1);
     const late = fallen.landmarks.filter(
-      (l) => !["traditionLost", "hallOfFameClass"].includes(l.kind),
+      (l) => !["traditionBorn", "traditionLost", "chantSpread", "hallOfFameClass"].includes(l.kind),
     );
     expect(late.at(-1)).toMatchObject({
       kind: "birthplaceOutlived",

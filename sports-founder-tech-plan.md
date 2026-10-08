@@ -945,6 +945,18 @@ got in (22–25 players, against 19–26 retired stars), so the bar is 20 (16–
 every 8 seasons). Late-game anchors already hold 3–4.6 tradition strength against a cap of 2, so
 shrine weight matters early and in former seat countries.
 
+*Step 3 built 2026-10-07.* `CultureUpdate.chant` at each season's end: the champion's living chant
+renews; otherwise an underdog title or a first title in a close finish (`seasonStories`) founds one,
+named from `names.yaml traditions.chants`; the first chant ever is the anthem (+`anthemBonus`).
+`reachOut` lets chants reach without nodes (`reachChance` along any proximity or language link,
+from `reachMinStrength`, up to `maxFollowers`; nodes add) and records `chantSpread` for a chant's
+first follower abroad; `quieten` drops followers below the hardcore floor each year;
+`modernizeGrounds` betrays chants with famous venues. Found in measurement (builder, Brazil 1,
+Austria 2, Japan 3, 200 turns): underdog titles never happened, and a young league's titles are all
+firsts, so chants were born in seasons 1–7 of every campaign (8–9 each). A first title now counts
+only after `historySeasons` (10) seasons of that league: 5–9 chants a campaign, the first in
+seasons 14–22, most fading when their club stops winning; 4–5 spread news a campaign.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

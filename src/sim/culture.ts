@@ -5,6 +5,7 @@ import { tidyName } from "./identity";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
+import { seasonStories } from "./season-stories";
 import {
   type AxisId,
   type Club,
@@ -25,8 +26,9 @@ import {
 
 // Culture, first build (GDD v1.22). Culture is never bought: traditions are born only from
 // recorded facts, held by the player's fans in follower countries, renewed by new facts and faded
-// without them. Six types: derby, club rite, star legacy, national name, famous venue and the
-// trophy. They make the player's hardcore fans stickier (generational turnover, rival poaching and
+// without them. Six types from the first build (derby, club rite, star legacy, national name,
+// famous venue and the trophy) and chants (GDD v1.31), the only type that spreads with its fans.
+// They make the player's hardcore fans stickier (generational turnover, rival poaching and
 // reclaim) and make them resist betrayal: amendments that move away from the rules a tradition was
 // born under, moving the commissioner's seat away from them, and renaming the trophy. Founding
 // character biases births (birthplace) and betrayals (ethos). Every number is config (`culture`).
@@ -405,6 +407,50 @@ class CultureUpdate {
         if (legacy.type === "legacy" && living(legacy) && legacy.clubIds[0] === star?.clubId)
           this.renew(legacy, year);
     }
+
+    this.chant(summary, year);
+  }
+
+  /**
+   * Chants (GDD v1.31): the champion's terrace song is born from an underdog title or a first
+   * title won in a close finish (the season-story rules) once the league has played
+   * `chant.historySeasons` seasons, one living chant a club; the first chant
+   * ever is the anthem and starts stronger. Every title of the club renews its chant.
+   */
+  chant(summary: SeasonSummary, year: number): void {
+    const { state, world } = this;
+    const clubId = summary.championId;
+    const existing = this.livingOf("chant", (t) => t.clubIds[0] === clubId);
+    if (existing) {
+      this.renew(existing, year);
+      return;
+    }
+    const seasons = state.flagship.seasons;
+    const index = seasons.findIndex((s) => s.season === summary.season);
+    if (index < 0) return;
+    const stories = seasonStories(seasons, index, world);
+    // In a young league every title is a first: a first title counts once the league has history.
+    const history = seasons.filter(
+      (s) => s.countryId === summary.countryId && s.season < summary.season,
+    ).length;
+    const dramatic =
+      stories.includes("underdog") ||
+      (stories.includes("firstTitle") &&
+        stories.includes("closeFinish") &&
+        history >= this.config.chant.historySeasons);
+    if (!dramatic) return;
+    const anthem = !this.traditions.some((t) => t.type === "chant");
+    this.born(
+      "chant",
+      summary.countryId,
+      {
+        clubIds: [clubId],
+        name: poolName(world.names.traditions.chants, `${state.seed}|chant|${clubId}`),
+        seasons: [summary.season],
+      },
+      year,
+      anthem ? this.config.chant.anthemBonus : 0,
+    );
   }
 
   /**
@@ -549,21 +595,42 @@ class CultureUpdate {
           continue;
         }
       }
+      if (tradition.type === "chant") this.quieten(tradition);
       this.reachOut(tradition);
     }
   }
 
   /**
-   * Reach (Culture nodes only): a tradition at full strength at home may gain one follower a
-   * year, a country linked to a follower by a channel the nodes reach along, where the player has
-   * enough hardcore fans. National names never spread.
+   * A chant goes quiet abroad (GDD v1.31): a follower where the player's hardcore share has fallen
+   * below the reach floor is dropped; the fans who sang it are gone.
+   */
+  quieten(tradition: Tradition): void {
+    const { state, world } = this;
+    const floor = this.config.reach.minHardcoreShare;
+    tradition.followers = tradition.followers.filter((id, f) => {
+      if (f === 0) return true;
+      const index = world.countries.findIndex((c) => c.id === id);
+      const hardcore = state.countries[index]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
+      return hardcore >= floor * (world.countries[index]?.population ?? 0);
+    });
+  }
+
+  /**
+   * Reach: a tradition at full strength at home may gain one follower a year, a country linked
+   * to a follower by a channel the Culture nodes reach along, where the player has enough hardcore
+   * fans. National names never spread. Chants (GDD v1.31) reach without nodes, from a lower
+   * strength, along any proximity or language link, up to a cap of followers; the nodes add.
    */
   reachOut(tradition: Tradition): void {
     const { state, world } = this;
-    const { reach } = this.config;
-    if (tradition.type === "nationalName" || tradition.strength < reach.minStrength) return;
+    const { reach, chant: chants } = this.config;
+    const chant = tradition.type === "chant";
+    const minStrength = chant ? chants.reachMinStrength : reach.minStrength;
+    if (tradition.type === "nationalName" || tradition.strength < minStrength) return;
+    if (chant && tradition.followers.length >= chants.maxFollowers) return;
     const bonus = cultureFactors(world, state.growthNodes, tradition.type).reach;
-    if (bonus.proximity <= 1 && bonus.language <= 1) return;
+    // Chants spread with their fans without nodes (GDD v1.31); the rest only through nodes.
+    if (!chant && bonus.proximity <= 1 && bonus.language <= 1) return;
     const roll = nextFloat(this.rng);
     const pick = nextFloat(this.rng);
     const followers = new Set(
@@ -575,19 +642,27 @@ class CultureUpdate {
       const hardcore = state.countries[index]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
       if (hardcore < reach.minHardcoreShare * country.population) return;
       let best = 0;
+      let linked = false;
       for (const link of world.inbound[index] ?? []) {
         if (!followers.has(link.source)) continue;
         if (link.proximity > 0) best = Math.max(best, bonus.proximity - 1);
         if (link.language > 0) best = Math.max(best, bonus.language - 1);
+        if (link.proximity > 0 || link.language > 0) linked = true;
       }
-      if (best > 0) candidates.push({ index, chance: reach.chancePerReach * best });
+      const chance = reach.chancePerReach * best + (chant && linked ? chants.reachChance : 0);
+      if (chance > 0) candidates.push({ index, chance });
     });
     if (candidates.length === 0) return;
     const chance = Math.min(1, Math.max(...candidates.map((c) => c.chance)));
     if (roll >= chance) return;
     const chosen = candidates[Math.floor(pick * candidates.length)];
     const country = chosen && world.countries[chosen.index];
-    if (country) tradition.followers.push(country.id);
+    if (!country) return;
+    tradition.followers.push(country.id);
+    // A chant's first follower abroad is news, once (GDD v1.31).
+    const told = (l: Landmark) => l.kind === "chantSpread" && l.traditionId === tradition.id;
+    if (chant && !state.landmarks.some(told) && !this.found.some(told))
+      this.found.push(landmarks.chantSpread(state.turn, state.quarter, country.id, tradition.id));
   }
 }
 
@@ -792,12 +867,13 @@ export function betrayGround(state: GameState, world: World, clubId: number): Ga
 
 /**
  * Modernizing the grounds (GDD v1.30): opening a venue level at or past `modernize.fromLevel`
- * betrays every famous venue in the country, as naming rights do.
+ * betrays every famous venue in the country, as naming rights do, and every chant there (GDD
+ * v1.31: seated stands kill the singing end).
  */
 export function modernizeGrounds(state: GameState, world: World, index: number): GameState {
   const countryId = world.countries[index]?.id;
   const betrayed = state.culture.traditions.filter(
-    (t) => living(t) && t.type === "venue" && t.countryId === countryId,
+    (t) => living(t) && (t.type === "venue" || t.type === "chant") && t.countryId === countryId,
   );
   return betrayGrounds(state, world, index, betrayed, world.config.leagues.venue.modernize);
 }

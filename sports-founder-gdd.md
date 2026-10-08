@@ -852,7 +852,9 @@ number is config (`culture.chant`).
 - *Birth:* a title that is dramatic and rare: an underdog title (the season stories' underdog
   rule), or a club's first title won in a close finish. A plain close finish is too common to
   count. The birthplace sets an ease for the type, balanced with the rest. Many campaigns go
-  decades without one (choose pain).
+  decades without one (choose pain). *Call made at build:* a first title counts only once the
+  league has played 10 seasons, since a young league's titles are all firsts (without it every
+  campaign had a chant in its first seasons).
 - *It spreads with its fans (its distinct feature).* Once a year a chant at high strength may gain
   one follower: a country linked to a follower by proximity or language where the player's
   hardcore share is above the reach floor. The chance works without Culture nodes; reach nodes add

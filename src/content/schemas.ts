@@ -299,6 +299,8 @@ export const namesFileSchema = z.strictObject({
     rites: z.record(id, z.array(z.string().min(1)).min(1)),
     /** By language sphere; `default` for spheres without a pool. */
     nationalNames: z.record(id, z.array(z.string().min(1)).min(1)),
+    /** Chants (GDD v1.31): invented terrace songs. */
+    chants: z.array(z.string().min(1)).min(1),
     rivals: z.record(
       id,
       z.array(
@@ -989,6 +991,7 @@ export const configFileSchema = z.strictObject({
       reachChance: unitInterval,
       reachMinStrength: unitInterval,
       maxFollowers: z.int().min(1),
+      historySeasons: z.int().min(0),
     }),
   }),
   /** The Hall of Fame (GDD v1.31). */

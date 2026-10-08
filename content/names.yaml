@@ -257,6 +257,10 @@ traditions:
     french: [le Grand Jeu, le Jeu du Dimanche, la Partie, le Jeu du Peuple]
     german: [das Volksspiel, das Sonntagsspiel, das Große Spiel, das Hofspiel]
     italian: [il Gioco del Popolo, la Partitella, il Gioco Grande, il Gioco di Piazza]
+  # Chants (GDD v1.31): invented terrace songs, picked by a stable key from the seed and the club.
+  chants: [Ten Men and a Song, Nobody Gave Us a Chance, Rain on the Terrace, The Long Walk Back,
+    Home Before Midnight, Never Saw It Coming, Lights of the Town, Over the Hill and Home,
+    One More Season, Sing When We're Losing, The Night We Won, Last Bus Home]
   # Rivals' traditions are flavor (GDD v1.22): shown on the map, no effect, never born or lost.
   # Generic invented names; a mod can rename them.
   rivals:
