@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.30 | October 7, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked)*
+*Version 1.31 | October 7, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner)*
 
 ---
 
@@ -818,6 +818,77 @@ config). Wings: players, league directors, founding-family members, and a Moment
 events. Each induction is a 9x16 key moment. Mechanical effect: each inductee adds permanent
 hardcore stickiness in their home country.
 
+**What the sport remembers, topic 1: the Hall of Fame (decided 2026-10-07, v1.31).** The
+lightweight build. Every number is config (`hallOfFame`).
+- *Wings:* Players and Moments. League directors and founding-family members wait until those
+  people exist (parking lot).
+- *Players are inducted on points from retained records only:* star seasons, titles won while at
+  the club, seasons as the league's top scorer (the stand-in for awards until Player of the Season
+  exists) and holding the all-time scoring record. A player is eligible a few seasons after
+  retiring (e.g. 2). Those above a points bar go in best first, at most a few a class (e.g. 2);
+  the rest wait for a later class and are never dropped. Backing and honors add nothing: fame
+  comes only from facts (choose pain: inductions are late and scarce).
+- *The Moments wing* inducts a closed content list of firsts, each once: e.g. the founding club's
+  first title, the first star, the first Professional and Elite seasons, the first record crowd,
+  first taking #1, the win. At most one per class, oldest first.
+- *Effect: permanent shrine weight.* Each player inductee adds a small fixed amount (e.g. 0.1) to
+  their home country's tradition weight. It never decays and cannot be betrayed, but it counts
+  inside the weight cap (a country already full of traditions gains nothing) and, being weight,
+  raises the cost of moving the seat away from that country. Induction renews the inductee's
+  living star legacy. The Moments wing has no mechanical effect beyond its card's PP.
+- *Classes:* one a season, when the offseason opens, after the champion card. An empty class shows
+  nothing.
+- *Where it lives:* a new **Almanac** tab: the Hall of Fame (two wings; each plaque quotes its
+  recorded facts) and Records (the roll of champions by season, all-time top scorers, the record
+  crowd). It is the future home of other kept history, such as all-time stats leaderboards, the
+  heatmap timelapse and history charts. Traditions stay on the Rulebook.
+
+**What the sport remembers, topic 2: chants and anthems (decided 2026-10-07, v1.31).** Every
+number is config (`culture.chant`).
+- *A new tradition type, `chant`, held by one club.* Derby (a pair rivalry) and club rite (the
+  founding ritual) are unchanged; a chant is any club's terrace song. The first chant ever born is
+  *the anthem*: it starts stronger, and there is only ever one. A club holds at most one living
+  chant; the founding club can hold its rite and a chant.
+- *Birth:* a title that is dramatic and rare: an underdog title (the season stories' underdog
+  rule), or a club's first title won in a close finish. A plain close finish is too common to
+  count. The birthplace sets an ease for the type, balanced with the rest. Many campaigns go
+  decades without one (choose pain).
+- *It spreads with its fans (its distinct feature).* Once a year a chant at high strength may gain
+  one follower: a country linked to a follower by proximity or language where the player's
+  hardcore share is above the reach floor. The chance works without Culture nodes; reach nodes add
+  to it. At most a few followers (e.g. 4), held abroad at the usual follower share. It is the only
+  tradition that carries stickiness abroad without nodes.
+- *Renewal, decay and loss:* the club's titles renew it; it decays without them and is lost when
+  the club folds. A follower abroad is dropped when the player's hardcore share there falls below
+  the floor: the fans who sang it are gone.
+- *What it constrains:* amendments offend it like every tradition, and modernizing a ground
+  (venue levels 4–5) betrays the chants of that country's clubs as it does famous venues: seated
+  stands kill the singing end.
+- *Cards:* a birth moment with PP by type; the anthem's birth is a headline. A chant's first
+  follower abroad is a minor moment; later spreads are silent.
+
+**What the sport remembers, topic 3: the gear brand (decided 2026-10-07, v1.31).** The homegrown
+gear brand is **not** a tradition. It stays what deals built (v1.28): a demand-free main-sponsor
+option at a share of value with a bigger loyalty edge, offered every offseason. This replaces the
+v1.12 artifact rule that it appears once a country's hardcore base is large enough.
+
+**What the sport remembers, topic 4: presentation and saves (decided 2026-10-07, v1.31).**
+- *The induction card:* one card per class, taking no moment slot, after the champion card. It
+  names every inductee and quotes their recorded facts. A big moment; the sport's first class, and
+  any class inducting the all-time scoring record holder, is a headline. PP per inductee by wing
+  (config), scaled by the flagship's tier as the champion card is.
+- *Chant cards* reuse the tradition birth and loss cards with chant wording (a moment slot, as
+  other types). The anthem's birth is a headline; a chant's first follower abroad is a minor toast.
+- *Save format 23* adds the Hall of Fame. Format 22 migrates with an empty Hall and no
+  retroactive inductions: only players retiring after the migration become eligible, Moments firsts
+  count only from landmarks recorded after it, and chants are born only from seasons ending after it.
+- *The Almanac* shows the plaques, a Waiting list (eligible players not yet inducted, and retired
+  players still within their waiting seasons, by facts, never points) and Records (the roll of
+  champions by season with top scorer and crowd, the all-time top ten scorers, the record crowd).
+  Plaques link to their country.
+- *Shrine weight on the map:* the country card lists the Hall of Fame's inductees from there in
+  words, beside its traditions; the map's tradition marker counts shrine weight too.
+
 **Awards:** Player of the Season per league and a global Player of the Year. Mostly flavor — they
 feed Hall of Fame eligibility, raise star power (affecting transfers toward the flagship), and name
 names in stories.
@@ -844,7 +915,8 @@ purchased traits and percentage modifiers alone do not make culture.
 - Stories and the Almanac may cite a tradition only through the facts that made it.
 - **Artifacts are traditions that are things** (decided 2026-09-26): the same entity model and the
   same help-and-constrain rule, not a separate system. First build: famous venues, the flagship
-  trophy, chants and anthems, and homegrown gear brands. Films and books come later, as flavor.
+  trophy, and chants and anthems (the homegrown gear brand stays a deal partner, v1.31). Films and
+  books come later, as flavor.
   - *Famous venues* are earned, never bought: the player buys capacity (the 1–5 level), but fame
     comes from facts (hosting finals, record crowds, a legendary match). The founding club's
     ground is the first, named at creation with founding character. A famous venue makes nearby
@@ -854,8 +926,8 @@ purchased traits and percentage modifiers alone do not make culture.
     can be lost (club folds, league collapses, ground sold), which is a lasting landmark.
   - *The trophy* is named after a founder or star; fans resist renaming it.
   - *Chants and anthems* are born at big moments and spread with the fans who hold them.
-  - *A homegrown gear brand* appears once a country's hardcore base is large enough. At the
-    flagship it is a sponsor option: loyal and demand-free, but smaller than outside sponsors.
+  - *A homegrown gear brand* is a sponsor option at the flagship: loyal and demand-free, but
+    smaller than outside sponsors. It is not a tradition (v1.31); it is always offered.
   - *Fame comes only from facts.* The player can build capacity, name the trophy, and nurture an
     existing artifact through the Culture category, but cannot buy fame.
 - **Culture, first build (decided 2026-10-04, v1.22).** Every number is config (`culture`).
@@ -1663,6 +1735,8 @@ Items flagged during the interview that need further discussion in future sessio
   measured.
 - Auto-collect for minor moments (parked 2026-10-05, v1.26): an option that collects toasts
   without clicks, for players who want only the big news.
+- Hall of Fame wings for league directors and founding-family members (parked 2026-10-07,
+  v1.31): they wait until those people exist in the simulation.
 - Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to
   handle missed matches; deferred from the Phase 1 stars build.
 - Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship

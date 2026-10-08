@@ -167,7 +167,8 @@ sim facts and are held by fans in particular countries: they make fans stickier 
 rule changes, cheapening deal demands and seat moves. The Culture tree category nurtures traditions
 that exist. Artifacts are traditions that are things: famous venues (earned from finals and
 record crowds, never bought; fans resist naming rights and moves; can be lost), the named trophy,
-chants, and a homegrown gear brand (a small, demand-free sponsor at the flagship). Founding character at creation (birthplace, ethos, colors and emblem, the sport's own
+chants and anthems; the homegrown gear brand is a deal partner only (a small, demand-free
+sponsor at the flagship, always offered; not a tradition, v1.31). Founding character at creation (birthplace, ethos, colors and emblem, the sport's own
 terms) seeds which traditions form, never affinity.
 First build (v1.22): derby (3 of 5 top-two finishes), club rite (founding club's first title),
 star legacy (long star career or all-time record), national name (first Professional league),
@@ -177,6 +178,10 @@ rival poaching/reclaim. Each tradition remembers its rulebook: offending amendme
 backlash and wear it down; seat moves and trophy renames cost more. Birthplace biases births,
 ethos the betrayals (balanced to ~1). Rivals have flavor-only content traditions. Culture tree
 (tier 4): strength, reach, protection, hold; fork Heritage trust / Living game.
+Chants (v1.31): a club's terrace song, born from an underdog title or a first title in a close
+finish; the first is the anthem (stronger, a headline). The only tradition that spreads on its own:
+one linked country a year, a few at most, dropped where the player's hardcore fans fall away. Clubs'
+titles renew it; modernizing grounds (levels 4–5) betrays it.
 
 **Stars:** Full squads at the flagship (later; Phase 1 has one named leading player per club,
 whose scores are recorded); a few lazily named standouts in every other league. A season's top
@@ -207,7 +212,12 @@ World Championship (player-founded and named, every 4 years, player picks host),
 Weekly Challenge, ~6–10 at launch incl. 1900 start), 9x16 camera-friendly design pass.
 
 **Legacy & Flavor:** Hall of Fame (auto classes from records; inductees add hardcore stickiness at
-home), awards (Player of the Season/Year), press (presentation only, fictional outlets, front
+home; v1.31 lightweight build: Players and Moments wings, players on points from star seasons,
+titles, top-scorer seasons and the scoring record, eligible 2 seasons after retiring, at most 2 a
+class; Moments are a list of firsts, one a class; each player inductee adds permanent shrine weight
+at home inside the tradition weight cap; a class each offseason; lives on a new Almanac tab with
+Records and a Waiting list, the future home of all-time leaderboards; one big card per class,
+headline for the first; save format 23, no retroactive inductions), awards (Player of the Season/Year), press (presentation only, fictional outlets, front
 pages). Lightweight versions in Phase 1. Venues and youth programs are league-level 1–5 ratings
 bought with cash.
 

@@ -79,6 +79,10 @@ surface before playtesting or during it.
 | 2026-10-05 | Living time and the offseason (GDD v1.24), after the first playtest: Play / Pause with three speeds over End Turn, the date ticking quarter by quarter, auto-pause on the interrupt list and decisions with resume after answering; cards revealed at their fact's quarter as event windows over the map (presentation only; a mid-turn sim stop is parked); the seasonal window renamed the offseason, opening on the first turn after the season ends, with one screen for the season review and all league business, prices against PP on hand; backing stays 60 PP. Build plan: 2.13 | Decided |
 | 2026-10-05 | Moments have weight (GDD v1.26): minor (toast), big (back-page window) and headline (front page over a dimmed map) per card in content; big flagship moments become headlines at Professional and Elite; card families look different; big moments come first and cannot be skipped (Next Turn waits); auto-collect for minor moments parked. Build plan: 2.14 | Decided |
 | 2026-10-05 | The clock is dropped after playtest (GDD v1.25): built as step 3 and played, the quarter-by-quarter replay was choppy and the self-pauses jarring; reverted the same day. Next Turn stays with tier-scaled lengths, the date heads the bottom bar, and cards pop up over the map after each turn in the order they happened. Build plan 2.13 revised | Decided |
+| 2026-10-07 | What the sport remembers, topic 1 (GDD v1.31): Hall of Fame with Players and Moments wings; players inducted on points from retained records (star seasons, titles, top-scorer seasons, scoring record), eligible a few seasons after retiring, capped per class; Moments are a closed list of firsts, one a class; player inductees add permanent shrine weight at home inside the weight cap and renew their legacy; a class each offseason; a new Almanac tab (Hall of Fame and Records, the future home of all-time leaderboards) | Decided |
+| 2026-10-07 | What the sport remembers, topic 2 (GDD v1.31): chants are a new club tradition type (derby and rite unchanged); born from an underdog title or a first title in a close finish; the first is the anthem (stronger, headline); the only tradition with natural reach (one linked country a year, capped, dropped below the hardcore floor); renewed by titles; modernizing grounds betrays them | Decided |
+| 2026-10-07 | What the sport remembers, topic 3 (GDD v1.31): the homegrown gear brand is not a tradition; it stays the deals' demand-free main-sponsor option, always offered | Decided |
+| 2026-10-07 | What the sport remembers, topic 4 (GDD v1.31): one induction card per class (no moment slot, big; headline for the first class or the record holder; PP per inductee by wing, tier-scaled); chants reuse the tradition cards (anthem headline, first follower abroad a toast); save format 23, no retroactive inductions; Almanac with plaques, Waiting list and Records; inductees on the country card | Decided |
 
 ---
 
@@ -883,6 +887,45 @@ tier 5 122.5, first win 161); #1 lost before the win 20/36 (56%); no Near-Collap
 0.0000025 and the third sponsor slot 0.1 → 0.07 bring it to 120% (seeds 1–2), the top of the band.
 Greedy-spread from Austria, 8 seeds: none collapsed, tier 5 at turn 102.5. Docs:
 `docs/venues/README.md`.
+
+### 2.18 Build Plan: What the Sport Remembers (GDD v1.31)
+
+A lightweight Hall of Fame with an Almanac tab, and chants and anthems as a seventh tradition
+type. Every number is config (`hallOfFame`, `culture.chant`). The gear brand is unchanged (a deal
+partner, not a tradition). Awards, press, league directors and founding family stay later.
+
+1. **Config, state and save.** `hallOfFame`: points per star season, title, top-scorer season and
+   the scoring record; the bar; seasons to wait after retiring; players per class; the shrine
+   weight per inductee; PP per inductee by wing; the Moments firsts (a closed list of landmark
+   kinds, validated at load). `culture.chant`: the anthem's start bonus, natural reach chance,
+   minimum strength, follower cap, modernization wear. `chant` joins the tradition types (an ease
+   for every birthplace, birth PP). `GameState.hallOfFame`: inductees (wing, player or landmark
+   ref, home country, class season, the facts quoted), the season and landmark index it counts
+   from. Save format 23: format 22 migrates with an empty Hall counting from now.
+2. **The Hall of Fame.** `src/sim/hall-of-fame.ts`: a class at each season's end (read from the
+   `seasonChampion` landmark in the turn's culture pass): eligible retired players scored from
+   career lines and season summaries, best first up to the cap above the bar; the oldest uninducted
+   first. `hallOfFameClass` landmark. Shrine weight joins each country's tradition weight inside
+   the cap (stickiness and the seat cost alike); induction renews a living legacy. Tests: points
+   from records, the wait, the cap and backlog, firsts once each, no retroactive inductions,
+   shrine weight under the cap.
+3. **Chants.** Births in culture's season pass (an underdog title, or a club's first title won in
+   a close finish, using the season-story rules), the anthem first; one living chant a club;
+   renewal by the club's titles; natural reach on culture's stream with the follower cap; a
+   follower dropped below the hardcore floor; modernization betrays the seat country's chants.
+   Tests: each birth rule, the anthem, reach without nodes and its cap, the follower drop,
+   modernization.
+4. **Cards.** One induction card per class after the champion card (no moment slot; big, headline
+   for the first class or the record holder; PP by wing scaled by tier; induction facts on event
+   records). Chant wording on the tradition cards, the anthem a headline, the first follower
+   abroad a minor toast (`chantSpread` landmark). Tests.
+5. **The Almanac and the map.** An Almanac nav tab: Hall of Fame wings with plaques quoting facts,
+   the Waiting list, Records (champions by season with top scorer and crowd, all-time top ten
+   scorers, the record crowd). The country card lists inductees from there; the tradition marker
+   counts shrine weight. i18n; smoke screenshots.
+6. **Runner and measure.** The runner prints inductees, chants born and their followers, shrine
+   weight. Measure pacing on seeds 1–3, the #1 contest, and whether bots buy Culture nodes. Docs:
+   `docs/almanac/README.md`, progress, CLAUDE.md, cheat sheet.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
