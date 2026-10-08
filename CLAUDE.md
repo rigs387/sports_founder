@@ -332,6 +332,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 23 adds the Hall of Fame (GDD v1.31): `GameState.hallOfFame` and class facts on
   event records. Format 22 migrates with an empty Hall and no retroactive inductions: only players
   retiring from the season under way, and firsts recorded from then on, count.
+- Save format 24 adds awards (GDD v1.33): each season summary's `playerOfSeason`, the champion's
+  season facts' `playerOfSeasonId`, and Hall of Fame inductees' award counts. Format 23 migrates
+  with no winners and no award facts (no retroactive awards).
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

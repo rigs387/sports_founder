@@ -19,7 +19,7 @@ import {
   updateCulture,
 } from "../src/sim";
 import { clubIds, fresh, withSeason, withTradition } from "./culture-helpers";
-import { countryIndex, migratedHall, setupFor, withConfig, world } from "./helpers";
+import { awardless, countryIndex, migratedHall, setupFor, withConfig, world } from "./helpers";
 
 // The Hall of Fame (GDD v1.31, tech plan 2.18).
 
@@ -102,7 +102,7 @@ describe("Hall of Fame state (tech plan 2.18 step 1)", () => {
       newHallOfFame(played.flagship.season, played.landmarks.length),
     );
     expect(serializeSave(loaded)).toBe(
-      serializeSave({ ...played, hallOfFame: migratedHall(played) }),
+      serializeSave(awardless({ ...played, hallOfFame: migratedHall(played) })),
     );
   });
 });
@@ -134,6 +134,7 @@ describe("Hall of Fame classes (tech plan 2.18 step 2)", () => {
       starSeasons: 4,
       titles: 2,
       topScorerSeasons: 1,
+      awards: 0,
       record: true,
       scores: 40,
     });

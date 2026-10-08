@@ -50,6 +50,7 @@ function summary(season: number, championId: number, runnerUpId: number, gap: nu
     newStarId: null,
     crowd: null,
     recordCrowd: false,
+    playerOfSeason: null,
   } satisfies SeasonSummary;
 }
 const interest = (seasons: SeasonSummary[]) => seasonInterest(seasons, seasons.length - 1, world);

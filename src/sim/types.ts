@@ -313,6 +313,8 @@ export interface SeasonSummary {
   crowd: number | null;
   /** Whether the crowd set the league's attendance record: a fame fact for a ground. */
   recordCrowd: boolean;
+  /** The season's Player of the Season (GDD v1.33); null before save format 24 or untallied. */
+  playerOfSeason: number | null;
 }
 
 /**
@@ -845,6 +847,8 @@ export interface InducteeFacts {
   starSeasons: number;
   titles: number;
   topScorerSeasons: number;
+  /** Player of the Season awards (GDD v1.33). */
+  awards: number;
   /** Whether they ever held the league's all-time scoring record. */
   record: boolean;
   /** Career scores. */

@@ -24,6 +24,8 @@ export const seasonFactsSchema = z.strictObject({
   championPlayerId: z.int().positive().nullable(),
   topScorerId: z.int().positive().nullable(),
   topScorerScores: z.int().nonnegative().nullable(),
+  /** The season's Player of the Season (GDD v1.33); null before save format 24. */
+  playerOfSeasonId: z.int().positive().nullable(),
 });
 
 /**

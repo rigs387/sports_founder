@@ -15,6 +15,7 @@ import {
   type World,
 } from "../src/sim";
 import {
+  awardless,
   cardless,
   crowdless,
   migratedCulture,
@@ -181,6 +182,6 @@ describe("save format 13", () => {
       culture: migratedCulture(played),
       hallOfFame: migratedHall(played),
     };
-    expect(serializeSave(loaded)).toBe(serializeSave(expected));
+    expect(serializeSave(loaded)).toBe(serializeSave(awardless(expected)));
   });
 });

@@ -39,6 +39,7 @@ export function inducteeFacts(
       seasons.some((s) => s.season === line.season && s.championId === line.clubId),
     ).length,
     topScorerSeasons: seasons.filter((s) => s.topScorer?.playerId === player.id).length,
+    awards: seasons.filter((s) => s.playerOfSeason === player.id).length,
     record: state.landmarks.some((l) => l.kind === "scoringRecord" && l.playerId === player.id),
     scores: player.career.reduce((sum, line) => sum + line.scores, 0),
   };
@@ -51,6 +52,7 @@ export function hallPoints(facts: InducteeFacts, world: World): number {
     facts.starSeasons * points.starSeason +
     facts.titles * points.title +
     facts.topScorerSeasons * points.topScorer +
+    facts.awards * points.playerOfSeason +
     (facts.record ? points.record : 0)
   );
 }

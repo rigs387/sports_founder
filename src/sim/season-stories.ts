@@ -39,6 +39,7 @@ export function seasonFacts(
       )?.id ?? null,
     topScorerId: summary.topScorer?.playerId ?? null,
     topScorerScores: summary.topScorer?.scores ?? null,
+    playerOfSeasonId: summary.playerOfSeason,
   };
 }
 

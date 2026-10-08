@@ -995,10 +995,19 @@ export const configFileSchema = z.strictObject({
       historySeasons: z.int().min(0),
     }),
   }),
+  /** Awards (GDD v1.33): Player of the Season points from a season's record. */
+  awards: z.strictObject({
+    score: z.number().min(0),
+    champion: z.number().min(0),
+    runnerUp: z.number().min(0),
+    playoffScore: z.number().min(0),
+    finalScore: z.number().min(0),
+  }),
   /** The Hall of Fame (GDD v1.31). */
   hallOfFame: z.strictObject({
     points: z.strictObject({
       starSeason: z.number().min(0),
+      playerOfSeason: z.number().min(0),
       title: z.number().min(0),
       topScorer: z.number().min(0),
       record: z.number().min(0),

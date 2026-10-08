@@ -21,6 +21,7 @@ import {
   type TableRow,
 } from "../src/sim";
 import {
+  awardless,
   countryIndex,
   crowdless,
   migratedCulture,
@@ -77,6 +78,7 @@ function summary(
     newStarId: null,
     crowd: null,
     recordCrowd: false,
+    playerOfSeason: null,
     ...options,
   };
 }
@@ -393,23 +395,25 @@ describe("season cards in play", () => {
     expect(loaded.flagship.seasons.every((s) => s.startRatings.length === 0)).toBe(true);
     expect(loaded.events.seasonOffered).toEqual({});
     expect(serializeSave(loaded)).toBe(
-      serializeSave({
-        ...played,
-        countries: venueless(played),
-        flagship: {
-          ...played.flagship,
-          scoring: "medium",
-          seasons: crowdless(played.flagship.seasons).map((s) => ({
-            ...s,
+      serializeSave(
+        awardless({
+          ...played,
+          countries: venueless(played),
+          flagship: {
+            ...played.flagship,
             scoring: "medium",
-            startRatings: [],
-          })),
-          // Deals came with format 20: none signed or offered (GDD v1.28).
-          deals: newDeals(played.seed),
-        },
-        culture: migratedCulture(played),
-        hallOfFame: migratedHall(played),
-      }),
+            seasons: crowdless(played.flagship.seasons).map((s) => ({
+              ...s,
+              scoring: "medium",
+              startRatings: [],
+            })),
+            // Deals came with format 20: none signed or offered (GDD v1.28).
+            deals: newDeals(played.seed),
+          },
+          culture: migratedCulture(played),
+          hallOfFame: migratedHall(played),
+        }),
+      ),
     );
   });
 });

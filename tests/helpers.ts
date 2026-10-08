@@ -92,6 +92,37 @@ export function migratedHall(state: GameState) {
   return newHallOfFame(state.flagship.season, state.landmarks.length);
 }
 
+/** Awards as an older save gains them on loading (format 24): no winners and no award facts. */
+export function awardless(state: GameState): GameState {
+  const told = (list: GameState["events"]["pending"]) =>
+    list.map((event) =>
+      event.facts.season
+        ? {
+            ...event,
+            facts: { ...event.facts, season: { ...event.facts.season, playerOfSeasonId: null } },
+          }
+        : event,
+    );
+  return {
+    ...state,
+    events: {
+      ...state.events,
+      pending: told(state.events.pending),
+      history: told(state.events.history),
+    },
+    flagship: {
+      ...state.flagship,
+      seasons: state.flagship.seasons.map((summary) => ({ ...summary, playerOfSeason: null })),
+    },
+    hallOfFame: {
+      ...state.hallOfFame,
+      inductees: state.hallOfFame.inductees.map((inductee) =>
+        inductee.facts ? { ...inductee, facts: { ...inductee.facts, awards: 0 } } : inductee,
+      ),
+    },
+  };
+}
+
 /** Leagues as an older save gains them on loading (format 22): level 1, nothing built, no record. */
 export function venueless(state: GameState): GameState["countries"] {
   return state.countries.map((country) =>

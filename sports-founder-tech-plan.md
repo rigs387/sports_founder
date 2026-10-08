@@ -1064,6 +1064,13 @@ press is saved.
    seeds 1–3; a short playtest replay; docs (`docs/almanac` or a press README), progress, CLAUDE.md,
    cheat sheet.
 
+*Step 1 built 2026-10-08.* `playerOfSeason` (`src/sim/flagship.ts`) picks the winner from the
+season's tallies by config `awards` when a season ends; `SeasonSummary.playerOfSeason` and the
+season facts' `playerOfSeasonId` record it. `InducteeFacts.awards` counts a player's awards and
+`hallPoints` adds `hallOfFame.points.playerOfSeason` for each. Save format 24 (format 23 migrates
+with no winners, no award facts, inductees at 0 awards; `awardless` in `tests/helpers.ts` is that
+migration for older-save tests). `tests/awards.test.ts`.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

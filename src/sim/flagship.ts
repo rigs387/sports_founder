@@ -856,6 +856,44 @@ function topScorer(flagship: FlagshipState, tallies: readonly PlayerTally[]): To
   return { playerId: player.id, clubId: player.clubId, scores: best.scores };
 }
 
+/**
+ * The season's Player of the Season (GDD v1.33): the most points from the season's record, by
+ * config `awards` (scores, the club's finish, playoff and final scores); ties go to fewer matches,
+ * then the lower id. Null when nobody played.
+ */
+export function playerOfSeason(
+  flagship: FlagshipState,
+  tallies: readonly PlayerTally[],
+  championId: number,
+  runnerUpId: number,
+  world: World,
+): number | null {
+  const weights = world.config.awards;
+  const scored = tallies.flatMap((tally) => {
+    const player = flagship.players.find((p) => p.id === tally.playerId);
+    if (!player || tally.matches === 0) return [];
+    const finish =
+      player.clubId === championId
+        ? weights.champion
+        : player.clubId === runnerUpId
+          ? weights.runnerUp
+          : 0;
+    const points =
+      tally.scores * weights.score +
+      tally.playoffScores * weights.playoffScore +
+      tally.finalScores * weights.finalScore +
+      finish;
+    return [{ tally, points }];
+  });
+  const best = scored.sort(
+    (a, b) =>
+      b.points - a.points ||
+      a.tally.matches - b.tally.matches ||
+      a.tally.playerId - b.tally.playerId,
+  )[0];
+  return best && best.points > 0 ? best.tally.playerId : null;
+}
+
 /** At a season's end, each tallied player who played gains a permanent career line. */
 function closeCareers(flagship: FlagshipState, tallies: readonly PlayerTally[]): FlagshipState {
   const tallied = new Map(tallies.map((tally) => [tally.playerId, tally]));
@@ -1365,6 +1403,10 @@ export function stepFlagshipQuarter(
         newStarId: null,
         crowd: seasonCrowd(nextCountries, world, flagship.countryId),
         recordCrowd: false,
+        playerOfSeason:
+          tallies === null
+            ? null
+            : playerOfSeason(flagship, tallies, playoffs.champion, playoffs.runnerUp, world),
       };
       const crowd = recordCrowd(nextCountries, world, flagship.countryId, summary.crowd ?? 0);
       nextCountries = crowd.countries;

@@ -26,6 +26,7 @@ import {
 } from "../src/sim";
 import { clubIds, fresh, ofType, withSeason, withTradition } from "./culture-helpers";
 import {
+  awardless,
   countryIndex,
   crowdless,
   migratedHall,
@@ -91,15 +92,17 @@ describe("venue state (tech plan 2.17 step 1)", () => {
     };
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 21, state: v21 }), world);
     expect(serializeSave(loaded)).toBe(
-      serializeSave({
-        ...played,
-        countries: venueless(played),
-        flagship: {
-          ...played.flagship,
-          seasons: crowdless(played.flagship.seasons),
-        },
-        hallOfFame: migratedHall(played),
-      }),
+      serializeSave(
+        awardless({
+          ...played,
+          countries: venueless(played),
+          flagship: {
+            ...played.flagship,
+            seasons: crowdless(played.flagship.seasons),
+          },
+          hallOfFame: migratedHall(played),
+        }),
+      ),
     );
   });
 });

@@ -11,6 +11,7 @@ import {
   stepQuarter,
 } from "../src/sim";
 import {
+  awardless,
   baseGenome,
   cardless,
   crowdless,
@@ -137,17 +138,19 @@ describe("save format 10", () => {
       flagship: { ...flagship, seasons: flagship.seasons.map(({ scoring: _r, ...s }) => s) },
     };
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 9, state: v9 }), world);
-    expect(loaded).toStrictEqual({
-      ...played,
-      countries: venueless(played),
-      flagship: {
-        ...played.flagship,
-        scoring: "medium",
-        seasons: crowdless(played.flagship.seasons).map((s) => ({ ...s, scoring: "medium" })),
-      },
-      culture: migratedCulture(played),
-      hallOfFame: migratedHall(played),
-    });
+    expect(loaded).toStrictEqual(
+      awardless({
+        ...played,
+        countries: venueless(played),
+        flagship: {
+          ...played.flagship,
+          scoring: "medium",
+          seasons: crowdless(played.flagship.seasons).map((s) => ({ ...s, scoring: "medium" })),
+        },
+        culture: migratedCulture(played),
+        hallOfFame: migratedHall(played),
+      }),
+    );
     const next = closeOffseason(playSeasons(loaded, 3), world);
     expect(next.flagship.seasons.at(-1)?.scoring).toBe("medium");
     expect(next.flagship.scoring).toBe("high");

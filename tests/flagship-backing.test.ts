@@ -19,6 +19,7 @@ import {
   type World,
 } from "../src/sim";
 import {
+  awardless,
   countryIndex,
   crowdless,
   migratedCulture,
@@ -193,13 +194,15 @@ describe("bots and saves", () => {
     };
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 13, state: v13 }), content);
     expect(serializeSave(loaded)).toBe(
-      serializeSave({
-        ...state,
-        countries: venueless(state),
-        flagship: { ...state.flagship, seasons: crowdless(state.flagship.seasons) },
-        culture: migratedCulture(state),
-        hallOfFame: migratedHall(state),
-      }),
+      serializeSave(
+        awardless({
+          ...state,
+          countries: venueless(state),
+          flagship: { ...state.flagship, seasons: crowdless(state.flagship.seasons) },
+          culture: migratedCulture(state),
+          hallOfFame: migratedHall(state),
+        }),
+      ),
     );
   });
 });

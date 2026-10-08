@@ -32,7 +32,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 23;
+export const SAVE_FORMAT_VERSION = 24;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -441,6 +441,7 @@ const flagshipSchema = z.strictObject({
       newStarId: z.int().min(1).nullable(),
       crowd: count.nullable(),
       recordCrowd: z.boolean(),
+      playerOfSeason: z.int().min(1).nullable(),
     }),
   ),
   deals: dealsSchema,
@@ -597,6 +598,7 @@ const gameStateSchema = z.strictObject({
             starSeasons: count,
             titles: count,
             topScorerSeasons: count,
+            awards: count,
             record: z.boolean(),
             scores: count,
           })
@@ -625,6 +627,44 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 23 → 24: awards (GDD v1.33). No retroactive awards: past seasons have no Player of the Season,
+  // season cards name none, and Hall of Fame inductees have no award count.
+  23: (save) => {
+    const flagship = save.state.flagship as FlagshipState;
+    const events = save.state.events as Record<string, unknown>;
+    const hall = save.state.hallOfFame as { inductees: Record<string, unknown>[] };
+    const told = (list: unknown) =>
+      (Array.isArray(list) ? list : []).map((event: Record<string, unknown>) => {
+        const facts = event.facts as Record<string, unknown>;
+        const season = facts.season as Record<string, unknown> | null;
+        return season
+          ? { ...event, facts: { ...facts, season: { ...season, playerOfSeasonId: null } } }
+          : event;
+      });
+    return {
+      formatVersion: 24,
+      state: {
+        ...save.state,
+        events: { ...events, pending: told(events.pending), history: told(events.history) },
+        flagship: {
+          ...flagship,
+          seasons: flagship.seasons.map((summary) => ({ ...summary, playerOfSeason: null })),
+        },
+        hallOfFame: {
+          ...hall,
+          inductees: hall.inductees.map((inductee) => {
+            const facts = inductee.facts as Record<string, unknown> | null;
+            if (!facts) return inductee;
+            const { starSeasons, titles, topScorerSeasons, record, scores } = facts;
+            return {
+              ...inductee,
+              facts: { starSeasons, titles, topScorerSeasons, awards: 0, record, scores },
+            };
+          }),
+        },
+      },
+    };
+  },
   // 22 → 23: the Hall of Fame (GDD v1.31). An empty Hall with no retroactive inductions: only
   // players retiring from the season under way, and firsts recorded from now on, count. Recorded
   // events tell no class.

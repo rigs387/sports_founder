@@ -64,6 +64,7 @@ export function withSeason(
     newStarId: options.newStarId ?? null,
     crowd: null,
     recordCrowd: options.recordCrowd ?? false,
+    playerOfSeason: null,
   };
   return {
     ...state,
