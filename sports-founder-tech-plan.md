@@ -1092,6 +1092,15 @@ stable hash of the event (a context title, like the anthem's, wins); `FrontPage`
 front page needs an outlet masthead and no missing strings (`runs/smoke/27d-offseason.png`).
 `tests/press.test.ts`.
 
+*Step 4 built 2026-10-08.* Measured (builder, 12 typical anchors, seeds 1–3, 200 turns; seed 3 in
+two halves of six anchors): award points swelled the Hall to 20–24 players a campaign (16–19
+before), so the bar is 24 (17 on seeds 1–2, 19–20 on seed 3; the first player inducted around
+turn 43). Pacing pooled is unchanged (tier 2 at 33, tier 3 44, tier 4 75.5, tier 5 121, first win
+159); #1 lost before the win 19/36 (53%). A 2.5-minute playtest replay (Austria, 117 turns): no
+console errors or missing strings; title variants mix ("…are champions of" 33, "…take the title
+in" 17, "Champions of" 8); the award took the first Hall player's name ("the Koch Medal"); the
+front page led with a first title when the season told one. Docs: `docs/almanac/README.md`.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

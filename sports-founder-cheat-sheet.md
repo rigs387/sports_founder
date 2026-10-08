@@ -227,11 +227,12 @@ invented outlet per country (its biggest place + a sports-paper word) once its l
 sport's own paper before; mastheads show the outlet; 2–3 headline variants for frequent cards; the
 offseason's season in review is the seat outlet's front page; presentation only. Save format 24
 stores each season's Player of the Season (no retroactive awards); the top scorer's prize is "the
-{Score} Crown"; the Almanac lists the most awarded players.
+{Score} Crown"; the Almanac lists the most awarded players. Built: the Hall bar rose to 24 to keep
+classes at 17–20 players a campaign once awards counted.
 
 **Legacy & Flavor:** Hall of Fame (auto classes from records; inductees add hardcore stickiness at
 home; v1.31 lightweight build: Players and Moments wings, players on points from star seasons,
-titles, top-scorer seasons and the scoring record (bar 20), eligible 2 seasons after retiring, at most 2 a
+titles, top-scorer seasons, awards and the scoring record (bar 24), eligible 2 seasons after retiring, at most 2 a
 class; Moments are a list of firsts, one a class; each player inductee adds permanent shrine weight
 at home inside the tradition weight cap; a class each offseason; lives on a new Almanac tab with
 Records and a Waiting list, the future home of all-time leaderboards; one big card per class,

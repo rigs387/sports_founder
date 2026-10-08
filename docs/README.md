@@ -21,7 +21,7 @@ Start with the [world map's current direction](world-map/README.md): **Matchday 
 - [Flagship deals: TV, sponsors, naming rights, demands and breaches](deals/README.md)
 - [Venues and payroll: the gate cap, building levels, star wages](venues/README.md)
 - [Culture and traditions: births, shelter, betrayal, the Culture category](culture/README.md)
-- [What the sport remembers: the Hall of Fame, the Almanac, chants and anthems](almanac/README.md)
+- [What the sport remembers: the Hall of Fame, the Almanac, chants, awards and press](almanac/README.md)
 - [Growth tree visual studies](growth-tree/README.md)
 - [World map implementation brief](world-map/brief.html)
 - [Earlier visual studies](world-map/README.md#earlier-studies)

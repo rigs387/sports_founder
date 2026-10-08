@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-07",
-  design: "GDD v1.32",
+  design: "GDD v1.33",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -94,6 +94,18 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-08",
+      type: "Built",
+      title: "Awards and press",
+      text: "Tech plan 2.20 (GDD v1.33): the flagship's Player of the Season (points for scores, the club's finish, playoff and final scores), stored on each season and counting toward the Hall of Fame, named after the first Hall player; the top scorer's {Score} Crown; lines on the champion card, Stars panel and Almanac, the first award a toast. Press: an invented paper per country once its league forms, mastheads by outlet and section, headline variants for five cards, and the offseason's season in review as the seat paper's front page. Save format 24. The Hall bar rose to 24 (award points had swelled classes to 20-24 players); pacing and the #1 contest (53%) unchanged.",
+    },
+    {
+      date: "2026-10-08",
+      type: "Design",
+      title: "Awards and press",
+      text: "GDD v1.33: Player of the Season and the top scorer's prize, from records only, counting toward the Hall of Fame and named after its first player; Player of the Year parked until other leagues have named players. Press is presentation only: invented outlets per country once a league forms, headline variants, and the season's front page.",
+    },
     {
       date: "2026-10-08",
       type: "Built",
@@ -780,12 +792,12 @@ window.SF_PROGRESS = {
       gdd: "GDD system 11 · light version in Phase 1",
       icon: "14",
       summary: "Fictional outlets tell the stories that the simulation can prove.",
-      next: "Present major recorded moments as readable headlines and occasional front pages.",
+      next: "More headline variants as the deck grows; a turn recap front page was considered and declined (too many interruptions).",
       depends: ["events"],
       sources: [["Press design", "../../sports-founder-gdd.md#progression--economy"]],
       items: [
-        ["planned", "Fictional outlets and record-backed press templates"],
-        ["planned", "Newspaper front pages for major turns"],
+        ["built", "Fictional outlets per country and record-backed headline variants (GDD v1.33)"],
+        ["built", "The season's front page on the offseason screen (GDD v1.33)"],
       ],
     },
     {
@@ -826,12 +838,18 @@ window.SF_PROGRESS = {
       gdd: "GDD system 14 · light version in Phase 1",
       icon: "17",
       summary: "Season achievements become stories, star power and legacy.",
-      next: "Derive awards from recorded performance once seasons and players exist.",
+      next: "Player of the Year once other leagues have named players (parked); star power toward the flagship with the parked talent pull.",
       depends: ["stars", "leagues"],
       sources: [["Awards design", "../../sports-founder-gdd.md#progression--economy"]],
       items: [
-        ["planned", "League Player of the Season and global Player of the Year"],
-        ["planned", "Awards feed star power, stories and Hall of Fame eligibility"],
+        [
+          "partial",
+          "The flagship's Player of the Season and the top scorer's Crown built (GDD v1.33); Player of the Year waits for named players in other leagues",
+        ],
+        [
+          "partial",
+          "Awards feed stories and Hall of Fame eligibility; star power waits for the talent pull",
+        ],
       ],
     },
     {

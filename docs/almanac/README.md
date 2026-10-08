@@ -40,6 +40,28 @@ counts them.
 
 ![A plaque's home: the country card names its Hall of Fame players.](country.png)
 
+## Awards and press (GDD v1.33)
+
+Built October 8, 2026 (tech plan 2.20).
+
+- **Player of the Season** goes to the flagship player with the most points from the season's
+  record: 1 per score, +10 for a champion's player, +5 for a runner-up's, +1 more per playoff score
+  and +2 more per final score. It is stored on the season, counts 3 points toward the Hall of Fame
+  (the bar rose to 24 to keep classes the same size), and is named after the first player the Hall
+  inducts ("the Koch Medal"). The season's top scorer wins **the {Score} Crown** in the sport's
+  own term. Awards show as lines on the champion card, the front page, the Stars panel and in the
+  Almanac (the roll, plaque counts, "Won {award} most often"); the first award ever is a toast.
+- **Press:** every country gets an invented paper once its league forms: its biggest place and a
+  sports-paper word ("The Vienna Final Whistle"); before that its stories run in the sport's own
+  paper, and world championships run on the wire. Big moments carry the paper as their masthead,
+  with the card family as its section. Five frequent cards have two headline variants each,
+  picked so a card never changes on reload. The offseason's season in review is the seat paper's
+  **front page**: the champion as the lead (a first title, an underdog, a dynasty or a foregone
+  league leads differently), the result, then the awards, a new star, a record crowd, traditions
+  born and the Hall's class. Press is presentation only: nothing is saved and no number changes.
+
+![The season's front page on the offseason screen.](front-page.png)
+
 ## Chants and anthems
 
 `chant` is a seventh tradition type, held by one club. Derby and club rite are unchanged.

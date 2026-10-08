@@ -978,6 +978,9 @@ names in stories.
   2; the bar stays 20 and is raised if classes swell, rather than cutting award points.
 - *The Almanac:* the roll of champions names each season's Player of the Season, plaques count a
   player's awards, and Records gain "Most Player of the Season awards" (top 5).
+- *Built 2026-10-08 (calls made at build).* Award points swelled the Hall from 16–19 players a
+  campaign to 20–24, so the bar rose from 20 to 24 (17–20). Pacing and the #1 contest (53%) are
+  unchanged. A player's medal takes the family name, the last word of the recorded name.
 
 **Press coverage:** Presentation only; no press sentiment system. Fictional outlets per country
 (in the names data file); headlines built from record-backed Moments, with English-only flavor

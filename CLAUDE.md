@@ -134,6 +134,17 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   amendments, backing, the seat, the trophy) happens only while it is open.
 - The Almanac smoke step (`src/main/almanac-smoke.ts`) runs last and plays on until a Hall of
   Fame class is inducted.
+- Awards (GDD v1.33): the flagship's Player of the Season (`playerOfSeason` in `flagship.ts`, config
+  `awards`) is stored on each season summary and counts toward the Hall of Fame; it is named after
+  the first Hall player (`HallSnapshot.awardNamerId`, `useAwardWords` in
+  `src/renderer/src/awards/`); the top scorer's prize is "the {Score} Crown". Lines only, plus one
+  `first-award` toast (trigger `award`).
+- Press (GDD v1.33) is presentation only and never saved: `src/sim/press.ts` gives each event
+  snapshot its `outlet` (a country's biggest place + a `names.yaml press.words` word once its
+  league formed; the sport's paper before; the wire for rival championships) and the flagship
+  snapshot its `frontPage`. Moment mastheads show the outlet; five cards have `title_v1`/`title_v2`
+  variants picked by a stable hash; the offseason's season in review is `FrontPage`
+  (`src/renderer/src/press/`).
 - Playtest follow-ups (GDD v1.32): no deal offer below `flagship.deals.minOfferValue`; minor
   moments auto-collect (`collectMinorMoments`, the renderer's `AutoCollect` and a bottom-bar
   toggle, on by default and remembered in local storage; the smoke turns it off after setup for the
