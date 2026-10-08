@@ -25,7 +25,15 @@ import {
   venueTerms,
 } from "../src/sim";
 import { clubIds, fresh, ofType, withSeason, withTradition } from "./culture-helpers";
-import { countryIndex, crowdless, setupFor, venueless, withConfig, world } from "./helpers";
+import {
+  countryIndex,
+  crowdless,
+  migratedHall,
+  setupFor,
+  venueless,
+  withConfig,
+  world,
+} from "./helpers";
 
 // Venues and payroll (GDD v1.30, tech plan 2.17).
 
@@ -90,6 +98,7 @@ describe("venue state (tech plan 2.17 step 1)", () => {
           ...played.flagship,
           seasons: crowdless(played.flagship.seasons),
         },
+        hallOfFame: migratedHall(played),
       }),
     );
   });

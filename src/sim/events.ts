@@ -81,6 +81,7 @@ function offerSeasonCards(
           tradition: null,
           deal: null,
           venue: null,
+          hall: null,
         },
         resolution: null,
       });
@@ -243,6 +244,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
           tradition: null,
           deal: null,
           venue: null,
+          hall: null,
         },
         resolution: null,
       });

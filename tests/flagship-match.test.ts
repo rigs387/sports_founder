@@ -15,6 +15,7 @@ import {
   cardless,
   crowdless,
   migratedCulture,
+  migratedHall,
   setupFor,
   venueless,
   world,
@@ -145,6 +146,7 @@ describe("save format 10", () => {
         seasons: crowdless(played.flagship.seasons).map((s) => ({ ...s, scoring: "medium" })),
       },
       culture: migratedCulture(played),
+      hallOfFame: migratedHall(played),
     });
     const next = closeOffseason(playSeasons(loaded, 3), world);
     expect(next.flagship.seasons.at(-1)?.scoring).toBe("medium");

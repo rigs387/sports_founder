@@ -5,6 +5,8 @@ import type {
   DealSlot,
   EscalationLevel,
   Genome,
+  HallFirst,
+  HallWing,
   HealthLevel,
   LeagueTierId,
   TimedCountermoveKind,
@@ -633,6 +635,23 @@ export type Landmark =
       type: TraditionType;
       reason: TraditionLossReason;
     }
+  /** A chant gained its first follower abroad (GDD v1.31): the country now singing it. */
+  | {
+      kind: "chantSpread";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      traditionId: number;
+    }
+  /** A Hall of Fame class was inducted at a flagship season's end (GDD v1.31). */
+  | {
+      kind: "hallOfFameClass";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      inductees: number;
+    }
   | {
       kind: "rivalRuleCopied";
       turn: number;
@@ -817,6 +836,45 @@ export interface GameState {
   rules: RulesState;
   /** Traditions and what makes them (GDD v1.22). */
   culture: CultureState;
+  /** The Hall of Fame's inductees (GDD v1.31). */
+  hallOfFame: HallOfFameState;
+}
+
+/** The career facts a player's induction quotes, read from retained records (GDD v1.31). */
+export interface InducteeFacts {
+  starSeasons: number;
+  titles: number;
+  topScorerSeasons: number;
+  /** Whether they ever held the league's all-time scoring record. */
+  record: boolean;
+  /** Career scores. */
+  scores: number;
+}
+
+/** One Hall of Fame inductee: a player, or a first in the Moments wing. */
+export interface Inductee {
+  id: number;
+  wing: HallWing;
+  /** The flagship season whose end inducted them (their class). */
+  season: number;
+  turn: number;
+  quarter: number;
+  /** Home: a player's birth country; a first's landmark country (the anchor for #1 and the win). */
+  countryId: string;
+  playerId: number | null;
+  facts: InducteeFacts | null;
+  first: HallFirst | null;
+  /** The landmark a first was read from (landmarks are never removed). */
+  landmarkIndex: number | null;
+}
+
+export interface HallOfFameState {
+  /** Only players retiring in this flagship season or later are eligible (no retroactive ones). */
+  startSeason: number;
+  /** Firsts count only from landmarks at or after this index. */
+  landmarkStart: number;
+  inductees: Inductee[];
+  nextId: number;
 }
 
 export interface CampaignSetup {

@@ -32,8 +32,8 @@ describe("content", () => {
       loadWorld(
         sourcesWith("identity", (text) =>
           text.replace(
-            "schoolyard: { derby: 0.85, rite: 0.9, legacy: 1.3, nationalName: 1.1, venue: 0.9, trophy: 1 }",
-            "schoolyard: { derby: 1.5, rite: 1.5, legacy: 1.5, nationalName: 1.5, venue: 1.5, trophy: 1.5 }",
+            "schoolyard: { derby: 0.85, rite: 0.9, legacy: 1.3, nationalName: 1.1, venue: 0.9, trophy: 1, chant: 1.1 }",
+            "schoolyard: { derby: 1.5, rite: 1.5, legacy: 1.5, nationalName: 1.5, venue: 1.5, trophy: 1.5, chant: 1.5 }",
           ),
         ),
       ),

@@ -3,6 +3,7 @@ import { tierEntry } from "./calendar";
 import { newCulture } from "./culture";
 import { emptyEvents } from "./events-state";
 import { newFlagship } from "./flagship";
+import { newHallOfFame } from "./hall-of-fame";
 import { defaultIdentitySetup, foundSport, identityProblems } from "./identity";
 import { newLeague } from "./leagues";
 import { landmarks } from "./records";
@@ -95,7 +96,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     i === 0 ? setup.anchorCountryId : null,
   );
 
-  const founded: Omit<GameState, "identity" | "rules" | "culture"> = {
+  const founded: Omit<GameState, "identity" | "rules" | "culture" | "hallOfFame"> = {
     seed: setup.seed,
     rng: createRngState(setup.seed),
     anchorCountryId: setup.anchorCountryId,
@@ -138,6 +139,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     ...foundSport(founded, world, identitySetup),
     rules: { amendments: [] },
     culture: newCulture(setup.seed, 1, founded.landmarks.length, 0, world),
+    hallOfFame: newHallOfFame(1, founded.landmarks.length),
   };
 }
 

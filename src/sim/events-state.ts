@@ -68,6 +68,12 @@ export const venueFactsSchema = z.strictObject({
   clubId: z.int().positive().nullable(),
 });
 
+/** The Hall of Fame class a class card tells (GDD v1.31): its season and inductees' ids. */
+export const hallFactsSchema = z.strictObject({
+  season: z.int().positive(),
+  inducteeIds: z.array(z.int().positive()).min(1),
+});
+
 export const eventRecordSchema = z.strictObject({
   id: z.int().positive(),
   templateId: z.string(),
@@ -89,6 +95,7 @@ export const eventRecordSchema = z.strictObject({
     tradition: traditionFactsSchema.nullable(),
     deal: dealFactsSchema.nullable(),
     venue: venueFactsSchema.nullable(),
+    hall: hallFactsSchema.nullable(),
   }),
   resolution: z
     .strictObject({
@@ -124,6 +131,7 @@ export type StarFacts = z.infer<typeof starFactsSchema>;
 export type TraditionFacts = z.infer<typeof traditionFactsSchema>;
 export type DealFacts = z.infer<typeof dealFactsSchema>;
 export type VenueFacts = z.infer<typeof venueFactsSchema>;
+export type HallFacts = z.infer<typeof hallFactsSchema>;
 export type EventState = z.infer<typeof eventStateSchema>;
 export const emptyEvents = (landmarkCursor: number): EventState => ({
   nextId: 1,

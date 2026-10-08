@@ -9,6 +9,8 @@ import {
   formatPath,
   GENOME_AXES,
   genomeSchema,
+  hallFirstSchema,
+  hallWingSchema,
   healthLevelSchema,
   LEAGUE_TIERS,
   leagueTierSchema,
@@ -20,6 +22,7 @@ import { newCulture } from "./culture";
 import { newDeals } from "./deals";
 import { emptyEvents, eventStateSchema } from "./events-state";
 import { newFlagship, staffFlagship } from "./flagship";
+import { newHallOfFame } from "./hall-of-fame";
 import { defaultGroundName, defaultIdentitySetup, foundingClubOf } from "./identity";
 import { invariantsOf } from "./invariants";
 import { newLeague } from "./leagues";
@@ -29,7 +32,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 22;
+export const SAVE_FORMAT_VERSION = 23;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -270,6 +273,21 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     traditionId: z.int().min(1),
     type: traditionTypeSchema,
     reason: lossReasonSchema,
+  }),
+  z.strictObject({
+    kind: z.literal("chantSpread"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    traditionId: z.int().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal("hallOfFameClass"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    inductees: z.int().min(1),
   }),
   z.strictObject({
     kind: z.literal("rivalRuleCopied"),
@@ -562,6 +580,33 @@ const gameStateSchema = z.strictObject({
     stokes: z.array(z.strictObject({ clubIds: z.array(z.int().min(1)), season: z.int().min(1) })),
     naming: z.int().min(1).nullable(),
   }),
+  hallOfFame: z.strictObject({
+    startSeason: z.int().min(1),
+    landmarkStart: count,
+    inductees: z.array(
+      z.strictObject({
+        id: z.int().min(1),
+        wing: hallWingSchema,
+        season: z.int().min(1),
+        turn: z.int().min(1),
+        quarter: count,
+        countryId: z.string().min(1),
+        playerId: z.int().min(1).nullable(),
+        facts: z
+          .strictObject({
+            starSeasons: count,
+            titles: count,
+            topScorerSeasons: count,
+            record: z.boolean(),
+            scores: count,
+          })
+          .nullable(),
+        first: hallFirstSchema.nullable(),
+        landmarkIndex: count.nullable(),
+      }),
+    ),
+    nextId: z.int().min(1),
+  }),
 });
 
 const saveFileSchema = z.strictObject({
@@ -580,6 +625,27 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 22 → 23: the Hall of Fame (GDD v1.31). An empty Hall with no retroactive inductions: only
+  // players retiring from the season under way, and firsts recorded from now on, count. Recorded
+  // events tell no class.
+  22: (save) => {
+    const flagship = save.state.flagship as FlagshipState;
+    const landmarks = Array.isArray(save.state.landmarks) ? save.state.landmarks : [];
+    const events = save.state.events as Record<string, unknown>;
+    const told = (list: unknown) =>
+      (Array.isArray(list) ? list : []).map((event: Record<string, unknown>) => ({
+        ...event,
+        facts: { ...(event.facts as Record<string, unknown>), hall: null },
+      }));
+    return {
+      formatVersion: 23,
+      state: {
+        ...save.state,
+        events: { ...events, pending: told(events.pending), history: told(events.history) },
+        hallOfFame: newHallOfFame(flagship.season, landmarks.length),
+      },
+    };
+  },
   // 21 → 22: venues (GDD v1.30). Every league starts at level 1 with nothing building and no
   // record crowd; past seasons carry no crowd and set no record; recorded events tell no venue.
   21: (save) => {

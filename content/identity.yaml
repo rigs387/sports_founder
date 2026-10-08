@@ -58,12 +58,12 @@ oddPairings:
 # never its difficulty. Every birthplace and ethos above needs an entry; every type needs an ease.
 culture:
   birthplaces:
-    schoolyard: { derby: 0.85, rite: 0.9, legacy: 1.3, nationalName: 1.1, venue: 0.9, trophy: 1 }
-    factory: { derby: 1.35, rite: 0.9, legacy: 0.9, nationalName: 1, venue: 1.1, trophy: 0.85 }
-    beach: { derby: 0.9, rite: 0.9, legacy: 1.3, nationalName: 1.15, venue: 0.8, trophy: 1 }
-    barracks: { derby: 0.9, rite: 1.3, legacy: 0.8, nationalName: 0.95, venue: 1.2, trophy: 1 }
-    village-green: { derby: 0.8, rite: 1.25, legacy: 0.85, nationalName: 0.95, venue: 1, trophy: 1.25 }
-    docks: { derby: 1.3, rite: 1, legacy: 0.85, nationalName: 1.1, venue: 0.9, trophy: 0.95 }
+    schoolyard: { derby: 0.85, rite: 0.9, legacy: 1.3, nationalName: 1.1, venue: 0.9, trophy: 1, chant: 1.1 }
+    factory: { derby: 1.35, rite: 0.9, legacy: 0.9, nationalName: 1, venue: 1.1, trophy: 0.85, chant: 1.15 }
+    beach: { derby: 0.9, rite: 0.9, legacy: 1.3, nationalName: 1.15, venue: 0.8, trophy: 1, chant: 1.2 }
+    barracks: { derby: 0.9, rite: 1.3, legacy: 0.8, nationalName: 0.95, venue: 1.2, trophy: 1, chant: 0.85 }
+    village-green: { derby: 0.8, rite: 1.25, legacy: 0.85, nationalName: 0.95, venue: 1, trophy: 1.25, chant: 0.9 }
+    docks: { derby: 1.3, rite: 1, legacy: 0.85, nationalName: 1.1, venue: 0.9, trophy: 0.95, chant: 1.2 }
   ethos:
     gentlemans-game: { rules: 1.3, seat: 0.9, rename: 0.85 }
     working-class-game: { rules: 0.65, seat: 1.3, rename: 1.2 }

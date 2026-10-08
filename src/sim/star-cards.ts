@@ -189,6 +189,7 @@ export function offerStarCards(
         tradition: null,
         deal: null,
         venue: null,
+        hall: null,
       },
       resolution: null,
     });

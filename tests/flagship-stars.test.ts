@@ -18,6 +18,7 @@ import {
   cardless,
   crowdless,
   migratedCulture,
+  migratedHall,
   setupFor,
   venueless,
   withConfig,
@@ -178,6 +179,7 @@ describe("save format 13", () => {
         seasons: crowdless(played.flagship.seasons).map((s) => ({ ...s, newStarId: null })),
       },
       culture: migratedCulture(played),
+      hallOfFame: migratedHall(played),
     };
     expect(serializeSave(loaded)).toBe(serializeSave(expected));
   });

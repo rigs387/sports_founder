@@ -24,6 +24,7 @@ import {
   countryIndex,
   crowdless,
   migratedCulture,
+  migratedHall,
   setupFor,
   sweepAnchors,
   venueless,
@@ -407,6 +408,7 @@ describe("season cards in play", () => {
           deals: newDeals(played.seed),
         },
         culture: migratedCulture(played),
+        hallOfFame: migratedHall(played),
       }),
     );
   });

@@ -6,7 +6,13 @@ import {
   type WorldContent,
 } from "../src/content";
 import { loadWorldFromDisk } from "../src/runner/content-from-disk";
-import { type CampaignSetup, defaultGenome, type GameState, newCulture } from "../src/sim";
+import {
+  type CampaignSetup,
+  defaultGenome,
+  type GameState,
+  newCulture,
+  newHallOfFame,
+} from "../src/sim";
 
 export const world = loadWorldFromDisk();
 
@@ -79,6 +85,11 @@ export function migratedCulture(state: GameState) {
     state.quarter,
     world,
   );
+}
+
+/** The Hall of Fame an older save gains on loading (format 23): empty, counting from now. */
+export function migratedHall(state: GameState) {
+  return newHallOfFame(state.flagship.season, state.landmarks.length);
 }
 
 /** Leagues as an older save gains them on loading (format 22): level 1, nothing built, no record. */

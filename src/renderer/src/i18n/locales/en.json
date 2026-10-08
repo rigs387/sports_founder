@@ -289,7 +289,8 @@
         "body_legacy": "{{player}} retired after a great career as a star. In {{country}} people now call that way of playing {{name}}.",
         "body_nationalName": "The league in {{country}} has turned Professional, and people there have their own name for the sport: {{name}}.",
         "body_venue": "{{ground}} has seen {{count}} titles and finals. It is now one of the famous grounds of the sport.",
-        "body_trophy": "The first {{seasonNoun}} of the league in {{country}} is over, and its champions lifted {{name}}. You can give the trophy its own name now, free, on the flagship screen."
+        "body_trophy": "The first {{seasonNoun}} of the league in {{country}} is over, and its champions lifted {{name}}. You can give the trophy its own name now, free, on the flagship screen.",
+        "body_chant": "{{club}} won the title nobody expected. Their fans sang {{name}} all the way home, and they have not stopped since."
       },
       "deal-broken": {
         "title": "{{partner}} walks away",
@@ -1521,7 +1522,8 @@
       "legacy": "star legacy",
       "nationalName": "national name",
       "venue": "famous ground",
-      "trophy": "trophy"
+      "trophy": "trophy",
+      "chant": "chant"
     },
     "typesPlural": {
       "derby": "derbies",
@@ -1529,7 +1531,8 @@
       "legacy": "star legacies",
       "nationalName": "national names",
       "venue": "famous grounds",
-      "trophy": "trophies"
+      "trophy": "trophies",
+      "chant": "chants"
     },
     "heading": "Traditions",
     "intro": "Traditions are born only from what happened. They make fans hold on longer and resist rival pull, and they push back against changes that break them.",
@@ -1557,7 +1560,8 @@
       "legacy": "Born {{year}}: {{player}} retired after a great career.",
       "nationalName": "Born {{year}}: the league in {{country}} turned Professional.",
       "venue": "Born {{year}}: titles and finals at the ground of {{club}}.",
-      "trophy": "Born {{year}}: first played for in {{country}}."
+      "trophy": "Born {{year}}: first played for in {{country}}.",
+      "chant": "Born {{year}}: sung since {{club}} won the title against the odds."
     },
     "lost": {
       "faded": "Faded away in {{year}}.",
@@ -1571,7 +1575,8 @@
       "legacy": "Star legacies",
       "nationalName": "National names",
       "venue": "Famous grounds",
-      "trophy": "Trophies"
+      "trophy": "Trophies",
+      "chant": "Chants"
     },
     "offends": "Fans of {{name}} hold to these rules: {{rules}}.",
     "offended_one": "Offends {{count}} tradition: {{names}}.",

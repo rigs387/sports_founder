@@ -585,10 +585,38 @@ culture:
   # minHardcoreShare.
   reach: { minStrength: 0.9, chancePerReach: 1, followerShare: 0.5, minHardcoreShare: 0.001 }
   # The birth moment's PP by type (the loss moment pays nothing).
-  birthPP: { derby: 6, rite: 8, legacy: 6, nationalName: 6, venue: 6, trophy: 4 }
+  birthPP: { derby: 6, rite: 8, legacy: 6, nationalName: 6, venue: 6, trophy: 4, chant: 6 }
   # Content validation: each birthplace's eases and each ethos's betrayal multipliers must have a
   # geometric mean within 1 ± characterBand (character changes a campaign's shape, not difficulty).
   characterBand: 0.1
+  # Chants (GDD v1.31): a club's terrace song, born from an underdog title or a club's first title
+  # won in a close finish (the season-story rules). The first chant is the anthem and starts
+  # anthemBonus stronger. Chants alone spread without Culture nodes: once a year a chant at
+  # reachMinStrength or more may gain a follower with chance reachChance (+ the reach nodes' bonus),
+  # by the usual reach rules, up to maxFollowers countries (home included). A follower abroad is
+  # dropped when the player's hardcore share there falls below reach.minHardcoreShare.
+  chant: { anthemBonus: 0.25, reachChance: 0.25, reachMinStrength: 0.6, maxFollowers: 4 }
+
+# The Hall of Fame (GDD v1.31). A class each flagship season's end. Players: retired at least
+# waitSeasons seasons, retired after the Hall began (no retroactive inductions), with points from
+# retained records at or above the bar; best first (ties: earlier retirement, then lower id), at
+# most playersPerClass a class; the rest wait. Points: each star season, each title won at the club,
+# each season as the league's top scorer, and ever holding the all-time scoring record.
+# Moments: the firsts listed, each once, from its first landmark recorded after the Hall began;
+# oldest first, at most momentsPerClass a class. Each player inductee adds shrineWeight to their
+# home country's tradition weight (inside culture.weightCap). PP per inductee by wing and the
+# flagship league's tier.
+hallOfFame:
+  points: { starSeason: 3, title: 2, topScorer: 2, record: 5 }
+  bar: 12
+  waitSeasons: 2
+  playersPerClass: 2
+  momentsPerClass: 1
+  shrineWeight: 0.1
+  pp:
+    players: { amateur: 4, semi-pro: 6, professional: 8, elite: 12 }
+    moments: { amateur: 2, semi-pro: 3, professional: 4, elite: 6 }
+  moments: [foundingTitle, firstStar, firstProfessional, firstElite, firstRecordCrowd, firstRankOne, won]
 
 # Sport identity (GDD v1.18): limits on the names typed at setup (the sport, the founding club's
 # name and its ground), counted after trimming.

@@ -22,6 +22,7 @@ import {
   countryIndex,
   crowdless,
   migratedCulture,
+  migratedHall,
   setupFor,
   venueless,
   withConfig,
@@ -197,6 +198,7 @@ describe("bots and saves", () => {
         countries: venueless(state),
         flagship: { ...state.flagship, seasons: crowdless(state.flagship.seasons) },
         culture: migratedCulture(state),
+        hallOfFame: migratedHall(state),
       }),
     );
   });

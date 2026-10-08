@@ -183,7 +183,10 @@ export const sportsFileSchema = z.strictObject({
 
 // ---- Culture (GDD v1.22) -------------------------------------------------------------------
 
-/** The closed tradition vocabulary of the first build: four traditions and two artifacts. */
+/**
+ * The closed tradition vocabulary: four traditions and two artifacts from the first build, and
+ * chants (GDD v1.31).
+ */
 export const TRADITION_TYPES = [
   "derby",
   "rite",
@@ -191,6 +194,7 @@ export const TRADITION_TYPES = [
   "nationalName",
   "venue",
   "trophy",
+  "chant",
 ] as const;
 export const traditionTypeSchema = z.enum(TRADITION_TYPES);
 export type TraditionType = z.infer<typeof traditionTypeSchema>;
@@ -202,7 +206,32 @@ const byTradition = <T extends z.ZodType>(value: T) =>
     nationalName: value,
     venue: value,
     trophy: value,
+    chant: value,
   });
+
+// ---- Hall of Fame (GDD v1.31) --------------------------------------------------------------
+
+/** The Hall of Fame's wings: players and the Moments wing of firsts. */
+export const HALL_WINGS = ["players", "moments"] as const;
+export const hallWingSchema = z.enum(HALL_WINGS);
+export type HallWing = z.infer<typeof hallWingSchema>;
+
+/**
+ * The closed vocabulary of firsts the Moments wing can induct, each read from the first landmark
+ * of its kind: the founding club's first title, the sport's first star, its first Professional
+ * and Elite leagues, the first record crowd, first taking #1 and the win.
+ */
+export const HALL_FIRSTS = [
+  "foundingTitle",
+  "firstStar",
+  "firstProfessional",
+  "firstElite",
+  "firstRecordCrowd",
+  "firstRankOne",
+  "won",
+] as const;
+export const hallFirstSchema = z.enum(HALL_FIRSTS);
+export type HallFirst = z.infer<typeof hallFirstSchema>;
 
 // ---- Sport identity (GDD v1.18) ------------------------------------------------------------
 
@@ -954,6 +983,33 @@ export const configFileSchema = z.strictObject({
     }),
     birthPP: byTradition(z.number().min(0)),
     characterBand: unitInterval,
+    /** Chants (GDD v1.31): the anthem's start bonus and the natural reach only chants have. */
+    chant: z.strictObject({
+      anthemBonus: unitInterval,
+      reachChance: unitInterval,
+      reachMinStrength: unitInterval,
+      maxFollowers: z.int().min(1),
+    }),
+  }),
+  /** The Hall of Fame (GDD v1.31). */
+  hallOfFame: z.strictObject({
+    points: z.strictObject({
+      starSeason: z.number().min(0),
+      title: z.number().min(0),
+      topScorer: z.number().min(0),
+      record: z.number().min(0),
+    }),
+    bar: z.number().positive(),
+    waitSeasons: z.int().min(0),
+    playersPerClass: z.int().min(1),
+    momentsPerClass: z.int().min(0),
+    shrineWeight: z.number().min(0),
+    /** PP per inductee by wing and the flagship league's tier when the class card arrives. */
+    pp: z.strictObject({
+      players: byLeagueTier(z.number().min(0)),
+      moments: byLeagueTier(z.number().min(0)),
+    }),
+    moments: z.array(hallFirstSchema),
   }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({
