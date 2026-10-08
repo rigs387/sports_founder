@@ -38,6 +38,7 @@ export function App() {
   const [hover, setHover] = useState<MapHover | null>(null);
   const [patterns, setPatterns] = useState(false);
   const [rivals, setRivals] = useState(true);
+  const [autoCollect, setAutoCollect] = useState(readAutoCollect);
   const [overview, setOverview] = useState<Overview | null>(null);
   useEffect(() => {
     if (campaignRevision === 0) return;
@@ -257,7 +258,11 @@ export function App() {
           />
         )}
         {overview === null && (
-          <EventLayer onHighlight={setHighlighted} onBurst={(id) => navigate("burst", id)} />
+          <EventLayer
+            autoCollect={autoCollect}
+            onHighlight={setHighlighted}
+            onBurst={(id) => navigate("burst", id)}
+          />
         )}
         <div className="campaign-heading">
           <span className="eyebrow">{t("map.chapter")}</span>
@@ -544,6 +549,19 @@ export function App() {
             />
             {t("map.rivals")}
           </label>
+          <label title={t("map.autoCollectHint")}>
+            <input
+              type="checkbox"
+              data-testid="auto-collect"
+              checked={autoCollect}
+              onChange={(event) => {
+                const on = event.currentTarget.checked;
+                setAutoCollect(on);
+                writeAutoCollect(on);
+              }}
+            />
+            {t("map.autoCollect")}
+          </label>
         </div>
         <EventBoard key={campaignRevision} />
         {/* Big moments cannot be skipped (GDD v1.26): Next Turn waits until they are collected,
@@ -594,4 +612,22 @@ export function App() {
       )}
     </main>
   );
+}
+
+// Auto-collect for minor moments (GDD v1.32): on by default, remembered per viewer. Storage can be
+// missing or blocked; the default then applies.
+const AUTO_COLLECT_KEY = "sports-founder.autoCollect";
+function readAutoCollect(): boolean {
+  try {
+    return localStorage.getItem(AUTO_COLLECT_KEY) !== "off";
+  } catch {
+    return true;
+  }
+}
+function writeAutoCollect(on: boolean): void {
+  try {
+    localStorage.setItem(AUTO_COLLECT_KEY, on ? "on" : "off");
+  } catch {
+    // The choice still holds for this session.
+  }
 }

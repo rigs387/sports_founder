@@ -114,6 +114,17 @@ async function run(
   };
 
   const setup = await verifySetup(win, screenshot);
+  // Auto-collect (GDD v1.32) is on by default; the early steps collect moments by hand, so it is
+  // off until the pop-up step tests it and turns it back on (the preference is remembered).
+  const autoCollectAtStart = (await win.webContents.executeJavaScript(
+    `document.querySelector('[data-testid="auto-collect"]').checked`,
+    true,
+  )) as boolean;
+  if (autoCollectAtStart)
+    await win.webContents.executeJavaScript(
+      `document.querySelector('[data-testid="auto-collect"]').click()`,
+      true,
+    );
   const events = await verifyEvents(win, outDir, filePrompts, screenshot);
   const before = await waitFor((s) => s.status === "ready" && s.endTurnEnabled, "first snapshot");
   await screenshot("01-start.png");
@@ -156,6 +167,7 @@ async function run(
     throw new Error(JSON.stringify({ errors, remoteRequests }));
   const report = {
     passed,
+    autoCollectAtStart,
     turnsPlayed: TURNS_TO_PLAY,
     before,
     after: current,

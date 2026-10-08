@@ -1702,7 +1702,10 @@ export interface StarSnapshot {
   /** The season they became a star, or null for a backed successor who is not a star yet. */
   starSince: number | null;
   finalSeason: boolean;
-  /** This season's tally so far, or null when the season is not tallied. */
+  /**
+   * This season's tally so far, or in the offseason the season just finished (GDD v1.32); null
+   * when the season is not tallied.
+   */
   season: SeasonTally | null;
   /** Every finished season added up. */
   career: SeasonTally & { seasons: number };
@@ -1852,16 +1855,45 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
     leaders: activeClubs(flagship).flatMap((club) => {
       const player = leadingPlayer(flagship, club.id);
       if (!player) return [];
-      const tally = flagship.tallies?.find((entry) => entry.playerId === player.id);
       return [
         {
           clubId: club.id,
           playerId: player.id,
-          scores: flagship.tallies === null ? null : (tally?.scores ?? 0),
+          scores: shownTally(flagship, player)?.scores ?? null,
         },
       ];
     }),
   };
+}
+
+/**
+ * The tally the flagship screen shows for a player (GDD v1.32): this season's so far, or while the
+ * offseason is open the season just finished, read from their career line. Null when the season
+ * under way is not tallied.
+ */
+function shownTally(flagship: FlagshipState, player: Player): SeasonTally | null {
+  if (flagship.offseason) {
+    const last = flagship.seasons.at(-1);
+    const line = last && player.career.find((entry) => entry.season === last.season);
+    return line
+      ? {
+          matches: line.matches,
+          scores: line.scores,
+          playoffScores: line.playoffScores,
+          finalScores: line.finalScores,
+        }
+      : { ...EMPTY_TALLY };
+  }
+  if (flagship.tallies === null) return null;
+  const tally = flagship.tallies.find((entry) => entry.playerId === player.id);
+  return tally
+    ? {
+        matches: tally.matches,
+        scores: tally.scores,
+        playoffScores: tally.playoffScores,
+        finalScores: tally.finalScores,
+      }
+    : { ...EMPTY_TALLY };
 }
 
 function starSnapshots(state: GameState, world: World): StarSnapshot[] {
@@ -1879,7 +1911,6 @@ function starSnapshots(state: GameState, world: World): StarSnapshot[] {
         a.id - b.id,
     )
     .map((player): StarSnapshot => {
-      const tally = flagship.tallies?.find((entry) => entry.playerId === player.id);
       const career = player.career.reduce(
         (sum, line) => ({
           seasons: sum.seasons + 1,
@@ -1899,17 +1930,7 @@ function starSnapshots(state: GameState, world: World): StarSnapshot[] {
         age: flagship.season - player.birthSeason,
         starSince: player.starSince,
         finalSeason: player.finalSeason,
-        season:
-          flagship.tallies === null
-            ? null
-            : tally
-              ? {
-                  matches: tally.matches,
-                  scores: tally.scores,
-                  playoffScores: tally.playoffScores,
-                  finalScores: tally.finalScores,
-                }
-              : { ...EMPTY_TALLY },
+        season: shownTally(flagship, player),
         career,
         backing: player.backing && {
           season: player.backing.season,

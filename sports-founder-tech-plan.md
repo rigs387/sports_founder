@@ -1014,6 +1014,16 @@ costs; the runner's event policy normalizes by it, so bot preferences are unchan
 run with a minimum of 0 (Brazil's first offers are worth under 1), and the minimum has its own test;
 `tests/playtest-followups.test.ts` covers the rest.
 
+*Step 2 built 2026-10-08.* The `collectMinorMoments` action (`minorMomentIds`) collects every
+minor moment in order. The renderer's `AutoCollect` (in the event layer) runs it whenever minor
+moments wait and the bottom-bar "Auto-collect" toggle is on (default on, remembered in local
+storage), and shows one line with the count and PP for five seconds; with it off the toasts work
+as before. `shownTally`: while the offseason is open the flagship's leaders and stars show the
+season just finished (from career lines), and the Stars panel says "Last season". Smoke: the start
+records the toggle and turns it off for the early hand-collection steps; the pop-up step turns it
+on, sees a minor story collected (`runs/smoke/59-auto-collect.png`), then tests toasts with it off
+and turns it back on.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

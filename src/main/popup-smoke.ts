@@ -191,7 +191,25 @@ export async function verifyPopups(
   if ((await evaluate<string>(`document.querySelector('${map}').dataset.highlighted`)) !== "")
     throw new Error("The map must drop its outline once no card is up.");
 
-  // A moment toast collects with a click (toasts wait until no decision is up).
+  // Auto-collect (GDD v1.32): minor stories collect themselves, with one line. The smoke turned
+  // it off for the earlier steps.
+  const AUTO = '[data-testid="auto-collect"]';
+  if (!(await evaluate<boolean>(`document.querySelector('${AUTO}').checked`))) await click(AUTO);
+  let autoCollected = false;
+  for (let more = 0; !autoCollected && more < 10; more += 1) {
+    await collectNews();
+    while (await exists('[data-testid="event-popup-later"]'))
+      await click('[data-testid="event-popup-later"]');
+    if (await exists('[data-testid="moment-collected"]')) {
+      autoCollected = true;
+      if (await exists(".moment-toast")) throw new Error("Auto-collect must leave no toast.");
+      await screenshot("59-auto-collect.png");
+    } else await endTurn();
+  }
+  if (!autoCollected) throw new Error("No minor story was auto-collected in 10 turns.");
+  // With it off, a moment toast collects with a click (toasts wait until no decision is up).
+  await click(AUTO);
+  await collectNews();
   let collected = false;
   for (let more = 0; !collected && more < 10; more += 1) {
     await collectNews();
@@ -207,6 +225,7 @@ export async function verifyPopups(
     } else await endTurn();
   }
   if (!collected) throw new Error("No moment toast came up to collect in 10 turns.");
+  await click(AUTO);
 
   // The next offseason opens its own screen from the world map, on the season in review.
   const offseason = '[data-testid="offseason-screen"]';

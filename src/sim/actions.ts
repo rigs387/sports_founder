@@ -8,7 +8,7 @@ import {
   renameTrophyBlocker,
 } from "./culture";
 import { breakDeals, signBlocker, signDeal } from "./deals";
-import { eventBlocker, resolveEvent } from "./events";
+import { eventBlocker, minorMomentIds, resolveEvent } from "./events";
 import { backBlocker, backStar, dropBlocker, dropStar, seatBlocker } from "./flagship";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
 import { leagueActionReason, leagueActions } from "./league-actions";
@@ -27,6 +27,7 @@ import { buildVenue, venueBlocker } from "./venue-actions";
 
 // The player's legal actions. Every action, from the UI or a bot, goes through applyAction, which
 // validates legality first, so nothing can bypass the rules.
+//   collectMinorMoments  collect every minor moment waiting, in order (GDD v1.32: auto-collect)
 //   assignFocus     point a focus slot at a country (GDD Spread Model: focus slots, cold launches)
 //   dropFocusSlot   give up a slot owed after a PP tier demotion
 //   promoteLeague   promote a qualifying league, in the offseason only (GDD League tiers)
@@ -50,6 +51,7 @@ import { buildVenue, venueBlocker } from "./venue-actions";
 
 export type Action =
   | { type: "collectMoment"; eventId: number }
+  | { type: "collectMinorMoments" }
   | { type: "chooseEvent"; eventId: number; choiceId: string }
   | { type: "buyNode"; nodeId: string }
   | { type: "assignFocus"; slot: number; countryId: string }
@@ -113,6 +115,8 @@ const money = (value: number) => value.toFixed(1);
 /** Returns why an action is illegal, or null if it is legal. */
 export function checkAction(state: GameState, world: World, action: Action): string | null {
   if (state.outcome !== null) return "the campaign has ended";
+  if (action.type === "collectMinorMoments")
+    return minorMomentIds(state, world).length === 0 ? "no minor moment waits" : null;
   if (action.type === "collectMoment" || action.type === "chooseEvent")
     return eventBlocker(
       state,
@@ -295,6 +299,11 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
   switch (action.type) {
     case "collectMoment":
       return resolveEvent(state, world, action.eventId, null);
+    case "collectMinorMoments":
+      return minorMomentIds(state, world).reduce(
+        (next, eventId) => resolveEvent(next, world, eventId, null),
+        state,
+      );
     case "chooseEvent":
       return resolveEvent(state, world, action.eventId, action.choiceId);
     case "buyNode": {

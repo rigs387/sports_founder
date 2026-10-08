@@ -164,7 +164,14 @@ function StarCard({
       </p>
       <dl className="star-tallies">
         <div>
-          <dt>{t("flagship.stars.seasonTally", nouns)}</dt>
+          <dt>
+            {t(
+              snapshot.offseasonOpen
+                ? "flagship.stars.lastSeasonTally"
+                : "flagship.stars.seasonTally",
+              nouns,
+            )}
+          </dt>
           <dd>
             {star.season
               ? t("flagship.stars.scores", {

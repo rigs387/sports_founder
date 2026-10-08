@@ -16,7 +16,8 @@ export function ActionFeedback() {
         {t("actions.working")}
       </p>
     );
-  if (!lastAction) return null;
+  // Auto-collect says what it collected itself (GDD v1.32).
+  if (!lastAction || lastAction.type === "collectMinorMoments") return null;
   return (
     <p className="action-feedback" role="status">
       {t(`actions.success.${lastAction.type}`, {

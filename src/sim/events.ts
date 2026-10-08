@@ -571,6 +571,17 @@ function momentWeight(
   return "big";
 }
 
+/** Minor moments waiting to be collected, in the order they happened (GDD v1.32). */
+export function minorMomentIds(state: GameState, world: World): number[] {
+  return state.events.pending
+    .filter((event) => {
+      const card = world.events.cards.find((c) => c.id === event.templateId);
+      return card?.kind === "moment" && card.weight === "minor";
+    })
+    .sort((a, b) => a.quarter - b.quarter || a.id - b.id)
+    .map((event) => event.id);
+}
+
 export function eventSnapshots(state: GameState, world: World) {
   return state.events.pending.map((event) => {
     const card = world.events.cards.find((c) => c.id === event.templateId);

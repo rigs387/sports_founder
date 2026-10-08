@@ -175,6 +175,39 @@
   border-radius: 8px;
 }
 
+/* Auto-collect (GDD v1.32): one quiet line where the toasts would be, fading after a few seconds. */
+.moment-collected {
+  position: absolute;
+  z-index: 3;
+  left: 24px;
+  top: 220px;
+  width: 260px;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #2c4a3f;
+  background: #f4fbf7;
+  border: 1px solid #b9dccb;
+  border-left: 3px solid #326d61;
+  border-radius: 6px;
+  box-shadow: 0 2px 0 rgb(16 40 70 / 0.12);
+  animation: moment-collected 5s ease-in forwards;
+}
+@keyframes moment-collected {
+  0%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .moment-collected {
+    animation: none;
+  }
+}
 .moment-toasts {
   position: absolute;
   z-index: 3;
@@ -404,6 +437,15 @@
   }
   .is-headline h2 {
     font-size: 28px;
+  }
+  .moment-collected {
+    position: fixed;
+    z-index: 4;
+    top: auto;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
   }
   .moment-toasts {
     position: fixed;

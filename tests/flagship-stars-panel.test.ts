@@ -85,7 +85,9 @@ describe("the Stars panel snapshot", () => {
   });
 
   it("gives every active club's leading player and their scores this season", () => {
-    const state = withStar();
+    // During a season (in the offseason the last season's scores show: GDD v1.32).
+    const starred = withStar();
+    const state = { ...starred, flagship: { ...starred.flagship, offseason: false } };
     const snap = snapshot(state, content);
     expect(snap.flagship.leaders.map((l) => l.clubId)).toEqual(
       activeClubs(state.flagship).map((club) => club.id),

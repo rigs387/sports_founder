@@ -1,20 +1,26 @@
 import { describe, expect, it } from "vitest";
 import {
+  applyAction,
   cardPPFactor,
+  checkAction,
   costMultiplier,
+  createCampaign,
   type EventRecord,
+  endTurn,
   eventChoiceCost,
   eventEffects,
   eventSnapshots,
+  flagshipSnapshot,
   type GameState,
   landmarks,
+  minorMomentIds,
   nodeSizeFactor,
   type Player,
   seasonFacts,
   updateCulture,
 } from "../src/sim";
 import { clubIds, fresh, withSeason } from "./culture-helpers";
-import { withConfig, world } from "./helpers";
+import { setupFor, withConfig, world } from "./helpers";
 
 // Playtest follow-ups (GDD v1.32, tech plan 2.19 step 1).
 
@@ -226,3 +232,33 @@ function pairOf(state: GameState): [number, number] {
   const [a = 0, b = 0] = clubIds(state).filter((id) => id !== state.identity.foundingClubId);
   return [a, b];
 }
+
+describe("presentation (tech plan 2.19 step 2)", () => {
+  it("collects every minor moment at once, and only minor ones", () => {
+    let state = createCampaign(world, setupFor(5, "brazil"));
+    while (minorMomentIds(state, world).length < 2 && state.turn < 40)
+      state = endTurn(state, world);
+    const minor = minorMomentIds(state, world);
+    expect(minor.length).toBeGreaterThanOrEqual(2);
+    const others = state.events.pending.filter((e) => !minor.includes(e.id)).map((e) => e.id);
+    const after = applyAction(state, world, { type: "collectMinorMoments" });
+    expect(minorMomentIds(after, world)).toEqual([]);
+    expect(after.events.pending.map((e) => e.id)).toEqual(others);
+    expect(after.pp).toBeGreaterThan(state.pp);
+    expect(checkAction(after, world, { type: "collectMinorMoments" })).not.toBeNull();
+  });
+
+  it("the offseason shows the season just finished, not the new season's empty tallies", () => {
+    let state = createCampaign(world, setupFor(5, "brazil"));
+    while (!state.flagship.offseason) state = endTurn(state, world);
+    const last = state.flagship.seasons.at(-1);
+    const view = flagshipSnapshot(state, world);
+    expect(view.leaders.length).toBeGreaterThan(0);
+    for (const leader of view.leaders) {
+      const player = state.flagship.players.find((p) => p.id === leader.playerId);
+      const line = player?.career.find((entry) => entry.season === last?.season);
+      expect(leader.scores).toBe(line?.scores ?? 0);
+    }
+    expect(view.leaders.some((leader) => (leader.scores ?? 0) > 0)).toBe(true);
+  });
+});

@@ -20,9 +20,12 @@ const byWhenItHappened = (a: EventSnapshot, b: EventSnapshot) =>
  * waiting, the moments as toasts. One thing at a time.
  */
 export function EventLayer({
+  autoCollect,
   onHighlight,
   onBurst,
 }: {
+  /** Minor moments collect themselves (GDD v1.32). */
+  autoCollect: boolean;
   onHighlight: (countryId: string | null) => void;
   onBurst: (countryId: string) => void;
 }) {
@@ -56,8 +59,21 @@ export function EventLayer({
     return () => onHighlight(null);
   }, [outlined, onHighlight]);
   if (!snapshot || !text || snapshot.outcome) return null;
-  if (news) return <MomentWindow event={news} onBurst={onBurst} />;
-  if (!current) return <MomentToasts />;
+  const collector = autoCollect ? <AutoCollect /> : null;
+  if (news)
+    return (
+      <>
+        {collector}
+        <MomentWindow event={news} onBurst={onBurst} />
+      </>
+    );
+  if (!current)
+    return (
+      <>
+        {collector}
+        {autoCollect ? null : <MomentToasts />}
+      </>
+    );
   const busy = status !== "ready";
   const total = snapshot.events.filter((event) => event.kind === "decision").length;
   const choice = current.choices.find((option) => option.id === confirming);
@@ -68,137 +84,181 @@ export function EventLayer({
   const x = geometry.markets[current.countryId]?.center[0] ?? 0;
   const dock = x < geometry.width / 2 ? "dock-right" : "dock-left";
   return (
-    <section
-      className={`event-popup ${dock} family-${current.family}${current.tone === "pressure" ? " is-pressure" : ""}`}
-      role="dialog"
-      aria-labelledby="event-popup-title"
-      data-testid="event-popup"
-      data-event-id={current.id}
-      data-event-template={current.templateId}
-      data-country={current.countryId}
-    >
-      <header>
-        <span className="eyebrow">
-          {t("events.popup.where", {
-            kind: t("events.decision"),
-            country: text.country(current.countryId),
-            date: text.dateOf(current),
-          })}
-        </span>
-        {total > 1 && (
-          <small>
-            {t("events.popup.position", { index: total - queue.length + 1, count: total })}
-          </small>
+    <>
+      {collector}
+      <section
+        className={`event-popup ${dock} family-${current.family}${current.tone === "pressure" ? " is-pressure" : ""}`}
+        role="dialog"
+        aria-labelledby="event-popup-title"
+        data-testid="event-popup"
+        data-event-id={current.id}
+        data-event-template={current.templateId}
+        data-country={current.countryId}
+      >
+        <header>
+          <span className="eyebrow">
+            {t("events.popup.where", {
+              kind: t("events.decision"),
+              country: text.country(current.countryId),
+              date: text.dateOf(current),
+            })}
+          </span>
+          {total > 1 && (
+            <small>
+              {t("events.popup.position", { index: total - queue.length + 1, count: total })}
+            </small>
+          )}
+        </header>
+        <h3 id="event-popup-title">{text.title(current)}</h3>
+        <p>{text.body(current)}</p>
+        {text.factLines(current).map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+        {current.arrivalEffects.length > 0 && (
+          <div className="event-popup-arrived">
+            <strong>{t("events.arrived")}</strong>
+            <ul>
+              {current.arrivalEffects.map((effect) => (
+                <Effect effect={effect} key={JSON.stringify(effect)} />
+              ))}
+            </ul>
+          </div>
         )}
-      </header>
-      <h3 id="event-popup-title">{text.title(current)}</h3>
-      <p>{text.body(current)}</p>
-      {text.factLines(current).map((line) => (
-        <p key={line}>{line}</p>
-      ))}
-      {current.arrivalEffects.length > 0 && (
-        <div className="event-popup-arrived">
-          <strong>{t("events.arrived")}</strong>
-          <ul>
-            {current.arrivalEffects.map((effect) => (
-              <Effect effect={effect} key={JSON.stringify(effect)} />
-            ))}
-          </ul>
+        <div className="event-popup-choices">
+          {current.choices.map((option) => {
+            const [first, ...rest] = option.effects;
+            const star = {
+              candidate: text.player(current.facts.star?.candidateId),
+              cash: option.leagueCash,
+            };
+            return (
+              <div className="event-popup-choice" key={option.id}>
+                <button
+                  type="button"
+                  data-testid="event-popup-choice"
+                  data-choice={option.id}
+                  data-cost={option.cost}
+                  aria-pressed={confirming === option.id}
+                  aria-describedby={`event-choice-${option.id}`}
+                  disabled={busy || !!option.blocker}
+                  onClick={() => (option.cost > 0 ? setConfirming(option.id) : choose(option.id))}
+                >
+                  <span className="choice-name">{choiceName(option.id)}</span>
+                  <b>{t(option.cost ? "events.cost" : "events.free", { amount: option.cost })}</b>
+                  <ul className="choice-line">
+                    {first ? (
+                      <Effect effect={first} star={star} />
+                    ) : (
+                      <li>{t("events.noChange")}</li>
+                    )}
+                    {rest.length > 0 && (
+                      <li className="choice-more">
+                        {t("events.popup.more", { count: rest.length })}
+                      </li>
+                    )}
+                  </ul>
+                </button>
+                <div className="event-popup-detail" role="tooltip" id={`event-choice-${option.id}`}>
+                  <ul>
+                    {option.effects.length ? (
+                      option.effects.map((effect) => (
+                        <Effect effect={effect} key={JSON.stringify(effect)} star={star} />
+                      ))
+                    ) : (
+                      <li>{t("events.noChange")}</li>
+                    )}
+                  </ul>
+                  {option.blocker && (
+                    <p className="event-tradeoff">{t(`events.blockers.${option.blocker}`)}</p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
-      )}
-      <div className="event-popup-choices">
-        {current.choices.map((option) => {
-          const [first, ...rest] = option.effects;
-          const star = {
-            candidate: text.player(current.facts.star?.candidateId),
-            cash: option.leagueCash,
-          };
-          return (
-            <div className="event-popup-choice" key={option.id}>
+        {choice && (
+          <fieldset className="event-popup-confirm" data-testid="event-popup-confirm">
+            <strong>
+              {t("events.confirm", {
+                choice: choiceName(choice.id),
+                country: text.country(current.countryId),
+                amount: choice.cost,
+              })}
+            </strong>
+            <div>
               <button
                 type="button"
-                data-testid="event-popup-choice"
-                data-choice={option.id}
-                data-cost={option.cost}
-                aria-pressed={confirming === option.id}
-                aria-describedby={`event-choice-${option.id}`}
-                disabled={busy || !!option.blocker}
-                onClick={() => (option.cost > 0 ? setConfirming(option.id) : choose(option.id))}
+                className="action-button"
+                disabled={busy}
+                onClick={() => setConfirming(null)}
               >
-                <span className="choice-name">{choiceName(option.id)}</span>
-                <b>{t(option.cost ? "events.cost" : "events.free", { amount: option.cost })}</b>
-                <ul className="choice-line">
-                  {first ? <Effect effect={first} star={star} /> : <li>{t("events.noChange")}</li>}
-                  {rest.length > 0 && (
-                    <li className="choice-more">
-                      {t("events.popup.more", { count: rest.length })}
-                    </li>
-                  )}
-                </ul>
+                {t("events.cancel")}
               </button>
-              <div className="event-popup-detail" role="tooltip" id={`event-choice-${option.id}`}>
-                <ul>
-                  {option.effects.length ? (
-                    option.effects.map((effect) => (
-                      <Effect effect={effect} key={JSON.stringify(effect)} star={star} />
-                    ))
-                  ) : (
-                    <li>{t("events.noChange")}</li>
-                  )}
-                </ul>
-                {option.blocker && (
-                  <p className="event-tradeoff">{t(`events.blockers.${option.blocker}`)}</p>
-                )}
-              </div>
+              <button
+                type="button"
+                className="action-button"
+                data-testid="event-popup-confirm-choice"
+                disabled={busy || !!choice.blocker}
+                onClick={() => choose(choice.id)}
+              >
+                {t("events.confirmChoice")}
+              </button>
             </div>
-          );
-        })}
-      </div>
-      {choice && (
-        <fieldset className="event-popup-confirm" data-testid="event-popup-confirm">
-          <strong>
-            {t("events.confirm", {
-              choice: choiceName(choice.id),
-              country: text.country(current.countryId),
-              amount: choice.cost,
-            })}
-          </strong>
-          <div>
-            <button
-              type="button"
-              className="action-button"
-              disabled={busy}
-              onClick={() => setConfirming(null)}
-            >
-              {t("events.cancel")}
-            </button>
-            <button
-              type="button"
-              className="action-button"
-              data-testid="event-popup-confirm-choice"
-              disabled={busy || !!choice.blocker}
-              onClick={() => choose(choice.id)}
-            >
-              {t("events.confirmChoice")}
-            </button>
-          </div>
-        </fieldset>
-      )}
-      <footer>
-        <small>
-          {current.defaultChoice &&
-            t("events.default", { choice: choiceName(current.defaultChoice) })}
-        </small>
-        <button
-          type="button"
-          className="event-popup-later"
-          data-testid="event-popup-later"
-          onClick={() => setLater({ turn, ids: [...setAside, current.id] })}
-        >
-          {t("events.popup.later")}
-        </button>
-      </footer>
-    </section>
+          </fieldset>
+        )}
+        <footer>
+          <small>
+            {current.defaultChoice &&
+              t("events.default", { choice: choiceName(current.defaultChoice) })}
+          </small>
+          <button
+            type="button"
+            className="event-popup-later"
+            data-testid="event-popup-later"
+            onClick={() => setLater({ turn, ids: [...setAside, current.id] })}
+          >
+            {t("events.popup.later")}
+          </button>
+        </footer>
+      </section>
+    </>
+  );
+}
+
+/**
+ * Auto-collect (GDD v1.32): every minor moment waiting is collected at once as it arrives, and one
+ * line says how many and the PP they brought, for a few seconds. The journal keeps every card.
+ */
+function AutoCollect() {
+  const { t } = useTranslation();
+  const { snapshot, status, dispatchAction } = useGameStore();
+  const [note, setNote] = useState<{ count: number; pp: number; key: number } | null>(null);
+  // Each set of waiting moments is tried once: a rejected collection is not retried in a loop.
+  const tried = useRef("");
+  const minor = (snapshot?.events ?? []).filter(
+    (event) => event.kind === "moment" && event.weight === "minor",
+  );
+  const waiting = minor.map((event) => event.id).join(",");
+  useEffect(() => {
+    if (!waiting || status !== "ready" || snapshot?.outcome || tried.current === waiting) return;
+    tried.current = waiting;
+    const pp = minor.reduce(
+      (sum, event) => sum + event.effects.reduce((s, e) => s + (e.type === "pp" ? e.amount : 0), 0),
+      0,
+    );
+    setNote({ count: minor.length, pp, key: Date.now() });
+    void dispatchAction({ type: "collectMinorMoments" });
+  }, [waiting, status, snapshot?.outcome, minor, dispatchAction]);
+  useEffect(() => {
+    if (!note) return;
+    const timer = setTimeout(() => setNote(null), 5000);
+    return () => clearTimeout(timer);
+  }, [note]);
+  if (!note) return null;
+  return (
+    <p className="moment-collected" role="status" data-testid="moment-collected" key={note.key}>
+      {t("events.popup.collected", { count: note.count, pp: note.pp })}
+    </p>
   );
 }
 

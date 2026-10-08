@@ -74,9 +74,9 @@
 .almanac-note {
   color: var(--muted);
 }
-.almanac-note {
-  margin-top: 10px !important;
-  font-size: 12px !important;
+.almanac-card p.almanac-note {
+  margin-top: 10px;
+  font-size: 12px;
 }
 
 /* Players wing: plaques. */
@@ -136,9 +136,9 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
-.plaque-record {
-  margin: 8px 0 0 !important;
-  font-size: 12px !important;
+.plaque p.plaque-record {
+  margin: 8px 0 0;
+  font-size: 12px;
   font-weight: 700;
   color: var(--bronze);
 }
