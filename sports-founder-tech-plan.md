@@ -927,6 +927,24 @@ partner, not a tradition). Awards, press, league directors and founding family s
    weight. Measure pacing on seeds 1–3, the #1 contest, and whether bots buy Culture nodes. Docs:
    `docs/almanac/README.md`, progress, CLAUDE.md, cheat sheet.
 
+*Step 1 built 2026-10-07.* `GameState.hallOfFame` (`src/sim/hall-of-fame.ts`: `newHallOfFame`):
+inductees (wing, class season, home country, player and the facts quoted, or a first and its
+landmark index), the season and landmark index it counts from. `chant` joins `TRADITION_TYPES`
+(eases in `identity.yaml`, balanced). Landmarks `chantSpread` and `hallOfFameClass`; event facts
+`hall`. Config `hallOfFame` and `culture.chant`. Save format 23.
+
+*Step 2 built 2026-10-07.* `chooseClass` runs in culture's turn at each `seasonChampion` landmark,
+after the season's traditions (`CultureUpdate.hallClass`): eligible players (retired since the Hall
+began, waited `waitSeasons`) scored by `inducteeFacts`/`hallPoints`, best first up to
+`playersPerClass`; firsts from the first landmark of each kind, recorded after the Hall began and
+before the season's champion landmark, oldest first, `momentsPerClass` a class. Induction renews a
+living legacy; `shrineWeights` joins `traditionWeights` inside the cap (so the seat cost reads it
+too); `hallProblems` in the invariants; `cardless` zeroes the shrine. Measured with the builder
+(Brazil 1, Austria 2, Japan 3, 200 turns, ~135 seasons): at a bar of 12 nearly every retired star
+got in (22–25 players, against 19–26 retired stars), so the bar is 20 (16–19 inductees, about one
+every 8 seasons). Late-game anchors already hold 3–4.6 tradition strength against a cap of 2, so
+shrine weight matters early and in former seat countries.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

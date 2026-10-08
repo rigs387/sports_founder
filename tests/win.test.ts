@@ -252,7 +252,10 @@ describe("post-win play", () => {
     expect(fallen.outcome).toBeNull();
     expect(fallen.countries[index]?.league).toBeNull();
     expect(fallen.countries[index]?.leaguesFolded).toBe(1);
-    expect(fallen.landmarks.filter((l) => l.kind !== "traditionLost").at(-1)).toMatchObject({
+    const late = fallen.landmarks.filter(
+      (l) => !["traditionLost", "hallOfFameClass"].includes(l.kind),
+    );
+    expect(late.at(-1)).toMatchObject({
       kind: "birthplaceOutlived",
       turn: collapseTurn,
       countryId: ANCHOR,

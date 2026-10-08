@@ -231,6 +231,19 @@ export const landmarks = {
     type: TraditionType,
     reason: TraditionLossReason,
   ): Landmark => ({ kind: "traditionLost", turn, quarter, countryId, traditionId, type, reason }),
+  chantSpread: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    traditionId: number,
+  ): Landmark => ({ kind: "chantSpread", turn, quarter, countryId, traditionId }),
+  hallOfFameClass: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    season: number,
+    inductees: number,
+  ): Landmark => ({ kind: "hallOfFameClass", turn, quarter, countryId, season, inductees }),
   dealBroken: (
     turn: number,
     quarter: number,

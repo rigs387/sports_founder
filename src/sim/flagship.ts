@@ -1196,7 +1196,7 @@ export function seatEligible(league: LeagueState | null, world: World): boolean 
  * tradition weight there), at most all of them.
  */
 export function seatLeaveShare(
-  state: Pick<GameState, "anchorCountryId" | "culture" | "growthNodes" | "identity">,
+  state: Pick<GameState, "anchorCountryId" | "culture" | "growthNodes" | "hallOfFame" | "identity">,
   world: World,
   countryId: string,
 ): number {

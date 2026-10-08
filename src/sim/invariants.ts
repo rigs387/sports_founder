@@ -5,6 +5,7 @@ import { dealProblems } from "./deals";
 import { eventProblems } from "./events";
 import { flagshipProblems } from "./flagship";
 import { forkOf } from "./growth";
+import { hallProblems } from "./hall-of-fame";
 import { identityStateProblems } from "./identity";
 import { rulesProblems } from "./rules";
 import {
@@ -30,6 +31,7 @@ export function invariantsOf(state: GameState, world: World): string[] {
     ...identityStateProblems(state, world),
     ...rulesProblems(state),
     ...cultureProblems(state, world),
+    ...hallProblems(state),
   ];
 
   if (!Number.isInteger(state.turn) || state.turn < 1)

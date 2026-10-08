@@ -608,7 +608,7 @@ culture:
 # flagship league's tier.
 hallOfFame:
   points: { starSeason: 3, title: 2, topScorer: 2, record: 5 }
-  bar: 12
+  bar: 20
   waitSeasons: 2
   playersPerClass: 2
   momentsPerClass: 1

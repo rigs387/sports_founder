@@ -1,5 +1,6 @@
 import { LEAGUE_TIERS, RULE_AXES, TRADITION_TYPES, type TraditionType } from "../content";
 import { yearOfQuarter } from "./calendar";
+import { chooseClass, classLandmark, shrineWeights } from "./hall-of-fame";
 import { tidyName } from "./identity";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
@@ -10,6 +11,7 @@ import {
   type CultureState,
   type GameState,
   type Genome,
+  type Inductee,
   type Landmark,
   type LeagueTierId,
   PLAYER_INDEX,
@@ -211,6 +213,8 @@ class CultureUpdate {
   readonly found: Landmark[] = [];
   nextId: number;
   naming: number | null = null;
+  /** Hall of Fame inductees this update adds (GDD v1.31). */
+  readonly inducted: Inductee[] = [];
 
   readonly rng: Rng;
 
@@ -403,6 +407,34 @@ class CultureUpdate {
     }
   }
 
+  /**
+   * A Hall of Fame class at a season's end (GDD v1.31), after the season's traditions: inducts the
+   * class, renews the inductees' living star legacies and records the class landmark.
+   */
+  hallClass(summary: SeasonSummary, championIndex: number, quarter: number): void {
+    const { state, world } = this;
+    const hall = {
+      ...state.hallOfFame,
+      inductees: [...state.hallOfFame.inductees, ...this.inducted],
+      nextId: state.hallOfFame.nextId + this.inducted.length,
+    };
+    const inductees = chooseClass(
+      { ...state, hallOfFame: hall },
+      world,
+      summary,
+      championIndex,
+      state.turn,
+      quarter,
+    );
+    const year = seasonYear(summary, world);
+    for (const inductee of inductees) {
+      const legacy = this.livingOf("legacy", (t) => t.playerId === inductee.playerId);
+      if (inductee.playerId !== null && legacy) this.renew(legacy, year);
+    }
+    this.inducted.push(...inductees);
+    this.found.push(...classLandmark(state, inductees));
+  }
+
   /** Whether a pair of clubs has met often enough lately (with stokes) to found a derby. */
   derby(pair: number[], countryId: string, season: number, year: number, renewing = true): void {
     const { state, world } = this;
@@ -572,11 +604,13 @@ function professional(tier: LeagueTierId): boolean {
 export function updateCulture(state: GameState, world: World): GameState {
   const update = new CultureUpdate(state, world);
   const recent = state.landmarks.slice(state.culture.landmarkCursor);
-  for (const landmark of recent) {
+  recent.forEach((landmark, offset) => {
     switch (landmark.kind) {
       case "seasonChampion": {
         const summary = state.flagship.seasons.find((s) => s.season === landmark.season);
         if (summary && summary.season >= state.culture.startSeason) update.season(summary);
+        if (summary && summary.season >= state.hallOfFame.startSeason)
+          update.hallClass(summary, state.culture.landmarkCursor + offset, landmark.quarter);
         break;
       }
       case "starRetired":
@@ -593,7 +627,7 @@ export function updateCulture(state: GameState, world: World): GameState {
       default:
         break;
     }
-  }
+  });
   // Stokes answered since the season ended can complete a derby.
   const latest = state.flagship.seasons.at(-1);
   if (latest)
@@ -623,6 +657,14 @@ export function updateCulture(state: GameState, world: World): GameState {
       nextId: update.nextId,
       naming: update.naming,
     },
+    hallOfFame:
+      update.inducted.length === 0
+        ? state.hallOfFame
+        : {
+            ...state.hallOfFame,
+            inductees: [...state.hallOfFame.inductees, ...update.inducted],
+            nextId: state.hallOfFame.nextId + update.inducted.length,
+          },
   };
 }
 
@@ -674,15 +716,18 @@ export function cultureProblems(state: GameState, world: World): string[] {
 
 /**
  * Each country's tradition weight (content order): the strength of every living tradition its
- * fans hold (abroad at reach.followerShare), × the Culture nodes' hold on its type, capped.
+ * fans hold (abroad at reach.followerShare), × the Culture nodes' hold on its type, plus the Hall
+ * of Fame's shrine weight, capped.
  */
 export function traditionWeights(
-  state: Pick<GameState, "culture" | "growthNodes">,
+  state: Pick<GameState, "culture" | "growthNodes" | "hallOfFame">,
   world: World,
 ): number[] {
   const { weightCap } = world.config.culture;
-  return heldStrength(state.culture.traditions, state, world).map((weight) =>
-    Math.min(weightCap, weight),
+  // Hall of Fame inductees add shrine weight at home, inside the cap (GDD v1.31).
+  const shrine = shrineWeights(state, world);
+  return heldStrength(state.culture.traditions, state, world).map((weight, i) =>
+    Math.min(weightCap, weight + (shrine[i] ?? 0)),
   );
 }
 

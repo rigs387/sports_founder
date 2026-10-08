@@ -122,6 +122,7 @@ export function cardless(base: World): World {
     config: {
       ...base.config,
       culture: { ...culture, turnoverCut: 0, poachCut: 0, pilgrimage: 0, seatWeight: 0 },
+      hallOfFame: { ...base.config.hallOfFame, shrineWeight: 0 },
       flagship: {
         ...flagship,
         broadcast: { ...flagship.broadcast, ceiling: silent },
