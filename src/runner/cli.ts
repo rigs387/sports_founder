@@ -41,6 +41,7 @@ import {
   median,
   nodeOutcomesCsv,
   optionOutcomesCsv,
+  remembersAggregate,
   rulesAggregate,
   type TurnRow,
   turnsCsv,
@@ -780,6 +781,10 @@ function main(): number {
         .join(
           ", ",
         )}; levels opened ${venues.opened}, modernized ${venues.modernized}; record crowds ${venues.records}; payroll baseline ${pct(venues.payrollShare.median ?? 0)} and star wages ${pct(venues.wagesShare.median ?? 0)} of the seat's costs (median)`,
+    );
+    const remembers = remembersAggregate(results);
+    console.log(
+      `  Remembers: Hall of Fame players per campaign median ${fmt(remembers.players.median)} (max ${fmt(remembers.players.max)}; in ${remembers.withPlayers}/${results.length} campaigns, the first at turn median ${fmt(remembers.firstPlayerTurn)}), moments median ${fmt(remembers.moments.median)}; anchor shrine weight median ${fmt(remembers.anchorShrine.median)}; chants per campaign median ${fmt(remembers.chants.median)}, ${remembers.chantsSpread} spread abroad; Culture nodes bought in ${remembers.boughtCulture}/${results.length} campaigns (median ${fmt(remembers.cultureNodes.median)})`,
     );
     const [slateLow, slateHigh] = world.config.balanceTargets.dealSlateShare;
     console.log(

@@ -891,6 +891,14 @@ v1.12 artifact rule that it appears once a country's hardcore base is large enou
 - *Shrine weight on the map:* the country card lists the Hall of Fame's inductees from there in
   words, beside its traditions; the map's tradition marker counts shrine weight too.
 
+**What the sport remembers, built 2026-10-07 (calls made at build).** The player bar is 20 points
+(at 12 nearly every retired star got in); a never-a-star player can still get in on titles and
+top-scorer seasons, and the card says so. Measured (builder, 12 typical anchors, seeds 1–3, 200
+turns): pacing passes and barely moves (first win median 158, was 161); #1 lost before the win
+53% (was 56%); 16–18 player inductees a campaign, the first around turn 35–44; the anchor's shrine
+weight reaches the cap by the end, where traditions already hold it; 6–7 chants a campaign, most
+fading when their club stops winning. Bots still never buy Culture nodes (watch item).
+
 **Awards:** Player of the Season per league and a global Player of the Year. Mostly flavor — they
 feed Hall of Fame eligibility, raise star power (affecting transfers toward the flagship), and name
 names in stories.

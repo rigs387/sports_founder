@@ -3,7 +3,8 @@
 Built October 4, 2026 (GDD v1.22, tech plan 2.11). First build: six tradition types born from
 recorded facts, the shelter they give fans, the betrayals they resist, founding character's
 biases, rivals' flavor traditions, and the Culture category of the growth tree. Chants and
-anthems come later; the homegrown gear brand and naming-rights dilemmas come with deals.
+anthems came on October 7 (GDD v1.31): see [What the sport remembers](../almanac/README.md). The
+homegrown gear brand stays a deal partner, not a tradition; naming-rights dilemmas came with deals.
 
 Culture is never bought. A tradition is born only from something the simulation recorded, held
 by the player's fans in its countries, renewed when new facts repeat it, and lost when it fades,

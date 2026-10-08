@@ -20,6 +20,7 @@ import {
   PLAYER_INDEX,
   QUARTERS_PER_YEAR,
   seatedCrowd,
+  shrineWeights,
   snapshot,
   turnLengthQuarters,
   type World,
@@ -513,6 +514,17 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         opened: state.landmarks.filter((l) => l.kind === "venueOpened").length,
         modernized: state.landmarks.filter((l) => l.kind === "venueOpened" && l.modernized).length,
         records: state.landmarks.filter((l) => l.kind === "recordCrowd").length,
+      },
+      remembers: {
+        players: state.hallOfFame.inductees.filter((i) => i.wing === "players").length,
+        moments: state.hallOfFame.inductees.filter((i) => i.wing === "moments").length,
+        firstPlayerTurn: state.hallOfFame.inductees.find((i) => i.wing === "players")?.turn ?? null,
+        chants: state.culture.traditions.filter((t) => t.type === "chant").length,
+        chantsSpread: state.landmarks.filter((l) => l.kind === "chantSpread").length,
+        anchorShrine: shrineWeights(state, world)[anchorIndex] ?? 0,
+        cultureNodes: state.growthNodes.filter(
+          (id) => world.growthTree.nodes.find((n) => n.id === id)?.category === "culture",
+        ).length,
       },
       amendments: state.rules.amendments.map(({ turn, axis, from, to, demoted }) => ({
         turn,

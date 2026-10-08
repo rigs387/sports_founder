@@ -53,7 +53,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   (`src/runner/event-policy.ts`); the run prints how often each choice was taken, the win contest
   (#1 lost before the win), and the flagship's title spread. Bots sign the best deal offer per
   slot (GDD v1.28); every run prints deals signed, demands and breaches, deal income's share, turns
-  at Near-Collapse and the deal slate by league tier against `balanceTargets.dealSlateShare`.
+  at Near-Collapse and the deal slate by league tier against `balanceTargets.dealSlateShare`,
+  and a Remembers line (GDD v1.31): Hall of Fame inductees, chants and their spread, the anchor's
+  shrine weight and how often bots buy Culture nodes.
 - `npm run sim -- --experiment pacing --turns 200`: one balance experiment (12 anchors × 5 seeds,
   about 3 minutes; it also gives the win contest). Experiments: differentiation, collapse, hard-anchor, pacing, options, rivals,
   benchmark. Misses are reported, never counted as passes. Defaults are sized to finish in minutes:
@@ -130,6 +132,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   full year, so seasons end on turn boundaries). A bare `stepQuarter` closes it first, as a
   quarter-length turn would; `endTurn` holds one that opens mid-turn. League business (promotion,
   amendments, backing, the seat, the trophy) happens only while it is open.
+- The Almanac smoke step (`src/main/almanac-smoke.ts`) runs last and plays on until a Hall of
+  Fame class is inducted.
 - The offseason screen (GDD v1.24) is `src/renderer/src/offseason/OffseasonScreen.tsx`: the season
   in review, then stars, rules, promotions, the seat and the trophy, priced against PP on hand. It
   opens itself only from the world map; its nav tab shows while the offseason is open. The
@@ -235,6 +239,21 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   births and ethos scales betrayals (`identity.yaml`, balance-checked at load). Culture node effects
   are read by `cultureFactors`, never `growthFactors`. Rivals' traditions are flavor content with
   no effect. Flagship isolation tests use `cardless` (`tests/helpers.ts`) to switch them off.
+- The Hall of Fame (GDD v1.31) lives in `src/sim/hall-of-fame.ts` and `GameState.hallOfFame`. A
+  class is chosen in culture's turn at each `seasonChampion` landmark (`chooseClass`): retired
+  players on points from retained records (star seasons, titles, top-scorer seasons, the scoring
+  record) after `waitSeasons`, best first up to a cap; the Moments wing's firsts (closed list
+  `HALL_FIRSTS`) from landmarks recorded after the Hall began. Player inductees add shrine weight
+  at home inside the tradition weight cap (`shrineWeights` in `traditionWeights`). One
+  `hall-of-fame-class` card per class (`src/sim/hall-cards.ts`, no moment slot). The Almanac tab
+  (`src/renderer/src/almanac/`) reads `TurnSnapshot.hallOfFame` (`hallSnapshot`): plaques, the
+  Waiting list, Records; it is the home for later history (leaderboards, the timelapse).
+- Chants (GDD v1.31) are the seventh tradition type (`culture.ts`): born from an underdog title or
+  a first title in a close finish once the league has `chant.historySeasons` seasons; the first is
+  the anthem. Only chants reach abroad without Culture nodes (`reachOut`), are dropped where the
+  player's hardcore fans fall away (`quieten`), and are betrayed by modernizing the grounds. A
+  chant's first follower abroad is a `chantSpread` landmark and a toast. The homegrown gear brand
+  is not a tradition.
 - The win hold is a contest (GDD v1.8): near #1 (`rivalAI.nearTop`) rival intensity peaks just past
   parity, rivals defend wherever the player holds ground in their territory, and they may buy more
   countermoves per quarter. The runner reports how many campaigns lost #1 before winning; the
@@ -302,6 +321,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 22 adds venues (GDD v1.30): each league's `venue`, each season summary's `crowd` and
   `recordCrowd`, venue facts on event records. Format 21 migrates with level 1 venues, nothing
   building, no record, crowdless seasons and no venue facts.
+- Save format 23 adds the Hall of Fame (GDD v1.31): `GameState.hallOfFame` and class facts on
+  event records. Format 22 migrates with an empty Hall and no retroactive inductions: only players
+  retiring from the season under way, and firsts recorded from then on, count.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

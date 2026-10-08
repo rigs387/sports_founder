@@ -977,6 +977,17 @@ line says so (found in the smoke run: "0 seasons as a star"). Smoke (`src/main/a
 last step, ~45 turns more, 124 s in all): the class card, the Almanac wide and narrow, a plaque's
 country (`runs/smoke/55-hall-card.png` to `58-hall-country.png`).
 
+*Step 6 built 2026-10-07.* The runner prints a Remembers line (`remembersAggregate`): Hall of Fame
+players and moments per campaign, the first player class's turn, the anchor's shrine weight,
+chants and their spread, and campaigns where bots bought Culture nodes. Measured with the builder
+over the 12 typical pacing anchors, seeds 1–3 (run as 1–2 and 3 to fit the 5-minute budget), 200
+turns: pacing passes pooled (tier 2 at turn 33, tier 3 44, tier 4 76, tier 5 120.5, first win 158;
+before: 33, 44, 76, 122.5, 161); #1 lost before the win 19/36 (53%, before 56%); 16–18 player
+inductees a campaign, the first around turn 35–44, and 7 moments; the anchor's shrine weight
+reaches the cap of 2 by the end (late-game anchors are at the cap from traditions anyway); 6–7
+chants a campaign, 92 spreads abroad in 36 campaigns; Culture nodes bought in 0/36 campaigns (a
+standing watch item, unchanged). Docs: `docs/almanac/README.md`.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

@@ -149,6 +149,19 @@ export interface CampaignResult {
     modernized: number;
     records: number;
   };
+  /** What the sport remembers (GDD v1.31): the Hall of Fame, chants, Culture nodes. */
+  remembers: {
+    players: number;
+    moments: number;
+    /** The turn of the first player induction, if any. */
+    firstPlayerTurn: number | null;
+    chants: number;
+    /** Chants that reached a country abroad (each tells it once). */
+    chantsSpread: number;
+    /** The anchor's shrine weight at the end. */
+    anchorShrine: number;
+    cultureNodes: number;
+  };
   /** Rule amendments made (GDD v1.20): when, which change, hardcore fans who turned casual. */
   amendments: { turn: number; change: string; demoted: number }[];
   /** Per fork id: the node chosen, or null if the fork was never decided. */
@@ -377,6 +390,26 @@ export function flagshipAggregate(results: CampaignResult[]) {
     firstBackTurn: distribution(
       results.flatMap((r) => (r.flagship.firstBackTurn === null ? [] : [r.flagship.firstBackTurn])),
     ),
+  };
+}
+
+/** What the sport remembers across campaigns (GDD v1.31). */
+export function remembersAggregate(results: CampaignResult[]) {
+  const pick = (f: (r: CampaignResult) => number) => distribution(results.map(f));
+  return {
+    players: pick((r) => r.remembers.players),
+    moments: pick((r) => r.remembers.moments),
+    firstPlayerTurn: median(
+      results.flatMap((r) =>
+        r.remembers.firstPlayerTurn === null ? [] : [r.remembers.firstPlayerTurn],
+      ),
+    ),
+    withPlayers: results.filter((r) => r.remembers.players > 0).length,
+    chants: pick((r) => r.remembers.chants),
+    chantsSpread: results.reduce((sum, r) => sum + r.remembers.chantsSpread, 0),
+    anchorShrine: pick((r) => r.remembers.anchorShrine),
+    cultureNodes: pick((r) => r.remembers.cultureNodes),
+    boughtCulture: results.filter((r) => r.remembers.cultureNodes > 0).length,
   };
 }
 

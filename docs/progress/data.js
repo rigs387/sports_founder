@@ -2,25 +2,25 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-07",
-  design: "GDD v1.30",
+  design: "GDD v1.31",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
   summary:
-    "Creation, global growth, rival pressure, league management, events and saving are playable; the flagship league has clubs, seasons and stars; the sport has its identity and rulebook; and traditions are born from what happens, shelter fans and resist betrayal.",
+    "Creation, global growth, rival pressure, league management, events and saving are playable; the flagship league has clubs, seasons and stars; the sport has its identity and rulebook; traditions are born from what happens, shelter fans and resist betrayal; and the Almanac's Hall of Fame remembers the sport's legends and firsts.",
   milestone: "A flagship season the player remembers",
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-07",
-    tests: 526,
-    files: 48,
-    note: "npm run check passed after venues and payroll (type checks, Biome, purity, 526 tests in 48 files). Lint has existing visual-study warnings.",
+    tests: 542,
+    files: 50,
+    note: "npm run check passed after the Hall of Fame, the Almanac and chants (type checks, Biome, purity, 542 tests in 50 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-07",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players.",
   },
-  eventDeck: { current: 34, target: "40–60" },
+  eventDeck: { current: 36, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -32,7 +32,7 @@ window.SF_PROGRESS = {
       name: "Phase 1",
       title: "Make it matter",
       state: "Current",
-      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution, the first traditions, flagship deals, venues and payroll are built.",
+      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution, the first traditions, flagship deals, venues and payroll, and a lightweight Hall of Fame with chants are built.",
     },
     {
       name: "Phase 2",
@@ -94,6 +94,18 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-07",
+      type: "Built",
+      title: "What the sport remembers",
+      text: "Tech plan 2.18 (GDD v1.31): a Hall of Fame class at each season's end, read from retained records: retired players on points (star seasons, titles, top-scorer seasons, the scoring record; bar 20, 2 seasons' wait, 2 a class) and the sport's firsts, one a class. Player inductees add permanent shrine weight at home inside the tradition cap. One class card per class (no moment slot; the first class is a front page). The Almanac tab holds plaques, the Waiting list and records. Chants are a seventh tradition: born from an underdog title or a first title in a close finish once the league has 10 seasons; the first is the anthem; the only tradition that spreads abroad without nodes. Save format 23, no retroactive inductions. Measured (builder, 12 anchors, seeds 1–3, 200 turns): pacing passes (first win 158, was 161); #1 lost before the win 53%; 16–18 inductees and 6–7 chants a campaign; bots bought Culture nodes in 0 of 36.",
+    },
+    {
+      date: "2026-10-07",
+      type: "Design",
+      title: "What the sport remembers",
+      text: "GDD v1.31: a lightweight Hall of Fame (Players and Moments wings, inductions on points from retained records, permanent shrine weight at home inside the tradition cap, a class each offseason, an Almanac tab); chants and anthems as a tradition that spreads with its fans and is betrayed by modernized grounds; the homegrown gear brand stays a deal partner, not a tradition.",
+    },
     {
       date: "2026-10-07",
       type: "Built",
@@ -677,12 +689,13 @@ window.SF_PROGRESS = {
       icon: "11",
       summary:
         "Derbies, club rites, star legacies, national names, famous grounds and the trophy are born from what happened; they shelter fans and resist betrayal.",
-      next: "Chants and anthems; with deals, naming rights at famous grounds and the homegrown gear brand. Watch whether bots ever buy Culture nodes.",
+      next: "Bots still never buy Culture nodes (0 of 36 campaigns, 2026-10-07): give them a reason or a weight. Films and books later, as flavor.",
       depends: ["leagues", "stars", "creation"],
       sources: [
         ["Culture and artifacts design", "../../sports-founder-gdd.md#progression--economy"],
         ["Culture and traditions", "../culture/README.md"],
         ["Culture tests", "../../tests/culture-births.test.ts"],
+        ["Chant tests", "../../tests/chants.test.ts"],
         [
           "Culture build plan",
           "../../sports-founder-tech-plan.md#211-build-plan-culture-first-build-gdd-v122",
@@ -692,8 +705,8 @@ window.SF_PROGRESS = {
         ["built", "Traditions with stable IDs, origin facts and local followers"],
         ["built", "Fan stickiness and resistance to betraying traditions"],
         [
-          "partial",
-          "Famous grounds and the trophy built; chants, anthems and homegrown gear brands later",
+          "built",
+          "Famous grounds, the trophy, and chants and anthems that spread with their fans (the homegrown gear brand stays a deal partner, GDD v1.31)",
         ],
         ["built", "Culture upgrades nurture existing traditions; never buy fame"],
       ],
@@ -720,16 +733,32 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 10 · light version in Phase 1",
       icon: "13",
-      summary: "A visible home for the history the campaign earns.",
-      next: "Use retained season and career records for a small first Hall of Fame.",
+      summary:
+        "A lightweight Hall of Fame (players and the sport's firsts) chosen from retained records each season, and an Almanac tab with plaques, a Waiting list and records.",
+      next: "League directors and founding family when those people exist; all-time leaderboards, the heatmap timelapse and history charts in the Almanac.",
       depends: ["stars", "leagues"],
       sources: [
         ["History and Hall of Fame design", "../../sports-founder-gdd.md#progression--economy"],
+        ["What the sport remembers", "../almanac/README.md"],
+        ["Hall of Fame tests", "../../tests/hall-of-fame.test.ts"],
+        [
+          "Build plan 2.18",
+          "../../sports-founder-tech-plan.md#218-build-plan-what-the-sport-remembers-gdd-v131",
+        ],
       ],
       items: [
-        ["planned", "Record-based induction and home-country stickiness"],
-        ["planned", "Players, directors, founding family and moment collections"],
-        ["planned", "Browsable Almanac, records and retrospective charts"],
+        [
+          "built",
+          "Record-based induction and home-country stickiness (shrine weight inside the cap)",
+        ],
+        [
+          "partial",
+          "Players and Moments wings built; league directors and founding family wait for those people",
+        ],
+        [
+          "partial",
+          "Browsable Almanac with plaques, a Waiting list and records; leaderboards and retrospective charts later",
+        ],
       ],
     },
     {

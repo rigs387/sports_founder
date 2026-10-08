@@ -181,7 +181,8 @@ ethos the betrayals (balanced to ~1). Rivals have flavor-only content traditions
 Chants (v1.31): a club's terrace song, born from an underdog title or a first title in a close
 finish; the first is the anthem (stronger, a headline). The only tradition that spreads on its own:
 one linked country a year, a few at most, dropped where the player's hardcore fans fall away. Clubs'
-titles renew it; modernizing grounds (levels 4–5) betrays it.
+titles renew it; modernizing grounds (levels 4–5) betrays it. A first title counts only once the
+league has 10 seasons of history (a young league's titles are all firsts).
 
 **Stars:** Full squads at the flagship (later; Phase 1 has one named leading player per club,
 whose scores are recorded); a few lazily named standouts in every other league. A season's top
@@ -213,7 +214,7 @@ Weekly Challenge, ~6–10 at launch incl. 1900 start), 9x16 camera-friendly desi
 
 **Legacy & Flavor:** Hall of Fame (auto classes from records; inductees add hardcore stickiness at
 home; v1.31 lightweight build: Players and Moments wings, players on points from star seasons,
-titles, top-scorer seasons and the scoring record, eligible 2 seasons after retiring, at most 2 a
+titles, top-scorer seasons and the scoring record (bar 20), eligible 2 seasons after retiring, at most 2 a
 class; Moments are a list of firsts, one a class; each player inductee adds permanent shrine weight
 at home inside the tradition weight cap; a class each offseason; lives on a new Almanac tab with
 Records and a Waiting list, the future home of all-time leaderboards; one big card per class,
