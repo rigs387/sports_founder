@@ -219,6 +219,16 @@ record crowd counts once its league is Professional; the offseason shows last se
 Card PP scaling was tried and reverted (it ended the #1 contest); late rewards in what is scarce
 late are parked.
 
+**Awards (v1.33):** the flagship's Player of the Season (composite of scores, club finish, playoff
+and final scores) and the top scorer's prize; Hall of Fame points; named after the first Hall of
+Fame player once there is one; lines on the champion card, season review, Almanac and Stars panel,
+no new cards. Player of the Year parked until other leagues have named players. Press (v1.33): an
+invented outlet per country (its biggest place + a sports-paper word) once its league forms, the
+sport's own paper before; mastheads show the outlet; 2–3 headline variants for frequent cards; the
+offseason's season in review is the seat outlet's front page; presentation only. Save format 24
+stores each season's Player of the Season (no retroactive awards); the top scorer's prize is "the
+{Score} Crown"; the Almanac lists the most awarded players.
+
 **Legacy & Flavor:** Hall of Fame (auto classes from records; inductees add hardcore stickiness at
 home; v1.31 lightweight build: Players and Moments wings, players on points from star seasons,
 titles, top-scorer seasons and the scoring record (bar 20), eligible 2 seasons after retiring, at most 2 a

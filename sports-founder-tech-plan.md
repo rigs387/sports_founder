@@ -85,6 +85,9 @@ surface before playtesting or during it.
 | 2026-10-07 | What the sport remembers, topic 4 (GDD v1.31): one induction card per class (no moment slot, big; headline for the first class or the record holder; PP per inductee by wing, tier-scaled); chants reuse the tradition cards (anthem headline, first follower abroad a toast); save format 23, no retroactive inductions; Almanac with plaques, Waiting list and Records; inductees on the country card | Decided |
 | 2026-10-07 | Playtest follow-ups (GDD v1.32): no deal offer below `minOfferValue`; minor moments auto-collect (option, on by default); front pages only for rare stories (champion: first title, underdog, dynasty, foregone; stars: the first star; Hall: the first class or the current record holder); the first record crowd needs a Professional league; card PP rewards and choice costs scale by the node price factor; the offseason shows last season's scores | Decided |
 | 2026-10-08 | Card PP scaling reverted (GDD v1.32): scaling card PP like node prices made bots buy out the tree and never lose #1 before the win (0/36; size^0.5 25%, tier only 39%, before 53%). Rewards stay unscaled, costs scale by tier; late rewards in scarce currencies parked | Decided |
+| 2026-10-08 | Awards and press, topic 1 (GDD v1.33): flagship Player of the Season (composite of scores, club finish, playoff and final scores) and the top scorer as a named prize; Hall of Fame points, no other effect; named after the first Hall of Fame player, fixed; lines on existing screens, the first award a toast; Player of the Year parked | Decided |
+| 2026-10-08 | Awards and press, topic 2 (GDD v1.33): an invented outlet per country (biggest place + sports-paper word) once its league forms, the sport's paper before; outlet mastheads with family sections; 2–3 headline variants for frequent cards by stable hash; the offseason's season in review becomes the seat outlet's front page; presentation only, nothing saved | Decided |
+| 2026-10-08 | Awards and press, topic 3 (GDD v1.33): save format 24 stores each season's Player of the Season (no retroactive awards); the top scorer's prize is the {Score} Crown; starting weights (score 1, champion +10, runner-up +5, playoff +1, final +2; Hall: award 3, prize 2, bar 20); the Almanac names winners, counts awards and lists the most awarded | Decided |
 
 ---
 
@@ -1036,6 +1039,30 @@ projected over the budget.) Replayed playtest (Austria, 5 minutes, 171 turns, a 
 raw strings, no "0 a season" offers, no toasts to click, 21 champion front pages in ~105 seasons
 (62 in 75 before), 1 star front page (20), 3 of 15 Hall classes front pages (7 of 13); the first
 class inducted the first star, and the first record crowd waited for Professional.
+
+### 2.20 Build Plan: Awards and Press (GDD v1.33)
+
+Every number is config (`awards`, `hallOfFame.points`). Presentation only for press; nothing about
+press is saved.
+
+1. **Awards in the sim.** Config `awards` (score, champion, runner-up, playoff and final weights).
+   At each season's end the flagship records `playerOfSeason` on the summary (composite points,
+   ties by fewer matches then lower id); the champion card's season facts carry it. Hall of Fame
+   points gain `playerOfSeason`; `inducteeFacts` counts awards. Save format 24: format 23 migrates
+   with no winner and no award facts. Tests: the composite, ties, differing from the top scorer,
+   Hall points, the migration.
+2. **Award names and lines.** The award's name (Player of the Season until the first Hall player,
+   then theirs) and the {Score} Crown in the snapshot; lines on the champion card, the season in
+   review, the Stars panel; the Almanac's roll, plaque counts and "Most Player of the Season
+   awards"; the first award a minor toast. Tests.
+3. **Press.** Outlet words in `names.yaml`; `outletOf(country)` (biggest place + word by a stable
+   hash; the sport's paper before the country's first league; an international wire for rival
+   championships), mastheads with family sections; 2–3 title variants for the frequent cards by a
+   stable hash of the event; the offseason's season in review as the seat outlet's front page,
+   filmable in 9x16. Smoke screenshots.
+4. **Measure and docs.** Hall classes against the bar (raise it if they swell), the #1 contest on
+   seeds 1–3; a short playtest replay; docs (`docs/almanac` or a press README), progress, CLAUDE.md,
+   cheat sheet.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 

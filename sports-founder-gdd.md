@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.32 | October 7, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted)*
+*Version 1.33 | October 8, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press)*
 
 ---
 
@@ -927,6 +927,58 @@ found the late game noisy and its rewards weightless. Every number is config.
 feed Hall of Fame eligibility, raise star power (affecting transfers toward the flagship), and name
 names in stories.
 
+**Awards and press, topic 1: awards (decided 2026-10-08, v1.33).** Every number is config
+(`awards`).
+- *Which awards:* the flagship's Player of the Season, and the season's top scorer as a named
+  prize (in the sport's terms). Only the flagship has named players, so Player of the Year waits
+  for named standouts in other leagues (parking lot).
+- *Player of the Season* is chosen from the season's record: points for scores, a bonus for the
+  club's finish (champion, runner-up) and points for playoff and final scores (config weights);
+  ties go to fewer matches, then the lower id. It often differs from the top scorer. Star-making
+  is unchanged: an award makes no star.
+- *What awards do:* flavor and the Hall of Fame. Each Player of the Season award earns Hall points
+  (config); the top scorer's points stay, under the prize's name. Awards name names on cards and in
+  the Almanac. Star power toward the flagship waits for the parked talent pull; no other effect.
+- *The name comes from the records:* "Player of the Season" until the Hall of Fame inducts its
+  first player, then named after them (e.g. "the Huber Medal"), fixed once given (choose pain: no
+  renaming).
+- *How it reaches the player:* lines, not cards: the champion card and the season in review name
+  the winner; the Almanac's roll of champions shows them, plaques count awards, the Stars panel
+  shows a star's awards. The first award ever is a minor toast; no other new moment.
+
+**Awards and press, topic 2: press (decided 2026-10-08, v1.33).** Presentation only.
+- *Outlets:* one invented outlet per country, named from content: its biggest real place
+  (`places.yaml`) and a sports-paper word from a list in the names file ("The Graz Matchday",
+  "The Lagos Terrace Post"); sports words keep clear of real newspapers. A moment's masthead is
+  its country's outlet, with the card family as its section ("The Graz Matchday · Sports Page").
+  Rival world championships run on one invented international wire.
+- *A country gets its press when its league forms;* until then its stories run in the sport's own
+  paper ("The {sport} Gazette").
+- *Headline variety:* 2–3 title variants for the frequent cards (champion, star breakout,
+  tradition birth, league formed, promotion), picked by a stable hash of the event so a card never
+  changes on reload. Bodies unchanged; a variant claims only what the card's facts show; English
+  only.
+- *The season's front page:* the offseason's "season in review" becomes the seat outlet's front
+  page: the champion as the lead story (headlined when the season tells a rare story), and short
+  items from the season's record: Player of the Season, the top scorer's prize, a new star, a
+  record crowd, traditions born, a Hall of Fame class. Laid out to film in 9x16; not a new popup.
+- *Limits:* no press sentiment; outlets never change a number; no headline claims an unrecorded
+  fact. Outlets are derived from content and the league record, never saved.
+
+**Awards and press, topic 3: presentation and saves (decided 2026-10-08, v1.33).**
+- *Saves:* each season summary stores its Player of the Season (so changed weights never rewrite
+  history), and the champion card's season facts name them. Save format 24; format 23 migrates
+  with no winner for past seasons: awards start at the next season's end (no retroactive awards,
+  as with the Hall of Fame).
+- *The top scorer's prize* is "the {Score} Crown" in the sport's own term ("the Goal Crown", "the
+  Run Crown").
+- *Starting numbers:* Player of the Season points: 1 per score, +10 for a champion's player, +5 for
+  a runner-up's, +1 more per playoff score and +2 more per final score. In the Hall of Fame each
+  Player of the Season award is worth 3 points (as a star season) and the top scorer's prize stays
+  2; the bar stays 20 and is raised if classes swell, rather than cutting award points.
+- *The Almanac:* the roll of champions names each season's Player of the Season, plaques count a
+  player's awards, and Records gain "Most Player of the Season awards" (top 5).
+
 **Press coverage:** Presentation only; no press sentiment system. Fictional outlets per country
 (in the names data file); headlines built from record-backed Moments, with English-only flavor
 variety. Big turns can show a newspaper-style front page in the recap (a 9x16 candidate).
@@ -1772,6 +1824,8 @@ Items flagged during the interview that need further discussion in future sessio
 - Late rewards in what is scarce late (parked 2026-10-08, v1.32): late in a campaign PP piles up
   (~100K banked) and card PP rewards are noise, but scaling them up ends the #1 contest. Late cards
   could pay in fans, cash or culture instead. Needs a design session.
+- Player of the Year (parked 2026-10-08, v1.33): a global award once other leagues have named
+  players; until then it would always name the flagship's Player of the Season.
 - Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to
   handle missed matches; deferred from the Phase 1 stars build.
 - Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship
