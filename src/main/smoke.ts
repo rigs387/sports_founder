@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { app, type BrowserWindow } from "electron";
 import { verifyActions } from "./action-smoke";
+import { verifyAlmanac } from "./almanac-smoke";
 import { verifyChampionshipCard } from "./contest-smoke";
 import { verifyTraditions } from "./culture-smoke";
 import { verifyDeals } from "./deals-smoke";
@@ -149,6 +150,7 @@ async function run(
   const venue = await verifyVenue(win, screenshot);
   const amendment = await verifyAmendment(win, screenshot);
   const traditions = await verifyTraditions(win, screenshot);
+  const almanac = await verifyAlmanac(win, screenshot);
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
@@ -173,6 +175,7 @@ async function run(
     venue,
     amendment,
     traditions,
+    almanac,
     saves,
     errors,
     remoteRequests,

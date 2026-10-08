@@ -212,15 +212,20 @@ export function useEventText() {
     return snapshot.hallOfFame.inductees
       .filter((inductee) => hall.inducteeIds.includes(inductee.id))
       .map((inductee) => {
-        if (inductee.facts)
-          return t(inductee.facts.record ? "hall.line_record" : "hall.line", {
-            ...termVars({ score: inductee.facts.scores, seasons: inductee.facts.starSeasons }),
+        const facts = inductee.facts;
+        if (facts) {
+          // A player who was never a star got in on titles and seasons as top scorer.
+          const star = facts.starSeasons > 0;
+          const seasons = star ? facts.starSeasons : facts.topScorerSeasons;
+          return t(star ? (facts.record ? "hall.line_record" : "hall.line") : "hall.line_noStar", {
+            ...termVars({ score: facts.scores, seasons }),
             player: player(inductee.playerId),
             club: club(inductee.clubId ?? undefined),
-            count: inductee.facts.scores,
-            seasons: inductee.facts.starSeasons,
-            titles: inductee.facts.titles,
+            count: facts.scores,
+            seasons,
+            titles: facts.titles,
           });
+        }
         return t(`hall.firsts.${inductee.first}`, {
           year: inductee.firstYear ?? inductee.year,
           player: player(inductee.firstPlayerId),

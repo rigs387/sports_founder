@@ -1007,6 +1007,7 @@
       "leagues": "Leagues",
       "flagship": "Flagship",
       "growth": "Growth",
+      "almanac": "Almanac",
       "offseason": "Offseason"
     },
     "prestige": "Prestige",
@@ -1527,8 +1528,54 @@
     "amend": "Amend",
     "changeShort": "Change"
   },
+  "almanac": {
+    "eyebrow": "The Almanac",
+    "title": "What {{sport}} remembers",
+    "status_one": "One name in the Hall of Fame · {{seasons}} {{seasonsNoun}} on record",
+    "status_other": "{{count}} names in the Hall of Fame · {{seasons}} {{seasonsNoun}} on record",
+    "status_zero": "The Hall of Fame is empty · {{seasons}} {{seasonsNoun}} on record",
+    "classOf": "Class of {{year}}",
+    "home": "Home: {{country}}",
+    "recordHolder": "Once held the all-time scoring record",
+    "players": {
+      "heading": "Hall of Fame: players",
+      "empty": "No player has been inducted yet. A class is chosen at every season's end from the records: long star careers, titles, seasons as top scorer, the scoring record. Players go in a few seasons after they retire."
+    },
+    "moments": {
+      "heading": "Hall of Fame: moments",
+      "empty": "The sport's firsts enter this wing one class at a time: the founding club's first title, the first star, the first Professional league."
+    },
+    "waiting": {
+      "heading": "Waiting for the Hall",
+      "empty": "Nobody is waiting.",
+      "from": "{{club}} · eligible from {{seasonNoun}} {{season}}",
+      "ready": "{{club}} · eligible, waiting for room in a class",
+      "note": "Each class has room for only a few. Legends of the game keep fans at home holding on longer."
+    },
+    "records": {
+      "heading": "Records",
+      "crowd": "Record crowd: {{crowd, number(maximumFractionDigits: 0)}} in {{year}}, in {{country}}.",
+      "noCrowd": "No record crowd yet.",
+      "scorers": "All-time top {{scoresNoun}}",
+      "noScorers": "Nobody has scored yet."
+    },
+    "roll": {
+      "heading": "Roll of champions",
+      "empty": "No season has finished yet.",
+      "scorer": "Top scorer: {{player}}, {{count}} {{scoreNoun}}"
+    },
+    "stats": {
+      "starSeasons": "Star seasons",
+      "titles": "Titles",
+      "topScorer": "Top scorer",
+      "scores": "Career {{scoresNoun}}"
+    },
+    "countryLine": "Hall of Fame: {{names}}",
+    "countryNote": "Legends from here keep fans holding on longer."
+  },
   "hall": {
     "line": "{{player}} ({{club}}): {{count}} {{scoreNoun}} and {{seasons}} {{seasonsNoun}} as a star. Titles won: {{titles}}.",
+    "line_noStar": "{{player}} ({{club}}): {{count}} {{scoreNoun}} without ever being a star, and the league's top scorer in {{seasons}} {{seasonsNoun}}. Titles won: {{titles}}.",
     "line_record": "{{player}} ({{club}}): {{count}} {{scoreNoun}}, once the league's all-time record, and {{seasons}} {{seasonsNoun}} as a star. Titles won: {{titles}}.",
     "firsts": {
       "foundingTitle": "{{year}}: {{club}}, the founding club, won its first title.",

@@ -8,6 +8,7 @@ import {
   type GameState,
   hallPoints,
   hallProblems,
+  hallSnapshot,
   inducteeFacts,
   landmarks,
   newHallOfFame,
@@ -280,5 +281,38 @@ describe("Hall of Fame cards (tech plan 2.18 step 4)", () => {
     state = offerEvents(seasons(state, 1, x, y, now), now, 4);
     const classes = eventSnapshots(state, now).filter((e) => e.templateId === "hall-of-fame-class");
     expect(classes.map((e) => e.weight)).toEqual(["headline", "big"]);
+  });
+});
+
+describe("the Almanac's snapshot (tech plan 2.18 step 5)", () => {
+  it("lists who waits for the Hall, then inducts them; records come from retained seasons", () => {
+    const base = fresh();
+    const p = leading(base, 0);
+    let state = retire(base, p.id, -20, 1);
+    const [x, y] = pair(state);
+    state = seasons(state, 1, x, y);
+    const waiting = hallSnapshot(state, world);
+    expect(waiting.waiting).toEqual([
+      expect.objectContaining({
+        playerId: p.id,
+        retiredSeason: 1,
+        eligibleSeason: 1 + world.config.hallOfFame.waitSeasons,
+      }),
+    ]);
+    // A player below the bar never shows.
+    expect(waiting.waiting.some((w) => w.playerId !== p.id)).toBe(false);
+    state = seasons(state, world.config.hallOfFame.waitSeasons, x, y);
+    const inducted = hallSnapshot(state, world);
+    expect(inducted.waiting).toEqual([]);
+    expect(inducted.inductees.map((i) => i.playerId)).toContain(p.id);
+    expect(inducted.records.champions.map((c) => c.season)).toEqual(
+      [...state.flagship.seasons].reverse().map((s) => s.season),
+    );
+    expect(inducted.records.scorers[0]).toMatchObject({
+      playerId: p.id,
+      scores: 10,
+      retired: true,
+    });
+    expect(inducted.records.scorers.length).toBeLessThanOrEqual(world.config.hallOfFame.leaders);
   });
 });

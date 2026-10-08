@@ -262,12 +262,16 @@ function MapScene(props: SceneProps) {
             .stroke({ width: 1 / viewport.scale.x, color: 0xf4ffff });
         }
       }
-      // A pennant where the player's fans keep traditions (GDD v1.22); the country card names them.
-      const held = new Set(
-        latest.current.snapshot.culture.traditions.flatMap((tradition) =>
+      // A pennant where the player's fans keep traditions (GDD v1.22) or Hall of Fame legends
+      // add shrine weight (GDD v1.31); the country card names them.
+      const held = new Set([
+        ...latest.current.snapshot.culture.traditions.flatMap((tradition) =>
           tradition.lost === null ? tradition.followers : [],
         ),
-      );
+        ...latest.current.snapshot.hallOfFame.inductees.flatMap((inductee) =>
+          inductee.wing === "players" ? [inductee.countryId] : [],
+        ),
+      ]);
       const unit = 1 / viewport.scale.x;
       for (const id of held) {
         const market = geometry.markets[id];

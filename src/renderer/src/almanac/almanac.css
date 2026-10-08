@@ -1,0 +1,260 @@
+/* The Almanac (GDD v1.31): what the sport remembers. Laid out like the flagship screen; the Hall of
+   Fame's plaques carry a bronze accent. */
+.almanac-screen[hidden] {
+  display: none;
+}
+.almanac-screen {
+  --bronze: #8a6a1f;
+  --bronze-soft: #f6efdc;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 26px 16px;
+  background: #f1f8fa;
+  color: var(--ink);
+}
+.almanac-heading {
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.almanac-title {
+  margin-right: auto;
+}
+.almanac-heading h1 {
+  margin: 4px 0;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1.3px;
+}
+.almanac-status {
+  max-width: 420px;
+  margin: 0;
+  text-align: right;
+  font-size: 13px;
+  color: #526d80;
+}
+.almanac-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 16px;
+  align-items: start;
+}
+.almanac-main,
+.almanac-side {
+  display: grid;
+  gap: 16px;
+}
+.almanac-card {
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 3px 0 #c5d6ea;
+}
+.almanac-card h2 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--second);
+}
+.almanac-card h3 {
+  margin: 12px 0 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.almanac-card p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.almanac-empty,
+.almanac-note {
+  color: var(--muted);
+}
+.almanac-note {
+  margin-top: 10px !important;
+  font-size: 12px !important;
+}
+
+/* Players wing: plaques. */
+.plaques {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.plaque {
+  position: relative;
+  padding: 14px 14px 12px;
+  background: linear-gradient(180deg, var(--bronze-soft), #fffdf7);
+  border: 1px solid #d9c48f;
+  border-top: 4px solid var(--bronze);
+  border-radius: 8px;
+}
+.plaque-class {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--bronze);
+}
+.plaque h3 {
+  margin: 4px 0 2px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.plaque > p {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: #5c6b78;
+}
+.plaque dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
+}
+.plaque dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding-bottom: 3px;
+  border-bottom: 1px dotted #d9c48f;
+  font-size: 12px;
+}
+.plaque dt {
+  color: #5c6b78;
+}
+.plaque dd {
+  margin: 0;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.plaque-record {
+  margin: 8px 0 0 !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  color: var(--bronze);
+}
+.plaque-home {
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--second);
+  cursor: pointer;
+}
+.plaque-home:hover,
+.plaque-home:focus-visible {
+  text-decoration: underline;
+}
+
+/* Moments wing: the sport's firsts in order. */
+.moments-wing {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.moments-wing li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--bronze);
+  background: #fbf8ef;
+  font-size: 13px;
+}
+.moments-wing small,
+.waiting small,
+.scorers small,
+.roll small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.moments-wing small {
+  white-space: nowrap;
+}
+
+/* Waiting list, scorers and the roll of champions. */
+.waiting,
+.scorers,
+.roll {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+.waiting li,
+.roll li span:last-child,
+.scorers li span {
+  display: grid;
+}
+.scorers {
+  counter-reset: scorer;
+}
+.scorers li {
+  counter-increment: scorer;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+}
+.scorers li::before {
+  content: counter(scorer);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.scorers li.retired span {
+  color: #5c6b78;
+}
+.scorers b {
+  font-variant-numeric: tabular-nums;
+}
+.roll {
+  max-height: 320px;
+  overflow: auto;
+}
+.roll li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e3ecf7;
+}
+.roll-year {
+  font-weight: 800;
+  color: var(--second);
+  font-variant-numeric: tabular-nums;
+}
+.record-crowd {
+  padding: 8px 10px;
+  background: #eef5ff;
+  border-radius: 6px;
+}
+
+@media (max-width: 900px) {
+  .almanac-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .almanac-heading {
+    flex-wrap: wrap;
+  }
+  .almanac-status {
+    text-align: left;
+  }
+}

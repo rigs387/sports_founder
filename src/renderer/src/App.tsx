@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { AlmanacScreen } from "./almanac/AlmanacScreen";
 import { ActionFeedback } from "./components/ActionFeedback";
 import { CampaignOverview, type Overview } from "./components/CampaignOverview";
 import { CampaignSetupScreen } from "./components/CampaignSetupScreen";
@@ -48,7 +49,11 @@ export function App() {
     void loadSetup();
   }, [loadSetup]);
   const news = snapshot ? bigMoments(snapshot.events).length : 0;
-  const fullPage = overview === "growth" || overview === "flagship" || overview === "offseason";
+  const fullPage =
+    overview === "growth" ||
+    overview === "flagship" ||
+    overview === "almanac" ||
+    overview === "offseason";
   // On narrow screens the nav scrolls; keep the current view's tab in sight.
   useEffect(() => {
     document
@@ -143,7 +148,7 @@ export function App() {
           >
             {t("map.nav.world")}
           </button>
-          {(["sport", "leagues", "flagship", "growth"] as const).map((view) => (
+          {(["sport", "leagues", "flagship", "growth", "almanac"] as const).map((view) => (
             <button
               type="button"
               key={view}
@@ -213,6 +218,18 @@ export function App() {
           active={overview === "flagship"}
           busy={status !== "ready"}
           onAction={(action) => void dispatchAction(action)}
+        />
+      )}
+      {names && snapshot && (
+        <AlmanacScreen
+          snapshot={snapshot}
+          names={names}
+          active={overview === "almanac"}
+          onCountry={(id) => {
+            setOverview(null);
+            selectCountry(id);
+            navigate("locate", id);
+          }}
         />
       )}
       {names && (
@@ -340,6 +357,9 @@ export function App() {
             anchor={snapshot.anchorCountryId}
             turn={snapshot.turn}
             culture={snapshot.culture}
+            inductees={snapshot.hallOfFame.inductees
+              .filter((i) => i.wing === "players" && i.countryId === selected.countryId)
+              .map((i) => snapshot.flagship.players.find((p) => p.id === i.playerId)?.name ?? "")}
             onClose={() => selectCountry(null)}
             onLocate={() => navigate("locate", selected.countryId)}
             leagueControls={

@@ -18,6 +18,8 @@ interface Props {
   leagueControls?: ReactNode;
   /** Traditions (GDD v1.22): the ones held here, and rivals' flavor traditions here. */
   culture?: CultureSnapshot;
+  /** Hall of Fame players from here (GDD v1.31), by name. */
+  inductees?: string[];
 }
 export function CountryCard({
   country,
@@ -30,6 +32,7 @@ export function CountryCard({
   children,
   leagueControls,
   culture,
+  inductees = [],
 }: Props) {
   const { t, i18n } = useTranslation();
   const compact = (value: number) => t("format.compact", { value });
@@ -188,9 +191,19 @@ export function CountryCard({
             <small>{moves.length ? moveList : t("map.roomToGrow")}</small>
           </div>
         </div>
-        {(held.length > 0 || rivalHeld.length > 0) && (
+        {(held.length > 0 || rivalHeld.length > 0 || inductees.length > 0) && (
           <section className="culture-section" data-testid="country-traditions">
             <h3>{t("culture.heading")}</h3>
+            {inductees.length > 0 && (
+              <p className="culture-note" data-testid="country-hall">
+                <strong>
+                  {t("almanac.countryLine", {
+                    names: new Intl.ListFormat(i18n.language).format(inductees),
+                  })}
+                </strong>{" "}
+                {t("almanac.countryNote")}
+              </p>
+            )}
             {held.length > 0 && (
               <>
                 <TraditionList traditions={held} countryId={country.countryId} />

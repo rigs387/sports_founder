@@ -967,6 +967,16 @@ minor toast in the follower country. A `hall` card family (masthead "The Hall of
 the Waiting list, and Records (champions, the top `leaders` scorers, the best crowd). Card text:
 one line per inductee (`factLines`, which replaced `seasonLines`). The deck is 36 cards.
 
+*Step 5 built 2026-10-07.* `src/renderer/src/almanac/AlmanacScreen.tsx`, an Almanac nav tab (full
+page like the Flagship tab): plaques for the Players wing (class, club, star seasons, titles,
+top-scorer seasons, career scores, the record, a link home to the map), the Moments wing in
+order, the Waiting list (by facts; eligible from a season or waiting for room), and Records (the
+record crowd, the all-time top ten scorers, the roll of champions with top scorers). The country
+card names its Hall of Fame players; the map's pennant counts them. A never-a-star inductee's card
+line says so (found in the smoke run: "0 seasons as a star"). Smoke (`src/main/almanac-smoke.ts`,
+last step, ~45 turns more, 124 s in all): the class card, the Almanac wide and narrow, a plaque's
+country (`runs/smoke/55-hall-card.png` to `58-hall-country.png`).
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.
