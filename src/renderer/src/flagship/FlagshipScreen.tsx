@@ -134,7 +134,7 @@ function Broadcast({
     >
       <h2 id="flagship-broadcast-heading">{t("flagship.broadcast.heading")}</h2>
       <p className="broadcast-interest">
-        <strong>{t(`flagship.broadcast.interest.${broadcast.interest}`)}</strong>{" "}
+        <strong>{t(`flagship.broadcast.interest.${broadcast.interest}`, vars)}</strong>{" "}
         {t(`flagship.broadcast.why.${broadcast.interest}`, vars)}
       </p>
       {broadcast.health === null ? (

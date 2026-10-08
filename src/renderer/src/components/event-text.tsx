@@ -201,7 +201,7 @@ export function useEventText() {
       hardcore: event.facts.hardcore,
       rival: names?.sports[event.facts.rivalId ?? ""] ?? "",
       tournament: names?.tournaments[event.facts.rivalId ?? ""] ?? "",
-      health: event.facts.health ? t(`league.health.${event.facts.health}`) : "",
+      health: event.facts.health ? t(`league.healthLevels.${event.facts.health}`) : "",
       tier: event.facts.leagueTier ? t(`league.tiers.${event.facts.leagueTier}`) : "",
       ...textVars(event),
     });

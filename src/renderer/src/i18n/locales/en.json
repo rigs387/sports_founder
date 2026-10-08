@@ -331,7 +331,7 @@
         "body": "{{crowd, number}} hardcore fans had a seat this {{seasonNoun}}, a league record in {{country}}. {{club}} hosted it, and the ground's fame grows."
       },
       "deal-ended": {
-        "title": "{{partner}}'s deal has run its term",
+        "title": "The deal with {{partner}} has run its term",
         "body": "The {{slot}} deal with {{partner}} is over. The slot is open in the offseason, where {{partner}} may offer to renew."
       },
       "tradition-lost": {
@@ -940,7 +940,7 @@
     "warnStepDown_other": "Stepping down breaks {{count}} deals: {{partners}} signed for this tier.",
     "warnSeat_one": "Moving breaks a deal: {{partners}} signed to keep the seat in {{country}}.",
     "warnSeat_other": "Moving breaks {{count}} deals: {{partners}} signed to keep the seat in {{country}}.",
-    "rulebookDue": "{{partner}}'s deal asks for {{trait}}: {{option}} by the end of the {{seasonNoun}} {{season}} offseason."
+    "rulebookDue": "The deal with {{partner}} asks for {{trait}}: {{option}} by the end of the {{seasonNoun}} {{season}} offseason."
   },
   "format": {
     "count": "{{value, number(maximumFractionDigits: 0)}}",

@@ -96,6 +96,12 @@ window.SF_PROGRESS = {
   history: [
     {
       date: "2026-10-07",
+      type: "Review",
+      title: "Playtest pass after the Hall of Fame",
+      text: 'Played Austria through the real app for 133 turns (73 offseasons, 109 decisions, 252 moments; no console errors), driving the UI as a player: deals, venues, promotions, backing, growth. Fixed: a league\'s health shown as a raw key on decision cards, the broadcast\'s season noun shown raw, and partner possessives ("Grocers\'s"). Found for design: naming-rights and gear-brand offers worth almost nothing at small leagues (one still demanded a seat lock); once-per-country toasts flood the late game (213 "A following of your own"); champion and star moments are front pages nearly every season at Professional and above, and almost every player class is too (most inductees once held the scoring record); the first Hall class is a trivial first (a record crowd in season 2); card PP is single digits while late Prestige is ~100K; the Flagship table shows 0 scores for the finished season during the offseason.',
+    },
+    {
+      date: "2026-10-07",
       type: "Built",
       title: "What the sport remembers",
       text: "Tech plan 2.18 (GDD v1.31): a Hall of Fame class at each season's end, read from retained records: retired players on points (star seasons, titles, top-scorer seasons, the scoring record; bar 20, 2 seasons' wait, 2 a class) and the sport's firsts, one a class. Player inductees add permanent shrine weight at home inside the tradition cap. One class card per class (no moment slot; the first class is a front page). The Almanac tab holds plaques, the Waiting list and records. Chants are a seventh tradition: born from an underdog title or a first title in a close finish once the league has 10 seasons; the first is the anthem; the only tradition that spreads abroad without nodes. Save format 23, no retroactive inductions. Measured (builder, 12 anchors, seeds 1–3, 200 turns): pacing passes (first win 158, was 161); #1 lost before the win 53%; 16–18 inductees and 6–7 chants a campaign; bots bought Culture nodes in 0 of 36.",
