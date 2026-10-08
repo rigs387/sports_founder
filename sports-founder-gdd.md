@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.31 | October 7, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner)*
+*Version 1.32 | October 7, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale, card PP that grows with the sport)*
 
 ---
 
@@ -633,7 +633,7 @@ the game does not stop that, it makes them play differently.
     minor toasts.
   - *Big moments cannot be skipped (choose pain on attention).* They have no dismiss; Next Turn
     stays locked until each is collected. Only minor moments are collected by Next Turn.
-  - *Parked:* an optional auto-collect for minor moments.
+  - *Built later (v1.32):* minor moments collect themselves (an option, on by default).
 - **Negative events** (scandals, star injuries, rival coups) occur throughout and grow more
   frequent at higher PP tiers, reinforcing growing pains and feeding late-game pressure.
 - **The flagship season as cards (decided 2026-10-03).** The flagship's results reach the
@@ -898,6 +898,27 @@ turns): pacing passes and barely moves (first win median 158, was 161); #1 lost 
 53% (was 56%); 16–18 player inductees a campaign, the first around turn 35–44; the anchor's shrine
 weight reaches the cap by the end, where traditions already hold it; 6–7 chants a campaign, most
 fading when their club stops winning. Bots still never buy Culture nodes (watch item).
+
+**Playtest follow-ups (decided 2026-10-07, v1.32).** A 133-turn playtest through the app (Austria)
+found the late game noisy and its rewards weightless. Every number is config.
+- *No worthless deal offers.* An offer (renewals and the gear brand included) is made only if it is
+  worth at least a minimum a season (`flagship.deals.minOfferValue`); a slot with none stays empty.
+  Small leagues' naming rights were worth hundredths and one still demanded a seat lock.
+- *Minor news collects itself.* Minor moments are collected automatically as they arrive (an
+  option, on by default), with one short line saying how many and the PP; the journal keeps every
+  card. This replaces the parked auto-collect item. The playtest saw 213 "A following of your own"
+  toasts.
+- *Front pages for rare stories only.* At the headline tiers the champion card is a front page
+  only when its season tells a rare story (a first title, an underdog title, a dynasty, a foregone
+  league); star cards keep only the first star's front page. A Hall of Fame class is a front page
+  only if it is the first class or inducts the current all-time scoring record holder. (The
+  playtest had 62 champion front pages in 75 seasons and 7 of 13 classes.)
+- *Firsts with scale.* The first record crowd counts for the Hall of Fame only once that league has
+  turned Professional (it was inducted from season 2 at a league of 239 hardcore fans).
+- *Card PP grows with the sport.* A card's PP rewards and its choices' PP costs scale by the same
+  factor as growth node prices: the peak tier's cost multiplier × the sport's size factor. Late
+  rewards were single digits against ~100K Prestige; costs scaled only by tier.
+- *The offseason shows last season's scores* on the flagship until the new season starts.
 
 **Awards:** Player of the Season per league and a global Player of the Year. Mostly flavor — they
 feed Hall of Fame eligibility, raise star power (affecting transfers toward the flagship), and name
@@ -1743,8 +1764,6 @@ Items flagged during the interview that need further discussion in future sessio
 - Flagship ticket pricing (parked 2026-10-07, v1.30): a cheap, standard or premium stance (more
   gate per fan against slower conversion), tied to the venue cap. Revisit after the cap is
   measured.
-- Auto-collect for minor moments (parked 2026-10-05, v1.26): an option that collects toasts
-  without clicks, for players who want only the big news.
 - Hall of Fame wings for league directors and founding-family members (parked 2026-10-07,
   v1.31): they wait until those people exist in the simulation.
 - Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to

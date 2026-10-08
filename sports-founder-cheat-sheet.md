@@ -212,6 +212,12 @@ World Championship (player-founded and named, every 4 years, player picks host),
 (best players by nationality), awards, scenarios (YAML data files, scenario-only leaderboards, suspend-save ranked runs with fixed seeds,
 Weekly Challenge, ~6–10 at launch incl. 1900 start), 9x16 camera-friendly design pass.
 
+**Playtest follow-ups (v1.32):** no deal offer below a minimum value; minor news collects itself
+(option, on by default); front pages only for rare stories (first title, underdog, dynasty,
+foregone; the first star; the first Hall class or one with the current record holder); the first
+record crowd counts once its league is Professional; card PP rewards and costs scale like node
+prices (tier multiplier × sport size); the offseason shows last season's scores.
+
 **Legacy & Flavor:** Hall of Fame (auto classes from records; inductees add hardcore stickiness at
 home; v1.31 lightweight build: Players and Moments wings, players on points from star seasons,
 titles, top-scorer seasons and the scoring record (bar 20), eligible 2 seasons after retiring, at most 2 a

@@ -83,6 +83,7 @@ surface before playtesting or during it.
 | 2026-10-07 | What the sport remembers, topic 2 (GDD v1.31): chants are a new club tradition type (derby and rite unchanged); born from an underdog title or a first title in a close finish; the first is the anthem (stronger, headline); the only tradition with natural reach (one linked country a year, capped, dropped below the hardcore floor); renewed by titles; modernizing grounds betrays them | Decided |
 | 2026-10-07 | What the sport remembers, topic 3 (GDD v1.31): the homegrown gear brand is not a tradition; it stays the deals' demand-free main-sponsor option, always offered | Decided |
 | 2026-10-07 | What the sport remembers, topic 4 (GDD v1.31): one induction card per class (no moment slot, big; headline for the first class or the record holder; PP per inductee by wing, tier-scaled); chants reuse the tradition cards (anthem headline, first follower abroad a toast); save format 23, no retroactive inductions; Almanac with plaques, Waiting list and Records; inductees on the country card | Decided |
+| 2026-10-07 | Playtest follow-ups (GDD v1.32): no deal offer below `minOfferValue`; minor moments auto-collect (option, on by default); front pages only for rare stories (champion: first title, underdog, dynasty, foregone; stars: the first star; Hall: the first class or the current record holder); the first record crowd needs a Professional league; card PP rewards and choice costs scale by the node price factor; the offseason shows last season's scores | Decided |
 
 ---
 
@@ -987,6 +988,20 @@ inductees a campaign, the first around turn 35–44, and 7 moments; the anchor's
 reaches the cap of 2 by the end (late-game anchors are at the cap from traditions anyway); 6–7
 chants a campaign, 92 spreads abroad in 36 campaigns; Culture nodes bought in 0/36 campaigns (a
 standing watch item, unchanged). Docs: `docs/almanac/README.md`.
+
+### 2.19 Build Plan: Playtest Follow-ups (GDD v1.32)
+
+1. **Sim rules.** `flagship.deals.minOfferValue` (offers, renewals and the gear brand below it are
+   not made). Front pages: the champion card at headline tiers needs a rare season story; star cards
+   lose the tier rule (the first star keeps its front page); `classHeadline` reads the current
+   record holder (the latest `scoringRecord` landmark). The first record crowd needs an earlier
+   promotion of its league's country to Professional. `eventEffects` and `eventChoiceCost` scale PP
+   by `costMultiplier × nodeSizeFactor` (`cardPPFactor`). Tests for each.
+2. **Presentation.** A `collectMinorMoments` action; the renderer runs it when "Auto-collect" (a
+   bottom-bar toggle, on by default, remembered per viewer) is on, and shows one summary line. The
+   flagship snapshot carries last season's scores while the offseason is open. Smoke screenshots.
+3. **Measure and replay.** Pacing on seeds 1–3 and the #1 contest (card PP now scales); replay the
+   playtest and compare front pages, toasts and offers. Docs, progress, CLAUDE.md, cheat sheet.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
