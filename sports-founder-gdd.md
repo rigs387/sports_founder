@@ -1079,6 +1079,9 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
     scoring record, Player of the Season and Hall of Fame points, the star threshold and the close
     final margin, so a high-scoring sport does not flood the Hall or the awards.
   - *Term values parked:* scores worth different points by the sport's term (a try 5, a kick 3).
+  - *Built 2026-10-09 (calls made at build).* The stronger club's *expected result* (wins plus half
+    the draws) is what stays fixed: fewer draws in high-scoring sports become wins and losses. Star
+    thresholds were refitted too: more scores make a top scorer's share steadier.
 - *Topic F, press goes digital (decided 2026-10-08).* Outlets were a place plus a British
   football word ("New York City Kickabout") and every big story was a newspaper page; the champion
   front page then came back as the offseason's season in review.

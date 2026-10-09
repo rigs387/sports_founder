@@ -61,15 +61,26 @@ function odds(scoring: ScoringOption, gap: number) {
 const GAPS = [5, 10, 20];
 
 describe("scoring frequency", () => {
-  it("lets the stronger club win about as often at every frequency", () => {
-    // Measured 2026-10-03 (stronger club's win %, gaps 5/10/20): low 47/61/85, medium 50/62/83,
-    // high 53/63/82.
-    for (const gap of GAPS) {
-      const medium = odds("medium", gap).win;
-      for (const scoring of SCORING_OPTIONS) {
-        expect(Math.abs(odds(scoring, gap).win - medium)).toBeLessThan(0.04);
-      }
-    }
+  it("gives the stronger club the same expected result at every frequency", () => {
+    // GDD v1.34: refitted for realistic totals so wins + half the draws match the pre-v1.34 medium
+    // rule (61.5 / 72.2 / 88.9% at gaps 5 / 10 / 20); fewer draws in high-scoring sports mean more
+    // wins and losses.
+    const expected = (scoring: ScoringOption, gap: number) => {
+      const o = odds(scoring, gap);
+      return o.win + o.draw / 2;
+    };
+    const before = [0.615, 0.722, 0.889];
+    GAPS.forEach((gap, i) => {
+      for (const scoring of SCORING_OPTIONS)
+        expect(Math.abs(expected(scoring, gap) - (before[i] ?? 0))).toBeLessThan(0.01);
+    });
+  });
+
+  it("plays realistic totals: about 1.5, 20 and 90 a side", () => {
+    const { chances, baseRate } = world.config.flagship.match;
+    expect(chances.low * baseRate.low).toBeCloseTo(1.5, 1);
+    expect(chances.medium * baseRate.medium).toBeCloseTo(20, 1);
+    expect(chances.high * baseRate.high).toBeCloseTo(90, 1);
   });
 
   it("draws more in low-scoring sports and fewer in high-scoring ones", () => {

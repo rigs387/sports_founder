@@ -11,6 +11,7 @@ import {
   offerEvents,
   type PlayerTally,
   playerOfSeason,
+  scoreUnit,
   serializeSave,
 } from "../src/sim";
 import { awardless, setupFor, world } from "./helpers";
@@ -42,18 +43,30 @@ describe("Player of the Season", () => {
   const [a, b, c] = state.flagship.players;
   if (!a || !b || !c) throw new Error("No players");
   const { champion, runnerUp, score, finalScore } = world.config.awards;
+  // Scores count in units of the reference rule's (GDD v1.34): u scores make one point.
+  const u = scoreUnit(world, state.flagship.scoring);
+  const n = (points: number) => Math.round(points * u);
 
   it("weighs scores, the club's finish and final scores, not scores alone", () => {
     // The top scorer plays for a mid-table club; the champion's leader scored less.
-    const tallies = [tally(a.id, 20), tally(b.id, 20 - champion / score + 1)];
+    const tallies = [tally(a.id, n(20)), tally(b.id, n(20 - champion / score + 1))];
     expect(playerOfSeason(state.flagship, tallies, b.clubId, c.clubId, world)).toBe(b.id);
     // A final settles it the other way when it is worth more than the finish.
-    const finals = [tally(a.id, 20, { playoffScores: 6, finalScores: 6 }), tally(b.id, 12)];
+    const finals = [
+      tally(a.id, n(20), { playoffScores: n(6), finalScores: n(6) }),
+      tally(b.id, n(12)),
+    ];
     expect(6 * finalScore).toBeGreaterThan(champion);
     expect(playerOfSeason(state.flagship, finals, b.clubId, c.clubId, world)).toBe(a.id);
     // A runner-up's player is lifted too.
     expect(
-      playerOfSeason(state.flagship, [tally(a.id, 10), tally(c.id, 10)], b.clubId, c.clubId, world),
+      playerOfSeason(
+        state.flagship,
+        [tally(a.id, n(10)), tally(c.id, n(10))],
+        b.clubId,
+        c.clubId,
+        world,
+      ),
     ).toBe(runnerUp > 0 ? c.id : a.id);
   });
 

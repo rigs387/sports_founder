@@ -1144,6 +1144,17 @@ one price everywhere.
    rival countermove lands at the seat; the deals panel's TV slot shows rival, cut and end date.
    Tests.
 
+*Step 6 built 2026-10-09.* `flagship.match`: chances 4 / 50 / 200, base rates 0.375 / 0.4 /
+0.45 (1.5 / 20 / 90 a side), rating effects refitted so the stronger club's expected result
+(wins + half the draws) matches the pre-v1.34 medium rule within 0.5 points at gaps 0–20; draws
+about 28 / 8 / 4%. Score-counted numbers: `scoreUnit` (a rule's scores a game ÷
+`match.referenceScores` 1.8) divides Player of the Season score points; `closeFinalMargin` 1 / 4 /
+10 keeps close finals as common (73 / 64 / 71% between equal clubs); `stars.share` 0.4 / 0.354 /
+0.342 keeps the top scorer passing as often (measured, Brazil, 6 seeds × 25 seasons, against the
+old engine). Hall points count no raw scores. Measured (5 campaigns, 200 turns): stars 27 a
+campaign (23 before), Hall players 22 (21), pacing and the win unchanged; a run takes about a
+fifth longer. The odds test now compares expected results.
+
 *Step 5 built 2026-10-09.* Config `leagues.venue.groundSize` (3,000 / 12,000 / 30,000 / 55,000 /
 80,000) and `attendShare` 0.5. `matchCrowd` (`src/sim/venues.ts`): attendShare of a club's share
 of the seated hardcore fans, up to the ground, sold out exactly when the seated fans reach the

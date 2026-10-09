@@ -636,6 +636,7 @@ culture:
 # playoffScore and finalScore more per score in the playoffs and the final (a final score is also a
 # playoff score). Ties go to fewer matches, then the lower id. The top scorer's prize (the {Score}
 # Crown) is the season's top scorer, already recorded.
+# Score weights count scores in units of flagship.match.referenceScores (GDD v1.34).
 awards: { score: 1, champion: 10, runnerUp: 5, playoffScore: 1, finalScore: 2 }
 
 # The Hall of Fame (GDD v1.31). A class each flagship season's end. Players: retired at least
@@ -697,10 +698,18 @@ flagship:
   # a season at its start. Medium is the pre-v1.16 rule. Low and high were fitted (exact binomial
   # odds, tests/flagship-match.test.ts) so the stronger club wins about as often at every rating
   # gap; low draws more and the weaker club wins less, high draws less and upsets more.
+  # Refitted in GDD v1.34 for realistic totals, a side a game: low 1.5 (soccer, hockey), medium 20
+  # (rugby, American football), high 90 (basketball). ratingEffect was fitted so the stronger
+  # club's expected result (wins + half the draws) matches the pre-v1.34 medium rule at every gap
+  # (50 / 61.5 / 72.2 / 88.9% at gaps 0 / 5 / 10 / 20, all within 0.5 points). Draws fall with
+  # scoring: about 28% low, 8% medium, 4% high between equal clubs.
   match:
-    chances: { low: 3, medium: 6, high: 14 }
-    baseRate: { low: 0.4, medium: 0.3, high: 0.3 }
-    ratingEffect: { low: 0.013, medium: 0.008, high: 0.0047 }
+    chances: { low: 4, medium: 50, high: 200 }
+    baseRate: { low: 0.375, medium: 0.4, high: 0.45 }
+    ratingEffect: { low: 0.01034, medium: 0.00296, high: 0.0015 }
+    # Score-counted numbers (awards) read scores in units of this many a side a game, the
+    # pre-v1.34 medium rule, so a high-scoring sport does not flood them (GDD v1.34).
+    referenceScores: 1.8
     homeAdvantage: 4
     minRate: 0.05
     maxRate: 0.8
@@ -768,7 +777,10 @@ flagship:
   # medium 17%, high 16%), the first star at median season 5 / 2 / 5, and half fill the Amateur
   # star place. Stars lift runaway and foregone-league stories by a few points.
   stars:
-    share: { low: 0.44, medium: 0.39, high: 0.37 }
+    # Refitted in GDD v1.34 with the realistic scorelines (more scores make shares steadier): each
+    # rule's top scorer passes as often as before (measured 2026-10-09, Brazil, 6 seeds × 25
+    # seasons: low 23%, medium 24%, high 29% of seasons).
+    share: { low: 0.4, medium: 0.354, high: 0.342 }
     places: { amateur: 1, semi-pro: 2, professional: 3, elite: 4 }
     strengthPerSkill: 0.08
     moveChance: 0.25
@@ -839,7 +851,9 @@ flagship:
     # a margin of 2 for high gives 64–65%. Low stays at 1: low-scoring sports decide more finals
     # by one score (GDD v1.16). European rates and runaway stayed within a few points.
     closeFinishWins: 1
-    closeFinalMargin: { low: 1, medium: 1, high: 2 }
+    # GDD v1.34: scaled with the refitted totals so a close final stays as common: P(margin <= m)
+    # between equal clubs low 73%, medium 64%, high 71% (was 79 / 66 / 70%).
+    closeFinalMargin: { low: 1, medium: 4, high: 10 }
     # Underdog: the champion was among the weakest floor(clubs ÷ underdogDivisor) clubs by rating
     # when the season began.
     underdogDivisor: 3

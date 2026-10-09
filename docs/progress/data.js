@@ -97,6 +97,12 @@ window.SF_PROGRESS = {
     {
       date: "2026-10-09",
       type: "Built",
+      title: "Realistic scorelines",
+      text: "Tech plan 2.21 step 6 (GDD v1.34): flagship games now score about 1.5, 20 or 90 a side by the sport's scoring rule, refitted so the stronger club's expected result is unchanged; high-scoring sports rarely draw. Award points, star thresholds and the close-final margin were rescaled so stars and the Hall of Fame stay as common.",
+    },
+    {
+      date: "2026-10-09",
+      type: "Built",
       title: "Attendance and max capacity",
       text: "Tech plan 2.21 step 5 (GDD v1.34): the venue card shows Max capacity a game at each club's ground (3,000 to 80,000 by level) and Attendance a game and a season, sold out while hardcore fans are turned away; record crowds are the best crowd a game, in the Almanac and on the front page too. A modernizing level says it tears down the old grounds.",
     },

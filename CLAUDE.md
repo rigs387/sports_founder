@@ -136,6 +136,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   amendments, backing, the seat, the trophy) happens only while it is open.
 - The Almanac smoke step (`src/main/almanac-smoke.ts`) runs last and plays on until a Hall of
   Fame class is inducted.
+- Scorelines (GDD v1.34): matches play realistic totals by scoring rule (about 1.5 / 20 / 90 a
+  side); anything that counts scores divides by `scoreUnit` (the rule's scores a game in units of
+  `flagship.match.referenceScores`), and star shares and the close-final margin are by rule.
 - Awards (GDD v1.33): the flagship's Player of the Season (`playerOfSeason` in `flagship.ts`, config
   `awards`) is stored on each season summary and counts toward the Hall of Fame; it is named after
   the first Hall player (`HallSnapshot.awardNamerId`, `useAwardWords` in

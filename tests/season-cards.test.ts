@@ -121,7 +121,7 @@ describe("season stories", () => {
     });
     expect(stories([upset])).toEqual(["firstTitle", "closeFinish"]);
     // A tight table does not make a close finish when the final was a rout.
-    const rout = summary(1, 5, 6, 0, { format: "american", playoffs: [final(5, 6, 4, 0)] });
+    const rout = summary(1, 5, 6, 0, { format: "american", playoffs: [final(5, 6, 40, 0)] });
     expect(stories([rout])).toEqual(["firstTitle"]);
     // Deciders are the narrowest margin of all.
     const deciders = summary(1, 5, 6, 8, { format: "american", playoffs: [final(5, 6, 1, 1)] });

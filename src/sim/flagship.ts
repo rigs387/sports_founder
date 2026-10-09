@@ -871,6 +871,8 @@ export function playerOfSeason(
   world: World,
 ): number | null {
   const weights = world.config.awards;
+  // Scores count in units of the reference rule's scores a game (GDD v1.34).
+  const unit = scoreUnit(world, flagship.scoring);
   const scored = tallies.flatMap((tally) => {
     const player = flagship.players.find((p) => p.id === tally.playerId);
     if (!player || tally.matches === 0) return [];
@@ -881,9 +883,10 @@ export function playerOfSeason(
           ? weights.runnerUp
           : 0;
     const points =
-      tally.scores * weights.score +
-      tally.playoffScores * weights.playoffScore +
-      tally.finalScores * weights.finalScore +
+      (tally.scores * weights.score +
+        tally.playoffScores * weights.playoffScore +
+        tally.finalScores * weights.finalScore) /
+        unit +
       finish;
     return [{ tally, points }];
   });
@@ -994,6 +997,15 @@ export function newFlagship(
 }
 
 // ---- Matches --------------------------------------------------------------------------------
+
+/**
+ * A side's scores a game under a scoring rule, in units of the reference rule's (GDD v1.34): what
+ * score-counted numbers divide by, so a high-scoring sport does not flood awards.
+ */
+export function scoreUnit(world: World, scoring: ScoringOption): number {
+  const { match } = world.config.flagship;
+  return (match.chances[scoring] * match.baseRate[scoring]) / match.referenceScores;
+}
 
 /** The chance that one of a club's scoring chances scores, under the season's scoring rule. */
 export function scoringRate(

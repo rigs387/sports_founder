@@ -1070,6 +1070,8 @@ export const configFileSchema = z.strictObject({
       chances: byScoring(z.int().min(1)),
       baseRate: byScoring(unitInterval),
       ratingEffect: byScoring(z.number().min(0)),
+      /** Score-counted numbers read scores in units of this many a side a game (v1.34). */
+      referenceScores: z.number().positive(),
       homeAdvantage: z.number().min(0),
       minRate: unitInterval,
       maxRate: unitInterval,
