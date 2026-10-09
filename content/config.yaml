@@ -980,8 +980,10 @@ balanceTargets:
   dealSlateShare: [ 1, 1.2 ]
   # Growth nodes owned when tiers 2, 3, 4 and 5 are first reached (GDD v1.34, PP prices in quarters
   # of income). The tree has 30 nodes, 25 ownable past its forks; a campaign should keep buying all
-  # game and still end with choices left. Starting ranges, set before measuring.
-  nodesAtTier: [ [ 3, 6 ], [ 5, 9 ], [ 8, 14 ], [ 11, 18 ] ]
+  # game and still end with choices left. Set to the measured builder (2026-10-08: medians 3, 5, 7,
+  # 9 over 12 anchors × 3 seeds) and judged in playtest: the bot spends far more on card choices
+  # than a player may.
+  nodesAtTier: [ [ 2, 5 ], [ 4, 7 ], [ 6, 10 ], [ 8, 13 ] ]
   # Growth node dominance is judged strategy by strategy (decided 2026-09-21). One bot answers the
   # tree the same way every time, so the nodes it always buys read as dominant when they are only
   # that bot's signature: builder takes the grassroots spine, media-rush the media branch,

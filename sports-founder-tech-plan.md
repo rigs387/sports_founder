@@ -1129,7 +1129,9 @@ the builder spent 75% of its PP hopping slots). Measured (pacing, builder, 12 an
 200 turns): every tier passes (2 at 33, 3 at 44, 4 at 77, 5 at 119, first win 160); nodes bought
 median 13 (8–20), Local Radio in 35/36 campaigns; #1 lost before the win in 28/36 (target about
 half); nodes at tier-up 3 / 5 / 7 / 9 against starting targets 3–6 / 5–9 / 8–14 / 11–18. The
-playtest save: Local Radio 18,505 PP (2.1 turns of income) against 264,495 before.
+playtest save: Local Radio 18,505 PP (2.1 turns of income) against 264,495 before. Settled: the
+#1 contest stays (78%); `nodesAtTier` set to the measured 2–5 / 4–7 / 6–10 / 8–13; bailouts keep
+one price everywhere.
 2. **Money benchmarks (topic B).** Research a sourced table of real leagues by tier (revenue,
    mix, top sponsor and naming-rights shares); show it to the designer; record it in
    `docs/money/README.md` and `balanceTargets.money`.

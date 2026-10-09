@@ -1007,6 +1007,10 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
     where they were. Card choice costs became quarters (old PP ÷ 10). The rise per node compounds.
     Pacing passes at every tier; #1 is lost before the win in 78% of campaigns (was 53%), and the
     builder bot reaches each tier with fewer nodes than the starting targets (open questions).
+  - *Settled after measuring (2026-10-08):* the harder #1 contest (78%) is accepted for now: it
+    errs toward pain, and more rival sports will reshape it. Nodes-at-tier targets are set to the
+    measured builder (2–5, 4–7, 6–10, 8–13) and judged in playtest. One bailout price everywhere:
+    rescuing a minor league costs as much as the anchor's, so the player picks which leagues matter.
 - *Topic B, money in dollars (decided 2026-10-08).* The playtest saw a $3 TV deal and a
   1,700 sponsorship beside an Elite league of 50M fans: cash had no unit and showed the sim's raw
   numbers, and deals were the wrong size against revenue (the main sponsor about 3% of revenue,
