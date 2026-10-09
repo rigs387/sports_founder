@@ -1071,6 +1071,8 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
   moment slots. "First following" and "league arrival" no longer take moment slots (like deal
   news), stay minor and collect themselves, and are skipped when stale: the country is already past
   a config share (2% to start) or the fact is more than a config number of turns old.
+  - *Built 2026-10-08 (call made at build):* no turn limit was needed. League arrival reads its
+    fact only in the turn it happens, so a full turn dropped it (156 of 213 told), never delayed it.
 - *Saves:* nobody plays but the designer, so these changes need no save migrations (2026-10-08).
 
 **Press coverage:** Presentation only; no press sentiment system. Fictional outlets per country

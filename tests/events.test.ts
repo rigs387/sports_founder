@@ -19,6 +19,7 @@ import {
   settleEvents,
   snapshot,
   stepQuarter,
+  takesNoSlot,
 } from "../src/sim";
 import { setupFor, venueless, withConfig, world } from "./helpers";
 
@@ -108,9 +109,12 @@ describe("event triggers and settlement", () => {
           (e) => world.events.cards.find((c) => c.id === e.templateId)?.kind === "decision",
         ).length,
       ).toBeLessThanOrEqual(world.events.settings.maxDecisions);
-      expect(current.events.pending.length).toBeLessThanOrEqual(
-        world.events.settings.maxMoments + world.events.settings.maxDecisions,
-      );
+      // Slot-free cards (the champion, deal news, firsts: GDD v1.34) sit outside the caps.
+      expect(
+        current.events.pending.filter(
+          (e) => !takesNoSlot(world.events.cards.find((c) => c.id === e.templateId)),
+        ).length,
+      ).toBeLessThanOrEqual(world.events.settings.maxMoments + world.events.settings.maxDecisions);
       expect(checkInvariants(current, world)).toEqual([]);
       current = endTurn(current, world);
     }

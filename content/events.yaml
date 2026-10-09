@@ -46,6 +46,10 @@ cards:
   - id: first-following
     kind: moment
     weight: minor
+    # GDD v1.34: never waits for a slot, and is skipped once the country is past 2% following
+    # (a playtest told it ~45 turns late, at 15-38%).
+    noSlot: true
+    staleShare: 0.02
     tone: positive
     priority: 60
     trigger: audience
@@ -63,6 +67,9 @@ cards:
   - id: league-arrival
     kind: moment
     weight: minor
+    # GDD v1.34: never waits for a slot (its fact is read only the turn it happens, so a full
+    # turn dropped it: 156 of 213 leagues announced in a playtest).
+    noSlot: true
     tone: positive
     priority: 80
     trigger: leagueFormed

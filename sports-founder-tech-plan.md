@@ -1148,6 +1148,14 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    collect themselves, and are skipped past config `staleShare` (0.02) or `staleTurns`. Test with
    a backlog-shaped state.
 
+*Step 9 built 2026-10-08.* Cards gain `noSlot` (minor moments only: never waits for a moment
+slot, read by `takesNoSlot`) and `staleShare` (audience cards only: past that share of the
+country's people the card is skipped and marked offered, so the old news never returns).
+`first-following` has both (0.02), `league-arrival` has `noSlot`. No `staleTurns`: league arrival
+reads its fact only in the turn it happens, so it was dropped, never late. Measured: the playtest
+save's 20 untold firsts are skipped; a fresh US campaign with no input told 201 firsts at a median
+0.01% share (max 1.88%) and announced all 109 leagues formed in 75 turns. `tests/firsts-on-time.test.ts`.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

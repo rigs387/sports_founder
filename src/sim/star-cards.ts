@@ -141,8 +141,9 @@ function starFact(
 /** Whether a card is offered without taking a slot (the season's champion and a star's breakout). */
 export function takesNoSlot(card: EventTemplate | undefined): boolean {
   // Deal news never waits for a slot: a breach must reach the player (GDD v1.28).
-  // Nor does a Hall of Fame class (GDD v1.31).
+  // Nor does a Hall of Fame class (GDD v1.31), nor a minor first marked noSlot (GDD v1.34).
   return (
+    card?.noSlot === true ||
     card?.story === "champion" ||
     card?.star === "breakout" ||
     card?.deal != null ||

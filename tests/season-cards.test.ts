@@ -208,7 +208,7 @@ describe("offering season cards", () => {
       tight,
       1,
     );
-    // first-following still gets the one moment slot; the opening decision waits.
+    // first-following takes no slot (GDD v1.34) and is still told; the opening decision waits.
     expect(offered(state)).toEqual(["season-champion", "season-first-title", "first-following"]);
   });
 

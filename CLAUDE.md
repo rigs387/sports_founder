@@ -153,6 +153,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   first or inducts the current record holder; the first record crowd needs a Professional league;
   in the offseason the flagship shows last season's scores (`shownTally`). Card PP is not scaled
   with the sport: measured, it ended the #1 contest.
+- Firsts on time (GDD v1.34): a card with `noSlot` (minor moments) never waits for a moment slot;
+  `staleShare` (audience cards) skips a card for good once the country is past that share.
+  `first-following` has both, `league-arrival` has `noSlot`.
 - The offseason screen (GDD v1.24) is `src/renderer/src/offseason/OffseasonScreen.tsx`: the season
   in review, then stars, rules, promotions, the seat and the trophy, priced against PP on hand. It
   opens itself only from the world map; its nav tab shows while the offseason is open. The

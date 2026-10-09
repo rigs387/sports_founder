@@ -143,6 +143,13 @@ const template = z
     defaultChoice: z.string().nullable(),
     /** Moments only (GDD v1.26): minor (toast), big (back page) or headline (front page). */
     weight: z.enum(MOMENT_WEIGHTS).nullable().default(null),
+    /** Minor moments only (GDD v1.34): never waits for a moment slot, so its news is never late. */
+    noSlot: z.boolean().default(false),
+    /**
+     * Audience cards only (GDD v1.34): skipped for good once the country's followers (casual and
+     * hardcore) pass this share of its people; the news it tells has gone stale.
+     */
+    staleShare: z.number().gt(0).lt(1).nullable().default(null),
   })
   .superRefine((card, ctx) => {
     const issue = (message: string) => ctx.addIssue({ code: "custom", message });
@@ -202,6 +209,10 @@ const template = z
       if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
         issue("The award card belongs to the flagship: campaign scope, no anchor or health filter");
     }
+    if (card.noSlot && card.weight !== "minor")
+      issue("Only minor moments may skip the moment slots");
+    if (card.staleShare !== null && card.trigger !== "audience")
+      issue("Only audience cards go stale by share");
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");
     if (star) {

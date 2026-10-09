@@ -195,10 +195,11 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
     )
       continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
-    for (const { country } of ranked) {
+    for (const { country, index } of ranked) {
       // The champion and breakout moments never take a moment slot; a season story counts as a
       // decision.
       if (
+        !takesNoSlot(card) &&
         pending.filter((event) => {
           const other = world.events.cards.find((c) => c.id === event.templateId);
           return other?.kind === card.kind && !takesNoSlot(other);
@@ -216,6 +217,12 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
       const fans = country.fans[PLAYER_INDEX];
       if (!fans || fans.casual + fans.hardcore < card.minFans || fans.hardcore < card.minHardcore)
         continue;
+      // A first told decades late is no news (GDD v1.34): past its share, the moment has passed.
+      const population = world.countries[index]?.population ?? 0;
+      if (card.staleShare !== null && fans.casual + fans.hardcore > card.staleShare * population) {
+        offered[key] = state.turn;
+        continue;
+      }
       if (card.health.length && (!country.league || !card.health.includes(country.league.health)))
         continue;
       const fact = recent.find((landmark) =>
