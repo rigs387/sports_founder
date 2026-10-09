@@ -575,7 +575,8 @@ const dealsSchema = z
     renewalEdge: z.number().min(0),
     /** The homegrown gear brand: a demand-free main-sponsor offer at valueShare of an ordinary one. */
     gearBrand: z.strictObject({ valueShare: z.number().min(0), renewalEdge: z.number().min(0) }),
-    minOfferValue: z.number().min(0),
+    /** No offer worth less than this a season, in dollars (GDD v1.32, v1.34). */
+    minOfferDollars: z.number().min(0),
     /** The growth tree's TV fork shapes TV offers (node ids checked at load). */
     tvFork: z.record(
       z.string().min(1),
@@ -636,8 +637,8 @@ const leagueTierConfigSchema = z.strictObject({
     .strictObject({
       hardcoreShare: unitInterval,
       minHardcore: z.int().min(0),
-      reserveQuarters: z.number().min(0),
-      costQuarters: z.number().min(0),
+      /** Cash investors put in on promotion, in quarters of the new tier's running cost (v1.34). */
+      investmentQuarters: z.number().min(0),
     })
     .nullable(),
 });
@@ -701,6 +702,8 @@ export const configFileSchema = z.strictObject({
   }),
   /** PP prices in quarters of income (GDD v1.34): the income a price is measured in. */
   ppPrices: z.strictObject({ minIncomePerQuarter: z.number().positive() }),
+  /** Money on screen (GDD v1.34): dollars = cash × dollarsPerCash. */
+  money: z.strictObject({ dollarsPerCash: z.number().positive() }),
   ppTiers: z.array(ppTierSchema).min(1),
   attributeCurves: z.strictObject({
     wealth: curveSchema,
@@ -1231,6 +1234,12 @@ export const configFileSchema = z.strictObject({
     dealSlateShare: z.tuple([z.number().min(0), z.number().min(0)]),
     /** Growth nodes owned when each tier from 2 up is reached, [low, high] (GDD v1.34). */
     nodesAtTier: z.array(z.tuple([z.int().min(0), z.int().min(0)])).min(1),
+    /** The Elite seat's income mix at the top PP tier, [low, high] shares (GDD v1.34). */
+    money: z.strictObject({
+      eliteGate: z.tuple([unitInterval, unitInterval]),
+      eliteMedia: z.tuple([unitInterval, unitInterval]),
+      eliteCommercial: z.tuple([unitInterval, unitInterval]),
+    }),
   }),
 });
 

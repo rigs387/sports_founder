@@ -68,10 +68,9 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
           needed: blocker.needed,
           current: blocker.current,
         });
-      case "reserve":
-        return t("league.manage.blockers.reserve", {
-          needed: blocker.needed,
-          current: blocker.current,
+      case "unhealthy":
+        return t("league.manage.blockers.unhealthy", {
+          health: t(`league.healthLevels.${blocker.health}`),
         });
       case "notNearCollapse":
         return t("league.manage.blockers.notNearCollapse", {
@@ -92,7 +91,7 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
     if (kind === "promoteLeague") {
       const terms = league.actions.promoteLeague.terms;
       return terms
-        ? t("league.manage.promotionPrice", { tier: tier(terms.to), cash: terms.cost })
+        ? t("league.manage.promotionPrice", { tier: tier(terms.to), cash: terms.investment })
         : t("league.manage.blockers.topTier", { tier: tier(league.tier) });
     }
     if (kind === "stepDownLeague") {
@@ -126,16 +125,11 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
                 current: country.hardcore,
               })}
             </li>
+            <li>{t("league.manage.healthRequired")}</li>
             <li>
-              {t("league.manage.reserveRequired", {
-                needed: offer.reserveNeeded,
-                current: league.cash,
-              })}
-            </li>
-            <li>
-              {t("league.manage.promotionDeduction", {
-                cost: offer.cost,
-                remaining: league.cash - offer.cost,
+              {t("league.manage.promotionInvestment", {
+                investment: offer.investment,
+                after: league.cash + offer.investment,
               })}
             </li>
             <li>
@@ -256,14 +250,15 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
           className="league-action"
           key={kind}
           data-league-action={kind}
-          data-cash-cost={
-            kind === "promoteLeague" ? league.actions.promoteLeague.terms?.cost : undefined
-          }
           data-pp-cost={
             kind === "bailoutLeague" ? league.actions.bailoutLeague.terms.ppCost : undefined
           }
           data-cash-grant={
-            kind === "bailoutLeague" ? league.actions.bailoutLeague.terms.cash : undefined
+            kind === "bailoutLeague"
+              ? league.actions.bailoutLeague.terms.cash
+              : kind === "promoteLeague"
+                ? league.actions.promoteLeague.terms?.investment
+                : undefined
           }
           data-hardcore-demoted={
             kind === "stepDownLeague"

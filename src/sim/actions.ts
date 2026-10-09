@@ -339,7 +339,8 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
         return {
           country: {
             ...country,
-            league: { ...league, tier: terms.to, cash: league.cash - terms.cost },
+            // Investors fund the step up (GDD v1.34).
+            league: { ...league, tier: terms.to, cash: league.cash + terms.investment },
           },
           landmark: landmarks.leaguePromoted(
             state.turn,

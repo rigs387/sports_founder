@@ -129,6 +129,8 @@ export interface CampaignResult {
     breaches: Record<string, number>;
     /** Deal income's share of the flagship league's income, averaged over the turns played. */
     incomeShare: number;
+    /** The Elite seat's income mix at the top PP tier, averaged over those turns (GDD v1.34). */
+    eliteMix: { gate: number; media: number; commercial: number; annual: number } | null;
     /** At each offseason: the seat league's tier and its slate share before and after the cap. */
     slates: { tier: LeagueTierId; before: number; after: number }[];
     /** Share of turns the flagship league spent at Near-Collapse. */
@@ -478,6 +480,16 @@ export function dealsAggregate(results: CampaignResult[], target: readonly [numb
     demandsSigned: sum((r) => r.deals.demandsSigned),
     breaches: sum((r) => r.deals.breaches),
     incomeShare: distribution(results.map((r) => r.deals.incomeShare)),
+    eliteMix: (() => {
+      const mixes = results.flatMap((r) => (r.deals.eliteMix ? [r.deals.eliteMix] : []));
+      return {
+        campaigns: mixes.length,
+        gate: median(mixes.map((m) => m.gate)),
+        media: median(mixes.map((m) => m.media)),
+        commercial: median(mixes.map((m) => m.commercial)),
+        annual: median(mixes.map((m) => m.annual)),
+      };
+    })(),
     nearCollapseShare: distribution(results.map((r) => r.deals.nearCollapseShare)),
     clauses: results.reduce<Record<string, { met: number; missed: number; walked: number }>>(
       (total, r) => {

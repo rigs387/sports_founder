@@ -18,7 +18,7 @@ export type LeagueActionBlocker =
   | { kind: "topTier"; tier: LeagueTierId }
   | { kind: "hardcore"; to: LeagueTierId; needed: number; current: number }
   | { kind: "venue"; to: LeagueTierId; needed: number; current: number }
-  | { kind: "reserve"; to: LeagueTierId; needed: number; current: number }
+  | { kind: "unhealthy"; health: HealthLevel }
   | { kind: "notNearCollapse"; health: HealthLevel }
   | { kind: "bottomTier" }
   | { kind: "healthy" }
@@ -31,8 +31,8 @@ export interface LeagueActions {
     terms: {
       to: LeagueTierId;
       hardcoreNeeded: number;
-      reserveNeeded: number;
-      cost: number;
+      /** Cash investors put in when the league steps up (GDD v1.34). */
+      investment: number;
       runningCostPerQuarter: number;
       /** Income a quarter at the new tier with today's fans and venue (GDD v1.30). */
       revenuePerQuarter: number;
@@ -88,13 +88,8 @@ export function leagueActions(state: GameState, world: World, index: number): Le
             }
           : venueNeeded > league.venue.level
             ? { kind: "venue", to: promotion.to, needed: venueNeeded, current: league.venue.level }
-            : league.cash < promotion.reserveNeeded
-              ? {
-                  kind: "reserve",
-                  to: promotion.to,
-                  needed: promotion.reserveNeeded,
-                  current: league.cash,
-                }
+            : league.health !== "healthy"
+              ? { kind: "unhealthy", health: league.health }
               : null);
   const stepDownBlocker: LeagueActionBlocker | null =
     ended ??
@@ -161,8 +156,8 @@ export function leagueActionReason(blocker: LeagueActionBlocker | null): string 
       return `not enough hardcore fans for ${blocker.to}: needs ${blocker.needed}, has ${blocker.current}`;
     case "venue":
       return `${blocker.to} at the seat needs venue level ${blocker.needed}, it is ${blocker.current}`;
-    case "reserve":
-      return `not enough cash reserve for ${blocker.to}: needs ${blocker.needed.toFixed(1)}, has ${blocker.current.toFixed(1)}`;
+    case "unhealthy":
+      return `investors back only a healthy league (it is ${blocker.health})`;
     case "notNearCollapse":
       return `a league can only step down at near-collapse (it is ${blocker.health})`;
     case "bottomTier":

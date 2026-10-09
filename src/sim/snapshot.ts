@@ -153,6 +153,8 @@ export interface TurnSnapshot {
   pp: number;
   /** PP earned a turn at today's fans, growth tree included (GDD v1.34: prices read in turns). */
   ppIncomePerTurn: number;
+  /** Dollars per unit of the simulation's cash, for display only (GDD v1.34). */
+  dollarsPerCash: number;
   offseasonOpen: boolean;
   tierTrack: TierTrackSnapshot;
   focus: (string | null)[];
@@ -280,6 +282,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     ppTier: state.ppTier,
     turnLengthQuarters: turnLengthQuarters(state.ppTier, world.config),
     pp: state.pp,
+    dollarsPerCash: world.config.money.dollarsPerCash,
     ppIncomePerTurn:
       quarterPpIncome(
         state.countries,

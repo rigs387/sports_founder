@@ -364,7 +364,11 @@ export function offerDeals(state: GameState, world: World): GameState {
   // premium, is not made; a slot left without offers stays empty.
   for (let i = offers.length - 1; i >= 0; i -= 1) {
     const candidate = offers[i];
-    if (candidate && (ordinary.get(candidate.id) ?? 0) < settings.minOfferValue)
+    if (
+      candidate &&
+      (ordinary.get(candidate.id) ?? 0) <
+        settings.minOfferDollars / world.config.money.dollarsPerCash
+    )
       offers.splice(i, 1);
   }
   // Every slot keeps an offer with no demand or clause (GDD v1.29): if all demand something, the

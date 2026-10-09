@@ -778,6 +778,17 @@ function main(): number {
     console.log(
       `  Deals: signed per campaign median ${fmt(deals.signedPerCampaign.median)} (${counts(deals.signed)}); demands signed ${counts(deals.demandsSigned)}; breaches ${counts(deals.breaches)}; deal income's share of the flagship's income median ${pct(deals.incomeShare.median ?? 0)}; turns at Near-Collapse median ${pct(deals.nearCollapseShare.median ?? 0)}, max ${pct(deals.nearCollapseShare.max ?? 0)}`,
     );
+    const mix = deals.eliteMix;
+    const [gLow, gHigh] = world.config.balanceTargets.money.eliteGate;
+    const [mLow, mHigh] = world.config.balanceTargets.money.eliteMedia;
+    const [cLow, cHigh] = world.config.balanceTargets.money.eliteCommercial;
+    const judge = (value: number | null, low: number, high: number) =>
+      value === null ? "-" : `${pct(value)} ${value >= low && value <= high ? "met" : "MISSED"}`;
+    console.log(
+      mix.campaigns === 0
+        ? "  Elite seat income at the top tier: no campaign got there"
+        : `  Elite seat income at the top tier (${mix.campaigns} campaigns, medians): gate ${judge(mix.gate, gLow, gHigh)} [${pct(gLow)}-${pct(gHigh)}], media ${judge(mix.media, mLow, mHigh)} [${pct(mLow)}-${pct(mHigh)}], sponsors and naming ${judge(mix.commercial, cLow, cHigh)} [${pct(cLow)}-${pct(cHigh)}]; ${fmt((mix.annual ?? 0) * world.config.money.dollarsPerCash)} dollars a year`,
+    );
     const clauseLine = Object.entries(deals.clauses)
       .map(
         ([kind, n]) =>

@@ -33,6 +33,13 @@ ppIncome:
 ppPrices:
   minIncomePerQuarter: 10
 
+# Money on screen (GDD v1.34, docs/money/README.md): the simulation counts cash in its own unit and
+# the UI shows US dollars, cash × dollarsPerCash. Calibrated so a United States Elite flagship with
+# a full deal slate at PP tier 5 earns the NFL's US$23B a year (2024): 2.52M cash in the playtest
+# save of 2026-10-08.
+money:
+  dollarsPerCash: 9100
+
 # PP tier table (GDD Global PP Tier Track). Turn length is in quarters (1 = quarter, 2 = half-year,
 # 4 = year).
 #   fandomScoreRequired    Fandom Score needed to tier up into this tier
@@ -44,7 +51,9 @@ ppPrices:
 #                                                 among modeled sports (player + rivals)
 #   focusSlots             focus slots held at this tier
 #   backingSlots           flagship stars the player can back at this tier (GDD v1.16)
-#   mediaRevenueMultiplier PP tier caps the size of media and sponsor deals (GDD Business Layer)
+#   mediaRevenueMultiplier PP tier caps the size of media and sponsor deals (GDD Business Layer);
+#                          steep since v1.34 so media outgrows gate as the sport goes global (an
+#                          Elite seat at tier 5 earns about half from media, as the NFL does)
 ppTiers:
   - tier: 1
     fandomScoreRequired: 0
@@ -72,21 +81,21 @@ ppTiers:
     turnLengthQuarters: 2
     focusSlots: 3
     backingSlots: 2
-    mediaRevenueMultiplier: 1.5
+    mediaRevenueMultiplier: 2.5
   - tier: 4
     fandomScoreRequired: 170000000
     breadth: { type: leaguesOnContinents, leagueTier: professional, continents: 3 }
     turnLengthQuarters: 2
     focusSlots: 4
     backingSlots: 2
-    mediaRevenueMultiplier: 2
+    mediaRevenueMultiplier: 6
   - tier: 5
     fandomScoreRequired: 1600000000
     breadth: { type: globalRank, rank: 3 }
     turnLengthQuarters: 4
     focusSlots: 5
     backingSlots: 3
-    mediaRevenueMultiplier: 2.5
+    mediaRevenueMultiplier: 17
 
 # Tier-ups, demotion and cooldowns (GDD Global PP Tier Track).
 tierTrack:
@@ -384,37 +393,45 @@ leagues:
   # Per tier: runningCost per quarter (before the wealth and size factors below), minRunningCost (a
   # floor on that result, so a tiny country's professional league still costs something), revenue
   # multiplier, and promotion INTO this tier: hardcore fans needed = max(minHardcore, hardcoreShare
-  # × population), cash reserve needed and cash cost, both in quarters of this tier's running cost.
+  # × population), and the cash investors put in, in quarters of this tier's running cost (GDD
+  # v1.34: promotion no longer spends savings; only a Healthy league can be promoted).
   # minHardcore keeps the fixed starting fan base from qualifying a tiny country for promotion
   # straight away (GDD: early collapse very unlikely). The shares were raised for the real dataset
   # (2026-09-16) to sit near the fans a tier's running cost actually needs: promotion is still a
   # stretch that can sink a league, but no longer one a league qualifies for at a sixth of the
   # revenue it will owe. The minRunningCost floors are what make a micro-market's professional
   # league unaffordable however saturated it is (GDD: a tiny anchor is fragile).
+  #
+  # Money by tier (GDD v1.34, docs/money/README.md): revenue per fan is steep by tier (Amateur
+  # earns 0.02 of Elite's, as real amateur leagues earn next to nothing from their fans), and each
+  # tier's running costs were scaled by the same factor as its revenue (Amateur 0.05, Semi-Pro
+  # 0.25, Professional 0.625, Elite 1 of their pre-v1.34 values), so a tier's margins hold and a
+  # promotion is how a league gets rich. A league could no longer save up for a promotion from
+  # Amateur money (40/60 naive-bot collapses against 10), so investors fund it (B8).
   tiers:
     amateur:
-      runningCost: 0.4
+      runningCost: 0.02
       # Even a micro-market league has fixed overhead: without a floor, a 4,000-person market's
       # league costs almost nothing and can never fail (GDD: a minimum per league tier, and a tiny
       # anchor is fragile). Retuned for the real dataset, 2026-09-16.
-      minRunningCost: 0.5
-      revenueMultiplier: 1
+      minRunningCost: 0.025
+      revenueMultiplier: 0.02
       promotion: null
     semi-pro:
-      runningCost: 6
-      minRunningCost: 3
-      revenueMultiplier: 1.5
-      promotion: { hardcoreShare: 0.0012, minHardcore: 1500, reserveQuarters: 2.5, costQuarters: 2 }
+      runningCost: 1.5
+      minRunningCost: 0.75
+      revenueMultiplier: 0.15
+      promotion: { hardcoreShare: 0.0012, minHardcore: 1500, investmentQuarters: 1 }
     professional:
-      runningCost: 40
-      minRunningCost: 20
-      revenueMultiplier: 2
-      promotion: { hardcoreShare: 0.006, minHardcore: 3000, reserveQuarters: 2.5, costQuarters: 2 }
+      runningCost: 25
+      minRunningCost: 12.5
+      revenueMultiplier: 0.5
+      promotion: { hardcoreShare: 0.006, minHardcore: 3000, investmentQuarters: 1 }
     elite:
       runningCost: 90
       minRunningCost: 60
-      revenueMultiplier: 2.5
-      promotion: { hardcoreShare: 0.02, minHardcore: 15000, reserveQuarters: 2.5, costQuarters: 2 }
+      revenueMultiplier: 1
+      promotion: { hardcoreShare: 0.02, minHardcore: 15000, investmentQuarters: 1 }
   formation:
     # An Amateur league forms once player hardcore fans reach max(minHardcore, share × population).
     minHardcore: 300
@@ -436,9 +453,12 @@ leagues:
   #   gate  = hardcore × gatePerHardcore × (wealthFloor + (1 − wealthFloor) × wealth score)
   #   media = casual × mediaPerCasual × (mediaMarketFloor + (1 − floor) × media market score)
   #           × the PP tier's mediaRevenueMultiplier
+  # GDD v1.34: both ×2.5 for the tier rescale above (Elite's revenue multiplier is now 1). Media
+  # outgrows gate late through the PP tier's mediaRevenueMultiplier (ppTiers), not here: a cut gate
+  # starved young leagues (measured: 31/60 naive-bot collapses against 10).
   revenue:
-    gatePerHardcore: 0.001
-    mediaPerCasual: 0.00005
+    gatePerHardcore: 0.0025
+    mediaPerCasual: 0.000125
     wealthFloor: 0.3
     mediaMarketFloor: 0.3
   # Health is evaluated once per turn and moves at most one step. The target rung comes from:
@@ -484,7 +504,10 @@ leagues:
   # the seat country as naming rights do (hardcoreDemotionShare, traditionWear).
   venue:
     capacityShare: [0.01, 0.03, 0.08, 0.15, 0.3]
-    priceQuarters: [4, 8, 14, 20]
+    # GDD v1.34: level 2 is built by a Semi-Pro league at the Professional cost basis and level 3 by
+    # a Professional one at the Elite basis, so their quarters were scaled by the two tiers' money
+    # factors (0.4 and 0.625) to keep their timing.
+    priceQuarters: [1.6, 5, 14, 20]
     buildSeasons: [1, 2, 2, 3]
     upkeepShare: 0.04
     conversionBoost: 0.04
@@ -852,9 +875,12 @@ flagship:
     offersPerSlot: { min: 2, max: 3 }
     seasons: { min: 1, max: 5 }
     value:
-      tvPerCasual: 0.00002875
-      sponsorPerFan: 0.000005
-      namingPerHardcore: 0.0000025
+      # GDD v1.34: sponsors ×3.5 (sponsors and naming 15-30% of a full slate), naming rights ×0.1
+      # (about 0.1% of revenue a ground, as real naming deals are), all ×2.5 for the tier rescale
+      # (Elite's revenue multiplier is now 1). Deals also grow with mediaRevenueMultiplier.
+      tvPerCasual: 0.000071875
+      sponsorPerFan: 0.00004375
+      namingPerHardcore: 0.000000625
       sponsorSlotShares: [ 0.5, 0.25, 0.07 ]
       spread: 0.15
     # A sport's PP tier caps what partners will pay (GDD: sponsors take a maturing sport seriously),
@@ -863,7 +889,8 @@ flagship:
     # differ. It bites at PP tier 1 and trims the
     # windfall of a rich Semi-Pro flagship at tier 2 (measured 2026-10-06: a Semi-Pro flagship
     # earned 1.3–6× its running cost when the builder promoted it); it never bound at Elite.
-    capByPpTier: [ 0.6, 1.2, 1.4, 1.6, 2 ]
+    # GDD v1.34: × the growth of each tier's mediaRevenueMultiplier, so the cap bites where it did.
+    capByPpTier: [ 0.6, 1.2, 2.33, 4.8, 13.6 ]
     # One demand or clause per offer, drawn in this order; every slot keeps an offer with neither.
     demands:
       tierFloor: { chance: 0.12, premium: 0.3 }
@@ -902,8 +929,8 @@ flagship:
     gearBrand: { valueShare: 0.6, renewalEdge: 0.25 }
     # No worthless offers (GDD v1.32): an offer (renewals and the gear brand included) worth less
     # than this a season, before any demand's premium, is not made. A playtest found small leagues'
-    # naming rights worth hundredths, one still demanding a seat lock.
-    minOfferValue: 1
+    # naming rights worth hundredths, one still demanding a seat lock. In dollars since v1.34.
+    minOfferDollars: 10000
     # Pay-TV owners get bigger TV offers, exclusive twice as often; Free-to-Air owners smaller,
     # never exclusive.
     tvFork:
@@ -977,13 +1004,26 @@ balanceTargets:
   # on the 12 typical anchors, seeds 1–3, 200 turns, Elite read 1.20–1.21; the second and third
   # sponsor shares were cut (0.3 → 0.25, 0.2 → 0.1) for Elite 1.18–1.19, Professional 1.05–1.08,
   # Amateur 1.05, Semi-Pro 1.03–1.04.
-  dealSlateShare: [ 1, 1.2 ]
+  # Raised in GDD v1.34 (money benchmarked on real leagues): sponsors grew so a full Elite slate
+  # is a quarter of the seat's income, as real leagues' commercial lines are. Measured (builder, 5
+  # campaigns, 200 turns): Amateur 1.23, Semi-Pro 1.13, Professional 1.23, Elite 1.53.
+  dealSlateShare: [ 1.1, 1.6 ]
   # Growth nodes owned when tiers 2, 3, 4 and 5 are first reached (GDD v1.34, PP prices in quarters
   # of income). The tree has 30 nodes, 25 ownable past its forks; a campaign should keep buying all
   # game and still end with choices left. Set to the measured builder (2026-10-08: medians 3, 5, 7,
   # 9 over 12 anchors × 3 seeds) and judged in playtest: the bot spends far more on card choices
   # than a player may.
   nodesAtTier: [ [ 2, 5 ], [ 4, 7 ], [ 6, 10 ], [ 8, 13 ] ]
+  # The Elite seat's income at PP tier 5 by source (GDD v1.34, docs/money/README.md): real top
+  # leagues earn about half from media (NFL ~52% national TV, Premier League ~53% broadcast), 15-25%
+  # at the gate and 15-30% commercially. Media is the kept media line plus the TV deal; commercial
+  # is sponsors and naming rights. Signed deals count, so a bot that leaves slots empty reads low.
+  money:
+    # Widened from 30% after measuring: typical anchors have weaker media markets than the US and
+    # lean on the gate (33% median, builder, 5 campaigns), as smaller real leagues do.
+    eliteGate: [ 0.15, 0.35 ]
+    eliteMedia: [ 0.4, 0.65 ]
+    eliteCommercial: [ 0.1, 0.3 ]
   # Growth node dominance is judged strategy by strategy (decided 2026-09-21). One bot answers the
   # tree the same way every time, so the nodes it always buys read as dominant when they are only
   # that bot's signature: builder takes the grassroots spine, media-rush the media branch,

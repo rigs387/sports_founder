@@ -41,7 +41,7 @@ import { baseGenome, countryIndex, setupFor, world as shipped, withConfig } from
 // These tests read the deal mechanics, not the size of a market: offers of any value are made.
 // The minimum offer (GDD v1.32) has its own test with the shipped config.
 const world = withConfig(shipped, (c) => {
-  c.flagship.deals.minOfferValue = 0;
+  c.flagship.deals.minOfferDollars = 0;
 });
 
 // Flagship deals, step 2 (GDD v1.28, tech plan 2.15): offers, signing, lapsing and saves.
@@ -413,7 +413,7 @@ describe("revenue (step 3)", () => {
     );
   });
 
-  it("a full slate of ordinary offers is 100–120% of the media line it replaces, at every tier", () => {
+  it("a full slate of ordinary offers is within the balance target of the media line it replaces, at every tier", () => {
     const [low, high] = world.config.balanceTargets.dealSlateShare;
     for (const anchor of ["brazil", "sweden"]) {
       const state = runTurns(createCampaign(world, setupFor(1, anchor)), world, 40);
@@ -1017,7 +1017,7 @@ describe("the minimum offer (GDD v1.32)", () => {
     const min = Math.min(...values);
     // Set the bar between the smallest and largest plain offers: the smallest are dropped.
     const strict = withConfig(world, (c) => {
-      c.flagship.deals.minOfferValue = min * 1.5;
+      c.flagship.deals.minOfferDollars = min * 1.5 * c.money.dollarsPerCash;
     });
     const state = reoffer(loose, strict, 5);
     const ordinary = state.flagship.deals.offers;
@@ -1034,6 +1034,6 @@ describe("the minimum offer (GDD v1.32)", () => {
       expect(ordinary.some((o) => `${o.slot}:${o.position}` === slot && o.demand === null)).toBe(
         true,
       );
-    expect(shipped.config.flagship.deals.minOfferValue).toBeGreaterThan(0);
+    expect(shipped.config.flagship.deals.minOfferDollars).toBeGreaterThan(0);
   });
 });

@@ -97,6 +97,12 @@ window.SF_PROGRESS = {
     {
       date: "2026-10-08",
       type: "Built",
+      title: "Money in dollars, benchmarked",
+      text: "Tech plan 2.21 steps 2-3 (GDD v1.34): money shows as US dollars, calibrated so a US Elite flagship earns the NFL's $23B; a sourced benchmark table in docs/money. Revenue per fan is steep by league tier (Amateur 2% of Elite's), investors fund promotions, media outgrows gate as the sport goes global, naming rights a tenth of before, no offer under $10,000. Collapses under the naive bot 12/60 (10 before); pacing unchanged.",
+    },
+    {
+      date: "2026-10-08",
+      type: "Built",
       title: "PP prices in quarters of income",
       text: "Tech plan 2.21 step 1 (GDD v1.34): every PP price is quarters of base PP income (floor 10 a quarter), with no tier multiplier; nodes rise 5% for each one owned. The growth screen says how many turns of income a node costs. The playtest save's Local Radio fell from 264,495 PP (30 turns) to 18,505 (2 turns). Pacing passes at every tier; #1 is lost before the win in 78% of campaigns (target about half).",
     },

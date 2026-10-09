@@ -1026,6 +1026,26 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
     revenue. It lives in the docs and in `balanceTargets.money`; the runner reports against it.
     The table is shown to the designer before tuning.
   - *Floor:* no offer below $10,000 a season (config, in dollars); smaller leagues get none.
+  - *Benchmarks and retune (decided 2026-10-08, after the table in `docs/money/README.md`).*
+    Calibrate `dollarsPerCash` so a US-scale Elite flagship earns the NFL's $23B. Retune the mix:
+    a seat with a full slate is about half media (baseline line plus TV), 15–25% gate, 15–30%
+    sponsors and naming; naming rights about a tenth of before. Steepen revenue per fan by tier
+    (Amateur 0.02, Semi-pro 0.15, Professional 0.5, Elite 1 of Elite's), with each tier's running
+    costs scaled alike so a tier's margins hold and promotion is how a league gets rich; what
+    crosses tiers (promotion reserves, venue prices) is rescaled to keep its timing. Measured
+    against league health, collapses and the deal slate.
+  - *Investors fund promotion (decided 2026-10-08, B8).* With Amateur earning little, a league can
+    no longer save up for a step up (measured: 40/60 naive-bot collapses against 10). Promotion
+    spends no savings: investors put in a share of the new tier's running cost, and only a Healthy
+    league can be promoted. A league that does not grow into its tier still slides toward collapse.
+  - *Built 2026-10-08 (calls made at build).* Gate and media rates per fan stay as they were;
+    media outgrows gate through the PP tier's media revenue multiplier (1, 1.25, 2.5, 6, 17),
+    because cutting the gate starved young leagues. Investment one quarter of running cost (12/60
+    naive-bot collapses, every anchor still collapses sometimes). `dollarsPerCash` 9,100. The
+    measured Elite seat mix at typical anchors is gate 33% (target widened to 15–35%: smaller media
+    markets lean on the gate), media 44%, sponsors and naming 23%; the main sponsor is about 15%
+    of revenue, above any real single sponsor, because three slots carry a whole commercial line.
+    See `docs/money/README.md`.
 - *Topic C, rival TV lockouts (decided 2026-10-08).* A rival's broadcast deal countermove removed
   every TV offer at the seat for 16 quarters, twice, unexplained.
   - *It cuts, never blocks:* while it runs at the seat, TV offers are fewer and smaller by a config

@@ -330,7 +330,7 @@ describe("league actions are validated", () => {
   const semiCost = runningCostPerQuarter(world, index, "semi-pro", []);
   const qualified = withCountry(start, world, ANCHOR, {
     hardcore: Math.ceil((promotion?.hardcoreShare ?? 0) * population) + 10,
-    league: { cash: (promotion?.reserveQuarters ?? 0) * semiCost + 1 },
+    league: { cash: 1 },
   });
   const inWindow = (s: GameState): GameState => ({
     ...s,
@@ -342,13 +342,13 @@ describe("league actions are validated", () => {
   });
   const promote = { type: "promoteLeague" as const, countryId: ANCHOR };
 
-  it("promotion is legal for a qualifying league in the window, and pays its cost", () => {
+  it("promotion is legal for a qualifying league in the window, and investors fund it", () => {
     const state = inWindow(qualified);
     expect(checkAction(state, world, promote)).toBeNull();
     const promoted = applyAction(state, world, promote);
     expect(leagueOf(promoted, world, ANCHOR)?.tier).toBe("semi-pro");
     expect(leagueOf(promoted, world, ANCHOR)?.cash).toBeCloseTo(
-      (leagueOf(state, world, ANCHOR)?.cash ?? 0) - (promotion?.costQuarters ?? 0) * semiCost,
+      (leagueOf(state, world, ANCHOR)?.cash ?? 0) + (promotion?.investmentQuarters ?? 0) * semiCost,
       6,
     );
     expect(promoted.landmarks.at(-1)).toMatchObject({
@@ -362,11 +362,16 @@ describe("league actions are validated", () => {
     expect(checkAction(outOfWindow(qualified), world, promote)).toMatch(/offseason/);
   });
 
-  it("promotion below the hardcore or cash thresholds is rejected", () => {
+  it("promotion below the hardcore threshold, or of an unhealthy league, is rejected", () => {
     const fewFans = withCountry(inWindow(qualified), world, ANCHOR, { hardcore: 10 });
     expect(checkAction(fewFans, world, promote)).toMatch(/not enough hardcore fans/);
-    const noCash = withCountry(inWindow(qualified), world, ANCHOR, { league: { cash: 1 } });
-    expect(checkAction(noCash, world, promote)).toMatch(/not enough cash reserve/);
+    // Investors back only a Healthy league (GDD v1.34); savings no longer matter.
+    const struggling = withCountry(inWindow(qualified), world, ANCHOR, {
+      league: { health: "struggling" },
+    });
+    expect(checkAction(struggling, world, promote)).toMatch(/only a healthy league/);
+    const broke = withCountry(inWindow(qualified), world, ANCHOR, { league: { cash: 0 } });
+    expect(checkAction(broke, world, promote)).toBeNull();
   });
 
   it("step-down is rejected above Near-Collapse and for an amateur league", () => {

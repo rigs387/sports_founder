@@ -363,7 +363,6 @@ function manageLeagues(step: BotStep, world: World): void {
     const revenue = leagueIncomePerQuarter(step.state, world, index, current, terms.to);
     const cost = leagueCosts(step.state, world, index, current, terms.to).total;
     if (revenue < cost * BUILDER_MARGIN) continue;
-    if (league.cash < terms.reserveNeeded + terms.cost) continue;
     attempt(step, world, { type: "promoteLeague", countryId: country.id });
   }
 }
@@ -530,8 +529,7 @@ function anchorTurtleTurn(state: GameState, world: World): BotStep {
     current?.league &&
     current.league.health === "healthy" &&
     terms &&
-    hardcore >= terms.hardcoreNeeded * TURTLE_MARGIN &&
-    current.league.cash >= (terms.reserveNeeded + terms.cost) * TURTLE_MARGIN
+    hardcore >= terms.hardcoreNeeded * TURTLE_MARGIN
   ) {
     attempt(step, world, { type: "promoteLeague", countryId: anchor });
   }

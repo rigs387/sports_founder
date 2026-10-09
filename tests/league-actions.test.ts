@@ -51,24 +51,23 @@ describe("league action quotes and eligibility", () => {
           }
   });
 
-  it("promotion quotes the exact cash deduction, reserve and subsequent running costs", () => {
+  it("promotion quotes the exact investment and subsequent running costs (GDD v1.34)", () => {
     const terms = promotionTerms(world, index, "amateur", []);
     if (!terms) throw new Error("Missing promotion terms");
-    const state = make({ cash: terms.reserveNeeded }, 0, terms.hardcoreNeeded);
+    const state = make({ cash: 5 }, 0, terms.hardcoreNeeded);
     const offer = view(state)?.actions.promoteLeague;
     expect(offer?.blocker).toBeNull();
     const after = applyAction(state, world, action("promoteLeague"));
-    expect(view(after)?.cash).toBeCloseTo(terms.reserveNeeded - (offer?.terms?.cost ?? 0), 8);
+    expect(view(after)?.cash).toBeCloseTo(5 + (offer?.terms?.investment ?? 0), 8);
     expect(view(after)?.runningCostPerQuarter).toBe(offer?.terms?.runningCostPerQuarter);
     expect(after.pp).toBe(state.pp);
     expect(after.turn).toBe(state.turn);
     expect(
-      view(make({ cash: terms.reserveNeeded - 0.01 }, 0, terms.hardcoreNeeded))?.actions
-        .promoteLeague.blocker?.kind,
-    ).toBe("reserve");
-    expect(
-      view(make({ cash: terms.reserveNeeded }, 0, terms.hardcoreNeeded - 1))?.actions.promoteLeague
+      view(make({ cash: 5, health: "struggling" }, 0, terms.hardcoreNeeded))?.actions.promoteLeague
         .blocker?.kind,
+    ).toBe("unhealthy");
+    expect(
+      view(make({ cash: 5 }, 0, terms.hardcoreNeeded - 1))?.actions.promoteLeague.blocker?.kind,
     ).toBe("hardcore");
   });
 

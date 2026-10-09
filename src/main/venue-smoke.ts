@@ -60,7 +60,11 @@ export async function verifyVenue(win: BrowserWindow, screenshot: (name: string)
   const review = await evaluate<string>(
     `document.querySelector('${CARD} [data-testid="venue-review"]').textContent`,
   );
-  if (!/pays .* cash now/.test(review) || !/opens before/.test(review))
+  // Money in dollars (GDD v1.34): "The league pays $53.4M of its $80.8M now."
+  if (
+    !/pays \$[\d.,]+[KMB]? of its \$[\d.,]+[KMB]? now/.test(review) ||
+    !/opens before/.test(review)
+  )
     throw new Error(`The venue review must state the price and when it opens: ${review}`);
   await screenshot("52-venue-review.png");
   await click(`${CARD} [data-testid="venue-confirm"]`);

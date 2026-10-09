@@ -259,8 +259,7 @@ describe("content validation", () => {
       setValue({
         hardcoreShare: 0.001,
         minHardcore: 0,
-        reserveQuarters: 1,
-        costQuarters: 1,
+        investmentQuarters: 1,
       }),
     );
     expect(loadError(dir).message).toContain(

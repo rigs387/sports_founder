@@ -152,8 +152,7 @@ function Promotions({
                   <small>{t("offseason.promotions.step", { from, to })}</small>
                   <small>
                     {t("offseason.promotions.cost", {
-                      cost: terms.cost,
-                      cash: entry.league.cash,
+                      investment: terms.investment,
                       running: terms.runningCostPerQuarter,
                     })}
                   </small>

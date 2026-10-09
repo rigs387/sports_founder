@@ -18,7 +18,9 @@ import {
   leagueCosts,
   leagueIncomePerQuarter,
   PLAYER_INDEX,
+  payingDeals,
   QUARTERS_PER_YEAR,
+  revenuePerQuarter,
   seatedCrowd,
   shrineWeights,
   snapshot,
@@ -74,6 +76,10 @@ export function onCampaignPlayed(next: CampaignListener | null): void {
 }
 
 /** Plays one campaign: the bot acts, then the turn ends, until the turn limit or the end. */
+
+const mean = (values: number[]): number =>
+  values.reduce((sum, value) => sum + value, 0) / Math.max(1, values.length);
+
 export function playCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   const started = performance.now();
   const played = playOneCampaign(world, plan);
@@ -126,6 +132,8 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   const slates: CampaignResult["deals"]["slates"] = [];
   let slateSeason: number | null = null;
   const dealIncomeShares: number[] = [];
+  // The Elite seat's income mix at the top PP tier (GDD v1.34, balanceTargets.money).
+  const eliteMix: { gate: number; media: number; commercial: number; annual: number }[] = [];
   let nearCollapseTurns = 0;
   /** Clause judgements by kind (GDD v1.29): seasons met, seasons missed, partners who walked. */
   const clauses: CampaignResult["deals"]["clauses"] = {};
@@ -167,6 +175,31 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       if (seatLeague.health === "near-collapse") nearCollapseTurns += 1;
       const income = leagueIncomePerQuarter(current, world, seat);
       if (income > 0) dealIncomeShares.push(dealIncomePerQuarter(current.flagship) / income);
+      const fans = current.countries[seat]?.fans[PLAYER_INDEX];
+      if (
+        fans &&
+        income > 0 &&
+        seatLeague.tier === "elite" &&
+        current.ppTier === world.config.ppTiers.length
+      ) {
+        const seated = seatedCrowd(world, seat, seatLeague.venue.level, fans.hardcore);
+        const gate = revenuePerQuarter(
+          world,
+          seat,
+          "elite",
+          { ...fans, hardcore: seated },
+          current.ppTier,
+        ).gate;
+        const commercial = payingDeals(current.flagship)
+          .filter((deal) => deal.slot !== "tv")
+          .reduce((sum, deal) => sum + deal.annualValue / 4, 0);
+        eliteMix.push({
+          gate: gate / income,
+          media: (income - gate - commercial) / income,
+          commercial: commercial / income,
+          annual: income * 4,
+        });
+      }
       const hardcore = current.countries[seat]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
       if (hardcore > 0) {
         const seated = seatedCrowd(world, seat, seatLeague.venue.level, hardcore);
@@ -502,6 +535,14 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         incomeShare:
           dealIncomeShares.reduce((sum, share) => sum + share, 0) /
           Math.max(1, dealIncomeShares.length),
+        eliteMix: eliteMix.length
+          ? {
+              gate: mean(eliteMix.map((m) => m.gate)),
+              media: mean(eliteMix.map((m) => m.media)),
+              commercial: mean(eliteMix.map((m) => m.commercial)),
+              annual: mean(eliteMix.map((m) => m.annual)),
+            }
+          : null,
         slates,
         nearCollapseShare: nearCollapseTurns / Math.max(1, seatTurns),
         clauses,

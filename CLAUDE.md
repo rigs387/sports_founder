@@ -147,7 +147,7 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   snapshot its `frontPage`. Moment mastheads show the outlet; five cards have `title_v1`/`title_v2`
   variants picked by a stable hash; the offseason's season in review is `FrontPage`
   (`src/renderer/src/press/`).
-- Playtest follow-ups (GDD v1.32): no deal offer below `flagship.deals.minOfferValue`; minor
+- Playtest follow-ups (GDD v1.32): no deal offer below `flagship.deals.minOfferDollars` (in dollars since v1.34); minor
   moments auto-collect (`collectMinorMoments`, the renderer's `AutoCollect` and a bottom-bar
   toggle, on by default and remembered in local storage; the smoke turns it off after setup for the
   hand-collection steps and the pop-up step turns it back on); a champion card is a front page at
@@ -212,6 +212,11 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   before its offers: met pays a bonus and grows the renewal edge; enough misses in a row and the
   partner walks (`dealWalked`), no penalty. The UI is `src/renderer/src/deals/`; signing happens
   only on the offseason screen (the Flagship tab is read-only).
+- Money (GDD v1.34, `docs/money/README.md`): the sim counts cash in its own unit; the UI shows US
+  dollars through the i18next `money` formatter at `TurnSnapshot.dollarsPerCash` (config
+  `money.dollarsPerCash`). Never print a raw cash number. Revenue per fan is steep by league tier,
+  running costs scale with it, and promotion is funded by investors (`investmentQuarters`; only a
+  Healthy league is promoted). Media grows with the PP tier's `mediaRevenueMultiplier`.
 - Venues and payroll (GDD v1.30) are the flagship's only: `LeagueState.venue` (level 1–5, a build,
   the record crowd) on every league, built only at the seat. `src/sim/venues.ts` (capacity, the
   conversion lift), `src/sim/venue-actions.ts` (`buildVenue` in the offseason; `openVenues` when

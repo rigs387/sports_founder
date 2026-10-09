@@ -173,8 +173,8 @@ export function demoteHardcore(fans: SportFans, share: number): SportFans {
 export interface PromotionTerms {
   to: LeagueTierId;
   hardcoreNeeded: number;
-  reserveNeeded: number;
-  cost: number;
+  /** Cash investors put in on promotion (GDD v1.34). */
+  investment: number;
 }
 
 /** What promoting a country's league one tier would require, or null at the top tier. */
@@ -196,8 +196,7 @@ export function promotionTerms(
       promotion.minHardcore,
       Math.ceil(promotion.hardcoreShare * country.population),
     ),
-    reserveNeeded: promotion.reserveQuarters * cost,
-    cost: promotion.costQuarters * cost,
+    investment: promotion.investmentQuarters * cost,
   };
 }
 

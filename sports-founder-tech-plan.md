@@ -1143,6 +1143,20 @@ one price everywhere.
    config share (0.5) instead of blocking; signed deals untouched. A big moment card when any
    rival countermove lands at the seat; the deals panel's TV slot shows rival, cut and end date.
    Tests.
+
+*Steps 2 and 3 built 2026-10-08.* `docs/money/README.md` holds the sourced benchmark table and the
+calibration. Config: `money.dollarsPerCash` 9,100; league tiers' revenue multipliers 0.02 / 0.15 /
+0.5 / 1 with running costs scaled alike (Amateur 0.05, Semi-Pro 0.25, Professional 0.625 of
+before); gate and media rates ×2.5; `mediaRevenueMultiplier` 1 / 1.25 / 2.5 / 6 / 17; deal rates
+(TV ×2.5, sponsors ×8.75, naming ×0.25); `capByPpTier` × the media growth; venue level 2 and 3
+price quarters ×0.4 and ×0.625; promotion `investmentQuarters` 1 replaces the reserve and cost
+(only a Healthy league is promoted; blocker `unhealthy`); `flagship.deals.minOfferDollars`
+10,000; `balanceTargets.dealSlateShare` 1.1–1.6 and `balanceTargets.money` (the Elite seat's mix
+at the top tier, printed by the runner). Renderer: `TurnSnapshot.dollarsPerCash`, the i18next
+`money` formatter (`formatMoney`, compact above $1,000) set from the store, every money string on
+it. Measured: collapse (greedy-spread, 4 anchors × 15 seeds, 60 turns) 12/60 against 10/60 before,
+1 by turn 20; pacing and the win unchanged (5 campaigns). `tests/money.test.ts`. The suite ran
+slow on a loaded machine (long-campaign tests over 30 s; they pass with a longer limit).
 5. **Attendance and max capacity (topic D).** Config ground sizes by venue level and a crowd
    fill share; the venue snapshot gives per-match crowd, season attendance, max capacity and fans
    turned away; record crowd as the biggest single-match crowd (the trigger stays the seated
