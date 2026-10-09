@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.33 | October 8, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press)*
+*Version 1.34 | October 8, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default)*
 
 ---
 
@@ -750,8 +750,9 @@ the game does not stop that, it makes them play differently.
 - **Exclusive forks:** 1–2 per category; choosing one locks out the other (e.g., Pay-TV exclusivity:
   +cash, −casual reach vs. Free-to-air: +casual reach, −cash).
 - **No refunds.** Purchased nodes are permanent — choices must hurt.
-- **Cost:** base cost × current PP tier multiplier × the sport's size factor. Buying before a
-  tier-up is cheaper, rewarding preparation for growing pains.
+- **Cost (revised v1.34):** PP income per quarter × the node's quarters of income, rising a
+  config share for every node owned (see Second playtest follow-ups). The tier multiplier and the
+  v1.9 size factor below no longer apply to PP prices.
 - **Prices grow with the sport (decided 2026-09-19).** A node's price also scales with the sport's
   own Fandom Score, so the tree is never bought out: a campaign ends owning about half of it, and
   which half is the decision. Before this, PP income grew with the sport while prices did not, so
@@ -981,6 +982,96 @@ names in stories.
 - *Built 2026-10-08 (calls made at build).* Award points swelled the Hall from 16–19 players a
   campaign to 20–24, so the bar rose from 20 to 24 (17–20). Pacing and the #1 contest (53%) are
   unchanged. A player's medal takes the family name, the last word of the recorded name.
+
+**Second playtest follow-ups (decided 2026-10-08, v1.34).** A 101-turn playtest save (United
+States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then the player's notes.
+- *Topic A, PP prices in quarters of income.* The playtest never bought a Media node: node prices
+  grew with the sport faster than income (size ^0.6 against income ^0.5) and were multiplied by up
+  to ×6 by tier, so the cheapest Media node cost about 30 turns of income at tier 5 (35 at tier 4)
+  and 152k PP sat unspent, while a focus slot cost 36 PP. This supersedes the v1.9 size factor and
+  the tier multiplier on PP prices.
+  - *Price = PP income per quarter × quarters of income.* Every PP price is the sport's current
+    base PP income per quarter times a number of quarters set in content, so a price takes the
+    same time to earn at any size and the UI can say it in turns. This covers growth nodes, focus
+    slots, star backing, rule amendments, bailouts and card choice costs.
+  - *Node pacing:* Grassroots 3–6 quarters, Media 6–12, Culture 10–16; deeper nodes in a branch sit
+    at the top of their range. At tier 5 (a year a turn) a Media or Culture node is about 1.5–4
+    turns.
+  - *The tree stays a choice (choose pain):* every node owned raises the next node's price by a
+    config share, 5% to start (`growthTree.costScaling`).
+  - *No tier multiplier on PP prices.* Longer turns and the per-node rise do that job; the tier
+    still sets turn length, focus and backing slots and media revenue.
+  - *Measured:* a pacing target for nodes owned when each tier is reached (`balanceTargets`), read
+    by the runner and the pacing experiment. Saves need no migration: prices are computed live.
+- *Topic B, money in dollars (decided 2026-10-08).* The playtest saw a $3 TV deal and a
+  1,700 sponsorship beside an Elite league of 50M fans: cash had no unit and showed the sim's raw
+  numbers, and deals were the wrong size against revenue (the main sponsor about 3% of revenue,
+  each naming-rights deal about 1%, against under 1% and about 0.1% in real top leagues).
+  - *US dollars everywhere,* shown compactly ($4.2K, $310M, $12.4B).
+  - *One conversion, the sim unchanged:* config `dollarsPerCash` turns the sim's cash into dollars
+    for display, calibrated so a US-scale Elite flagship earns in the NFL's range. Deal and revenue
+    rates are then retuned so the revenue mix and deal sizes match the benchmarks. Converting the
+    sim itself to dollars is parked.
+  - *Benchmarks:* a sourced table of real leagues by tier (Amateur local leagues, Semi-pro
+    USL/National League class, Professional MLS class, Elite NFL/Premier League class): annual
+    revenue, the mix (media, sponsors, gate) and top sponsor and naming-rights deals as shares of
+    revenue. It lives in the docs and in `balanceTargets.money`; the runner reports against it.
+    The table is shown to the designer before tuning.
+  - *Floor:* no offer below $10,000 a season (config, in dollars); smaller leagues get none.
+- *Topic C, rival TV lockouts (decided 2026-10-08).* A rival's broadcast deal countermove removed
+  every TV offer at the seat for 16 quarters, twice, unexplained.
+  - *It cuts, never blocks:* while it runs at the seat, TV offers are fewer and smaller by a config
+    share (50% to start); a TV deal already signed is untouched. Its media reach block stays.
+  - *The player is told:* a rival countermove landing at the seat is a big moment ("Soccer's
+    broadcaster locks up the US airwaves until 2031"), and the deals panel's TV slot names the
+    rival, the cut and the end date.
+- *Topic D, attendance and max capacity (decided 2026-10-08).* The offseason said a level 1 venue
+  "seats 3.4M hardcore fans": the venue's capacity is a league-wide share of the population, shown
+  as seats.
+  - *The sim is unchanged:* capacity still caps the seat's gate and fades the conversion lift when
+    fans overflow. Raising it means modernizing, which tears down old grounds and betrays the famous
+    ones; that is the intended cost and the screen says so plainly.
+  - *Named as what it is:* the screen calls it **Attendance** and **Max capacity**. Each club's
+    ground has a size by venue level (config: 3,000 / 12,000 / 30,000 / 55,000 / 80,000), a match's
+    crowd is its ground filled to a share, and season attendance is clubs × home games × crowd. The
+    cap is a line in fans: "1.2M hardcore fans can't get tickets."
+  - *Record crowd:* the biggest single-match crowd (the final, or the champion's best gate); it is
+    still set when the seated crowd beats the record.
+- *Topic E, realistic scorelines (decided 2026-10-08).* "High" scoring gave about 4 a side, barely
+  above medium (about 2): the chosen scoring rule did not show in the score.
+  - *The match engine is refitted* so each scoring rule plays realistic totals while the stronger
+    club wins, draws and upsets stay at today's fitted odds: per side about 1.5 (low, soccer and
+    hockey), 20 (medium, rugby and American football) and 90 (high, basketball), in config.
+  - *Everything counted in scores is normalized* by the rule's average: top scorer tallies, the
+    scoring record, Player of the Season and Hall of Fame points, the star threshold and the close
+    final margin, so a high-scoring sport does not flood the Hall or the awards.
+  - *Term values parked:* scores worth different points by the sport's term (a try 5, a kick 3).
+- *Topic F, press goes digital (decided 2026-10-08).* Outlets were a place plus a British
+  football word ("New York City Kickabout") and every big story was a newspaper page; the champion
+  front page then came back as the offseason's season in review.
+  - *The look matches the moment's weight:* minor = a phone push notification or social post, big =
+    a news-site article, headline = a breaking-news banner or a site's lead story. Print survives
+    only as rare flavor (an old clipping in the Almanac). This supersedes v1.33's mastheads and
+    front pages.
+  - *Outlet names:* place + a modern, neutral word (Sports Desk, Live, Daily, Insider, Report,
+    Network, Pulse, Now): "Houston Sports Desk". Pools by language sphere are parked.
+  - *One headline, one recap:* the champion moment keeps the headline look; the offseason's season
+    in review becomes a stats recap (final standings, the playoff path, awards, records, traditions
+    born, a Hall class), not a second front page.
+- *No Britishisms by default (decided 2026-10-08).* Default English is neutral international, not
+  British: no "matchday", "fixture list", "terrace", "kickabout" as defaults in strings, names or
+  content. Local flavor belongs to the country it fits (British words for British markets).
+- *Topic G, a leagues overview with bulk promotion (decided 2026-10-08).* Promotion was one click
+  per country across 200+ leagues. A leagues overview lists every league with tier, health, cash
+  and eligibility, sortable; at its top "Promote all eligible" by target tier ("Promote 14 leagues
+  to Semi-Pro") confirms with the list and each league's cash. Each league still pays its own
+  cash; the flagship is excluded (its promotion needs a venue and is the seat's decision).
+- *Topic H, firsts on time (decided 2026-10-08).* "A following of your own" cards arrived about 45
+  turns late, for countries already at 15–38%: they waited behind higher-priority cards for the six
+  moment slots. "First following" and "league arrival" no longer take moment slots (like deal
+  news), stay minor and collect themselves, and are skipped when stale: the country is already past
+  a config share (2% to start) or the fact is more than a config number of turns old.
+- *Saves:* nobody plays but the designer, so these changes need no save migrations (2026-10-08).
 
 **Press coverage:** Presentation only; no press sentiment system. Fictional outlets per country
 (in the names data file); headlines built from record-backed Moments, with English-only flavor
@@ -1824,6 +1915,13 @@ Items flagged during the interview that need further discussion in future sessio
   measured.
 - Hall of Fame wings for league directors and founding-family members (parked 2026-10-07,
   v1.31): they wait until those people exist in the simulation.
+- Outlet words and player names by language sphere and country (parked 2026-10-08, v1.34): e.g.
+  "Deportes Hoy"; the United States draws British given and family names today.
+- Scores worth points by the sport's term (parked 2026-10-08, v1.34): a try 5, a kick 3, a
+  basket 2 or 3, on top of the refitted engine's totals. Flavor only.
+- The sim in dollars (parked 2026-10-08, v1.34): convert every money number in the sim and config
+  to dollars instead of a display conversion (`dollarsPerCash`). No gameplay gain; come back when
+  the money model is next reworked.
 - Late rewards in what is scarce late (parked 2026-10-08, v1.32): late in a campaign PP piles up
   (~100K banked) and card PP rewards are noise, but scaling them up ends the #1 contest. Late cards
   could pay in fans, cash or culture instead. Needs a design session.

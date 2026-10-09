@@ -1,8 +1,8 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-07",
-  design: "GDD v1.33",
+  updated: "2026-10-08",
+  design: "GDD v1.34",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-08",
+      type: "Design",
+      title: "Second playtest follow-ups",
+      text: "GDD v1.34, tech plan 2.21 (planned, nothing built). A 101-turn playtest save (United States, tier 5, #1 on turn 100) reviewed headlessly, then the designer's notes. PP prices become quarters of income (no tier multiplier, +5% per node owned): the playtest never afforded a Media node. Money shows in dollars through one conversion benchmarked on real leagues, no offer under $10,000; a rival TV lockout cuts offers instead of blocking. Venues show Attendance against Max capacity; scorelines are realistic by scoring rule. Press goes digital by moment weight; no Britishisms by default. A leagues overview with bulk promotion; first-following cards no longer arrive decades late.",
+    },
     {
       date: "2026-10-08",
       type: "Built",

@@ -1101,6 +1101,53 @@ console errors or missing strings; title variants mix ("…are champions of" 33,
 in" 17, "Champions of" 8); the award took the first Hall player's name ("the Koch Medal"); the
 front page led with a first title when the season told one. Docs: `docs/almanac/README.md`.
 
+### 2.21 Build Plan: Second Playtest Follow-ups (GDD v1.34)
+
+Topics are settled one at a time; steps are added as each is decided. Nothing here is built yet.
+
+1. **PP prices in quarters of income (topic A).** `ppPrice(state, world, quarters)` = base PP
+   income per quarter × quarters; nodes get `quarters` in `growth-tree.yaml` (Grassroots 3–6,
+   Media 6–12, Culture 10–16) and `growthTree.costScaling.perNodeOwned` (0.05); focus, backing,
+   amendments, bailouts and card choice costs move to quarters in config. Remove the tier
+   multiplier and `nodeSizeFactor` from PP prices (`costMultiplier` stays only where it scales
+   non-PP things, if anywhere). UI shows a price in turns of income. `balanceTargets` gains nodes
+   owned at each tier-up; the runner prints it. Measure with the pacing experiment and the #1
+   contest (v1.32 found that cheap late PP buys out the tree and ends the contest; watch it).
+   Tests: price ∝ income, the per-node rise, no tier multiplier, a playtest-shaped late state can
+   afford a Media node within its quarters.
+2. **Money benchmarks (topic B).** Research a sourced table of real leagues by tier (revenue,
+   mix, top sponsor and naming-rights shares); show it to the designer; record it in
+   `docs/money/README.md` and `balanceTargets.money`.
+3. **Dollars on screen (topic B).** Config `dollarsPerCash`, calibrated on the US Elite benchmark;
+   one renderer formatter for every money string ($4.2K / $310M / $12.4B, i18next number
+   formatting); `minOfferValue` in dollars ($10,000). Retune deal and revenue rates to the
+   benchmark mix; the runner prints money against `balanceTargets.money`. No save migration.
+4. **TV lockouts cut (topic C).** `broadcastDeal` at the seat cuts TV offers' count and value by
+   config share (0.5) instead of blocking; signed deals untouched. A big moment card when any
+   rival countermove lands at the seat; the deals panel's TV slot shows rival, cut and end date.
+   Tests.
+5. **Attendance and max capacity (topic D).** Config ground sizes by venue level and a crowd
+   fill share; the venue snapshot gives per-match crowd, season attendance, max capacity and fans
+   turned away; record crowd as the biggest single-match crowd (the trigger stays the seated
+   crowd). Venue card and offseason screen use "Attendance" and "Max capacity" and say which
+   grounds modernizing tears down. Smoke screenshot.
+6. **Realistic scorelines (topic E).** Refit `flagship.match` per scoring rule to config target
+   averages (1.5 / 20 / 90 a side) keeping the fitted favourite, draw and upset odds
+   (`tests/flagship-match.test.ts`); normalize score-counted numbers (top scorer, record, awards,
+   Hall points, star threshold, close final margin) by the rule's average. Measure Hall classes
+   and star counts against today's.
+7. **Digital press (topic F).** Moment looks by weight (push/social, article, breaking banner);
+   `names.yaml press.words` replaced by the modern neutral list; the offseason's season in review
+   becomes a stats recap; a sweep of default strings and content for Britishisms. Smoke
+   screenshots of each look and the recap.
+8. **Leagues overview and bulk promotion (topic G).** A leagues view (tier, health, cash,
+   eligibility, sortable); a `promoteLeagues` action (or a batch of `promoteLeague` through
+   `applyAction`) by target tier, the flagship excluded, a confirm listing each league's cash.
+   Tests; smoke screenshot.
+9. **Firsts on time (topic H).** `first-following` and `league-arrival` take no moment slot,
+   collect themselves, and are skipped past config `staleShare` (0.02) or `staleTurns`. Test with
+   a backlog-shaped state.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

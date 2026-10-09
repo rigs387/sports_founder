@@ -95,9 +95,9 @@ Costs: payroll, operations, venues. Cash builds local hardcore via venues/youth,
 cross-country transfers; PP-funded bailouts. Phase 0: gate + one media/sponsor line.
 
 **Growth Tree:** Branching tree per category (~8–12 nodes), global nodes conditioned on country
-attributes, exclusive forks, no refunds, cost = base × current tier multiplier × a size factor that
-grows with the sport's own Fandom Score, so a campaign owns about half the tree and which half is
-the decision. Phase 0: 20
+attributes, exclusive forks, no refunds, cost = PP income per quarter × the node's quarters of income
+(Grassroots 3–6, Media 6–12, Culture 10–16), +5% (config) per node owned; no tier multiplier on
+any PP price (v1.34: focus, backing, amendments, bailouts and card choices use the same rule). Phase 0: 20
 Grassroots and Media nodes, 4 forks (where to play, roots, TV deal, coverage); a category is
 buyable only while the current tier unlocks it (demotion keeps nodes, blocks new buys); conditions
 never turn a bonus into a penalty.
@@ -218,6 +218,16 @@ foregone; the first star; the first Hall class or one with the current record ho
 record crowd counts once its league is Professional; the offseason shows last season's scores.
 Card PP scaling was tried and reverted (it ended the #1 contest); late rewards in what is scarce
 late are parked.
+
+**Money (v1.34):** US dollars on screen through one config conversion (`dollarsPerCash`), tuned
+to a sourced benchmark of real leagues by tier; no offer under $10,000. A rival's TV lockout cuts
+TV offers (fewer, 50% smaller), never blocks, and is told as a big moment.
+Venues show Attendance against Max capacity (grounds 3K–80K by level; modernizing tears old ones
+down). Scorelines are realistic by scoring rule (about 1.5 / 20 / 90 a side), score-counted
+numbers normalized by the rule's average.
+Press is digital and weighted (push, article, breaking banner); outlets "Houston Sports Desk";
+the season in review is a stats recap. No Britishisms by default. A leagues overview promotes all
+eligible leagues by tier. Firsts take no moment slot and are skipped when stale.
 
 **Awards (v1.33):** the flagship's Player of the Season (composite of scores, club finish, playoff
 and final scores) and the top scorer's prize; Hall of Fame points; named after the first Hall of
