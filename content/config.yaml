@@ -938,6 +938,9 @@ flagship:
       free-to-air: { value: 0.85, exclusivityChance: 0 }
     exclusivityLiftCut: 0.5
     sponsorLockout: { value: 0.6, offersCut: 1 }
+    # A rival's broadcast deal at the seat (GDD v1.34): TV offers are worth × value and one fewer;
+    # it never blocks the slot, and a TV deal already signed is untouched.
+    broadcastLockout: { value: 0.5, offersCut: 1 }
     namingRights: { hardcoreDemotionShare: 0.02, traditionWear: 0.2, pilgrimageCut: 0.5 }
 
 # Win condition (GDD Win condition, Post-win play): the player's sport wins by ending holdTurns

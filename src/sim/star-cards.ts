@@ -148,7 +148,8 @@ export function takesNoSlot(card: EventTemplate | undefined): boolean {
     card?.star === "breakout" ||
     card?.deal != null ||
     card?.trigger === "hall" ||
-    card?.trigger === "award"
+    card?.trigger === "award" ||
+    card?.trigger === "countermove"
   );
 }
 
@@ -198,6 +199,7 @@ export function offerStarCards(
         deal: null,
         venue: null,
         hall: null,
+        countermove: null,
       },
       resolution: null,
     });

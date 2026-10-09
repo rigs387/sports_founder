@@ -586,6 +586,8 @@ const dealsSchema = z
     exclusivityLiftCut: unitInterval,
     /** A rival's sponsor lockout in the seat country: sponsor offers × value, offersCut fewer. */
     sponsorLockout: z.strictObject({ value: unitInterval, offersCut: z.int().min(0) }),
+    /** A rival's broadcast deal at the seat cuts TV offers, never blocks them (GDD v1.34). */
+    broadcastLockout: z.strictObject({ value: unitInterval, offersCut: z.int().min(0) }),
     /**
      * Naming rights on a famous ground betray it (GDD v1.28): hardcoreDemotionShare × the
      * tradition's weight × ethos of seat-country hardcore fans turn casual, the tradition wears by

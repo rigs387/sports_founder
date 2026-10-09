@@ -80,6 +80,7 @@ describe("stoking a repeat final", () => {
         deal: null,
         venue: null,
         hall: null,
+        countermove: null,
       },
       resolution: null,
     };

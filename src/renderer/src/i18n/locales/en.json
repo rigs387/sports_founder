@@ -320,6 +320,18 @@
         "body_one": "One name joins the Hall of Fame this year. It stays there for good.",
         "body_other": "{{count}} names join the Hall of Fame this year. They stay there for good."
       },
+      "rival-countermove": {
+        "title": "{{rival}} hits back in {{country}}",
+        "title_broadcastDeal": "{{rival}}'s broadcaster locks up the {{country}} airwaves",
+        "title_sponsorLockout": "{{rival}} locks up the sponsors in {{country}}",
+        "title_mediaBlitz": "{{rival}} floods the airwaves in {{country}}",
+        "title_youthPrograms": "{{rival}} goes after the next generation in {{country}}",
+        "body": "{{rival}} has moved against your league in {{country}} until {{year}}.",
+        "body_broadcastDeal": "{{rival}} has tied up {{country}}'s broadcasters until {{year}}. TV offers to your league will be fewer and {{cut, number(style: percent)}} smaller until then, and your sport's media reach into {{country}} is shut out. A TV deal you already hold is untouched.",
+        "body_sponsorLockout": "{{rival}} has signed up {{country}}'s sponsors until {{year}}. Your league's media and sponsor income there is cut, and sponsor and naming offers will be fewer and smaller.",
+        "body_mediaBlitz": "{{rival}} is pouring money into coverage in {{country}} until {{year}}. It will win casual fans far faster than usual while the campaign runs.",
+        "body_youthPrograms": "{{rival}} has launched youth programs in {{country}} that run until {{year}}. It will turn far more of its fans hardcore, and climb above its usual level while they last."
+      },
       "deal-broken": {
         "title": "{{partner}} walks away",
         "body_tierFloor": "The league fell below the tier {{partner}} signed for, and the {{slot}} deal is over. The rest of its money is lost, the league paid {{penalty, money}}, and {{partner}} will not deal with the sport for {{seasons}} {{seasonsNoun}}.",
@@ -920,6 +932,7 @@
     "signed": "{{partner}} · {{value, money}} a {{seasonNoun}}, through {{seasonNoun}} {{last}}",
     "notPaying": "Pays from {{seasonNoun}} {{first}}.",
     "open": "Open: offers come in the offseason.",
+    "tvLockout": "{{rival}} has tied up the broadcasters here until {{year}}: TV offers are fewer and {{cut, number(style: percent)}} smaller.",
     "noOffers": "No offers for this slot this offseason.",
     "elsewhere": "Deals are signed on the offseason screen.",
     "offerValue": "{{value, money}} a {{seasonNoun}}",

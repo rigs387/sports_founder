@@ -98,6 +98,15 @@ export const eventRecordSchema = z.strictObject({
     deal: dealFactsSchema.nullable(),
     venue: venueFactsSchema.nullable(),
     hall: hallFactsSchema.nullable(),
+    /** A rival's countermove at the seat (GDD v1.34); absent in older records. */
+    countermove: z
+      .strictObject({
+        move: z.string(),
+        endQuarter: z.int().nonnegative(),
+        endYear: z.int(),
+      })
+      .nullable()
+      .default(null),
   }),
   resolution: z
     .strictObject({

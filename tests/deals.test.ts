@@ -258,10 +258,29 @@ describe("what shapes offers", () => {
     return { ...state, countries };
   };
 
-  it("a rival broadcast deal leaves no TV offers; a sponsor lockout shrinks sponsor offers", () => {
+  it("a rival broadcast deal cuts TV offers, never blocks them; a sponsor lockout shrinks sponsor offers", () => {
     const state = atOffers();
-    const blocked = reoffer(withCountermove(state, "broadcastDeal"), world, 5);
-    expect(blocked.flagship.deals.offers.some((offer) => offer.slot === "tv")).toBe(false);
+    // GDD v1.34: fewer and smaller TV offers, but always at least one.
+    const broadcast = withCountermove(state, "broadcastDeal");
+    const tv = { slot: "tv" as const, position: 0 };
+    expect(ordinaryDealValue(broadcast, world, tv)).toBeCloseTo(
+      ordinaryDealValue(state, world, tv) * world.config.flagship.deals.broadcastLockout.value,
+    );
+    const cut = world.config.flagship.deals.broadcastLockout.offersCut;
+    for (let seed = 1; seed <= 10; seed += 1) {
+      const count = reoffer(broadcast, world, seed).flagship.deals.offers.filter(
+        (offer) => offer.slot === "tv",
+      ).length;
+      expect(count).toBeGreaterThanOrEqual(1);
+      expect(count).toBeLessThanOrEqual(
+        Math.max(1, world.config.flagship.deals.offersPerSlot.max - cut),
+      );
+    }
+    expect(dealsSnapshot(broadcast, world).tvLockout).toMatchObject({
+      rivalId: "soccer",
+      cut: 0.5,
+    });
+    expect(dealsSnapshot(state, world).tvLockout).toBeNull();
 
     const locked = withCountermove(state, "sponsorLockout");
     const ref = { slot: "sponsor" as const, position: 0 };

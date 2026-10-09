@@ -216,7 +216,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   dollars through the i18next `money` formatter at `TurnSnapshot.dollarsPerCash` (config
   `money.dollarsPerCash`). Never print a raw cash number. Revenue per fan is steep by league tier,
   running costs scale with it, and promotion is funded by investors (`investmentQuarters`; only a
-  Healthy league is promoted). Media grows with the PP tier's `mediaRevenueMultiplier`.
+  Healthy league is promoted). Media grows with the PP tier's `mediaRevenueMultiplier`. A rival's
+  broadcast deal at the seat cuts TV offers (`broadcastLockout`), never blocks them; every timed
+  countermove at the seat is the big `rival-countermove` card (`src/sim/countermove-cards.ts`).
 - Venues and payroll (GDD v1.30) are the flagship's only: `LeagueState.venue` (level 1–5, a build,
   the record crowd) on every league, built only at the seat. `src/sim/venues.ts` (capacity, the
   conversion lift), `src/sim/venue-actions.ts` (`buildVenue` in the offseason; `openVenues` when

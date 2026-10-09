@@ -116,6 +116,7 @@ const template = z
       "venue",
       "hall",
       "award",
+      "countermove",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),
@@ -214,6 +215,13 @@ const template = z
       issue("Only minor moments may skip the moment slots");
     if (card.staleShare !== null && card.trigger !== "audience")
       issue("Only audience cards go stale by share");
+    // A rival's countermove at the seat (GDD v1.34): one big moment told from the landmark.
+    if (card.trigger === "countermove") {
+      if (card.kind !== "moment" || card.cooldownTurns !== null)
+        issue("Countermove cards are moments that follow recorded facts: no cooldown");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("Countermove cards belong to the seat: campaign scope, no anchor or health filter");
+    }
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");
     if (star) {

@@ -1,4 +1,5 @@
 import type { EventEffect, EventTemplate, MomentWeight } from "../content";
+import { offerCountermoveCards } from "./countermove-cards";
 import { venueStrength } from "./culture";
 import { offerDealCards } from "./deal-cards";
 import type { EventRecord, EventState } from "./events-state";
@@ -85,6 +86,7 @@ function offerSeasonCards(
           deal: null,
           venue: null,
           hall: null,
+          countermove: null,
         },
         resolution: null,
       });
@@ -174,11 +176,12 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
     caps.moment - used("moment", starEvents.pending),
   );
   // Deal news (GDD v1.28) and venue news (GDD v1.30) take no slot.
-  const dealEvents = offerVenueCards(
+  // A rival's countermove at the seat (GDD v1.34) takes no slot either.
+  const dealEvents = offerCountermoveCards(
     state,
     world,
     recent,
-    offerDealCards(state, world, recent, traditionEvents),
+    offerVenueCards(state, world, recent, offerDealCards(state, world, recent, traditionEvents)),
   );
   const pending = [...dealEvents.pending];
   const offered = { ...state.events.offered };
@@ -191,7 +194,8 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
       card.trigger === "deal" ||
       card.trigger === "venue" ||
       card.trigger === "hall" ||
-      card.trigger === "award"
+      card.trigger === "award" ||
+      card.trigger === "countermove"
     )
       continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
@@ -263,6 +267,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
           deal: null,
           venue: null,
           hall: null,
+          countermove: null,
         },
         resolution: null,
       });

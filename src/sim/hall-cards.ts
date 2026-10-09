@@ -43,6 +43,7 @@ export function offerHallCards(
         deal: null,
         venue: null,
         hall: { season: landmark.season, inducteeIds },
+        countermove: null,
       },
       resolution: null,
     });
@@ -96,6 +97,7 @@ export function offerAwardCards(
           deal: null,
           venue: null,
           hall: null,
+          countermove: null,
         },
         resolution: null,
       },

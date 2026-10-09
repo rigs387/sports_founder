@@ -261,6 +261,15 @@ export function DealsPanel({ snapshot, names, busy, onAction, readOnly = false }
               data-open={signed === undefined}
             >
               <h3>{slotName(slot.slot, slot.position)}</h3>
+              {slot.slot === "tv" && deals.tvLockout && (
+                <p className="deal-due" data-testid="deal-tv-lockout">
+                  {t("deals.tvLockout", {
+                    rival: names.sports[deals.tvLockout.rivalId] ?? deals.tvLockout.rivalId,
+                    year: deals.tvLockout.endYear,
+                    cut: deals.tvLockout.cut,
+                  })}
+                </p>
+              )}
               {signed ? (
                 signedRow(signed)
               ) : readOnly ? (

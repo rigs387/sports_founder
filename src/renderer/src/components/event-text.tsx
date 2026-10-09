@@ -83,10 +83,20 @@ export function useEventText() {
     const first = snapshot.hallOfFame.inductees.find((i) => hall.inducteeIds.includes(i.id));
     return { year: first?.year ?? 0, count: hall.inducteeIds.length };
   };
+  // A rival's countermove at the seat (GDD v1.34) names the move, its end and the TV cut.
+  const countermoveText = (event: EventRecord) => {
+    const move = event.facts.countermove;
+    if (!move) return hallText(event);
+    return {
+      year: move.endYear,
+      cut: snapshot.flagship.deals.tvLockout?.cut ?? 0.5,
+      context: move.move,
+    };
+  };
   // Venue cards (GDD v1.30) name the level, and for a record crowd its size and ground.
   const venueText = (event: EventRecord) => {
     const venue = event.facts.venue;
-    if (!venue) return hallText(event);
+    if (!venue) return countermoveText(event);
     const ground = snapshot.flagship.clubs.find((c) => c.id === venue.clubId)?.ground ?? "";
     return {
       level: venue.level,

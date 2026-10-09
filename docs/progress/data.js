@@ -12,10 +12,10 @@ window.SF_PROGRESS = {
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
-    date: "2026-10-08",
-    tests: 563,
-    files: 54,
-    note: "npm run check passed after PP prices in quarters of income (type checks, Biome, purity, 563 tests in 54 files). Lint has existing visual-study warnings.",
+    date: "2026-10-09",
+    tests: 569,
+    files: 56,
+    note: "npm run check passed after rival TV lockouts (type checks, Biome, purity, 569 tests in 56 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-08",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
@@ -94,6 +94,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-09",
+      type: "Built",
+      title: "Rival TV lockouts explained",
+      text: "Tech plan 2.21 step 4 (GDD v1.34): a rival's broadcast deal at the seat makes TV offers fewer and half the size instead of removing them, and the TV slot says who and until when. Every rival countermove landing at the seat is now a big news story. The deck is 38 cards.",
+    },
     {
       date: "2026-10-08",
       type: "Built",

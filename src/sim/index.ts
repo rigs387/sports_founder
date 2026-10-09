@@ -1,5 +1,6 @@
 export * from "./actions";
 export * from "./calendar";
+export * from "./countermove-cards";
 export * from "./countermoves";
 export * from "./culture";
 export * from "./deal-clauses";

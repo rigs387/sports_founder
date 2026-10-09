@@ -141,6 +141,7 @@ describe("famous venues", () => {
         deal: null,
         venue: null,
         hall: null,
+        countermove: null,
       },
     };
     const pp = (s: GameState) => {

@@ -817,3 +817,22 @@ cards:
         quarters: 0.6
         effects: [{ type: conversion, target: casual, factor: 1.08, quarters: 4 }]
       - { id: hold, quarters: 0, effects: [] }
+  # A rival's countermove at the seat (GDD v1.34): a playtest lost its TV offers to a rival's
+  # broadcast deal twice and was never told. Told from the landmark; it takes no moment slot.
+  - id: rival-countermove
+    kind: moment
+    weight: big
+    tone: pressure
+    priority: 200
+    trigger: countermove
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null

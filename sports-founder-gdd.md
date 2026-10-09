@@ -1053,6 +1053,8 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
   - *The player is told:* a rival countermove landing at the seat is a big moment ("Soccer's
     broadcaster locks up the US airwaves until 2031"), and the deals panel's TV slot names the
     rival, the cut and the end date.
+  - *Built 2026-10-09.* Every timed countermove at the seat except reclaim (it has its own card)
+    is the big moment, told by move; it takes no moment slot.
 - *Topic D, attendance and max capacity (decided 2026-10-08).* The offseason said a level 1 venue
   "seats 3.4M hardcore fans": the venue's capacity is a league-wide share of the population, shown
   as seats.

@@ -63,6 +63,7 @@ export function offerDealCards(
         },
         venue: null,
         hall: null,
+        countermove: null,
       },
       resolution: null,
     });

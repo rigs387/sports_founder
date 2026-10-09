@@ -1,5 +1,5 @@
 import { type AxisId, type DealSlot, GEAR_BRAND_ID, GENOME_AXES, LEAGUE_TIERS } from "../content";
-import { offseasonOpen, tierEntry } from "./calendar";
+import { offseasonOpen, tierEntry, yearOfQuarter } from "./calendar";
 import { hasCountermove, mediaRevenueFactor } from "./countermoves";
 import { growthFactorsAt } from "./growth";
 import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
@@ -132,7 +132,14 @@ export function ordinaryDealValue(state: GameState, world: World, ref: DealSlotR
   const lockout = hasCountermove(country, "sponsorLockout") ? deals.sponsorLockout.value : 1;
   let quarter: number;
   if (ref.slot === "tv") {
-    quarter = fans.casual * deals.value.tvPerCasual * market * tvForkFactors(state, world).value;
+    // A rival's broadcast deal makes TV offers smaller, never impossible (GDD v1.34).
+    const broadcast = hasCountermove(country, "broadcastDeal") ? deals.broadcastLockout.value : 1;
+    quarter =
+      fans.casual *
+      deals.value.tvPerCasual *
+      market *
+      tvForkFactors(state, world).value *
+      broadcast;
   } else if (ref.slot === "sponsor") {
     const share = deals.value.sponsorSlotShares[ref.position] ?? 0;
     quarter = (fans.casual + fans.hardcore) * deals.value.sponsorPerFan * wealth * share * lockout;
@@ -250,7 +257,7 @@ export function offerDeals(state: GameState, world: World): GameState {
   const cap = dealCap(state, world);
   const tierFloorAllowed =
     LEAGUE_TIERS.indexOf(league.tier) >= LEAGUE_TIERS.indexOf(settings.tierFloorMinTier);
-  const broadcastBlocked = hasCountermove(country, "broadcastDeal");
+  const broadcastCut = hasCountermove(country, "broadcastDeal");
   const lockout = hasCountermove(country, "sponsorLockout");
   const { broadcasters, sponsors } = world.names.dealPartners;
   let nextId = base.nextId;
@@ -284,12 +291,12 @@ export function offerDeals(state: GameState, world: World): GameState {
 
   for (const ref of dealSlots(state, world, league)) {
     if (signed.some((deal) => sameSlot(deal, ref))) continue;
-    if (ref.slot === "tv" && broadcastBlocked) continue;
     const sponsorKind = ref.slot !== "tv";
     const count = Math.max(
       1,
       between(rng, settings.offersPerSlot.min, settings.offersPerSlot.max) -
-        (sponsorKind && lockout ? settings.sponsorLockout.offersCut : 0),
+        (sponsorKind && lockout ? settings.sponsorLockout.offersCut : 0) -
+        (!sponsorKind && broadcastCut ? settings.broadcastLockout.offersCut : 0),
     );
     // The PP tier's cap bounds the ordinary value; each offer's own spread, share and premium apply
     // after it, so capped offers still differ and a demand still pays more.
@@ -602,6 +609,8 @@ export interface DealsSnapshot {
   breach: { penaltySeasons: number; shunSeasons: number };
   /** How clauses are judged (GDD v1.29): the bonus share, the edge per season met, the walk. */
   clauses: { bonusShare: number; renewalEdgePerMet: number; walkAfterMisses: number };
+  /** A rival's broadcast deal at the seat (GDD v1.34): who, how much smaller TV offers are, until when. */
+  tvLockout: { rivalId: string; cut: number; endYear: number } | null;
 }
 
 export function dealsSnapshot(state: GameState, world: World): DealsSnapshot {
@@ -629,6 +638,18 @@ export function dealsSnapshot(state: GameState, world: World): DealsSnapshot {
     incomePerQuarter: dealIncomePerQuarter(flagship),
     breach: world.config.flagship.deals.breach,
     clauses: world.config.flagship.deals.clauses,
+    tvLockout: tvLockout(state, world),
+  };
+}
+
+function tvLockout(state: GameState, world: World): DealsSnapshot["tvLockout"] {
+  const country = state.countries[indexOf(world, state.flagship.countryId)];
+  const move = country?.countermoves.find((m) => m.kind === "broadcastDeal");
+  if (!move) return null;
+  return {
+    rivalId: move.sportId,
+    cut: 1 - world.config.flagship.deals.broadcastLockout.value,
+    endYear: yearOfQuarter(move.endQuarter, world.config),
   };
 }
 

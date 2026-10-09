@@ -1144,6 +1144,15 @@ one price everywhere.
    rival countermove lands at the seat; the deals panel's TV slot shows rival, cut and end date.
    Tests.
 
+*Step 4 built 2026-10-09.* `flagship.deals.broadcastLockout` (value 0.5, one offer fewer) applies
+while a rival's `broadcastDeal` runs at the seat; the TV slot is never skipped and signed deals are
+untouched. `DealsSnapshot.tvLockout` (rival, cut, end year) puts a line on the TV slot. A new
+`countermove` trigger and card (`rival-countermove`, big, no slot, `src/sim/countermove-cards.ts`)
+tells every timed countermove except reclaim landing at the seat, with `facts.countermove` (move,
+end quarter, end year; optional, so older saves load) and title and body by move. The deck is 38
+cards. `tests/countermove-cards.test.ts`; the deals test now expects cut, not blocked, TV offers.
+Not yet seen in the running app: the smoke run never meets a lockout at the seat.
+
 *Steps 2 and 3 built 2026-10-08.* `docs/money/README.md` holds the sourced benchmark table and the
 calibration. Config: `money.dollarsPerCash` 9,100; league tiers' revenue multipliers 0.02 / 0.15 /
 0.5 / 1 with running costs scaled alike (Amateur 0.05, Semi-Pro 0.25, Professional 0.625 of
