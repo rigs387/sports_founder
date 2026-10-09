@@ -9,6 +9,7 @@ import {
   endTurn,
   focusCost,
   IllegalActionError,
+  priceIncome,
   runTurns,
 } from "../src/sim";
 import { countryIndex, firstAnchor, setupFor, world } from "./helpers";
@@ -68,13 +69,14 @@ describe("focus slot actions go through one validated function", () => {
     const neighbourId = world.countries[countryIndex(world, firstAnchor)]?.neighbors[0] ?? "";
     const neighbour = focusCost(later, world, neighbourId);
     const island = focusCost(later, world, coldId);
-    const { focus, ppTiers } = world.config;
-    const multiplier = ppTiers.find((t) => t.tier === later.ppTier)?.costMultiplier ?? 1;
+    const { focus } = world.config;
+    // Prices are quarters of income (GDD v1.34).
+    const income = priceIncome(later, world);
     // The coldest country has no exposure at all, so its push is a cold launch.
-    expect(island).toBeGreaterThan(focus.coldLaunchCost * multiplier * 0.99);
-    expect(island).toBeLessThanOrEqual(focus.coldLaunchCost * multiplier);
+    expect(island).toBeGreaterThan(focus.coldLaunchQuarters * income * 0.99);
+    expect(island).toBeLessThanOrEqual(focus.coldLaunchQuarters * income);
     expect(neighbour).toBeLessThan(island * 0.8);
-    expect(neighbour).toBeGreaterThanOrEqual(focus.exposedCost * multiplier);
+    expect(neighbour).toBeGreaterThanOrEqual(focus.exposedQuarters * income);
   });
 
   it("extra slots arrive with tier-ups and can be filled", () => {

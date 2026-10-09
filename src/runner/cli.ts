@@ -292,6 +292,14 @@ function printGrowth(growth: ReturnType<typeof growthAggregate>, campaigns: numb
     `  Growth tree: nodes bought per campaign min ${fmt(d.min)}, median ${fmt(d.median)}, max ${fmt(d.max)}; PP spent on nodes median ${fmt(growth.ppSpentOnNodes.median)}; final PP banked median ${fmt(growth.finalPpBanked.median)}`,
   );
   console.log(
+    `  Nodes owned at each tier-up (median, target): ${growth.nodesAtTier
+      .map(
+        (t) =>
+          `tier ${t.tier} ${t.median === null ? "-" : fmt(t.median)} [${t.target[0]}-${t.target[1]}]${t.median === null ? "" : t.within ? "" : " MISS"} (${t.campaigns})`,
+      )
+      .join("; ")}`,
+  );
+  console.log(
     `  Forks: ${growth.forks
       .map(
         (fork) =>
@@ -690,7 +698,11 @@ function main(): number {
   const { results, turnRows, countryRows } = collected;
   const tierCount = world.config.ppTiers.length;
   const agg = aggregate(results, tierCount);
-  const growth = growthAggregate(results, world.growthTree);
+  const growth = growthAggregate(
+    results,
+    world.growthTree,
+    world.config.balanceTargets.nodesAtTier,
+  );
   const events = eventAggregate(results);
   const flagship = flagshipAggregate(results);
   const summary = {

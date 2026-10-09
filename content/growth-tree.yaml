@@ -13,8 +13,7 @@
 #              reduced quantity or lower the bonus.
 #
 # Nodes
-#   cost       base PP cost; the price is cost × the PP cost multiplier of the highest tier reached,
-#              so buying before a tier-up is cheaper
+#   quarters   PP price in quarters of income (see costScaling)
 #   requires   node ids in the same category that must be owned first
 #   effects    from the closed vocabulary below, validated at load:
 #                spreadChannel (with channel: proximity / language / media)
@@ -45,19 +44,14 @@ categories:
 limits:
   minFactor: 0.25
 
-# A node's price is base cost × the peak tier's cost multiplier × (Fandom Score ÷
-# referenceFandomScore) ^ exponent, never scaled below 1 (decided 2026-09-19). PP income grows with
-# the Fandom Score, so fixed prices made the whole tree affordable by tier 3 and every campaign
-# owned all of it; prices that grow with the sport keep each branch a choice. The exponent is set
-# against the income curve (ppIncome.exponent 0.5): at 0.5 a node costs the same number of quarters
-# of income whatever the sport's size, and 0.6 makes each one dearer than the last. Base costs were
-# halved and effect amounts raised ×1.6 at the same time: a campaign now owns about half the tree
-# (median 9 of the 16 reachable nodes), each node matters more, and which half depends on the
-# strategy - builder takes the grassroots spine, media-rush the media branch, and they choose
-# different fork sides.
+# A node's price is its quarters of PP income (config ppPrices: base income per quarter, never
+# below the floor) × (1 + perNodeOwned) ^ nodes owned (GDD v1.34). Quarters by category:
+# Grassroots 3-6, Media 6-12, Culture 10-16, deeper nodes at the top of their range. This replaces
+# the v1.9 size factor and the tier multiplier: prices grew with the sport (^0.6) faster than income
+# (^0.5) and ×6 by tier 5, so a playtest never afforded a Media node. The per-node rise keeps the
+# tree a choice (choose pain).
 costScaling:
-  referenceFandomScore: 100000
-  exponent: 0.6
+  perNodeOwned: 0.05
 
 forks:
   - id: where-to-play
@@ -75,21 +69,21 @@ nodes:
   # ---- Grassroots (tier 1): proximity spread, casual conversion, league formation, churn ----------
   - id: backyard-clinics
     category: grassroots
-    cost: 30
+    quarters: 3
     requires: []
     effects:
       - { type: casualConversion, amount: 0.16 }
 
   - id: word-of-mouth
     category: grassroots
-    cost: 50
+    quarters: 3.5
     requires: [ backyard-clinics ]
     effects:
       - { type: spreadChannel, channel: proximity, amount: 0.48 }
 
   - id: weekend-leagues
     category: grassroots
-    cost: 50
+    quarters: 3.5
     requires: [ backyard-clinics ]
     effects:
       - { type: formationThresholdReduction, amount: 0.48 }
@@ -97,7 +91,7 @@ nodes:
   # Fork "where to play": wide and cheap in dense, lower-income countries, or deep in wealthy ones.
   - id: street-courts
     category: grassroots
-    cost: 80
+    quarters: 4
     requires: [ backyard-clinics ]
     effects:
       - type: casualConversion
@@ -107,7 +101,7 @@ nodes:
 
   - id: club-grounds
     category: grassroots
-    cost: 80
+    quarters: 4
     requires: [ backyard-clinics ]
     effects:
       - type: hardcoreConversion
@@ -121,14 +115,14 @@ nodes:
 
   - id: fan-meetups
     category: grassroots
-    cost: 80
+    quarters: 4
     requires: [ word-of-mouth ]
     effects:
       - { type: churnReduction, amount: 0.24 }
 
   - id: volunteer-organisers
     category: grassroots
-    cost: 100
+    quarters: 4.5
     requires: [ weekend-leagues ]
     effects:
       - type: runningCostReduction
@@ -137,7 +131,7 @@ nodes:
 
   - id: border-tournaments
     category: grassroots
-    cost: 120
+    quarters: 5
     requires: [ word-of-mouth ]
     effects:
       - { type: spreadChannel, channel: proximity, amount: 0.64 }
@@ -146,7 +140,7 @@ nodes:
   # Fork "roots": dig in at home, or tour to open new markets.
   - id: community-ownership
     category: grassroots
-    cost: 180
+    quarters: 6
     requires: [ fan-meetups, volunteer-organisers ]
     effects:
       - { type: churnReduction, amount: 0.24 }
@@ -155,7 +149,7 @@ nodes:
 
   - id: barnstorming-tours
     category: grassroots
-    cost: 180
+    quarters: 6
     requires: [ fan-meetups, volunteer-organisers ]
     effects:
       - { type: coldLaunchCostReduction, amount: 0.64 }
@@ -165,14 +159,14 @@ nodes:
   # ---- Media (tier 2): media reach and language channels, casual reach ---------------------------
   - id: local-radio
     category: media
-    cost: 120
+    quarters: 6
     requires: []
     effects:
       - { type: spreadChannel, channel: language, amount: 0.48 }
 
   - id: newspaper-columns
     category: media
-    cost: 160
+    quarters: 7
     requires: [ local-radio ]
     effects:
       - type: casualConversion
@@ -181,14 +175,14 @@ nodes:
 
   - id: highlight-reels
     category: media
-    cost: 160
+    quarters: 7
     requires: [ local-radio ]
     effects:
       - { type: spreadChannel, channel: media, amount: 0.8 }
 
   - id: dubbed-broadcasts
     category: media
-    cost: 240
+    quarters: 8
     requires: [ local-radio ]
     effects:
       - { type: spreadChannel, channel: language, amount: 0.64 }
@@ -197,7 +191,7 @@ nodes:
   # Fork "TV deal": league cash, or casual reach.
   - id: pay-tv-exclusivity
     category: media
-    cost: 300
+    quarters: 9
     requires: [ highlight-reels ]
     effects:
       - type: runningCostReduction
@@ -207,7 +201,7 @@ nodes:
 
   - id: free-to-air
     category: media
-    cost: 300
+    quarters: 9
     requires: [ highlight-reels ]
     effects:
       - type: casualConversion
@@ -218,7 +212,7 @@ nodes:
 
   - id: star-profiles
     category: media
-    cost: 300
+    quarters: 9
     requires: [ newspaper-columns ]
     effects:
       - { type: hardcoreConversion, amount: 0.16 }
@@ -227,7 +221,7 @@ nodes:
   # Fork "coverage": protection and PP, or casual volume that comes and goes.
   - id: sponsor-showcase
     category: media
-    cost: 400
+    quarters: 10.5
     requires: [ star-profiles ]
     effects:
       - { type: countermoveResistance, amount: 0.64 }
@@ -236,7 +230,7 @@ nodes:
 
   - id: tabloid-buzz
     category: media
-    cost: 400
+    quarters: 10.5
     requires: [ star-profiles ]
     effects:
       - type: casualConversion
@@ -246,7 +240,7 @@ nodes:
 
   - id: satellite-feed
     category: media
-    cost: 500
+    quarters: 12
     requires: [ highlight-reels, dubbed-broadcasts ]
     effects:
       - { type: spreadChannel, channel: media, amount: 0.96 }
@@ -261,14 +255,14 @@ nodes:
   #   traditionHold        more weight per unit of strength: stickier fans, and harder betrayals
   - id: oral-history
     category: culture
-    cost: 400
+    quarters: 10
     requires: []
     effects:
       - { type: traditionStrength, amount: 0.3 }
 
   - id: derby-days
     category: culture
-    cost: 400
+    quarters: 10
     requires: []
     effects:
       - { type: traditionStrength, traditionType: derby, amount: 0.6 }
@@ -276,14 +270,14 @@ nodes:
 
   - id: supporters-trusts
     category: culture
-    cost: 450
+    quarters: 11
     requires: []
     effects:
       - { type: traditionProtection, amount: 0.4 }
 
   - id: club-museum
     category: culture
-    cost: 450
+    quarters: 11
     requires: [ oral-history ]
     effects:
       - { type: traditionStrength, traditionType: rite, amount: 0.5 }
@@ -291,7 +285,7 @@ nodes:
 
   - id: hall-of-legends
     category: culture
-    cost: 450
+    quarters: 11
     requires: [ oral-history ]
     effects:
       - { type: traditionStrength, traditionType: legacy, amount: 0.6 }
@@ -299,21 +293,21 @@ nodes:
 
   - id: travelling-support
     category: culture
-    cost: 500
+    quarters: 12
     requires: [ derby-days ]
     effects:
       - { type: traditionReach, channel: proximity, amount: 0.5 }
 
   - id: twinned-towns
     category: culture
-    cost: 500
+    quarters: 12
     requires: [ oral-history ]
     effects:
       - { type: traditionReach, channel: language, amount: 0.5 }
 
   - id: heritage-listing
     category: culture
-    cost: 450
+    quarters: 11
     requires: [ supporters-trusts ]
     effects:
       - { type: traditionProtection, traditionType: venue, amount: 0.4 }
@@ -323,7 +317,7 @@ nodes:
   # more; Living game spreads and grows them but leaves them easier to break.
   - id: heritage-trust
     category: culture
-    cost: 700
+    quarters: 16
     requires: [ supporters-trusts ]
     effects:
       - { type: traditionProtection, amount: 0.3 }
@@ -331,7 +325,7 @@ nodes:
 
   - id: living-game
     category: culture
-    cost: 700
+    quarters: 16
     requires: [ supporters-trusts ]
     effects:
       - { type: traditionReach, amount: 0.5 }

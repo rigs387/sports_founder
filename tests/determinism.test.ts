@@ -64,9 +64,10 @@ describe("determinism", () => {
     expect(b).toStrictEqual(a);
     expect(serializeSave(b)).toBe(serializeSave(a));
     // Several purchases spread over separate turns: enough to exercise buying repeatedly without
-    // the guard tracking what the tree happens to cost.
+    // the guard tracking what the tree happens to cost. Since prices became quarters of income
+    // (GDD v1.34), greedy-spread spends more of its PP moving focus, so three purchases is enough.
     const purchases = a.landmarks.filter((l) => l.kind === "nodeBought");
-    expect(purchases.length).toBeGreaterThan(3);
+    expect(purchases.length).toBeGreaterThanOrEqual(3);
     expect(new Set(purchases.map((l) => l.turn)).size).toBeGreaterThan(2);
   });
 

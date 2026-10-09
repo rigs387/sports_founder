@@ -99,8 +99,10 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - The growth tree lives in `src/sim/growth.ts`. Owned nodes (`GameState.growthNodes`, purchase
   order) become per-country factors on rates, costs and countermove effects; every effect type is a
   closed vocabulary validated at load. Buying is the `buyNode` action: category unlocked at the
-  current PP tier, prerequisites owned, no fork sibling owned, price = base cost × the peak tier's
-  cost multiplier. No refunds. Purchases are landmarks; the snapshot lists every node's status.
+  current PP tier, prerequisites owned, no fork sibling owned, price = the node's quarters of income
+  × 1.05 (config) per node owned. No refunds. Every PP price is `ppPrice` (`src/sim/prices.ts`,
+  GDD v1.34): base PP income per quarter, never below `ppPrices.minIncomePerQuarter`, × quarters;
+  the PP tier multiplies no price. Purchases are landmarks; the snapshot lists every node's status.
 - Generational turnover runs each quarter in `src/sim/quarter.ts`: every sport's hardcore fans above
   a floor age out at an annual rate and demote to casual about the same sport. The player and the
   rivals age out; the "other sports" bucket does not. Rivals recruit replacements for their aging

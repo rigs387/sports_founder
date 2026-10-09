@@ -24,6 +24,15 @@ ppIncome:
   scale: 0.05
   exponent: 0.5
 
+# PP prices in quarters of income (GDD v1.34). Every PP price (growth nodes, focus, star backing,
+# rule amendments, bailouts, card choices) is quarters × the sport's base PP income per quarter (no
+# growth tree bonus), never below minIncomePerQuarter, so a price takes the same time to earn at any
+# size. The floor holds early prices where they were before v1.34 (10 PP a quarter is a Fandom Score
+# of about 40,000): a playtest never afforded a Media node when prices grew with the sport and the
+# tier (×6 at tier 5) faster than income.
+ppPrices:
+  minIncomePerQuarter: 10
+
 # PP tier table (GDD Global PP Tier Track). Turn length is in quarters (1 = quarter, 2 = half-year,
 # 4 = year).
 #   fandomScoreRequired    Fandom Score needed to tier up into this tier
@@ -35,7 +44,6 @@ ppIncome:
 #                                                 among modeled sports (player + rivals)
 #   focusSlots             focus slots held at this tier
 #   backingSlots           flagship stars the player can back at this tier (GDD v1.16)
-#   costMultiplier         scales PP costs ("growing pains"); the highest tier ever reached applies
 #   mediaRevenueMultiplier PP tier caps the size of media and sponsor deals (GDD Business Layer)
 ppTiers:
   - tier: 1
@@ -44,7 +52,6 @@ ppTiers:
     turnLengthQuarters: 1
     focusSlots: 1
     backingSlots: 1
-    costMultiplier: 1
     mediaRevenueMultiplier: 1
   - tier: 2
     fandomScoreRequired: 10000
@@ -52,7 +59,6 @@ ppTiers:
     turnLengthQuarters: 1
     focusSlots: 2
     backingSlots: 1
-    costMultiplier: 1.5
     mediaRevenueMultiplier: 1.25
   - tier: 3
     # Lowered from 1,500,000 (2026-09-17). The genome tuning in this pass cut both casual and
@@ -66,7 +72,6 @@ ppTiers:
     turnLengthQuarters: 2
     focusSlots: 3
     backingSlots: 2
-    costMultiplier: 2.5
     mediaRevenueMultiplier: 1.5
   - tier: 4
     fandomScoreRequired: 170000000
@@ -74,7 +79,6 @@ ppTiers:
     turnLengthQuarters: 2
     focusSlots: 4
     backingSlots: 2
-    costMultiplier: 4
     mediaRevenueMultiplier: 2
   - tier: 5
     fandomScoreRequired: 1600000000
@@ -82,7 +86,6 @@ ppTiers:
     turnLengthQuarters: 4
     focusSlots: 5
     backingSlots: 3
-    costMultiplier: 6
     mediaRevenueMultiplier: 2.5
 
 # Tier-ups, demotion and cooldowns (GDD Global PP Tier Track).
@@ -184,11 +187,11 @@ focus:
   # Direct outreach: a focused country gets exposure as if this many people followed the sport,
   # so a cold launch (zero exposure) still starts, slowly.
   outreachPeople: 3000
-  # PP cost of assigning a slot to a country, times the tier's costMultiplier. Costs
-  # coldLaunchCost with zero exposure, falling linearly to exposedCost as the country's exposure
-  # (without focus) reaches costSaturationExposure.
-  coldLaunchCost: 30
-  exposedCost: 6
+  # PP price of assigning a slot to a country, in quarters of income (ppPrices). Costs
+  # coldLaunchQuarters with zero exposure, falling linearly to exposedQuarters as the country's
+  # exposure (without focus) reaches costSaturationExposure.
+  coldLaunchQuarters: 3
+  exposedQuarters: 0.6
   costSaturationExposure: 0.005
 
 # Quarterly fan dynamics. Rates are fractions per quarter.
@@ -456,10 +459,11 @@ leagues:
   # Voluntary step-down at Near-Collapse: one tier down, reset to Struggling, demote this share.
   stepDown:
     hardcoreDemotionShare: 0.05
-  # PP bailout: costs ppCost × the PP cost multiplier, grants cashQuarters of the league's running
+  # PP bailout: costs ppQuarters of PP income (ppPrices), grants cashQuarters of the league's running
   # cost, then cannot be used on that league again for cooldownQuarters.
   bailout:
-    ppCost: 25
+    # PP price in quarters of income (ppPrices).
+    ppQuarters: 2.5
     cashQuarters: 8
     cooldownQuarters: 16
   # Venues (GDD v1.30): the flagship's league has a capacity level 1–5; other leagues stay at 1 and
@@ -525,8 +529,8 @@ wealthLevels:
 
 # Rules evolution, first build (GDD v1.20). In the seasonal window the player may amend one rule
 # trait a year to any of its options. The jump is the number of steps between the options, or
-# fixedJump for traits whose options have no order. Price = basePrice × the peak tier's cost
-# multiplier × jump. Purist backlash: in every country a share of the player's hardcore fans turn
+# fixedJump for traits whose options have no order. Price = priceQuarters of PP income (ppPrices)
+# × jump. Purist backlash: in every country a share of the player's hardcore fans turn
 # casual: sharePerJump × jump × min(1, the rule's age in years ÷ fullAgeYears), × anchorFactor in
 # the anchor, × (1 + fitWeight × how much the new option's net lever delta there falls short of the
 # old one's), capped at maxShare. Purists remember the founding rules (decided 2026-10-04): the
@@ -535,7 +539,7 @@ wealthLevels:
 # every sport amended toward the same rulebook and the differentiation experiment failed). A
 # review shows fit hints for the anchor and previewMarkets more.
 rulesEvolution:
-  basePrice: 100
+  priceQuarters: 10
   fixedJump: { structure: 2 }
   backlash:
     sharePerJump: 0.03
@@ -758,8 +762,8 @@ flagship:
     dropDemotionShare: 0.01
     recordMinSeasons: 5
   # Backing stars (GDD v1.16, tech plan 2.6 step 5). In the seasonal window the player may back a
-  # star playing at the seat, one per backing slot (ppTiers), for a one-time basePrice × the peak
-  # tier's cost multiplier in PP, with no upkeep; or drop one. A backed star's influence starts at
+  # star playing at the seat, one per backing slot (ppTiers), for a one-time priceQuarters of PP
+  # income (ppPrices), with no upkeep; or drop one. A backed star's influence starts at
   # 0 and grows by 1 ÷ influenceSeasons at each season's end they played at the seat, to 1.
   # Dropping resets it; retiring ends the backing. Each backed star playing at the seat
   # multiplies casual conversion in the flagship country by (1 + casualConversion × influence)
@@ -775,7 +779,7 @@ flagship:
     perSeason: 0.15
     perInfluence: 0.5
   backing:
-    basePrice: 60
+    priceQuarters: 6
     influenceSeasons: 4
     casualConversion: 0.15
     mediaReach: 0.3
@@ -974,6 +978,10 @@ balanceTargets:
   # sponsor shares were cut (0.3 → 0.25, 0.2 → 0.1) for Elite 1.18–1.19, Professional 1.05–1.08,
   # Amateur 1.05, Semi-Pro 1.03–1.04.
   dealSlateShare: [ 1, 1.2 ]
+  # Growth nodes owned when tiers 2, 3, 4 and 5 are first reached (GDD v1.34, PP prices in quarters
+  # of income). The tree has 30 nodes, 25 ownable past its forks; a campaign should keep buying all
+  # game and still end with choices left. Starting ranges, set before measuring.
+  nodesAtTier: [ [ 3, 6 ], [ 5, 9 ], [ 8, 14 ], [ 11, 18 ] ]
   # Growth node dominance is judged strategy by strategy (decided 2026-09-21). One bot answers the
   # tree the same way every time, so the nodes it always buys read as dominant when they are only
   # that bot's signature: builder takes the grassroots spine, media-rush the media branch,

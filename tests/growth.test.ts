@@ -16,6 +16,7 @@ import {
   mediaRevenueFactor,
   nodeCost,
   PLAYER_INDEX,
+  priceIncome,
   quarterPpIncome,
   runningCostPerQuarter,
   snapshot,
@@ -41,7 +42,7 @@ function treeWorld(effects: NodeEffect[], base: World = world): World {
       limits: { minFactor: 0.25 },
       costScaling: base.growthTree.costScaling,
       forks: [],
-      nodes: [{ id: TEST_NODE, category: "grassroots", cost: 10, requires: [], effects }],
+      nodes: [{ id: TEST_NODE, category: "grassroots", quarters: 1, requires: [], effects }],
     };
   });
 }
@@ -191,7 +192,9 @@ describe("each growth node effect changes what it names by the configured amount
   it("cold-launch cost: the premium above the exposed cost shrinks; an exposed push is unchanged", () => {
     const w = treeWorld([{ type: "coldLaunchCostReduction", amount: 0.5 }]);
     const state = createCampaign(w, setupFor(1, ANCHOR));
-    const { coldLaunchCost, exposedCost } = w.config.focus;
+    const income = priceIncome(state, w);
+    const coldLaunchCost = w.config.focus.coldLaunchQuarters * income;
+    const exposedCost = w.config.focus.exposedQuarters * income;
     // Far-off Tuvalu has only a trickle of exposure: its push is all but a cold launch.
     const plain = focusCost(state, w, "tuvalu");
     expect(plain).toBeGreaterThan(coldLaunchCost * 0.99);
@@ -201,8 +204,9 @@ describe("each growth node effect changes what it names by the configured amount
     );
     // A country whose own fans fully expose it costs the exposed price: no premium to cut.
     const exposed = withPlayerFans(state, w, ANCHOR, 2e6, 2e5);
-    expect(focusCost(exposed, w, ANCHOR)).toBe(exposedCost);
-    expect(focusCost(owning(exposed), w, ANCHOR)).toBe(exposedCost);
+    const exposedPrice = w.config.focus.exposedQuarters * priceIncome(exposed, w);
+    expect(focusCost(exposed, w, ANCHOR)).toBe(exposedPrice);
+    expect(focusCost(owning(exposed), w, ANCHOR)).toBe(exposedPrice);
   });
 
   it("PP income: income grows by the amount; a conditioned node is weighted by where the fans are", () => {
@@ -367,8 +371,11 @@ describe("conditions apply only where the country attribute matches", () => {
 });
 
 describe("buying growth nodes", () => {
+  // A fresh campaign earns less than the price floor, so a node costs its quarters × the floor.
   const baseCost = (id: string) =>
-    world.growthTree.nodes.find((node) => node.id === id)?.cost ?? Number.NaN;
+    (world.growthTree.nodes.find((node) => node.id === id)?.quarters ?? Number.NaN) *
+    world.config.ppPrices.minIncomePerQuarter;
+  const rise = (owned: number) => (1 + world.growthTree.costScaling.perNodeOwned) ** owned;
   const start = createCampaign(world, setupFor(1));
   const rich: GameState = { ...start, pp: 100_000 };
   const buy = (state: GameState, nodeId: string) =>
@@ -381,7 +388,7 @@ describe("buying growth nodes", () => {
     tierTrack: { ...state.tierTrack, peakTier: peak },
   });
 
-  it("a purchase deducts base cost × the multiplier, records a landmark, and stays valid", () => {
+  it("a purchase deducts its quarters of income, records a landmark, and stays valid", () => {
     const bought = buy(rich, "backyard-clinics");
     expect(bought.growthNodes).toStrictEqual(["backyard-clinics"]);
     expect(bought.pp).toBe(100_000 - baseCost("backyard-clinics"));
@@ -438,30 +445,52 @@ describe("buying growth nodes", () => {
     );
   });
 
-  it("cost scales with the peak tier's multiplier, which stays after a demotion", () => {
-    const multiplier = (tier: number) =>
-      world.config.ppTiers.find((t) => t.tier === tier)?.costMultiplier ?? Number.NaN;
-    expect(nodeCost(atTier(rich, 3), world, "local-radio")).toBe(
-      baseCost("local-radio") * multiplier(3),
+  it("the PP tier no longer multiplies prices (GDD v1.34)", () => {
+    expect(world.config.ppPrices.minIncomePerQuarter).toBeGreaterThan(
+      priceIncome(rich, world) - 1e-9,
     );
-    const demoted = atTier(rich, 2, 3);
-    expect(nodeCost(demoted, world, "local-radio")).toBe(baseCost("local-radio") * multiplier(3));
-    expect(multiplier(3)).toBeGreaterThan(multiplier(2));
+    const price = nodeCost(rich, world, "local-radio");
+    expect(nodeCost(atTier(rich, 3), world, "local-radio")).toBe(price);
+    expect(nodeCost(atTier(rich, 5), world, "local-radio")).toBe(price);
   });
 
-  it("buying before an announced tier-up is cheaper than after it", () => {
-    const announced: GameState = {
+  it("a price is its quarters of income, however big the sport (GDD v1.34)", () => {
+    // A sport followed by 30% of every country, as late in a campaign.
+    const big: GameState = {
       ...rich,
-      tierTrack: { ...rich.tierTrack, pendingTierUp: { tier: 2, turnsLeft: 1 } },
+      countries: rich.countries.map((country, index) => ({
+        ...country,
+        fans: country.fans.map((f, i) =>
+          i === PLAYER_INDEX
+            ? {
+                ...f,
+                casual: 0.2 * (world.countries[index]?.population ?? 0),
+                hardcore: 0.1 * (world.countries[index]?.population ?? 0),
+              }
+            : f,
+        ),
+      })),
     };
-    const before = nodeCost(announced, world, "backyard-clinics");
-    const next = endTurn(announced, world);
-    expect(next.ppTier).toBe(2);
-    const after = nodeCost(next, world, "backyard-clinics");
-    expect(after).toBeGreaterThan(before);
-    expect(after / before).toBe(
-      (world.config.ppTiers[1]?.costMultiplier ?? 0) /
-        (world.config.ppTiers[0]?.costMultiplier ?? 1),
+    const income = priceIncome(big, world);
+    expect(income).toBeGreaterThan(100 * world.config.ppPrices.minIncomePerQuarter);
+    const quarters = world.growthTree.nodes.find((n) => n.id === "local-radio")?.quarters ?? 0;
+    expect(nodeCost(big, world, "local-radio") / income).toBeCloseTo(quarters, 9);
+  });
+
+  it("each node owned raises the next node's price by perNodeOwned, compounding", () => {
+    const one = buy(rich, "backyard-clinics");
+    const two = buy(one, "word-of-mouth");
+    expect(nodeCost(one, world, "weekend-leagues")).toBeCloseTo(
+      baseCost("weekend-leagues") * rise(1),
+      9,
+    );
+    expect(nodeCost(two, world, "weekend-leagues")).toBeCloseTo(
+      baseCost("weekend-leagues") * rise(2),
+      9,
+    );
+    expect(two.pp).toBeCloseTo(
+      100_000 - baseCost("backyard-clinics") - baseCost("word-of-mouth") * rise(1),
+      6,
     );
   });
 
@@ -481,7 +510,7 @@ describe("buying growth nodes", () => {
     expect(byId("street-courts")).toMatchObject({ status: "owned", lock: null });
     expect(byId("word-of-mouth")).toMatchObject({
       status: "available",
-      cost: baseCost("word-of-mouth"),
+      cost: baseCost("word-of-mouth") * rise(2),
       affordable: true,
       lock: null,
     });
@@ -492,7 +521,7 @@ describe("buying growth nodes", () => {
     });
     expect(byId("local-radio")).toMatchObject({
       status: "locked",
-      cost: baseCost("local-radio"),
+      cost: baseCost("local-radio") * rise(2),
       lock: { kind: "tier", unlockTier: 2 },
     });
     expect(byId("fan-meetups")).toMatchObject({

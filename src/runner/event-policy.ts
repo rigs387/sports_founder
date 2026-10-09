@@ -4,12 +4,12 @@ import {
   activeClubs,
   applyAction,
   checkAction,
-  costMultiplier,
   eventBlocker,
   eventChoiceCost,
   type GameState,
   keepCost,
   PLAYER_INDEX,
+  priceIncome,
   type World,
 } from "../sim";
 
@@ -29,8 +29,13 @@ import {
 //                      the field (flagship season cards: competitive balance)
 //   derbyStoke         a share of a derby's shelter against hardcore turnover (GDD v1.22)
 //   pp                 PP gained, at the bot's PP price
-// The price is cost × ppPrice ÷ the PP cost multiplier, because PP income grows with the sport as
-// fast as prices do.
+// The price is cost × ppPrice ÷ the price level (price income ÷ the floor, GDD v1.34), because PP
+// income grows with the sport as fast as prices do.
+
+/** How far PP prices have risen from the floor (GDD v1.34): PP is worth less as prices climb. */
+function priceLevel(state: GameState, world: World): number {
+  return priceIncome(state, world) / world.config.ppPrices.minIncomePerQuarter;
+}
 
 export interface EventWeights {
   casual: number;
@@ -42,7 +47,7 @@ export interface EventWeights {
   rival: number;
   /** Competitive balance in the flagship league, per rating step closed. */
   balance: number;
-  /** Value of one PP at the starting cost multiplier. */
+  /** Value of one PP at the price floor (GDD v1.34). */
   ppPrice: number;
 }
 
@@ -127,7 +132,7 @@ function effectValue(
     case "leagueHealth":
       return effect.steps * weights.league;
     case "pp":
-      return (effect.amount * weights.ppPrice) / costMultiplier(state, world.config);
+      return (effect.amount * weights.ppPrice) / priceLevel(state, world);
     // Star cards (GDD v1.16). Honors and mentoring keep some of a backed star's influence working
     // after they retire; keeping a star holds their strength at their old club for league cash.
     case "starHonors":
@@ -204,8 +209,7 @@ export function choiceValue(
     0,
   );
   const price =
-    (eventChoiceCost(state, world, card, choiceId) * weights.ppPrice) /
-    costMultiplier(state, world.config);
+    (eventChoiceCost(state, world, card, choiceId) * weights.ppPrice) / priceLevel(state, world);
   return gains - price;
 }
 

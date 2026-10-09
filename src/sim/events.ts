@@ -1,5 +1,4 @@
 import type { EventEffect, EventTemplate, MomentWeight } from "../content";
-import { costMultiplier } from "./calendar";
 import { venueStrength } from "./culture";
 import { offerDealCards } from "./deal-cards";
 import type { EventRecord, EventState } from "./events-state";
@@ -7,6 +6,7 @@ import { activeClubs, moveClubRatings } from "./flagship";
 import { offerAwardCards, offerHallCards } from "./hall-cards";
 import { classHeadline, classPP } from "./hall-of-fame";
 import { outletOf, wireOutlet } from "./press";
+import { ppPrice } from "./prices";
 import { seasonFacts, seasonStories } from "./season-stories";
 import {
   applyStarEffect,
@@ -313,9 +313,11 @@ export function eventChoiceCost(
   card: EventTemplate,
   choiceId: string | null,
 ): number {
-  return (
-    (card.choices.find((choice) => choice.id === choiceId)?.cost ?? 0) *
-    costMultiplier(state, world.config)
+  // Quarters of income (GDD v1.34).
+  return ppPrice(
+    state,
+    world,
+    card.choices.find((choice) => choice.id === choiceId)?.quarters ?? 0,
   );
 }
 export type EventBlocker =

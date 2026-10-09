@@ -6,9 +6,9 @@ import {
   NUMERIC_ATTRIBUTES,
   numericConditionDelta,
 } from "../content";
-import { costMultiplier } from "./calendar";
 import { playerFandomScore } from "./fandom";
 import { countryAttributes } from "./genome";
+import { ppPrice } from "./prices";
 import type { GameState, World } from "./types";
 
 // PP growth tree (GDD PP Growth Tree). Nodes are permanent purchases that apply worldwide, often
@@ -21,7 +21,7 @@ import type { GameState, World } from "./types";
 // growthTree.limits.minFactor. An effect's value in a country is its amount plus its conditions
 // (the genome's condition style), and a condition never flips the effect's sign.
 // Buying rules: the category must be unlocked at the current PP tier, every prerequisite owned, no
-// fork sibling owned, and the price is base cost × the PP cost multiplier. No refunds.
+// fork sibling owned, and the price is its quarters of PP income (GDD v1.34). No refunds.
 
 export interface GrowthFactors {
   proximity: number;
@@ -198,35 +198,14 @@ export function nodeBlocker(
 }
 
 /**
- * How much the sport's own size raises node prices: (Fandom Score ÷ reference) ^ exponent, never
- * below 1 (GDD PP Growth Tree, decided 2026-09-19). A bigger sport pays more for the same node, so
- * the tree is never bought out and its branches stay a choice.
- */
-export function nodeSizeFactor(
-  state: Pick<GameState, "sports" | "countries">,
-  world: World,
-): number {
-  const { referenceFandomScore, exponent } = world.growthTree.costScaling;
-  const score = playerFandomScore(
-    state.sports,
-    state.countries,
-    world.config.fandomScore.casualWeight,
-  );
-  return Math.max(1, score / referenceFandomScore) ** exponent;
-}
-
-/**
- * PP price of a node now: base cost × the PP cost multiplier (the highest tier reached) × the
- * sport's size factor.
+ * PP price of a node now (GDD v1.34): its quarters of income × (1 + perNodeOwned) ^ nodes owned,
+ * so the tree stays a choice however rich the sport gets.
  */
 export function nodeCost(
-  state: Pick<GameState, "tierTrack" | "sports" | "countries">,
+  state: Pick<GameState, "countries" | "growthNodes">,
   world: World,
   nodeId: string,
 ): number {
-  return (
-    growthNode(world, nodeId).cost *
-    costMultiplier(state, world.config) *
-    nodeSizeFactor(state, world)
-  );
+  const rise = (1 + world.growthTree.costScaling.perNodeOwned) ** state.growthNodes.length;
+  return ppPrice(state, world, growthNode(world, nodeId).quarters) * rise;
 }

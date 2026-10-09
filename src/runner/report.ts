@@ -330,7 +330,24 @@ export function rivalAggregate(results: CampaignResult[]) {
 export function growthAggregate(
   results: CampaignResult[],
   tree: { nodes: { id: string }[]; forks: { id: string; nodes: string[] }[] },
+  nodesAtTierTarget: readonly (readonly [number, number])[] = [],
 ) {
+  // Nodes owned on the turn each tier from 2 up was first reached (GDD v1.34).
+  const nodesAtTier = nodesAtTierTarget.map((target, i) => {
+    const tier = i + 2;
+    const owned = results.flatMap((r) => {
+      const reached = r.tierReached[tier]?.turnsCompleted;
+      return reached === undefined ? [] : [r.nodesBought.filter((b) => b.turn <= reached).length];
+    });
+    const med = owned.length ? median(owned) : null;
+    return {
+      tier,
+      campaigns: owned.length,
+      median: med,
+      target,
+      within: med !== null && med >= target[0] && med <= target[1],
+    };
+  });
   const nodes = tree.nodes.map((node) => {
     const turns = results.flatMap((r) =>
       r.nodesBought.filter((bought) => bought.nodeId === node.id).map((bought) => bought.turn),
@@ -362,6 +379,7 @@ export function growthAggregate(
   });
   return {
     nodesBoughtPerCampaign: distribution(results.map((r) => r.nodesBought.length)),
+    nodesAtTier,
     ppSpentOnNodes: distribution(results.map((r) => r.ppSpentOnNodes)),
     finalPpBanked: distribution(results.map((r) => r.pp)),
     nodes,

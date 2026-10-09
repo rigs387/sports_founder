@@ -9,12 +9,12 @@ import {
   checkAction,
   checkInvariants,
   closeOffseason,
-  costMultiplier,
   createCampaign,
   deserializeSave,
   type GameState,
   offseasonOpen,
   PLAYER_INDEX,
+  priceIncome,
   serializeSave,
   snapshot,
   stepQuarter,
@@ -63,11 +63,11 @@ describe("an amendment's size and price", () => {
     expect(amendmentJump("scoring", "low", "low", content)).toBe(0);
   });
 
-  it("costs the base price × the peak tier's multiplier × the jump", () => {
+  it("costs priceQuarters of income × the jump (GDD v1.34)", () => {
     const state = inWindow(2);
     const price = amendmentPrice(state, content, 2);
     expect(price).toBe(
-      content.config.rulesEvolution.basePrice * costMultiplier(state, content.config) * 2,
+      content.config.rulesEvolution.priceQuarters * 2 * priceIncome(state, content),
     );
   });
 });

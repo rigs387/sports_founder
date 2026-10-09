@@ -1115,6 +1115,21 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    contest (v1.32 found that cheap late PP buys out the tree and ends the contest; watch it).
    Tests: price ∝ income, the per-node rise, no tier multiplier, a playtest-shaped late state can
    afford a Media node within its quarters.
+
+*Step 1 built 2026-10-08.* `src/sim/prices.ts`: `quarterPpIncome` and `ppWeights` moved from
+`quarter.ts`; `priceIncome` (base income per quarter, no growth tree bonus, floor
+`ppPrices.minIncomePerQuarter` 10, which holds early prices where they were) and `ppPrice`. Nodes
+carry `quarters` (Grassroots 3–6, Media 6–12, Culture 10–16), × 1.05 compounding per node owned
+(`growthTree.costScaling.perNodeOwned`); focus (3 cold, 0.6 exposed), backing 6, amendments 10 per
+jump, bailouts 2.5 and card choices (old cost ÷ 10) are quarters too. `costMultiplier` and
+`nodeSizeFactor` are gone. `TurnSnapshot.ppIncomePerTurn`; the growth screen says "About N turns of
+income". The runner prints nodes owned at each tier-up against `balanceTargets.nodesAtTier`. Bot fix:
+`spreadFocus` never moves a slot onto an already saturated country (with focus at quarters of income
+the builder spent 75% of its PP hopping slots). Measured (pacing, builder, 12 anchors × 3 seeds,
+200 turns): every tier passes (2 at 33, 3 at 44, 4 at 77, 5 at 119, first win 160); nodes bought
+median 13 (8–20), Local Radio in 35/36 campaigns; #1 lost before the win in 28/36 (target about
+half); nodes at tier-up 3 / 5 / 7 / 9 against starting targets 3–6 / 5–9 / 8–14 / 11–18. The
+playtest save: Local Radio 18,505 PP (2.1 turns of income) against 264,495 before.
 2. **Money benchmarks (topic B).** Research a sourced table of real leagues by tier (revenue,
    mix, top sponsor and naming-rights shares); show it to the designer; record it in
    `docs/money/README.md` and `balanceTargets.money`.

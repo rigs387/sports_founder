@@ -33,16 +33,16 @@ cards:
     defaultChoice: hold
     choices:
       - id: welcome
-        cost: 8
+        quarters: 0.8
         effects:
           - { type: conversion, target: casual, factor: 1.35, quarters: 4 }
           - { type: conversion, target: hardcore, factor: 0.85, quarters: 4 }
       - id: regulars
-        cost: 0
+        quarters: 0
         effects:
           - { type: conversion, target: hardcore, factor: 1.2, quarters: 4 }
           - { type: conversion, target: casual, factor: 0.85, quarters: 4 }
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   - id: first-following
     kind: moment
     weight: minor
@@ -118,16 +118,16 @@ cards:
     defaultChoice: hold
     choices:
       - id: broadcast
-        cost: 35
+        quarters: 3.5
         effects:
           - { type: spread, target: media, factor: 1.5, quarters: 8 }
           - { type: conversion, target: hardcore, factor: 0.9, quarters: 8 }
       - id: neighbourhood
-        cost: 20
+        quarters: 2
         effects:
           - { type: spread, target: proximity, factor: 1.35, quarters: 8 }
           - { type: fanShift, target: uninterestedToCasual, share: 0.0001 }
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   - id: crowded-sidelines
     kind: decision
     tone: positive
@@ -145,14 +145,14 @@ cards:
     defaultChoice: hold
     choices:
       - id: recruit
-        cost: 20
+        quarters: 2
         effects: [{ type: fanShift, target: casualToHardcore, share: 0.02 }]
       - id: fundraise
-        cost: 0
+        quarters: 0
         effects:
           - { type: pp, amount: 12 }
           - { type: conversion, target: casual, factor: 0.85, quarters: 4 }
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   - id: league-under-strain
     kind: decision
     tone: pressure
@@ -170,16 +170,16 @@ cards:
     defaultChoice: hold
     choices:
       - id: regroup
-        cost: 30
+        quarters: 3
         effects:
           - { type: leagueHealth, steps: 1 }
           - { type: hardcoreDemotion, share: 0.02 }
       - id: outreach
-        cost: 15
+        quarters: 1.5
         effects:
           - { type: conversion, target: casual, factor: 1.25, quarters: 4 }
           - { type: conversion, target: hardcore, factor: 0.9, quarters: 4 }
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   - id: rival-pushback
     kind: decision
     tone: pressure
@@ -197,14 +197,14 @@ cards:
     defaultChoice: hold
     choices:
       - id: challenge
-        cost: 25
+        quarters: 2.5
         effects:
           - { type: rivalSetback, share: 0.005 }
           - { type: conversion, target: casual, factor: 0.9, quarters: 4 }
       - id: build
-        cost: 15
+        quarters: 1.5
         effects: [{ type: conversion, target: hardcore, factor: 1.2, quarters: 4 }]
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   # Rivals win ground back near #1 (GDD v1.17). A reclaim tells where a rival is taking the
   # player's hardcore fans back; a world championship is told once, in the player's biggest market.
   # Both only inform: their effect is the rival's own.
@@ -287,11 +287,11 @@ cards:
     defaultChoice: hold
     choices:
       - id: draft-lottery
-        cost: 12
+        quarters: 1.2
         effects:
           - { type: clubRating, target: champion, steps: -2 }
           - { type: clubRating, target: field, steps: 1 }
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   - id: season-runaway
     kind: decision
     tone: pressure
@@ -312,9 +312,9 @@ cards:
     defaultChoice: hold
     choices:
       - id: revenue-sharing
-        cost: 12
+        quarters: 1.2
         effects: [{ type: clubRating, target: field, steps: 1 }]
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   - id: season-dynasty
     kind: decision
     tone: positive
@@ -333,16 +333,16 @@ cards:
     defaultChoice: hold
     choices:
       - id: celebrate
-        cost: 0
+        quarters: 0
         effects:
           - { type: conversion, target: hardcore, factor: 1.25, quarters: 4 }
           - { type: conversion, target: casual, factor: 0.85, quarters: 4 }
       - id: level-the-field
-        cost: 10
+        quarters: 1
         effects:
           - { type: clubRating, target: champion, steps: -2 }
           - { type: hardcoreDemotion, share: 0.01 }
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   - id: season-repeat-final
     kind: decision
     tone: positive
@@ -361,14 +361,14 @@ cards:
     defaultChoice: hold
     choices:
       - id: stoke-it
-        cost: 0
+        quarters: 0
         effects:
           - { type: conversion, target: hardcore, factor: 1.2, quarters: 4 }
           - { type: leagueHealth, steps: -1 }
           # One extra meeting toward a derby between the two clubs (GDD v1.22).
           - { type: derbyStoke }
-      - { id: cool-it, cost: 6, effects: [] }
-      - { id: hold, cost: 0, effects: [] }
+      - { id: cool-it, quarters: 0.6, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   - id: season-underdog
     kind: decision
     tone: positive
@@ -387,12 +387,12 @@ cards:
     defaultChoice: hold
     choices:
       - id: ride-the-story
-        cost: 6
+        quarters: 0.6
         effects: [{ type: conversion, target: casual, factor: 1.3, quarters: 4 }]
       - id: build-on-it
-        cost: 0
+        quarters: 0
         effects: [{ type: clubRating, target: champion, steps: 1 }]
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   - id: season-first-title
     kind: decision
     tone: positive
@@ -412,12 +412,12 @@ cards:
     defaultChoice: hold
     choices:
       - id: new-fans
-        cost: 5
+        quarters: 0.5
         effects: [{ type: conversion, target: casual, factor: 1.25, quarters: 4 }]
       - id: old-guard
-        cost: 0
+        quarters: 0
         effects: [{ type: conversion, target: hardcore, factor: 1.15, quarters: 4 }]
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   - id: season-close-finish
     kind: decision
     tone: positive
@@ -437,14 +437,14 @@ cards:
     defaultChoice: hold
     choices:
       - id: market-it
-        cost: 8
+        quarters: 0.8
         effects: [{ type: spread, target: media, factor: 1.4, quarters: 8 }]
       - id: bank-the-gate
-        cost: 0
+        quarters: 0
         effects:
           - { type: pp, amount: 8 }
           - { type: conversion, target: casual, factor: 0.9, quarters: 4 }
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }
   # Flagship stars as cards (GDD v1.16). Built from recorded facts only: a season's new star, or a
   # star landmark. The breakout moment (PP by league tier: config flagship.stars.breakoutPP) takes
   # no moment slot; the other moments use moment slots; the decisions count against maxDecisions
@@ -767,12 +767,12 @@ cards:
     defaultChoice: let-go
     choices:
       - id: honors
-        cost: 8
+        quarters: 0.8
         effects: [{ type: starHonors }]
       - id: mentor
-        cost: 8
+        quarters: 0.8
         effects: [{ type: starMentor }]
-      - { id: let-go, cost: 0, effects: [] }
+      - { id: let-go, quarters: 0, effects: [] }
   - id: star-keep
     kind: decision
     tone: positive
@@ -791,9 +791,9 @@ cards:
     defaultChoice: let-move
     choices:
       - id: keep
-        cost: 0
+        quarters: 0
         effects: [{ type: starKeep }]
-      - { id: let-move, cost: 0, effects: [] }
+      - { id: let-move, quarters: 0, effects: [] }
   - id: star-dropped
     kind: decision
     tone: pressure
@@ -814,6 +814,6 @@ cards:
     defaultChoice: hold
     choices:
       - id: farewell
-        cost: 6
+        quarters: 0.6
         effects: [{ type: conversion, target: casual, factor: 1.08, quarters: 4 }]
-      - { id: hold, cost: 0, effects: [] }
+      - { id: hold, quarters: 0, effects: [] }

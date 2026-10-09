@@ -690,6 +690,8 @@
       "choose": "Choose this path",
       "add": "Add to your sport",
       "need": "Need {{pp, number(maximumFractionDigits: 1)}} more PP.",
+      "turns_one": "About {{count, number(maximumFractionDigits: 1)}} turn of income.",
+      "turns_other": "About {{count, number(maximumFractionDigits: 1)}} turns of income.",
       "benefit": "Benefit",
       "downside": "Tradeoff",
       "conditional": "Base effect; varies with {{attributes}}.",

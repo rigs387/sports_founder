@@ -73,7 +73,7 @@ describe("event content", () => {
     if (!card) throw new Error("No cards");
     const fallback = card.choices.find((c) => c.id === card.defaultChoice);
     if (!fallback) throw new Error("No default");
-    fallback.cost = 1;
+    fallback.quarters = 1;
     expect(eventsFileSchema.safeParse(base).success).toBe(false);
     expect(
       eventsFileSchema.safeParse({ ...world.events, cards: [...world.events.cards, card] }).success,

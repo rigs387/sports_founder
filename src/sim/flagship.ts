@@ -1,9 +1,10 @@
 import type { SeasonInterest, SeasonStory } from "../content";
-import { costMultiplier, offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
+import { offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights } from "./culture";
 import { type DealsSnapshot, dealsSnapshot, exclusiveTv, lapseOffers, newDeals } from "./deals";
 import { demoteHardcore, runningCostPerQuarter } from "./leagues";
 import { leadStory, type Outlet, outletOf } from "./press";
+import { ppPrice } from "./prices";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { seasonStories } from "./season-stories";
@@ -372,9 +373,9 @@ function seatBacked(flagship: FlagshipState): Player[] {
   return backedStars(flagship).filter((player) => active.has(player.clubId));
 }
 
-/** The PP price of backing a star now: base × the peak tier's cost multiplier. */
-export function backingPrice(state: Pick<GameState, "tierTrack">, world: World): number {
-  return world.config.flagship.backing.basePrice * costMultiplier(state, world.config);
+/** The PP price of backing a star now, in quarters of income (GDD v1.34). */
+export function backingPrice(state: Pick<GameState, "countries">, world: World): number {
+  return ppPrice(state, world, world.config.flagship.backing.priceQuarters);
 }
 
 /** Backing slots at the current PP tier. */

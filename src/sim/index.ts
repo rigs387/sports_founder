@@ -20,6 +20,7 @@ export * from "./league-costs";
 export * from "./leagues";
 export * from "./poaching";
 export * from "./press";
+export * from "./prices";
 export * from "./quarter";
 export * from "./records";
 export * from "./rivals";

@@ -616,11 +616,11 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
       );
     }
   }
-  if (world.config.focus.exposedCost > world.config.focus.coldLaunchCost) {
+  if (world.config.focus.exposedQuarters > world.config.focus.coldLaunchQuarters) {
     issue(
       sources.config,
-      "focus.exposedCost",
-      "must not exceed coldLaunchCost (existing exposure makes a push cheaper)",
+      "focus.exposedQuarters",
+      "must not exceed coldLaunchQuarters (existing exposure makes a push cheaper)",
     );
   }
 

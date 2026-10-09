@@ -347,6 +347,16 @@ export function GrowthScreen({ snapshot, busy, active, error, onAction }: Props)
                 {reason(selected)}
               </p>
             )}
+            {selected.status !== "owned" && snapshot.ppIncomePerTurn > 0 && (
+              <p className="growth-eligibility" data-testid="growth-turns">
+                {t("growth.board.turns", {
+                  count: Math.max(
+                    0.1,
+                    Math.round((selected.cost / snapshot.ppIncomePerTurn) * 10) / 10,
+                  ),
+                })}
+              </p>
+            )}
             <button
               type="button"
               className="growth-buy"

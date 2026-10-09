@@ -14,14 +14,6 @@ export function turnLengthQuarters(tier: number, config: Config): number {
   return tierEntry(tier, config).turnLengthQuarters;
 }
 
-/**
- * PP cost multiplier. After a demotion, costs stay at the highest tier ever reached until the
- * player climbs back (GDD Global PP Tier Track), so the peak tier applies.
- */
-export function costMultiplier(state: Pick<GameState, "tierTrack">, config: Config): number {
-  return tierEntry(state.tierTrack.peakTier, config).costMultiplier;
-}
-
 /** The in-game year a quarter falls in. */
 export function yearOfQuarter(quarter: number, config: Config): number {
   return config.calendar.startYear + Math.floor(quarter / QUARTERS_PER_YEAR);

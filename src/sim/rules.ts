@@ -1,9 +1,10 @@
 import { GENOME_AXES, RULE_AXES } from "../content";
-import { costMultiplier, offseasonOpen, yearOfQuarter } from "./calendar";
+import { offseasonOpen, yearOfQuarter } from "./calendar";
 import { ethosFactor, heldStrength, living, wearTraditions } from "./culture";
 import { fandomScore } from "./fandom";
 import { optionNetDelta } from "./hints";
 import { demoteHardcore } from "./leagues";
+import { ppPrice } from "./prices";
 import { landmarks } from "./records";
 import {
   type Amendment,
@@ -18,7 +19,7 @@ import {
 // Rules evolution, first build (GDD v1.20). In the offseason the player may amend one rule
 // trait a year, to any of its options. The amendment's size is its jump: steps along the trait's
 // options, or a fixed size for traits whose options have no order (play structure). It costs a
-// base PP price × the peak tier's cost multiplier × the jump, and purists push back: in every
+// priceQuarters of PP income × the jump (GDD v1.34), and purists push back: in every
 // country a share of the player's hardcore fans turn casual, growing with the jump and the rule's
 // age, heavier in the anchor and where the old option suited fans better. Fans and spread feel the
 // new rule from the next quarter; the flagship plays it from its next season. Every number is
@@ -49,9 +50,9 @@ export function driftSteps(axis: AxisId, founding: string, option: string, world
   return amendmentJump(axis, founding, option, world);
 }
 
-/** The PP price of an amendment of this jump now. */
-export function amendmentPrice(state: Pick<GameState, "tierTrack">, world: World, jump: number) {
-  return world.config.rulesEvolution.basePrice * costMultiplier(state, world.config) * jump;
+/** The PP price of an amendment of this jump now, in quarters of income (GDD v1.34). */
+export function amendmentPrice(state: Pick<GameState, "countries">, world: World, jump: number) {
+  return ppPrice(state, world, world.config.rulesEvolution.priceQuarters * jump);
 }
 
 /** The quarter a rule trait last changed: its last amendment, or the campaign's start. */

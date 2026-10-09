@@ -1,5 +1,6 @@
-import { costMultiplier, tierEntry } from "./calendar";
+import { tierEntry } from "./calendar";
 import { growthFactorsAt } from "./growth";
+import { ppPrice } from "./prices";
 import { landmarks } from "./records";
 import {
   type Config,
@@ -209,7 +210,7 @@ export function bailoutTerms(state: GameState, world: World, countryIndex: numbe
   const league = state.countries[countryIndex]?.league;
   const { bailout } = world.config.leagues;
   return {
-    ppCost: bailout.ppCost * costMultiplier(state, world.config),
+    ppCost: ppPrice(state, world, bailout.ppQuarters),
     cash: league
       ? bailout.cashQuarters *
         runningCostPerQuarter(world, countryIndex, league.tier, state.growthNodes)

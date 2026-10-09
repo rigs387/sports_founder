@@ -153,7 +153,7 @@ export interface PendingTierUp {
 }
 
 export interface TierTrack {
-  /** Highest PP tier ever reached. PP cost multipliers stay at its level. */
+  /** Highest PP tier ever reached. */
   peakTier: number;
   /** Turn of the last tier change, or null if none yet. */
   lastChangeTurn: number | null;

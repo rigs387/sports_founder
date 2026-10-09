@@ -1,5 +1,5 @@
 import { AXIS_IDS, GENOME_AXES } from "../content";
-import { costMultiplier, offseasonOpen } from "./calendar";
+import { offseasonOpen } from "./calendar";
 import {
   betrayGround,
   nameTrophy,
@@ -19,6 +19,7 @@ import {
   promotionTerms,
   runningCostPerQuarter,
 } from "./leagues";
+import { ppPrice } from "./prices";
 import { landmarks } from "./records";
 import { amendBlocker, amendmentJump, amendmentPrice, amendRule } from "./rules";
 import { computeExposure } from "./spread";
@@ -79,24 +80,24 @@ export class IllegalActionError extends Error {
 }
 
 /**
- * PP cost of pointing a focus slot at a country. A cold launch (no exposure) costs the most;
- * existing organic exposure makes it cheaper, down to exposedCost once exposure reaches
- * costSaturationExposure. The cold-launch premium (the part above exposedCost) is scaled by the
- * growth tree's factor in that country, and the whole cost by the PP cost multiplier ("growing
- * pains").
+ * PP cost of pointing a focus slot at a country, in quarters of income (GDD v1.34). A cold
+ * launch (no exposure) costs the most; existing organic exposure makes it cheaper, down to
+ * exposedQuarters once exposure reaches costSaturationExposure. The cold-launch premium (the part
+ * above exposedQuarters) is scaled by the growth tree's factor in that country.
  */
 export function focusCostFromExposure(
   organicExposure: number,
-  state: Pick<GameState, "tierTrack" | "growthNodes">,
+  state: Pick<GameState, "countries" | "growthNodes">,
   world: World,
   countryIndex: number,
 ): number {
   const { focus } = world.config;
   const level = Math.min(1, organicExposure / focus.costSaturationExposure);
   const premium = growthFactorsAt(world, state.growthNodes, countryIndex).coldLaunchPremium;
-  const base =
-    focus.exposedCost + (focus.coldLaunchCost - focus.exposedCost) * (1 - level) * premium;
-  return base * costMultiplier(state, world.config);
+  const quarters =
+    focus.exposedQuarters +
+    (focus.coldLaunchQuarters - focus.exposedQuarters) * (1 - level) * premium;
+  return ppPrice(state, world, quarters);
 }
 
 export function focusCost(state: GameState, world: World, countryId: string): number {

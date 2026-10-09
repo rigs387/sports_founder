@@ -8,11 +8,12 @@ import type { EventState } from "./events-state";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
 import { broadcastEffects, type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
-import { type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
+import { growthFactors, type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
 import { type HallSnapshot, hallSnapshot } from "./hall-of-fame";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
 import { type LeagueActions, leagueActions } from "./league-actions";
 import { type LeagueCosts, leagueCosts } from "./league-costs";
+import { ppWeights, quarterPpIncome } from "./prices";
 import { type RulesSnapshot, rulesSnapshot } from "./rules";
 import { computeExposure } from "./spread";
 import { tierStatus } from "./tiers";
@@ -125,7 +126,7 @@ export interface GrowthNodeSnapshot {
   category: GrowthCategory;
   /** owned; available (every rule met, whether or not the PP is there); locked. */
   status: "owned" | "available" | "locked";
-  /** Price right now: base cost × the PP cost multiplier. */
+  /** Price right now: quarters of PP income, risen per node owned (GDD v1.34). */
   cost: number;
   affordable: boolean;
   /** Why it cannot be bought (null when available or owned). */
@@ -150,6 +151,8 @@ export interface TurnSnapshot {
   ppTier: number;
   turnLengthQuarters: number;
   pp: number;
+  /** PP earned a turn at today's fans, growth tree included (GDD v1.34: prices read in turns). */
+  ppIncomePerTurn: number;
   offseasonOpen: boolean;
   tierTrack: TierTrackSnapshot;
   focus: (string | null)[];
@@ -277,6 +280,13 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     ppTier: state.ppTier,
     turnLengthQuarters: turnLengthQuarters(state.ppTier, world.config),
     pp: state.pp,
+    ppIncomePerTurn:
+      quarterPpIncome(
+        state.countries,
+        growthFactors(world, state.growthNodes),
+        world.config,
+        ppWeights(world),
+      ) * turnLengthQuarters(state.ppTier, world.config),
     offseasonOpen: offseasonOpen(state),
     tierTrack: {
       peakTier: track.peakTier,

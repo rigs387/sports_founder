@@ -10,6 +10,7 @@ import { type GrowthFactors, growthFactors } from "./growth";
 import { leagueCosts } from "./league-costs";
 import { stepLeagueQuarter } from "./leagues";
 import { poachableHardcore, poachingRates } from "./poaching";
+import { ppWeights, quarterPpIncome } from "./prices";
 import { landmarks, yearlySnapshot } from "./records";
 import { stepRivals } from "./rivals";
 import { nextFloat, type Rng, restoreRng, saveRng } from "./rng";
@@ -215,38 +216,6 @@ export function stepQuarter(
       ? [...state.yearly, yearlySnapshot({ countries }, yearOfQuarter(quarter - 1, config))]
       : state.yearly,
   };
-}
-
-/**
- * PP income for a quarter: scale × score ^ exponent × the score-weighted mean of each country's
- * growth tree PP income factor (so an unconditional +8% node adds exactly 8%). The score counts
- * each country's Fandom Score × its wealth level's weight (GDD v1.21); without weights, raw.
- */
-export function quarterPpIncome(
-  countries: readonly CountryState[],
-  growth: readonly GrowthFactors[],
-  config: Config,
-  wealthWeights: readonly number[] = [],
-): number {
-  let score = 0;
-  let weighted = 0;
-  countries.forEach((country, index) => {
-    const fans = country.fans[PLAYER_INDEX];
-    if (!fans) return;
-    const here =
-      fandomScore(fans.casual, fans.hardcore, config.fandomScore.casualWeight) *
-      (wealthWeights[index] ?? 1);
-    score += here;
-    weighted += here * (growth[index]?.ppIncome ?? 1);
-  });
-  if (score <= 0) return 0;
-  return config.ppIncome.scale * score ** config.ppIncome.exponent * (weighted / score);
-}
-
-/** Each country's wealth level weight on Prestige income (GDD v1.21). */
-export function ppWeights(world: World): number[] {
-  const { levels } = world.config.wealthLevels;
-  return world.derived.map((derived) => levels[derived.wealthLevel]?.ppWeight ?? 1);
 }
 
 /** Per-quarter turnover rate that compounds to the configured annual rate. */

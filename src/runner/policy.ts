@@ -325,6 +325,9 @@ function spreadFocus(state: GameState, world: World, candidates: { id: string }[
     if (here !== null && fandomShare(step.state, world, here) < SATURATED_SHARE) continue;
     for (const candidate of candidates) {
       if (step.state.focus.includes(candidate.id)) continue;
+      // Never onto a country already saturated: it would move again next turn, and since focus
+      // costs quarters of income (GDD v1.34) the hopping ate most of the bots' PP.
+      if (fandomShare(step.state, world, candidate.id) >= SATURATED_SHARE) continue;
       if (attempt(step, world, { type: "assignFocus", slot, countryId: candidate.id })) break;
     }
   }

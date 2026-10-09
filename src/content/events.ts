@@ -91,7 +91,8 @@ export const MOMENT_WEIGHTS = ["minor", "big", "headline"] as const;
 export type MomentWeight = (typeof MOMENT_WEIGHTS)[number];
 const choice = z.strictObject({
   id: z.string().regex(/^[a-z][a-z0-9-]*$/),
-  cost: z.number().nonnegative(),
+  /** PP price in quarters of income (GDD v1.34); 0 is free. */
+  quarters: z.number().nonnegative(),
   effects: z.array(eventEffectSchema),
 });
 const template = z
@@ -163,7 +164,7 @@ const template = z
       const fallback = card.choices.find((c) => c.id === card.defaultChoice);
       if (card.choices.length < 2 || card.effects.length)
         issue("Decisions need at least two choices and no automatic effects");
-      if (fallback?.cost !== 0 || fallback.effects.length)
+      if (fallback?.quarters !== 0 || fallback.effects.length)
         issue("Default choice must be a free, no-effect option");
     }
     const season = card.trigger === "seasonEnd";

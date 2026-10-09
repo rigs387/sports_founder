@@ -1003,6 +1003,10 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
     still sets turn length, focus and backing slots and media revenue.
   - *Measured:* a pacing target for nodes owned when each tier is reached (`balanceTargets`), read
     by the runner and the pacing experiment. Saves need no migration: prices are computed live.
+  - *Built 2026-10-08 (calls made at build).* A price floor of 10 PP a quarter keeps early prices
+    where they were. Card choice costs became quarters (old PP ÷ 10). The rise per node compounds.
+    Pacing passes at every tier; #1 is lost before the win in 78% of campaigns (was 53%), and the
+    builder bot reaches each tier with fewer nodes than the starting targets (open questions).
 - *Topic B, money in dollars (decided 2026-10-08).* The playtest saw a $3 TV deal and a
   1,700 sponsorship beside an Elite league of 50M fans: cash had no unit and showed the sim's raw
   numbers, and deals were the wrong size against revenue (the main sponsor about 3% of revenue,

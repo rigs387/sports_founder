@@ -426,7 +426,8 @@ export const nodeEffectSchema = z.strictObject({
 export const growthNodeSchema = z.strictObject({
   id,
   category: growthCategorySchema,
-  cost: z.number().positive(),
+  /** PP price in quarters of income (GDD v1.34). */
+  quarters: z.number().positive(),
   requires: z.array(id).default([]),
   effects: z.array(nodeEffectSchema).min(1),
 });
@@ -434,11 +435,8 @@ export const growthNodeSchema = z.strictObject({
 export const growthTreeFileSchema = z.strictObject({
   categories: z.partialRecord(growthCategorySchema, z.strictObject({ unlockTier: z.int().min(1) })),
   limits: z.strictObject({ minFactor: z.number().gt(0).max(1) }),
-  /** How a node's price grows with the sport's size (GDD PP Growth Tree, decided 2026-09-19). */
-  costScaling: z.strictObject({
-    referenceFandomScore: z.number().positive(),
-    exponent: z.number().min(0),
-  }),
+  /** Each node owned raises the next node's price by this share, compounding (GDD v1.34). */
+  costScaling: z.strictObject({ perNodeOwned: z.number().min(0) }),
   forks: z.array(z.strictObject({ id, nodes: z.array(id).min(2) })).default([]),
   nodes: z.array(growthNodeSchema).min(1),
 });
@@ -627,7 +625,6 @@ export const ppTierSchema = z.strictObject({
   turnLengthQuarters: z.int().min(1).max(4),
   focusSlots: z.int().min(1),
   backingSlots: z.int().min(0),
-  costMultiplier: z.number().positive(),
   mediaRevenueMultiplier: z.number().positive(),
 });
 
@@ -702,6 +699,8 @@ export const configFileSchema = z.strictObject({
     scale: z.number().min(0),
     exponent: z.number().gt(0).max(1),
   }),
+  /** PP prices in quarters of income (GDD v1.34): the income a price is measured in. */
+  ppPrices: z.strictObject({ minIncomePerQuarter: z.number().positive() }),
   ppTiers: z.array(ppTierSchema).min(1),
   attributeCurves: z.strictObject({
     wealth: curveSchema,
@@ -733,8 +732,8 @@ export const configFileSchema = z.strictObject({
     inboundMultiplier: z.number().min(1),
     conversionMultiplier: z.number().min(1),
     outreachPeople: z.number().min(0),
-    coldLaunchCost: z.number().min(0),
-    exposedCost: z.number().min(0),
+    coldLaunchQuarters: z.number().min(0),
+    exposedQuarters: z.number().min(0),
     costSaturationExposure: z.number().positive(),
   }),
   dynamics: z.strictObject({
@@ -887,7 +886,7 @@ export const configFileSchema = z.strictObject({
     }),
     stepDown: z.strictObject({ hardcoreDemotionShare: unitInterval }),
     bailout: z.strictObject({
-      ppCost: z.number().min(0),
+      ppQuarters: z.number().min(0),
       cashQuarters: z.number().min(0),
       cooldownQuarters: z.int().min(0),
     }),
@@ -951,7 +950,8 @@ export const configFileSchema = z.strictObject({
     }),
   /** Rules evolution, first build (GDD v1.20). */
   rulesEvolution: z.strictObject({
-    basePrice: z.number().min(0),
+    /** PP price per jump, in quarters of income (GDD v1.34). */
+    priceQuarters: z.number().min(0),
     /** Jumps for traits whose options have no order; others count steps between options. */
     fixedJump: z.record(z.string(), z.int().min(1)),
     backlash: z.strictObject({
@@ -1088,7 +1088,8 @@ export const configFileSchema = z.strictObject({
     }),
     /** Backing stars (GDD v1.16). */
     backing: z.strictObject({
-      basePrice: z.number().min(0),
+      /** PP price of backing a star, in quarters of income (GDD v1.34). */
+      priceQuarters: z.number().min(0),
       influenceSeasons: z.int().min(1),
       casualConversion: z.number().min(0),
       mediaReach: z.number().min(0),
@@ -1228,6 +1229,8 @@ export const configFileSchema = z.strictObject({
     flagshipBroadcastShare: z.tuple([unitInterval, unitInterval]),
     /** A full slate of ordinary deals as a share of the media line it replaces (GDD v1.28). */
     dealSlateShare: z.tuple([z.number().min(0), z.number().min(0)]),
+    /** Growth nodes owned when each tier from 2 up is reached, [low, high] (GDD v1.34). */
+    nodesAtTier: z.array(z.tuple([z.int().min(0), z.int().min(0)])).min(1),
   }),
 });
 
