@@ -8,7 +8,7 @@ import { Seat } from "../flagship/FlagshipScreen";
 import { StarsPanel } from "../flagship/StarsPanel";
 import { AmendRules } from "../identity/AmendRules";
 import { useTermVars } from "../identity/terms";
-import { FrontPage } from "../press/FrontPage";
+import { SeasonRecap } from "../press/SeasonRecap";
 import { VenueCard } from "../venues/VenueCard";
 import "../flagship/flagship.css";
 import "./offseason.css";
@@ -66,7 +66,7 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
       )}
       <section className="flagship-card offseason-review" aria-labelledby="offseason-review">
         <h2 id="offseason-review">{t("offseason.review.heading", nouns)}</h2>
-        <FrontPage snapshot={snapshot} clubName={clubName} />
+        <SeasonRecap snapshot={snapshot} clubName={clubName} />
         {decisions > 0 && (
           <p className="offseason-decisions">
             {t("offseason.review.decisions", { count: decisions })}{" "}

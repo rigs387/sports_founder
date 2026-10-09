@@ -1094,6 +1094,9 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
   - *One headline, one recap:* the champion moment keeps the headline look; the offseason's season
     in review becomes a stats recap (final standings, the playoff path, awards, records, traditions
     born, a Hall class), not a second front page.
+  - *Built 2026-10-09.* Sections are web sections (Scores, Players, Culture, Hall of Fame, World,
+    Business); before its first league a story runs on "{sport} Now"; the wire is the Worldwide
+    Sports Wire.
 - *No Britishisms by default (decided 2026-10-08).* Default English is neutral international, not
   British: no "matchday", "fixture list", "terrace", "kickabout" as defaults in strings, names or
   content. Local flavor belongs to the country it fits (British words for British markets).

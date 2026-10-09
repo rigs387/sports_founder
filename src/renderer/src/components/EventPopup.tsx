@@ -263,12 +263,17 @@ function AutoCollect() {
   );
 }
 
-/** The turn's moments as toasts: a click collects one; Next Turn collects the rest. */
+/**
+ * The turn's minor moments as phone notifications (GDD v1.34): the outlet is the app, the sport's
+ * emblem its icon. A click collects one; Next Turn collects the rest.
+ */
 function MomentToasts() {
   const { t } = useTranslation();
   const { snapshot, status, dispatchAction } = useGameStore();
   const text = useEventText();
+  const outletName = useOutletName(snapshot?.identity.sportName ?? "");
   if (!snapshot || !text || snapshot.outcome) return null;
+  const { identity } = snapshot;
   const moments = snapshot.events
     .filter((event) => event.kind === "moment" && event.weight === "minor")
     .sort(byWhenItHappened);
@@ -290,14 +295,19 @@ function MomentToasts() {
           disabled={status !== "ready"}
           onClick={() => void dispatchAction({ type: "collectMoment", eventId: moment.id })}
         >
-          <small className="moment-where">
-            {t("events.popup.where", {
-              kind: t("events.moment"),
-              country: text.country(moment.countryId),
-              date: text.dateOf(moment),
-            })}
-          </small>
+          <span className="moment-app">
+            <Emblem
+              {...identity.emblem}
+              primary={identity.colors.primary}
+              secondary={identity.colors.secondary}
+              size={18}
+              label={identity.sportName}
+            />
+            <b>{outletName(moment.outlet)}</b>
+            <small>{text.dateOf(moment)}</small>
+          </span>
           <strong>{text.title(moment)}</strong>
+          <small className="moment-where">{text.country(moment.countryId)}</small>
           <ul className="choice-line">
             {moment.effects.slice(0, 1).map((effect) => (
               <Effect effect={effect} key={JSON.stringify(effect)} />
@@ -323,8 +333,9 @@ export function bigMoments(events: readonly EventSnapshot[]): EventSnapshot[] {
 }
 
 /**
- * A big moment as a back page over the map, or a headline as a front page over a dimmed map in
- * the sport's colours. Collect is the only way on; a headline bursts from its country.
+ * A big moment as a news-site article over the map, or a headline as breaking news over a dimmed
+ * map in the sport's colors (GDD v1.34: digital press). Collect is the only way on; a headline
+ * bursts from its country.
  */
 function MomentWindow({
   event,
@@ -342,7 +353,7 @@ function MomentWindow({
   const x = geometry.markets[event.countryId]?.center[0] ?? 0;
   const dock = x < geometry.width / 2 ? "dock-right" : "dock-left";
   const { identity } = snapshot;
-  // The paper the story runs in (GDD v1.33), and the card family as its section.
+  // The outlet the story runs on (GDD v1.33), and the card family as its section.
   const masthead = outletName(event.outlet);
   const section =
     event.outlet.kind === "sport" && event.family === "sport"
@@ -369,25 +380,29 @@ function MomentWindow({
       }
     >
       <header className="moment-masthead">
-        {headline && (
-          <Emblem
-            {...identity.emblem}
-            primary={identity.colors.primary}
-            secondary={identity.colors.secondary}
-            size={40}
-            label={identity.sportName}
-          />
-        )}
+        <Emblem
+          {...identity.emblem}
+          primary={identity.colors.primary}
+          secondary={identity.colors.secondary}
+          size={headline ? 32 : 22}
+          label={identity.sportName}
+        />
         <strong>{masthead}</strong>
         {section && <span className="moment-section">{section}</span>}
-        <small className="moment-dateline">
-          {t("events.popup.dateline", {
-            country: text.country(event.countryId),
-            date: text.dateOf(event),
-          })}
-        </small>
       </header>
+      {headline && (
+        <p className="moment-breaking" data-testid="moment-breaking">
+          <span>{t("events.popup.breaking")}</span>
+          {text.country(event.countryId)}
+        </p>
+      )}
       <h2 id="moment-window-title">{text.title(event)}</h2>
+      <small className="moment-dateline">
+        {t("events.popup.dateline", {
+          country: text.country(event.countryId),
+          date: text.dateOf(event),
+        })}
+      </small>
       <p>{text.body(event)}</p>
       {text.factLines(event).map((line) => (
         <p key={line}>{line}</p>

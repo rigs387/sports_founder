@@ -621,7 +621,7 @@ culture:
   # Content validation: each birthplace's eases and each ethos's betrayal multipliers must have a
   # geometric mean within 1 ± characterBand (character changes a campaign's shape, not difficulty).
   characterBand: 0.1
-  # Chants (GDD v1.31): a club's terrace song, born from an underdog title or a club's first title
+  # Chants (GDD v1.31): a club's fan song, born from an underdog title or a club's first title
   # won in a close finish (the season-story rules) once the league in that country has played
   # historySeasons seasons (a young league's titles are all firsts: measured at build, chants were
   # born in seasons 1-7 of every campaign without it). The first chant is the anthem and starts

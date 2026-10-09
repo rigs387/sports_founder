@@ -1144,6 +1144,18 @@ one price everywhere.
    rival countermove lands at the seat; the deals panel's TV slot shows rival, cut and end date.
    Tests.
 
+*Step 7 built 2026-10-09.* Minor moments are phone notifications (the sport's emblem as the app
+icon, the outlet as the app, the date); big moments are news-site articles (a site bar with the
+outlet and a section pill, a sans headline, a dateline); headlines are breaking news (a pulsing
+"Breaking" strip in the sport's colors). Outlets are "{place} {word}" with `press.words` Sports
+Desk, Live, Daily, Insider, Report, Network, Pulse, Now; sections Scores, Players, Culture, Hall of
+Fame, World, Business; the sport's own outlet "{sport} Now"; the wire "Worldwide Sports Wire".
+`FrontPage` became `SeasonRecap`: the champion and final, the final table's top four, the playoff
+path, awards, and records and culture. Britishism sweep: American spellings in the locale, "Fan
+Trusts" and "Traveling Fans", ground words Park / Field / Stadium / Oval / Arena / Court / Bowl /
+Center, fan songs and rites without terraces or colour; "fixture" and "term" stay as choices but
+are never the default. The popup smoke checks the recap.
+
 *Step 6 built 2026-10-09.* `flagship.match`: chances 4 / 50 / 200, base rates 0.375 / 0.4 /
 0.45 (1.5 / 20 / 90 a side), rating effects refitted so the stronger club's expected result
 (wins + half the draws) matches the pre-v1.34 medium rule within 0.5 points at gaps 0–20; draws

@@ -32,13 +32,13 @@
     "cancel": "Keep thinking",
     "collect": "Collect moment",
     "mastheads": {
-      "season": "The Sports Page",
-      "star": "Player Profile",
-      "tradition": "Heritage",
-      "hall": "The Hall of Fame",
-      "rival": "World News",
-      "business": "The Business Pages",
-      "sport": "The {{sport}} Gazette"
+      "season": "Scores",
+      "star": "Players",
+      "tradition": "Culture",
+      "hall": "Hall of Fame",
+      "rival": "World",
+      "business": "Business",
+      "sport": "{{sport}} Now"
     },
     "newsFirst_one": "Collect the news first: {{count}} story waits",
     "newsFirst_other": "Collect the news first: {{count}} stories wait",
@@ -46,6 +46,7 @@
       "collected_one": "One minor story collected automatically: +{{pp, number(maximumFractionDigits: 0)}} PP. The journal keeps it.",
       "collected_other": "{{count}} minor stories collected automatically: +{{pp, number(maximumFractionDigits: 0)}} PP. The journal keeps them.",
       "dateline": "{{country}} · {{date}}",
+      "breaking": "Breaking",
       "where": "{{kind}} · {{country}} · {{date}}",
       "position": "{{index}} of {{count}}",
       "more_one": "+ {{count}} more effect",
@@ -66,7 +67,7 @@
       "hardcore": "hardcore",
       "media": "media",
       "language": "language",
-      "proximity": "neighbouring-market"
+      "proximity": "neighboring-market"
     },
     "effects": {
       "conversion": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} {{target}} conversion for {{quarters}} quarters.",
@@ -84,7 +85,7 @@
       "clubRating_field_other": "Every other club {{count, number(signDisplay: always)}} rating steps (hidden club strength).",
       "starHonors": "Retire them with honors: their influence fades over {{seasons, number}} {{seasonsNoun}} instead of stopping.",
       "starMentor": "{{candidate}} gets a lift to their scoring this {{seasonNoun}}, then takes the backing with {{share, number(style: percent)}} of the influence.",
-      "starKeep": "Costs the league {{cash, money}}. The move is cancelled.",
+      "starKeep": "Costs the league {{cash, money}}. The move is canceled.",
       "derbyStoke": "Counts as one more meeting toward a derby between these two clubs."
     },
     "blockers": {
@@ -112,7 +113,7 @@
         "body": "{{country}} has reached the first audience milestone: {{fans, number}} people follow your sport. It is a small foothold, but it belongs to you."
       },
       "league-arrival": {
-        "title": "Put it on the fixture list",
+        "title": "Put it on the schedule",
         "title_v1": "{{country}} gets a league of its own",
         "title_v2": "A new league kicks off in {{country}}",
         "body": "A league formed in {{country}} during the last turn. There are {{hardcore, number}} hardcore fans here now. Another place where your sport has a home."
@@ -125,10 +126,10 @@
       },
       "local-airtime": {
         "title": "An audience worth reaching",
-        "body": "{{country}} now has {{fans, number}} fans. You have enough of a following to decide how to reach more people: invest in incoming media exposure or build connections with neighbouring markets.",
+        "body": "{{country}} now has {{fans, number}} fans. You have enough of a following to decide how to reach more people: invest in incoming media exposure or build connections with neighboring markets.",
         "choices": {
           "broadcast": "Buy local airtime",
-          "neighbourhood": "Work the neighbourhood",
+          "neighbourhood": "Work the neighborhood",
           "hold": "Stay with organic growth"
         }
       },
@@ -213,7 +214,7 @@
       },
       "season-first-title": {
         "title": "A first title",
-        "body": "{{champion}} won the first title in their history in {{seasonNoun}} {{season}} in {{country}}, ahead of {{runnerUp}}. Use the moment to reach new people, or reward the supporters who were there before it.",
+        "body": "{{champion}} won the first title in their history in {{seasonNoun}} {{season}} in {{country}}, ahead of {{runnerUp}}. Use the moment to reach new people, or reward the faithful who were there before it.",
         "choices": {
           "new-fans": "Court new fans",
           "old-guard": "Reward the old guard",
@@ -279,7 +280,7 @@
       },
       "star-dropped": {
         "title": "Fans remember",
-        "body": "Supporters have not forgiven you for dropping {{player}}. Casual interest in {{country}} is cooling.",
+        "body": "Fans have not forgiven you for dropping {{player}}. Casual interest in {{country}} is cooling.",
         "choices": {
           "farewell": "Stage a farewell match",
           "hold": "Ride it out"
@@ -287,7 +288,7 @@
       },
       "rival-reclaim": {
         "title": "They want their fans back",
-        "body": "{{rival}} is winning back the terraces in {{country}}. With your sport near the top of the world, it is turning some of your {{hardcore, number}} hardcore fans here back to its own game, season by season."
+        "body": "{{rival}} is winning back the stands in {{country}}. With your sport near the top of the world, it is turning some of your {{hardcore, number}} hardcore fans here back to its own game, season by season."
       },
       "rival-championship": {
         "title": "The world tunes in to {{rival}}",
@@ -352,7 +353,7 @@
       },
       "venue-modernized": {
         "title": "Level {{level}}, and the old grounds are gone",
-        "body": "The league in {{country}} opened a modern level {{level}} venue. More fans have a seat, but supporters of the famous grounds feel betrayed: some purists have turned casual, and the grounds' traditions have worn."
+        "body": "The league in {{country}} opened a modern level {{level}} venue. More fans have a seat, but fans of the famous grounds feel betrayed: some purists have turned casual, and the grounds' traditions have worn."
       },
       "venue-record": {
         "title": "A record crowd at {{ground}}",
@@ -657,7 +658,7 @@
       "street-courts": "Street Courts",
       "club-grounds": "Club Grounds",
       "fan-meetups": "Fan Meetups",
-      "volunteer-organisers": "Volunteer Organisers",
+      "volunteer-organisers": "Volunteer Organizers",
       "border-tournaments": "Border Tournaments",
       "community-ownership": "Community Ownership",
       "barnstorming-tours": "Barnstorming Tours",
@@ -673,10 +674,10 @@
       "satellite-feed": "Satellite Feed",
       "oral-history": "Oral History",
       "derby-days": "Derby Days",
-      "supporters-trusts": "Supporters' Trusts",
+      "supporters-trusts": "Fan Trusts",
       "club-museum": "Club Museum",
       "hall-of-legends": "Hall of Legends",
-      "travelling-support": "Travelling Support",
+      "travelling-support": "Traveling Fans",
       "twinned-towns": "Twinned Towns",
       "heritage-listing": "Heritage Listing",
       "heritage-trust": "Heritage Trust",
@@ -755,14 +756,14 @@
         "traditionHold": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 1)}} weight of {{traditions}}: stickier fans, harder betrayals"
       },
       "summaries": {
-        "backyard-clinics": "Turn curious neighbours into first-time players.",
+        "backyard-clinics": "Turn curious neighbors into first-time players.",
         "word-of-mouth": "Give the local game a reason to travel.",
         "weekend-leagues": "Help the first leagues get off the ground.",
         "street-courts": "More people playing. Fewer becoming diehards.",
         "club-grounds": "Build a devoted core behind the clubhouse doors.",
         "fan-meetups": "Give your fans a reason to come back.",
         "volunteer-organisers": "Keep the local game running on community effort.",
-        "border-tournaments": "Take the game to the neighbours.",
+        "border-tournaments": "Take the game to the neighbors.",
         "community-ownership": "Make the sport harder to dislodge at home.",
         "barnstorming-tours": "Trade stability for a place on the road.",
         "local-radio": "Let the conversation cross language communities.",
@@ -900,7 +901,7 @@
     "offseasonOnly": "Venues are built on the offseason screen.",
     "build": "Review level {{level}}",
     "review": "The league pays {{price, money}} of its {{cash, money}} now. Level {{level}} opens before {{seasonNoun}} {{season}}; the old stands keep working until then.",
-    "modernize": "Level {{level}} modernizes the grounds. Supporters of {{names}} will feel betrayed: some purists turn casual, and those traditions wear.",
+    "modernize": "Level {{level}} modernizes the grounds. Fans of {{names}} will feel betrayed: some purists turn casual, and those traditions wear.",
     "modernizeNone": "Level {{level}} modernizes the grounds. No ground here is famous yet, so nobody minds.",
     "confirm": "Build level {{level}}",
     "back": "Back",
@@ -1613,8 +1614,16 @@
     "countryNote": "Legends from here keep fans holding on longer."
   },
   "press": {
-    "local": "The {{place}} {{word}}",
+    "local": "{{place}} {{word}}",
     "dateline": "{{SeasonNoun}} {{season}} · {{year}}",
+    "recap": "{{SeasonNoun}} {{season}} in review · {{year}}",
+    "recapTable": "Final table",
+    "recapPoints_one": "{{count}} pt",
+    "recapPoints_other": "{{count}} pts",
+    "recapPlayoffs": "Playoffs",
+    "recapMatch": "{{home}} {{homeScore}}–{{awayScore}} {{away}}",
+    "recapAwards": "Awards",
+    "recapCulture": "Records and culture",
     "lead": {
       "default": "{{club}} are {{seasonNoun}} {{season}} champions",
       "firstTitle": "{{club}} win their first title",

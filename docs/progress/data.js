@@ -97,6 +97,12 @@ window.SF_PROGRESS = {
     {
       date: "2026-10-09",
       type: "Built",
+      title: "Digital press",
+      text: 'Tech plan 2.21 step 7 (GDD v1.34): minor news arrives as phone notifications, big news as news-site articles and headlines as breaking news; outlets have modern names ("Houston Sports Desk"); the offseason\'s season in review is a stats recap instead of a second front page. British defaults swept from the locale and name pools.',
+    },
+    {
+      date: "2026-10-09",
+      type: "Built",
       title: "Realistic scorelines",
       text: "Tech plan 2.21 step 6 (GDD v1.34): flagship games now score about 1.5, 20 or 90 a side by the sport's scoring rule, refitted so the stronger club's expected result is unchanged; high-scoring sports rarely draw. Award points, star thresholds and the close-final margin were rescaled so stars and the Hall of Fame stay as common.",
     },

@@ -216,6 +216,8 @@ export async function verifyPopups(
     while (await exists('[data-testid="event-popup-later"]'))
       await click('[data-testid="event-popup-later"]');
     if (await exists(".moment-toast")) {
+      // Minor news is a phone notification (GDD v1.34).
+      await screenshot("27h-notification.png");
       const pending = await moments();
       await click(".moment-toast");
       await wait(
@@ -248,17 +250,14 @@ export async function verifyPopups(
     `document.querySelector('${offseason} [data-testid="offseason-champion"]')?.textContent ?? ""`,
   );
   if (!review) throw new Error("The offseason screen must open on the season's champion.");
-  // The season in review is the seat outlet's front page (GDD v1.33).
-  const masthead = await evaluate<string>(
-    `document.querySelector('${offseason} [data-testid="front-page"] .front-masthead strong')?.textContent ?? ""`,
+  // The season in review is a stats recap (GDD v1.34), with no missing strings.
+  const recap = await evaluate<string>(
+    `document.querySelector('${offseason} [data-testid="season-recap"]')?.textContent ?? ""`,
   );
-  if (!masthead.startsWith("The ") || masthead.includes("{{"))
-    throw new Error(`The front page needs its outlet's masthead: ${masthead}`);
-  const frontPage = await evaluate<string>(
-    `document.querySelector('${offseason} [data-testid="front-page"]').textContent`,
-  );
-  if (/\{\{|press\.|awards\./.test(frontPage))
-    throw new Error(`The front page shows a missing string: ${frontPage.slice(0, 300)}`);
+  if (!recap || /\{\{|press\.|awards\./.test(recap))
+    throw new Error(
+      `The season recap is missing or shows a missing string: ${recap.slice(0, 300)}`,
+    );
   await screenshot("27d-offseason.png");
   win.setContentSize(390, 844);
   await delay(300);

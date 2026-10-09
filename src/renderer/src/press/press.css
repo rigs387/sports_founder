@@ -1,61 +1,65 @@
-/* The season's front page (GDD v1.33): newsprint, one column, framed to film in 9x16. */
-.front-page {
-  width: min(100%, 520px);
+/* The season in review (GDD v1.34): a stats recap, not a newspaper page. */
+.season-recap {
+  width: min(100%, 560px);
   margin: 4px 0 10px;
-  padding: 0 0 14px;
-  color: #1d2733;
-  background: #fffdf7;
-  border: 1px solid #d8d0bd;
-  border-top: 4px solid #1d2733;
-  box-shadow: 0 3px 0 #e2dccb;
+  color: var(--ink, #1d2733);
+  background: #fff;
+  border: 1px solid #d5dee5;
+  border-radius: 12px;
+  overflow: hidden;
 }
-.front-masthead {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-  padding: 10px 16px 8px;
-  border-bottom: 1px solid #1d2733;
+.recap-header {
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid #e6ecf0;
 }
-.front-masthead strong {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 22px;
-  letter-spacing: 0.01em;
-}
-.front-masthead small {
-  margin-left: auto;
+.recap-header small {
   font-size: 11px;
-  font-weight: 700;
-  color: #5c6470;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6a7f90;
 }
-.front-page .front-headline {
-  margin: 12px 16px 6px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.12;
+.recap-header h3 {
+  margin: 4px 0 2px;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.2;
 }
-.front-page .front-deck {
-  margin: 0 16px 10px;
+.recap-header p {
+  margin: 0;
   font-size: 13px;
   color: #4a5361;
 }
-.front-items {
-  margin: 0 16px;
-  padding: 10px 0 0;
+.recap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1px;
+  background: #e6ecf0;
+}
+.recap-grid section {
+  padding: 10px 16px 12px;
+  background: #fff;
+}
+.recap-grid h4 {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6a7f90;
+}
+.recap-grid ul,
+.recap-grid ol {
+  margin: 0;
+  padding: 0;
   list-style: none;
   display: grid;
-  gap: 6px;
-  border-top: 1px solid #d8d0bd;
+  gap: 4px;
   font-size: 13px;
   line-height: 1.4;
 }
-.front-items li {
-  padding-left: 12px;
-  border-left: 3px solid #c9b98f;
-}
-@media (max-width: 600px) {
-  .front-page .front-headline {
-    font-size: 23px;
-  }
+.recap-table li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
 }

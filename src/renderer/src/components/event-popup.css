@@ -217,26 +217,46 @@
   gap: 8px;
   width: 260px;
 }
+/* Minor moments are phone notifications (GDD v1.34). */
 .moment-toast {
   display: grid;
-  gap: 2px;
-  padding: 10px 12px;
+  gap: 3px;
+  padding: 10px 12px 9px;
   text-align: left;
   color: var(--ink);
-  background: #fff;
-  border: 1px solid #abc7bd;
-  border-left: 4px solid #548d83;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgb(16 40 70 / 0.15);
+  background: rgb(255 255 255 / 0.94);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgb(16 40 70 / 0.12);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgb(16 40 70 / 0.18);
   cursor: pointer;
 }
-.moment-toast .moment-where {
+.moment-toast .moment-app {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 10px;
-  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5e768a;
+}
+.moment-toast .moment-app b {
+  font-weight: 800;
+  color: #34495a;
+}
+.moment-toast .moment-app small {
+  margin-left: auto;
+  font-size: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.moment-toast .moment-where {
+  font-size: 11px;
   color: #5e768a;
 }
 .moment-toast strong {
   font-size: 13px;
+  line-height: 1.3;
 }
 .moment-collect {
   justify-self: end;
@@ -275,6 +295,7 @@
 .event-popup[class*="family-"] > header .eyebrow {
   color: var(--family);
 }
+/* Big moments are news-site articles (GDD v1.34): a site bar, a section, a sans headline. */
 .moment-window {
   position: absolute;
   z-index: 5;
@@ -282,12 +303,11 @@
   width: min(500px, calc(100% - 400px));
   padding: 0 0 18px;
   color: var(--ink);
-  background: #fffdf7;
-  border: 2px solid var(--family);
-  border-radius: 6px;
-  box-shadow:
-    0 6px 0 var(--family),
-    0 22px 46px rgb(16 40 70 / 0.32);
+  background: #fff;
+  border: 1px solid #d5dee5;
+  border-top: 4px solid var(--family);
+  border-radius: 12px;
+  box-shadow: 0 22px 46px rgb(16 40 70 / 0.28);
   animation: moment-in 0.35s ease-out;
 }
 .moment-window.dock-left {
@@ -299,36 +319,39 @@
 .moment-masthead {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 10px 20px;
-  color: #fff;
-  background: var(--family);
-  border-radius: 3px 3px 0 0;
+  border-bottom: 1px solid #e6ecf0;
 }
 .moment-masthead strong {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 18px;
-  letter-spacing: 0.02em;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 .moment-masthead .moment-section {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-.moment-masthead .moment-dateline {
   margin-left: auto;
-  font-size: 11px;
-  font-weight: 700;
-  opacity: 0.9;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--family);
+  border-radius: 999px;
 }
 .moment-window h2 {
-  margin: 16px 20px 8px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 28px;
-  line-height: 1.1;
-  letter-spacing: -0.3px;
+  margin: 16px 20px 4px;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.moment-window > .moment-dateline {
+  display: block;
+  margin: 0 20px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6a7f90;
 }
 .moment-window > p {
   margin: 0 20px 10px;
@@ -342,7 +365,7 @@
   gap: 16px;
   margin: 14px 20px 0;
   padding-top: 12px;
-  border-top: 1px solid #e3dcc8;
+  border-top: 1px solid #e6ecf0;
 }
 .moment-reward {
   margin: 0;
@@ -363,35 +386,64 @@
   background: rgb(16 30 50 / 0.55);
   animation: moment-fade 0.3s ease-out;
 }
+/* Headlines are breaking news in the sport's colors (GDD v1.34). */
 .moment-window.is-headline {
   position: relative;
   top: auto;
   width: min(640px, 100%);
-  border-width: 3px;
-  border-color: var(--sport-primary, var(--family));
-  box-shadow:
-    0 8px 0 var(--sport-primary, var(--family)),
-    0 30px 60px rgb(0 0 0 / 0.45);
+  border-top: 6px solid var(--sport-primary, var(--family));
+  box-shadow: 0 30px 60px rgb(0 0 0 / 0.45);
 }
 .is-headline .moment-masthead {
+  color: #fff;
   background: var(--sport-primary, var(--family));
-  border-bottom: 4px solid var(--sport-secondary, #fff);
+  border-bottom: 3px solid var(--sport-secondary, #fff);
 }
 .is-headline .moment-masthead strong {
-  font-size: 22px;
+  font-size: 18px;
+}
+.is-headline .moment-masthead .moment-section {
+  color: var(--sport-primary, var(--family));
+  background: #fff;
+}
+.moment-breaking {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 26px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8a1c1c;
+  background: #fde8e6;
+}
+.moment-breaking span {
+  padding: 2px 8px;
+  color: #fff;
+  background: #c62828;
+  border-radius: 3px;
+  animation: moment-pulse 1.6s ease-in-out infinite;
 }
 .is-headline h2 {
-  font-size: 40px;
-  text-align: center;
-  margin: 22px 26px 12px;
+  font-size: 36px;
+  margin: 18px 26px 6px;
+}
+.is-headline > .moment-dateline {
+  margin-inline: 26px;
 }
 .is-headline > p {
   margin-inline: 26px;
-  text-align: center;
   font-size: 15px;
 }
 .is-headline > footer {
   margin-inline: 26px;
+}
+@keyframes moment-pulse {
+  50% {
+    opacity: 0.65;
+  }
 }
 @keyframes moment-in {
   from {
@@ -405,6 +457,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .moment-breaking span,
   .moment-window,
   .moment-backdrop {
     animation: none;

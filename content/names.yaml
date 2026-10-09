@@ -234,7 +234,7 @@ sportNameParts:
   first: [Cross, Swift, Hook, Rush, Volley, Strike, Loop, Dash, Skim, Flick, Kettle, Rally, Stone,
     Tumble, Pike, Hurl, Bound, Brisk, Clip, Sling]
   second: [ball, stick, court, run, dash, play, shot, bat, ring, field, hoop, toss]
-groundWords: [Park, Field, Ground, Oval, Common, Meadow, Lane, Road]
+groundWords: [Park, Field, Stadium, Oval, Arena, Court, Bowl, Center]
 
 # Culture (GDD v1.22). Every club's ground is its town and one of the ground words above (the
 # founding club keeps the ground named at setup). Tradition names come from facts (the derby's
@@ -243,24 +243,24 @@ groundWords: [Park, Field, Ground, Oval, Common, Meadow, Lane, Road]
 # language sphere of the country (default when a sphere has no pool).
 traditions:
   rites:
-    schoolyard: [the Bell Run, the Chalk Line, the Last Lesson, the Satchel Toss]
-    factory: [the Shift Whistle, the Lamp Walk, the Clocking Off, the Foundry March]
+    schoolyard: [the Bell Run, the Chalk Line, the Last Lesson, the Backpack Toss]
+    factory: [the Shift Whistle, the Lamp Walk, the Quitting Bell, the Foundry March]
     beach: [the Tide Walk, the Sunset Swim, the Driftwood Fire, the Low Tide Roll]
-    barracks: [the Muster, the Colour Parade, the Reveille, the Long March]
+    barracks: [the Muster, the Color Parade, the Reveille, the Long March]
     village-green: [the Bell, the Maypole Lap, the Oak Toast, the Hat Pass]
-    docks: [the Lantern Walk, the Rope Pull, the Harbour Horn, the Crane Salute]
+    docks: [the Lantern Walk, the Rope Pull, the Harbor Horn, the Crane Salute]
   nationalNames:
     default: [the Old Game, the People's Game, the Weekend Game, the Long Game, the Quick Game,
-      the Street Game, the Big Game, the Proper Game]
+      the Street Game, the Big Game, the Real Game]
     spanish: [el Juego Grande, el Juego del Barrio, la Fiesta, el Clásico Diario]
     portuguese: [o Jogo do Povo, o Jogo de Rua, a Pelada, o Jogão]
     french: [le Grand Jeu, le Jeu du Dimanche, la Partie, le Jeu du Peuple]
     german: [das Volksspiel, das Sonntagsspiel, das Große Spiel, das Hofspiel]
     italian: [il Gioco del Popolo, la Partitella, il Gioco Grande, il Gioco di Piazza]
-  # Chants (GDD v1.31): invented terrace songs, picked by a stable key from the seed and the club.
-  chants: [Ten Men and a Song, Nobody Gave Us a Chance, Rain on the Terrace, The Long Walk Back,
+  # Chants (GDD v1.31): invented fan songs, picked by a stable key from the seed and the club.
+  chants: [Down to the Wire, Nobody Gave Us a Chance, Rain on the Bleachers, The Long Walk Back,
     Home Before Midnight, Never Saw It Coming, Lights of the Town, Over the Hill and Home,
-    One More Season, Sing When We're Losing, The Night We Won, Last Bus Home]
+    One More Season, Loud When We're Losing, The Night We Won, Last Bus Home]
   # Rivals' traditions are flavor (GDD v1.22): shown on the map, no effect, never born or lost.
   # Generic invented names; a mod can rename them.
   rivals:
@@ -275,13 +275,12 @@ traditions:
       - { id: border-derby, type: derby, countryId: india, name: the Border Derby }
       - { id: maidan-game, type: nationalName, countryId: india, name: the Maidan Game }
 
-# Press (GDD v1.33): each country's invented outlet is its biggest place and one of these words
-# ("The Graz Matchday"), picked by a stable key. Sports-paper words keep clear of real newspapers.
-# Rival world championships run on the wire.
+# Press (GDD v1.33, v1.34): each country's invented outlet is its biggest place and one of these
+# words ("Houston Sports Desk"), picked by a stable key: modern, neutral and digital (v1.34 dropped
+# the British football words), clear of real outlets. Rival world championships run on the wire.
 press:
-  words: [Matchday, Terrace Post, Touchline, Final Whistle, Scoreboard, Sports Ledger, Back Page,
-    Fixture List, Sideline, Clubhouse News, Crowd Courier, Kickabout]
-  wire: The Worldwide Sporting Wire
+  words: [Sports Desk, Live, Daily, Insider, Report, Network, Pulse, Now]
+  wire: Worldwide Sports Wire
 
 # Flagship deal partners (GDD v1.28): invented broadcasters and sponsors, never real brands or
 # broadcasters. Ids are stable (a shunned partner is remembered by id). Naming-rights partners are

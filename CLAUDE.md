@@ -147,9 +147,11 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Press (GDD v1.33) is presentation only and never saved: `src/sim/press.ts` gives each event
   snapshot its `outlet` (a country's biggest place + a `names.yaml press.words` word once its
   league formed; the sport's paper before; the wire for rival championships) and the flagship
-  snapshot its `frontPage`. Moment mastheads show the outlet; five cards have `title_v1`/`title_v2`
-  variants picked by a stable hash; the offseason's season in review is `FrontPage`
-  (`src/renderer/src/press/`).
+  snapshot its `frontPage` (the season's facts). Digital since v1.34: minor moments are phone
+  notifications (the outlet is the app), big ones news-site articles, headlines breaking news; five
+  cards have `title_v1`/`title_v2` variants picked by a stable hash; the offseason's season in
+  review is the `SeasonRecap` stats card (`src/renderer/src/press/`). Default English is neutral,
+  not British (GDD v1.34).
 - Playtest follow-ups (GDD v1.32): no deal offer below `flagship.deals.minOfferDollars` (in dollars since v1.34); minor
   moments auto-collect (`collectMinorMoments`, the renderer's `AutoCollect` and a bottom-bar
   toggle, on by default and remembered in local storage; the smoke turns it off after setup for the
@@ -178,7 +180,7 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   (season, star, tradition, rival, business, sport) for the card's look. Deal news
   (`src/sim/deal-cards.ts`, GDD v1.28) is told from the `dealBroken` and `dealEnded` landmarks and
   takes no moment slot. Big and headline moments show first
-  as `MomentWindow`s (headline: a front page over a dimmed map) and cannot be skipped: Next Turn
+  as `MomentWindow`s (headline: breaking news over a dimmed map) and cannot be skipped: Next Turn
   waits (`data-news`). Smoke steps run `COLLECT_NEWS` (`src/main/smoke-news.ts`) before ending a
   turn or checking that Next Turn is enabled.
 - Flagship seasons reach the player as event cards (GDD v1.15): `src/sim/season-stories.ts` reads
