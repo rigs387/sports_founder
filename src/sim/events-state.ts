@@ -68,6 +68,8 @@ export const venueFactsSchema = z.strictObject({
   /** A record crowd and the ground it is credited to; null for a level opening. */
   crowd: z.int().nonnegative().nullable(),
   clubId: z.int().positive().nullable(),
+  /** The record's crowd a game as the screen shows it (GDD v1.34); null before. */
+  matchCrowd: z.int().nonnegative().nullable().default(null),
 });
 
 /** The Hall of Fame class a class card tells (GDD v1.31): its season and inductees' ids. */

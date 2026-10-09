@@ -42,8 +42,8 @@ export function VenueCard({
   }
   const { venue } = league;
   const { terms, blocker } = flagship.venue;
-  const overflow = Math.max(0, seat.hardcore - venue.capacity);
-  const filled = venue.capacity > 0 ? Math.min(1, seat.hardcore / venue.capacity) : 0;
+  const overflow = venue.turnedAway;
+  const filled = venue.groundSize > 0 ? Math.min(1, venue.matchCrowd / venue.groundSize) : 0;
   const famous = snapshot.culture.traditions.filter(
     (tradition) =>
       tradition.type === "venue" &&
@@ -62,7 +62,7 @@ export function VenueCard({
       <h2 id="venue-heading">{t("venue.heading")}</h2>
       <p>
         <strong>{t("venue.level", { level: venue.level })}</strong>{" "}
-        {t("venue.capacity", { capacity: venue.capacity })}
+        {t("venue.capacity", { ...nouns, ground: venue.groundSize })}
       </p>
       {/* The numbers are in the line below; the bar only shows them. */}
       <div
@@ -72,12 +72,16 @@ export function VenueCard({
         <span style={{ width: `${filled * 100}%` }} />
       </div>
       <p className={overflow > 0 ? "warning" : undefined} data-testid="venue-seated">
-        {overflow > 0
-          ? t("venue.overflow", { overflow, hardcore: seat.hardcore })
-          : t("venue.seated", { seated: venue.seated, capacity: venue.capacity })}
+        {t(overflow > 0 ? "venue.soldOut" : "venue.attendance", {
+          ...nouns,
+          crowd: venue.matchCrowd,
+          season: venue.seasonAttendance,
+          overflow,
+          hardcore: seat.hardcore,
+        })}
       </p>
-      {venue.record !== null && (
-        <p className="venue-record">{t("venue.record", { crowd: venue.record })}</p>
+      {venue.recordMatchCrowd !== null && (
+        <p className="venue-record">{t("venue.record", { crowd: venue.recordMatchCrowd })}</p>
       )}
       {promotion?.kind === "venue" && (
         <p className="warning" data-testid="venue-promotion">
@@ -103,12 +107,17 @@ export function VenueCard({
             {t("venue.next", {
               ...nouns,
               level: terms.level,
-              capacity: terms.capacity,
+              ground: terms.groundSize,
               price: terms.price,
               count: terms.seasons,
               upkeep: terms.upkeep,
             })}
           </p>
+          {terms.modernizes && (
+            <p className="warning" data-testid="venue-tears-down">
+              {t("venue.tearsDown")}
+            </p>
+          )}
           {readOnly ? (
             <p className="flagship-empty">{t("venue.offseasonOnly")}</p>
           ) : reviewing && blocker === null ? (

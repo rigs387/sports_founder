@@ -1,4 +1,10 @@
-import { type GameState, PLAYER_INDEX, type VenueState, type World } from "./types";
+import {
+  type GameState,
+  PLAYER_INDEX,
+  type SeasonSummary,
+  type VenueState,
+  type World,
+} from "./types";
 
 // Venues (GDD v1.30): the flagship's league has a capacity level 1–5, no individual stadiums. At
 // the seat, gate is paid only on hardcore fans up to capacity. A level stays with its country's
@@ -14,6 +20,45 @@ export function venueCapacity(world: World, countryIndex: number, level: number)
   const shares = world.config.leagues.venue.capacityShare;
   const share = shares[Math.min(shares.length, Math.max(1, level)) - 1] ?? 0;
   return Math.floor(share * (world.countries[countryIndex]?.population ?? 0));
+}
+
+/** Each club's ground at a venue level (GDD v1.34): what "max capacity" means on screen. */
+export function groundSize(world: World, level: number): number {
+  const sizes = world.config.leagues.venue.groundSize;
+  return sizes[Math.min(sizes.length, Math.max(1, level)) - 1] ?? 0;
+}
+
+/**
+ * The crowd a game draws (GDD v1.34): attendShare of a club's share of the seated hardcore fans,
+ * up to the ground; sold out exactly while fans are turned away (seated at capacity). Display
+ * only: the gate and the conversion lift read the seated fans.
+ */
+export function matchCrowd(
+  world: World,
+  countryIndex: number,
+  level: number,
+  seated: number,
+  clubs: number,
+): number {
+  const ground = groundSize(world, level);
+  if (seated >= venueCapacity(world, countryIndex, level)) return ground;
+  const share = (seated * world.config.leagues.venue.attendShare) / Math.max(1, clubs);
+  return Math.min(ground, Math.round(share));
+}
+
+/**
+ * A recorded season's crowd a game (GDD v1.34), from its seated fans, clubs and venue level;
+ * seasons recorded before v1.34 use the country's venue level now.
+ */
+export function seasonMatchCrowd(
+  state: Pick<GameState, "countries">,
+  world: World,
+  summary: Pick<SeasonSummary, "countryId" | "crowd" | "standings" | "venueLevel">,
+): number | null {
+  if (summary.crowd === null) return null;
+  const index = world.countries.findIndex((c) => c.id === summary.countryId);
+  const level = summary.venueLevel ?? state.countries[index]?.league?.venue.level ?? 1;
+  return matchCrowd(world, index, level, summary.crowd, summary.standings.length);
 }
 
 /** Hardcore fans seated: the crowd, never above capacity. */

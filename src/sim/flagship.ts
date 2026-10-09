@@ -37,7 +37,7 @@ import {
   venueBlocker,
   venueTerms,
 } from "./venue-actions";
-import { seatedCrowd } from "./venues";
+import { seasonMatchCrowd, seatedCrowd } from "./venues";
 
 // The flagship league (GDD v1.11 commissioner's seat, v1.13 seat rules, v1.14 flagship season).
 // The player runs one league in depth: named clubs based in real places, one season a year ending
@@ -1405,6 +1405,7 @@ export function stepFlagshipQuarter(
         newStarId: null,
         crowd: seasonCrowd(nextCountries, world, flagship.countryId),
         recordCrowd: false,
+        venueLevel: current.venue.level,
         playerOfSeason:
           tallies === null
             ? null
@@ -1796,7 +1797,11 @@ export interface FlagshipSnapshot {
   /** American format: how many clubs make the playoffs. 0 in the European format. */
   playoffClubs: number;
   /** Finished seasons, newest first, without their full tables, with the year each ended. */
-  recentSeasons: (Omit<SeasonSummary, "standings" | "startRatings"> & { year: number })[];
+  /** Recent seasons, newest first, with the crowd a game as the screen shows it (GDD v1.34). */
+  recentSeasons: (Omit<SeasonSummary, "standings" | "startRatings"> & {
+    year: number;
+    matchCrowd: number | null;
+  })[];
   /**
    * The last season's front page (GDD v1.33): the seat outlet, the rare story it leads with (or
    * null), and the traditions born and Hall of Fame inductees its end brought. Null before one.
@@ -1889,9 +1894,10 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
     recentSeasons: flagship.seasons
       .slice(-RECENT_SEASONS)
       .reverse()
-      .map(({ standings: _standings, startRatings: _ratings, ...summary }) => ({
+      .map(({ standings, startRatings: _ratings, ...summary }) => ({
         ...summary,
         year: yearOfQuarter(summary.quarter - 1, world.config),
+        matchCrowd: seasonMatchCrowd(state, world, { ...summary, standings }),
       })),
     seatTargets: state.countries
       .filter(

@@ -97,6 +97,12 @@ window.SF_PROGRESS = {
     {
       date: "2026-10-09",
       type: "Built",
+      title: "Attendance and max capacity",
+      text: "Tech plan 2.21 step 5 (GDD v1.34): the venue card shows Max capacity a game at each club's ground (3,000 to 80,000 by level) and Attendance a game and a season, sold out while hardcore fans are turned away; record crowds are the best crowd a game, in the Almanac and on the front page too. A modernizing level says it tears down the old grounds.",
+    },
+    {
+      date: "2026-10-09",
+      type: "Built",
       title: "Rival TV lockouts explained",
       text: "Tech plan 2.21 step 4 (GDD v1.34): a rival's broadcast deal at the seat makes TV offers fewer and half the size instead of removing them, and the TV slot says who and until when. Every rival countermove landing at the seat is now a big news story. The deck is 38 cards.",
     },

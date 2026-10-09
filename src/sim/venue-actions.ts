@@ -3,7 +3,7 @@ import { modernizeGrounds } from "./culture";
 import { venueCostBasis } from "./leagues";
 import { landmarks } from "./records";
 import type { GameState, Landmark, World } from "./types";
-import { venueCapacity } from "./venues";
+import { groundSize, venueCapacity } from "./venues";
 
 // Building venues (GDD v1.30): the seat's league buys the next level with cash in the offseason,
 // one level at a time. It opens when the offseason before `opensSeason` closes; the old capacity
@@ -17,6 +17,8 @@ export interface VenueTerms {
   seasons: number;
   opensSeason: number;
   capacity: number;
+  /** Each club's ground at that level, as the screen shows it (GDD v1.34). */
+  groundSize: number;
   /** Upkeep a quarter once it opens, on top of today's. */
   upkeep: number;
   modernizes: boolean;
@@ -44,6 +46,7 @@ export function venueTerms(state: GameState, world: World): VenueTerms | null {
     seasons,
     opensSeason: state.flagship.season + seasons,
     capacity: venueCapacity(world, index, level),
+    groundSize: groundSize(world, level),
     upkeep: settings.upkeepShare * basis,
     modernizes: level >= settings.modernize.fromLevel,
   };

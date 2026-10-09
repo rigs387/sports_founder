@@ -100,7 +100,7 @@ export function useEventText() {
     const ground = snapshot.flagship.clubs.find((c) => c.id === venue.clubId)?.ground ?? "";
     return {
       level: venue.level,
-      crowd: venue.crowd ?? 0,
+      crowd: venue.matchCrowd ?? venue.crowd ?? 0,
       ground,
       club: club(venue.clubId ?? undefined),
     };

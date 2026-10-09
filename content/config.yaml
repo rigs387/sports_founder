@@ -504,6 +504,11 @@ leagues:
   # the seat country as naming rights do (hardcoreDemotionShare, traditionWear).
   venue:
     capacityShare: [0.01, 0.03, 0.08, 0.15, 0.3]
+    # What the screen shows (GDD v1.34): each club's ground holds groundSize[level - 1], and a
+    # game draws attendShare of a club's share of the seated hardcore fans, up to the ground, sold
+    # out exactly while fans are turned away (capacityShare above is still what caps the gate).
+    groundSize: [3000, 12000, 30000, 55000, 80000]
+    attendShare: 0.5
     # GDD v1.34: level 2 is built by a Semi-Pro league at the Professional cost basis and level 3 by
     # a Professional one at the Elite basis, so their quarters were scaled by the two tiers' money
     # factors (0.4 and 0.625) to keep their timing.

@@ -903,6 +903,14 @@ export const configFileSchema = z.strictObject({
         .refine((shares) => shares.every((v, i) => i === 0 || v > (shares[i - 1] ?? 0)), {
           message: "capacity must rise with the level",
         }),
+      /** Each club's ground by level, and the share of a club's seated fans a game draws (v1.34). */
+      groundSize: z
+        .array(z.int().positive())
+        .length(5)
+        .refine((sizes) => sizes.every((v, i) => i === 0 || v > (sizes[i - 1] ?? 0)), {
+          message: "grounds must grow with the level",
+        }),
+      attendShare: unitInterval,
       priceQuarters: z.array(z.number().min(0)).length(4),
       buildSeasons: z.array(z.int().min(1)).length(4),
       upkeepShare: z.number().min(0),

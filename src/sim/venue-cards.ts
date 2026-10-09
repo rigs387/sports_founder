@@ -1,5 +1,6 @@
 import type { EventState } from "./events-state";
 import { type GameState, type Landmark, PLAYER_INDEX, type World } from "./types";
+import { matchCrowd } from "./venues";
 
 // Venues as news (GDD v1.30). A level opening is a minor toast, and a big moment when it modernizes
 // the grounds; a record crowd is a minor toast naming the ground it is credited to. All are told
@@ -41,8 +42,21 @@ export function offerVenueCards(
         deal: null,
         venue:
           landmark.kind === "recordCrowd"
-            ? { level: landmark.level, crowd: landmark.crowd, clubId: landmark.clubId }
-            : { level: landmark.level, crowd: null, clubId: null },
+            ? {
+                level: landmark.level,
+                crowd: landmark.crowd,
+                clubId: landmark.clubId,
+                // A game's crowd, as the screen shows it (GDD v1.34).
+                matchCrowd: matchCrowd(
+                  world,
+                  world.countries.findIndex((c) => c.id === landmark.countryId),
+                  landmark.level,
+                  landmark.crowd,
+                  state.flagship.clubs.filter((c) => c.active && c.countryId === landmark.countryId)
+                    .length,
+                ),
+              }
+            : { level: landmark.level, crowd: null, clubId: null, matchCrowd: null },
         hall: null,
         countermove: null,
       },

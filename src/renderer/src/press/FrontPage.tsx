@@ -66,10 +66,10 @@ export function FrontPage({
       testId: "offseason-new-star",
       text: t("offseason.review.newStar", { player: player(last.newStarId) }),
     });
-  if (last.recordCrowd && last.crowd !== null)
+  if (last.recordCrowd && last.matchCrowd !== null)
     items.push({
       key: "crowd",
-      text: t("press.items.recordCrowd", { ...nouns(), crowd: last.crowd }),
+      text: t("press.items.recordCrowd", { ...nouns(), crowd: last.matchCrowd }),
     });
   if (traditions.length > 0)
     items.push({

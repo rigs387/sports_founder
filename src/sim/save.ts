@@ -441,6 +441,7 @@ const flagshipSchema = z.strictObject({
       newStarId: z.int().min(1).nullable(),
       crowd: count.nullable(),
       recordCrowd: z.boolean(),
+      venueLevel: z.int().min(1).max(5).nullable().optional(),
       playerOfSeason: z.int().min(1).nullable(),
     }),
   ),

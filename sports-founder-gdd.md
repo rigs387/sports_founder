@@ -1067,6 +1067,9 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
     cap is a line in fans: "1.2M hardcore fans can't get tickets."
   - *Record crowd:* the biggest single-match crowd (the final, or the champion's best gate); it is
     still set when the seated crowd beats the record.
+  - *Built 2026-10-09 (calls made at build).* A game draws half of each club's share of the
+    seated hardcore fans, up to its ground, and is sold out exactly while fans are turned away; a
+    season is a double round robin. Older seasons' crowds use today's venue level.
 - *Topic E, realistic scorelines (decided 2026-10-08).* "High" scoring gave about 4 a side, barely
   above medium (about 2): the chosen scoring rule did not show in the score.
   - *The match engine is refitted* so each scoring rule plays realistic totals while the stronger

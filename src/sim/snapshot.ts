@@ -30,7 +30,7 @@ import {
   type TimedCountermoveKind,
   type World,
 } from "./types";
-import { seatedCrowd, venueCapacity } from "./venues";
+import { groundSize, matchCrowd, seasonMatchCrowd, seatedCrowd, venueCapacity } from "./venues";
 import { countsTowardHold, standing } from "./win";
 
 const QUARTERS_PER_YEAR = 4;
@@ -54,6 +54,14 @@ export interface LeagueSnapshot {
     seated: number;
     building: { level: number; opensSeason: number } | null;
     record: number | null;
+    /** What the screen shows (GDD v1.34): each club's ground, a game's crowd and a season's. */
+    groundSize: number;
+    matchCrowd: number;
+    seasonAttendance: number;
+    /** Hardcore fans with no seat: the cap on the gate. */
+    turnedAway: number;
+    /** The best crowd a game in this country's recorded seasons. */
+    recordMatchCrowd: number | null;
   };
 }
 
@@ -181,6 +189,35 @@ export interface TurnSnapshot {
   hallOfFame: HallSnapshot;
 }
 
+/** Attendance and max capacity as the venue card shows them (GDD v1.34). */
+function venueDisplay(
+  state: GameState,
+  world: World,
+  index: number,
+  level: number,
+  hardcore: number,
+) {
+  const countryId = world.countries[index]?.id;
+  const clubs = state.flagship.clubs.filter((c) => c.active && c.countryId === countryId).length;
+  const seated = seatedCrowd(world, index, level, hardcore);
+  const crowd = matchCrowd(world, index, level, seated, Math.max(1, clubs));
+  // A season is a double round robin: every club hosts every other once.
+  const games = clubs * Math.max(0, clubs - 1);
+  let record: number | null = null;
+  for (const season of state.flagship.seasons) {
+    if (season.countryId !== countryId) continue;
+    const drew = seasonMatchCrowd(state, world, season);
+    if (drew !== null && (record === null || drew > record)) record = drew;
+  }
+  return {
+    groundSize: groundSize(world, level),
+    matchCrowd: crowd,
+    seasonAttendance: crowd * games,
+    turnedAway: Math.max(0, hardcore - venueCapacity(world, index, level)),
+    recordMatchCrowd: record,
+  };
+}
+
 export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeSnapshot[] {
   return world.growthTree.nodes.map((node): GrowthNodeSnapshot => {
     const blocker = nodeBlocker(state, world, node.id);
@@ -254,6 +291,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
               seated: seatedCrowd(world, index, league.venue.level, fans.hardcore),
               building: league.venue.building,
               record: league.venue.record,
+              ...venueDisplay(state, world, index, league.venue.level, fans.hardcore),
             },
           }
         : null,

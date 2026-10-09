@@ -313,6 +313,8 @@ export interface SeasonSummary {
   crowd: number | null;
   /** Whether the crowd set the league's attendance record: a fame fact for a ground. */
   recordCrowd: boolean;
+  /** The seat's venue level at the season's end (GDD v1.34), for its crowd a game; absent before. */
+  venueLevel?: number | null;
   /** The season's Player of the Season (GDD v1.33); null before save format 24 or untallied. */
   playerOfSeason: number | null;
 }

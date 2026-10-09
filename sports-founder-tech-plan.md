@@ -1144,6 +1144,18 @@ one price everywhere.
    rival countermove lands at the seat; the deals panel's TV slot shows rival, cut and end date.
    Tests.
 
+*Step 5 built 2026-10-09.* Config `leagues.venue.groundSize` (3,000 / 12,000 / 30,000 / 55,000 /
+80,000) and `attendShare` 0.5. `matchCrowd` (`src/sim/venues.ts`): attendShare of a club's share
+of the seated hardcore fans, up to the ground, sold out exactly when the seated fans reach the
+sim's capacity (which still caps the gate). The league venue snapshot adds `groundSize`,
+`matchCrowd`, `seasonAttendance` (crowd × a double round robin's games), `turnedAway` and
+`recordMatchCrowd`; venue terms add the next level's `groundSize`. Season summaries record
+`venueLevel` (optional; older seasons use today's level) and `seasonMatchCrowd` converts a
+recorded season, used by the Almanac's records and roll, the front page and record-crowd cards
+(`facts.venue.matchCrowd`). The venue card says "Max capacity: 55,000 a game at each club's
+ground", "Attendance: … a game, … a season" or "sold out … N hardcore fans can't get tickets",
+and a modernizing level says it tears down the old grounds. Tests in `tests/venues.test.ts`.
+
 *Step 4 built 2026-10-09.* `flagship.deals.broadcastLockout` (value 0.5, one offer fewer) applies
 while a rival's `broadcastDeal` runs at the seat; the TV slot is never skipped and signed deals are
 untouched. `DealsSnapshot.tvLockout` (rival, cut, end year) puts a line on the TV slot. A new

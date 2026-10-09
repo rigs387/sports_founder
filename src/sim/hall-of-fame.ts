@@ -12,6 +12,7 @@ import type {
   SeasonSummary,
   World,
 } from "./types";
+import { seasonMatchCrowd } from "./venues";
 
 // The Hall of Fame (GDD v1.31): a class at each flagship season's end, read only from retained
 // records. Players are inducted on points from their careers once they have retired and waited;
@@ -389,10 +390,16 @@ export function hallSnapshot(state: GameState, world: World): HallSnapshot {
     })
     .sort((a, b) => b.awards - a.awards || a.playerId - b.playerId)
     .slice(0, config.awardLeaders);
+  // Crowds a game, as the screen shows them (GDD v1.34).
+  const perGame = new Map(
+    flagship.seasons.map((s) => [s.season, seasonMatchCrowd(state, world, s)]),
+  );
   let crowd: HallSnapshot["records"]["crowd"] = null;
-  for (const s of flagship.seasons)
-    if (s.crowd !== null && (crowd === null || s.crowd > crowd.crowd))
-      crowd = { crowd: s.crowd, season: s.season, year: year(s.quarter), countryId: s.countryId };
+  for (const s of flagship.seasons) {
+    const drew = perGame.get(s.season) ?? null;
+    if (drew !== null && (crowd === null || drew > crowd.crowd))
+      crowd = { crowd: drew, season: s.season, year: year(s.quarter), countryId: s.countryId };
+  }
   return {
     inductees,
     waiting,
@@ -406,7 +413,7 @@ export function hallSnapshot(state: GameState, world: World): HallSnapshot {
         topScorer: s.topScorer
           ? { playerId: s.topScorer.playerId, scores: s.topScorer.scores }
           : null,
-        crowd: s.crowd,
+        crowd: perGame.get(s.season) ?? null,
         playerOfSeason: s.playerOfSeason,
       })),
       scorers,

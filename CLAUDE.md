@@ -228,7 +228,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   seated fans only (`leagueIncomePerQuarter`). Promotion at the seat needs venue level
   `promotionLevel`. A level is priced by the tier it serves (`venueCostBasis`). Record crowds are
   fame facts and `recordCrowd` landmarks; venue news is `src/sim/venue-cards.ts`. The UI is
-  `src/renderer/src/venues/VenueCard.tsx` (building only on the offseason screen). Youth programs,
+  `src/renderer/src/venues/VenueCard.tsx` (building only on the offseason screen). On screen
+  (GDD v1.34) capacity is Max capacity a game per ground (`groundSize`) and Attendance a game
+  (`matchCrowd`); the sim's capacity still caps the gate and decides when a game is sold out. Youth programs,
   standing policies and ticket pricing are parked.
 - Sport identity (GDD v1.18) lives in `src/sim/identity.ts` and `GameState.identity`: the sport's
   name, founding club (a real flagship club at the anchor) and ground, birthplace, ethos, terms and

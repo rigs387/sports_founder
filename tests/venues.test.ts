@@ -9,14 +9,17 @@ import {
   deserializeSave,
   endTurn,
   type GameState,
+  groundSize,
   landmarks,
   leagueCosts,
   leagueIncomePerQuarter,
+  matchCrowd,
   offerVenueCards,
   PLAYER_INDEX,
   runningCostPerQuarter,
   seatedCrowd,
   serializeSave,
+  snapshot,
   starWage,
   updateCulture,
   venueBlocker,
@@ -393,10 +396,14 @@ describe("venue news (tech plan 2.17 step 4)", () => {
       "venue-modernized",
       "venue-record",
     ]);
+    // A record also keeps its crowd a game as the screen shows it (GDD v1.34).
+    const clubs = state.flagship.clubs.filter((c) => c.active && c.countryId === "brazil").length;
+    const perGame = matchCrowd(world, countryIndex(world, "brazil"), 2, 5000, clubs);
+    expect(perGame).toBe(Math.round((5000 * world.config.leagues.venue.attendShare) / clubs));
     expect(told.map((e) => e.facts.venue)).toEqual([
-      { level: 2, crowd: null, clubId: null },
-      { level: 4, crowd: null, clubId: null },
-      { level: 2, crowd: 5000, clubId: 7 },
+      { level: 2, crowd: null, clubId: null, matchCrowd: null },
+      { level: 4, crowd: null, clubId: null, matchCrowd: null },
+      { level: 2, crowd: 5000, clubId: 7, matchCrowd: perGame },
     ]);
     const weights = world.events.cards
       .filter((c) => c.trigger === "venue")
@@ -406,5 +413,39 @@ describe("venue news (tech plan 2.17 step 4)", () => {
       ["modernized", "big"],
       ["record", "minor"],
     ]);
+  });
+});
+
+describe("attendance and max capacity on screen (GDD v1.34)", () => {
+  const index = countryIndex(world, "brazil");
+  const capacity = venueCapacity(world, index, 1);
+
+  it("a game draws a share of each club's seated fans, up to the ground", () => {
+    expect(matchCrowd(world, index, 1, 1600, 8)).toBe(
+      Math.round((1600 * world.config.leagues.venue.attendShare) / 8),
+    );
+    // Short of capacity, never more than the ground holds.
+    expect(matchCrowd(world, index, 1, capacity - 1, 8)).toBe(groundSize(world, 1));
+  });
+
+  it("is sold out exactly while fans are turned away, and grounds grow with the level", () => {
+    expect(matchCrowd(world, index, 1, capacity, 8)).toBe(groundSize(world, 1));
+    const sizes = [1, 2, 3, 4, 5].map((level) => groundSize(world, level));
+    expect(sizes).toEqual([...sizes].sort((a, b) => a - b));
+    expect(sizes[3]).toBe(55000);
+  });
+
+  it("the snapshot says the crowd a game, a season's attendance and the fans turned away", () => {
+    const state = afterFirstSeason();
+    const venue = snapshot(state, world).countries[index]?.league?.venue;
+    const clubs = state.flagship.clubs.filter((c) => c.active && c.countryId === "brazil").length;
+    expect(venue?.groundSize).toBe(groundSize(world, venue?.level ?? 1));
+    expect(venue?.seasonAttendance).toBe((venue?.matchCrowd ?? 0) * clubs * (clubs - 1));
+    expect(venue?.turnedAway).toBe(
+      Math.max(
+        0,
+        (snapshot(state, world).countries[index]?.hardcore ?? 0) - (venue?.capacity ?? 0),
+      ),
+    );
   });
 });
