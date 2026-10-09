@@ -217,6 +217,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   before its offers: met pays a bonus and grows the renewal edge; enough misses in a row and the
   partner walks (`dealWalked`), no penalty. The UI is `src/renderer/src/deals/`; signing happens
   only on the offseason screen (the Flagship tab is read-only).
+- Leagues overview (GDD v1.34): the Leagues tab lists every league (`LeaguesTable`, sortable) and
+  `BulkPromotion` (also on the offseason screen) promotes every eligible league into a tier with
+  the `promoteLeagues` action; the flagship is never included.
 - Money (GDD v1.34, `docs/money/README.md`): the sim counts cash in its own unit; the UI shows US
   dollars through the i18next `money` formatter at `TurnSnapshot.dollarsPerCash` (config
   `money.dollarsPerCash`). Never print a raw cash number. Revenue per fan is steep by league tier,

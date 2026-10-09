@@ -35,6 +35,7 @@ export function ActionFeedback() {
             ? (snapshot?.flagship.players.find((p) => p.id === lastAction.playerId)?.name ?? "")
             : "",
         name: "name" in lastAction ? lastAction.name.trim().replace(/s+/g, " ") : "",
+        tier: "to" in lastAction ? t(`league.tiers.${lastAction.to}`) : "",
       })}
     </p>
   );

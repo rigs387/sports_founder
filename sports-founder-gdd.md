@@ -1105,6 +1105,8 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
   and eligibility, sortable; at its top "Promote all eligible" by target tier ("Promote 14 leagues
   to Semi-Pro") confirms with the list and each league's cash. Each league still pays its own
   cash; the flagship is excluded (its promotion needs a venue and is the seat's decision).
+  - *Built 2026-10-09.* With investors funding promotion (topic B), the review lists what investors
+    put into each league rather than what it spends.
 - *Topic H, firsts on time (decided 2026-10-08).* "A following of your own" cards arrived about 45
   turns late, for countries already at 15–38%: they waited behind higher-priority cards for the six
   moment slots. "First following" and "league arrival" no longer take moment slots (like deal

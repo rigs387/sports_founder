@@ -1,0 +1,80 @@
+/* The leagues overview and bulk promotion (GDD v1.34). */
+.bulk-promotion {
+  margin: 0 0 12px;
+}
+.bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.bulk-list {
+  max-height: 180px;
+  margin: 8px 0 10px;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+}
+.bulk-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.bulk-list small {
+  color: #5e768a;
+}
+.leagues-table-wrap {
+  max-height: 340px;
+  margin: 0 0 14px;
+  overflow: auto;
+  border: 1px solid #d5dee5;
+  border-radius: 10px;
+}
+.leagues-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.leagues-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f1f5f8;
+  text-align: left;
+}
+.leagues-table th button {
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.leagues-table thead th button {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5e768a;
+}
+.leagues-table th,
+.leagues-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #e6ecf0;
+  white-space: nowrap;
+}
+.leagues-table tbody tr {
+  cursor: pointer;
+}
+.leagues-table tbody tr:hover,
+.leagues-table tbody tr.is-selected {
+  background: #eef5fb;
+}
+.leagues-table td.is-ready {
+  font-weight: 700;
+  color: #1f6f5c;
+}

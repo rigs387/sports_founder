@@ -11,7 +11,7 @@ import { leverMultipliers, similarityEffect } from "./genome";
 import { growthFactors, type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
 import { type HallSnapshot, hallSnapshot } from "./hall-of-fame";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
-import { type LeagueActions, leagueActions } from "./league-actions";
+import { bulkPromotable, type LeagueActions, leagueActions } from "./league-actions";
 import { type LeagueCosts, leagueCosts } from "./league-costs";
 import { ppWeights, quarterPpIncome } from "./prices";
 import { type RulesSnapshot, rulesSnapshot } from "./rules";
@@ -24,6 +24,7 @@ import {
   type Genome,
   type GrowthCategory,
   type HealthLevel,
+  LEAGUE_TIERS,
   type LeagueTierId,
   type PendingTierUp,
   PLAYER_INDEX,
@@ -161,6 +162,8 @@ export interface TurnSnapshot {
   pp: number;
   /** PP earned a turn at today's fans, growth tree included (GDD v1.34: prices read in turns). */
   ppIncomePerTurn: number;
+  /** Bulk promotion (GDD v1.34): each tier some leagues could be promoted into now, and which. */
+  bulkPromotions: { to: LeagueTierId; countryIds: string[] }[];
   /** Dollars per unit of the simulation's cash, for display only (GDD v1.34). */
   dollarsPerCash: number;
   offseasonOpen: boolean;
@@ -321,6 +324,11 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     turnLengthQuarters: turnLengthQuarters(state.ppTier, world.config),
     pp: state.pp,
     dollarsPerCash: world.config.money.dollarsPerCash,
+    bulkPromotions: offseasonOpen(state)
+      ? LEAGUE_TIERS.slice(1)
+          .map((to) => ({ to, countryIds: bulkPromotable(state, world, to) }))
+          .filter((entry) => entry.countryIds.length > 0)
+      : [],
     ppIncomePerTurn:
       quarterPpIncome(
         state.countries,

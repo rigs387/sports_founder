@@ -1144,6 +1144,16 @@ one price everywhere.
    rival countermove lands at the seat; the deals panel's TV slot shows rival, cut and end date.
    Tests.
 
+*Step 8 built 2026-10-09.* `promoteLeagues { to }` (through `applyAction`) promotes every league
+`bulkPromotable` lists (`src/sim/league-actions.ts`: blocker-free, into that tier, never the seat),
+each exactly as `promoteLeague` would; offseason only. `TurnSnapshot.bulkPromotions` lists each
+tier with eligible leagues. Renderer: `BulkPromotion` (a button per tier, a review listing each
+league and its investment) on the Leagues tab and the offseason's Promotions card; `LeaguesTable`
+(league, tier, health, hardcore, cash, promotion status; sortable; a row opens the league's
+controls). `tests/bulk-promotion.test.ts`.
+
+*Step 9 was built first (2026-10-08, above).* All of 2.21 is built.
+
 *Step 7 built 2026-10-09.* Minor moments are phone notifications (the sport's emblem as the app
 icon, the outlet as the app, the date); big moments are news-site articles (a site bar with the
 outlet and a section pill, a sans headline, a dateline); headlines are breaking news (a pulsing

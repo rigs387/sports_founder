@@ -540,6 +540,43 @@
     "won": "Won on turn {{turn}}: the world's #1 sport. The campaign goes on."
   },
   "league": {
+    "bulk": {
+      "window": "Leagues are promoted in the offseason.",
+      "none": "No league can step up this offseason.",
+      "button_one": "Promote {{count}} league to {{tier}}",
+      "button_other": "Promote {{count}} leagues to {{tier}}",
+      "review_one": "{{count}} league steps up to {{tier}}. Investors put money into each, and each must grow into its new running costs. Your flagship is decided on its own.",
+      "review_other": "{{count}} leagues step up to {{tier}}. Investors put money into each, and each must grow into its new running costs. Your flagship is decided on its own.",
+      "investment": "Investors put in {{cash, money}}",
+      "confirm_one": "Promote {{count}} league",
+      "confirm_other": "Promote all {{count}}",
+      "back": "Not yet"
+    },
+    "table": {
+      "columns": {
+        "country": "League",
+        "tier": "Tier",
+        "health": "Health",
+        "hardcore": "Hardcore",
+        "cash": "Cash",
+        "promotion": "Promotion"
+      },
+      "top": "Top tier",
+      "ready": "Ready for {{tier}}",
+      "blocked": {
+        "ended": "—",
+        "window": "Offseason only",
+        "topTier": "Top tier",
+        "hardcore": "Needs fans",
+        "venue": "Needs a venue",
+        "unhealthy": "Not healthy",
+        "notNearCollapse": "—",
+        "bottomTier": "—",
+        "healthy": "—",
+        "cooldown": "—",
+        "prestige": "—"
+      }
+    },
     "heading": "The founding league",
     "none": "No league",
     "tier": "Tier",
@@ -1018,6 +1055,7 @@
       "assignFocus": "Slot {{slot}} now focuses on {{country}}.",
       "dropFocusSlot": "Gave up focus slot {{slot}}.",
       "promoteLeague": "Promoted the league in {{country}}.",
+      "promoteLeagues": "Promoted every eligible league to {{tier}}.",
       "stepDownLeague": "Restructured the league in {{country}}.",
       "bailoutLeague": "Funded a bailout in {{country}}.",
       "moveSeat": "After this season the seat will be in {{country}}.",

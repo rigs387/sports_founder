@@ -58,6 +58,22 @@ export interface LeagueActions {
   };
 }
 
+/**
+ * Every league that can be promoted into `to` right now (GDD v1.34, bulk promotion), in content
+ * order. The flagship's league is never included: its promotion needs a venue and is the seat's
+ * own decision.
+ */
+export function bulkPromotable(state: GameState, world: World, to: LeagueTierId): string[] {
+  const ids: string[] = [];
+  state.countries.forEach((country, index) => {
+    if (!country.league || country.countryId === state.flagship.countryId) return;
+    const options = leagueActions(state, world, index);
+    if (options?.promoteLeague.blocker === null && options.promoteLeague.terms?.to === to)
+      ids.push(country.countryId);
+  });
+  return ids;
+}
+
 /** Shared by action validation and snapshots: UI explanations cannot drift from legality. */
 export function leagueActions(state: GameState, world: World, index: number): LeagueActions | null {
   const country = state.countries[index];

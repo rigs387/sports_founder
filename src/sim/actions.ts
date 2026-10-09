@@ -11,7 +11,7 @@ import { breakDeals, signBlocker, signDeal } from "./deals";
 import { eventBlocker, minorMomentIds, resolveEvent } from "./events";
 import { backBlocker, backStar, dropBlocker, dropStar, seatBlocker } from "./flagship";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
-import { leagueActionReason, leagueActions } from "./league-actions";
+import { bulkPromotable, leagueActionReason, leagueActions } from "./league-actions";
 import {
   bailoutTerms,
   demoteHardcore,
@@ -23,7 +23,14 @@ import { ppPrice } from "./prices";
 import { landmarks } from "./records";
 import { amendBlocker, amendmentJump, amendmentPrice, amendRule } from "./rules";
 import { computeExposure } from "./spread";
-import { type AxisId, type GameState, LEAGUE_TIERS, PLAYER_INDEX, type World } from "./types";
+import {
+  type AxisId,
+  type GameState,
+  LEAGUE_TIERS,
+  type LeagueTierId,
+  PLAYER_INDEX,
+  type World,
+} from "./types";
 import { buildVenue, venueBlocker } from "./venue-actions";
 
 // The player's legal actions. Every action, from the UI or a bot, goes through applyAction, which
@@ -58,6 +65,8 @@ export type Action =
   | { type: "assignFocus"; slot: number; countryId: string }
   | { type: "dropFocusSlot"; slot: number }
   | { type: "promoteLeague"; countryId: string }
+  /** Every eligible league but the flagship, into one tier (GDD v1.34). */
+  | { type: "promoteLeagues"; to: LeagueTierId }
   | { type: "stepDownLeague"; countryId: string }
   | { type: "bailoutLeague"; countryId: string }
   | { type: "moveSeat"; countryId: string }
@@ -268,6 +277,13 @@ export function checkAction(state: GameState, world: World, action: Action): str
     }
   }
 
+  if (action.type === "promoteLeagues") {
+    if (!offseasonOpen(state)) return "leagues can only be promoted in the offseason";
+    if (bulkPromotable(state, world, action.to).length === 0)
+      return `no league can be promoted to ${action.to} now`;
+    return null;
+  }
+
   if (
     action.type !== "promoteLeague" &&
     action.type !== "stepDownLeague" &&
@@ -351,6 +367,12 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
           ),
         };
       });
+    case "promoteLeagues":
+      // One promotion each, in content order, as if each were promoted on its own.
+      return bulkPromotable(state, world, action.to).reduce(
+        (next, countryId) => applyLegal(next, world, { type: "promoteLeague", countryId }),
+        state,
+      );
     case "stepDownLeague":
       return updateLeague(state, world, action.countryId, (country) => {
         const league = country.league;

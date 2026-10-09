@@ -2,7 +2,10 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, TurnSnapshot } from "../../../sim";
+import { BulkPromotion } from "./BulkPromotion";
 import { LeagueControls } from "./LeagueControls";
+import { LeaguesTable } from "./LeaguesTable";
+import "./leagues-table.css";
 
 interface Props {
   snapshot: TurnSnapshot;
@@ -32,8 +35,16 @@ export function LeagueOverview({
     countries.find((item) => item.countryId === snapshot.anchorCountryId) ??
     countries[0];
   if (!country?.league) return <p>{t("league.manage.none")}</p>;
+  const countryName = (id: string) => name(id);
   return (
     <div className="league-overview">
+      <BulkPromotion snapshot={snapshot} country={countryName} busy={busy} onAction={onAction} />
+      <LeaguesTable
+        snapshot={snapshot}
+        names={names}
+        selected={country.countryId}
+        onSelect={setSelected}
+      />
       <label className="league-picker">
         {t("league.manage.select")}
         <select

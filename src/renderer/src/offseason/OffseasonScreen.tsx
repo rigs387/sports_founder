@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, CountrySnapshot, TurnSnapshot } from "../../../sim";
+import { BulkPromotion } from "../components/BulkPromotion";
 import { TrophyCard } from "../culture/TrophyCard";
 import { DealsPanel } from "../deals/DealsPanel";
 import { Seat } from "../flagship/FlagshipScreen";
@@ -136,6 +137,9 @@ function Promotions({
       data-testid="offseason-promotions"
     >
       <h2 id="offseason-promotions">{t("offseason.promotions.heading")}</h2>
+      {snapshot.bulkPromotions.length > 0 && (
+        <BulkPromotion snapshot={snapshot} country={country} busy={busy} onAction={onAction} />
+      )}
       {ready.length === 0 ? (
         <p className="flagship-empty">{t("offseason.promotions.none")}</p>
       ) : (
