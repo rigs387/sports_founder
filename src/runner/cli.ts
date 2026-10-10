@@ -809,6 +809,25 @@ function main(): number {
     console.log(
       `  Remembers: Hall of Fame players per campaign median ${fmt(remembers.players.median)} (max ${fmt(remembers.players.max)}; in ${remembers.withPlayers}/${results.length} campaigns, the first at turn median ${fmt(remembers.firstPlayerTurn)}), moments median ${fmt(remembers.moments.median)}; anchor shrine weight median ${fmt(remembers.anchorShrine.median)}; chants per campaign median ${fmt(remembers.chants.median)}, ${remembers.chantsSpread} spread abroad; Culture nodes bought in ${remembers.boughtCulture}/${results.length} campaigns (median ${fmt(remembers.cultureNodes.median)})`,
     );
+    // Folds by market size (GDD v1.35): the ceilings exist so micro-markets stop folding.
+    const bands = [
+      ...world.config.leagues.ceilings.map((band) => band.below),
+      Number.POSITIVE_INFINITY,
+    ];
+    console.log(
+      `  Folds by population: ${bands
+        .map((below, i) => {
+          const above = bands[i - 1] ?? 0;
+          const folds = countryRows
+            .filter((row) => row.population >= above && row.population < below)
+            .reduce((sum, row) => sum + row.leaguesFolded, 0);
+          const label = Number.isFinite(below)
+            ? `under ${below.toLocaleString("en-US")}`
+            : `${above.toLocaleString("en-US")}+`;
+          return `${label} ${fmt(folds / results.length)}`;
+        })
+        .join(", ")} (per campaign)`,
+    );
     const [slateLow, slateHigh] = world.config.balanceTargets.dealSlateShare;
     console.log(
       `  Deal slate before the PP-tier cap (target ${pct(slateLow)}–${pct(slateHigh)}), median by league tier: ${deals.slates

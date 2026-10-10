@@ -2,7 +2,10 @@ import type { BrowserWindow } from "electron";
 import type { LeagueActionKind } from "../sim";
 import { COLLECT_NEWS } from "./smoke-news";
 
-/** Grow the existing focused Tuvalu market naturally, then exercise all three league actions. */
+/**
+ * Grow the existing focused Tonga market naturally, then exercise all three league actions. Tonga
+ * is small enough to fail at Semi-Pro and big enough that its ceiling allows it (GDD v1.35).
+ */
 export async function verifyLeagues(
   win: BrowserWindow,
   screenshot: (name: string) => Promise<void>,
@@ -88,22 +91,22 @@ export async function verifyLeagues(
   let turns = 0;
   while (turns++ < 160) {
     const exists = await evaluate<boolean>(
-      '!!document.querySelector("[data-testid=league-picker] option[value=tuvalu]")',
+      '!!document.querySelector("[data-testid=league-picker] option[value=tonga]")',
     );
     if (exists) {
-      await select("tuvalu");
+      await select("tonga");
       await delay();
       if (await ready("promoteLeague")) break;
     }
     await advance();
   }
-  if (!(await ready("promoteLeague"))) throw new Error("Tuvalu never qualified for promotion");
+  if (!(await ready("promoteLeague"))) throw new Error("Tonga never qualified for promotion");
   const receipts: Record<string, unknown> = {};
   for (const kind of ["promoteLeague", "bailoutLeague", "stepDownLeague"] as const) {
     let waited = 0;
     while (!(await ready(kind)) && waited++ < 40) {
       await advance();
-      await select("tuvalu");
+      await select("tonga");
       await delay();
     }
     if (!(await ready(kind))) throw new Error(`Could not reach a legal ${kind}`);

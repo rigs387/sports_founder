@@ -83,7 +83,7 @@ export async function verifyActions(
   const growth = await verifyGrowth(win, screenshot);
   await close();
   await evaluate(
-    `(() => {const picker=document.querySelector('[data-testid="market-picker"]');picker.value='tuvalu';picker.dispatchEvent(new Event('change',{bubbles:true}));})()`,
+    `(() => {const picker=document.querySelector('[data-testid="market-picker"]');picker.value='tonga';picker.dispatchEvent(new Event('change',{bubbles:true}));})()`,
   );
   await delay();
   const focus = () =>
@@ -108,11 +108,11 @@ export async function verifyActions(
     afterFocus.history !== beforeFocus.history
   )
     throw new Error("Focus assignment did not spend the displayed cost or changed turn history.");
-  await screenshot("10-focused-tuvalu.png");
+  await screenshot("10-focused-tonga.png");
   await evaluate(`document.querySelector('.game-nav [data-view=sport]').click()`);
   await delay();
   const slots = await evaluate<string>(`document.querySelector('.focus-list').textContent`);
-  if (!slots.includes("Tuvalu") || slots.toLowerCase().includes(anchorId))
+  if (!slots.includes("Tonga") || slots.toLowerCase().includes(anchorId))
     throw new Error("Focus assignment did not replace the old slot.");
   await closeDialog();
   await advance();

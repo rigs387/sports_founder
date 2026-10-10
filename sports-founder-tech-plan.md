@@ -1258,6 +1258,15 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    the `BulkPromotion` review. Tests (two anchors or fewer): a capped league cannot be promoted
    or bulk-promoted; a micro-market anchor's flagship can; the seat leaving steps the old league
    down. Runner: report folds by population band.
+
+   *Built 2026-10-09.* Config `leagues.ceilings`; `CountryDerived.maxTier`; the
+   `marketTooSmall` blocker comes before the offseason window; `toCeiling` in `flagship.ts`
+   runs after `moveSeat` in `closeOffseason`; promotion terms carry `flowPerQuarter`; the
+   snapshot's `maxTier`; a Max tier column, the country card's ceiling line, the bulk review's
+   flow per league and a loss count. The smoke focuses Tonga instead of Tuvalu for the league
+   actions (Tuvalu is now Amateur only) and opens the bulk review when one is offered.
+   `tests/market-ceilings.test.ts`. Runner: folds by population band (zero in every band, before
+   and after; promotions about 596 → 504 a campaign).
 2. **More fun culture (topic 2).** `culture.ts`: the national name is born from a new
    `rankOneLocal` fact (the sport becomes a country's #1 by fans; recorded as a landmark when the
    per-country rank changes) instead of `promoted`; `yearEnded` renews it while #1 there and

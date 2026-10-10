@@ -890,6 +890,17 @@ export const configFileSchema = z.strictObject({
       }),
     }),
     stepDown: z.strictObject({ hardcoreDemotionShare: unitInterval }),
+    /**
+     * Market size ceilings (GDD v1.35): a country under `below` people can run a league no higher
+     * than `maxTier`; the first band that fits applies, and a country above every band is
+     * uncapped. The league holding the seat ignores its ceiling.
+     */
+    ceilings: z
+      .array(z.strictObject({ below: z.int().positive(), maxTier: leagueTierSchema }))
+      .refine(
+        (bands) => bands.every((band, i) => i === 0 || band.below > (bands[i - 1]?.below ?? 0)),
+        "ceilings must be in ascending population order",
+      ),
     bailout: z.strictObject({
       ppQuarters: z.number().min(0),
       cashQuarters: z.number().min(0),

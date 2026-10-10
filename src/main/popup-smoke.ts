@@ -259,6 +259,28 @@ export async function verifyPopups(
       `The season recap is missing or shows a missing string: ${recap.slice(0, 300)}`,
     );
   await screenshot("27d-offseason.png");
+  // Bulk promotion's review shows each league's flow at the new tier (GDD v1.35).
+  const bulkButton = `${offseason} .bulk-actions button[data-testid^="bulk-"]`;
+  let bulk: { lines: number; losing: number } | null = null;
+  if (await exists(bulkButton)) {
+    await click(bulkButton);
+    await delay(200);
+    const lines = await evaluate<string[]>(
+      `[...document.querySelectorAll('${offseason} [data-testid="bulk-review"] .bulk-list small')].map((n) => n.textContent)`,
+    );
+    if (
+      lines.length === 0 ||
+      lines.some((line) => /{{|league./.test(line) || !/quarter/.test(line))
+    )
+      throw new Error(`Bulk review lines are missing their flow: ${lines.slice(0, 3).join(" | ")}`);
+    const losing = await evaluate<number>(
+      `document.querySelectorAll('${offseason} [data-testid="bulk-review"] .bulk-list li.is-losing').length`,
+    );
+    bulk = { lines: lines.length, losing };
+    await screenshot("27d2-bulk-review.png");
+    await click(`${offseason} [data-testid="bulk-review"] .flagship-back`);
+    await delay(200);
+  }
   win.setContentSize(390, 844);
   await delay(300);
   const offseasonOverflow = await evaluate<boolean>(
@@ -279,6 +301,7 @@ export async function verifyPopups(
     setAside,
     collected,
     review,
+    bulk,
     turnsPlayed,
   };
 }

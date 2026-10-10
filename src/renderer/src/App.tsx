@@ -360,6 +360,7 @@ export function App() {
             names={names}
             history={history[selected.countryId] ?? []}
             anchor={snapshot.anchorCountryId}
+            seat={snapshot.flagship.countryId}
             turn={snapshot.turn}
             culture={snapshot.culture}
             inductees={snapshot.hallOfFame.inductees

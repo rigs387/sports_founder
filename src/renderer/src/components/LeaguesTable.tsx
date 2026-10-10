@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { CountrySnapshot, TurnSnapshot } from "../../../sim";
 
-type Column = "country" | "tier" | "health" | "hardcore" | "cash" | "promotion";
+type Column = "country" | "tier" | "maxTier" | "health" | "hardcore" | "cash" | "promotion";
 const TIER_ORDER = ["amateur", "semi-pro", "professional", "elite"];
 const HEALTH_ORDER = ["near-collapse", "struggling", "healthy"];
 
 /**
- * Every league at a glance (GDD v1.34): tier, health, hardcore fans, cash and whether it can be
- * promoted now, sortable by any column. A row opens that league's controls below.
+ * Every league at a glance (GDD v1.34): tier, the market's ceiling (GDD v1.35), health, hardcore
+ * fans, cash and whether it can be promoted now, sortable by any column. A row opens that league's controls below.
  */
 export function LeaguesTable({
   snapshot,
@@ -35,6 +35,8 @@ export function LeaguesTable({
       };
     return { order: 1, text: t(`league.table.blocked.${action.blocker.kind}`) };
   };
+  // The seat's league ignores its market's ceiling (GDD v1.35).
+  const atSeat = (country: CountrySnapshot) => country.countryId === snapshot.flagship.countryId;
   const key = (country: CountrySnapshot): number | string => {
     const league = country.league;
     switch (sort.by) {
@@ -42,6 +44,8 @@ export function LeaguesTable({
         return name(country.countryId);
       case "tier":
         return TIER_ORDER.indexOf(league?.tier ?? "");
+      case "maxTier":
+        return atSeat(country) ? TIER_ORDER.length : TIER_ORDER.indexOf(country.maxTier);
       case "health":
         return HEALTH_ORDER.indexOf(league?.health ?? "");
       case "hardcore":
@@ -89,6 +93,7 @@ export function LeaguesTable({
           <tr>
             {header("country")}
             {header("tier")}
+            {header("maxTier")}
             {header("health")}
             {header("hardcore")}
             {header("cash")}
@@ -114,6 +119,11 @@ export function LeaguesTable({
                   </button>
                 </th>
                 <td>{t(`league.tiers.${league.tier}`)}</td>
+                <td>
+                  {atSeat(country)
+                    ? t("league.table.noLimit")
+                    : t(`league.tiers.${country.maxTier}`)}
+                </td>
                 <td>
                   <span className={`health-pill ${league.health}`}>
                     {t(`league.healthLevels.${league.health}`)}

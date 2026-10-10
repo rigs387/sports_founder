@@ -5,7 +5,8 @@ import type { Action, TurnSnapshot } from "../../../sim";
 
 /**
  * Bulk promotion (GDD v1.34): one button per tier some leagues could step up into this offseason,
- * with a review listing each league and what investors put in. Each league is promoted exactly as
+ * with a review listing each league, what investors put in and its projected cash flow a quarter at
+ * the new tier, flagging the ones that would lose money (GDD v1.35). Each league is promoted exactly as
  * on its own; the flagship is never included (its promotion is the seat's decision).
  */
 export function BulkPromotion({
@@ -25,10 +26,12 @@ export function BulkPromotion({
   if (snapshot.bulkPromotions.length === 0)
     return <p className="flagship-empty">{t("league.bulk.none")}</p>;
   const name = country;
-  const investment = (id: string) =>
-    snapshot.countries.find((c) => c.countryId === id)?.league?.actions.promoteLeague.terms
-      ?.investment ?? 0;
+  const terms = (id: string) =>
+    snapshot.countries.find((c) => c.countryId === id)?.league?.actions.promoteLeague.terms;
   const entry = snapshot.bulkPromotions.find((item) => item.to === reviewing);
+  const losing = entry
+    ? entry.countryIds.filter((id) => (terms(id)?.flowPerQuarter ?? 0) < 0).length
+    : 0;
   return (
     <div className="bulk-promotion" data-testid="bulk-promotion">
       {entry ? (
@@ -39,15 +42,30 @@ export function BulkPromotion({
               tier: t(`league.tiers.${entry.to}`),
             })}
           </p>
+          {losing > 0 ? (
+            <p className="bulk-warning" data-testid="bulk-losing">
+              {t("league.bulk.losing", { count: losing })}
+            </p>
+          ) : null}
           <ul className="bulk-list">
             {[...entry.countryIds]
               .sort((a, b) => name(a).localeCompare(name(b), i18n.language))
-              .map((id) => (
-                <li key={id}>
-                  <span>{name(id)}</span>
-                  <small>{t("league.bulk.investment", { cash: investment(id) })}</small>
-                </li>
-              ))}
+              .map((id) => {
+                const flow = terms(id)?.flowPerQuarter ?? 0;
+                const tier = t(`league.tiers.${entry.to}`);
+                return (
+                  <li key={id} className={flow < 0 ? "is-losing" : undefined}>
+                    <span>{name(id)}</span>
+                    <small>
+                      {t(flow < 0 ? "league.bulk.loss" : "league.bulk.flow", {
+                        cash: terms(id)?.investment ?? 0,
+                        flow: Math.abs(flow),
+                        tier,
+                      })}
+                    </small>
+                  </li>
+                );
+              })}
           </ul>
           <div className="bulk-actions">
             <button

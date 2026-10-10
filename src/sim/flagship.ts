@@ -2,7 +2,7 @@ import type { SeasonInterest, SeasonStory } from "../content";
 import { offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights } from "./culture";
 import { type DealsSnapshot, dealsSnapshot, exclusiveTv, lapseOffers, newDeals } from "./deals";
-import { demoteHardcore, runningCostPerQuarter } from "./leagues";
+import { demoteHardcore, leagueTierIndex, runningCostPerQuarter } from "./leagues";
 import { leadStory, type Outlet, outletOf } from "./press";
 import { ppPrice } from "./prices";
 import { landmarks } from "./records";
@@ -1520,6 +1520,45 @@ export function returnSeatIfFolded(state: GameState, world: World): GameState {
 }
 
 /**
+ * The league the seat has left drops straight to its market's ceiling (GDD v1.35), paying the
+ * voluntary step-down's hardcore demotion for each tier it drops. Its health stands and its
+ * hardcore trend starts clean, as after any restructure.
+ */
+function toCeiling(
+  countries: CountryState[],
+  world: World,
+  countryId: string,
+  turn: number,
+  quarter: number,
+): { countries: CountryState[]; landmark: Landmark | null } {
+  const index = indexOf(world, countryId);
+  const country = countries[index];
+  const league = country?.league;
+  const maxTier = world.derived[index]?.maxTier ?? "elite";
+  if (!country || !league || leagueTierIndex(league.tier) <= leagueTierIndex(maxTier))
+    return { countries, landmark: null };
+  const drops = leagueTierIndex(league.tier) - leagueTierIndex(maxTier);
+  const share = 1 - (1 - world.config.leagues.stepDown.hardcoreDemotionShare) ** drops;
+  const fans = country.fans.map((sport, sportIndex) =>
+    sportIndex === PLAYER_INDEX ? demoteHardcore(sport, share) : sport,
+  );
+  const next = countries.slice();
+  next[index] = {
+    ...country,
+    fans,
+    league: {
+      ...league,
+      tier: maxTier,
+      hardcoreAtLastEval: fans[PLAYER_INDEX]?.hardcore ?? 0,
+    },
+  };
+  return {
+    countries: next,
+    landmark: landmarks.leagueSteppedDown(turn, quarter, countryId, league.tier, maxTier),
+  };
+}
+
+/**
  * Closes the offseason at the start of End Turn (GDD v1.24): a requested seat move happens (with
  * its purist cost), the club count follows the seat league's tier, and a season of a full year
  * starts. Does nothing outside the offseason.
@@ -1545,6 +1584,9 @@ export function closeOffseason(state: GameState, world: World): GameState {
       flagship = moved.flagship;
       countries = moved.countries;
       found.push(landmarks.seatMoved(state.turn, state.quarter, from, pending, "moved"));
+      const left = toCeiling(countries, world, from, state.turn, state.quarter);
+      countries = left.countries;
+      if (left.landmark) found.push(left.landmark);
     } else {
       flagship = { ...flagship, pendingCountryId: null };
     }

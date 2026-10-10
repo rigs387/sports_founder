@@ -57,6 +57,11 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
     switch (blocker.kind) {
       case "topTier":
         return t("league.manage.blockers.topTier", { tier: tier(blocker.tier) });
+      case "marketTooSmall":
+        return t("league.manage.blockers.marketTooSmall", {
+          tier: tier(blocker.to),
+          maxTier: tier(blocker.maxTier),
+        });
       case "hardcore":
         return t("league.manage.blockers.hardcore", {
           needed: blocker.needed,

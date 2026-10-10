@@ -9,6 +9,7 @@ import type {
   GenomeContent,
   GrowthTreeContent,
   IdentityContent,
+  LeagueTierId,
   Names,
   OptionModifiers,
   Places,
@@ -53,6 +54,8 @@ export interface CountryDerived extends AffinityAttributes {
   wealthLevel: number;
   /** How strongly genome fit applies here: 1, or less in a giant market (GDD v1.21). */
   fitScale: number;
+  /** The highest league tier the market can hold unless it has the seat (GDD v1.35). */
+  maxTier: LeagueTierId;
 }
 
 /** Spread link strengths from one source into a target, per channel, before any modifiers. */
@@ -138,6 +141,9 @@ function deriveCountry(
           content.config.bigMarkets.fitExponent,
       ),
     ),
+    maxTier:
+      content.config.leagues.ceilings.find((band) => country.population < band.below)?.maxTier ??
+      "elite",
     wealthLevel: content.config.wealthLevels.thresholds.filter(
       (threshold) => country.incomePerPerson >= threshold,
     ).length,

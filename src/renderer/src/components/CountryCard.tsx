@@ -11,6 +11,8 @@ interface Props {
   names: Names;
   history: HistoryPoint[];
   anchor: string;
+  /** The seat's country: its league ignores the market's ceiling (GDD v1.35). */
+  seat: string;
   turn: number;
   onClose: () => void;
   onLocate: () => void;
@@ -26,6 +28,7 @@ export function CountryCard({
   names,
   history,
   anchor,
+  seat,
   turn,
   onClose,
   onLocate,
@@ -90,6 +93,11 @@ export function CountryCard({
               data-level={country.wealthLevel}
             >
               {t("map.wealthLevel", { level: t(`map.wealthLevels.${country.wealthLevel}`) })}
+            </p>
+            <p className="wealth-level" data-testid="country-max-tier" data-tier={country.maxTier}>
+              {country.countryId === seat
+                ? t("map.maxTierSeat")
+                : t("map.maxTier", { tier: t(`league.tiers.${country.maxTier}`) })}
             </p>
           </div>
           <button

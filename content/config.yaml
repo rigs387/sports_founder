@@ -479,6 +479,15 @@ leagues:
   # Voluntary step-down at Near-Collapse: one tier down, reset to Struggling, demote this share.
   stepDown:
     hardcoreDemotionShare: 0.05
+  # Market size ceilings (GDD v1.35): a league's tier is capped by its country's population, real
+  # headcount only (Luxembourg's and the Faroes' real leagues are semi-pro however rich they are).
+  # The first band a country falls under applies; from 5 million a league may reach Elite. The
+  # league holding the seat ignores its ceiling, and steps down to it when the seat leaves. Set
+  # after a playtest where every fold was a micro-market promoted past what it could pay.
+  ceilings:
+    - { below: 50000, maxTier: amateur }
+    - { below: 500000, maxTier: semi-pro }
+    - { below: 5000000, maxTier: professional }
   # PP bailout: costs ppQuarters of PP income (ppPrices), grants cashQuarters of the league's running
   # cost, then cannot be used on that league again for cooldownQuarters.
   bailout:

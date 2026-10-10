@@ -1142,6 +1142,12 @@ capped by max capacity while fans outnumber seats stays as it is.
     player may still make the mistake, but sees it.
   - *Shown up front:* the Leagues table and the country panel show each market's max tier.
   - *Saves:* the ceiling applies to new campaigns; no migration.
+  - *Built 2026-10-09 (calls made at build).* The ceiling blocks promotion all year, ahead of the
+    offseason window, so the panel says why at any time. The step-down when the seat leaves
+    demotes 1 − 0.95^tiers dropped of the league's hardcore fans; its health stands. The country
+    card reads "League ceiling: Semi-Pro". Headless bots never folded a league before or after,
+    so the runner shows the ceiling only as fewer promotions (about 596 to 504 a campaign over
+    150 turns); in the playtest save Saint Kitts and Nevis leaves bulk promotion.
 - *Topic 2, more fun culture.* 190 of the save's 206 traditions were national names, one born
   (with a card) at every league's first Professional promotion from an 8-name default pool, so
   "the Long Game" came back again and again. Everything else needs flagship facts, and 41 seasons

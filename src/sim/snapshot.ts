@@ -72,6 +72,8 @@ export interface CountrySnapshot {
   population: number;
   /** The market's wealth level id (GDD v1.21): what its fans can spend on sport. */
   wealthLevel: string;
+  /** The highest league tier the market can hold unless it has the seat (GDD v1.35). */
+  maxTier: LeagueTierId;
   casual: number;
   hardcore: number;
   fandomScore: number;
@@ -258,6 +260,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
       population: country.population,
       wealthLevel:
         world.config.wealthLevels.levels[world.derived[index]?.wealthLevel ?? 0]?.id ?? "",
+      maxTier: world.derived[index]?.maxTier ?? "elite",
       casual: fans.casual,
       hardcore: fans.hardcore,
       fandomScore: score,

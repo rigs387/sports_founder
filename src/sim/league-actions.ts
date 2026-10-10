@@ -16,6 +16,7 @@ export type LeagueActionBlocker =
   | { kind: "ended" }
   | { kind: "window" }
   | { kind: "topTier"; tier: LeagueTierId }
+  | { kind: "marketTooSmall"; to: LeagueTierId; maxTier: LeagueTierId }
   | { kind: "hardcore"; to: LeagueTierId; needed: number; current: number }
   | { kind: "venue"; to: LeagueTierId; needed: number; current: number }
   | { kind: "unhealthy"; health: HealthLevel }
@@ -36,6 +37,8 @@ export interface LeagueActions {
       runningCostPerQuarter: number;
       /** Income a quarter at the new tier with today's fans and venue (GDD v1.30). */
       revenuePerQuarter: number;
+      /** Income less running costs a quarter at the new tier with today's fans (GDD v1.35). */
+      flowPerQuarter: number;
     } | null;
   };
   stepDownLeague: {
@@ -86,27 +89,39 @@ export function leagueActions(state: GameState, world: World, index: number): Le
   const atSeat = world.countries[index]?.id === state.flagship.countryId;
   const levels: Partial<Record<LeagueTierId, number>> = world.config.leagues.venue.promotionLevel;
   const venueNeeded = atSeat && promotion ? (levels[promotion.to] ?? 1) : 1;
+  // The market's size caps its league, except at the seat (GDD v1.35).
+  const maxTier = world.derived[index]?.maxTier ?? "elite";
+  const tooSmall =
+    !atSeat && promotion !== null && leagueTierIndex(promotion.to) > leagueTierIndex(maxTier);
   const bailout = bailoutTerms(state, world, index);
   const remainingQuarters = Math.max(0, league.bailoutReadyQuarter - state.quarter);
   const ended: LeagueActionBlocker | null = state.outcome ? { kind: "ended" } : null;
   const promotionBlocker: LeagueActionBlocker | null =
     ended ??
-    (!offseasonOpen(state)
-      ? { kind: "window" }
-      : !promotion
-        ? { kind: "topTier", tier: league.tier }
-        : hardcore < promotion.hardcoreNeeded
-          ? {
-              kind: "hardcore",
-              to: promotion.to,
-              needed: promotion.hardcoreNeeded,
-              current: hardcore,
-            }
-          : venueNeeded > league.venue.level
-            ? { kind: "venue", to: promotion.to, needed: venueNeeded, current: league.venue.level }
-            : league.health !== "healthy"
-              ? { kind: "unhealthy", health: league.health }
-              : null);
+    // A permanent reason comes before the season's window, so the panel says it all year.
+    (promotion !== null && tooSmall
+      ? { kind: "marketTooSmall", to: promotion.to, maxTier }
+      : !offseasonOpen(state)
+        ? { kind: "window" }
+        : !promotion
+          ? { kind: "topTier", tier: league.tier }
+          : hardcore < promotion.hardcoreNeeded
+            ? {
+                kind: "hardcore",
+                to: promotion.to,
+                needed: promotion.hardcoreNeeded,
+                current: hardcore,
+              }
+            : venueNeeded > league.venue.level
+              ? {
+                  kind: "venue",
+                  to: promotion.to,
+                  needed: venueNeeded,
+                  current: league.venue.level,
+                }
+              : league.health !== "healthy"
+                ? { kind: "unhealthy", health: league.health }
+                : null);
   const stepDownBlocker: LeagueActionBlocker | null =
     ended ??
     (league.health !== "near-collapse"
@@ -123,14 +138,21 @@ export function leagueActions(state: GameState, world: World, index: number): Le
         : state.pp < bailout.ppCost
           ? { kind: "prestige", cost: bailout.ppCost, current: state.pp }
           : null);
+  const promotedCost = promotion
+    ? leagueCosts(state, world, index, undefined, promotion.to).total
+    : 0;
+  const promotedIncome = promotion
+    ? leagueIncomePerQuarter(state, world, index, undefined, promotion.to)
+    : 0;
   return {
     promoteLeague: {
       blocker: promotionBlocker,
       terms: promotion
         ? {
             ...promotion,
-            runningCostPerQuarter: leagueCosts(state, world, index, undefined, promotion.to).total,
-            revenuePerQuarter: leagueIncomePerQuarter(state, world, index, undefined, promotion.to),
+            runningCostPerQuarter: promotedCost,
+            revenuePerQuarter: promotedIncome,
+            flowPerQuarter: promotedIncome - promotedCost,
           }
         : null,
     },
@@ -168,6 +190,8 @@ export function leagueActionReason(blocker: LeagueActionBlocker | null): string 
       return "leagues can only be promoted in the offseason";
     case "topTier":
       return `the league is already ${blocker.tier}, the top tier`;
+    case "marketTooSmall":
+      return `the market is too small for ${blocker.to}: its ceiling is ${blocker.maxTier}`;
     case "hardcore":
       return `not enough hardcore fans for ${blocker.to}: needs ${blocker.needed}, has ${blocker.current}`;
     case "venue":
