@@ -229,6 +229,30 @@ Press is digital and weighted (push, article, breaking banner); outlets "Houston
 the season in review is a stats recap. No Britishisms by default. A leagues overview promotes all
 eligible leagues by tier. Firsts take no moment slot and are skipped when stale.
 
+**Third playtest (v1.35):** league tiers are capped by population (under 50K Amateur, under 500K
+Semi-Pro, under 5M Professional, Elite from 5M); the flagship is exempt and steps down to its
+ceiling when the seat leaves. Bulk promotion skips capped leagues and flags projected losses.
+A players' union CBA is parked as the late cash sink.
+National names are born when the sport becomes a country's #1 (lost when it isn't), from pools by
+language sphere without repeats. New traditions: curses (negative; breaking one is a headline),
+eras (3 straight titles), the Invincibles, signature moves named after stars, matchday food
+(flavor). Target: one tradition beyond national names every 2 seasons.
+Stars come from any standout season (Player of the Season, top scorer, a club's dominant scorer),
+several a season; places 2/3/5/6 by tier, so stars outnumber backing slots (1/1/2/2/3). Unbacked
+stars move clubs twice as often. Breakout cards offer Back directly.
+The Hall counts careers (scores in rule units, all-time top 10), aims at about one player a season
+from Professional on, and votes from a ballot (above half the bar; drop off after N classes).
+Firsts move to the Almanac's "{Sport} History" timeline; the Hall is players only.
+The growth tree becomes tracks: cheap small steps, a permanent fork every 3–4 levels that shapes
+the sport (fit, institutions, style of play); a purchase every 2–3 turns; effects previewed.
+Four tracks × 12 levels, mandatory forks at 4/8/12: Grassroots (gear, indoor/outdoor, courts or
+clubs), Media (free or pay TV, breaks, stars or clubs), Institutions (draft or open market,
+expansion or compact, cap or star pay), Culture from tier 3 (attacking or defensive, heritage or
+living game, local or global).
+Saves live in Saved Games\Sports Founder with a Load screen and 3 rotating autosaves. Clicking the
+top bar rank opens Standings (every sport's Fandom Score, fans, #1 countries, trend chart); the
+country panel shows each sport there and the map has a "#1 sport" view.
+
 **Awards (v1.33):** the flagship's Player of the Season (composite of scores, club finish, playoff
 and final scores) and the top scorer's prize; Hall of Fame points; named after the first Hall of
 Fame player once there is one; lines on the champion card, season review, Almanac and Stars panel,

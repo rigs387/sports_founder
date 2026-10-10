@@ -1,8 +1,8 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-08",
-  design: "GDD v1.34",
+  updated: "2026-10-09",
+  design: "GDD v1.35",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -49,6 +49,12 @@ window.SF_PROGRESS = {
   ],
   priorities: [
     {
+      system: "growth",
+      title: "Third playtest follow-ups",
+      text: "Tech plan 2.22 (GDD v1.35): market size ceilings, more fun culture, more stars than slots, a Hall that remembers careers, growth tracks that shape the sport, saves and standings. Designed 2026-10-09; nothing built.",
+      tag: "Next build",
+    },
+    {
       system: "foundation",
       title: "Living time and the offseason",
       text: "The first playtest loved the game but found the choice board stiff and the seasonal window never usable. Built: the offseason opens right after each season, and every card knows when it happened. A Play / Pause clock was tried and dropped (GDD v1.25): Next Turn stays. Decisions now pop up over the map after each turn, with their country outlined, and once a year the offseason screen gathers the season review and all league business. Build plan 2.13 is complete, with a smoke test for the pop-ups and the offseason screen. Next, the flagship's broadcast (tech plan 2.12).",
@@ -94,6 +100,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-09",
+      type: "Design",
+      title: "Third playtest follow-ups",
+      text: "GDD v1.35, tech plan 2.22 (planned, nothing built). An 89-turn playtest save (Germany, Ice Strike, tier 5, #1 on turn 84) reviewed headlessly, then the designer's notes. League tiers capped by population (every fold was a micro-market looped through bulk promotion); national names only where the sport is #1, plus curses, eras, the Invincibles, signature moves and matchday food; stars from any standout season so they outnumber backing slots (4 stars in 41 seasons before); a Hall that counts careers, votes from a ballot and leaves firsts to a History timeline; the growth tree becomes four tracks of small steps with mandatory forks that shape the sport; saves in Saved Games with a Load screen and autosaves; a Standings panel against the rival sports. A players' union CBA is parked as the late cash sink.",
+    },
     {
       date: "2026-10-09",
       type: "Built",

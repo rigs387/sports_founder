@@ -1241,6 +1241,89 @@ reads its fact only in the turn it happens, so it was dropped, never late. Measu
 save's 20 untold firsts are skipped; a fresh US campaign with no input told 201 firsts at a median
 0.01% share (max 1.88%) and announced all 109 leagues formed in 75 turns. `tests/firsts-on-time.test.ts`.
 
+### 2.22 Build Plan: Third Playtest Follow-ups (GDD v1.35)
+
+Topics are settled one at a time; steps are added as each is decided. Nothing here is built yet.
+
+1. **Market size ceilings (topic 1).** Config `leagues.ceilings`: population bands and the
+   highest tier each allows (under 50,000 amateur, under 500,000 semi-pro, under 5,000,000
+   professional, else elite). A derived `maxTier` per country at load (`CountryDerived`).
+   `promotionTerms` / the promote action and `promoteLeagues` gain a `marketTooSmall` blocker
+   unless the league holds the seat. `closeOffseason`: when the seat has moved away, the old
+   seat's league drops straight to its ceiling, demoting `stepDown.hardcoreDemotionShare` of its
+   hardcore fans per tier dropped (a landmark, told like a step-down). Snapshot: `maxTier` on
+   the country and league rows; bulk promotion terms add each league's projected flow a quarter
+   at the new tier (`revenuePerQuarter` − `leagueCosts` at today's fans). Renderer: a max tier
+   column in `LeaguesTable`, a line in the country panel, the blocker's words, a loss flag in
+   the `BulkPromotion` review. Tests (two anchors or fewer): a capped league cannot be promoted
+   or bulk-promoted; a micro-market anchor's flagship can; the seat leaving steps the old league
+   down. Runner: report folds by population band.
+2. **More fun culture (topic 2).** `culture.ts`: the national name is born from a new
+   `rankOneLocal` fact (the sport becomes a country's #1 by fans; recorded as a landmark when the
+   per-country rank changes) instead of `promoted`; `yearEnded` renews it while #1 there and
+   lets it decay otherwise. `names.yaml` `nationalNames` pools for every language sphere (8+
+   each); the pick skips names already used this campaign until the pool is spent. Four new
+   tradition types in the closed vocabulary, born from season summaries: `curse` (config
+   `culture.curse`: drought seasons, lost finals; negative weight: its club's country gets extra
+   hardcore turnover by its strength; broken by a title, which loses it and births a `legacy`-
+   strength tradition with a headline), `era` (`culture.era.straightTitles` 3; renewed per extra
+   title), `invincibles` (no loss in a season, or in a playoff run), `signatureMove` (the scoring
+   record or `culture.signatureMove.starSeasons`; reaches abroad like a chant, config chance), and
+   `matchdayFood` (flavor, no weight; pools by birthplace in `names.yaml`, born early from the
+   founding club). Cards in `tradition-cards.ts` with weights per topic 2; national name cards
+   minor outside the 20 largest markets. Save format 25 (new types; no migration). Runner:
+   traditions by type a campaign; tune thresholds to about one non-national tradition every 2
+   seasons. Tests: one per new type from a constructed season summary; national name born at
+   local #1 and lost after it.
+3. **More stars than slots (topic 3).** `seasonEnd` in `flagship.ts`: candidates are the Player
+   of the Season, the top scorer and each active club's leading player whose share of the club's
+   scores passes `stars.clubShare[scoring]` (new), best first, while `stars.places` (2 / 3 / 5 /
+   6) are open; `newStarIds` on the season summary replaces `newStarId` (cards, Almanac, press).
+   `stars.moveChance` doubled for unbacked stars (`stars.unbackedMoveFactor` 2). Star card: big,
+   with the open slot count and a Back choice priced as backing (`applyAction` path); the first
+   star stays a headline. Runner: stars a campaign, the first star's season, and seasons with more
+   stars playing than backing slots; tune to the first star by about season 8 and one or two over
+   the slots from Professional on. Tests: two stars in one season; a capped season makes none;
+   Back from the card.
+4. **A Hall that remembers careers (topic 4).** `hall-of-fame.ts`: `InducteeFacts` adds career
+   score units (scores ÷ `scoreUnit`) and all-time rank; `hallOfFame.points` adds `careerUnit`
+   and `topTen`. Ballot: retired players at ≥ `ballotShare` (0.5) of the bar, with
+   `ballotClasses` appearances counted on the player (`Player.ballots`); `chooseClass` inducts up
+   to `playersPerClass` (3) who clear the bar, best first, and drops those past `ballotClasses`.
+   Remove the Moments wing (`momentsPerClass`, `HALL_FIRSTS` classes and their PP); the firsts
+   become a History timeline read from landmarks (`historySnapshot`), shown as a "{Sport}
+   History" tab in the Almanac (`src/renderer/src/almanac/`). Hall card adds the near-miss.
+   Runner: Hall players a campaign and per season from Professional; tune the bar to about one a
+   season. Tests: a career-only player reaches the ballot; drop-off after the limit; the
+   timeline lists firsts.
+5. **Growth tracks (topic 5).** `growth-tree.yaml` becomes `tracks`: grassroots, media,
+   institutions, culture (unlock tiers 1, 2, 3, 3), 12 levels each; levels 4, 8, 12 are forks
+   with two sides. `GameState.growthNodes` becomes owned levels and fork sides (purchase order).
+   Step effects reuse the closed effect vocabulary (today's amounts cut to about a quarter). New
+   effect types, validated at load: fit (`wealthFit`, `climateWeight`, `mediaMarketFit`,
+   `urbanFit`, read in `leverMultipliers`/affinity), institutions (`ratingParity`,
+   `flagshipClubs`, `wageFactor`, `starPlaces`, `starMoveFactor`), style (`scoringFactor`,
+   `closeGameFactor`, `traditionBirth` by type), money (`sponsorValue`, `mediaRevenue`) and a
+   one-time `puristBacklash` at the anchor. `buyNode` → `buyLevel` (next level of a track, or a
+   fork side); the fork blocks the track until taken; prices per level in `quarters`, set so the
+   runner's bots buy about every 2–3 turns. Snapshot: tracks with levels, status, price and an
+   effect preview (projected fans in the top 10 markets over 10 turns from today's rates; counts
+   for discrete effects) and a "done so far" estimate. Renderer: `GrowthScreen` as four track
+   rows with fork cards. Bots: each picks fork sides by its own weights. Runner: purchases per
+   turn, fork side shares (the options experiment flags a dominant side). Save format bump, no
+   migration. Tests: fork blocks the track; a fork closes its sibling; one fit and one
+   institution effect change their numbers.
+6. **Saves and standings (topic 6).** Main: a saves folder at `%USERPROFILE%\Saved Games\Sports
+   Founder` (created on first use; `app.getPath("home")`), the default for both dialogs; a
+   `listSaves` IPC endpoint reading each save's header (name, anchor, turn, year, mtime; headers
+   only, bounded like `readCampaignFile`); autosave after each `endTurn` to `autosave-1..3`
+   (rotated, atomic). Renderer: a Load screen (title menu and in game). Sim snapshot: per-sport
+   world totals already exist; add countries at #1 per sport, the 10-turn change and a yearly
+   Fandom Score series from `yearly`; per country, every sport's fans and the player's rank.
+   Renderer: a `StandingsPanel` opened from the top bar rank, an SVG line chart (no chart
+   library), country panel rows, and a "#1 sport" map mode. Smoke: open the standings and the
+   Load screen, screenshot both.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

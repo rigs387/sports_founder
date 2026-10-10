@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.34 | October 8, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default)*
+*Version 1.35 | October 9, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size)*
 
 ---
 
@@ -1116,6 +1116,154 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
     fact only in the turn it happens, so a full turn dropped it (156 of 213 told), never delayed it.
 - *Saves:* nobody plays but the designer, so these changes need no save migrations (2026-10-08).
 
+**Third playtest follow-ups (decided 2026-10-09, v1.35).** An 89-turn playtest save (Germany,
+Ice Strike, tier 5 on turn 79, #1 on turn 84) reviewed headlessly, then the player's notes. League
+cash piling up with nothing to spend it on is parked (a collective bargaining agreement); attendance
+capped by max capacity while fans outnumber seats stays as it is.
+- *Topic 1, market size ceilings.* All 46 folds were in markets under 500,000 people, in one loop:
+  bulk promotion offered a micro-market Semi-Pro and then Professional, investors paid for it, it
+  could not pay Professional's minimum running cost and folded a few turns later, re-formed after
+  the cooldown and was offered again (the British Virgin Islands five times). Meanwhile Gibraltar
+  (39,000 people) and the Faroe Islands ran Elite leagues, the same tier as Germany's.
+  - *A league's tier is capped by its country's population* (config, real headcount only; wealth
+    does not lift it, as Luxembourg's and the Faroes' real leagues are semi-pro): under 50,000
+    Amateur only; under 500,000 Semi-Pro at most; under 5 million Professional at most; Elite
+    from 5 million. 86 markets are capped, 39 of them at Semi-Pro or below (every market that
+    folded). Small sporting nations land where they really are: Uruguay, Croatia, Wales, Puerto
+    Rico and Qatar Professional; Iceland, Barbados, Samoa and Tonga Semi-Pro; New Zealand,
+    Scotland, Norway and Ireland may reach Elite.
+  - *The flagship is exempt:* the league holding the seat ignores its ceiling (a micro-market
+    anchor can still grow its flagship). When the seat leaves, that league steps down to its
+    ceiling at once as the offseason closes, paying the voluntary step-down's hardcore demotion
+    for each tier it drops.
+  - *Promotion says why not:* a league at its ceiling shows a "market too small" blocker and is
+    left out of bulk promotion. Bulk promotion's review shows each league's projected cash flow a
+    quarter at the new tier and flags the ones that would lose money, without removing them: the
+    player may still make the mistake, but sees it.
+  - *Shown up front:* the Leagues table and the country panel show each market's max tier.
+  - *Saves:* the ceiling applies to new campaigns; no migration.
+- *Topic 2, more fun culture.* 190 of the save's 206 traditions were national names, one born
+  (with a card) at every league's first Professional promotion from an 8-name default pool, so
+  "the Long Game" came back again and again. Everything else needs flagship facts, and 41 seasons
+  gave 1 derby, 1 rite, 3 legacies, 2 chants, 8 famous venues and the trophy.
+  - *National names mean something:* one is born when the sport becomes a country's #1 sport by
+    fans (no longer at first Professional). It renews each year while the sport stays #1 there
+    and decays like any other tradition once it is not, so it can be lost.
+  - *Name pools by language sphere:* every sphere gets a pool of at least 8 names, and no name
+    repeats within a campaign until its pool runs out.
+  - *Five new types, all born from flagship facts:*
+    - *Curses* (the one negative tradition, choose pain): a former champion goes a config number
+      of seasons without a title, or loses a config number of finals. Its club's fans churn a
+      little more where it is held. Breaking it is a headline and turns it into a strong
+      tradition of the ordinary kind (the Red Sox, 2004).
+    - *Eras:* a config number of straight titles (3 to start) names an era ("the Leipzig Years"),
+      renewed while the run lasts.
+    - *The Invincibles:* an unbeaten season, or an unbeaten playoff run, is remembered by name.
+    - *Signature moves:* a scoring-record holder or a long-time star gives a move their name
+      ("the Seidel Spin"); stronger than a legacy, and it reaches abroad with the star's fame.
+    - *Matchday food and rituals,* drawn by founding character (a bratwurst stand at the 67s):
+      flavor only, with no effect.
+  - *Effects:* the new types use the existing weight rules (stickiness, resisting betrayal), except
+    curses (negative) and matchday food (flavor). Supporters' groups were considered and not taken.
+  - *How often:* about one tradition other than national names every 2 seasons at the flagship,
+    about 20 in a 40-season campaign (thresholds measured at build).
+  - *Card weight:* national names are minor and collect themselves, except in the 20 biggest
+    markets (big); a broken curse and a new era are headlines; every other birth is big.
+- *Topic 3, more stars than slots.* 4 stars in 41 seasons, the first in season 25 (turn 64),
+  never two at once, so 2–3 backing slots never forced a choice. Only the league's top scorer
+  could become a star, at 34% of the club's scores (high rule), so at most one candidate a season,
+  passing about one season in four. The player wants stars sooner and choices between them.
+  - *Any standout season makes a star:* the Player of the Season, the top scorer, or any club's
+    leading player with a club-leading share above a config threshold. Several can be made in one
+    season while places are open.
+  - *How many:* the first star within about 8 seasons; from Professional on, usually one or two
+    more stars playing than backing slots. Star places rise to 2 / 3 / 5 / 6 by league tier
+    (numbers tuned at build).
+  - *Unbacked stars wander:* an unbacked star's chance to move clubs doubles. Stars do not leave
+    for rival sports.
+  - *Backing slots stay* 1 / 1 / 2 / 2 / 3 by PP tier: scarcity comes from more stars, not fewer
+    slots.
+  - *The breakout card asks:* the first star stays a headline; later breakouts are big cards that
+    name the open slots ("Back her? 0 of 2 slots free") and offer Back directly at its price.
+- *Topic 4, a Hall that remembers careers.* 4 players in 41 seasons. Points counted only star
+  seasons, awards, titles, top-scorer seasons and the record, never careers: the #4 all-time
+  scorer (15,510) had 0 points and was not even waiting; a four-time top scorer had 13 of 24.
+  - *Careers count:* points for career scores, counted in the scoring rule's units (so every rule
+    is even), plus a bonus for an all-time top-10 finish.
+  - *Size:* about one player a season from Professional on, roughly 25 in a 40-season league, in
+    classes of up to 3 (the bar is tuned at build).
+  - *A ballot, not a waiting list:* every retired player above half the bar is on the ballot,
+    shown with points against the bar; each class inducts the best who clear it; a player still
+    out after a config number of classes drops off for good. The Almanac shows the ballot.
+  - *The Hall is for people:* the firsts leave the Hall for a "{Sport} History" section in the
+    Almanac, a dated timeline of the sport's firsts and landmarks. This supersedes v1.31's
+    Moments wing; Hall classes are players only.
+  - *Cards:* one per class as now; it names a ballot near-miss when there is one ("Schulz misses
+    again").
+- *Topic 5, a growth tree that shapes the sport.* 30 nodes, each a permanent worldwide
+  percentage; 11 bought in 89 turns (one every 8), none changing what the sport is, so they read
+  as forgettable one-time bonuses. The player wants more frequent, smaller purchases that shape
+  the sport and its attributes. This supersedes the v1.5 node list (its effects survive as step
+  effects).
+  - *Tracks, not a tree:* each category is a track of cheap levels, each a small steady effect
+    (today's reach effects, cut down: conversion, spread, churn, costs, tradition strength), with
+    a fork every 3rd–4th level that shapes the sport.
+  - *Forks shape the sport in three ways:* **fit** (where the sport catches on: cheap or premium
+    gear, indoor or outdoor play, broadcast breaks; read through the existing country attributes,
+    where rule amendments change the rule traits themselves), **institutions** (how leagues work:
+    a draft or an open market, academies, playoffs, expansion clubs) and **style of play**
+    (attacking or defensive: scorelines, star production, which traditions are born).
+  - *Pace:* a purchase every 2–3 turns on average; steps cost about 1–2 turns of income, forks
+    more (prices still in quarters of income, set per level so the pace holds across turn
+    lengths).
+  - *Forks are permanent* (choose pain): taking one side closes the other for the campaign.
+  - *It must be seen to matter:* each purchase previews its concrete effect ("about +1.2M fans in
+    your top 10 markets over 10 turns", "+2 star places"); the Growth screen says what the tree
+    has done so far, estimated where a measurement is not cheap.
+  - *Four tracks of 12 levels, forks at levels 4, 8 and 12* (48 levels, 12 forks; at one purchase
+    every 2–3 turns a campaign buys about 40, so not everything). Steps are about a quarter of
+    today's node effects. A fork is a level of its own: the track goes no further until a side
+    is taken, so the choice cannot be dodged.
+    - *Grassroots (tier 1)*, steps in casual conversion, league formation and churn. Forks:
+      **cheap gear** (poorer markets fit better) or **premium gear** (rich markets convert
+      hardcore; bigger sponsor offers); **indoor halls** (climate counts half as much) or
+      **outdoor grounds** (fitting climates stronger; famous venues born sooner); **street
+      courts** (dense cities, more casual) or **club grounds** (more hardcore, less churn).
+    - *Media (tier 2)*, steps in language and media spread and PP income. Forks: **free-to-air**
+      (casual reach) or **pay TV** (league money, less reach); **broadcast breaks** (big media
+      markets fit better and pay more; a one-time purist backlash at home) or **uninterrupted
+      play** (purists stickier, less media money); **star-driven coverage** (stars pull more
+      fans) or **club-driven coverage** (derbies and club rites born sooner).
+    - *Institutions (tier 3, new)*, steps in running costs, promotion investment and venue costs.
+      Forks: **draft** (club strength evens out, titles spread, curses break) or **open market**
+      (eras and dynasties; stars drift to big clubs); **expansion** (+2 flagship clubs at
+      Professional and Elite: more seats and gate) or **compact league** (more meetings, more
+      derbies, richer clubs); **salary cap** (lower wages, evener clubs) or **star pay** (higher
+      wages, stars move less, more star places).
+    - *Culture (tier 3, was 4)*, steps in tradition strength, protection and reach. Forks:
+      **attacking style** (higher scorelines, more star breakouts, more casual pull) or
+      **defensive style** (closer games: more close finals, underdog titles, chants and curses);
+      **heritage** (traditions protected; amendments cost more backlash) or **living game**
+      (traditions reach abroad more, less protected); **local pride** (national names and
+      derbies stronger at home) or **global game** (chants and signature moves spread abroad).
+- *Topic 6, saves and standings.* Saves had no folder (the dialog opened Documents, synced to
+  OneDrive), and nothing showed the player's sport against the rivals side by side.
+  - *Saves live in `Saved Games\Sports Founder`* in the user's folder (Windows' folder for game
+    saves, not synced by OneDrive by default, a Steam Cloud target later). Dialogs open there;
+    Save As can still go anywhere.
+  - *In-game saves:* a Load screen lists the saves in that folder (name, anchor, turn, year, date
+    saved); an autosave each turn keeps the last 3.
+  - *Standings:* clicking the rank in the top bar opens a Standings panel: per sport, Fandom
+    Score, casual, hardcore, countries where it is #1 and the change over the last 10 turns, a
+    line chart of Fandom Score by year (the yearly history), and the win hold's progress on top.
+  - *Per country:* the country panel shows the same rows for that country and the player's rank
+    there; the world map gains a "#1 sport" view.
+- *Topic 7, a dominant scorer (reviewed, no change).* The top scorer's share of his club's scores
+  rose from 24–32% (seasons 1–10) to 33–41% (seasons 31–41): replacements lean toward strong
+  clubs' ratings and credit rises with skill toward a 60% cap that never binds. Tim Seidel's 37%
+  matches real basketball's all-time ceiling (Jordan about 32%, Kobe 2006 about 36%). Left as it
+  is: an all-time great is welcome, and topic 3's per-club star threshold already rewards one.
+
 **Press coverage:** Presentation only; no press sentiment system. Fictional outlets per country
 (in the names data file); headlines built from record-backed Moments, with English-only flavor
 variety. Big turns can show a newspaper-style front page in the recap (a 9x16 candidate).
@@ -1970,6 +2118,11 @@ Items flagged during the interview that need further discussion in future sessio
   could pay in fans, cash or culture instead. Needs a design session.
 - Player of the Year (parked 2026-10-08, v1.33): a global award once other leagues have named
   players; until then it would always name the flagship's Player of the Season.
+- Collective bargaining agreement (parked 2026-10-09, third playtest): late leagues pile up cash
+  with nothing to spend it on (a turn-89 save held $2.87 trillion across leagues; the flagship
+  earned $1.6B a quarter against $80M of costs). A CBA with a players' union would claim a share
+  of league revenue through negotiated terms, with strikes or lockouts when talks fail, and act as
+  the money sink. Other late ideas may close the gap first; design it with them.
 - Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to
   handle missed matches; deferred from the Phase 1 stars build.
 - Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship
