@@ -5,8 +5,6 @@ import type {
   DealSlot,
   EscalationLevel,
   Genome,
-  HallFirst,
-  HallWing,
   HealthLevel,
   LeagueTierId,
   TimedCountermoveKind,
@@ -656,6 +654,8 @@ export type Landmark =
       countryId: string;
       season: number;
       inductees: number;
+      /** The best player on the ballot left out (GDD v1.35), if any. */
+      nearMissId: number | null;
     }
   | {
       kind: "rivalRuleCopied";
@@ -856,32 +856,38 @@ export interface InducteeFacts {
   record: boolean;
   /** Career scores. */
   scores: number;
+  /** Career scores in units of each season's rule (scores ÷ scoreUnit), GDD v1.35. */
+  careerUnits: number;
+  /** Place among every flagship player by career units when the facts were read, 1 = first. */
+  allTimeRank: number;
 }
 
-/** One Hall of Fame inductee: a player, or a first in the Moments wing. */
+/** One Hall of Fame inductee: a player (GDD v1.35: the Hall is for people). */
 export interface Inductee {
   id: number;
-  wing: HallWing;
   /** The flagship season whose end inducted them (their class). */
   season: number;
   turn: number;
   quarter: number;
-  /** Home: a player's birth country; a first's landmark country (the anchor for #1 and the win). */
+  /** Home: the player's birth country. */
   countryId: string;
-  playerId: number | null;
-  facts: InducteeFacts | null;
-  first: HallFirst | null;
-  /** The landmark a first was read from (landmarks are never removed). */
-  landmarkIndex: number | null;
+  playerId: number;
+  facts: InducteeFacts;
+}
+
+/** A player's standing on the ballot (GDD v1.35): classes they have been passed over in. */
+export interface BallotEntry {
+  playerId: number;
+  classes: number;
 }
 
 export interface HallOfFameState {
   /** Only players retiring in this flagship season or later are eligible (no retroactive ones). */
   startSeason: number;
-  /** Firsts count only from landmarks at or after this index. */
-  landmarkStart: number;
   inductees: Inductee[];
   nextId: number;
+  /** Everyone passed over so far; at ballotClasses they are off the ballot for good. */
+  ballots: BallotEntry[];
 }
 
 export interface CampaignSetup {

@@ -583,9 +583,19 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         records: state.landmarks.filter((l) => l.kind === "recordCrowd").length,
       },
       remembers: {
-        players: state.hallOfFame.inductees.filter((i) => i.wing === "players").length,
-        moments: state.hallOfFame.inductees.filter((i) => i.wing === "moments").length,
-        firstPlayerTurn: state.hallOfFame.inductees.find((i) => i.wing === "players")?.turn ?? null,
+        players: state.hallOfFame.inductees.length,
+        // Seasons since the flagship's league first turned Professional (GDD v1.35: the Hall aims at
+        // about one player a season from then on).
+        proSeasons: (() => {
+          const pro = state.landmarks.find(
+            (l) =>
+              l.kind === "leaguePromoted" &&
+              l.to === "professional" &&
+              state.flagship.seasons.some((s) => s.countryId === l.countryId),
+          );
+          return pro ? state.flagship.seasons.filter((s) => s.quarter >= pro.quarter).length : 0;
+        })(),
+        firstPlayerTurn: state.hallOfFame.inductees[0]?.turn ?? null,
         chants: state.culture.traditions.filter((t) => t.type === "chant").length,
         chantsSpread: state.landmarks.filter((l) => l.kind === "chantSpread").length,
         anchorShrine: shrineWeights(state, world)[anchorIndex] ?? 0,

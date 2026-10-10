@@ -243,7 +243,16 @@ export const landmarks = {
     countryId: string,
     season: number,
     inductees: number,
-  ): Landmark => ({ kind: "hallOfFameClass", turn, quarter, countryId, season, inductees }),
+    nearMissId: number | null,
+  ): Landmark => ({
+    kind: "hallOfFameClass",
+    turn,
+    quarter,
+    countryId,
+    season,
+    inductees,
+    nearMissId,
+  }),
   dealBroken: (
     turn: number,
     quarter: number,

@@ -97,7 +97,7 @@ describe("births", () => {
     expect(ofType(home, "venue").map((t) => t.clubIds[0])).toEqual([founding]);
   });
 
-  it("a star legacy needs a long star career or the scoring record; honors start it stronger", () => {
+  it("a star legacy is not born at retirement, however long the star career (GDD v1.35)", () => {
     const state = fresh();
     const player = state.flagship.players[0];
     const rival = state.flagship.players[1];
@@ -140,13 +140,9 @@ describe("births", () => {
       };
       return ofType(updateCulture(next, world), "legacy");
     };
-    expect(retire(5, 5, false)).toEqual([]);
-    const [legacy] = retire(3, 5, false);
-    expect(legacy?.playerId).toBe(player.id);
-    const [honored] = retire(3, 5, true);
-    expect(honored?.strength).toBeGreaterThan(legacy?.strength ?? 1);
-    // Two star seasons, but the league's all-time top scorer.
-    expect(retire(5, 50, false)).toHaveLength(1);
+    // Legacies come with the Hall of Fame (tests/hall-of-fame.test.ts), never at retirement.
+    expect(retire(1, 5, true)).toEqual([]);
+    expect(retire(5, 50, false)).toEqual([]);
   });
 
   it("a national name is born where the sport becomes #1, never repeats, and fades after", () => {

@@ -9,8 +9,6 @@ import {
   formatPath,
   GENOME_AXES,
   genomeSchema,
-  hallFirstSchema,
-  hallWingSchema,
   healthLevelSchema,
   LEAGUE_TIERS,
   leagueTierSchema,
@@ -22,7 +20,7 @@ import { newCulture } from "./culture";
 import { newDeals } from "./deals";
 import { emptyEvents, eventStateSchema } from "./events-state";
 import { newFlagship, staffFlagship } from "./flagship";
-import { newHallOfFame } from "./hall-of-fame";
+import { inducteeFacts, newHallOfFame } from "./hall-of-fame";
 import { defaultGroundName, defaultIdentitySetup, foundingClubOf } from "./identity";
 import { invariantsOf } from "./invariants";
 import { newLeague } from "./leagues";
@@ -32,7 +30,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 24;
+export const SAVE_FORMAT_VERSION = 25;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -288,6 +286,7 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     countryId: z.string().min(1),
     season: z.int().min(1),
     inductees: z.int().min(1),
+    nearMissId: z.int().min(1).nullable(),
   }),
   z.strictObject({
     kind: z.literal("rivalRuleCopied"),
@@ -592,31 +591,28 @@ const gameStateSchema = z.strictObject({
   }),
   hallOfFame: z.strictObject({
     startSeason: z.int().min(1),
-    landmarkStart: count,
     inductees: z.array(
       z.strictObject({
         id: z.int().min(1),
-        wing: hallWingSchema,
         season: z.int().min(1),
         turn: z.int().min(1),
         quarter: count,
         countryId: z.string().min(1),
-        playerId: z.int().min(1).nullable(),
-        facts: z
-          .strictObject({
-            starSeasons: count,
-            titles: count,
-            topScorerSeasons: count,
-            awards: count,
-            record: z.boolean(),
-            scores: count,
-          })
-          .nullable(),
-        first: hallFirstSchema.nullable(),
-        landmarkIndex: count.nullable(),
+        playerId: z.int().min(1),
+        facts: z.strictObject({
+          starSeasons: count,
+          titles: count,
+          topScorerSeasons: count,
+          awards: count,
+          record: z.boolean(),
+          scores: count,
+          careerUnits: z.number().min(0),
+          allTimeRank: z.int().min(1),
+        }),
       }),
     ),
     nextId: z.int().min(1),
+    ballots: z.array(z.strictObject({ playerId: z.int().min(1), classes: z.int().min(1) })),
   }),
 });
 
@@ -636,6 +632,72 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 24 → 25: the Hall is for people (GDD v1.35). The Moments wing's firsts leave the Hall (they are
+  // the Almanac's history, read from landmarks); player inductees keep their facts, with career
+  // units and all-time rank read from today's records; nobody has been passed over yet. Class
+  // landmarks and class cards name no near-miss.
+  24: (save, world) => {
+    const flagship = save.state.flagship as FlagshipState;
+    const hall = save.state.hallOfFame as {
+      startSeason: number;
+      inductees: Record<string, unknown>[];
+      nextId: number;
+      ballots?: unknown[];
+    };
+    const facts = (playerId: number) => {
+      const player = flagship.players.find((p) => p.id === playerId);
+      return player
+        ? inducteeFacts({ flagship, landmarks: [] }, world, player)
+        : { careerUnits: 0, allTimeRank: 1 };
+    };
+    const landmarkList = (Array.isArray(save.state.landmarks) ? save.state.landmarks : []).map(
+      (landmark: Record<string, unknown>) =>
+        landmark.kind === "hallOfFameClass"
+          ? { ...landmark, nearMissId: landmark.nearMissId ?? null }
+          : landmark,
+    );
+    const events = save.state.events as Record<string, unknown>;
+    const told = (list: unknown) =>
+      (Array.isArray(list) ? list : []).map((event: Record<string, unknown>) => {
+        const eventFacts = event.facts as Record<string, unknown>;
+        const hallFacts = eventFacts.hall as Record<string, unknown> | null;
+        return hallFacts
+          ? {
+              ...event,
+              facts: {
+                ...eventFacts,
+                hall: { ...hallFacts, nearMissId: hallFacts.nearMissId ?? null },
+              },
+            }
+          : event;
+      });
+    return {
+      formatVersion: 25,
+      state: {
+        ...save.state,
+        landmarks: landmarkList,
+        events: { ...events, pending: told(events.pending), history: told(events.history) },
+        hallOfFame: {
+          startSeason: hall.startSeason,
+          inductees: hall.inductees
+            .filter((inductee) => (inductee.wing ?? "players") === "players")
+            .map(({ wing: _w, first: _f, landmarkIndex: _l, facts: kept, ...inductee }) => {
+              const read = facts(inductee.playerId as number);
+              return {
+                ...inductee,
+                facts: {
+                  ...(kept as Record<string, unknown>),
+                  careerUnits: (kept as Record<string, unknown>).careerUnits ?? read.careerUnits,
+                  allTimeRank: (kept as Record<string, unknown>).allTimeRank ?? read.allTimeRank,
+                },
+              };
+            }),
+          nextId: hall.nextId,
+          ballots: hall.ballots ?? [],
+        },
+      },
+    };
+  },
   // 23 → 24: awards (GDD v1.33). No retroactive awards: past seasons have no Player of the Season,
   // season cards name none, and Hall of Fame inductees have no award count.
   23: (save) => {
@@ -691,7 +753,7 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
       state: {
         ...save.state,
         events: { ...events, pending: told(events.pending), history: told(events.history) },
-        hallOfFame: newHallOfFame(flagship.season, landmarks.length),
+        hallOfFame: newHallOfFame(flagship.season),
       },
     };
   },

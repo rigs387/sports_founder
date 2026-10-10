@@ -161,7 +161,8 @@ export interface CampaignResult {
   /** What the sport remembers (GDD v1.31): the Hall of Fame, chants, Culture nodes. */
   remembers: {
     players: number;
-    moments: number;
+    /** Flagship seasons since its league first turned Professional. */
+    proSeasons: number;
     /** The turn of the first player induction, if any. */
     firstPlayerTurn: number | null;
     chants: number;
@@ -437,7 +438,12 @@ export function remembersAggregate(results: CampaignResult[]) {
   const pick = (f: (r: CampaignResult) => number) => distribution(results.map(f));
   return {
     players: pick((r) => r.remembers.players),
-    moments: pick((r) => r.remembers.moments),
+    // Hall players a season from Professional on (GDD v1.35: about one).
+    perProSeason: median(
+      results
+        .filter((r) => r.remembers.proSeasons > 0)
+        .map((r) => r.remembers.players / r.remembers.proSeasons),
+    ),
     firstPlayerTurn: median(
       results.flatMap((r) =>
         r.remembers.firstPlayerTurn === null ? [] : [r.remembers.firstPlayerTurn],

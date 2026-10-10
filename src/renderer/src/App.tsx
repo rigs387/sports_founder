@@ -364,7 +364,7 @@ export function App() {
             turn={snapshot.turn}
             culture={snapshot.culture}
             inductees={snapshot.hallOfFame.inductees
-              .filter((i) => i.wing === "players" && i.countryId === selected.countryId)
+              .filter((i) => i.countryId === selected.countryId)
               .map((i) => snapshot.flagship.players.find((p) => p.id === i.playerId)?.name ?? "")}
             onClose={() => selectCountry(null)}
             onLocate={() => navigate("locate", selected.countryId)}

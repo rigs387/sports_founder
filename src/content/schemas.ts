@@ -224,15 +224,11 @@ const byTradition = <T extends z.ZodType>(value: T) =>
 
 // ---- Hall of Fame (GDD v1.31) --------------------------------------------------------------
 
-/** The Hall of Fame's wings: players and the Moments wing of firsts. */
-export const HALL_WINGS = ["players", "moments"] as const;
-export const hallWingSchema = z.enum(HALL_WINGS);
-export type HallWing = z.infer<typeof hallWingSchema>;
-
 /**
- * The closed vocabulary of firsts the Moments wing can induct, each read from the first landmark
- * of its kind: the founding club's first title, the sport's first star, its first Professional
- * and Elite leagues, the first record crowd, first taking #1 and the win.
+ * The closed vocabulary of the sport's firsts the Almanac's history tells (GDD v1.35; the Hall's
+ * Moments wing before), each read from the first landmark of its kind: the founding club's first
+ * title, the sport's first star, its first Professional and Elite leagues, the first record
+ * crowd, first taking #1 and the win.
  */
 export const HALL_FIRSTS = [
   "foundingTitle",
@@ -1016,7 +1012,6 @@ export const configFileSchema = z.strictObject({
     decayPerYear: unitInterval,
     honorsBonus: unitInterval,
     derby: z.strictObject({ meetings: z.int().min(1), seasons: z.int().min(1) }),
-    legacy: z.strictObject({ starSeasons: z.int().min(1) }),
     venue: z.strictObject({ fameFacts: z.int().min(1), foundingFacts: z.int().min(0) }),
     weightCap: z.number().positive(),
     turnoverCut: unitInterval,
@@ -1089,7 +1084,7 @@ export const configFileSchema = z.strictObject({
     playoffScore: z.number().min(0),
     finalScore: z.number().min(0),
   }),
-  /** The Hall of Fame (GDD v1.31). */
+  /** The Hall of Fame (GDD v1.31; players only and a ballot since v1.35). */
   hallOfFame: z.strictObject({
     points: z.strictObject({
       starSeason: z.number().min(0),
@@ -1097,18 +1092,23 @@ export const configFileSchema = z.strictObject({
       title: z.number().min(0),
       topScorer: z.number().min(0),
       record: z.number().min(0),
+      /** One point per this many career score units (scores ÷ the season rule's scoreUnit). */
+      careerUnits: z.number().positive(),
+      /** For a career in the all-time top topRank by score units. */
+      topTen: z.number().min(0),
     }),
+    topRank: z.int().min(1),
     bar: z.number().positive(),
     waitSeasons: z.int().min(0),
     playersPerClass: z.int().min(1),
-    momentsPerClass: z.int().min(0),
+    /** On the ballot at ballotShare × bar; off it for good after ballotClasses classes. */
+    ballotShare: unitInterval,
+    ballotClasses: z.int().min(1),
     shrineWeight: z.number().min(0),
-    /** PP per inductee by wing and the flagship league's tier when the class card arrives. */
-    pp: z.strictObject({
-      players: byLeagueTier(z.number().min(0)),
-      moments: byLeagueTier(z.number().min(0)),
-    }),
-    moments: z.array(hallFirstSchema),
+    /** PP per inductee by the flagship league's tier when the class card arrives. */
+    pp: byLeagueTier(z.number().min(0)),
+    /** The firsts the Almanac's history tells, in order (GDD v1.35). */
+    firsts: z.array(hallFirstSchema),
     leaders: z.int().min(1),
     awardLeaders: z.int().min(1),
   }),

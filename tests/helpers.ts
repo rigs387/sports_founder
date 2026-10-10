@@ -89,7 +89,7 @@ export function migratedCulture(state: GameState) {
 
 /** The Hall of Fame an older save gains on loading (format 23): empty, counting from now. */
 export function migratedHall(state: GameState) {
-  return newHallOfFame(state.flagship.season, state.landmarks.length);
+  return newHallOfFame(state.flagship.season);
 }
 
 /** Awards as an older save gains them on loading (format 24): no winners and no award facts. */

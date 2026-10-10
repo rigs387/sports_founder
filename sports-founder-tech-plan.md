@@ -1329,6 +1329,17 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    Runner: Hall players a campaign and per season from Professional; tune the bar to about one a
    season. Tests: a career-only player reaches the ballot; drop-off after the limit; the
    timeline lists firsts.
+
+   *Built 2026-10-10.* `hall-of-fame.ts`: `careerUnitsById` (once per call), `allTimeRank`,
+   `hallBallot`, `chooseClass` → `{ inductees, ballots, nearMissId }`, `historySnapshot` (one
+   pass; `professionalSince` for the first record crowd), `hallSnapshot` with `ballot`, `bar` and
+   `history`. `Inductee` is players only; `HallOfFameState.ballots`; the class landmark and the
+   card's hall facts carry `nearMissId`. Culture: `legacy` is born at induction (`retired` and the
+   `legacy.starSeasons` threshold are gone). Config `hallOfFame`: `points.careerUnits` 15,
+   `points.topTen` 5, `topRank` 10, `bar` 16, `playersPerClass` 3, `ballotShare` 0.5,
+   `ballotClasses` 5, `pp` by tier, `firsts`. Save format 25 (migration 24: drop the Moments wing,
+   read career units and rank, no ballot, no near-misses). Almanac: plaques, the Ballot, "{Sport}
+   history"; the smoke checks the history. Runner: Hall players a season from Professional on.
 5. **Growth tracks (topic 5).** `growth-tree.yaml` becomes `tracks`: grassroots, media,
    institutions, culture (unlock tiers 1, 2, 3, 3), 12 levels each; levels 4, 8, 12 are forks
    with two sides. `GameState.growthNodes` becomes owned levels and fork sides (purchase order).

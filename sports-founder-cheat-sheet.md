@@ -242,7 +242,8 @@ several a season; places 2/3/5/6 by tier, so stars outnumber backing slots (1/1/
 stars move clubs twice as often. Breakout cards offer Back directly.
 The Hall counts careers (scores in rule units, all-time top 10), aims at about one player a season
 from Professional on, and votes from a ballot (above half the bar; drop off after N classes).
-Firsts move to the Almanac's "{Sport} History" timeline; the Hall is players only.
+Firsts move to the Almanac's "{Sport} History" timeline; the Hall is players only. A star legacy
+is born when its player enters the Hall.
 The growth tree becomes tracks: cheap small steps, a permanent fork every 3–4 levels that shapes
 the sport (fit, institutions, style of play); a purchase every 2–3 turns; effects previewed.
 Four tracks × 12 levels, mandatory forks at 4/8/12: Grassroots (gear, indoor/outdoor, courts or

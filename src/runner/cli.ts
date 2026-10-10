@@ -807,7 +807,7 @@ function main(): number {
     );
     const remembers = remembersAggregate(results);
     console.log(
-      `  Remembers: Hall of Fame players per campaign median ${fmt(remembers.players.median)} (max ${fmt(remembers.players.max)}; in ${remembers.withPlayers}/${results.length} campaigns, the first at turn median ${fmt(remembers.firstPlayerTurn)}), moments median ${fmt(remembers.moments.median)}; anchor shrine weight median ${fmt(remembers.anchorShrine.median)}; chants per campaign median ${fmt(remembers.chants.median)}, ${remembers.chantsSpread} spread abroad; Culture nodes bought in ${remembers.boughtCulture}/${results.length} campaigns (median ${fmt(remembers.cultureNodes.median)})`,
+      `  Remembers: Hall of Fame players per campaign median ${fmt(remembers.players.median)} (max ${fmt(remembers.players.max)}; in ${remembers.withPlayers}/${results.length} campaigns, the first at turn median ${fmt(remembers.firstPlayerTurn)}), a season from Professional on median ${(remembers.perProSeason ?? 0).toFixed(2)} (target about 1); anchor shrine weight median ${fmt(remembers.anchorShrine.median)}; chants per campaign median ${fmt(remembers.chants.median)}, ${remembers.chantsSpread} spread abroad; Culture nodes bought in ${remembers.boughtCulture}/${results.length} campaigns (median ${fmt(remembers.cultureNodes.median)})`,
     );
     console.log(
       `  Traditions born per campaign (median): ${remembers.traditions

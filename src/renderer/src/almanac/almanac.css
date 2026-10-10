@@ -186,6 +186,16 @@
 .moments-wing small {
   white-space: nowrap;
 }
+/* The sport's history (GDD v1.35): the year, then the first. */
+.moments-wing li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 8px;
+}
+/* A ballot player who clears the bar but waits for room or seasons. */
+.waiting li.clears strong {
+  color: var(--bronze);
+}
 
 /* Waiting list, scorers and the roll of champions. */
 .waiting,

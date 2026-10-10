@@ -601,8 +601,8 @@ culture:
   # Births. Thresholds are divided by the birthplace's ease for the type and rounded (at least 1).
   # Facts count only from culture.startSeason (no retroactive history for older saves).
   derby: { meetings: 3, seasons: 5 }
-  legacy: { starSeasons: 4 }
   venue: { fameFacts: 3, foundingFacts: 1 }
+  # Star legacies have no threshold: one is born when its player enters the Hall of Fame (GDD v1.35).
   # Effects. A country's weight is the strength its traditions hold there (abroad at
   # reach.followerShare), capped; each effect scales with weight ÷ weightCap at most.
   weightCap: 2
@@ -680,17 +680,23 @@ awards: { score: 1, champion: 10, runnerUp: 5, playoffScore: 1, finalScore: 2 }
 # oldest first, at most momentsPerClass a class. Each player inductee adds shrineWeight to their
 # home country's tradition weight (inside culture.weightCap). PP per inductee by wing and the
 # flagship league's tier.
+# GDD v1.35: careers count (a point per careerUnits score units, scores ÷ the season rule's
+# scoreUnit, and topTen for a career in the all-time top topRank); every retired player at
+# ballotShare × bar is on the ballot, and one passed over in ballotClasses classes drops off.
+# Classes of up to playersPerClass. The firsts are the Almanac's history, no longer inducted.
+# Bar measured on pacing (24 campaigns, 200 turns): 24 inducted 0.51 players a season from
+# Professional on, 16 inducts 0.66, about two in three retiring leading players (each club has one).
 hallOfFame:
-  points: { starSeason: 3, playerOfSeason: 3, title: 2, topScorer: 2, record: 5 }
-  bar: 24
+  points: { starSeason: 3, playerOfSeason: 3, title: 2, topScorer: 2, record: 5, careerUnits: 15, topTen: 5 }
+  topRank: 10
+  bar: 16
   waitSeasons: 2
-  playersPerClass: 2
-  momentsPerClass: 1
+  playersPerClass: 3
+  ballotShare: 0.5
+  ballotClasses: 5
   shrineWeight: 0.1
-  pp:
-    players: { amateur: 4, semi-pro: 6, professional: 8, elite: 12 }
-    moments: { amateur: 2, semi-pro: 3, professional: 4, elite: 6 }
-  moments: [foundingTitle, firstStar, firstProfessional, firstElite, firstRecordCrowd, firstRankOne, won]
+  pp: { amateur: 4, semi-pro: 6, professional: 8, elite: 12 }
+  firsts: [foundingTitle, firstStar, firstProfessional, firstElite, firstRecordCrowd, firstRankOne, won]
   # The Almanac's all-time top scorers list.
   leaders: 10
   # The Almanac's most Player of the Season awards list (GDD v1.33).

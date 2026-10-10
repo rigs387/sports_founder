@@ -8,6 +8,7 @@ import {
   eventSnapshots,
   flagshipSnapshot,
   type GameState,
+  historySnapshot,
   landmarks,
   minorMomentIds,
   type Player,
@@ -97,7 +98,6 @@ describe("Hall of Fame front pages and firsts with scale", () => {
   const now = withConfig(world, (c) => {
     c.hallOfFame.waitSeasons = 0;
     c.hallOfFame.playersPerClass = 1;
-    c.hallOfFame.momentsPerClass = 0;
   });
 
   it("a later class is a front page only for the current scoring record holder", () => {
@@ -125,7 +125,13 @@ describe("Hall of Fame front pages and firsts with scale", () => {
     const classes = state.hallOfFame.inductees.map((i) => i.playerId);
     expect(classes).toHaveLength(2);
     const cards = classes.map((_, i) => ({
-      facts: { hall: { season: i + 1, inducteeIds: [state.hallOfFame.inductees[i]?.id ?? 0] } },
+      facts: {
+        hall: {
+          season: i + 1,
+          inducteeIds: [state.hallOfFame.inductees[i]?.id ?? 0],
+          nearMissId: null,
+        },
+      },
     }));
     const weights = cards.map(
       (card) =>
@@ -171,15 +177,16 @@ describe("Hall of Fame front pages and firsts with scale", () => {
     const base = fresh();
     const country = base.flagship.countryId;
     const [x = 0, y = 0] = clubIds(base).filter((id) => id !== base.identity.foundingClubId);
+    // The firsts are the Almanac's history since GDD v1.35.
     const firsts = withConfig(world, (c) => {
-      c.hallOfFame.moments = ["firstRecordCrowd"];
+      c.hallOfFame.firsts = ["firstRecordCrowd"];
     });
     const early: GameState = {
       ...base,
       landmarks: [...base.landmarks, landmarks.recordCrowd(1, 1, country, 1, 500, x, 1)],
     };
     const amateur = updateCulture(withSeason(early, x, y), firsts);
-    expect(amateur.hallOfFame.inductees).toEqual([]);
+    expect(historySnapshot(amateur, firsts)).toEqual([]);
     const promoted: GameState = {
       ...amateur,
       landmarks: [
@@ -189,7 +196,7 @@ describe("Hall of Fame front pages and firsts with scale", () => {
       ],
     };
     const later = updateCulture(withSeason(promoted, x, y), firsts);
-    expect(later.hallOfFame.inductees.map((i) => i.first)).toEqual(["firstRecordCrowd"]);
+    expect(historySnapshot(later, firsts).map((h) => h.first)).toEqual(["firstRecordCrowd"]);
   });
 });
 

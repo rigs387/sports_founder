@@ -14,10 +14,10 @@ interface Props {
   onCountry: (countryId: string) => void;
 }
 
-// The Almanac (GDD v1.31): what the sport remembers. The Hall of Fame's two wings, the players
-// waiting for a place in it, and the records it is chosen from. Every line is read from retained
-// records in the snapshot; points and effect sizes stay in the simulation. Later it holds other
-// kept history (all-time leaderboards, the heatmap timelapse).
+// The Almanac (GDD v1.31, v1.35): what the sport remembers. The Hall of Fame's players, the
+// ballot for the next class, the sport's history (its firsts) and the records it is chosen from.
+// Every line is read from retained records in the snapshot; points come from the simulation.
+// Later it holds other kept history (all-time leaderboards, the heatmap timelapse).
 export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
   const { t } = useTranslation();
   const hall = snapshot.hallOfFame;
@@ -31,8 +31,7 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
   };
   const player = (id: number | null) =>
     snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
-  const players = hall.inductees.filter((i) => i.wing === "players").reverse();
-  const moments = hall.inductees.filter((i) => i.wing === "moments");
+  const players = [...hall.inductees].reverse();
   const { champions, scorers, crowd, mostAwards } = hall.records;
 
   return (
@@ -85,23 +84,25 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
               </ul>
             )}
           </section>
-          <section className="almanac-card" aria-labelledby="almanac-moments-heading">
-            <h2 id="almanac-moments-heading">{t("almanac.moments.heading")}</h2>
-            {moments.length === 0 ? (
-              <p className="almanac-empty">{t("almanac.moments.empty")}</p>
+          <section className="almanac-card" aria-labelledby="almanac-history-heading">
+            <h2 id="almanac-history-heading">
+              {t("almanac.history.heading", { sport: snapshot.identity.sportName })}
+            </h2>
+            {hall.history.length === 0 ? (
+              <p className="almanac-empty">{t("almanac.history.empty")}</p>
             ) : (
-              <ol className="moments-wing" data-testid="hall-moments">
-                {moments.map((inductee) => (
-                  <li key={inductee.id}>
+              <ol className="moments-wing" data-testid="almanac-history">
+                {hall.history.map((entry) => (
+                  <li key={entry.first}>
+                    <span className="roll-year">{entry.year}</span>
                     <span>
-                      {t(`hall.firsts.${inductee.first}`, {
-                        year: inductee.firstYear ?? inductee.year,
-                        player: player(inductee.firstPlayerId),
-                        club: club(inductee.firstClubId),
-                        country: country(inductee.countryId),
+                      {t(`hall.firsts.${entry.first}`, {
+                        year: entry.year,
+                        player: player(entry.playerId),
+                        club: club(entry.clubId),
+                        country: country(entry.countryId),
                       })}
                     </span>
-                    <small>{t("almanac.classOf", { year: inductee.year })}</small>
                   </li>
                 ))}
               </ol>
@@ -109,29 +110,35 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
           </section>
         </div>
         <div className="almanac-side">
-          <section className="almanac-card" aria-labelledby="almanac-waiting-heading">
-            <h2 id="almanac-waiting-heading">{t("almanac.waiting.heading")}</h2>
-            {hall.waiting.length === 0 ? (
-              <p className="almanac-empty">{t("almanac.waiting.empty")}</p>
+          <section className="almanac-card" aria-labelledby="almanac-ballot-heading">
+            <h2 id="almanac-ballot-heading">{t("almanac.ballot.heading")}</h2>
+            {hall.ballot.length === 0 ? (
+              <p className="almanac-empty">{t("almanac.ballot.empty")}</p>
             ) : (
-              <ul className="waiting" data-testid="hall-waiting">
-                {hall.waiting.map((entry) => (
-                  <li key={entry.playerId}>
+              <ul className="waiting" data-testid="hall-ballot">
+                {hall.ballot.map((entry) => (
+                  <li
+                    key={entry.playerId}
+                    className={entry.points >= hall.bar ? "clears" : undefined}
+                  >
                     <strong>{player(entry.playerId)}</strong>
                     <small>
+                      {t("almanac.ballot.points", {
+                        club: club(entry.clubId),
+                        points: entry.points,
+                        bar: hall.bar,
+                      })}
+                    </small>
+                    <small>
                       {entry.eligibleSeason > snapshot.flagship.season - 1
-                        ? t("almanac.waiting.from", {
-                            ...nouns(),
-                            club: club(entry.clubId),
-                            season: entry.eligibleSeason,
-                          })
-                        : t("almanac.waiting.ready", { club: club(entry.clubId) })}
+                        ? t("almanac.ballot.from", { ...nouns(), season: entry.eligibleSeason })
+                        : t("almanac.ballot.left", { count: entry.classesLeft })}
                     </small>
                   </li>
                 ))}
               </ul>
             )}
-            <p className="almanac-note">{t("almanac.waiting.note")}</p>
+            <p className="almanac-note">{t("almanac.ballot.note")}</p>
           </section>
           <section className="almanac-card" aria-labelledby="almanac-records-heading">
             <h2 id="almanac-records-heading">{t("almanac.records.heading")}</h2>
@@ -236,8 +243,7 @@ function Plaque({
   onHome: () => void;
 }) {
   const { t } = useTranslation();
-  const facts: InducteeFacts | null = inductee.facts;
-  if (!facts) return null;
+  const facts: InducteeFacts = inductee.facts;
   const stats: [string, number][] = [
     [t("almanac.stats.starSeasons"), facts.starSeasons],
     [t("almanac.stats.titles"), facts.titles],
@@ -246,7 +252,7 @@ function Plaque({
     [t("almanac.stats.scores", { scoresNoun: nouns().scoresNoun }), facts.scores],
   ];
   return (
-    <li className="plaque" data-player={inductee.playerId ?? undefined}>
+    <li className="plaque" data-player={inductee.playerId}>
       <span className="plaque-class">{t("almanac.classOf", { year: inductee.year })}</span>
       <h3>{name}</h3>
       <p>{club}</p>

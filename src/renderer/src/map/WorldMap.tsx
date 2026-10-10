@@ -268,9 +268,7 @@ function MapScene(props: SceneProps) {
         ...latest.current.snapshot.culture.traditions.flatMap((tradition) =>
           tradition.lost === null ? tradition.followers : [],
         ),
-        ...latest.current.snapshot.hallOfFame.inductees.flatMap((inductee) =>
-          inductee.wing === "players" ? [inductee.countryId] : [],
-        ),
+        ...latest.current.snapshot.hallOfFame.inductees.map((inductee) => inductee.countryId),
       ]);
       const unit = 1 / viewport.scale.x;
       for (const id of held) {

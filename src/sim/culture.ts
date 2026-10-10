@@ -9,6 +9,7 @@ import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng"
 import { seasonStories } from "./season-stories";
 import {
   type AxisId,
+  type BallotEntry,
   type Club,
   type CultureState,
   type GameState,
@@ -246,6 +247,8 @@ class CultureUpdate {
   naming: number | null = null;
   /** Hall of Fame inductees this update adds (GDD v1.31). */
   readonly inducted: Inductee[] = [];
+  /** The Hall's ballot after this update's classes (GDD v1.35), if a class was chosen. */
+  ballots: BallotEntry[] | null = null;
 
   readonly rng: Rng;
 
@@ -653,31 +656,47 @@ class CultureUpdate {
   }
 
   /**
-   * A Hall of Fame class at a season's end (GDD v1.31), after the season's traditions: inducts the
-   * class, renews the inductees' living star legacies and records the class landmark.
+   * A Hall of Fame class at a season's end (GDD v1.31, v1.35), after the season's traditions:
+   * inducts the class, founds each inductee's star legacy (or renews a living one), updates the
+   * ballot and records the class landmark with its near-miss.
    */
-  hallClass(summary: SeasonSummary, championIndex: number, quarter: number): void {
+  hallClass(summary: SeasonSummary, quarter: number): void {
     const { state, world } = this;
     const hall = {
       ...state.hallOfFame,
       inductees: [...state.hallOfFame.inductees, ...this.inducted],
       nextId: state.hallOfFame.nextId + this.inducted.length,
+      ballots: this.ballots ?? state.hallOfFame.ballots,
     };
-    const inductees = chooseClass(
-      { ...state, hallOfFame: hall },
-      world,
-      summary,
-      championIndex,
-      state.turn,
-      quarter,
-    );
+    const chosen = chooseClass({ ...state, hallOfFame: hall }, world, summary, state.turn, quarter);
     const year = seasonYear(summary, world);
-    for (const inductee of inductees) {
-      const legacy = this.livingOf("legacy", (t) => t.playerId === inductee.playerId);
-      if (inductee.playerId !== null && legacy) this.renew(legacy, year);
+    for (const inductee of chosen.inductees) this.legacy(inductee.playerId, year);
+    this.inducted.push(...chosen.inductees);
+    this.ballots = chosen.ballots;
+    this.found.push(...classLandmark(state, chosen.inductees, chosen.nearMissId));
+  }
+
+  /**
+   * A star legacy (GDD v1.35): born when its player enters the Hall of Fame, at home where they
+   * last played, from the seasons they starred (their whole career if they never did); honored
+   * backing starts it stronger. A living one is renewed instead.
+   */
+  legacy(playerId: number, year: number): void {
+    const { state } = this;
+    const living = this.livingOf("legacy", (t) => t.playerId === playerId);
+    if (living) {
+      this.renew(living, year);
+      return;
     }
-    this.inducted.push(...inductees);
-    this.found.push(...classLandmark(state, inductees));
+    if (this.traditions.some((t) => t.type === "legacy" && t.playerId === playerId)) return;
+    const player = state.flagship.players.find((p) => p.id === playerId);
+    const clubId = player?.career.at(-1)?.clubId ?? player?.clubId;
+    const club = state.flagship.clubs.find((c) => c.id === clubId);
+    if (!player || !club) return;
+    const since = player.starSince ?? 0;
+    const seasons = player.career.filter((line) => line.season >= since).map((line) => line.season);
+    const honors = player.backing?.honors ? this.config.honorsBonus : 0;
+    this.born("legacy", club.countryId, { clubIds: [club.id], playerId, seasons }, year, honors);
   }
 
   /** Whether a pair of clubs has met often enough lately (with stokes) to found a derby. */
@@ -710,36 +729,6 @@ class CultureUpdate {
       const clubIds = [Math.min(...pair), Math.max(...pair)];
       this.born("derby", countryId, { clubIds, seasons: met }, year);
     }
-  }
-
-  /** A star retired: a long star career or the league's scoring record founds a legacy. */
-  retired(landmark: Extract<Landmark, { kind: "firstStar" | "starRetired" }>): void {
-    const { state, world } = this;
-    const player = state.flagship.players.find((p) => p.id === landmark.playerId);
-    if (!player || player.starSince === null) return;
-    if (this.traditions.some((t) => t.type === "legacy" && t.playerId === player.id)) return;
-    const starSeasons = landmark.season - player.starSince + 1;
-    const here = new Set(
-      state.flagship.clubs.filter((c) => c.countryId === landmark.countryId).map((c) => c.id),
-    );
-    const total = (p: Player) =>
-      p.career.filter((line) => here.has(line.clubId)).reduce((sum, line) => sum + line.scores, 0);
-    const best = Math.max(0, ...state.flagship.players.map(total));
-    const record = total(player) > 0 && total(player) >= best;
-    const needed = birthThreshold(world, state.identity, "legacy", this.config.legacy.starSeasons);
-    if (starSeasons < needed && !record) return;
-    const since = player.starSince;
-    const seasons = player.career
-      .filter((line) => line.season >= since && line.season <= landmark.season)
-      .map((line) => line.season);
-    const honors = player.backing?.honors ? this.config.honorsBonus : 0;
-    this.born(
-      "legacy",
-      landmark.countryId,
-      { clubIds: [landmark.clubId], playerId: player.id, seasons },
-      yearOfQuarter(Math.max(0, landmark.quarter - 1), world.config),
-      honors,
-    );
   }
 
   /** A league folded: every tradition at home there is lost with it. */
@@ -885,18 +874,15 @@ class CultureUpdate {
 export function updateCulture(state: GameState, world: World): GameState {
   const update = new CultureUpdate(state, world);
   const recent = state.landmarks.slice(state.culture.landmarkCursor);
-  recent.forEach((landmark, offset) => {
+  recent.forEach((landmark) => {
     switch (landmark.kind) {
       case "seasonChampion": {
         const summary = state.flagship.seasons.find((s) => s.season === landmark.season);
         if (summary && summary.season >= state.culture.startSeason) update.season(summary);
         if (summary && summary.season >= state.hallOfFame.startSeason)
-          update.hallClass(summary, state.culture.landmarkCursor + offset, landmark.quarter);
+          update.hallClass(summary, landmark.quarter);
         break;
       }
-      case "starRetired":
-        update.retired(landmark);
-        break;
       case "scoringRecord":
         update.scoringRecord(landmark);
         break;
@@ -939,12 +925,13 @@ export function updateCulture(state: GameState, world: World): GameState {
       naming: update.naming,
     },
     hallOfFame:
-      update.inducted.length === 0
+      update.ballots === null
         ? state.hallOfFame
         : {
             ...state.hallOfFame,
             inductees: [...state.hallOfFame.inductees, ...update.inducted],
             nextId: state.hallOfFame.nextId + update.inducted.length,
+            ballots: update.ballots,
           },
   };
 }

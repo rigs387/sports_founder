@@ -246,26 +246,40 @@ export function useEventText() {
       .filter((inductee) => hall.inducteeIds.includes(inductee.id))
       .map((inductee) => {
         const facts = inductee.facts;
-        if (facts) {
-          // A player who was never a star got in on titles and seasons as top scorer.
-          const star = facts.starSeasons > 0;
-          const seasons = star ? facts.starSeasons : facts.topScorerSeasons;
-          return t(star ? (facts.record ? "hall.line_record" : "hall.line") : "hall.line_noStar", {
-            ...termVars({ score: facts.scores, seasons }),
-            player: player(inductee.playerId),
-            club: club(inductee.clubId ?? undefined),
-            count: facts.scores,
-            seasons,
-            titles: facts.titles,
-          });
-        }
-        return t(`hall.firsts.${inductee.first}`, {
-          year: inductee.firstYear ?? inductee.year,
-          player: player(inductee.firstPlayerId),
-          club: club(inductee.firstClubId ?? undefined),
-          country: country(inductee.countryId),
+        // A player who was never a star got in on seasons as top scorer, or on a long career
+        // alone (GDD v1.35).
+        const star = facts.starSeasons > 0;
+        const seasons = star ? facts.starSeasons : facts.topScorerSeasons;
+        const line = star
+          ? facts.record
+            ? "hall.line_record"
+            : "hall.line"
+          : facts.topScorerSeasons > 0
+            ? "hall.line_noStar"
+            : "hall.line_career";
+        return t(line, {
+          ...termVars({ score: facts.scores, seasons }),
+          player: player(inductee.playerId),
+          club: club(inductee.clubId),
+          count: facts.scores,
+          seasons,
+          titles: facts.titles,
+          rank: facts.allTimeRank,
         });
-      });
+      })
+      .concat(nearMissLine(hall.nearMissId));
+  };
+  /** The class's near-miss (GDD v1.35): left out, passed over again, or off the ballot for good. */
+  const nearMissLine = (playerId: number | null): string[] => {
+    if (playerId === null) return [];
+    const entry = snapshot.hallOfFame.ballot.find((b) => b.playerId === playerId);
+    const vars = {
+      player: player(playerId),
+      points: entry?.points ?? 0,
+      bar: snapshot.hallOfFame.bar,
+    };
+    if (!entry) return [t("hall.nearMissLast", vars)];
+    return [t(entry.passedOver > 1 ? "hall.nearMissAgain" : "hall.nearMiss", vars)];
   };
   /**
    * The lines under a card's body: a season's leading player and top scorer, where the record

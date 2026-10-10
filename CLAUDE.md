@@ -297,15 +297,18 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   are weightless (`weighs`): no shelter, no betrayal; a curse raises the player's hardcore
   turnover where held (`curseWeights`). Tradition cards are picked by id in
   `tradition-cards.ts`: small-market national names are minor and take no slot.
-- The Hall of Fame (GDD v1.31) lives in `src/sim/hall-of-fame.ts` and `GameState.hallOfFame`. A
-  class is chosen in culture's turn at each `seasonChampion` landmark (`chooseClass`): retired
-  players on points from retained records (star seasons, titles, top-scorer seasons, the scoring
-  record) after `waitSeasons`, best first up to a cap; the Moments wing's firsts (closed list
-  `HALL_FIRSTS`) from landmarks recorded after the Hall began. Player inductees add shrine weight
-  at home inside the tradition weight cap (`shrineWeights` in `traditionWeights`). One
-  `hall-of-fame-class` card per class (`src/sim/hall-cards.ts`, no moment slot). The Almanac tab
-  (`src/renderer/src/almanac/`) reads `TurnSnapshot.hallOfFame` (`hallSnapshot`): plaques, the
-  Waiting list, Records; it is the home for later history (leaderboards, the timelapse).
+- The Hall of Fame (GDD v1.31, revised v1.35) lives in `src/sim/hall-of-fame.ts` and
+  `GameState.hallOfFame`. It is players only. A class is chosen in culture's turn at each
+  `seasonChampion` landmark (`chooseClass`): the ballot (`hallBallot`: retired players after
+  `waitSeasons` at `ballotShare` of the bar, not yet passed over `ballotClasses` times) on points
+  from retained records (star seasons, titles, top-scorer seasons, awards, the record, career score
+  units, an all-time top ten), the best who clear the bar up to a cap; the class landmark names
+  its near-miss. Inductees add shrine weight at home inside the tradition weight cap
+  (`shrineWeights`) and found their star legacy (culture's `legacy`). One `hall-of-fame-class`
+  card per class (`src/sim/hall-cards.ts`, no moment slot). The sport's firsts (`HALL_FIRSTS`,
+  config `hallOfFame.firsts`) are the Almanac's history (`historySnapshot`), never inducted. The
+  Almanac tab (`src/renderer/src/almanac/`) reads `TurnSnapshot.hallOfFame`: plaques, the Ballot,
+  "{Sport} history", Records; it is the home for later history (leaderboards, the timelapse).
 - Chants (GDD v1.31) are the seventh tradition type (`culture.ts`): born from an underdog title or
   a first title in a close finish once the league has `chant.historySeasons` seasons; the first is
   the anthem. Only chants reach abroad without Culture nodes (`reachOut`), are dropped where the
@@ -385,6 +388,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 24 adds awards (GDD v1.33): each season summary's `playerOfSeason`, the champion's
   season facts' `playerOfSeasonId`, and Hall of Fame inductees' award counts. Format 23 migrates
   with no winners and no award facts (no retroactive awards).
+- Save format 25 makes the Hall players only (GDD v1.35): ballots, near-misses, career units and
+  all-time rank on inductee facts. Format 24 migrates with the Moments wing dropped, nobody passed
+  over and no near-misses.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

@@ -98,7 +98,7 @@ describe("Player of the Season", () => {
       (p) => p.id === played.flagship.seasons[0]?.playerOfSeason,
     );
     if (!winner) throw new Error("No winner");
-    const facts = inducteeFacts(played, winner);
+    const facts = inducteeFacts(played, world, winner);
     expect(facts.awards).toBe(1);
     expect(hallPoints(facts, world) - hallPoints({ ...facts, awards: 0 }, world)).toBe(
       world.config.hallOfFame.points.playerOfSeason,
@@ -139,15 +139,12 @@ describe("award names and lines (tech plan 2.20 step 2)", () => {
         inductees: [
           {
             id: 1,
-            wing: "players",
             season: 1,
             turn: 1,
             quarter: 1,
             countryId: first.countryId,
             playerId: first.id,
-            facts: null,
-            first: null,
-            landmarkIndex: null,
+            facts: inducteeFacts(played, world, first),
           },
         ],
         nextId: 2,

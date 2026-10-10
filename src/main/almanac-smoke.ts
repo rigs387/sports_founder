@@ -79,7 +79,7 @@ export async function verifyAlmanac(
   await collect();
   if ((await inductees()) === 0) throw new Error("No Hall of Fame class after many seasons.");
 
-  // The Almanac: the Hall's wings, the waiting list and the records, wide and narrow.
+  // The Almanac: the Hall, the ballot, the sport's history and the records, wide and narrow.
   await click(".game-nav [data-view=almanac]");
   await wait(`!document.querySelector('${ALMANAC}').hidden`);
   const page = await text(ALMANAC);
@@ -91,9 +91,11 @@ export async function verifyAlmanac(
   const players = await evaluate<number>(
     `document.querySelectorAll('[data-testid="hall-players"] .plaque').length`,
   );
-  const moments = await evaluate<number>(
-    `document.querySelectorAll('[data-testid="hall-moments"] li').length`,
+  // The sport's firsts are history, not Hall inductees (GDD v1.35).
+  const history = await evaluate<number>(
+    `document.querySelectorAll('[data-testid="almanac-history"] li').length`,
   );
+  if (history < 1) throw new Error("The Almanac's history lists no first after many seasons.");
   await screenshot("56-almanac.png");
   win.setContentSize(390, 844);
   await delay();
@@ -116,5 +118,5 @@ export async function verifyAlmanac(
     await screenshot("58-hall-country.png");
     await click(".card-close");
   } else await click(".game-nav [data-view=world]");
-  return { turnsPlayed, players, moments, roll, card: card.slice(0, 200), country };
+  return { turnsPlayed, players, history, roll, card: card.slice(0, 200), country };
 }

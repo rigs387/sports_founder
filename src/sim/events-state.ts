@@ -76,6 +76,8 @@ export const venueFactsSchema = z.strictObject({
 export const hallFactsSchema = z.strictObject({
   season: z.int().positive(),
   inducteeIds: z.array(z.int().positive()).min(1),
+  /** The best player on the ballot left out (GDD v1.35), if any. */
+  nearMissId: z.int().positive().nullable().default(null),
 });
 
 export const eventRecordSchema = z.strictObject({

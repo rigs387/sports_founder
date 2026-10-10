@@ -2,8 +2,9 @@ import type { EventState } from "./events-state";
 import { seasonFacts } from "./season-stories";
 import { type GameState, type Landmark, PLAYER_INDEX, type World } from "./types";
 
-// The Hall of Fame as cards (GDD v1.31): one moment per class, told from the class recorded. It
-// takes no moment slot and pays PP per inductee by wing and the flagship league's tier.
+// The Hall of Fame as cards (GDD v1.31): one moment per class, told from the class recorded and
+// naming its near-miss (GDD v1.35). It takes no moment slot and pays PP per inductee by the
+// flagship league's tier.
 
 /** Offers a class card for each Hall of Fame class the recent landmarks record. */
 export function offerHallCards(
@@ -42,7 +43,7 @@ export function offerHallCards(
         tradition: null,
         deal: null,
         venue: null,
-        hall: { season: landmark.season, inducteeIds },
+        hall: { season: landmark.season, inducteeIds, nearMissId: landmark.nearMissId },
         countermove: null,
       },
       resolution: null,

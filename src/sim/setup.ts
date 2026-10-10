@@ -139,7 +139,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     ...foundSport(founded, world, identitySetup),
     rules: { amendments: [] },
     culture: newCulture(setup.seed, 1, founded.landmarks.length, 0, world),
-    hallOfFame: newHallOfFame(1, founded.landmarks.length),
+    hallOfFame: newHallOfFame(1),
   };
 }
 

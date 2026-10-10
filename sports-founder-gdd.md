@@ -1231,6 +1231,21 @@ capped by max capacity while fans outnumber seats stays as it is.
     Moments wing; Hall classes are players only.
   - *Cards:* one per class as now; it names a ballot near-miss when there is one ("Schulz misses
     again").
+  - *Star legacies come with the Hall (decided 2026-10-09, after topic 3 was built):* a star
+    legacy is born when its player is inducted, no longer at retirement after a long star career
+    or with the scoring record. Topic 3's extra stars had raised legacies from about 15 to 55 a
+    campaign; this ties the style named after a player to the sport's own verdict on them.
+  - *Built 2026-10-10 (calls made at build).* Career points: one per 15 score units (scores ÷ the
+    season rule's unit), and 5 for an all-time top-10 career; the ballot line is half the bar and a
+    player drops off after 5 classes; classes of up to 3. The one-a-season target is bounded by
+    retirements: each club models one leading player, about 1.1–1.4 retiring a season, so a bar of
+    24 inducted 0.51 a season from Professional on and the bar was lowered to 16 (0.66, about two
+    in three retiring leading players); reaching one would induct nearly all of them. The near-miss
+    line reads "misses again" after two or more classes and "leaves the ballot" on the last. The
+    History lists the firsts in the order they happened, with no card or PP of their own (the Hall's
+    Moments wing paid a little PP; measured, step 4 cost about 2 wins in 36 and pacing passes).
+    Star legacies rise with the Hall (68 a bot campaign); the culture rate beyond national names
+    is about 1.4 a season, mostly legacies and famous grounds. Save format 25.
 - *Topic 5, a growth tree that shapes the sport.* 30 nodes, each a permanent worldwide
   percentage; 11 bought in 89 turns (one every 8), none changing what the sport is, so they read
   as forgettable one-time bonuses. The player wants more frequent, smaller purchases that shape
