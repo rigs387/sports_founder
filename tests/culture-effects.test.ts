@@ -165,12 +165,15 @@ describe("the Culture category", () => {
       protection: 1,
       hold: 1,
     });
-    const derby = cultureFactors(world, ["derby-days"], "derby");
-    expect(derby.strength).toBeCloseTo(1.6);
-    expect(derby.hold).toBeCloseTo(1.2);
-    expect(cultureFactors(world, ["derby-days"], "venue")).toEqual(none);
-    const living = cultureFactors(world, ["supporters-trusts", "living-game"], "rite");
-    expect(living.protection).toBeCloseTo(1 - 0.4 + 0.3);
+    // The Culture track (GDD v1.35): Local Pride strengthens derbies and national names only.
+    const derby = cultureFactors(world, ["local-pride"], "derby");
+    expect(derby.strength).toBeCloseTo(1.5);
+    expect(cultureFactors(world, ["local-pride"], "venue")).toEqual(none);
+    const heritage = cultureFactors(world, ["heritage"], "rite");
+    expect(heritage.protection).toBeCloseTo(1 - 0.3);
+    expect(heritage.hold).toBeCloseTo(1.05);
+    const living = cultureFactors(world, ["supporters-clubs", "living-game"], "rite");
+    expect(living.protection).toBeCloseTo(1 - 0.05 + 0.2);
     expect(living.reach).toEqual({ proximity: 1.5, language: 1.5 });
   });
 
@@ -179,8 +182,8 @@ describe("the Culture category", () => {
     const held = withTradition(base, "derby", ANCHOR, { strength: 0.5 });
     const index = countryIndex(world, ANCHOR);
     expect(traditionWeights(held, world)[index]).toBeCloseTo(0.5);
-    expect(traditionWeights({ ...held, growthNodes: ["derby-days"] }, world)[index]).toBeCloseTo(
-      0.6,
+    expect(traditionWeights({ ...held, growthNodes: ["heritage"] }, world)[index]).toBeCloseTo(
+      0.525,
     );
   });
 });

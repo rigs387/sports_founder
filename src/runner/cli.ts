@@ -754,6 +754,14 @@ function main(): number {
     console.log(`  Rival activity and player hardcore across all ${results.length} campaign(s):`);
     printRivalActivity(agg);
     printGrowth(growth, results.length);
+    // The growth tracks' pace (GDD v1.35): a level every 2–3 turns.
+    const pace = results
+      .map((r) => r.nodesBought.length / Math.max(1, r.turnsPlayed))
+      .sort((x, y) => x - y);
+    const turnsPerLevel = 1 / Math.max(1e-9, pace[Math.floor(pace.length / 2)] ?? 0);
+    console.log(
+      `  Growth pace: a level every ${turnsPerLevel.toFixed(1)} turns (median; target 2–3)`,
+    );
     printEvents(events);
     console.log(
       `  Flagship: seasons median ${fmt(flagship.seasons.median)}; different champions median ${fmt(flagship.distinctChampions.median)}; the most successful club's share of titles median ${pct(flagship.mostTitlesShare.median ?? 0)}, max ${pct(flagship.mostTitlesShare.max ?? 0)}`,

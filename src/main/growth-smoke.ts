@@ -31,7 +31,7 @@ export async function verifyGrowth(
   await click(".game-nav [data-view=growth]");
   await delay();
   await assert(
-    'document.querySelectorAll("[data-testid=growth-picker] option").length === 30',
+    'document.querySelectorAll("[data-testid=growth-picker] option").length === 60',
     "Every growth node must be keyboard selectable.",
   );
   await click('[data-category="media"]');
@@ -41,24 +41,40 @@ export async function verifyGrowth(
   );
   await screenshot("11-growth-media-locked.png");
   await click('[data-category="grassroots"]');
-  await click('[data-node="street-courts"]');
-  let turns = 0;
-  while (
-    (await evaluate<boolean>('document.querySelector("[data-testid=buy-node]").disabled')) &&
-    turns++ < 80
-  ) {
-    const before = await state();
-    await win.webContents.executeJavaScript(COLLECT_NEWS, true);
+  // Plays turns until the selected level can be bought (GDD v1.35: the tracks are bought in order).
+  const afford = async (what: string) => {
+    let turns = 0;
+    while (
+      (await evaluate<boolean>('document.querySelector("[data-testid=buy-node]").disabled')) &&
+      turns++ < 80
+    ) {
+      const before = await state();
+      await win.webContents.executeJavaScript(COLLECT_NEWS, true);
+      await assert(
+        '!document.querySelector("[data-testid=end-turn]").disabled',
+        "Campaign ended before fork test.",
+      );
+      await click('[data-testid="end-turn"]');
+      await wait(before.turn + 1);
+    }
     await assert(
-      '!document.querySelector("[data-testid=end-turn]").disabled',
-      "Campaign ended before fork test.",
+      '!document.querySelector("[data-testid=buy-node]").disabled',
+      `Could not afford ${what}.`,
     );
-    await click('[data-testid="end-turn"]');
-    await wait(before.turn + 1);
+  };
+  // The levels before the gear fork.
+  for (const id of ["weekend-leagues", "word-of-mouth"]) {
+    await click(`[data-node="${id}"]`);
+    await afford(id);
+    await click('[data-testid="buy-node"]');
+    await wait();
   }
+  await click('[data-node="cheap-gear"]');
+  await afford("Cheap Gear");
+  // A level's preview names what it does in the player's top markets.
   await assert(
-    '!document.querySelector("[data-testid=buy-node]").disabled',
-    "Could not afford Street Courts.",
+    '!!document.querySelector("[data-testid=growth-preview] li")',
+    "A level must preview its effect in the top markets.",
   );
   await assert(
     'document.querySelector("[data-testid=buy-node]").getBoundingClientRect().bottom < document.querySelector(".game-bottom").getBoundingClientRect().top',
@@ -71,7 +87,7 @@ export async function verifyGrowth(
   );
   await click('[data-testid="buy-node"]');
   await assert(
-    'document.querySelector(".growth-dialog").open && document.querySelector(".growth-comparison").textContent.includes("Club Grounds")',
+    'document.querySelector(".growth-dialog").open && document.querySelector(".growth-comparison").textContent.includes("Premium Gear")',
     "Fork must compare both real alternatives.",
   );
   await screenshot("13-growth-choice.png");
@@ -87,13 +103,13 @@ export async function verifyGrowth(
   const after = await wait();
   if (Math.abs(before.pp - price - after.pp) > 0.000001 || before.turn !== after.turn)
     throw new Error("Fork must spend exactly once without advancing time.");
-  await click('[data-node="club-grounds"]');
+  await click('[data-node="premium-gear"]');
   await assert(
-    'document.querySelector("[data-testid=buy-node]").disabled && document.querySelector("[data-testid=growth-reason]").textContent.includes("Street Courts")',
+    'document.querySelector("[data-testid=buy-node]").disabled && document.querySelector("[data-testid=growth-reason]").textContent.includes("Cheap Gear")',
     "Sibling must remain inspectable and permanently locked.",
   );
   await screenshot("14-growth-chosen.png");
-  await click('[data-node="street-courts"]');
+  await click('[data-node="cheap-gear"]');
   win.setContentSize(390, 844);
   await delay();
   await assert(
@@ -110,7 +126,7 @@ export async function verifyGrowth(
   await click(".game-nav [data-view=world]");
   await delay();
   return {
-    nodes: 30,
+    nodes: 60,
     permanentForkVerified: true,
     cancelledWithoutSpend: true,
     doubleClickSpentOnce: true,

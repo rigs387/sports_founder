@@ -51,13 +51,25 @@ export function multipliersFromDeltas(deltas: LeverDeltas, config: Config): Leve
   };
 }
 
-/** The genome's lever multipliers in one country. */
+/**
+ * The genome's lever multipliers in one country. `climateWeight` scales the climate deltas (the
+ * growth tracks' climateFit, GDD v1.35: indoor halls make climate count less).
+ */
 export function leverMultipliers(
   world: World,
   genome: Genome,
   countryIndex: number,
+  climateWeight = 1,
 ): LeverMultipliers {
-  const deltas = genomeDeltas(world.genome, genome, countryAttributes(world, countryIndex));
+  const attributes = countryAttributes(world, countryIndex);
+  const deltas = genomeDeltas(world.genome, genome, attributes);
+  if (climateWeight !== 1)
+    for (const axis of AXIS_IDS)
+      for (const c of optionContributions(
+        optionModifiers(world.genome, axis, genome[axis]),
+        attributes,
+      ))
+        if (c.source.startsWith("climate:")) deltas[c.lever] += (climateWeight - 1) * c.delta;
   return multipliersFromDeltas(scaleDeltas(deltas, fitScale(world, countryIndex)), world.config);
 }
 

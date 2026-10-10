@@ -30,7 +30,7 @@ import { defaultGenome } from "./setup";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 25;
+export const SAVE_FORMAT_VERSION = 26;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -632,6 +632,25 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 25 → 26: growth tracks (GDD v1.35). Old nodes the tracks still have are kept, in order, while
+  // their track's rules hold (the levels before, a side of the fork before, no fork sibling); the
+  // rest are dropped without a refund.
+  25: (save, world) => {
+    const owned = Array.isArray(save.state.growthNodes) ? (save.state.growthNodes as string[]) : [];
+    const kept: string[] = [];
+    for (const id of owned) {
+      const node = world.growthTree.nodes.find((candidate) => candidate.id === id);
+      if (!node || kept.includes(id)) continue;
+      const fork = world.growthTree.forks.find((f) => f.nodes.includes(id));
+      if (
+        node.requires.every((required) => kept.includes(required)) &&
+        (node.requiresAny.length === 0 || node.requiresAny.some((any) => kept.includes(any))) &&
+        !fork?.nodes.some((sibling) => sibling !== id && kept.includes(sibling))
+      )
+        kept.push(id);
+    }
+    return { formatVersion: 26, state: { ...save.state, growthNodes: kept } };
+  },
   // 24 → 25: the Hall is for people (GDD v1.35). The Moments wing's firsts leave the Hall (they are
   // the Almanac's history, read from landmarks); player inductees keep their facts, with career
   // units and all-time rank read from today's records; nobody has been passed over yet. Class

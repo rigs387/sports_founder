@@ -8,6 +8,7 @@ import { ppPrice } from "./prices";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { seasonStories } from "./season-stories";
+import { NEUTRAL_SHAPE, type ShapeFactors, shapeFactors } from "./shape";
 import {
   type CareerLine,
   type Club,
@@ -68,8 +69,13 @@ export function quartersUntilSeasonEnd(quarter: number, world: World): number {
   return ((end - (quarter % QUARTERS_PER_YEAR) + QUARTERS_PER_YEAR) % QUARTERS_PER_YEAR) + 1;
 }
 
-export function clubTarget(tier: LeagueTierId, world: World): number {
-  return world.config.flagship.clubs[tier];
+/** Clubs the flagship plays with at a tier; expansion or a compact league moves it (GDD v1.35). */
+export function clubTarget(
+  tier: LeagueTierId,
+  world: World,
+  shape: ShapeFactors = NEUTRAL_SHAPE,
+): number {
+  return Math.max(2, Math.round(world.config.flagship.clubs[tier] * shape.flagshipClubs));
 }
 
 export function activeClubs(flagship: FlagshipState): Club[] {
@@ -193,8 +199,14 @@ function meanRating(clubs: readonly Club[], world: World): number {
  * Brings the active clubs to the count the league tier calls for: old clubs of this country come
  * back first (oldest first), then generated expansion clubs; a smaller league drops the newest.
  */
-function fitClubs(flagship: FlagshipState, world: World, rng: Rng, tier: LeagueTierId) {
-  const target = clubTarget(tier, world);
+function fitClubs(
+  flagship: FlagshipState,
+  world: World,
+  rng: Rng,
+  tier: LeagueTierId,
+  shape: ShapeFactors = NEUTRAL_SHAPE,
+) {
+  const target = clubTarget(tier, world, shape);
   let next: FlagshipState = { ...flagship, clubs: flagship.clubs.map((club) => ({ ...club })) };
   const here = (club: Club) => club.countryId === next.countryId;
   const active = () => next.clubs.filter((club) => here(club) && club.active);
@@ -388,7 +400,7 @@ export function backingSlots(state: Pick<GameState, "ppTier">, world: World): nu
  * country and on media reach out of it, from the backed stars playing at the seat. Off the seat
  * their effects pause.
  */
-export function backingEffects(flagship: FlagshipState, world: World) {
+export function backingEffects(flagship: FlagshipState, world: World, starPull = 1) {
   const { casualConversion, mediaReach } = world.config.flagship.backing;
   // Backed players at the seat, plus the fading afterglow of stars retired with honors.
   const afterglow = flagship.players.filter((p) => !playing(p) && p.backing?.honors);
@@ -398,7 +410,8 @@ export function backingEffects(flagship: FlagshipState, world: World) {
   );
   return {
     countryId: flagship.countryId,
-    casualConversion: 1 + casualConversion * influence,
+    // Star-driven coverage pulls harder (GDD v1.35).
+    casualConversion: 1 + casualConversion * influence * starPull,
     mediaReach: 1 + mediaReach * influence,
   };
 }
@@ -681,6 +694,7 @@ function playersSeasonEnd(
   rng: Rng,
   turn: number,
   quarter: number,
+  shape: ShapeFactors = NEUTRAL_SHAPE,
 ): SeasonEnd {
   const { stars, players: rules } = world.config.flagship;
   const { season, countryId } = summary;
@@ -712,7 +726,8 @@ function playersSeasonEnd(
       (a, b) => Number(standout(b)) - Number(standout(a)) || shareOf(b) - shareOf(a) || a.id - b.id,
     );
   for (const candidate of candidates) {
-    if (seatStars(current()).length >= stars.places[tier]) break;
+    // Star pay and an attacking style make room for more stars (GDD v1.35).
+    if (seatStars(current()).length >= Math.round(stars.places[tier] * shape.starPlaces)) break;
     const first = !players.some((player) => player.starSince !== null);
     candidate.starSince = season;
     newStarIds.push(candidate.id);
@@ -784,7 +799,8 @@ function playersSeasonEnd(
   const ratingOf = new Map(flagship.clubs.map((club) => [club.id, club.rating]));
   for (const mover of seatStars(current())) {
     // Unbacked stars wander (GDD v1.35).
-    const chance = stars.moveChance * (mover.backing === null ? stars.unbackedMoveFactor : 1);
+    const chance =
+      stars.moveChance * shape.starMoves * (mover.backing === null ? stars.unbackedMoveFactor : 1);
     if (mover.finalSeason || nextFloat(rng) >= chance) continue;
     const own = ratingOf.get(mover.clubId) ?? 0;
     const targets = activeClubs(flagship)
@@ -1067,12 +1083,15 @@ function playMatch(
   world: World,
   knockout: boolean,
   credit: ReadonlyMap<number, number>,
+  scoringFactor = 1,
 ): PlayedMatch {
   const { match } = world.config.flagship;
   const homeRate = scoringRate(home.rating, away.rating, true, scoring, world);
   const awayRate = scoringRate(away.rating, home.rating, false, scoring, world);
-  const homeScore = rollScore(rng, homeRate, match.chances[scoring]);
-  const awayScore = rollScore(rng, awayRate, match.chances[scoring]);
+  // An attacking or defensive style plays more or fewer chances (GDD v1.35).
+  const chances = Math.max(1, Math.round(match.chances[scoring] * scoringFactor));
+  const homeScore = rollScore(rng, homeRate, chances);
+  const awayScore = rollScore(rng, awayRate, chances);
   // Deciders settle a drawn playoff but are not scores, so only the match's scores are credited.
   const credited: [number, number] = [
     rollScore(rng, credit.get(home.id) ?? 0, homeScore),
@@ -1162,6 +1181,7 @@ function playPlayoffs(
   world: World,
   credit: ReadonlyMap<number, number>,
   onPlayed: (played: PlayedMatch, stage: "playoff" | "final") => void,
+  scoringFactor = 1,
 ): { matches: MatchResult[]; champion: number; runnerUp: number } {
   const size = Math.max(1, bracketSize(ranked.length, world));
   const seedOf = new Map(ranked.map((row, i) => [row.clubId, i + 1]));
@@ -1177,7 +1197,7 @@ function playPlayoffs(
       const home = clubs.get(homeId);
       const away = clubs.get(awayId);
       if (!home || !away) throw new Error("Playoff club missing");
-      const played = playMatch(rng, home, away, scoring, world, true, credit);
+      const played = playMatch(rng, home, away, scoring, world, true, credit, scoringFactor);
       const { result } = played;
       onPlayed(played, alive.length === 2 ? "final" : "playoff");
       matches.push(result);
@@ -1199,7 +1219,13 @@ export interface FlagshipQuarter {
 }
 
 /** Ratings drift at the season's end, pulled toward the league's financial health. */
-function driftRatings(flagship: FlagshipState, world: World, rng: Rng, league: LeagueState) {
+function driftRatings(
+  flagship: FlagshipState,
+  world: World,
+  rng: Rng,
+  league: LeagueState,
+  parity = 1,
+) {
   const { rating } = world.config.flagship;
   const active = activeClubs(flagship);
   const mean = meanRating(active, world);
@@ -1210,7 +1236,8 @@ function driftRatings(flagship: FlagshipState, world: World, rng: Rng, league: L
       clamp(
         club.rating +
           rating.drift * (2 * nextFloat(rng) - 1) +
-          rating.reversion * (mean - club.rating) +
+          // A draft evens clubs out faster, an open market slower (GDD v1.35).
+          rating.reversion * parity * (mean - club.rating) +
           pull,
         rating.min,
         rating.max,
@@ -1343,6 +1370,7 @@ export function stepFlagshipQuarter(
   if (state.flagship.offseason) return { flagship: state.flagship, countries, landmarks: [] };
   const rng = restoreRng(state.flagship.rng);
   const found: Landmark[] = [];
+  const shape = shapeFactors(world, state.growthNodes);
   let flagship: FlagshipState = {
     ...state.flagship,
     quartersPlayed: state.flagship.quartersPlayed + 1,
@@ -1396,7 +1424,16 @@ export function stepFlagshipQuarter(
         const home = playingAs.get(homeId);
         const away = playingAs.get(awayId);
         if (!home || !away) throw new Error("Flagship fixture names a club not in the league");
-        const played = playMatch(rng, home, away, flagship.scoring, world, false, credit);
+        const played = playMatch(
+          rng,
+          home,
+          away,
+          flagship.scoring,
+          world,
+          false,
+          credit,
+          shape.scoring,
+        );
         count(played, "league");
         return played.result;
       });
@@ -1413,7 +1450,16 @@ export function stepFlagshipQuarter(
       const format: SeasonFormat = state.seasonFormat;
       const playoffs =
         format === "american"
-          ? playPlayoffs(rng, ranked, playingAs, flagship.scoring, world, credit, count)
+          ? playPlayoffs(
+              rng,
+              ranked,
+              playingAs,
+              flagship.scoring,
+              world,
+              credit,
+              count,
+              shape.scoring,
+            )
           : {
               matches: [],
               champion: ranked[0]?.clubId ?? 0,
@@ -1467,6 +1513,7 @@ export function stepFlagshipQuarter(
         rng,
         state.turn,
         newQuarter,
+        shape,
       );
       flagship = ended.flagship;
       summary.newStarIds = ended.newStarIds;
@@ -1485,6 +1532,7 @@ export function stepFlagshipQuarter(
         world,
         rng,
         current,
+        shape.ratingParity,
       );
     }
     // The offseason opens; the next season starts when it closes. Retired players are replaced
@@ -1515,7 +1563,8 @@ export function returnSeatIfFolded(state: GameState, world: World): GameState {
   const moved = moveSeat(flagship, state.countries, world, state.anchorCountryId, 0);
   let next = moved.flagship;
   const anchorLeague = state.countries[indexOf(world, state.anchorCountryId)]?.league ?? null;
-  if (anchorLeague !== null) next = fitClubs(next, world, rng, anchorLeague.tier);
+  if (anchorLeague !== null)
+    next = fitClubs(next, world, rng, anchorLeague.tier, shapeFactors(world, state.growthNodes));
   // In the offseason the season starts when it closes.
   next = next.offseason
     ? { ...next, rng: saveRng(rng) }
@@ -1609,7 +1658,14 @@ export function closeOffseason(state: GameState, world: World): GameState {
     }
   }
   const seatLeague = countries[indexOf(world, flagship.countryId)]?.league ?? null;
-  if (seatLeague !== null) flagship = fitClubs(flagship, world, rng, seatLeague.tier);
+  if (seatLeague !== null)
+    flagship = fitClubs(
+      flagship,
+      world,
+      rng,
+      seatLeague.tier,
+      shapeFactors(world, state.growthNodes),
+    );
   // Unsigned deal offers lapse (GDD v1.28).
   flagship = lapseOffers(startSeason(flagship, world, state.quarter, state.genome.scoring, true));
   // Venue levels due by the new season open (GDD v1.30).
@@ -1633,7 +1689,13 @@ function dormantClubs(state: GameState, world: World): GameState {
   const seatLeague = state.countries[indexOf(world, flagship.countryId)]?.league ?? null;
   if (seatLeague === null || flagship.table.length > 0 || flagship.offseason) return state;
   const rng = restoreRng(flagship.rng);
-  const fitted = fitClubs(flagship, world, rng, seatLeague.tier);
+  const fitted = fitClubs(
+    flagship,
+    world,
+    rng,
+    seatLeague.tier,
+    shapeFactors(world, state.growthNodes),
+  );
   return {
     ...state,
     flagship: startSeason(

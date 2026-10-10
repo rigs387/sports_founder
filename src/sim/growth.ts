@@ -20,8 +20,10 @@ import type { GameState, World } from "./types";
 // Totals sum every owned node's effect value in the country; no factor goes below
 // growthTree.limits.minFactor. An effect's value in a country is its amount plus its conditions
 // (the genome's condition style), and a condition never flips the effect's sign.
-// Buying rules: the category must be unlocked at the current PP tier, every prerequisite owned, no
-// fork sibling owned, and the price is its quarters of PP income (GDD v1.34). No refunds.
+// Buying rules: the category must be unlocked at the current PP tier, every prerequisite owned, a
+// side of the fork before taken (requiresAny, GDD v1.35: the tracks), no fork sibling owned, and
+// the price is its quarters of PP income (GDD v1.34). No refunds. Shaping effects are global:
+// src/sim/shape.ts reads them.
 
 export interface GrowthFactors {
   proximity: number;
@@ -66,6 +68,9 @@ function factorKey(effect: NodeEffect): { key: FactorKey; reduction: boolean } |
     case "traditionReach":
     case "traditionProtection":
     case "traditionHold":
+      return null;
+    // Shaping effects are global (GDD v1.35): src/sim/shape.ts reads them.
+    default:
       return null;
   }
 }
@@ -113,9 +118,18 @@ export function growthNode(world: World, nodeId: string): GrowthNode {
 // Factors depend only on static content and the set of owned nodes, and are read many times per
 // quarter, so they are cached per world and node set.
 const cache = new WeakMap<World, Map<string, GrowthFactors[]>>();
+/** The same owned list is read for every country every quarter: remember it by identity too. */
+const byList = new WeakMap<World, WeakMap<readonly string[], GrowthFactors[]>>();
 
 /** Per country (content order): the factors every owned node applies there. */
 export function growthFactors(world: World, owned: readonly string[]): readonly GrowthFactors[] {
+  let lists = byList.get(world);
+  if (!lists) {
+    lists = new WeakMap();
+    byList.set(world, lists);
+  }
+  const known = lists.get(owned);
+  if (known) return known;
   let byNodes = cache.get(world);
   if (!byNodes) {
     byNodes = new Map();
@@ -123,7 +137,10 @@ export function growthFactors(world: World, owned: readonly string[]): readonly 
   }
   const key = [...owned].sort().join("|");
   const cached = byNodes.get(key);
-  if (cached) return cached;
+  if (cached) {
+    lists.set(owned, cached);
+    return cached;
+  }
 
   const nodes = owned.map((id) => growthNode(world, id));
   const floor = world.growthTree.limits.minFactor;
@@ -148,6 +165,7 @@ export function growthFactors(world: World, owned: readonly string[]): readonly 
     ) as unknown as GrowthFactors;
   });
   byNodes.set(key, factors);
+  lists.set(owned, factors);
   return factors;
 }
 
@@ -176,7 +194,9 @@ export type NodeBlocker =
   | { kind: "owned" }
   | { kind: "fork"; forkId: string; takenBy: string }
   | { kind: "tier"; unlockTier: number }
-  | { kind: "prerequisites"; missing: string[] };
+  | { kind: "prerequisites"; missing: string[] }
+  /** The fork before this level: either side opens it (GDD v1.35). */
+  | { kind: "forkFirst"; options: string[] };
 
 export function nodeBlocker(
   state: Pick<GameState, "growthNodes" | "ppTier">,
@@ -194,6 +214,8 @@ export function nodeBlocker(
   }
   const missing = node.requires.filter((id) => !state.growthNodes.includes(id));
   if (missing.length > 0) return { kind: "prerequisites", missing };
+  if (node.requiresAny.length > 0 && !node.requiresAny.some((id) => state.growthNodes.includes(id)))
+    return { kind: "forkFirst", options: node.requiresAny };
   return null;
 }
 

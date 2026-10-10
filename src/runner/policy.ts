@@ -1,7 +1,14 @@
 import { uniformFloat64 } from "pure-rand/distribution/uniformFloat64";
 import { uniformInt } from "pure-rand/distribution/uniformInt";
 import { xoroshiro128plus } from "pure-rand/generator/xoroshiro128plus";
-import { GENOME_AXES, RULE_AXES, TRADITION_EFFECT_TYPES, type TraditionType } from "../content";
+import {
+  GENOME_AXES,
+  type NodeEffect,
+  RULE_AXES,
+  SHAPE_EFFECT_TYPES,
+  TRADITION_EFFECT_TYPES,
+  type TraditionType,
+} from "../content";
 import {
   type Action,
   amendBlocker,
@@ -195,6 +202,17 @@ function buyableNodes(state: GameState, world: World): string[] {
 }
 
 /**
+ * A shaping effect's worth to a bot (GDD v1.35), per unit of Fandom Score: a quarter of its size,
+ * whichever way the sport changes, except that higher wages and a purist backlash are costs.
+ */
+function shapeWorth(effect: NodeEffect): number {
+  if (effect.type === "puristBacklash") return -effect.amount;
+  if (effect.type === "wageFactor") return -effect.amount * SHAPE_BOT_WEIGHT;
+  return Math.abs(effect.amount) * SHAPE_BOT_WEIGHT;
+}
+const SHAPE_BOT_WEIGHT = 0.25;
+
+/**
  * A node's worth to the player now: every effect's value in every country, weighted by the
  * player's Fandom Score there (or only in `onlyCountry`). Effects of every kind count alike; this is
  * a bot heuristic, not game balance.
@@ -229,6 +247,10 @@ export function nodeValue(
     const weight = fans.hardcore + fans.casual * casualWeight;
     if (weight <= 0) return;
     for (const effect of node.effects) {
+      if (SHAPE_EFFECT_TYPES.includes(effect.type)) {
+        value += weight * shapeWorth(effect);
+        continue;
+      }
       const culture = TRADITION_EFFECT_TYPES.includes(effect.type);
       const share = culture ? (heldOf(effect.traditionType)[index] ?? 0) : 1;
       value += weight * effectValue(effect, attributes) * share;

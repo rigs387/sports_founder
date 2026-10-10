@@ -42,7 +42,17 @@ function treeWorld(effects: NodeEffect[], base: World = world): World {
       limits: { minFactor: 0.25 },
       costScaling: base.growthTree.costScaling,
       forks: [],
-      nodes: [{ id: TEST_NODE, category: "grassroots", quarters: 1, requires: [], effects }],
+      nodes: [
+        {
+          id: TEST_NODE,
+          category: "grassroots",
+          level: 1,
+          quarters: 1,
+          requires: [],
+          requiresAny: [],
+          effects,
+        },
+      ],
     };
   });
 }
@@ -380,6 +390,9 @@ describe("buying growth nodes", () => {
   const rich: GameState = { ...start, pp: 100_000 };
   const buy = (state: GameState, nodeId: string) =>
     applyAction(state, world, { type: "buyNode", nodeId });
+  /** The first three Grassroots levels, so the gear fork is next (GDD v1.35). */
+  const toFork = (state: GameState) =>
+    buy(buy(buy(state, "backyard-clinics"), "weekend-leagues"), "word-of-mouth");
   const reason = (state: GameState, nodeId: string) =>
     checkAction(state, world, { type: "buyNode", nodeId });
   const atTier = (state: GameState, tier: number, peak = tier): GameState => ({
@@ -402,14 +415,18 @@ describe("buying growth nodes", () => {
     expect(checkInvariants(bought, world)).toEqual([]);
   });
 
-  it("prerequisites are enforced, naming every missing node", () => {
-    expect(reason(rich, "word-of-mouth")).toBe('"word-of-mouth" needs "backyard-clinics" first');
-    const clinics = buy(rich, "backyard-clinics");
-    expect(reason(clinics, "community-ownership")).toBe(
-      '"community-ownership" needs "fan-meetups" and "volunteer-organisers" first',
+  it("a track is bought in order, and the level after a fork needs either side (GDD v1.35)", () => {
+    expect(reason(rich, "weekend-leagues")).toBe(
+      '"weekend-leagues" needs "backyard-clinics" first',
     );
-    expect(reason(clinics, "word-of-mouth")).toBeNull();
-    expect(() => buy(rich, "word-of-mouth")).toThrow(IllegalActionError);
+    const clinics = buy(rich, "backyard-clinics");
+    expect(reason(clinics, "weekend-leagues")).toBeNull();
+    expect(() => buy(rich, "weekend-leagues")).toThrow(IllegalActionError);
+    const fork = toFork(rich);
+    expect(reason(fork, "fan-meetups")).toBe(
+      '"fan-meetups" needs "cheap-gear" or "premium-gear" first (the fork before it)',
+    );
+    expect(reason(buy(fork, "premium-gear"), "fan-meetups")).toBeNull();
   });
 
   it("Grassroots is open at tier 1; Media unlocks at tier 2", () => {
@@ -419,13 +436,13 @@ describe("buying growth nodes", () => {
   });
 
   it("a fork locks out the other side for good", () => {
-    const street = buy(buy(rich, "backyard-clinics"), "street-courts");
-    expect(reason(street, "club-grounds")).toBe(
-      '"club-grounds" is locked out: "street-courts" was chosen in the where-to-play fork',
+    const cheap = buy(toFork(rich), "cheap-gear");
+    expect(reason(cheap, "premium-gear")).toBe(
+      '"premium-gear" is locked out: "cheap-gear" was chosen in the gear fork',
     );
     // Still locked many turns later.
-    const later = endTurn(endTurn(street, world), world);
-    expect(reason({ ...later, pp: 100_000 }, "club-grounds")).toMatch(/locked out/);
+    const later = endTurn(endTurn(cheap, world), world);
+    expect(reason({ ...later, pp: 100_000 }, "premium-gear")).toMatch(/locked out/);
   });
 
   it("no refunds: an owned node cannot be bought again, and no action sells one", () => {
@@ -479,57 +496,65 @@ describe("buying growth nodes", () => {
 
   it("each node owned raises the next node's price by perNodeOwned, compounding", () => {
     const one = buy(rich, "backyard-clinics");
-    const two = buy(one, "word-of-mouth");
-    expect(nodeCost(one, world, "weekend-leagues")).toBeCloseTo(
-      baseCost("weekend-leagues") * rise(1),
+    const two = buy(one, "weekend-leagues");
+    expect(nodeCost(one, world, "word-of-mouth")).toBeCloseTo(
+      baseCost("word-of-mouth") * rise(1),
       9,
     );
-    expect(nodeCost(two, world, "weekend-leagues")).toBeCloseTo(
-      baseCost("weekend-leagues") * rise(2),
+    expect(nodeCost(two, world, "word-of-mouth")).toBeCloseTo(
+      baseCost("word-of-mouth") * rise(2),
       9,
     );
     expect(two.pp).toBeCloseTo(
-      100_000 - baseCost("backyard-clinics") - baseCost("word-of-mouth") * rise(1),
+      100_000 - baseCost("backyard-clinics") - baseCost("weekend-leagues") * rise(1),
       6,
     );
   });
 
-  it("a demoted sport keeps its Media nodes but cannot buy more until it is back at tier 2", () => {
+  it("a demoted sport keeps its Media levels but cannot buy more until it is back at tier 2", () => {
     const tier2 = buy(buy(atTier(rich, 2), "backyard-clinics"), "local-radio");
     const demoted = atTier(tier2, 1, 2);
     expect(demoted.growthNodes).toContain("local-radio");
-    expect(reason(demoted, "newspaper-columns")).toMatch(/unlock at PP tier 2/);
-    expect(reason(demoted, "word-of-mouth")).toBeNull();
+    expect(reason(demoted, "highlight-reels")).toMatch(/unlock at PP tier 2/);
+    expect(reason(demoted, "weekend-leagues")).toBeNull();
   });
 
-  it("the snapshot shows owned, available and locked nodes with prices and reasons", () => {
-    const state = buy(buy(rich, "backyard-clinics"), "street-courts");
+  it("the snapshot shows owned, available and locked levels with prices, reasons and previews", () => {
+    const state = buy(toFork(rich), "cheap-gear");
     const nodes = snapshot(state, world).growthNodes;
     const byId = (id: string) => nodes.find((node) => node.nodeId === id);
     expect(nodes.map((n) => n.nodeId)).toStrictEqual(world.growthTree.nodes.map((n) => n.id));
-    expect(byId("street-courts")).toMatchObject({ status: "owned", lock: null });
-    expect(byId("word-of-mouth")).toMatchObject({
+    expect(byId("cheap-gear")).toMatchObject({ status: "owned", lock: null, level: 4 });
+    expect(byId("fan-meetups")).toMatchObject({
       status: "available",
-      cost: baseCost("word-of-mouth") * rise(2),
+      cost: baseCost("fan-meetups") * rise(4),
       affordable: true,
       lock: null,
+      requiresAny: ["cheap-gear", "premium-gear"],
     });
-    expect(byId("club-grounds")).toMatchObject({
+    expect(byId("premium-gear")).toMatchObject({
       status: "locked",
-      lock: { kind: "fork", forkId: "where-to-play", takenBy: "street-courts" },
-      forkSiblings: ["street-courts"],
+      forkId: "gear",
+      lock: { kind: "fork", forkId: "gear", takenBy: "cheap-gear" },
+      forkSiblings: ["cheap-gear"],
     });
     expect(byId("local-radio")).toMatchObject({
       status: "locked",
-      cost: baseCost("local-radio") * rise(2),
+      cost: baseCost("local-radio") * rise(4),
       lock: { kind: "tier", unlockTier: 2 },
     });
-    expect(byId("fan-meetups")).toMatchObject({
+    expect(byId("coaching-badges")).toMatchObject({
       status: "locked",
-      lock: { kind: "prerequisites", missing: ["word-of-mouth"] },
+      lock: { kind: "prerequisites", missing: ["fan-meetups"] },
     });
+    // The preview reads each effect in the player's top markets.
+    const preview = byId("fan-meetups")?.preview;
+    expect(preview?.markets.length).toBeGreaterThan(0);
+    expect(preview?.markets[0]?.values).toEqual([
+      world.growthTree.nodes.find((n) => n.id === "fan-meetups")?.effects[0]?.amount,
+    ]);
     expect(
-      snapshot({ ...state, pp: 1 }, world).growthNodes.find((n) => n.nodeId === "word-of-mouth"),
+      snapshot({ ...state, pp: 1 }, world).growthNodes.find((n) => n.nodeId === "fan-meetups"),
     ).toMatchObject({ status: "available", affordable: false });
   });
 });

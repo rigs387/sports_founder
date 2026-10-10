@@ -50,7 +50,7 @@ export async function verifyActions(
 
   await openGrowth();
   await delay();
-  await evaluate(`document.querySelector('[data-node="word-of-mouth"]').click()`);
+  await evaluate(`document.querySelector('[data-node="weekend-leagues"]').click()`);
   const locked = await evaluate<boolean>(
     `document.querySelector('[data-testid="buy-node"]').disabled && document.querySelector('[data-testid="growth-reason"]').textContent.includes('Requires Backyard Clinics')`,
   );

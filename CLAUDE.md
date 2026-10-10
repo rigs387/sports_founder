@@ -96,11 +96,14 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   Player decisions cross the worker's `applyAction` endpoint; prices and legality stay in the sim.
 - The genome, affinity, spread, league, cash, health, PP tier, poaching, rival defense, growth tree
   and generational turnover models follow the GDD; their numbers are tuning.
-- The growth tree lives in `src/sim/growth.ts`. Owned nodes (`GameState.growthNodes`, purchase
-  order) become per-country factors on rates, costs and countermove effects; every effect type is a
-  closed vocabulary validated at load. Buying is the `buyNode` action: category unlocked at the
-  current PP tier, prerequisites owned, no fork sibling owned, price = the node's quarters of income
-  × 1.05 (config) per node owned. No refunds. Every PP price is `ppPrice` (`src/sim/prices.ts`,
+- The growth tracks (GDD v1.35) live in `src/sim/growth.ts` and `content/growth-tree.yaml`:
+  four tracks (grassroots, media, institutions, culture) of 12 levels, a fork of two sides at
+  levels 4, 8 and 12 that the track waits on (`requiresAny`). Owned levels (`GameState.growthNodes`,
+  purchase order) become per-country factors on rates, costs and countermove effects; the
+  shaping effects (`SHAPE_EFFECT_TYPES`) are global and read through `src/sim/shape.ts`; every
+  effect type is a closed vocabulary validated at load. Buying is the `buyNode` action: track
+  open at the current PP tier, levels before owned, no fork sibling owned, price = the level's
+  quarters of income × 1.02 (config) per level owned. No refunds. Every PP price is `ppPrice` (`src/sim/prices.ts`,
   GDD v1.34): base PP income per quarter, never below `ppPrices.minIncomePerQuarter`, × quarters;
   the PP tier multiplies no price. Purchases are landmarks; the snapshot lists every node's status.
 - Generational turnover runs each quarter in `src/sim/quarter.ts`: every sport's hardcore fans above
@@ -388,6 +391,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 24 adds awards (GDD v1.33): each season summary's `playerOfSeason`, the champion's
   season facts' `playerOfSeasonId`, and Hall of Fame inductees' award counts. Format 23 migrates
   with no winners and no award facts (no retroactive awards).
+- Save format 26 replaces the growth tree with the tracks (GDD v1.35). Format 25 migrates keeping
+  old nodes the tracks still have while their rules hold, dropping the rest without a refund.
 - Save format 25 makes the Hall players only (GDD v1.35): ballots, near-misses, career units and
   all-time rank on inductee facts. Format 24 migrates with the Moments wing dropped, nobody passed
   over and no near-misses.

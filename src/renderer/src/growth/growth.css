@@ -582,3 +582,28 @@
     transition: none;
   }
 }
+
+/* What a level does here, and what the tracks have done (GDD v1.35). */
+.growth-preview {
+  margin: 10px 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(31, 111, 92, 0.08);
+  font-size: 13px;
+}
+.growth-preview ul {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.growth-preview li {
+  display: grid;
+  gap: 2px;
+}
+.growth-done {
+  margin: 0 0 10px;
+  font-size: 13px;
+  opacity: 0.85;
+}

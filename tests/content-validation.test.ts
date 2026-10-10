@@ -426,22 +426,23 @@ describe("growth tree content validation", () => {
 
   it("a prerequisite in another category and a spread effect without a channel are rejected", () => {
     const dir = copyOfContent();
-    editYaml(dir, TREE, ["nodes", 10, "requires"], setValue(["backyard-clinics"]));
-    editYaml(dir, TREE, ["nodes", 1, "effects", 0, "channel"], remove);
+    // nodes[10] is a Grassroots level; nodes[2] (word-of-mouth) spreads by proximity.
+    editYaml(dir, TREE, ["nodes", 10, "requires"], setValue(["local-radio"]));
+    editYaml(dir, TREE, ["nodes", 2, "effects", 0, "channel"], remove);
     const message = loadError(dir).message;
     expect(message).toContain("nodes[10].requires[0]");
     expect(message).toContain("prerequisites must be in the same category");
     expect(message).toContain(
-      "nodes[1].effects[0].channel: a spreadChannel effect needs a channel",
+      "nodes[2].effects[0].channel: a spreadChannel effect needs a channel",
     );
   });
 
   it("duplicate ids, zero amounts and an unlock tier beyond the tier table are rejected", () => {
     const dir = copyOfContent();
-    editYaml(dir, TREE, ["nodes", 2, "id"], setValue("word-of-mouth"));
+    editYaml(dir, TREE, ["nodes", 3, "id"], setValue("word-of-mouth"));
     editYaml(dir, TREE, ["categories", "media", "unlockTier"], setValue(9));
     const message = loadError(dir).message;
-    expect(message).toContain('nodes[2].id: duplicate node id "word-of-mouth"');
+    expect(message).toContain('nodes[3].id: duplicate node id "word-of-mouth"');
     expect(message).toContain("categories.media.unlockTier: no tier 9 in config ppTiers");
 
     const dir2 = copyOfContent();

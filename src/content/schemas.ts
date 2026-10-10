@@ -368,14 +368,8 @@ export const placesFileSchema = z.strictObject({
 
 // ---- Growth tree (GDD PP Growth Tree) ------------------------------------------------------
 
-/** The GDD's growth categories. Phase 0 content defines Grassroots and Media only. */
-export const growthCategorySchema = z.enum([
-  "grassroots",
-  "media",
-  "infrastructure",
-  "culture",
-  "global",
-]);
+/** The growth tracks (GDD v1.35): Grassroots, Media, Institutions and Culture. */
+export const growthCategorySchema = z.enum(["grassroots", "media", "institutions", "culture"]);
 export type GrowthCategory = z.infer<typeof growthCategorySchema>;
 
 /**
@@ -398,7 +392,38 @@ export const NODE_EFFECT_TYPES = [
   "traditionReach",
   "traditionProtection",
   "traditionHold",
+  // Shaping the sport (GDD v1.35): global, no conditions.
+  "climateFit",
+  "sponsorValue",
+  "mediaRevenue",
+  "ratingParity",
+  "flagshipClubs",
+  "wageFactor",
+  "starPlaces",
+  "starMoves",
+  "scoring",
+  "starPull",
+  "traditionBirth",
+  "puristBacklash",
 ] as const;
+/**
+ * The effects that shape the sport (GDD v1.35): global (no conditions), each a factor of
+ * 1 + total on one system (src/sim/shape.ts), except puristBacklash, applied once at purchase.
+ */
+export const SHAPE_EFFECT_TYPES: readonly NodeEffectType[] = [
+  "climateFit",
+  "sponsorValue",
+  "mediaRevenue",
+  "ratingParity",
+  "flagshipClubs",
+  "wageFactor",
+  "starPlaces",
+  "starMoves",
+  "scoring",
+  "starPull",
+  "traditionBirth",
+  "puristBacklash",
+];
 /** The Culture effects: global (no conditions), optionally limited to one tradition type. */
 export const TRADITION_EFFECT_TYPES: readonly NodeEffectType[] = [
   "traditionStrength",
@@ -426,7 +451,7 @@ export const nodeEffectSchema = z.strictObject({
   type: nodeEffectTypeSchema,
   /** Only for spreadChannel. */
   channel: spreadChannelSchema.optional(),
-  /** Only for the Culture effects: limits the effect to one tradition type. */
+  /** Only for the Culture effects and traditionBirth: limits the effect to one tradition type. */
   traditionType: traditionTypeSchema.optional(),
   amount: z
     .number()
@@ -439,9 +464,13 @@ export const nodeEffectSchema = z.strictObject({
 export const growthNodeSchema = z.strictObject({
   id,
   category: growthCategorySchema,
+  /** The node's level on its track, 1–12 (GDD v1.35); a fork's two sides share a level. */
+  level: z.int().min(1),
   /** PP price in quarters of income (GDD v1.34). */
   quarters: z.number().positive(),
   requires: z.array(id).default([]),
+  /** At least one of these must be owned (the level after a fork needs either side). */
+  requiresAny: z.array(id).default([]),
   effects: z.array(nodeEffectSchema).min(1),
 });
 

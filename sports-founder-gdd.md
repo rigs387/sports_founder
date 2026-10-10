@@ -1292,6 +1292,21 @@ capped by max capacity while fans outnumber seats stays as it is.
       **heritage** (traditions protected; amendments cost more backlash) or **living game**
       (traditions reach abroad more, less protected); **local pride** (national names and
       derbies stronger at home) or **global game** (chants and signature moves spread abroad).
+  - *Built 2026-10-10 (calls made at build).* Every level is named (36 steps, 24 fork sides).
+    Prices 0.6–2.7 quarters of income by track and level, +2% per level owned. Measured on
+    pacing (24 campaigns, 200 turns), bots buy 46 of 48 levels; over 200 turns that is a level
+    every 4.3 turns, faster while the tracks are open (the target pace cannot hold once a track
+    is bought out). Bot campaigns now buy Culture and Institutions levels the old tree's prices
+    kept out of reach, and with countermove resistance in the steps the #1 contest collapsed (0
+    of 24 lost #1 before the win); the Institutions steps were made economic (running costs,
+    league formation) and the defensive steps cut (countermove resistance 0.04, culture strength
+    and protection 0.05, hold 0.02, churn 0.04), and the contest returned to 13 of 24 (target
+    about half). Wins 19/24 against 14/24 on the old tree; pacing passes. The preview reads each
+    country effect in the player's top 3 markets and the flagship's club count and star places
+    before and after; "done so far" is the tracks' casual and hardcore conversion in the top 3
+    markets (the sport's shape stays hidden with club ratings). Club-driven coverage eases derby
+    and famous-ground births, not the club rite (it is the founding club's first title).
+    Save format 26: old nodes the tracks keep stay while the track's rules hold.
 - *Topic 6, saves and standings.* Saves had no folder (the dialog opened Documents, synced to
   OneDrive), and nothing showed the player's sport against the rivals side by side.
   - *Saves live in `Saved Games\Sports Founder`* in the user's folder (Windows' folder for game

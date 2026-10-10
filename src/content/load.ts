@@ -18,6 +18,7 @@ import {
   namesFileSchema,
   placesFileSchema,
   RESERVED_SPORT_IDS,
+  SHAPE_EFFECT_TYPES,
   SOURCED_FIELDS,
   sourcesFileSchema,
   sportsFileSchema,
@@ -790,6 +791,13 @@ function checkGrowthTree(world: World, sources: ContentSources, issues: ContentI
       if (seenRequires.has(requiredId)) issue(field, `"${requiredId}" is listed more than once`);
       seenRequires.add(requiredId);
     });
+    // Either side of the fork before (GDD v1.35): known nodes of the same track.
+    node.requiresAny.forEach((requiredId, j) => {
+      const required = tree.nodes[byId.get(requiredId) ?? -1];
+      if (!required) issue(`${at}.requiresAny[${j}]`, `unknown node "${requiredId}"`);
+      else if (required.category !== node.category)
+        issue(`${at}.requiresAny[${j}]`, `"${requiredId}" is on another track`);
+    });
     node.effects.forEach((effect, j) => {
       const field = `${at}.effects[${j}]`;
       if (effect.type === "spreadChannel" && effect.channel === undefined) {
@@ -798,10 +806,13 @@ function checkGrowthTree(world: World, sources: ContentSources, issues: ContentI
       const culture = TRADITION_EFFECT_TYPES.includes(effect.type);
       if (culture && node.category !== "culture")
         issue(`${field}.type`, `${effect.type} belongs to Culture nodes only`);
+      // Shaping effects are global (GDD v1.35): they act on one system, not on a country.
+      if (SHAPE_EFFECT_TYPES.includes(effect.type) && effect.conditions !== undefined)
+        issue(`${field}.conditions`, `${effect.type} is global and takes no conditions`);
+      if (effect.traditionType !== undefined && !culture && effect.type !== "traditionBirth")
+        issue(`${field}.traditionType`, `only Culture effects and traditionBirth name a type`);
       if (culture && effect.conditions !== undefined)
         issue(`${field}.conditions`, "Culture effects apply everywhere and take no conditions");
-      if (!culture && effect.traditionType !== undefined)
-        issue(`${field}.traditionType`, `only Culture effects take a tradition type`);
       // Reach may be limited to the proximity or language links (GDD v1.22).
       if (effect.type === "traditionReach" && effect.channel === "media")
         issue(`${field}.channel`, "traditions reach only along proximity or language links");

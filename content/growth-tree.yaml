@@ -1,10 +1,10 @@
-# PP growth tree (GDD PP Growth Tree). Phase 0 builds Grassroots and Media only. Every number here
-# is tuning; the node set and the forks are design (approved 2026-09-13).
+# PP growth tracks (GDD v1.35, replacing the v1.5 tree). Every number here is tuning; the tracks,
+# levels and forks are design (decided 2026-10-09).
 #
-# categories   the PP tier at which each category's nodes can be bought (the current tier, not the
-#              peak: a demoted sport keeps its nodes but cannot buy from a category it no longer has)
+# categories   the four tracks and the PP tier at which each opens (the current tier, not the
+#              peak: a demoted sport keeps its levels but cannot buy from a track it no longer has)
 # limits.minFactor
-#              every node effect ends up as a factor on a rate, cost or effect size in a country:
+#              every effect on a rate, cost or effect size ends up as a factor in a country:
 #                bonuses     factor = 1 + total      (casual/hardcore conversion, spread channels,
 #                                                     PP income)
 #                reductions  factor = 1 − total      (churn, formation threshold, cold-launch
@@ -12,322 +12,513 @@
 #              and no factor ever goes below minFactor. Negative amounts (fork downsides) raise the
 #              reduced quantity or lower the bonus.
 #
-# Nodes
+# Levels: each track has 12, bought in order. A step is one node; levels 4, 8 and 12 are forks, two
+# nodes of which the player takes one for good (no refunds), and the track goes no further until a
+# side is taken (the next level requires either side: requiresAny).
 #   quarters   PP price in quarters of income (see costScaling)
-#   requires   node ids in the same category that must be owned first
-#   effects    from the closed vocabulary below, validated at load:
-#                spreadChannel (with channel: proximity / language / media)
-#                              inbound spread over that channel into the country
-#                casualConversion, hardcoreConversion   the player's conversion rates in the country
-#                churnReduction                         casual churn and decay in the country
-#                formationThresholdReduction            hardcore fans a league needs to form there
-#                coldLaunchCostReduction                the cold-launch premium of a focus slot
-#                                                       there (the part above the exposed cost)
-#                ppIncome                               PP income from the country's Fandom Score
-#                runningCostReduction                   league running cost there
-#                countermoveResistance                  the size of every rival countermove's
-#                                                       effect on the player there
-#   conditions optional, the genome's condition style (see genome.yaml): climate deltas and numeric
-#              weights on wealth, urbanDensity, sportCulture, mediaMarket, added to the amount in
-#              each country. A condition can shrink an effect to nothing but never flips its sign.
-#              Unlike a genome option's, a node's climate deltas are used as written, not centred on
-#              the world: a node is a thing the player buys, so a climate delta here is meant to make
-#              it worth more or less overall, not only to say where it pays best.
-#
-# Forks: exclusive choices. Owning one node of a fork locks out the others for good (no refunds).
+#   effects    the closed vocabulary, validated at load. Rates in a country (with optional
+#              conditions, the genome's style): spreadChannel (channel: proximity / language /
+#              media), casualConversion, hardcoreConversion, churnReduction,
+#              formationThresholdReduction, coldLaunchCostReduction, ppIncome,
+#              runningCostReduction, countermoveResistance.
+#              Culture (any track, global): traditionStrength, traditionReach, traditionProtection,
+#              traditionHold, with an optional traditionType.
+#              Shaping the sport (global, no conditions; factor = 1 + total unless noted):
+#                climateFit     how much climate counts in the sport's fit
+#                sponsorValue   sponsor and naming-rights offers at the flagship
+#                mediaRevenue   every league's media revenue
+#                ratingParity   how fast flagship club strength returns to the league's mean
+#                flagshipClubs  the flagship's club count (rounded)
+#                wageFactor     star wages and the payroll at the seat
+#                starPlaces     star places by league tier (rounded)
+#                starMoves      a star's chance to move clubs
+#                scoring        scoring chances in flagship matches
+#                starPull       a backed star's pull on casual conversion
+#                traditionBirth (with traditionType) divides that type's birth thresholds
+#                puristBacklash once, at purchase: this share of hardcore fans in the anchor turn
+#                               casual
 
 categories:
   grassroots: { unlockTier: 1 }
   media: { unlockTier: 2 }
-  culture: { unlockTier: 4 }
+  institutions: { unlockTier: 3 }
+  culture: { unlockTier: 3 }
 
 limits:
   minFactor: 0.25
 
-# A node's price is its quarters of PP income (config ppPrices: base income per quarter, never
-# below the floor) × (1 + perNodeOwned) ^ nodes owned (GDD v1.34). Quarters by category:
-# Grassroots 3-6, Media 6-12, Culture 10-16, deeper nodes at the top of their range. This replaces
-# the v1.9 size factor and the tier multiplier: prices grew with the sport (^0.6) faster than income
-# (^0.5) and ×6 by tier 5, so a playtest never afforded a Media node. The per-node rise keeps the
-# tree a choice (choose pain).
+# A level's price is its quarters of PP income (config ppPrices: base income per quarter, never
+# below the floor) × (1 + perNodeOwned) ^ levels owned (GDD v1.34). Quarters rise along a track and
+# by track (Grassroots 0.6–2.2, Media 0.8–2.4, Institutions and Culture 1.1–2.7, forks at the top), set so a
+# campaign buys about one level every 2–3 turns (runner: purchases a turn).
 costScaling:
-  perNodeOwned: 0.05
+  perNodeOwned: 0.02
 
 forks:
-  - id: where-to-play
-    nodes: [ street-courts, club-grounds ]
-  - id: roots
-    nodes: [ community-ownership, barnstorming-tours ]
-  - id: tv-deal
-    nodes: [ pay-tv-exclusivity, free-to-air ]
-  - id: coverage
-    nodes: [ sponsor-showcase, tabloid-buzz ]
-  - id: culture-way
-    nodes: [ heritage-trust, living-game ]
+  - { id: gear, nodes: [cheap-gear, premium-gear] }
+  - { id: where-to-play, nodes: [indoor-halls, outdoor-grounds] }
+  - { id: courts-or-clubs, nodes: [street-courts, club-grounds] }
+  - { id: tv-deal, nodes: [free-to-air, pay-tv] }
+  - { id: breaks, nodes: [broadcast-breaks, uninterrupted-play] }
+  - { id: coverage, nodes: [star-coverage, club-coverage] }
+  - { id: player-market, nodes: [draft, open-market] }
+  - { id: league-size, nodes: [expansion, compact-league] }
+  - { id: pay, nodes: [salary-cap, star-pay] }
+  - { id: style, nodes: [attacking-style, defensive-style] }
+  - { id: culture-way, nodes: [heritage, living-game] }
+  - { id: reach, nodes: [local-pride, global-game] }
 
 nodes:
-  # ---- Grassroots (tier 1): proximity spread, casual conversion, league formation, churn ----------
+  # Grassroots
   - id: backyard-clinics
     category: grassroots
-    quarters: 3
-    requires: []
+    level: 1
+    quarters: 0.6
     effects:
-      - { type: casualConversion, amount: 0.16 }
-
-  - id: word-of-mouth
-    category: grassroots
-    quarters: 3.5
-    requires: [ backyard-clinics ]
-    effects:
-      - { type: spreadChannel, channel: proximity, amount: 0.48 }
-
+      - { type: casualConversion, amount: 0.05 }
   - id: weekend-leagues
     category: grassroots
-    quarters: 3.5
-    requires: [ backyard-clinics ]
+    level: 2
+    quarters: 0.6
+    requires: [backyard-clinics]
     effects:
-      - { type: formationThresholdReduction, amount: 0.48 }
-
-  # Fork "where to play": wide and cheap in dense, lower-income countries, or deep in wealthy ones.
-  - id: street-courts
+      - { type: formationThresholdReduction, amount: 0.12 }
+  - id: word-of-mouth
     category: grassroots
-    quarters: 4
-    requires: [ backyard-clinics ]
+    level: 3
+    quarters: 0.8
+    requires: [weekend-leagues]
     effects:
-      - type: casualConversion
-        amount: 0.24
-        conditions: { urbanDensity: 0.1, wealth: -0.1 }
-      - { type: hardcoreConversion, amount: -0.16 }
-
-  - id: club-grounds
+      - { type: spreadChannel, channel: proximity, amount: 0.12 }
+  - id: cheap-gear
     category: grassroots
-    quarters: 4
-    requires: [ backyard-clinics ]
+    level: 4
+    quarters: 1.1
+    requires: [word-of-mouth]
     effects:
-      - type: hardcoreConversion
-        amount: 0.16
-        conditions: { wealth: 0.1 }
-      - { type: churnReduction, amount: 0.16 }
-      # Membership fees: fewer casual fans, but only where people are poorer.
-      - type: casualConversion
-        amount: -0.08
-        conditions: { wealth: 0.05 }
-
+      - { type: casualConversion, amount: 0.08, conditions: { wealth: -0.1 } }
+      - { type: hardcoreConversion, amount: 0.04, conditions: { wealth: -0.08 } }
+  - id: premium-gear
+    category: grassroots
+    level: 4
+    quarters: 1.1
+    requires: [word-of-mouth]
+    effects:
+      - { type: hardcoreConversion, amount: 0.06, conditions: { wealth: 0.08 } }
+      - { type: sponsorValue, amount: 0.15 }
   - id: fan-meetups
     category: grassroots
-    quarters: 4
-    requires: [ word-of-mouth ]
+    level: 5
+    quarters: 1
+    requiresAny: [cheap-gear, premium-gear]
     effects:
-      - { type: churnReduction, amount: 0.24 }
-
-  - id: volunteer-organisers
+      - { type: churnReduction, amount: 0.04 }
+  - id: coaching-badges
     category: grassroots
-    quarters: 4.5
-    requires: [ weekend-leagues ]
+    level: 6
+    quarters: 1.1
+    requires: [fan-meetups]
     effects:
-      - type: runningCostReduction
-        amount: 0.16
-        conditions: { wealth: -0.1 }
-
-  - id: border-tournaments
-    category: grassroots
-    quarters: 5
-    requires: [ word-of-mouth ]
-    effects:
-      - { type: spreadChannel, channel: proximity, amount: 0.64 }
-      - { type: coldLaunchCostReduction, amount: 0.4 }
-
-  # Fork "roots": dig in at home, or tour to open new markets.
-  - id: community-ownership
-    category: grassroots
-    quarters: 6
-    requires: [ fan-meetups, volunteer-organisers ]
-    effects:
-      - { type: churnReduction, amount: 0.24 }
-      - { type: countermoveResistance, amount: 0.48 }
-      - { type: coldLaunchCostReduction, amount: -0.32 }
-
+      - { type: hardcoreConversion, amount: 0.04 }
   - id: barnstorming-tours
     category: grassroots
-    quarters: 6
-    requires: [ fan-meetups, volunteer-organisers ]
+    level: 7
+    quarters: 1.2
+    requires: [coaching-badges]
     effects:
-      - { type: coldLaunchCostReduction, amount: 0.64 }
-      - { type: formationThresholdReduction, amount: 0.32 }
-      - { type: churnReduction, amount: -0.16 }
+      - { type: coldLaunchCostReduction, amount: 0.12 }
+  - id: indoor-halls
+    category: grassroots
+    level: 8
+    quarters: 1.6
+    requires: [barnstorming-tours]
+    effects:
+      - { type: climateFit, amount: -0.5 }
+      - { type: runningCostReduction, amount: -0.06 }
+  - id: outdoor-grounds
+    category: grassroots
+    level: 8
+    quarters: 1.6
+    requires: [barnstorming-tours]
+    effects:
+      - { type: climateFit, amount: 0.3 }
+      - { type: traditionBirth, traditionType: venue, amount: 0.3 }
+  - id: school-programs
+    category: grassroots
+    level: 9
+    quarters: 1.4
+    requiresAny: [indoor-halls, outdoor-grounds]
+    effects:
+      - { type: casualConversion, amount: 0.05 }
+  - id: border-tournaments
+    category: grassroots
+    level: 10
+    quarters: 1.4
+    requires: [school-programs]
+    effects:
+      - { type: spreadChannel, channel: proximity, amount: 0.12 }
+  - id: volunteer-organizers
+    category: grassroots
+    level: 11
+    quarters: 1.6
+    requires: [border-tournaments]
+    effects:
+      - { type: churnReduction, amount: 0.04 }
+  - id: street-courts
+    category: grassroots
+    level: 12
+    quarters: 2.2
+    requires: [volunteer-organizers]
+    effects:
+      - { type: casualConversion, amount: 0.12, conditions: { urbanDensity: 0.1, wealth: -0.1 } }
+      - { type: hardcoreConversion, amount: -0.06 }
+  - id: club-grounds
+    category: grassroots
+    level: 12
+    quarters: 2.2
+    requires: [volunteer-organizers]
+    effects:
+      - { type: hardcoreConversion, amount: 0.08, conditions: { wealth: 0.1 } }
+      - { type: churnReduction, amount: 0.08 }
+      - { type: casualConversion, amount: -0.04, conditions: { wealth: 0.05 } }
 
-  # ---- Media (tier 2): media reach and language channels, casual reach ---------------------------
+  # Media
   - id: local-radio
     category: media
-    quarters: 6
-    requires: []
+    level: 1
+    quarters: 0.8
     effects:
-      - { type: spreadChannel, channel: language, amount: 0.48 }
-
-  - id: newspaper-columns
-    category: media
-    quarters: 7
-    requires: [ local-radio ]
-    effects:
-      - type: casualConversion
-        amount: 0.16
-        conditions: { wealth: 0.05 }
-
+      - { type: spreadChannel, channel: language, amount: 0.12 }
   - id: highlight-reels
     category: media
-    quarters: 7
-    requires: [ local-radio ]
+    level: 2
+    quarters: 1
+    requires: [local-radio]
     effects:
-      - { type: spreadChannel, channel: media, amount: 0.8 }
-
-  - id: dubbed-broadcasts
+      - { type: spreadChannel, channel: media, amount: 0.15 }
+  - id: newspaper-columns
     category: media
-    quarters: 8
-    requires: [ local-radio ]
+    level: 3
+    quarters: 1.1
+    requires: [highlight-reels]
     effects:
-      - { type: spreadChannel, channel: language, amount: 0.64 }
-      - { type: coldLaunchCostReduction, amount: 0.32 }
-
-  # Fork "TV deal": league cash, or casual reach.
-  - id: pay-tv-exclusivity
-    category: media
-    quarters: 9
-    requires: [ highlight-reels ]
-    effects:
-      - type: runningCostReduction
-        amount: 0.32
-        conditions: { mediaMarket: 0.1 }
-      - { type: casualConversion, amount: -0.16 }
-
+      - { type: casualConversion, amount: 0.04, conditions: { wealth: 0.05 } }
   - id: free-to-air
     category: media
-    quarters: 9
-    requires: [ highlight-reels ]
+    level: 4
+    quarters: 1.4
+    requires: [newspaper-columns]
     effects:
-      - type: casualConversion
-        amount: 0.16
-        conditions: { mediaMarket: 0.1 }
-      - { type: spreadChannel, channel: media, amount: 0.4 }
-      - { type: runningCostReduction, amount: -0.16 }
-
+      - { type: casualConversion, amount: 0.06, conditions: { mediaMarket: 0.1 } }
+      - { type: spreadChannel, channel: media, amount: 0.1 }
+      - { type: mediaRevenue, amount: -0.05 }
+  - id: pay-tv
+    category: media
+    level: 4
+    quarters: 1.4
+    requires: [newspaper-columns]
+    effects:
+      - { type: mediaRevenue, amount: 0.2 }
+      - { type: casualConversion, amount: -0.04 }
+  - id: match-programs
+    category: media
+    level: 5
+    quarters: 1.2
+    requiresAny: [free-to-air, pay-tv]
+    effects:
+      - { type: ppIncome, amount: 0.03 }
+  - id: dubbed-broadcasts
+    category: media
+    level: 6
+    quarters: 1.4
+    requires: [match-programs]
+    effects:
+      - { type: spreadChannel, channel: language, amount: 0.12 }
   - id: star-profiles
     category: media
-    quarters: 9
-    requires: [ newspaper-columns ]
+    level: 7
+    quarters: 1.4
+    requires: [dubbed-broadcasts]
     effects:
-      - { type: hardcoreConversion, amount: 0.16 }
-      - { type: churnReduction, amount: 0.16 }
-
-  # Fork "coverage": protection and PP, or casual volume that comes and goes.
-  - id: sponsor-showcase
+      - { type: hardcoreConversion, amount: 0.04 }
+  - id: broadcast-breaks
     category: media
-    quarters: 10.5
-    requires: [ star-profiles ]
+    level: 8
+    quarters: 1.8
+    requires: [star-profiles]
     effects:
-      - { type: countermoveResistance, amount: 0.64 }
-      - { type: ppIncome, amount: 0.128 }
-      - { type: casualConversion, amount: -0.08 }
-
-  - id: tabloid-buzz
+      - { type: casualConversion, amount: 0.06, conditions: { mediaMarket: 0.08 } }
+      - { type: mediaRevenue, amount: 0.15 }
+      - { type: puristBacklash, amount: 0.03 }
+  - id: uninterrupted-play
     category: media
-    quarters: 10.5
-    requires: [ star-profiles ]
+    level: 8
+    quarters: 1.8
+    requires: [star-profiles]
     effects:
-      - type: casualConversion
-        amount: 0.24
-        conditions: { urbanDensity: 0.1 }
-      - { type: churnReduction, amount: -0.24 }
-
+      - { type: churnReduction, amount: 0.08 }
+      - { type: mediaRevenue, amount: -0.1 }
   - id: satellite-feed
     category: media
-    quarters: 12
-    requires: [ highlight-reels, dubbed-broadcasts ]
+    level: 9
+    quarters: 1.6
+    requiresAny: [broadcast-breaks, uninterrupted-play]
     effects:
-      - { type: spreadChannel, channel: media, amount: 0.96 }
-      - { type: ppIncome, amount: 0.08 }
+      - { type: spreadChannel, channel: media, amount: 0.15 }
+  - id: fantasy-games
+    category: media
+    level: 10
+    quarters: 1.8
+    requires: [satellite-feed]
+    effects:
+      - { type: ppIncome, amount: 0.03 }
+  - id: streaming-rights
+    category: media
+    level: 11
+    quarters: 1.8
+    requires: [fantasy-games]
+    effects:
+      - { type: casualConversion, amount: 0.05 }
+  - id: star-coverage
+    category: media
+    level: 12
+    quarters: 2.4
+    requires: [streaming-rights]
+    effects:
+      - { type: starPull, amount: 0.4 }
+  - id: club-coverage
+    category: media
+    level: 12
+    quarters: 2.4
+    requires: [streaming-rights]
+    effects:
+      - { type: traditionBirth, traditionType: derby, amount: 0.3 }
+      - { type: traditionBirth, traditionType: venue, amount: 0.2 }
 
-  # ---- Culture (tier 4, GDD v1.22): nurture traditions that exist; never create one ----------------
-  # Culture effects apply everywhere (no conditions) and may name one traditionType:
-  #   traditionStrength    bigger renewals and slower yearly decay
-  #   traditionReach       a yearly chance to gain a follower along proximity or language links
-  #                        (channel limits it to one); national names never spread
-  #   traditionProtection  less strength lost to an offending amendment
-  #   traditionHold        more weight per unit of strength: stickier fans, and harder betrayals
+  # Institutions
+  - id: league-office
+    category: institutions
+    level: 1
+    quarters: 1.1
+    effects:
+      - { type: runningCostReduction, amount: 0.05 }
+  - id: rules-committee
+    category: institutions
+    level: 2
+    quarters: 1.2
+    requires: [league-office]
+    effects:
+      - { type: runningCostReduction, amount: 0.04 }
+  - id: development-fund
+    category: institutions
+    level: 3
+    quarters: 1.4
+    requires: [rules-committee]
+    effects:
+      - { type: formationThresholdReduction, amount: 0.1 }
+  - id: draft
+    category: institutions
+    level: 4
+    quarters: 1.8
+    requires: [development-fund]
+    effects:
+      - { type: ratingParity, amount: 0.4 }
+  - id: open-market
+    category: institutions
+    level: 4
+    quarters: 1.8
+    requires: [development-fund]
+    effects:
+      - { type: ratingParity, amount: -0.3 }
+      - { type: starMoves, amount: 0.3 }
+      - { type: traditionBirth, traditionType: era, amount: 0.3 }
+  - id: shared-scouting
+    category: institutions
+    level: 5
+    quarters: 1.4
+    requiresAny: [draft, open-market]
+    effects:
+      - { type: hardcoreConversion, amount: 0.04 }
+  - id: commercial-department
+    category: institutions
+    level: 6
+    quarters: 1.6
+    requires: [shared-scouting]
+    effects:
+      - { type: ppIncome, amount: 0.03 }
+  - id: integrity-unit
+    category: institutions
+    level: 7
+    quarters: 1.8
+    requires: [commercial-department]
+    effects:
+      - { type: formationThresholdReduction, amount: 0.08 }
+  - id: expansion
+    category: institutions
+    level: 8
+    quarters: 2.2
+    requires: [integrity-unit]
+    effects:
+      - { type: flagshipClubs, amount: 0.1 }
+  - id: compact-league
+    category: institutions
+    level: 8
+    quarters: 2.2
+    requires: [integrity-unit]
+    effects:
+      - { type: flagshipClubs, amount: -0.1 }
+      - { type: traditionBirth, traditionType: derby, amount: 0.3 }
+      - { type: sponsorValue, amount: 0.1 }
+  - id: central-purchasing
+    category: institutions
+    level: 9
+    quarters: 1.8
+    requiresAny: [expansion, compact-league]
+    effects:
+      - { type: runningCostReduction, amount: 0.05 }
+  - id: youth-academies
+    category: institutions
+    level: 10
+    quarters: 2
+    requires: [central-purchasing]
+    effects:
+      - { type: hardcoreConversion, amount: 0.04 }
+  - id: players-liaison
+    category: institutions
+    level: 11
+    quarters: 2.2
+    requires: [youth-academies]
+    effects:
+      - { type: countermoveResistance, amount: 0.04 }
+  - id: salary-cap
+    category: institutions
+    level: 12
+    quarters: 2.7
+    requires: [players-liaison]
+    effects:
+      - { type: wageFactor, amount: -0.25 }
+      - { type: ratingParity, amount: 0.15 }
+  - id: star-pay
+    category: institutions
+    level: 12
+    quarters: 2.7
+    requires: [players-liaison]
+    effects:
+      - { type: wageFactor, amount: 0.25 }
+      - { type: starMoves, amount: -0.5 }
+      - { type: starPlaces, amount: 0.2 }
+
+  # Culture
   - id: oral-history
     category: culture
-    quarters: 10
-    requires: []
+    level: 1
+    quarters: 1.1
     effects:
-      - { type: traditionStrength, amount: 0.3 }
-
-  - id: derby-days
+      - { type: traditionStrength, amount: 0.05 }
+  - id: supporters-clubs
     category: culture
-    quarters: 10
-    requires: []
+    level: 2
+    quarters: 1.2
+    requires: [oral-history]
     effects:
-      - { type: traditionStrength, traditionType: derby, amount: 0.6 }
-      - { type: traditionHold, traditionType: derby, amount: 0.2 }
-
-  - id: supporters-trusts
+      - { type: traditionProtection, amount: 0.05 }
+  - id: club-museums
     category: culture
-    quarters: 11
-    requires: []
+    level: 3
+    quarters: 1.4
+    requires: [supporters-clubs]
     effects:
-      - { type: traditionProtection, amount: 0.4 }
-
-  - id: club-museum
+      - { type: traditionHold, amount: 0.02 }
+  - id: attacking-style
     category: culture
-    quarters: 11
-    requires: [ oral-history ]
+    level: 4
+    quarters: 1.8
+    requires: [club-museums]
     effects:
-      - { type: traditionStrength, traditionType: rite, amount: 0.5 }
-      - { type: traditionStrength, traditionType: venue, amount: 0.5 }
-
-  - id: hall-of-legends
+      - { type: scoring, amount: 0.1 }
+      - { type: starPlaces, amount: 0.2 }
+      - { type: casualConversion, amount: 0.04 }
+  - id: defensive-style
     category: culture
-    quarters: 11
-    requires: [ oral-history ]
+    level: 4
+    quarters: 1.8
+    requires: [club-museums]
     effects:
-      - { type: traditionStrength, traditionType: legacy, amount: 0.6 }
-      - { type: traditionHold, traditionType: legacy, amount: 0.2 }
-
-  - id: travelling-support
-    category: culture
-    quarters: 12
-    requires: [ derby-days ]
-    effects:
-      - { type: traditionReach, channel: proximity, amount: 0.5 }
-
+      - { type: scoring, amount: -0.1 }
+      - { type: traditionBirth, traditionType: curse, amount: 0.3 }
+      - { type: traditionBirth, traditionType: chant, amount: 0.3 }
+      - { type: churnReduction, amount: 0.04 }
   - id: twinned-towns
     category: culture
-    quarters: 12
-    requires: [ oral-history ]
+    level: 5
+    quarters: 1.4
+    requiresAny: [attacking-style, defensive-style]
     effects:
-      - { type: traditionReach, channel: language, amount: 0.5 }
-
-  - id: heritage-listing
+      - { type: traditionReach, channel: language, amount: 0.15 }
+  - id: old-timers-games
     category: culture
-    quarters: 11
-    requires: [ supporters-trusts ]
+    level: 6
+    quarters: 1.6
+    requires: [twinned-towns]
     effects:
-      - { type: traditionProtection, traditionType: venue, amount: 0.4 }
-      - { type: traditionHold, traditionType: venue, amount: 0.3 }
-
-  # The fork (choose pain): Heritage trust holds traditions harder, so fans resist every change
-  # more; Living game spreads and grows them but leaves them easier to break.
-  - id: heritage-trust
+      - { type: traditionStrength, amount: 0.05 }
+  - id: heritage-plaques
     category: culture
-    quarters: 16
-    requires: [ supporters-trusts ]
+    level: 7
+    quarters: 1.8
+    requires: [old-timers-games]
+    effects:
+      - { type: traditionProtection, amount: 0.05 }
+  - id: heritage
+    category: culture
+    level: 8
+    quarters: 2.2
+    requires: [heritage-plaques]
     effects:
       - { type: traditionProtection, amount: 0.3 }
-      - { type: traditionHold, amount: 0.3 }
-
+      - { type: traditionHold, amount: 0.05 }
   - id: living-game
     category: culture
-    quarters: 16
-    requires: [ supporters-trusts ]
+    level: 8
+    quarters: 2.2
+    requires: [heritage-plaques]
     effects:
       - { type: traditionReach, amount: 0.5 }
-      - { type: traditionStrength, amount: 0.3 }
-      - { type: traditionProtection, amount: -0.3 }
+      - { type: traditionProtection, amount: -0.2 }
+  - id: traveling-fans
+    category: culture
+    level: 9
+    quarters: 1.8
+    requiresAny: [heritage, living-game]
+    effects:
+      - { type: traditionReach, channel: proximity, amount: 0.15 }
+  - id: anniversary-matches
+    category: culture
+    level: 10
+    quarters: 2
+    requires: [traveling-fans]
+    effects:
+      - { type: traditionStrength, amount: 0.05 }
+  - id: fan-archive
+    category: culture
+    level: 11
+    quarters: 2.2
+    requires: [anniversary-matches]
+    effects:
+      - { type: traditionHold, amount: 0.02 }
+  - id: local-pride
+    category: culture
+    level: 12
+    quarters: 2.7
+    requires: [fan-archive]
+    effects:
+      - { type: traditionStrength, traditionType: nationalName, amount: 0.5 }
+      - { type: traditionStrength, traditionType: derby, amount: 0.5 }
+  - id: global-game
+    category: culture
+    level: 12
+    quarters: 2.7
+    requires: [fan-archive]
+    effects:
+      - { type: traditionReach, traditionType: chant, amount: 0.5 }
+      - { type: traditionReach, traditionType: signatureMove, amount: 0.5 }

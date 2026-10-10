@@ -993,7 +993,7 @@ flagship:
     # Pay-TV owners get bigger TV offers, exclusive twice as often; Free-to-Air owners smaller,
     # never exclusive.
     tvFork:
-      pay-tv-exclusivity: { value: 1.2, exclusivityChance: 2 }
+      pay-tv: { value: 1.2, exclusivityChance: 2 }
       free-to-air: { value: 0.85, exclusivityChance: 0 }
     exclusivityLiftCut: 0.5
     sponsorLockout: { value: 0.6, offersCut: 1 }

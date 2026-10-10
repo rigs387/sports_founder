@@ -1357,6 +1357,22 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    turn, fork side shares (the options experiment flags a dominant side). Save format bump, no
    migration. Tests: fork blocks the track; a fork closes its sibling; one fit and one
    institution effect change their numbers.
+
+   *Built 2026-10-10.* The node model stays: each level is a node with `level`, a fork's sides
+   share a fork and a level, and the level after a fork has `requiresAny` (blocker `forkFirst`).
+   `content/growth-tree.yaml` and `growth-view.yaml` were written once from one track table at
+   build; the YAML files are the source from now on (names and summaries in the locale). Category `institutions`. Twelve new effect types
+   (`SHAPE_EFFECT_TYPES`, global, no conditions) read through `src/sim/shape.ts`
+   (`shapeFactors`, cached by owned list): climateFit (`leverMultipliers`' climate weight),
+   sponsorValue (`ordinaryDealValue`), mediaRevenue (`leagueIncomePerQuarter`), ratingParity
+   (`driftRatings`), flagshipClubs (`clubTarget`), wageFactor (`leagueCosts`), starPlaces and
+   starMoves (`playersSeasonEnd`), scoring (`playMatch`), starPull (`backingEffects`),
+   traditionBirth (culture's `threshold` for derby, venue, curse, era, chant) and puristBacklash
+   (`buyNode`). Growth and culture factors are cached by owned list too (a profile showed
+   `growthFactors` at 27% with 40 levels). Snapshot: `level`, `forkId`, `requiresAny`,
+   `preview` per node; `growthDone`. Bots value shaping effects at a quarter of their size
+   (wages and backlash as costs). Runner: growth pace. Save format 26. Smoke: 60 levels, the gear
+   fork, the preview. `tests/growth-tracks.test.ts`.
 6. **Saves and standings (topic 6).** Main: a saves folder at `%USERPROFILE%\Saved Games\Sports
    Founder` (created on first use; `app.getPath("home")`), the default for both dialogs; a
    `listSaves` IPC endpoint reading each save's header (name, anchor, turn, year, mtime; headers

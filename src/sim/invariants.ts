@@ -91,6 +91,8 @@ export function invariantsOf(state: GameState, world: World): string[] {
         problems.push(`growth node "${nodeId}" was bought before its prerequisite "${required}"`);
       }
     }
+    if (node.requiresAny.length > 0 && !node.requiresAny.some((id) => ownedSoFar.has(id)))
+      problems.push(`growth node "${nodeId}" was bought before a side of the fork before it`);
     const fork = forkOf(world, nodeId);
     const sibling = fork?.nodes.find((id) => id !== nodeId && ownedSoFar.has(id));
     if (fork && sibling !== undefined) {

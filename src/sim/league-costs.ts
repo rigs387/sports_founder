@@ -1,5 +1,6 @@
 import { seatStars, starWage } from "./flagship";
 import { runningCostPerQuarter, venueUpkeep } from "./leagues";
+import { shapeFactors } from "./shape";
 import type { CountryState, GameState, LeagueTierId, World } from "./types";
 
 // A league's costs a quarter (GDD v1.30). Every league pays its running cost (tier × wealth ×
@@ -38,11 +39,16 @@ export function leagueCosts(
   if (world.countries[index]?.id !== state.flagship.countryId) {
     return { operations: running, payroll: 0, wages: 0, upkeep, total: running + upkeep };
   }
-  const payroll = world.config.flagship.payroll.baselineShare * running;
-  const wages = seatStars(state.flagship).reduce(
-    (sum, star) => sum + starWage(star, state.flagship, running, world),
-    0,
-  );
-  const operations = running - payroll;
-  return { operations, payroll, wages, upkeep, total: running + wages + upkeep };
+  // A salary cap or star pay scales the payroll and star wages (GDD v1.35).
+  const wage = shapeFactors(world, state.growthNodes).wageFactor;
+  const baseline = world.config.flagship.payroll.baselineShare * running;
+  const payroll = baseline * wage;
+  const wages =
+    wage *
+    seatStars(state.flagship).reduce(
+      (sum, star) => sum + starWage(star, state.flagship, running, world),
+      0,
+    );
+  const operations = running - baseline;
+  return { operations, payroll, wages, upkeep, total: operations + payroll + wages + upkeep };
 }

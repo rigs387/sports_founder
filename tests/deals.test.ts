@@ -304,8 +304,8 @@ describe("what shapes offers", () => {
     const plain = ordinaryDealValue(state, world, tv);
     const fork = world.config.flagship.deals.tvFork;
     const owning = (nodeId: string) => ({ ...state, growthNodes: [...state.growthNodes, nodeId] });
-    expect(ordinaryDealValue(owning("pay-tv-exclusivity"), world, tv)).toBeCloseTo(
-      plain * (fork["pay-tv-exclusivity"]?.value ?? 0),
+    expect(ordinaryDealValue(owning("pay-tv"), world, tv)).toBeCloseTo(
+      plain * (fork["pay-tv"]?.value ?? 0),
     );
     expect(ordinaryDealValue(owning("free-to-air"), world, tv)).toBeCloseTo(
       plain * (fork["free-to-air"]?.value ?? 0),

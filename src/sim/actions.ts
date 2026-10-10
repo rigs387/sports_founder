@@ -22,6 +22,7 @@ import {
 import { ppPrice } from "./prices";
 import { landmarks } from "./records";
 import { amendBlocker, amendmentJump, amendmentPrice, amendRule } from "./rules";
+import { puristBacklash } from "./shape";
 import { computeExposure } from "./spread";
 import {
   type AxisId,
@@ -150,6 +151,8 @@ export function checkAction(state: GameState, world: World, action: Action): str
           return `${growthNode(world, action.nodeId).category} nodes unlock at PP tier ${blocker.unlockTier} (you are at tier ${state.ppTier})`;
         case "prerequisites":
           return `"${action.nodeId}" needs ${blocker.missing.map((id) => `"${id}"`).join(" and ")} first`;
+        case "forkFirst":
+          return `"${action.nodeId}" needs ${blocker.options.map((id) => `"${id}"`).join(" or ")} first (the fork before it)`;
       }
     }
     const cost = nodeCost(state, world, action.nodeId);
@@ -325,8 +328,25 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
       return resolveEvent(state, world, action.eventId, action.choiceId);
     case "buyNode": {
       const cost = nodeCost(state, world, action.nodeId);
+      // Broadcast breaks cost the anchor's purists once (GDD v1.35).
+      const backlash = puristBacklash(world, action.nodeId);
+      const anchor = state.countries.findIndex((c) => c.countryId === state.anchorCountryId);
+      const countries =
+        backlash > 0
+          ? state.countries.map((country, i) =>
+              i === anchor
+                ? {
+                    ...country,
+                    fans: country.fans.map((fans, f) =>
+                      f === PLAYER_INDEX ? demoteHardcore(fans, backlash) : fans,
+                    ),
+                  }
+                : country,
+            )
+          : state.countries;
       return {
         ...state,
+        countries,
         pp: state.pp - cost,
         growthNodes: [...state.growthNodes, action.nodeId],
         landmarks: [

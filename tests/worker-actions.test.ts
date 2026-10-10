@@ -21,7 +21,7 @@ describe("worker action boundary", () => {
     );
     expect(bought.snapshot.landmarkCount).toBe(before.landmarkCount + 1);
     expect(
-      bought.snapshot.growthNodes.find((node) => node.nodeId === "word-of-mouth")?.status,
+      bought.snapshot.growthNodes.find((node) => node.nodeId === "weekend-leagues")?.status,
     ).toBe("available");
     expect(api.applyAction(action)).toEqual({
       ok: false,
@@ -67,10 +67,11 @@ describe("worker action boundary", () => {
         reason: "illegal-action",
         snapshot: start,
       });
-    api.applyAction({ type: "buyNode", nodeId: "backyard-clinics" });
-    const fork = api.applyAction({ type: "buyNode", nodeId: "street-courts" });
+    for (const nodeId of ["backyard-clinics", "weekend-leagues", "word-of-mouth"])
+      api.applyAction({ type: "buyNode", nodeId });
+    const fork = api.applyAction({ type: "buyNode", nodeId: "cheap-gear" });
     expect(fork.ok).toBe(true);
-    expect(api.applyAction({ type: "buyNode", nodeId: "club-grounds" }).snapshot).toEqual(
+    expect(api.applyAction({ type: "buyNode", nodeId: "premium-gear" }).snapshot).toEqual(
       fork.snapshot,
     );
     const poor = createSimWorkerApi(

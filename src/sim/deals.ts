@@ -5,6 +5,7 @@ import { growthFactorsAt } from "./growth";
 import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
+import { shapeFactors } from "./shape";
 import type {
   CountryState,
   Deal,
@@ -129,7 +130,10 @@ export function ordinaryDealValue(state: GameState, world: World, ref: DealSlotR
     tierEntry(state.ppTier, world.config).mediaRevenueMultiplier;
   const wealth = revenue.wealthFloor + (1 - revenue.wealthFloor) * derived.wealth;
   const market = revenue.mediaMarketFloor + (1 - revenue.mediaMarketFloor) * derived.mediaMarket;
-  const lockout = hasCountermove(country, "sponsorLockout") ? deals.sponsorLockout.value : 1;
+  // Premium gear and a compact league make sponsors pay more (GDD v1.35).
+  const lockout =
+    (hasCountermove(country, "sponsorLockout") ? deals.sponsorLockout.value : 1) *
+    shapeFactors(world, state.growthNodes).sponsorValue;
   let quarter: number;
   if (ref.slot === "tv") {
     // A rival's broadcast deal makes TV offers smaller, never impossible (GDD v1.34).
@@ -484,7 +488,7 @@ export function leagueIncomePerQuarter(
       country,
       world.config,
       growthFactorsAt(world, state.growthNodes, index).countermoveEffect,
-    ),
+    ) * shapeFactors(world, state.growthNodes).mediaRevenue,
   );
   if (!atSeat) return revenue.total;
   return (

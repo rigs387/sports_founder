@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-10",
-    tests: 593,
-    files: 60,
-    note: "npm run check passed after a Hall that remembers careers (type checks, Biome, purity, 593 tests in 60 files). Lint has existing visual-study warnings.",
+    tests: 599,
+    files: 61,
+    note: "npm run check passed after growth tracks (type checks, Biome, purity, 599 tests in 61 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-10",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "growth",
       title: "Third playtest follow-ups",
-      text: "Tech plan 2.22 (GDD v1.35): market size ceilings (built), more fun culture (built), more stars than slots (built), a Hall that remembers careers (built), growth tracks that shape the sport, saves and standings. Steps 1–4 built by 2026-10-10.",
+      text: "Tech plan 2.22 (GDD v1.35): market size ceilings (built), more fun culture (built), more stars than slots (built), a Hall that remembers careers (built), growth tracks that shape the sport (built), saves and standings. Steps 1–5 built by 2026-10-10.",
       tag: "Next build",
     },
     {
@@ -100,6 +100,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-10",
+      type: "Built",
+      title: "Growth tracks that shape the sport",
+      text: "Tech plan 2.22 step 5 (GDD v1.35): the growth tree became four tracks (Grassroots, Media, Institutions, Culture) of 12 cheap levels, with a permanent fork at levels 4, 8 and 12 that shapes the sport: cheap or premium gear, indoor or outdoor play, street courts or club grounds, free or pay TV, broadcast breaks, star or club coverage, a draft or an open market, expansion or a compact league, a salary cap or star pay, an attacking or defensive style, heritage or a living game, local pride or a global game. Each level previews what it does in the top markets. Bots buy 46 of 48 levels in 200 turns; with the defensive steps cut, the #1 contest holds at 13 of 24 and pacing passes. Save format 26. npm run check: 599 tests in 61 files; smoke passed.",
+    },
     {
       date: "2026-10-10",
       type: "Built",

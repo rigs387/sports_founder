@@ -13,7 +13,7 @@ import {
   updateCulture,
 } from "../src/sim";
 import { clubIds, fresh, ofType, withSeason, withTradition } from "./culture-helpers";
-import { world } from "./helpers";
+import { withConfig, world } from "./helpers";
 
 // Culture, first build (GDD v1.22): traditions as cards.
 
@@ -103,6 +103,11 @@ describe("stoking a repeat final", () => {
 
 describe("the Culture category: reach", () => {
   /** England with a full-strength derby and fans across the region, ten years on. */
+  // Traveling Fans (GDD v1.35) reach along borders and sea links; a high reach rate makes ten
+  // years enough to see it every time.
+  const eager = withConfig(world, (c) => {
+    c.culture.reach.chancePerReach = 5;
+  });
   function tenYears(nodes: string[]): GameState {
     const base = fresh("beach", 3);
     let state: GameState = {
@@ -116,15 +121,15 @@ describe("the Culture category: reach", () => {
       })),
     };
     for (let year = 0; year < 10; year += 1)
-      state = updateCulture({ ...state, quarter: state.quarter + 4 }, world);
+      state = updateCulture({ ...state, quarter: state.quarter + 4 }, eager);
     return state;
   }
 
   it("spreads followers only with reach nodes, and only along the links they name", () => {
     expect(ofType(tenYears([]), "derby")[0]?.followers).toEqual(["england"]);
-    const followers = ofType(tenYears(["derby-days", "travelling-support"]), "derby")[0]?.followers;
+    const followers = ofType(tenYears(["traveling-fans"]), "derby")[0]?.followers;
     expect(followers?.length).toBeGreaterThan(1);
-    // Travelling support reaches along borders and sea links only.
+    // Traveling fans reach along borders and sea links only.
     const index = new Map(world.countries.map((c, i) => [c.id, i]));
     const followerIndexes = new Set((followers ?? []).map((id) => index.get(id)));
     for (const id of followers?.slice(1) ?? []) {

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { NodeEffect } from "../../../content";
+import { type NodeEffect, SHAPE_EFFECT_TYPES, TRADITION_EFFECT_TYPES } from "../../../content";
 import type { Action, GrowthNodeSnapshot, TurnSnapshot } from "../../../sim";
 import { ActionFeedback } from "../components/ActionFeedback";
+import { useGameStore } from "../state/game-store";
 import { GrowthIcon } from "./GrowthIcon";
 import { canPurchase } from "./model";
 import { growthView } from "./settings";
@@ -15,6 +16,17 @@ interface Props {
   active: boolean;
   error: string | null;
   onAction: (action: Action) => void;
+}
+
+/** Shaping effects that change the sport's character rather than help or hurt (GDD v1.35). */
+const NEUTRAL_TYPES = ["ratingParity", "scoring", "flagshipClubs", "starMoves", "climateFit"];
+const neutral = (effect: NodeEffect) => NEUTRAL_TYPES.includes(effect.type);
+/** A cost to the player: a cut to something good, higher wages, or a purist backlash. */
+function downside(effect: NodeEffect): boolean {
+  if (effect.type === "puristBacklash") return true;
+  if (effect.type === "wageFactor") return effect.amount > 0;
+  if (neutral(effect)) return false;
+  return effect.amount < 0;
 }
 
 function Effects({ effects }: { effects: NodeEffect[] }) {
@@ -33,13 +45,13 @@ function Effects({ effects }: { effects: NodeEffect[] }) {
         return (
           <li
             key={`${effect.type}-${effect.channel ?? index}`}
-            className={effect.amount < 0 ? "downside" : ""}
+            className={downside(effect) ? "downside" : ""}
           >
             <b
               role="img"
-              aria-label={t(effect.amount < 0 ? "growth.board.downside" : "growth.board.benefit")}
+              aria-label={t(downside(effect) ? "growth.board.downside" : "growth.board.benefit")}
             >
-              {effect.amount < 0 ? "!" : "✓"}
+              {downside(effect) ? "!" : neutral(effect) ? "•" : "✓"}
             </b>
             <span>
               {t(`growth.board.effects.${effect.type}`, {
@@ -66,6 +78,74 @@ function Effects({ effects }: { effects: NodeEffect[] }) {
   );
 }
 
+/** A level's effect in concrete terms (GDD v1.35): in the top markets, and on the flagship. */
+function Preview({ node }: { node: Node }) {
+  const { t } = useTranslation();
+  const { names } = useGameStore();
+  const local = node.effects
+    .map((effect, index) => ({ effect, index }))
+    .filter(
+      ({ effect }) =>
+        !SHAPE_EFFECT_TYPES.includes(effect.type) && !TRADITION_EFFECT_TYPES.includes(effect.type),
+    );
+  const { clubs, starPlaces } = node.preview;
+  if (local.length === 0 && !clubs && !starPlaces) return null;
+  return (
+    <div className="growth-preview" data-testid="growth-preview">
+      <span className="eyebrow">{t("growth.board.preview")}</span>
+      <ul>
+        {node.preview.markets.map((market) => (
+          <li key={market.countryId}>
+            <b>{names?.countries[market.countryId] ?? market.countryId}</b>
+            <span>
+              {local
+                .map(({ effect, index }) =>
+                  t(`growth.board.effects.${effect.type}`, {
+                    value: signed(effect, market.values[index] ?? 0),
+                    channel: t(`growth.board.channels.${effect.channel ?? "proximity"}`),
+                  }),
+                )
+                .join(" · ")}
+            </span>
+          </li>
+        ))}
+        {clubs && <li>{t("growth.board.previewClubs", clubs)}</li>}
+        {starPlaces && <li>{t("growth.board.previewStars", starPlaces)}</li>}
+      </ul>
+    </div>
+  );
+}
+
+/** What the tracks have done so far, in the player's top markets (GDD v1.35). */
+function Done({ snapshot }: { snapshot: TurnSnapshot }) {
+  const { t } = useTranslation();
+  const { names } = useGameStore();
+  const owned = snapshot.growthNodes.filter((node) => node.status === "owned").length;
+  if (owned === 0) return null;
+  return (
+    <p className="growth-done" data-testid="growth-done">
+      {snapshot.growthDone.markets
+        .map((market) =>
+          t("growth.board.done", {
+            country: names?.countries[market.countryId] ?? market.countryId,
+            casual: market.factors.casualConversion - 1,
+            hardcore: market.factors.hardcoreConversion - 1,
+          }),
+        )
+        .join(" ")}
+    </p>
+  );
+}
+
+/** A reduction effect reads as a cut, so its value is shown negated. */
+function signed(effect: NodeEffect, value: number): number {
+  const reduction =
+    effect.type.endsWith("Reduction") ||
+    effect.type === "countermoveResistance" ||
+    effect.type === "traditionProtection";
+  return reduction ? -value : value;
+}
+
 export function GrowthScreen({ snapshot, busy, active, error, onAction }: Props) {
   const { t, i18n } = useTranslation();
   const [selectedId, setSelectedId] = useState(snapshot.growthNodes[0]?.nodeId ?? "");
@@ -79,6 +159,8 @@ export function GrowthScreen({ snapshot, busy, active, error, onAction }: Props)
   const categories = [...new Set(snapshot.growthNodes.map((node) => node.category))];
   const name = (id: string) => t(`growth.nodes.${id}`);
   const nodeNames = (ids: string[]) => new Intl.ListFormat(i18n.language).format(ids.map(name));
+  const orNames = (ids: string[]) =>
+    new Intl.ListFormat(i18n.language, { type: "disjunction" }).format(ids.map(name));
   const cost = (node: Node) => t("growth.cost", { cost: node.cost });
   const tile = (node: Node) => {
     const position = growthView.nodes[node.nodeId];
@@ -105,6 +187,9 @@ export function GrowthScreen({ snapshot, busy, active, error, onAction }: Props)
     if (node.lock?.kind === "prerequisites")
       return t("actions.lockPrerequisites", { nodes: nodeNames(node.lock.missing) });
     if (node.lock?.kind === "fork") return t("actions.lockFork", { node: name(node.lock.takenBy) });
+    // The level after a fork opens with either side (GDD v1.35).
+    if (node.lock?.kind === "forkFirst")
+      return t("actions.lockForkFirst", { nodes: orNames(node.lock.options) });
     if (!node.affordable)
       return t("growth.board.need", { pp: Math.max(0, node.cost - snapshot.pp) });
     return t("growth.available");
@@ -221,7 +306,7 @@ export function GrowthScreen({ snapshot, busy, active, error, onAction }: Props)
                 aria-hidden="true"
               >
                 {nodes.flatMap((node) =>
-                  node.requires.map((id) => {
+                  [...node.requires, ...node.requiresAny].map((id) => {
                     const parent = snapshot.growthNodes.find(
                       (candidate) => candidate.nodeId === id,
                     );
@@ -320,9 +405,11 @@ export function GrowthScreen({ snapshot, busy, active, error, onAction }: Props)
             <p className="growth-flavor">{t(`growth.board.summaries.${selected.nodeId}`)}</p>
             <Effects effects={selected.effects} />
             <p className="growth-prerequisites">
-              {selected.requires.length
-                ? t("actions.lockPrerequisites", { nodes: nodeNames(selected.requires) })
-                : t("growth.board.noPrerequisites")}
+              {selected.requiresAny.length
+                ? t("actions.lockForkFirst", { nodes: orNames(selected.requiresAny) })
+                : selected.requires.length
+                  ? t("actions.lockPrerequisites", { nodes: nodeNames(selected.requires) })
+                  : t("growth.board.noPrerequisites")}
             </p>
             {selected.forkSiblings.length > 0 && (
               <div className="growth-fork-note">
@@ -384,10 +471,12 @@ export function GrowthScreen({ snapshot, busy, active, error, onAction }: Props)
               </span>
               <b>{selected.status === "owned" ? "✓" : cost(selected)}</b>
             </button>
+            <Preview node={selected} />
           </div>
         </aside>
       </div>
       <div className="growth-feedback">
+        <Done snapshot={snapshot} />
         <ActionFeedback />
         {error && <p role="alert">{t("status.error", { message: error })}</p>}
         {snapshot.outcome && <p role="alert">{t("growth.board.ended")}</p>}

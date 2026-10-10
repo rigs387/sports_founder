@@ -1,37 +1,68 @@
-# Clubhouse board presentation. Prices, effects and dependencies stay in growth-tree.yaml.
-# Coordinates are CSS pixels; the renderer scrolls the board on smaller screens.
-width: 812
-height: 430
-tileWidth: 166
+# Clubhouse board presentation for the growth tracks (GDD v1.35). Prices, effects and order stay
+# in growth-tree.yaml. Coordinates are CSS pixels: each track is one row of 12 levels, steps in the
+# middle, a fork's two sides above and below it; the board scrolls sideways.
+width: 2198
+height: 336
+tileWidth: 150
 tileHeight: 76
 nodes:
-  backyard-clinics: { x: 12, y: 158, icon: ball }
-  word-of-mouth: { x: 216, y: 20, icon: voice }
-  weekend-leagues: { x: 216, y: 130, icon: trophy }
-  street-courts: { x: 216, y: 240, icon: court }
-  club-grounds: { x: 216, y: 340, icon: club }
-  fan-meetups: { x: 420, y: 20, icon: fans }
-  volunteer-organisers: { x: 420, y: 240, icon: flag }
-  border-tournaments: { x: 420, y: 130, icon: flag }
-  community-ownership: { x: 624, y: 90, icon: shield }
-  barnstorming-tours: { x: 624, y: 220, icon: flag }
-  local-radio: { x: 12, y: 158, icon: radio }
-  newspaper-columns: { x: 216, y: 20, icon: voice }
-  highlight-reels: { x: 216, y: 158, icon: screen }
-  dubbed-broadcasts: { x: 216, y: 330, icon: radio }
-  pay-tv-exclusivity: { x: 420, y: 130, icon: screen }
-  free-to-air: { x: 420, y: 230, icon: screen }
-  star-profiles: { x: 420, y: 20, icon: fans }
-  sponsor-showcase: { x: 624, y: 20, icon: shield }
-  tabloid-buzz: { x: 624, y: 130, icon: voice }
-  satellite-feed: { x: 420, y: 340, icon: radio }
-  oral-history: { x: 12, y: 40, icon: voice }
-  derby-days: { x: 12, y: 158, icon: fans }
-  supporters-trusts: { x: 12, y: 290, icon: shield }
-  club-museum: { x: 216, y: 20, icon: club }
-  hall-of-legends: { x: 216, y: 110, icon: trophy }
-  twinned-towns: { x: 216, y: 200, icon: flag }
-  heritage-listing: { x: 216, y: 330, icon: shield }
-  travelling-support: { x: 420, y: 100, icon: flag }
-  heritage-trust: { x: 420, y: 220, icon: shield }
-  living-game: { x: 420, y: 330, icon: ball }
+  backyard-clinics: { x: 12, y: 130, icon: ball }
+  weekend-leagues: { x: 196, y: 130, icon: court }
+  word-of-mouth: { x: 380, y: 130, icon: club }
+  cheap-gear: { x: 564, y: 20, icon: fans }
+  premium-gear: { x: 564, y: 240, icon: flag }
+  fan-meetups: { x: 748, y: 130, icon: ball }
+  coaching-badges: { x: 932, y: 130, icon: court }
+  barnstorming-tours: { x: 1116, y: 130, icon: club }
+  indoor-halls: { x: 1300, y: 20, icon: fans }
+  outdoor-grounds: { x: 1300, y: 240, icon: flag }
+  school-programs: { x: 1484, y: 130, icon: ball }
+  border-tournaments: { x: 1668, y: 130, icon: court }
+  volunteer-organizers: { x: 1852, y: 130, icon: club }
+  street-courts: { x: 2036, y: 20, icon: fans }
+  club-grounds: { x: 2036, y: 240, icon: flag }
+  local-radio: { x: 12, y: 130, icon: radio }
+  highlight-reels: { x: 196, y: 130, icon: screen }
+  newspaper-columns: { x: 380, y: 130, icon: voice }
+  free-to-air: { x: 564, y: 20, icon: radio }
+  pay-tv: { x: 564, y: 240, icon: screen }
+  match-programs: { x: 748, y: 130, icon: voice }
+  dubbed-broadcasts: { x: 932, y: 130, icon: radio }
+  star-profiles: { x: 1116, y: 130, icon: screen }
+  broadcast-breaks: { x: 1300, y: 20, icon: voice }
+  uninterrupted-play: { x: 1300, y: 240, icon: radio }
+  satellite-feed: { x: 1484, y: 130, icon: screen }
+  fantasy-games: { x: 1668, y: 130, icon: voice }
+  streaming-rights: { x: 1852, y: 130, icon: radio }
+  star-coverage: { x: 2036, y: 20, icon: screen }
+  club-coverage: { x: 2036, y: 240, icon: voice }
+  league-office: { x: 12, y: 130, icon: shield }
+  rules-committee: { x: 196, y: 130, icon: trophy }
+  development-fund: { x: 380, y: 130, icon: flag }
+  draft: { x: 564, y: 20, icon: club }
+  open-market: { x: 564, y: 240, icon: shield }
+  shared-scouting: { x: 748, y: 130, icon: trophy }
+  commercial-department: { x: 932, y: 130, icon: flag }
+  integrity-unit: { x: 1116, y: 130, icon: club }
+  expansion: { x: 1300, y: 20, icon: shield }
+  compact-league: { x: 1300, y: 240, icon: trophy }
+  central-purchasing: { x: 1484, y: 130, icon: flag }
+  youth-academies: { x: 1668, y: 130, icon: club }
+  players-liaison: { x: 1852, y: 130, icon: shield }
+  salary-cap: { x: 2036, y: 20, icon: trophy }
+  star-pay: { x: 2036, y: 240, icon: flag }
+  oral-history: { x: 12, y: 130, icon: fans }
+  supporters-clubs: { x: 196, y: 130, icon: voice }
+  club-museums: { x: 380, y: 130, icon: trophy }
+  attacking-style: { x: 564, y: 20, icon: shield }
+  defensive-style: { x: 564, y: 240, icon: fans }
+  twinned-towns: { x: 748, y: 130, icon: voice }
+  old-timers-games: { x: 932, y: 130, icon: trophy }
+  heritage-plaques: { x: 1116, y: 130, icon: shield }
+  heritage: { x: 1300, y: 20, icon: fans }
+  living-game: { x: 1300, y: 240, icon: voice }
+  traveling-fans: { x: 1484, y: 130, icon: trophy }
+  anniversary-matches: { x: 1668, y: 130, icon: shield }
+  fan-archive: { x: 1852, y: 130, icon: fans }
+  local-pride: { x: 2036, y: 20, icon: voice }
+  global-game: { x: 2036, y: 240, icon: trophy }

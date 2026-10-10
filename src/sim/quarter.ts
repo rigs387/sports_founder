@@ -14,6 +14,7 @@ import { ppWeights, quarterPpIncome } from "./prices";
 import { landmarks, yearlySnapshot } from "./records";
 import { stepRivals } from "./rivals";
 import { nextFloat, type Rng, restoreRng, saveRng } from "./rng";
+import { shapeFactors } from "./shape";
 import { type CountryExposure, computeExposure } from "./spread";
 import { activeTournament, type Tournament, tournamentsStarting } from "./tournaments";
 import {
@@ -99,7 +100,8 @@ export function stepQuarter(
   const growth = growthFactors(world, state.growthNodes);
   const quarter = state.quarter + 1;
   const found: Landmark[] = [];
-  const backing = backingEffects(state.flagship, world);
+  const shape = shapeFactors(world, state.growthNodes);
+  const backing = backingEffects(state.flagship, world, shape.starPull);
   const broadcast = broadcastEffects(state, world);
   const traditions = traditionWeights(state, world);
   const curses = curseWeights(state, world);
@@ -127,7 +129,7 @@ export function stepQuarter(
         `Game state and content disagree at country #${index} ("${countryState.countryId}")`,
       );
     }
-    const levers = leverMultipliers(world, state.genome, index);
+    const levers = leverMultipliers(world, state.genome, index, shape.climateFit);
     const eventRates = eventFactors(state, world, country.id);
     const rivalry = similarityEffect(
       world,

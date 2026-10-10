@@ -8,13 +8,21 @@ import type { EventState } from "./events-state";
 import { fandomScore, type SportTotals, sportTotals } from "./fandom";
 import { broadcastEffects, type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
-import { growthFactors, type NodeBlocker, nodeBlocker, nodeCost } from "./growth";
+import {
+  effectValue,
+  type GrowthFactors,
+  growthFactors,
+  type NodeBlocker,
+  nodeBlocker,
+  nodeCost,
+} from "./growth";
 import { type HallSnapshot, hallSnapshot } from "./hall-of-fame";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
 import { bulkPromotable, type LeagueActions, leagueActions } from "./league-actions";
 import { type LeagueCosts, leagueCosts } from "./league-costs";
 import { ppWeights, quarterPpIncome } from "./prices";
 import { type RulesSnapshot, rulesSnapshot } from "./rules";
+import { shapeFactors } from "./shape";
 import { computeExposure } from "./spread";
 import { tierStatus } from "./tiers";
 import {
@@ -132,9 +140,35 @@ export interface WinSnapshot {
 }
 
 /** One growth tree node as the UI sees it (GDD PP Growth Tree). No text: the UI names it. */
+/**
+ * What a level would do, in concrete terms (GDD v1.35): each country effect's value in the
+ * player's top markets, and the flagship's club count and star places before and after.
+ */
+export interface GrowthPreview {
+  /** Per top market: each effect's value there (0 for global effects), in effect order. */
+  markets: { countryId: string; values: number[] }[];
+  clubs: { from: number; to: number } | null;
+  starPlaces: { from: number; to: number } | null;
+}
+
+/**
+ * What the tracks have done so far (GDD v1.35): their factors in the player's top markets. The
+ * sport's shape stays in the simulation (it carries flagship club parity, which stays hidden).
+ */
+export interface GrowthDone {
+  markets: { countryId: string; factors: GrowthFactors }[];
+}
+
 export interface GrowthNodeSnapshot {
   nodeId: string;
   category: GrowthCategory;
+  /** The level on its track, 1–12; a fork's sides share one. */
+  level: number;
+  /** The fork this node is a side of, if any. */
+  forkId: string | null;
+  /** Either of these opens this level (the fork before it). */
+  requiresAny: string[];
+  preview: GrowthPreview;
   /** owned; available (every rule met, whether or not the PP is there); locked. */
   status: "owned" | "available" | "locked";
   /** Price right now: quarters of PP income, risen per node owned (GDD v1.34). */
@@ -178,6 +212,8 @@ export interface TurnSnapshot {
   countries: CountrySnapshot[];
   /** Every growth tree node in content order, with its status and current price. */
   growthNodes: GrowthNodeSnapshot[];
+  /** What the growth tracks have done so far, in the player's top markets (GDD v1.35). */
+  growthDone: GrowthDone;
   landmarkCount: number;
   events: EventSnapshot[];
   eventHistory: EventState["history"];
@@ -223,14 +259,71 @@ function venueDisplay(
   };
 }
 
+/** The player's top markets by Fandom Score, the ones previews are read in. */
+function topMarkets(state: GameState, world: World, count = 3): number[] {
+  const { casualWeight } = world.config.fandomScore;
+  return state.countries
+    .map((country, index) => {
+      const fans = country.fans[PLAYER_INDEX];
+      return { index, score: fans ? fandomScore(fans.casual, fans.hardcore, casualWeight) : 0 };
+    })
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .slice(0, count)
+    .map((entry) => entry.index);
+}
+
+/** What the growth tracks have done so far (GDD v1.35). */
+export function growthDone(state: GameState, world: World): GrowthDone {
+  const factors = growthFactors(world, state.growthNodes);
+  return {
+    markets: topMarkets(state, world).map((index) => ({
+      countryId: world.countries[index]?.id ?? "",
+      factors: factors[index] ?? growthFactors(world, [])[0] ?? ({} as GrowthFactors),
+    })),
+  };
+}
+
 export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeSnapshot[] {
+  const top = topMarkets(state, world);
+  const seat = state.countries.find((c) => c.countryId === state.flagship.countryId)?.league;
+  const now = shapeFactors(world, state.growthNodes);
   return world.growthTree.nodes.map((node): GrowthNodeSnapshot => {
     const blocker = nodeBlocker(state, world, node.id);
     const cost = nodeCost(state, world, node.id);
     const fork = world.growthTree.forks.find((candidate) => candidate.nodes.includes(node.id));
+    // Only a level that moves the club count or star places needs its shape after.
+    const discreteEffect = node.effects.some(
+      (e) => e.type === "flagshipClubs" || e.type === "starPlaces",
+    );
+    const after = discreteEffect
+      ? shapeFactors(world, [...state.growthNodes.filter((id) => id !== node.id), node.id])
+      : now;
+    const discrete = (base: number, from: number, to: number) => {
+      const before = Math.round(base * from);
+      const next = Math.round(base * to);
+      return before === next ? null : { from: before, to: next };
+    };
+    const preview: GrowthPreview = {
+      markets: top.map((index) => ({
+        countryId: world.countries[index]?.id ?? "",
+        values: node.effects.map((effect) =>
+          world.derived[index] ? effectValue(effect, world.derived[index]) : 0,
+        ),
+      })),
+      clubs: seat
+        ? discrete(world.config.flagship.clubs[seat.tier], now.flagshipClubs, after.flagshipClubs)
+        : null,
+      starPlaces: seat
+        ? discrete(world.config.flagship.stars.places[seat.tier], now.starPlaces, after.starPlaces)
+        : null,
+    };
     return {
       nodeId: node.id,
       category: node.category,
+      level: node.level,
+      forkId: fork?.id ?? null,
+      requiresAny: [...node.requiresAny],
+      preview,
       status: blocker === null ? "available" : blocker.kind === "owned" ? "owned" : "locked",
       cost,
       affordable: state.pp >= cost,
@@ -247,11 +340,12 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
   const exposure = computeExposure(state, world);
   const broadcast = broadcastEffects(state, world);
   const { casualWeight } = world.config.fandomScore;
+  const shape = shapeFactors(world, state.growthNodes);
   const countries = state.countries.map((countryState, index): CountrySnapshot => {
     const country = world.countries[index];
     const fans = countryState.fans[PLAYER_INDEX];
     if (!country || !fans) throw new Error(`Country #${index} is missing from content or state`);
-    const levers = leverMultipliers(world, state.genome, index);
+    const levers = leverMultipliers(world, state.genome, index, shape.climateFit);
     const score = fandomScore(fans.casual, fans.hardcore, casualWeight);
     const league = countryState.league;
     const costs = leagueCosts(state, world, index);
@@ -370,6 +464,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     sports: sportTotals(state, world),
     countries,
     growthNodes: growthNodeSnapshots(state, world),
+    growthDone: growthDone(state, world),
     landmarkCount: state.landmarks.length,
     flagship: flagshipSnapshot(state, world),
     identity: identitySnapshot(state, world),

@@ -7,6 +7,7 @@ import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { seasonStories } from "./season-stories";
+import { birthFactor, shapeFactors } from "./shape";
 import {
   type AxisId,
   type BallotEntry,
@@ -129,12 +130,40 @@ const NO_CULTURE: CultureFactors = {
 };
 
 /** The owned Culture nodes' factors on a tradition type (global: Culture effects take no conditions). */
+const cultureCache = new WeakMap<
+  World,
+  WeakMap<readonly string[], Map<TraditionType, CultureFactors>>
+>();
+
 export function cultureFactors(
   world: World,
   owned: readonly string[],
   type: TraditionType,
 ): CultureFactors {
   if (owned.length === 0) return NO_CULTURE;
+  // Read for every tradition many times a turn: remembered per owned list and type.
+  let lists = cultureCache.get(world);
+  if (!lists) {
+    lists = new WeakMap();
+    cultureCache.set(world, lists);
+  }
+  let byType = lists.get(owned);
+  if (!byType) {
+    byType = new Map();
+    lists.set(owned, byType);
+  }
+  const known = byType.get(type);
+  if (known) return known;
+  const factors = computeCultureFactors(world, owned, type);
+  byType.set(type, factors);
+  return factors;
+}
+
+function computeCultureFactors(
+  world: World,
+  owned: readonly string[],
+  type: TraditionType,
+): CultureFactors {
   const totals = { strength: 0, proximity: 0, language: 0, protection: 0, hold: 0 };
   for (const nodeId of owned) {
     const node = world.growthTree.nodes.find((n) => n.id === nodeId);
@@ -169,16 +198,6 @@ export function birthEase(
   type: TraditionType,
 ) {
   return world.identity.culture.birthplaces[identity.birthplace]?.[type] ?? 1;
-}
-
-/** A birth threshold after the birthplace's ease: base ÷ ease, rounded, at least 1. */
-export function birthThreshold(
-  world: World,
-  identity: Pick<SportIdentity, "birthplace">,
-  type: TraditionType,
-  base: number,
-): number {
-  return Math.max(1, Math.round(base / birthEase(world, identity, type)));
 }
 
 /** The ethos's multiplier on one betrayal (content; 1 when unknown). */
@@ -263,6 +282,18 @@ class CultureUpdate {
 
   get config() {
     return this.world.config.culture;
+  }
+
+  /**
+   * A birth threshold after the birthplace's ease and the growth tracks' traditionBirth for the
+   * type (GDD v1.35): base ÷ (ease × factor), rounded, at least `min`. Without `eased` the
+   * birthplace's ease is left out (a chant's history was never eased).
+   */
+  threshold(type: TraditionType, base: number, min = 1, eased = true): number {
+    const { state, world } = this;
+    const ease = eased ? birthEase(world, state.identity, type) : 1;
+    const factor = birthFactor(shapeFactors(world, state.growthNodes), type);
+    return Math.max(min, Math.round(base / (ease * factor)));
   }
 
   livingOf(type: TraditionType, match: (t: Tradition) => boolean): Tradition | undefined {
@@ -429,7 +460,7 @@ class CultureUpdate {
         factSeasons.length +
         records +
         (clubId === foundingClubId ? this.config.venue.foundingFacts : 0);
-      const threshold = birthThreshold(world, state.identity, "venue", this.config.venue.fameFacts);
+      const threshold = this.threshold("venue", this.config.venue.fameFacts);
       if (facts >= threshold)
         this.born("venue", countryId, { clubIds: [clubId], seasons: factSeasons }, year);
     }
@@ -486,7 +517,7 @@ class CultureUpdate {
       if (!season || season.championId !== clubId) break;
       streak.unshift(season.season);
     }
-    if (streak.length >= this.config.era.straightTitles)
+    if (streak.length >= this.threshold("era", this.config.era.straightTitles, 2))
       this.born("era", summary.countryId, { clubIds: [clubId], seasons: streak }, year);
   }
 
@@ -551,8 +582,9 @@ class CultureUpdate {
       const seconds = leagueSeasons
         .filter((s) => s.runnerUpId === clubId && s.season > (lastTitle ?? 0))
         .map((s) => s.season);
-      const drought = lastTitle !== null && summary.season - lastTitle >= droughtSeasons;
-      if (drought || seconds.length >= lostFinals)
+      const drought =
+        lastTitle !== null && summary.season - lastTitle >= this.threshold("curse", droughtSeasons);
+      if (drought || seconds.length >= this.threshold("curse", lostFinals))
         this.born(
           "curse",
           summary.countryId,
@@ -639,7 +671,7 @@ class CultureUpdate {
       stories.includes("underdog") ||
       (stories.includes("firstTitle") &&
         stories.includes("closeFinish") &&
-        history >= this.config.chant.historySeasons);
+        history >= this.threshold("chant", this.config.chant.historySeasons, 0, false));
     if (!dramatic) return;
     const anthem = !this.traditions.some((t) => t.type === "chant");
     this.born(
@@ -725,7 +757,7 @@ class CultureUpdate {
     const stoked = state.culture.stokes.filter(
       (stoke) => samePair(stoke.clubIds, pair) && stoke.season >= since && stoke.season <= season,
     ).length;
-    if (met.length + stoked >= birthThreshold(world, state.identity, "derby", meetings)) {
+    if (met.length + stoked >= this.threshold("derby", meetings)) {
       const clubIds = [Math.min(...pair), Math.max(...pair)];
       this.born("derby", countryId, { clubIds, seasons: met }, year);
     }

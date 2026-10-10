@@ -30,6 +30,7 @@ export * from "./rules";
 export * from "./save";
 export * from "./season-stories";
 export * from "./setup";
+export * from "./shape";
 export * from "./snapshot";
 export * from "./spread";
 export * from "./star-cards";

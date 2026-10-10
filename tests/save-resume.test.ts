@@ -391,12 +391,14 @@ describe("saves with the growth tree (format 5)", () => {
         world,
       );
     expect(() => load(["hall-of-fame"])).toThrow(/"hall-of-fame" is not in the growth tree/);
-    expect(() => load(["backyard-clinics", "street-courts", "club-grounds"])).toThrow(
-      /both owned in fork where-to-play/,
+    const toFork = ["backyard-clinics", "weekend-leagues", "word-of-mouth"];
+    expect(() => load([...toFork, "cheap-gear", "premium-gear"])).toThrow(
+      /both owned in fork gear/,
     );
-    expect(() => load(["word-of-mouth", "backyard-clinics"])).toThrow(
+    expect(() => load(["weekend-leagues", "backyard-clinics"])).toThrow(
       /bought before its prerequisite "backyard-clinics"/,
     );
-    expect(load(["backyard-clinics", "word-of-mouth"]).growthNodes).toHaveLength(2);
+    expect(() => load([...toFork, "fan-meetups"])).toThrow(/before a side of the fork/);
+    expect(load(["backyard-clinics", "weekend-leagues"]).growthNodes).toHaveLength(2);
   });
 });
