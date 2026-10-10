@@ -21,6 +21,8 @@ export function withSeason(
     host?: number;
     newStarId?: number;
     recordCrowd?: boolean;
+    /** An unbeaten champion (GDD v1.35: the Invincibles); otherwise every club lost once. */
+    unbeaten?: boolean;
   } = {},
 ): GameState {
   const clubs = activeClubs(state.flagship);
@@ -42,7 +44,7 @@ export function withSeason(
       played: 0,
       won: 0,
       drawn: 0,
-      lost: 0,
+      lost: options.unbeaten && clubId === championId ? 0 : 1,
       scoreFor: 0,
       scoreAgainst: 0,
       points: 0,

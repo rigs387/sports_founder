@@ -285,6 +285,13 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   births and ethos scales betrayals (`identity.yaml`, balance-checked at load). Culture node effects
   are read by `cultureFactors`, never `growthFactors`. Rivals' traditions are flavor content with
   no effect. Flagship isolation tests use `cardless` (`tests/helpers.ts`) to switch them off.
+- Culture, third playtest (GDD v1.35): national names are born where the sport is a country's #1
+  by Fandom Score (`localRank`) and fade when it is not, named without repeats by language
+  sphere. Curses (one living per league; a title lifts one into a `redemption`), eras, the
+  Invincibles, signature moves and matchday food are born from flagship seasons. Curses and food
+  are weightless (`weighs`): no shelter, no betrayal; a curse raises the player's hardcore
+  turnover where held (`curseWeights`). Tradition cards are picked by id in
+  `tradition-cards.ts`: small-market national names are minor and take no slot.
 - The Hall of Fame (GDD v1.31) lives in `src/sim/hall-of-fame.ts` and `GameState.hallOfFame`. A
   class is chosen in culture's turn at each `seasonChampion` landmark (`chooseClass`): retired
   players on points from retained records (star seasons, titles, top-scorer seasons, the scoring

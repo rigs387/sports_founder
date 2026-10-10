@@ -1175,6 +1175,21 @@ capped by max capacity while fans outnumber seats stays as it is.
     about 20 in a 40-season campaign (thresholds measured at build).
   - *Card weight:* national names are minor and collect themselves, except in the 20 biggest
     markets (big); a broken curse and a new era are headlines; every other birth is big.
+  - *Built 2026-10-09 (calls made at build).* "#1" is by Fandom Score, as in the world race, and
+    needs fans of the sport's own there. The redemption a lifted curse becomes is its own type
+    (the "{club} Miracle"); a lifted curse tells no loss card. Measured over 150-turn runs, the
+    thresholds alone gave 23–34 curses a campaign, so a league holds one living curse at a time;
+    curses need a 20-season drought or 4 second places. No champion went unbeaten in 41 seasons of
+    the playtest (at least 3 losses), so the Invincibles also remember a champion that sets the
+    league's record for the fewest losses once it has 10 seasons of history. Signature moves need
+    10 star seasons (bots' stars last long) or the scoring record. Matchday food comes only with a
+    league's first season. Bot campaigns now average about 0.74 traditions beyond national names a
+    season (curses 4, eras 5, Invincibles 2, signature moves 10, redemptions 3, food 1): over the
+    0.5 target, mostly from star legacies (16) and famous grounds (15), which predate this and
+    track the star count; revisit with topic 3. Pacing passes and the #1 contest is unchanged
+    within noise (27/36 wins against 29/36; #1 lost before the win in 24 of 35 against 28 of 36).
+    National name pools: every sphere with two or more markets plus Japanese, Korean, Polish and
+    Ukrainian; single-market spheres without one use the default (English) pool of 32.
 - *Topic 3, more stars than slots.* 4 stars in 41 seasons, the first in season 25 (turn 64),
   never two at once, so 2–3 backing slots never forced a choice. Only the league's top scorer
   could become a star, at 34% of the club's scores (high rule), so at most one candidate a season,

@@ -60,7 +60,7 @@ const leagueSchema = z.strictObject({
   }),
 });
 
-const lossReasonSchema = z.enum(["faded", "folded", "broken", "renamed"]);
+const lossReasonSchema = z.enum(["faded", "folded", "broken", "renamed", "lifted"]);
 
 const landmarkSchema = z.discriminatedUnion("kind", [
   z.strictObject({

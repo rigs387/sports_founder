@@ -184,8 +184,9 @@ export const sportsFileSchema = z.strictObject({
 // ---- Culture (GDD v1.22) -------------------------------------------------------------------
 
 /**
- * The closed tradition vocabulary: four traditions and two artifacts from the first build, and
- * chants (GDD v1.31).
+ * The closed tradition vocabulary: four traditions and two artifacts from the first build, chants
+ * (GDD v1.31), and curses, eras, the Invincibles, signature moves, matchday food and the
+ * redemption a lifted curse becomes (GDD v1.35).
  */
 export const TRADITION_TYPES = [
   "derby",
@@ -195,6 +196,12 @@ export const TRADITION_TYPES = [
   "venue",
   "trophy",
   "chant",
+  "curse",
+  "era",
+  "invincibles",
+  "signatureMove",
+  "matchdayFood",
+  "redemption",
 ] as const;
 export const traditionTypeSchema = z.enum(TRADITION_TYPES);
 export type TraditionType = z.infer<typeof traditionTypeSchema>;
@@ -207,6 +214,12 @@ const byTradition = <T extends z.ZodType>(value: T) =>
     venue: value,
     trophy: value,
     chant: value,
+    curse: value,
+    era: value,
+    invincibles: value,
+    signatureMove: value,
+    matchdayFood: value,
+    redemption: value,
   });
 
 // ---- Hall of Fame (GDD v1.31) --------------------------------------------------------------
@@ -309,6 +322,10 @@ export const namesFileSchema = z.strictObject({
     nationalNames: z.record(id, z.array(z.string().min(1)).min(1)),
     /** Chants (GDD v1.31): invented terrace songs. */
     chants: z.array(z.string().min(1)).min(1),
+    /** Signature moves (GDD v1.35): the move a star gives their name to. */
+    moves: z.array(z.string().min(1)).min(1),
+    /** Matchday food (GDD v1.35), by birthplace: flavor only. */
+    foods: z.record(id, z.array(z.string().min(1)).min(1)),
     rivals: z.record(
       id,
       z.array(
@@ -1025,6 +1042,43 @@ export const configFileSchema = z.strictObject({
       reachMinStrength: unitInterval,
       maxFollowers: z.int().min(1),
       historySeasons: z.int().min(0),
+    }),
+    /**
+     * National names (GDD v1.35): born where the sport is a country's #1; the card is big only in
+     * the bigMarkets most populous markets, minor elsewhere.
+     */
+    nationalName: z.strictObject({ bigMarkets: z.int().min(0) }),
+    /**
+     * Curses (GDD v1.35): a former champion without a title for droughtSeasons, or a club with
+     * lostFinals second places since its last title. Hardcore turnover × (1 + turnoverPenalty ×
+     * the curse strength held) where it is held. A title lifts it into a redemption born
+     * redemptionBonus stronger.
+     */
+    curse: z.strictObject({
+      droughtSeasons: z.int().min(1),
+      lostFinals: z.int().min(1),
+      /** Living curses a league may hold at once. */
+      maxLiving: z.int().min(1),
+      turnoverPenalty: z.number().min(0),
+      redemptionBonus: unitInterval,
+    }),
+    /** Eras (GDD v1.35): straightTitles titles in a row. */
+    era: z.strictObject({ straightTitles: z.int().min(2) }),
+    /**
+     * The Invincibles (GDD v1.35): a champion with at most maxLosses losses, or one that sets the
+     * league's record for the fewest losses (as a share of matches) after historySeasons seasons.
+     */
+    invincibles: z.strictObject({ maxLosses: z.int().min(0), historySeasons: z.int().min(1) }),
+    /**
+     * Signature moves (GDD v1.35): a star's starSeasons-th star season, or the league's scoring
+     * record, born startBonus stronger; they reach abroad like chants.
+     */
+    signatureMove: z.strictObject({
+      starSeasons: z.int().min(1),
+      startBonus: unitInterval,
+      reachChance: unitInterval,
+      reachMinStrength: unitInterval,
+      maxFollowers: z.int().min(1),
     }),
   }),
   /** Awards (GDD v1.33): Player of the Season points from a season's record. */

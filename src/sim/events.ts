@@ -540,6 +540,9 @@ function momentWeight(
   // The first Hall of Fame class, or one with a scoring record holder; the anthem (GDD v1.31).
   if (card.trigger === "hall") return classHeadline(state, event) ? "headline" : "big";
   const told = event.facts.tradition;
+  // A new era and a lifted curse's redemption are headlines (GDD v1.35).
+  if (card.tradition === "born" && (told?.type === "era" || told?.type === "redemption"))
+    return "headline";
   if (card.tradition === "born" && told?.type === "chant") {
     const anthem = state.culture.traditions.find((t) => t.type === "chant");
     return anthem?.id === told.traditionId ? "headline" : "big";

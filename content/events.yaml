@@ -489,6 +489,65 @@ cards:
     effects: []
     choices: []
     defaultChoice: null
+  # GDD v1.35: a national name outside the most populous markets (culture.nationalName.bigMarkets)
+  # is minor news that collects itself and takes no moment slot, born or lost; a curse's birth is
+  # pressure news (a lifted curse is told by the redemption it becomes, a headline).
+  - id: national-name-born
+    kind: moment
+    weight: minor
+    tone: positive
+    priority: 200
+    trigger: tradition
+    tradition: born
+    noSlot: true
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: national-name-lost
+    kind: moment
+    weight: minor
+    tone: pressure
+    priority: 200
+    trigger: tradition
+    tradition: lost
+    noSlot: true
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: curse-born
+    kind: moment
+    weight: big
+    tone: pressure
+    priority: 200
+    trigger: tradition
+    tradition: born
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   # Chants (GDD v1.31): a chant's first follower abroad is a toast, once.
   - id: chant-spread
     kind: moment

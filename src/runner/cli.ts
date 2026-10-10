@@ -809,6 +809,13 @@ function main(): number {
     console.log(
       `  Remembers: Hall of Fame players per campaign median ${fmt(remembers.players.median)} (max ${fmt(remembers.players.max)}; in ${remembers.withPlayers}/${results.length} campaigns, the first at turn median ${fmt(remembers.firstPlayerTurn)}), moments median ${fmt(remembers.moments.median)}; anchor shrine weight median ${fmt(remembers.anchorShrine.median)}; chants per campaign median ${fmt(remembers.chants.median)}, ${remembers.chantsSpread} spread abroad; Culture nodes bought in ${remembers.boughtCulture}/${results.length} campaigns (median ${fmt(remembers.cultureNodes.median)})`,
     );
+    console.log(
+      `  Traditions born per campaign (median): ${remembers.traditions
+        .map((t) => `${t.type} ${fmt(t.born)}`)
+        .join(
+          ", ",
+        )}; beyond national names per flagship season ${(remembers.perSeason ?? 0).toFixed(2)} (target about 0.5)`,
+    );
     // Folds by market size (GDD v1.35): the ceilings exist so micro-markets stop folding.
     const bands = [
       ...world.config.leagues.ceilings.map((band) => band.below),

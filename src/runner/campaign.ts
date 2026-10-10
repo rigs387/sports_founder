@@ -566,6 +566,11 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         cultureNodes: state.growthNodes.filter(
           (id) => world.growthTree.nodes.find((n) => n.id === id)?.category === "culture",
         ).length,
+        traditionsBorn: state.landmarks.reduce<Record<string, number>>((counts, l) => {
+          if (l.kind === "traditionBorn") counts[l.type] = (counts[l.type] ?? 0) + 1;
+          return counts;
+        }, {}),
+        seasons: state.flagship.seasons.length,
       },
       amendments: state.rules.amendments.map(({ turn, axis, from, to, demoted }) => ({
         turn,

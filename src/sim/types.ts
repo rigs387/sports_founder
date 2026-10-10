@@ -750,7 +750,7 @@ export interface RulesState {
 
 // ---- Culture (GDD v1.22; src/sim/culture.ts) -------------------------------------------------
 
-export type TraditionLossReason = "faded" | "folded" | "broken" | "renamed";
+export type TraditionLossReason = "faded" | "folded" | "broken" | "renamed" | "lifted";
 
 /**
  * A tradition: born only from recorded facts, held by the player's fans in its follower countries

@@ -209,6 +209,9 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
   for (const birthplace of world.identity.birthplaces)
     if (!traditions.rites[birthplace])
       issue(sources.names, `traditions.rites.${birthplace}`, "missing rite names");
+  for (const birthplace of world.identity.birthplaces)
+    if (!traditions.foods[birthplace])
+      issue(sources.names, `traditions.foods.${birthplace}`, "missing matchday food names");
   if (!traditions.nationalNames.default)
     issue(sources.names, "traditions.nationalNames.default", "missing the default pool");
   for (const [sportId, list] of Object.entries(traditions.rivals)) {

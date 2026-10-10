@@ -1,5 +1,6 @@
-import { LEAGUE_TIERS, RULE_AXES, TRADITION_TYPES, type TraditionType } from "../content";
+import { RULE_AXES, TRADITION_TYPES, type TraditionType } from "../content";
 import { yearOfQuarter } from "./calendar";
+import { localRank } from "./fandom";
 import { chooseClass, classLandmark, shrineWeights } from "./hall-of-fame";
 import { tidyName } from "./identity";
 import { demoteHardcore } from "./leagues";
@@ -14,7 +15,6 @@ import {
   type Genome,
   type Inductee,
   type Landmark,
-  type LeagueTierId,
   PLAYER_INDEX,
   type Player,
   type SeasonSummary,
@@ -35,6 +35,11 @@ import {
 //
 // Culture reads facts after they are recorded (landmarks and season summaries) once per turn, and
 // rolls reach on its own random stream, so the world's random sequence never depends on it.
+//
+// Third playtest follow-ups (GDD v1.35): national names are born where the sport becomes a
+// country's #1 and fade when it is not; curses (the one negative tradition), eras, the
+// Invincibles, signature moves and matchday food are born from flagship seasons. Curses and
+// matchday food carry no weight: they never shelter fans or resist betrayal.
 
 /** Distinguishes culture's random stream from the world's, the flagship's and identity's. */
 const CULTURE_STREAM = 0x2545_f491;
@@ -91,6 +96,12 @@ export function ruleTraits(genome: Genome): Partial<Record<AxisId, string>> {
 }
 
 export const living = (tradition: Tradition) => tradition.lost === null;
+
+/** Types that never shelter fans or resist betrayal (GDD v1.35): the curse and matchday food. */
+const WEIGHTLESS: ReadonlySet<TraditionType> = new Set(["curse", "matchdayFood"]);
+
+/** Whether a tradition's type carries weight: stickiness and resistance to betrayal. */
+export const weighs = (type: TraditionType) => !WEIGHTLESS.has(type);
 
 // ---- Culture nodes (GDD v1.22: nurture, never create) -----------------------------------------
 
@@ -204,6 +215,24 @@ function recordGround(summary: SeasonSummary): number | null {
 function poolName(pool: readonly string[] | undefined, key: string): string | null {
   if (!pool || pool.length === 0) return null;
   return pool[hash(key) % pool.length] ?? null;
+}
+
+/**
+ * A name from a pool not used yet (GDD v1.35): from the stable key's place on, the first not in
+ * `used`; once the pool runs out, the key's own pick.
+ */
+function freshName(
+  pool: readonly string[] | undefined,
+  key: string,
+  used: ReadonlySet<string | null>,
+): string | null {
+  if (!pool || pool.length === 0) return null;
+  const start = hash(key) % pool.length;
+  for (let i = 0; i < pool.length; i += 1) {
+    const name = pool[(start + i) % pool.length] ?? null;
+    if (!used.has(name)) return name;
+  }
+  return pool[start] ?? null;
 }
 
 /**
@@ -342,6 +371,8 @@ class CultureUpdate {
         year,
       );
       this.naming = born.id;
+      // A league's first season sets its matchday food (GDD v1.35).
+      this.food(named, countryId, year);
     }
 
     // The club rite: the founding club's first title, renewed by every title after.
@@ -409,6 +440,174 @@ class CultureUpdate {
     }
 
     this.chant(summary, year);
+    this.era(summary, leagueSeasons, year);
+    this.invincibles(summary, leagueSeasons, year);
+    this.curses(summary, leagueSeasons, year);
+    this.signatureMoves(summary, year);
+  }
+
+  /** Matchday food (GDD v1.35): one per club, flavor only, named by the birthplace's pool. */
+  food(clubId: number, countryId: string, year: number): void {
+    const { state, world } = this;
+    if (this.traditions.some((t) => t.type === "matchdayFood" && t.clubIds[0] === clubId)) return;
+    const used = new Set(
+      this.traditions.filter((t) => t.type === "matchdayFood").map((t) => t.name),
+    );
+    const name = freshName(
+      world.names.traditions.foods[state.identity.birthplace],
+      `${state.seed}|food|${clubId}`,
+      used,
+    );
+    this.born("matchdayFood", countryId, { clubIds: [clubId], name }, year);
+  }
+
+  /**
+   * Eras (GDD v1.35): straightTitles titles in a row name an era; every further title in the run
+   * renews it and is added to it.
+   */
+  era(summary: SeasonSummary, leagueSeasons: readonly SeasonSummary[], year: number): void {
+    const clubId = summary.championId;
+    const previous = leagueSeasons.at(-2)?.season ?? null;
+    const running = this.livingOf(
+      "era",
+      (t) => t.clubIds[0] === clubId && t.seasons.at(-1) === previous,
+    );
+    if (running) {
+      this.renew(running, year);
+      running.seasons = [...running.seasons, summary.season];
+      return;
+    }
+    const streak: number[] = [];
+    for (let i = leagueSeasons.length - 1; i >= 0; i -= 1) {
+      const season = leagueSeasons[i];
+      if (!season || season.championId !== clubId) break;
+      streak.unshift(season.season);
+    }
+    if (streak.length >= this.config.era.straightTitles)
+      this.born("era", summary.countryId, { clubIds: [clubId], seasons: streak }, year);
+  }
+
+  /**
+   * The Invincibles (GDD v1.35): a champion that lost at most maxLosses matches, or that lost the
+   * smallest share of its matches of any champion here once the league has historySeasons.
+   */
+  invincibles(summary: SeasonSummary, leagueSeasons: readonly SeasonSummary[], year: number): void {
+    const { maxLosses, historySeasons } = this.config.invincibles;
+    const lostShare = (s: SeasonSummary) => {
+      const r = s.standings.find((x) => x.clubId === s.championId);
+      return r && r.played > 0 ? r.lost / r.played : 1;
+    };
+    const row = summary.standings.find((r) => r.clubId === summary.championId);
+    if (!row) return;
+    const earlier = leagueSeasons.filter((s) => s.season < summary.season);
+    const record =
+      earlier.length >= historySeasons &&
+      row.played > 0 &&
+      earlier.every((s) => lostShare(summary) < lostShare(s));
+    if (row.lost > maxLosses && !record) return;
+    this.born(
+      "invincibles",
+      summary.countryId,
+      { clubIds: [summary.championId], seasons: [summary.season] },
+      year,
+    );
+  }
+
+  /**
+   * Curses (GDD v1.35), the one negative tradition: a former champion droughtSeasons without a
+   * title, or a club with lostFinals second places since its last title. Every season it goes on
+   * renews it; a title lifts it, and the lifted curse becomes a redemption (a headline).
+   */
+  curses(summary: SeasonSummary, leagueSeasons: readonly SeasonSummary[], year: number): void {
+    const { droughtSeasons, lostFinals, maxLiving, redemptionBonus } = this.config.curse;
+    const cursedHere = () =>
+      this.traditions.filter(
+        (t) => t.type === "curse" && living(t) && t.countryId === summary.countryId,
+      ).length;
+    for (const { clubId } of summary.standings) {
+      const curse = this.livingOf("curse", (t) => t.clubIds[0] === clubId);
+      if (clubId === summary.championId) {
+        if (!curse) continue;
+        this.lose(curse, "lifted");
+        this.born(
+          "redemption",
+          summary.countryId,
+          { clubIds: [clubId], seasons: [summary.season] },
+          year,
+          redemptionBonus,
+        );
+        continue;
+      }
+      if (curse) {
+        this.renew(curse, year);
+        continue;
+      }
+      if (cursedHere() >= maxLiving) continue;
+      const titles = leagueSeasons.filter((s) => s.championId === clubId).map((s) => s.season);
+      const lastTitle = titles.length > 0 ? Math.max(...titles) : null;
+      const seconds = leagueSeasons
+        .filter((s) => s.runnerUpId === clubId && s.season > (lastTitle ?? 0))
+        .map((s) => s.season);
+      const drought = lastTitle !== null && summary.season - lastTitle >= droughtSeasons;
+      if (drought || seconds.length >= lostFinals)
+        this.born(
+          "curse",
+          summary.countryId,
+          { clubIds: [clubId], seasons: drought && lastTitle !== null ? [lastTitle] : seconds },
+          year,
+        );
+    }
+  }
+
+  /**
+   * Signature moves (GDD v1.35): a star playing here in their starSeasons-th star season gives a
+   * move their name; every season they play on as a star renews it.
+   */
+  signatureMoves(summary: SeasonSummary, year: number): void {
+    const { state } = this;
+    const here = new Set(
+      state.flagship.clubs.filter((c) => c.countryId === summary.countryId).map((c) => c.id),
+    );
+    for (const player of state.flagship.players) {
+      if (player.starSince === null || player.starSince > summary.season) continue;
+      const played = player.career.find((line) => line.season === summary.season);
+      if (!played || !here.has(played.clubId)) continue;
+      const move = this.livingOf("signatureMove", (t) => t.playerId === player.id);
+      if (move) this.renew(move, year);
+      else if (summary.season - player.starSince + 1 >= this.config.signatureMove.starSeasons)
+        this.signatureMove(player.id, played.clubId, summary.countryId, year);
+    }
+  }
+
+  /** A player's signature move is born, once a campaign (GDD v1.35). */
+  signatureMove(playerId: number, clubId: number, countryId: string, year: number): void {
+    const { state, world } = this;
+    if (this.traditions.some((t) => t.type === "signatureMove" && t.playerId === playerId)) return;
+    this.born(
+      "signatureMove",
+      countryId,
+      {
+        clubIds: [clubId],
+        playerId,
+        name: poolName(world.names.traditions.moves, `${state.seed}|move|${playerId}`),
+        seasons: [],
+      },
+      year,
+      this.config.signatureMove.startBonus,
+    );
+  }
+
+  /** The league's scoring record founds its holder's signature move (GDD v1.35). */
+  scoringRecord(landmark: Extract<Landmark, { kind: "scoringRecord" }>): void {
+    const player = this.state.flagship.players.find((p) => p.id === landmark.playerId);
+    const clubId = player?.career.find((line) => line.season === landmark.season)?.clubId;
+    if (!player || clubId === undefined) return;
+    this.signatureMove(
+      player.id,
+      clubId,
+      landmark.countryId,
+      yearOfQuarter(Math.max(0, landmark.quarter - 1), this.world.config),
+    );
   }
 
   /**
@@ -543,46 +742,25 @@ class CultureUpdate {
     );
   }
 
-  /** A league promoted: its first time at Professional founds the national name. */
-  promoted(landmark: Extract<Landmark, { kind: "leaguePromoted" | "leagueSteppedDown" }>): void {
-    const { world } = this;
-    const year = yearOfQuarter(Math.max(0, landmark.quarter - 1), world.config);
-    const existing = this.livingOf("nationalName", (t) => t.countryId === landmark.countryId);
-    if (existing) {
-      this.renew(existing, year);
-      return;
-    }
-    if (!professional(landmark.to)) return;
-    if (
-      this.traditions.some((t) => t.type === "nationalName" && t.countryId === landmark.countryId)
-    )
-      return;
-    const country = world.countries.find((c) => c.id === landmark.countryId);
-    const pools = world.names.traditions.nationalNames;
-    const pool = pools[country?.languages.primary ?? ""] ?? pools.default;
-    this.born(
-      "nationalName",
-      landmark.countryId,
-      { name: poolName(pool, `${this.state.seed}|${landmark.countryId}`) },
-      year,
-    );
-  }
-
   /** A league folded: every tradition at home there is lost with it. */
   folded(countryId: string): void {
     for (const tradition of this.traditions)
       if (living(tradition) && tradition.countryId === countryId) this.lose(tradition, "folded");
   }
 
-  /** A year ended: national names renew while their league stays Professional; others decay. */
+  /**
+   * A year ended: national names renew where the sport is still #1 (GDD v1.35), others decay
+   * without renewing facts (matchday food never does), and a country where the sport has become
+   * #1 without a living national name founds one.
+   */
   yearEnded(year: number): void {
     const { state, world } = this;
     for (const tradition of this.traditions) {
       if (!living(tradition)) continue;
+      if (tradition.type === "matchdayFood") continue;
       if (tradition.type === "nationalName") {
         const index = world.countries.findIndex((c) => c.id === tradition.countryId);
-        const league = state.countries[index]?.league;
-        if (league && professional(league.tier)) {
+        if (this.numberOne(index)) {
           this.renew(tradition, year);
           continue;
         }
@@ -595,9 +773,34 @@ class CultureUpdate {
           continue;
         }
       }
-      if (tradition.type === "chant") this.quieten(tradition);
+      if (tradition.type === "chant" || tradition.type === "signatureMove") this.quieten(tradition);
       this.reachOut(tradition);
     }
+    this.nationalNames(year);
+  }
+
+  /** Whether the sport is a country's #1 with fans of its own there (GDD v1.35). */
+  numberOne(index: number): boolean {
+    const fans = this.state.countries[index]?.fans[PLAYER_INDEX];
+    if (!fans || fans.casual + fans.hardcore <= 0) return false;
+    return localRank(this.state, this.world, index) === 1;
+  }
+
+  /** National names (GDD v1.35): born where the sport is #1 and none is living, without repeats. */
+  nationalNames(year: number): void {
+    const { state, world } = this;
+    const pools = world.names.traditions.nationalNames;
+    const used = new Set(
+      this.traditions.filter((t) => t.type === "nationalName").map((t) => t.name),
+    );
+    world.countries.forEach((country, index) => {
+      if (!this.numberOne(index)) return;
+      if (this.livingOf("nationalName", (t) => t.countryId === country.id)) return;
+      const pool = pools[country.languages.primary] ?? pools.default;
+      const name = freshName(pool, `${state.seed}|${country.id}`, used);
+      used.add(name);
+      this.born("nationalName", country.id, { name }, year);
+    });
   }
 
   /**
@@ -623,10 +826,13 @@ class CultureUpdate {
    */
   reachOut(tradition: Tradition): void {
     const { state, world } = this;
-    const { reach, chant: chants } = this.config;
-    const chant = tradition.type === "chant";
+    const { reach } = this.config;
+    // Chants and signature moves spread with their fans without nodes (GDD v1.31, v1.35).
+    const chant = tradition.type === "chant" || tradition.type === "signatureMove";
+    const chants = tradition.type === "chant" ? this.config.chant : this.config.signatureMove;
     const minStrength = chant ? chants.reachMinStrength : reach.minStrength;
-    if (tradition.type === "nationalName" || tradition.strength < minStrength) return;
+    if (!weighs(tradition.type) || tradition.type === "nationalName") return;
+    if (tradition.strength < minStrength) return;
     if (chant && tradition.followers.length >= chants.maxFollowers) return;
     const bonus = cultureFactors(world, state.growthNodes, tradition.type).reach;
     // Chants spread with their fans without nodes (GDD v1.31); the rest only through nodes.
@@ -661,13 +867,9 @@ class CultureUpdate {
     tradition.followers.push(country.id);
     // A chant's first follower abroad is news, once (GDD v1.31).
     const told = (l: Landmark) => l.kind === "chantSpread" && l.traditionId === tradition.id;
-    if (chant && !state.landmarks.some(told) && !this.found.some(told))
+    if (tradition.type === "chant" && !state.landmarks.some(told) && !this.found.some(told))
       this.found.push(landmarks.chantSpread(state.turn, state.quarter, country.id, tradition.id));
   }
-}
-
-function professional(tier: LeagueTierId): boolean {
-  return LEAGUE_TIERS.indexOf(tier) >= LEAGUE_TIERS.indexOf("professional");
 }
 
 /**
@@ -691,8 +893,8 @@ export function updateCulture(state: GameState, world: World): GameState {
       case "starRetired":
         update.retired(landmark);
         break;
-      case "leaguePromoted":
-        update.promoted(landmark);
+      case "scoringRecord":
+        update.scoringRecord(landmark);
         break;
       case "leagueFolded":
       case "anchorCollapse":
@@ -806,11 +1008,26 @@ export function traditionWeights(
   );
 }
 
-/** How much of the player's hardcore loss to aging, poaching and reclaim remains at a weight. */
-export function traditionShelter(weight: number, world: World) {
+/**
+ * How much of the player's hardcore loss to aging, poaching and reclaim remains at a weight; a
+ * curse held there (GDD v1.35) raises the aging by turnoverPenalty × its strength.
+ */
+export function traditionShelter(weight: number, world: World, curse = 0) {
   const { weightCap, turnoverCut, poachCut } = world.config.culture;
   const level = Math.min(1, weight / weightCap);
-  return { turnover: 1 - turnoverCut * level, poaching: 1 - poachCut * level };
+  const cursed = 1 + world.config.culture.curse.turnoverPenalty * curse;
+  return { turnover: (1 - turnoverCut * level) * cursed, poaching: 1 - poachCut * level };
+}
+
+/** The strength of the living curses held in each country (content order, GDD v1.35). */
+export function curseWeights(state: Pick<GameState, "culture">, world: World): number[] {
+  const held = world.countries.map(() => 0);
+  for (const t of state.culture.traditions) {
+    if (t.type !== "curse" || !living(t)) continue;
+    const i = world.countries.findIndex((country) => country.id === t.countryId);
+    if (i >= 0) held[i] = (held[i] ?? 0) + t.strength;
+  }
+  return held;
 }
 
 /** The strength of the living famous venues at home in each country (content order). */
@@ -932,7 +1149,7 @@ export function heldStrength(
   const held = world.countries.map(() => 0);
   const index = new Map(world.countries.map((country, i) => [country.id, i]));
   for (const tradition of traditions) {
-    if (!living(tradition)) continue;
+    if (!living(tradition) || !weighs(tradition.type)) continue;
     const { hold } = cultureFactors(world, state.growthNodes, tradition.type);
     tradition.followers.forEach((countryId, f) => {
       const i = index.get(countryId);

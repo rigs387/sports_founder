@@ -46,6 +46,18 @@ export function useTraditionWords(snapshot: TurnSnapshot | null) {
         return tradition.name ?? t("culture.names.trophy", { ground: club(first)?.ground ?? "" });
       case "chant":
         return t("culture.names.chant", { song: tradition.name ?? "" });
+      // GDD v1.35: named from the club, the year or the star's family name (the last word).
+      case "curse":
+      case "era":
+      case "redemption":
+        return t(`culture.names.${tradition.type}`, { nickname: club(first)?.nickname ?? "" });
+      case "invincibles":
+        return t("culture.names.invincibles", { year: tradition.bornYear });
+      case "signatureMove":
+        return t("culture.names.signatureMove", {
+          family: player(tradition.playerId).split(" ").at(-1) ?? "",
+          move: tradition.name ?? "",
+        });
       default:
         return tradition.name ?? "";
     }
@@ -147,7 +159,21 @@ export function TraditionList({ traditions, countryId, testId, showRules }: List
 export function TraditionsSection({ snapshot }: { snapshot: TurnSnapshot }) {
   const { t } = useTranslation();
   const { traditions } = snapshot.culture;
-  const types = ["trophy", "rite", "derby", "venue", "legacy", "nationalName"] as const;
+  const types = [
+    "trophy",
+    "rite",
+    "derby",
+    "venue",
+    "legacy",
+    "chant",
+    "era",
+    "invincibles",
+    "signatureMove",
+    "redemption",
+    "curse",
+    "matchdayFood",
+    "nationalName",
+  ] as const;
   return (
     <section className="culture-section" data-testid="rulebook-traditions">
       <h4>{t("culture.heading")}</h4>

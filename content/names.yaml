@@ -249,14 +249,65 @@ traditions:
     barracks: [the Muster, the Color Parade, the Reveille, the Long March]
     village-green: [the Bell, the Maypole Lap, the Oak Toast, the Hat Pass]
     docks: [the Lantern Walk, the Rope Pull, the Harbor Horn, the Crane Salute]
+  # National names (GDD v1.35): by language sphere, no repeats in a campaign until a pool runs out;
+  # spheres without a pool use default. Bigger spheres have bigger pools.
   nationalNames:
     default: [the Old Game, the People's Game, the Weekend Game, the Long Game, the Quick Game,
-      the Street Game, the Big Game, the Real Game]
-    spanish: [el Juego Grande, el Juego del Barrio, la Fiesta, el Clásico Diario]
-    portuguese: [o Jogo do Povo, o Jogo de Rua, a Pelada, o Jogão]
-    french: [le Grand Jeu, le Jeu du Dimanche, la Partie, le Jeu du Peuple]
-    german: [das Volksspiel, das Sonntagsspiel, das Große Spiel, das Hofspiel]
-    italian: [il Gioco del Popolo, la Partitella, il Gioco Grande, il Gioco di Piazza]
+      the Street Game, the Big Game, the Real Game, the Working Game, the Saturday Game,
+      the Sunday Game, the Home Game, the Town Game, the Park Game, the Winter Game,
+      the Summer Game, the Family Game, the Hard Game, the Fair Game, the Great Game,
+      the Grand Game, the Common Game, the Night Game, the Open Game, the Fast Game,
+      the Clever Game, the True Game, the Loud Game, the Neighborhood Game, the Yard Game,
+      the Backstreet Game, the Main Event]
+    spanish: [el Juego Grande, el Juego del Barrio, la Fiesta, el Clásico Diario, el Juego del Pueblo,
+      el Juego de la Calle, el Juego de Siempre, el Juego del Domingo, la Pasión, el Partidazo,
+      el Juego Nacional, el Juego Viejo, la Gran Jugada, el Juego de Todos, el Juego Lindo,
+      el Juego de la Plaza]
+    portuguese: [o Jogo do Povo, o Jogo de Rua, a Pelada, o Jogão, o Jogo de Domingo, o Jogo da Vila,
+      o Jogo Grande, o Velho Jogo, o Jogo de Todos]
+    french: [le Grand Jeu, le Jeu du Dimanche, la Partie, le Jeu du Peuple, le Jeu de Quartier,
+      le Vieux Jeu, le Jeu des Rues, le Beau Jeu, le Jeu National, le Jeu du Samedi, le Jeu Roi,
+      la Grande Partie, le Jeu de Tous, le Jeu des Copains, le Jeu Vif, le Jeu de la Place]
+    german: [das Volksspiel, das Sonntagsspiel, das Große Spiel, das Hofspiel, das Straßenspiel,
+      das alte Spiel, das Samstagsspiel, das Kiezspiel]
+    italian: [il Gioco del Popolo, la Partitella, il Gioco Grande, il Gioco di Piazza,
+      il Gioco della Domenica, il Gioco di Strada, il Bel Gioco, il Gioco Antico]
+    arabic: [al-Lu'ba al-Kubra, Lu'bat al-Sha'b, Lu'bat al-Hara, al-Lu'ba al-Jamila,
+      Lu'bat al-Shari', Lu'bat al-Jum'a, al-Lu'ba al-Qadima, Lu'bat al-Watan, al-Lu'ba al-Sari'a,
+      Lu'bat al-Layl, al-Lu'ba al-Malakiya, Lu'bat al-Jami']
+    dutch: [het Volksspel, het Straatspel, het Zondagsspel, het Grote Spel, het Oude Spel,
+      het Buurtspel, het Pleinspel, het Spel van Iedereen]
+    scandinavian: [Folkspelet, Söndagsspelet, Gatuspelet, Det stora spelet, Gamla spelet,
+      Bygdespelet, Lördagsspelet, Alla tiders spel]
+    turkic: [Mahalle Oyunu, Büyük Oyun, Sokak Oyunu, Pazar Oyunu, Eski Oyun, Halkın Oyunu,
+      Bizim Oyun, Meydan Oyunu]
+    russian: [Narodnaya Igra, Bolshaya Igra, Dvorovaya Igra, Ulichnaya Igra, Staraya Igra,
+      Nasha Igra, Voskresnaya Igra]
+    serbo-croatian: [Narodna Igra, Velika Igra, Ulična Igra, Stara Igra, Naša Igra, Nedjeljna Igra,
+      Igra za Sve]
+    chinese: [Rénmín Yùndòng, Jiētóu Yùndòng, Guómín Yùndòng, Dà Bǐsài, Zhōumò Yùndòng]
+    persian: [Bāzi-ye Mardom, Bāzi-ye Bozorg, Bāzi-ye Kucheh]
+    malay-indonesian: [Permainan Rakyat, Permainan Kampung, Permainan Besar, Permainan Jalanan]
+    hindi-urdu: [Desh ka Khel, Galli ka Khel, Bada Khel, Janta ka Khel]
+    swahili: [Mchezo wa Watu, Mchezo Mkubwa, Mchezo wa Mtaani]
+    greek: [to Laiko Paichnidi, to Megalo Paichnidi, to Paichnidi tis Geitonias]
+    czech-slovak: [Lidová hra, Velká hra, Nedělní hra]
+    romanian: [Jocul Poporului, Jocul Mare, Jocul de Duminică]
+    korean: [Gungmin Undong, Uri Gyeonggi, Golmok Undong]
+    japanese: [Minna no Kyōgi, Machi no Kyōgi, Kokumin Kyōgi]
+    polish: [Gra Ludu, Wielka Gra, Gra Podwórkowa]
+    ukrainian: [Narodna Hra, Velyka Hra]
+  # Signature moves (GDD v1.35): "the {family name} {move}", picked by a stable key.
+  moves: [Spin, Flick, Hook, Drop, Turn, Shuffle, Fade, Lift, Dart, Swerve, Stepover, Glide,
+    Twist, Cut, Feint, Slide]
+  # Matchday food and rituals (GDD v1.35), by birthplace: flavor only.
+  foods:
+    schoolyard: [the Bake Sale Table, the Candy Run, the Lunchbox Swap, the Lemonade Stand]
+    factory: [the Shift Sandwich, the Steel Pot Stew, the Canteen Pie, the Furnace Grill]
+    beach: [the Grill Shack, the Coconut Cart, the Fish Taco Line, the Shaved Ice Cup]
+    barracks: [the Field Kitchen, the Mess Tent Stew, the Ration Roll, the Bugle Bun]
+    village-green: [the Pie Stand, the Cider Tent, the Fair Pudding, the Green Barbecue]
+    docks: [the Fish Fry, the Chowder Line, the Harbor Grill, the Net Shed Roll]
   # Chants (GDD v1.31): invented fan songs, picked by a stable key from the seed and the club.
   chants: [Down to the Wire, Nobody Gave Us a Chance, Rain on the Bleachers, The Long Walk Back,
     Home Before Midnight, Never Saw It Coming, Lights of the Town, Over the Hill and Home,

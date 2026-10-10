@@ -626,7 +626,9 @@ culture:
   # minHardcoreShare.
   reach: { minStrength: 0.9, chancePerReach: 1, followerShare: 0.5, minHardcoreShare: 0.001 }
   # The birth moment's PP by type (the loss moment pays nothing).
-  birthPP: { derby: 6, rite: 8, legacy: 6, nationalName: 6, venue: 6, trophy: 4, chant: 6 }
+  birthPP:
+    { derby: 6, rite: 8, legacy: 6, nationalName: 6, venue: 6, trophy: 4, chant: 6,
+      curse: 0, era: 8, invincibles: 10, signatureMove: 6, matchdayFood: 2, redemption: 12 }
   # Content validation: each birthplace's eases and each ethos's betrayal multipliers must have a
   # geometric mean within 1 ± characterBand (character changes a campaign's shape, not difficulty).
   characterBand: 0.1
@@ -639,6 +641,26 @@ culture:
   # by the usual reach rules, up to maxFollowers countries (home included). A follower abroad is
   # dropped when the player's hardcore share there falls below reach.minHardcoreShare.
   chant: { anthemBonus: 0.25, reachChance: 0.25, reachMinStrength: 0.6, maxFollowers: 4, historySeasons: 10 }
+  # Third playtest follow-ups (GDD v1.35). National names are born where the sport becomes a
+  # country's #1 by Fandom Score, renew while it stays #1 and fade after; their card is big only in
+  # the bigMarkets most populous markets. Curses are the one negative tradition: a former champion
+  # droughtSeasons without a title, or lostFinals second places since its last title; while held
+  # they raise the player's hardcore turnover there by turnoverPenalty × strength, and a title
+  # lifts them into a redemption born redemptionBonus stronger (a headline). Eras: straightTitles in
+  # a row. The Invincibles: a champion with at most maxLosses losses. Signature moves: a star's
+  # starSeasons-th star season or the scoring record, born startBonus stronger, reaching abroad like
+  # chants. Matchday food is flavor (no weight, no decay), born with a league's first season. Target about one tradition beyond
+  # national names every 2 seasons at the flagship (runner: traditions by type).
+  nationalName: { bigMarkets: 20 }
+  # One living curse a league at a time (maxLiving): measured at build, thresholds alone gave
+  # 23-34 curses a 150-turn campaign.
+  curse: { droughtSeasons: 20, lostFinals: 4, maxLiving: 1, turnoverPenalty: 0.3, redemptionBonus: 0.5 }
+  era: { straightTitles: 3 }
+  # Measured at build: no champion went unbeaten (at least 3 losses in 41 seasons of a playtest),
+  # so a champion that sets the league's record for the fewest losses (as a share of its matches)
+  # once the league has played historySeasons seasons is remembered too.
+  invincibles: { maxLosses: 0, historySeasons: 10 }
+  signatureMove: { starSeasons: 10, startBonus: 0.2, reachChance: 0.25, reachMinStrength: 0.6, maxFollowers: 4 }
 
 # Awards (GDD v1.33). The flagship's Player of the Season has the most points from the season's
 # record: score per score, champion or runnerUp if their club finished first or second, and

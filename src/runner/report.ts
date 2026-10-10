@@ -8,6 +8,7 @@ import {
   type Genome,
   LEAGUE_TIERS,
   type LeagueTierId,
+  TRADITION_TYPES,
 } from "../content";
 import type { SportTotals } from "../sim";
 import type { BotId } from "./policy";
@@ -163,6 +164,10 @@ export interface CampaignResult {
     /** The anchor's shrine weight at the end. */
     anchorShrine: number;
     cultureNodes: number;
+    /** Traditions born by type (GDD v1.35). */
+    traditionsBorn: Record<string, number>;
+    /** Flagship seasons played, for the births-per-season rate. */
+    seasons: number;
   };
   /** Rule amendments made (GDD v1.20): when, which change, hardcore fans who turned casual. */
   amendments: { turn: number; change: string; demoted: number }[];
@@ -430,6 +435,19 @@ export function remembersAggregate(results: CampaignResult[]) {
     anchorShrine: pick((r) => r.remembers.anchorShrine),
     cultureNodes: pick((r) => r.remembers.cultureNodes),
     boughtCulture: results.filter((r) => r.remembers.cultureNodes > 0).length,
+    // Traditions by type (GDD v1.35), and births beyond national names per flagship season.
+    traditions: TRADITION_TYPES.map((type) => ({
+      type,
+      born: median(results.map((r) => r.remembers.traditionsBorn[type] ?? 0)),
+    })),
+    perSeason: median(
+      results.map((r) => {
+        const beyond = Object.entries(r.remembers.traditionsBorn)
+          .filter(([type]) => type !== "nationalName")
+          .reduce((sum, [, n]) => sum + n, 0);
+        return beyond / Math.max(1, r.remembers.seasons);
+      }),
+    ),
   };
 }
 

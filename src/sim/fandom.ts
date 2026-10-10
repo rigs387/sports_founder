@@ -53,3 +53,27 @@ export function playerFandomScore(
   }
   return score;
 }
+
+/**
+ * The player's rank among the modeled sports in one country by Fandom Score, 1 = first (the
+ * "other sports" bucket is not a sport, as in the world race). Used by national names (GDD v1.35).
+ */
+export function localRank(
+  state: Pick<GameState, "sports" | "countries">,
+  world: World,
+  index: number,
+): number {
+  const country = state.countries[index];
+  const playerIndex = state.sports.findIndex((sport) => sport.kind === "player");
+  const { casualWeight } = world.config.fandomScore;
+  const score = (i: number) => {
+    const fans = country?.fans[i];
+    return fans ? fandomScore(fans.casual, fans.hardcore, casualWeight) : 0;
+  };
+  const player = score(playerIndex);
+  let rank = 1;
+  state.sports.forEach((sport, i) => {
+    if (sport.kind === "rival" && score(i) > player) rank += 1;
+  });
+  return rank;
+}

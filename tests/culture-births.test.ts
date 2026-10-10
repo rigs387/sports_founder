@@ -5,6 +5,7 @@ import {
   endTurn,
   type GameState,
   landmarks,
+  PLAYER_INDEX,
   serializeSave,
   updateCulture,
 } from "../src/sim";
@@ -21,7 +22,9 @@ describe("births", () => {
     const [trophy] = ofType(first, "trophy");
     expect(trophy?.clubIds).toEqual([state.identity.foundingClubId]);
     expect(first.culture.naming).toBe(trophy?.id);
-    expect(first.landmarks.at(-1)).toMatchObject({ kind: "traditionBorn", type: "trophy" });
+    expect(first.landmarks.some((l) => l.kind === "traditionBorn" && l.type === "trophy")).toBe(
+      true,
+    );
     const second = updateCulture(withSeason(first, a, b), world);
     expect(second.culture.naming).toBeNull();
     expect(ofType(second, "trophy")).toHaveLength(1);
@@ -146,31 +149,42 @@ describe("births", () => {
     expect(retire(5, 50, false)).toHaveLength(1);
   });
 
-  it("a national name is born at a league's first Professional promotion", () => {
+  it("a national name is born where the sport becomes #1, never repeats, and fades after", () => {
     const state = fresh();
-    const country = world.countries.find((c) => c.languages.primary === "spanish");
-    if (!country) throw new Error("no Spanish-speaking market");
-    const promote = (to: "semi-pro" | "professional") =>
-      updateCulture(
-        {
-          ...state,
-          landmarks: [
-            ...state.landmarks,
-            landmarks.leaguePromoted(
-              1,
-              0,
-              country.id,
-              to === "professional" ? "semi-pro" : "amateur",
-              to,
-            ),
-          ],
-        },
-        world,
-      );
-    expect(ofType(promote("semi-pro"), "nationalName")).toEqual([]);
-    const [name] = ofType(promote("professional"), "nationalName");
-    expect(name?.countryId).toBe(country.id);
-    expect(world.names.traditions.nationalNames.spanish).toContain(name?.name);
+    const spanish = world.countries.filter((c) => c.languages.primary === "spanish").slice(0, 2);
+    const [a, b] = spanish;
+    if (!a || !b) throw new Error("need two Spanish-speaking markets");
+    /** The player's fans in these countries: everyone, or no one. */
+    const fans = (base: GameState, ids: string[], everyone: boolean): GameState => ({
+      ...base,
+      countries: base.countries.map((country) =>
+        ids.includes(country.countryId)
+          ? {
+              ...country,
+              fans: country.fans.map((f, i) =>
+                i === PLAYER_INDEX
+                  ? everyone
+                    ? { ...f, casual: 1e9, hardcore: 1e9 }
+                    : { ...f, casual: 0, hardcore: 0 }
+                  : f,
+              ),
+            }
+          : country,
+      ),
+    });
+    const year = (base: GameState) => updateCulture({ ...base, quarter: base.quarter + 4 }, world);
+    expect(ofType(updateCulture(state, world), "nationalName")).toEqual([]);
+    const leading = year(fans(state, [a.id, b.id], true));
+    const names = ofType(leading, "nationalName");
+    expect(names.map((t) => t.countryId).sort()).toEqual([a.id, b.id].sort());
+    for (const t of names) expect(world.names.traditions.nationalNames.spanish).toContain(t.name);
+    expect(names[0]?.name).not.toBe(names[1]?.name);
+    // No longer #1 in the first: its name fades; the second's is renewed.
+    const later = year(fans(leading, [a.id], false));
+    const strength = (s: GameState, id: string) =>
+      ofType(s, "nationalName").find((t) => t.countryId === id)?.strength ?? 0;
+    expect(strength(later, a.id)).toBeLessThan(strength(leading, a.id));
+    expect(strength(later, b.id)).toBeGreaterThan(strength(leading, b.id));
   });
 });
 

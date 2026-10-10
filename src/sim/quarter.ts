@@ -1,6 +1,6 @@
 import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { reclaimShare, rivalConversionBoosts } from "./countermoves";
-import { traditionShelter, traditionWeights, venueStrengths } from "./culture";
+import { curseWeights, traditionShelter, traditionWeights, venueStrengths } from "./culture";
 import { leagueIncomePerQuarter } from "./deals";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
@@ -102,6 +102,7 @@ export function stepQuarter(
   const backing = backingEffects(state.flagship, world);
   const broadcast = broadcastEffects(state, world);
   const traditions = traditionWeights(state, world);
+  const curses = curseWeights(state, world);
   const venues = venueStrengths(state, world);
   const tournaments = new Map(
     state.sports.map((sport) => [sport.id, activeTournament(sport.id, state.quarter, config)]),
@@ -173,7 +174,7 @@ export function stepQuarter(
       playerRates,
       factors,
       tournaments,
-      traditionShelter(traditions[index] ?? 0, world),
+      traditionShelter(traditions[index] ?? 0, world, curses[index] ?? 0),
       config,
       rng,
     );

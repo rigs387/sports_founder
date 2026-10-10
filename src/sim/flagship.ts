@@ -1,6 +1,6 @@
 import type { SeasonInterest, SeasonStory } from "../content";
 import { offseasonOpen, QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
-import { clubGround, ethosFactor, traditionWeights } from "./culture";
+import { clubGround, ethosFactor, traditionWeights, weighs } from "./culture";
 import { type DealsSnapshot, dealsSnapshot, exclusiveTv, lapseOffers, newDeals } from "./deals";
 import { demoteHardcore, leagueTierIndex, runningCostPerQuarter } from "./leagues";
 import { leadStory, type Outlet, outletOf } from "./press";
@@ -1961,7 +1961,7 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
       .map((country) => country.countryId),
     leaveCost: seatLeaveShare(state, world, flagship.countryId),
     leaveTraditions: state.culture.traditions
-      .filter((t) => t.lost === null && t.followers.includes(flagship.countryId))
+      .filter((t) => t.lost === null && weighs(t.type) && t.followers.includes(flagship.countryId))
       .map((t) => t.id),
     players: flagship.players.map(({ id, name, clubId }) => ({ id, name, clubId })),
     starRules: {

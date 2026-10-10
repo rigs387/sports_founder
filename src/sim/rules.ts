@@ -1,6 +1,6 @@
 import { GENOME_AXES, RULE_AXES } from "../content";
 import { offseasonOpen, yearOfQuarter } from "./calendar";
-import { ethosFactor, heldStrength, living, wearTraditions } from "./culture";
+import { ethosFactor, heldStrength, living, wearTraditions, weighs } from "./culture";
 import { fandomScore } from "./fandom";
 import { optionNetDelta } from "./hints";
 import { demoteHardcore } from "./leagues";
@@ -151,7 +151,8 @@ export function offendedTraditions(
   const from = state.genome[axis];
   return state.culture.traditions.filter((tradition) => {
     const rule = tradition.rules[axis];
-    if (!living(tradition) || rule === undefined) return false;
+    // Curses and matchday food hold no rules (GDD v1.35).
+    if (!living(tradition) || !weighs(tradition.type) || rule === undefined) return false;
     return driftSteps(axis, rule, option, world) > driftSteps(axis, rule, from, world);
   });
 }

@@ -161,7 +161,7 @@ describe("what the player sees", () => {
       expect(culture.facts?.[type]).toBeTruthy();
       expect(cards["tradition-born"]?.[`body_${type}`]).toBeTruthy();
     }
-    for (const reason of ["faded", "folded", "broken", "renamed"]) {
+    for (const reason of ["faded", "folded", "broken", "renamed", "lifted"]) {
       expect(culture.lost?.[reason]).toBeTruthy();
       expect(cards["tradition-lost"]?.[`body_${reason}`]).toBeTruthy();
     }

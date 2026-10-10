@@ -56,6 +56,15 @@ export type DealCard = (typeof DEAL_CARDS)[number];
 export const VENUE_CARDS = ["opened", "modernized", "record"] as const;
 export type VenueCard = (typeof VENUE_CARDS)[number];
 export type TraditionCard = (typeof TRADITION_CARDS)[number];
+/** The tradition cards the simulation picks by id, and the fact each tells (GDD v1.35). */
+export const TRADITION_CARD_IDS: readonly (readonly [string, TraditionCard])[] = [
+  ["tradition-born", "born"],
+  ["tradition-lost", "lost"],
+  ["chant-spread", "spread"],
+  ["national-name-born", "born"],
+  ["national-name-lost", "lost"],
+  ["curse-born", "born"],
+];
 /** The flagship star facts a card can tell (GDD v1.16). */
 export const STAR_CARDS = [
   "breakout",
@@ -296,13 +305,17 @@ export const eventsFileSchema = z
         path: ["cards"],
         message: "Two cards tell the same season story",
       });
-    const told = data.cards.flatMap((c) => (c.tradition === null ? [] : [c.tradition]));
-    if (new Set(told).size !== told.length)
-      ctx.addIssue({
-        code: "custom",
-        path: ["cards"],
-        message: "Two cards tell the same tradition fact",
-      });
+    // Tradition cards are picked by id (GDD v1.35): every card the sim asks for must exist and
+    // tell its fact.
+    for (const [id, fact] of TRADITION_CARD_IDS) {
+      const card = data.cards.find((c) => c.id === id);
+      if (card?.tradition !== fact)
+        ctx.addIssue({
+          code: "custom",
+          path: ["cards"],
+          message: `Card "${id}" must exist and tell a tradition ${fact}`,
+        });
+    }
     if (data.cards.filter((c) => c.trigger === "hall").length > 1)
       ctx.addIssue({ code: "custom", path: ["cards"], message: "Only one Hall of Fame card" });
     if (data.cards.filter((c) => c.trigger === "award").length > 1)

@@ -13,14 +13,14 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-09",
-    tests: 579,
-    files: 58,
-    note: "npm run check passed after market size ceilings (type checks, Biome, purity, 579 tests in 58 files). Lint has existing visual-study warnings.",
+    tests: 586,
+    files: 59,
+    note: "npm run check passed after more fun culture (type checks, Biome, purity, 586 tests in 59 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-09",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
   },
-  eventDeck: { current: 36, target: "40–60" },
+  eventDeck: { current: 41, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "growth",
       title: "Third playtest follow-ups",
-      text: "Tech plan 2.22 (GDD v1.35): market size ceilings (built), more fun culture, more stars than slots, a Hall that remembers careers, growth tracks that shape the sport, saves and standings. Step 1 built 2026-10-09.",
+      text: "Tech plan 2.22 (GDD v1.35): market size ceilings (built), more fun culture (built), more stars than slots, a Hall that remembers careers, growth tracks that shape the sport, saves and standings. Steps 1–2 built 2026-10-09.",
       tag: "Next build",
     },
     {
@@ -100,6 +100,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-09",
+      type: "Built",
+      title: "More fun culture",
+      text: "Tech plan 2.22 step 2 (GDD v1.35): national names are born where the sport becomes a country's #1 and fade when it is not, minor news outside the 20 biggest markets, with pools by language sphere and no repeats. New traditions: curses (one per league; a title lifts one into a headline redemption), eras at three straight titles (a headline), the Invincibles (unbeaten or a record season), signature moves named after long-time stars and record scorers, and matchday food. Bot campaigns: about 0.74 traditions beyond national names a season against a 0.5 target, mostly older star legacies and famous grounds. Pacing passes; the #1 contest is unchanged within noise. npm run check: 586 tests in 59 files; smoke passed.",
+    },
     {
       date: "2026-10-09",
       type: "Built",

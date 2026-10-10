@@ -129,7 +129,8 @@ export function useEventText() {
     if (!told) return dealText(event);
     const tradition = snapshot.culture.traditions.find((item) => item.id === told?.traditionId);
     if (!told || !tradition) return {};
-    const born = event.templateId === "tradition-born";
+    // Every birth card, including the minor national name and the curse (GDD v1.35).
+    const born = event.templateId.endsWith("-born");
     // The first chant is the anthem (GDD v1.31).
     const anthem =
       tradition.type === "chant" &&

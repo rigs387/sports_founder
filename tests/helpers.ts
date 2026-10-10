@@ -152,7 +152,15 @@ export function cardless(base: World): World {
     ...base,
     config: {
       ...base.config,
-      culture: { ...culture, turnoverCut: 0, poachCut: 0, pilgrimage: 0, seatWeight: 0 },
+      culture: {
+        ...culture,
+        turnoverCut: 0,
+        poachCut: 0,
+        pilgrimage: 0,
+        seatWeight: 0,
+        // Curses raise turnover where they are held (GDD v1.35).
+        curse: { ...culture.curse, turnoverPenalty: 0 },
+      },
       hallOfFame: { ...base.config.hallOfFame, shrineWeight: 0 },
       flagship: {
         ...flagship,

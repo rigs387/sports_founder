@@ -1284,6 +1284,18 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    traditions by type a campaign; tune thresholds to about one non-national tradition every 2
    seasons. Tests: one per new type from a constructed season summary; national name born at
    local #1 and lost after it.
+
+   *Built 2026-10-09.* `localRank` (`fandom.ts`); `CultureUpdate`: `numberOne`,
+   `nationalNames` (yearly, no repeats via `freshName`), `era`, `invincibles`, `curses`
+   (`culture.curse.maxLiving` 1), `signatureMoves` and `scoringRecord`, `food`; loss reason
+   `lifted`; a sixth new type `redemption`. `weighs` keeps curses and food out of
+   `heldStrength`, `offendedTraditions` and the seat's leave list; `curseWeights` feeds
+   `traditionShelter`'s turnover penalty. Cards picked by id (`traditionCard`):
+   `national-name-born` / `-lost` (minor, `noSlot`), `curse-born`; content validation now
+   requires each id (`TRADITION_CARD_IDS`) instead of one card per fact. No save format bump
+   (the enums only grew). `cardless` also zeroes the curse penalty. Runner: traditions born by
+   type and the rate per flagship season. `tests/culture-new-types.test.ts`; the culture helper's
+   seasons now give every club a loss unless `unbeaten`.
 3. **More stars than slots (topic 3).** `seasonEnd` in `flagship.ts`: candidates are the Player
    of the Season, the top scorer and each active club's leading player whose share of the club's
    scores passes `stars.clubShare[scoring]` (new), best first, while `stars.places` (2 / 3 / 5 /
