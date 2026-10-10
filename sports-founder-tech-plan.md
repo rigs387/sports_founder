@@ -1384,6 +1384,19 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    library), country panel rows, and a "#1 sport" map mode. Smoke: open the standings and the
    Load screen, screenshot both.
 
+   *Built 2026-10-10.* Main: `savesFolder` (Saved Games\Sports Founder on Windows, the app data
+   folder elsewhere, the smoke's output folder in a smoke run), `campaign:list` (newest 40,
+   headers read from each save), `campaign:open-named` (a plain file name in the folder only),
+   `campaign:autosave` (`autosave-1..3`, rotated, skipped while one is writing). The session
+   save gains an optional `header`. Store: `loadFrom` shared by `loadCampaign` and
+   `loadNamed`, `listSaves`, an autosave after `endTurn`. The Campaign menu lists the folder's
+   saves. Sim: `src/sim/standings.ts` (`standingsSnapshot`, `countryStandings`,
+   `leadingSport`); `TurnSnapshot.standings`; country `sports`, `localRank`, `leaderSportId`.
+   Renderer: `src/renderer/src/standings/StandingsPanel.tsx`, the country card's sports, the
+   map's `topSport` tint. Smoke: `verifyStandings` (59, 60) and the autosave in the list (25).
+   Tests: `tests/standings.test.ts`, the session header, autosave and load by name. All of 2.22
+   is built.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

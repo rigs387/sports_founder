@@ -5,7 +5,7 @@ import { type CultureSnapshot, cultureSnapshot } from "./culture";
 import { leagueIncomePerQuarter } from "./deals";
 import { type EventSnapshot, eventSnapshots } from "./events";
 import type { EventState } from "./events-state";
-import { fandomScore, type SportTotals, sportTotals } from "./fandom";
+import { fandomScore, localRank, type SportTotals, sportTotals } from "./fandom";
 import { broadcastEffects, type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import {
@@ -24,6 +24,13 @@ import { ppWeights, quarterPpIncome } from "./prices";
 import { type RulesSnapshot, rulesSnapshot } from "./rules";
 import { shapeFactors } from "./shape";
 import { computeExposure } from "./spread";
+import {
+  type CountrySportStanding,
+  countryStandings,
+  leadingSport,
+  type StandingsSnapshot,
+  standingsSnapshot,
+} from "./standings";
 import { tierStatus } from "./tiers";
 import {
   type EscalationLevel,
@@ -80,6 +87,12 @@ export interface CountrySnapshot {
   population: number;
   /** The market's wealth level id (GDD v1.21): what its fans can spend on sport. */
   wealthLevel: string;
+  /** Every modeled sport's fans here, best first (GDD v1.35 standings). */
+  sports: CountrySportStanding[];
+  /** The player's place among the modeled sports here, 1 = first. */
+  localRank: number;
+  /** The sport leading here, if any has fans. */
+  leaderSportId: string | null;
   /** The highest league tier the market can hold unless it has the seat (GDD v1.35). */
   maxTier: LeagueTierId;
   casual: number;
@@ -214,6 +227,8 @@ export interface TurnSnapshot {
   growthNodes: GrowthNodeSnapshot[];
   /** What the growth tracks have done so far, in the player's top markets (GDD v1.35). */
   growthDone: GrowthDone;
+  /** The player's sport against the rival sports (GDD v1.35). */
+  standings: StandingsSnapshot;
   landmarkCount: number;
   events: EventSnapshot[];
   eventHistory: EventState["history"];
@@ -355,6 +370,9 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
       wealthLevel:
         world.config.wealthLevels.levels[world.derived[index]?.wealthLevel ?? 0]?.id ?? "",
       maxTier: world.derived[index]?.maxTier ?? "elite",
+      sports: countryStandings(state, world, index),
+      localRank: localRank(state, world, index),
+      leaderSportId: leadingSport(state, world, index),
       casual: fans.casual,
       hardcore: fans.hardcore,
       fandomScore: score,
@@ -465,6 +483,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     countries,
     growthNodes: growthNodeSnapshots(state, world),
     growthDone: growthDone(state, world),
+    standings: standingsSnapshot(state, world),
     landmarkCount: state.landmarks.length,
     flagship: flagshipSnapshot(state, world),
     identity: identitySnapshot(state, world),

@@ -1,0 +1,107 @@
+/* Standings (GDD v1.35): the player's sport against the rival sports. */
+.standings-dialog {
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 18px 22px;
+  border: 0;
+  border-radius: 14px;
+  color: var(--ink);
+  background: #fbfcfd;
+}
+.standings-dialog::backdrop {
+  background: rgba(16, 32, 52, 0.45);
+}
+.standings-dialog header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.standings-dialog h2 {
+  margin: 4px 0 6px;
+}
+.standings-hold,
+.standings-note,
+.standings-empty {
+  color: var(--muted);
+  font-size: 13px;
+}
+.standings-table {
+  width: 100%;
+  margin: 10px 0;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.standings-table th,
+.standings-table td {
+  padding: 6px 8px;
+  text-align: right;
+  border-bottom: 1px solid #e3e9ee;
+}
+.standings-table th:first-child {
+  text-align: left;
+}
+.standings-table th i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 3px;
+}
+.standings-chart {
+  width: 100%;
+  height: auto;
+}
+.standings-grid {
+  stroke: #e3e9ee;
+  stroke-width: 1;
+}
+.standings-axis {
+  fill: var(--muted);
+  font-size: 11px;
+}
+.standings-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.standings-label {
+  fill: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+.standings-hit {
+  fill: transparent;
+}
+.standings-hit:hover {
+  fill: rgba(33, 61, 97, 0.06);
+}
+/* The country card's sports (GDD v1.35). */
+.country-sports {
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 3px;
+  font-size: 13px;
+}
+.country-sports li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.country-sports li i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 6px;
+  border-radius: 2px;
+}
+.stat-button {
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  background: none;
+  cursor: pointer;
+}

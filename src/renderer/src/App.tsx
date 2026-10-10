@@ -17,6 +17,7 @@ import { Emblem } from "./identity/Emblem";
 import { heatBand, mapSettings } from "./map/model";
 import { type MapCommand, type MapHover, WorldMap } from "./map/WorldMap";
 import { OffseasonScreen } from "./offseason/OffseasonScreen";
+import { StandingsPanel } from "./standings/StandingsPanel";
 import { useGameStore } from "./state/game-store";
 
 export function App() {
@@ -37,6 +38,8 @@ export function App() {
   const [command, setCommand] = useState<MapCommand>({ kind: "home", serial: 0 });
   const [hover, setHover] = useState<MapHover | null>(null);
   const [patterns, setPatterns] = useState(false);
+  const [topSport, setTopSport] = useState(false);
+  const [standings, setStandings] = useState(false);
   const [rivals, setRivals] = useState(true);
   const [autoCollect, setAutoCollect] = useState(readAutoCollect);
   const [overview, setOverview] = useState<Overview | null>(null);
@@ -182,15 +185,35 @@ export function App() {
               <b>{compact(snapshot?.pp ?? 0)}</b>
             </div>
           </div>
-          <div>
+          <button
+            type="button"
+            className="stat-button"
+            data-testid="open-standings"
+            disabled={!snapshot}
+            aria-label={t("standings.open", { rank: snapshot?.win.rank ?? 1 })}
+            onClick={() => setStandings(true)}
+          >
             <span aria-hidden="true">&#9672;</span>
             <div>
               <small>{t("fans.score")}</small>
-              <b>{compact(player?.fandomScore ?? 0)}</b>
+              <b>
+                {t("fans.scoreRank", {
+                  score: compact(player?.fandomScore ?? 0),
+                  rank: snapshot?.win.rank ?? 1,
+                })}
+              </b>
             </div>
-          </div>
+          </button>
         </div>
         <SaveLoadControls />
+        {snapshot && (
+          <StandingsPanel
+            snapshot={snapshot}
+            names={names}
+            open={standings}
+            onClose={() => setStandings(false)}
+          />
+        )}
         <button
           type="button"
           className="icon-button"
@@ -252,6 +275,7 @@ export function App() {
             highlighted={overview === null ? highlighted : null}
             command={command}
             patterns={patterns}
+            topSport={topSport}
             rivals={rivals}
             onSelect={selectCountry}
             onHover={setHover}
@@ -549,6 +573,15 @@ export function App() {
               onChange={(event) => setRivals(event.currentTarget.checked)}
             />
             {t("map.rivals")}
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              data-testid="map-top-sport"
+              checked={topSport}
+              onChange={(event) => setTopSport(event.currentTarget.checked)}
+            />
+            {t("map.topSport")}
           </label>
           <label title={t("map.autoCollectHint")}>
             <input

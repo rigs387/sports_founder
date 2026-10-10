@@ -1,15 +1,29 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { SaveEntry } from "../../../shared/save-files";
 import { useGameStore } from "../state/game-store";
 import "./save-load.css";
 
 export function SaveLoadControls() {
-  const { t } = useTranslation();
-  const { status, snapshot, dirty, fileName, fileNotice, saveCampaign, loadCampaign } =
-    useGameStore();
+  const { t, i18n } = useTranslation();
+  const {
+    status,
+    snapshot,
+    names,
+    dirty,
+    fileName,
+    fileNotice,
+    saveCampaign,
+    loadCampaign,
+    loadNamed,
+    listSaves,
+  } = useGameStore();
   const dialog = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
-  const [confirmLoad, setConfirmLoad] = useState(false);
+  /** The load waiting on "replace unsaved progress?": a file chosen by dialog, or a listed save. */
+  const [confirmLoad, setConfirmLoad] = useState<{ name: string | null } | null>(null);
+  /** The saves folder's saves (GDD v1.35), read each time the menu opens. */
+  const [saves, setSaves] = useState<SaveEntry[] | null>(null);
   const busy = !["ready", "setup", "error"].includes(status);
   useEffect(() => {
     const sync = () => {
@@ -31,15 +45,27 @@ export function SaveLoadControls() {
     if (open) dialog.current?.showModal();
     else dialog.current?.close();
   }, [open]);
+  useEffect(() => {
+    if (!open || status === "saving" || status === "opening") return;
+    let current = true;
+    void listSaves().then((list) => {
+      if (current) setSaves(list);
+    });
+    return () => {
+      current = false;
+    };
+  }, [open, status, listSaves]);
   const copy = (kind: "save" | "load") => ({
     title: t(`saves.${kind}Title`),
     button: t(`saves.${kind}`),
     filter: t("saves.filter"),
   });
-  const load = async () => {
-    setConfirmLoad(false);
-    await loadCampaign(copy("load"));
+  const load = async (name: string | null) => {
+    setConfirmLoad(null);
+    if (name === null) await loadCampaign(copy("load"));
+    else await loadNamed(name);
   };
+  const ask = (name: string | null) => (dirty ? setConfirmLoad({ name }) : void load(name));
   return (
     <>
       <button
@@ -65,7 +91,7 @@ export function SaveLoadControls() {
           event.preventDefault();
           if (!busy) {
             setOpen(false);
-            setConfirmLoad(false);
+            setConfirmLoad(null);
           }
         }}
         aria-labelledby="save-heading"
@@ -79,7 +105,7 @@ export function SaveLoadControls() {
             aria-label={t("saves.close")}
             onClick={() => {
               setOpen(false);
-              setConfirmLoad(false);
+              setConfirmLoad(null);
             }}
           >
             &times;
@@ -117,14 +143,14 @@ export function SaveLoadControls() {
             <strong>{t("saves.replaceTitle")}</strong>
             <p>{t("saves.replaceDetail")}</p>
             <div className="save-buttons">
-              <button type="button" className="action-button" onClick={() => setConfirmLoad(false)}>
+              <button type="button" className="action-button" onClick={() => setConfirmLoad(null)}>
                 {t("saves.cancel")}
               </button>
               <button
                 type="button"
                 className="action-button"
                 data-testid="confirm-load"
-                onClick={() => void load()}
+                onClick={() => void load(confirmLoad.name)}
               >
                 {t("saves.replace")}
               </button>
@@ -148,11 +174,53 @@ export function SaveLoadControls() {
               className="action-button"
               disabled={busy}
               data-testid="load-campaign"
-              onClick={() => (dirty ? setConfirmLoad(true) : void load())}
+              onClick={() => ask(null)}
             >
-              {t("saves.load")}
+              {t("saves.openOther")}
             </button>
           </div>
+        )}
+        {!confirmLoad && saves && saves.length > 0 && (
+          <section className="save-list" aria-labelledby="save-list-heading">
+            <h3 id="save-list-heading">{t("saves.listHeading")}</h3>
+            <ul data-testid="save-list">
+              {saves.map((entry) => (
+                <li key={entry.name} data-save={entry.name}>
+                  <span>
+                    <strong>
+                      {entry.header
+                        ? t("saves.entry", {
+                            sport: entry.header.sportName,
+                            country: names?.countries[entry.header.anchorCountryId] ?? "",
+                          })
+                        : entry.name}
+                    </strong>
+                    <small>
+                      {t(entry.header ? "saves.entryWhen" : "saves.entryUnknown", {
+                        turn: entry.header?.turn,
+                        quarter: entry.header?.quarterOfYear,
+                        year: entry.header?.year,
+                        date: new Intl.DateTimeFormat(i18n.language, {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        }).format(entry.savedAt),
+                        context: entry.autosave ? "auto" : undefined,
+                      })}
+                    </small>
+                  </span>
+                  <button
+                    type="button"
+                    className="action-button"
+                    disabled={busy}
+                    data-testid="load-save"
+                    onClick={() => ask(entry.name)}
+                  >
+                    {t("saves.loadThis")}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
         <small className="save-hint">{t("saves.hint")}</small>
       </dialog>

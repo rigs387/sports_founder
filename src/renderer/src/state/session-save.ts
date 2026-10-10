@@ -18,6 +18,16 @@ const sessionSchema = z.strictObject({
     ),
   ),
   selectedCountryId: z.string().nullable(),
+  /** What the Load screen shows (GDD v1.35); read by the main process, ignored on load. */
+  header: z
+    .strictObject({
+      sportName: z.string(),
+      anchorCountryId: z.string(),
+      turn: z.int().min(1),
+      year: z.int(),
+      quarterOfYear: z.int().min(1).max(4),
+    })
+    .optional(),
 });
 
 function validateHistory(history: CountryHistory, state: GameState, world: World) {
@@ -76,11 +86,19 @@ export function writeSession(
   selectedCountryId: string | null,
   world: World,
 ) {
+  const view = snapshot(state, world);
   const text = JSON.stringify({
     sessionFormatVersion: SESSION_FORMAT_VERSION,
     campaign: JSON.parse(serializeSave(state)),
     history,
     selectedCountryId,
+    header: {
+      sportName: view.identity.sportName,
+      anchorCountryId: view.anchorCountryId,
+      turn: view.turn,
+      year: view.year,
+      quarterOfYear: view.quarterOfYear,
+    },
   });
   // Validate before writing too: never label a malformed session a successful save.
   readSession(text, world, Number.MAX_SAFE_INTEGER);

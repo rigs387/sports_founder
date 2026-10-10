@@ -433,12 +433,20 @@
     "replace": "Choose a campaign",
     "cancel": "Cancel",
     "close": "Close campaign menu",
-    "hint": "Use a different filename to keep multiple campaigns or return to an earlier turn. Saving to an existing file replaces that save.",
+    "hint": "Saves go to your Saved Games folder, with an autosave each turn (the last three are kept). Use a different filename to keep several campaigns; saving over an existing file replaces it.",
     "closeTitle": "Unsaved campaign",
     "closeMessage": "Leave without saving your progress?",
     "closeDetail": "Stay in the game and use Campaign → Save campaign to keep playing later.",
     "stay": "Stay in game",
-    "leave": "Leave without saving"
+    "leave": "Leave without saving",
+    "openOther": "Open another file…",
+    "listHeading": "Your saves",
+    "entry": "{{sport}} · {{country}}",
+    "entryWhen": "Turn {{turn}} · Q{{quarter}} {{year}} · saved {{date}}",
+    "entryUnknown": "An older save · saved {{date}}",
+    "loadThis": "Load",
+    "entryWhen_auto": "Turn {{turn}} · Q{{quarter}} {{year}} · autosaved {{date}}",
+    "entryUnknown_auto": "An older save · autosaved {{date}}"
   },
   "app": {
     "title": "Sports Founder",
@@ -1025,7 +1033,8 @@
     "hardcore": "Hardcore",
     "score": "Fandom Score",
     "yourSport": "Your sport",
-    "otherSports": "Other sports"
+    "otherSports": "Other sports",
+    "scoreRank": "{{score}} · #{{rank}}"
   },
   "countries": {
     "heading_zero": "Where your sport is catching on",
@@ -1283,7 +1292,10 @@
       "modest": "Modest",
       "comfortable": "Comfortable",
       "affluent": "Affluent"
-    }
+    },
+    "topSport": "#1 sport",
+    "countryRank": "Your sport here: #{{rank}}",
+    "countrySport": "{{sport}}: {{score}}"
   },
   "flagship": {
     "eyebrow": "The commissioner's seat",
@@ -1947,5 +1959,24 @@
     },
     "marker": "{{count}} traditions held here",
     "rule": "{{trait}}: {{option}}"
+  },
+  "standings": {
+    "eyebrow": "Standings",
+    "heading": "Your sport is #{{rank}} in the world",
+    "hold": "Win: hold #1 for {{needed}} turns in a row at tier {{tier}}. Held so far: {{held}}.",
+    "close": "Close standings",
+    "sport": "Sport",
+    "score": "Fandom Score",
+    "casual": "Casual",
+    "hardcore": "Hardcore",
+    "numberOne": "#1 in",
+    "change": "10 years",
+    "changeValue": "{{value, number(style: percent; signDisplay: always; maximumFractionDigits: 0)}}",
+    "chartLabel": "World Fandom Score by sport, {{from}} to {{to}}",
+    "noHistory": "The chart starts once a year has been recorded.",
+    "year": "{{year}}\n{{scores}}",
+    "yearScore": "{{sport}}: {{score}}",
+    "note": "Fandom Score counts hardcore fans plus a share of casual fans. #1 in counts the countries each sport leads.",
+    "open": "Standings: your sport is #{{rank}}"
   }
 }

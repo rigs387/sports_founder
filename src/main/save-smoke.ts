@@ -123,6 +123,10 @@ export async function verifySaves(
     );
     await open();
     await wait(`!document.querySelector('[data-testid="load-campaign"]').disabled`);
+    // The saves folder lists the turn's autosaves, newest first (GDD v1.35).
+    await wait(
+      `document.querySelector('[data-testid="save-list"] li')?.dataset.save === 'autosave-1.sfsave'`,
+    );
     await screenshot("25-load-from-setup.png");
     prompts.open = async () => saved;
     await load();

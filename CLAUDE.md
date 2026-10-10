@@ -230,6 +230,10 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   window). The seat's league is exempt; when the seat leaves, `closeOffseason` drops that league
   to its ceiling (`toCeiling` in `flagship.ts`). Promotion terms carry `flowPerQuarter` for
   the bulk review.
+- Standings (GDD v1.35): `src/sim/standings.ts` gives `TurnSnapshot.standings` (each modeled
+  sport's world Fandom Score, fans and countries led, and a yearly series from `yearly`) and each
+  country's `sports`, `localRank` and `leaderSportId`. The panel opens from the top bar's Fandom
+  Score; the map's "#1 sport" view tints by `leaderSportId` (`--sport-*` colors).
 - Leagues overview (GDD v1.34): the Leagues tab lists every league (`LeaguesTable`, sortable) and
   `BulkPromotion` (also on the offseason screen) promotes every eligible league into a tier with
   the `promoteLeagues` action; the flagship is never included.
@@ -396,6 +400,10 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 25 makes the Hall players only (GDD v1.35): ballots, near-misses, career units and
   all-time rank on inductee facts. Format 24 migrates with the Moments wing dropped, nobody passed
   over and no near-misses.
+- The saves folder (GDD v1.35) is `savesFolder` in `src/main/save-files.ts`: Saved Games\Sports
+  Founder on Windows. Each session save carries a `header` for the Load screen (the Campaign
+  menu's list, `campaign:list` / `campaign:open-named`); an autosave after each turn keeps
+  `autosave-1..3`. No path ever crosses to or from the renderer, only file names in the folder.
 - Every save includes a format version. Format changes require a migration step.
 - Saves are written atomically (temp file, then swap). Never use formats that break when code
   changes.

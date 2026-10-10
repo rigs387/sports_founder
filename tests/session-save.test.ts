@@ -36,6 +36,12 @@ function host() {
   const files = {
     save: vi.fn<SaveFiles["save"]>(),
     open: vi.fn<SaveFiles["open"]>(),
+    list: vi.fn<SaveFiles["list"]>(async () => ({ status: "ok", value: [] })),
+    openNamed: vi.fn<SaveFiles["openNamed"]>(),
+    autosave: vi.fn<SaveFiles["autosave"]>(async () => ({
+      status: "ok",
+      value: "autosave-1.sfsave",
+    })),
     closeState: vi.fn(),
     acceptLoad: vi.fn(),
   };
@@ -186,5 +192,38 @@ describe("campaign file sessions", () => {
     expect(client.endTurn).not.toHaveBeenCalled();
     await store.getState().loadCampaign(copy);
     expect(store.getState().status).toBe("ready");
+  });
+});
+
+describe("the saves folder (GDD v1.35)", () => {
+  it("writes a header the Load screen can show without the simulation", () => {
+    const { state, text } = fixture();
+    const header = JSON.parse(text).header;
+    const view = snapshot(state, world);
+    expect(header).toEqual({
+      sportName: view.identity.sportName,
+      anchorCountryId: state.anchorCountryId,
+      turn: view.turn,
+      year: view.year,
+      quarterOfYear: view.quarterOfYear,
+    });
+  });
+
+  it("autosaves after every turn, and loads a listed save by name", async () => {
+    const { store, files } = host();
+    const setup = setupFor(4);
+    await store.getState().loadSetup();
+    await store.getState().startCampaign(setup);
+    await store.getState().endTurn();
+    await vi.waitFor(() => expect(files.autosave).toHaveBeenCalledTimes(1));
+    const saved = files.autosave.mock.calls[0]?.[0] ?? "";
+    expect(JSON.parse(saved).header.turn).toBe(store.getState().snapshot?.turn);
+    files.openNamed.mockResolvedValue({
+      status: "ok",
+      value: { text: saved, name: "autosave-1.sfsave" },
+    });
+    await store.getState().loadNamed("autosave-1.sfsave");
+    expect(files.openNamed).toHaveBeenCalledWith("autosave-1.sfsave");
+    expect(store.getState()).toMatchObject({ status: "ready", fileName: "autosave-1.sfsave" });
   });
 });

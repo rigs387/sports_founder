@@ -4,6 +4,8 @@ import type { Names } from "../../../content";
 import type { CountrySnapshot, CultureSnapshot } from "../../../sim";
 import { TraditionList } from "../culture/traditions";
 import { geometry } from "../map/model";
+import { SPORT_COLORS, sportName } from "../standings/StandingsPanel";
+import { useGameStore } from "../state/game-store";
 import type { HistoryPoint } from "../state/history";
 
 interface Props {
@@ -109,6 +111,7 @@ export function CountryCard({
             &times;
           </button>
         </div>
+        <CountrySports country={country} />
         <div className="card-score">
           <div>
             <span className="eyebrow">{t("map.strength")}</span>
@@ -251,5 +254,28 @@ export function CountryCard({
         </div>
       </div>
     </aside>
+  );
+}
+
+/** Every sport's fans in this country and the player's rank here (GDD v1.35). */
+function CountrySports({ country }: { country: CountrySnapshot }) {
+  const { t } = useTranslation();
+  const { snapshot, names } = useGameStore();
+  if (!snapshot) return null;
+  return (
+    <div data-testid="country-standings">
+      <p className="wealth-level">{t("map.countryRank", { rank: country.localRank })}</p>
+      <ul className="country-sports">
+        {country.sports.map((sport) => (
+          <li key={sport.sportId} data-sport={sport.sportId}>
+            <span>
+              <i style={{ background: SPORT_COLORS[sport.sportId] }} aria-hidden="true" />
+              {sportName(snapshot, names, sport.sportId)}
+            </span>
+            <b>{t("format.compact", { value: sport.fandomScore })}</b>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

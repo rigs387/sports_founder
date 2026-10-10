@@ -88,3 +88,31 @@
 .save-replace {
   margin-top: 20px;
 }
+
+/* The Load screen (GDD v1.35): the saves folder's saves, newest first. */
+.save-list h3 {
+  margin: 14px 0 6px;
+  font-size: 14px;
+}
+.save-list ul {
+  max-height: 240px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+.save-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.save-list li span {
+  display: grid;
+  min-width: 0;
+}
+.save-list small {
+  opacity: 0.75;
+}

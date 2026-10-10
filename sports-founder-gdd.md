@@ -1319,6 +1319,15 @@ capped by max capacity while fans outnumber seats stays as it is.
     line chart of Fandom Score by year (the yearly history), and the win hold's progress on top.
   - *Per country:* the country panel shows the same rows for that country and the player's rank
     there; the world map gains a "#1 sport" view.
+  - *Built 2026-10-10 (calls made at build).* Off Windows the saves folder is the app's data
+    folder. Each save carries a small header (sport, anchor, turn, year) so the Load screen lists
+    saves without the simulation; the list is part of the Campaign menu, in setup and in play,
+    with "Open another file…" for anywhere else. The autosave runs after the turn and never holds
+    it up; it does not clear "unsaved progress". The Standings panel opens from the top bar's
+    Fandom Score (which now shows the rank); its change column is over the last ten recorded
+    years rather than ten turns (the yearly records are what the save keeps), and the chart has a
+    hover band a year. Series colors (your sport blue, soccer orange, cricket green) passed a
+    colorblind-safety check.
 - *Topic 7, a dominant scorer (reviewed, no change).* The top scorer's share of his club's scores
   rose from 24–32% (seasons 1–10) to 33–41% (seasons 31–41): replacements lean toward strong
   clubs' ratings and credit rises with skill toward a 60% cap that never binds. Tim Seidel's 37%

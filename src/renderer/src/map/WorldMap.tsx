@@ -32,6 +32,8 @@ interface Props {
   highlighted: string | null;
   command: MapCommand;
   patterns: boolean;
+  /** Tint markets by the sport leading them instead of the player's share (GDD v1.35). */
+  topSport?: boolean;
   rivals: boolean;
   onSelect: (id: string) => void;
   onHover: (hover: MapHover | null) => void;
@@ -44,7 +46,7 @@ interface MapController {
   update: (
     state: Pick<
       Props,
-      "snapshot" | "selected" | "highlighted" | "patterns" | "rivals" | "countryNames"
+      "snapshot" | "selected" | "highlighted" | "patterns" | "topSport" | "rivals" | "countryNames"
     >,
   ) => void;
   command: (command: MapCommand) => void;
@@ -410,7 +412,12 @@ function MapScene(props: SceneProps) {
           );
           entry.pattern = pattern;
         }
-        entry.face.tint = palette[bin] ?? palette[0] ?? "#b8d89c";
+        const leader = current.topSport ? country?.leaderSportId : undefined;
+        entry.face.tint = leader
+          ? color(`--sport-${leader}`)
+          : current.topSport
+            ? color("--neutral-land")
+            : (palette[bin] ?? palette[0] ?? "#b8d89c");
         if (entry.shape.market === current.selected) {
           for (const polygon of entry.shape.polygons)
             selectedLand.poly(polygon.outer).stroke({ color: color("--accent"), width: 2 });
@@ -493,6 +500,7 @@ function MapScene(props: SceneProps) {
       selected: props.selected,
       highlighted: props.highlighted,
       patterns: props.patterns,
+      topSport: props.topSport ?? false,
       rivals: props.rivals,
     });
   }, [
@@ -500,6 +508,7 @@ function MapScene(props: SceneProps) {
     props.selected,
     props.highlighted,
     props.patterns,
+    props.topSport,
     props.rivals,
     props.countryNames,
   ]);

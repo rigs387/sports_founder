@@ -14,6 +14,10 @@
   --land-edge: #468e80;
   --land-depth: #438d87;
   --neutral-land: #91b5a0;
+  /* Standings series and the #1 sport map view (GDD v1.35), validated as a categorical set. */
+  --sport-player: #2a6fd6;
+  --sport-soccer: #d4612a;
+  --sport-cricket: #2f9e6e;
   --heat-0: #b8d89c;
   --heat-1: #acd999;
   --heat-2: #8aca85;

@@ -18,6 +18,7 @@ import { verifySaves } from "./save-smoke";
 import { verifySeasonCards } from "./season-smoke";
 import { verifySetup } from "./setup-smoke";
 import { COLLECT_NEWS } from "./smoke-news";
+import { verifyStandings } from "./standings-smoke";
 import { verifyStarCards } from "./star-smoke";
 import { verifyStarsPanel } from "./stars-smoke";
 import { verifyVenue } from "./venue-smoke";
@@ -162,6 +163,7 @@ async function run(
   const amendment = await verifyAmendment(win, screenshot);
   const traditions = await verifyTraditions(win, screenshot);
   const almanac = await verifyAlmanac(win, screenshot);
+  const standings = await verifyStandings(win, screenshot);
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
@@ -173,6 +175,7 @@ async function run(
     after: current,
     map,
     popups,
+    standings,
     setup,
     events,
     championship,
