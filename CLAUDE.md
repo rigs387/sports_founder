@@ -194,6 +194,11 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   of `TurnSnapshot`; it carries player names, and recorded facts and backing for the Stars panel. Star cards' free defaults have no
   effect: a backed star's move stands unless kept, a backed star's backing ends at retirement
   unless honored or passed to a mentored successor.
+- More stars than slots (GDD v1.35): any standout season makes a star while `stars.places` are
+  open (the Player of the Season and top scorer outright, other club leaders at
+  `stars.clubShare`), several a season (`SeasonSummary.newStarIds`). The first star is the
+  headline `star-breakout`; every later one is the `star-backable` decision whose Back choice
+  (`starBack`) costs `backingPrice`. Unbacked stars move clubs `unbackedMoveFactor` times as often.
 - The flagship's broadcast (GDD v1.23, revised v1.27) is `broadcastEffects` in
   `src/sim/flagship.ts`: while a league holds the seat, all media reach into every market the
   seat's media reaches is multiplied by 1 + (tier ceiling × last season's interest × health +

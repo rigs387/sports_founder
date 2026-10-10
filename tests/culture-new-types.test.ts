@@ -198,6 +198,8 @@ describe("national names by market size", () => {
   it("is minor news without a moment slot in a small market and big news in a large one", () => {
     const start = fresh();
     const lead = new Set(["uruguay", "china"]);
+    const anchorLeague =
+      start.countries.find((c) => c.countryId === start.anchorCountryId)?.league ?? null;
     const leading: GameState = {
       ...start,
       quarter: start.quarter + 4,
@@ -205,6 +207,8 @@ describe("national names by market size", () => {
         lead.has(country.countryId)
           ? {
               ...country,
+              // A national name needs a league there.
+              league: country.league ?? anchorLeague,
               fans: country.fans.map((f, i) =>
                 i === PLAYER_INDEX ? { ...f, casual: 1e10, hardcore: 1e10 } : f,
               ),

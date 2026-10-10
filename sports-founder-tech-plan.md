@@ -1306,6 +1306,18 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    stars playing than backing slots; tune to the first star by about season 8 and one or two over
    the slots from Professional on. Tests: two stars in one season; a capped season makes none;
    Back from the card.
+
+   *Built 2026-10-09.* `playersSeasonEnd`: standouts (`playerOfSeason`, `topScorer`) first, then
+   leaders at `stars.clubShare`, while `stars.places` (2 / 3 / 5 / 6) are open;
+   `stars.unbackedMoveFactor` 2. `SeasonSummary.newStarIds` (a save `preprocess` reads an old
+   `newStarId`). `star-cards.ts`: `starFacts` gives one card per new star, `breakout` for the
+   first star and `backable` (card `star-backable`, a decision, no slot) after; effect
+   `starBack` (`starEffectBlocker` → `slots`; `eventChoiceCost` → `backingPrice`). Bots value
+   Back by influence over `influenceSeasons`. The runner counts backings from cards and reports
+   the first star's season and stars over slots. Smoke: the pop-up step waits up to 60 turns for
+   a headline (the first star is now before it) and the outline check waits a frame; the star
+   step prefers a backable breakout. `tests/more-stars.test.ts`; tests building pre-format-15/23
+   saves strip star and Hall cards (`withoutStarEvents`, `withoutHallEvents`).
 4. **A Hall that remembers careers (topic 4).** `hall-of-fame.ts`: `InducteeFacts` adds career
    score units (scores ÷ `scoreUnit`) and all-time rank; `hallOfFame.points` adds `careerUnit`
    and `topTen`. Ballot: retired players at ≥ `ballotShare` (0.5) of the bar, with

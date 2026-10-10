@@ -1176,7 +1176,8 @@ export const configFileSchema = z.strictObject({
     }),
     /** Stars (GDD v1.16). */
     stars: z.strictObject({
-      share: z.strictObject({ low: unitInterval, medium: unitInterval, high: unitInterval }),
+      clubShare: z.strictObject({ low: unitInterval, medium: unitInterval, high: unitInterval }),
+      unbackedMoveFactor: z.number().min(1),
       places: z.strictObject({
         amateur: z.int().min(0),
         "semi-pro": z.int().min(0),

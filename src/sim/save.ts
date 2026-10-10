@@ -424,26 +424,34 @@ const flagshipSchema = z.strictObject({
   startRatings: z.array(clubRatingSchema),
   lastRound: z.array(matchSchema),
   seasons: z.array(
-    z.strictObject({
-      season: z.int().min(1),
-      quarter: count,
-      countryId: z.string().min(1),
-      format: seasonFormatSchema,
-      scoring: scoringSchema,
-      championId: z.int().min(1),
-      runnerUpId: z.int().min(1),
-      standings: z.array(tableRowSchema),
-      playoffs: z.array(matchSchema),
-      startRatings: z.array(clubRatingSchema),
-      topScorer: z
-        .strictObject({ playerId: z.int().min(1), clubId: z.int().min(1), scores: count })
-        .nullable(),
-      newStarId: z.int().min(1).nullable(),
-      crowd: count.nullable(),
-      recordCrowd: z.boolean(),
-      venueLevel: z.int().min(1).max(5).nullable().optional(),
-      playerOfSeason: z.int().min(1).nullable(),
-    }),
+    // Saves from before GDD v1.35 name one new star a season (newStarId): read it as a list.
+    z.preprocess(
+      (summary) => {
+        if (!summary || typeof summary !== "object" || !("newStarId" in summary)) return summary;
+        const { newStarId, ...rest } = summary as Record<string, unknown>;
+        return { ...rest, newStarIds: typeof newStarId === "number" ? [newStarId] : [] };
+      },
+      z.strictObject({
+        season: z.int().min(1),
+        quarter: count,
+        countryId: z.string().min(1),
+        format: seasonFormatSchema,
+        scoring: scoringSchema,
+        championId: z.int().min(1),
+        runnerUpId: z.int().min(1),
+        standings: z.array(tableRowSchema),
+        playoffs: z.array(matchSchema),
+        startRatings: z.array(clubRatingSchema),
+        topScorer: z
+          .strictObject({ playerId: z.int().min(1), clubId: z.int().min(1), scores: count })
+          .nullable(),
+        newStarIds: z.array(z.int().min(1)),
+        crowd: count.nullable(),
+        recordCrowd: z.boolean(),
+        venueLevel: z.int().min(1).max(5).nullable().optional(),
+        playerOfSeason: z.int().min(1).nullable(),
+      }),
+    ),
   ),
   deals: dealsSchema,
 });
@@ -921,7 +929,10 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
       }),
     );
     const seasons = (Array.isArray(flagship.seasons) ? flagship.seasons : []).map(
-      (summary: Record<string, unknown>) => ({ ...summary, newStarId: summary.newStarId ?? null }),
+      (summary: Record<string, unknown>) => ({
+        ...summary,
+        newStarIds: Array.isArray(summary.newStarIds) ? summary.newStarIds : [],
+      }),
     );
     // Key order follows the schema, so the migrated state re-serializes byte-identically.
     return {

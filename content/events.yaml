@@ -736,6 +736,30 @@ cards:
     effects: []
     choices: []
     defaultChoice: null
+  # More stars than slots (GDD v1.35): every star after the first breaks out as a decision that
+  # names the open backing slots and offers Back at the backing price; both answers pay the
+  # breakout's PP. Its free default backs no one. It takes no slot.
+  - id: star-backable
+    kind: decision
+    tone: positive
+    priority: 200
+    trigger: star
+    star: backable
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    defaultChoice: not-now
+    choices:
+      - id: back
+        quarters: 0
+        effects: [{ type: starBack }]
+      - { id: not-now, quarters: 0, effects: [] }
   - id: star-final-season
     kind: moment
     weight: minor

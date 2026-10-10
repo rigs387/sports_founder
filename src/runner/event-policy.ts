@@ -150,6 +150,12 @@ function effectValue(
         (casualConversion * weights.casual + mediaReach * weights.media)
       );
     }
+    case "starBack": {
+      // Backing from a breakout card (GDD v1.35): a star at full influence, held for the
+      // seasons influence takes to grow.
+      const { casualConversion, mediaReach, influenceSeasons } = world.config.flagship.backing;
+      return influenceSeasons * (casualConversion * weights.casual + mediaReach * weights.media);
+    }
     case "starKeep": {
       // A typical star's strength (bots never read hidden skill) stays with the weaker club, in
       // rating steps of competitive balance, against the share of league cash it costs.

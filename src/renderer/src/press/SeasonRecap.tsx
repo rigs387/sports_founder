@@ -116,9 +116,12 @@ export function SeasonRecap({
                 })}
               </li>
             )}
-            {last.newStarId !== null && (
+            {last.newStarIds.length > 0 && (
               <li data-testid="offseason-new-star">
-                {t("offseason.review.newStar", { player: player(last.newStarId) })}
+                {t("offseason.review.newStar", {
+                  count: last.newStarIds.length,
+                  players: last.newStarIds.map(player),
+                })}
               </li>
             )}
           </ul>

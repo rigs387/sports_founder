@@ -161,6 +161,8 @@ describe("births", () => {
         ids.includes(country.countryId)
           ? {
               ...country,
+              // A national name needs a league there (GDD v1.35).
+              league: country.league ?? anchorLeague,
               fans: country.fans.map((f, i) =>
                 i === PLAYER_INDEX
                   ? everyone
@@ -173,6 +175,8 @@ describe("births", () => {
       ),
     });
     const year = (base: GameState) => updateCulture({ ...base, quarter: base.quarter + 4 }, world);
+    const anchorLeague =
+      state.countries.find((c) => c.countryId === state.anchorCountryId)?.league ?? null;
     expect(ofType(updateCulture(state, world), "nationalName")).toEqual([]);
     const leading = year(fans(state, [a.id, b.id], true));
     const names = ofType(leading, "nationalName");

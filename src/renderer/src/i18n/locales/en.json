@@ -86,6 +86,7 @@
       "starHonors": "Retire them with honors: their influence fades over {{seasons, number}} {{seasonsNoun}} instead of stopping.",
       "starMentor": "{{candidate}} gets a lift to their scoring this {{seasonNoun}}, then takes the backing with {{share, number(style: percent)}} of the influence.",
       "starKeep": "Costs the league {{cash, money}}. The move is canceled.",
+      "starBack": "Backs the star now: their influence grows each season they play here.",
       "derbyStoke": "Counts as one more meeting toward a derby between these two clubs."
     },
     "blockers": {
@@ -96,7 +97,8 @@
       "rival": "The named rival is no longer available.",
       "ended": "This campaign has ended.",
       "flagship": "The champions no longer play in your flagship league.",
-      "star": "That star's situation has changed: this choice is no longer possible."
+      "star": "That star's situation has changed: this choice is no longer possible.",
+      "slots": "Every backing slot is taken. Drop a star on the offseason screen to make room."
     },
     "cards": {
       "open-doors": {
@@ -240,6 +242,15 @@
         "title_v2": "A star rises at {{club}}",
         "body_one": "{{player}} scored {{count, number}} time in {{matches, number}} {{matchNoun}} for {{club}} in {{seasonNoun}} {{season}}: {{share, number(style: percent)}} of the club's {{scoresNoun}}. The league has a new star.",
         "body_other": "{{player}} scored {{count, number}} times in {{matches, number}} {{matchNoun}} for {{club}} in {{seasonNoun}} {{season}}: {{share, number(style: percent)}} of the club's {{scoresNoun}}. The league has a new star."
+      },
+      "star-backable": {
+        "title": "{{player}} becomes a star",
+        "body_one": "{{player}} scored {{count, number}} time in {{matches, number}} {{matchNoun}} for {{club}} in {{seasonNoun}} {{season}}: {{share, number(style: percent)}} of the club's {{scoresNoun}}. Back {{player}}? {{free}} of {{slots}} backing slots free.",
+        "body_other": "{{player}} scored {{count, number}} times in {{matches, number}} {{matchNoun}} for {{club}} in {{seasonNoun}} {{season}}: {{share, number(style: percent)}} of the club's {{scoresNoun}}. Back {{player}}? {{free}} of {{slots}} backing slots free.",
+        "choices": {
+          "back": "Back this star",
+          "not-now": "Not now"
+        }
       },
       "star-final-season": {
         "title": "One last {{seasonNoun}}",
@@ -498,7 +509,8 @@
     "review": {
       "heading": "The {{seasonNoun}} in review",
       "champion": "{{SeasonNoun}} {{season}} champions: {{club}}",
-      "newStar": "New star: {{player}}",
+      "newStar_one": "New star: {{players, list}}",
+      "newStar_other": "New stars: {{players, list}}",
       "decisions_one": "{{count}} decision from this season waits on the map.",
       "decisions_other": "{{count}} decisions from this season wait on the map.",
       "toMap": "Go to the map"

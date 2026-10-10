@@ -178,6 +178,28 @@ export function cardless(base: World): World {
 }
 
 /** The events without tradition cards: what a save older than format 18 could hold. */
+/**
+ * The events without Hall of Fame cards: what a save older than format 23 could hold (since GDD
+ * v1.35 the first star, and so a Hall class with it, comes in the first season).
+ */
+export function withoutHallEvents(state: GameState): GameState {
+  const keep = (list: GameState["events"]["pending"]) =>
+    list.filter((event) => event.facts.hall === null);
+  const { events } = state;
+  return {
+    ...state,
+    events: { ...events, pending: keep(events.pending), history: keep(events.history) },
+  };
+}
+
+/** The events without star cards: what a save older than format 15 could hold (GDD v1.35 makes
+ * stars from the first season, so short campaigns now have them). */
+export function withoutStarEvents(events: GameState["events"]): GameState["events"] {
+  const keep = (list: GameState["events"]["pending"]) =>
+    list.filter((event) => event.facts.star === null);
+  return { ...events, pending: keep(events.pending), history: keep(events.history) };
+}
+
 export function withoutTraditionEvents(events: GameState["events"]): GameState["events"] {
   const keep = (list: GameState["events"]["pending"]) =>
     list.filter((event) => event.facts.tradition === null);

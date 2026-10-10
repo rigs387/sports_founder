@@ -308,7 +308,8 @@ export interface SeasonSummary {
   /** Null when nobody scored or the season was not tallied (before save format 12). */
   topScorer: TopScorer | null;
   /** The player the season made a star, if any (null before save format 13). */
-  newStarId: number | null;
+  /** Stars made by this season, best first (GDD v1.35: several a season). */
+  newStarIds: number[];
   /** Hardcore fans seated at the season's end (GDD v1.30); null before save format 22. */
   crowd: number | null;
   /** Whether the crowd set the league's attendance record: a fame fact for a ground. */

@@ -222,8 +222,12 @@ describe("League Health Ladder", () => {
     let current = state;
     while (current.outcome === null) current = endTurn(current, w);
     expect(current.outcome).toMatchObject({ kind: "anchorCollapse", countryId: ANCHOR });
-    // Traditions at home are lost with the league (GDD v1.22); the collapse is the last other fact.
-    expect(current.landmarks.filter((l) => l.kind !== "traditionLost").at(-1)).toMatchObject({
+    // Traditions at home are lost with the league (GDD v1.22); culture's turn records its births
+    // and losses after the turn's facts, so the collapse is the last other fact.
+    const facts = current.landmarks.filter(
+      (l) => l.kind !== "traditionLost" && l.kind !== "traditionBorn",
+    );
+    expect(facts.at(-1)).toMatchObject({
       kind: "anchorCollapse",
       countryId: ANCHOR,
     });

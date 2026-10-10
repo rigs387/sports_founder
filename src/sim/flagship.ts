@@ -663,7 +663,7 @@ export function clubSeasonScores(summary: SeasonSummary, clubId: number): number
 
 interface SeasonEnd {
   flagship: FlagshipState;
-  newStarId: number | null;
+  newStarIds: number[];
   landmarks: Landmark[];
 }
 
@@ -688,31 +688,46 @@ function playersSeasonEnd(
   let players = flagship.players.map((player) => ({ ...player }));
   const current = () => ({ ...flagship, players });
 
-  // A star is made by a season: the top scorer, with the club share, if a place is open.
-  let newStarId: number | null = null;
-  const top = summary.topScorer;
-  const scorer = top ? players.find((player) => player.id === top.playerId) : undefined;
-  if (top && scorer && playing(scorer) && scorer.starSince === null) {
-    const clubScores = clubSeasonScores(summary, top.clubId);
-    const open = seatStars(current()).length < stars.places[tier];
-    if (open && clubScores > 0 && top.scores / clubScores >= stars.share[summary.scoring]) {
-      const first = !players.some((player) => player.starSince !== null);
-      scorer.starSince = season;
-      newStarId = scorer.id;
-      if (first) {
-        found.push(
-          landmarks.starLandmark(
-            "firstStar",
-            turn,
-            quarter,
-            countryId,
-            season,
-            scorer.id,
-            top.clubId,
-          ),
-        );
-      }
-    }
+  // Stars are made by standout seasons (GDD v1.35): the Player of the Season, the top scorer, and
+  // any club's leading player whose share of the club's scores reaches clubShare, best first,
+  // while places are open.
+  const newStarIds: number[] = [];
+  const lineOf = (player: Player) => player.career.find((line) => line.season === season);
+  const shareOf = (player: Player) => {
+    const line = lineOf(player);
+    const clubScores = line ? clubSeasonScores(summary, line.clubId) : 0;
+    return line && clubScores > 0 ? line.scores / clubScores : 0;
+  };
+  const standout = (player: Player) =>
+    player.id === summary.playerOfSeason || player.id === summary.topScorer?.playerId;
+  const candidates = players
+    .filter(
+      (player) =>
+        playing(player) &&
+        player.starSince === null &&
+        (lineOf(player)?.matches ?? 0) > 0 &&
+        (standout(player) || shareOf(player) >= stars.clubShare[summary.scoring]),
+    )
+    .sort(
+      (a, b) => Number(standout(b)) - Number(standout(a)) || shareOf(b) - shareOf(a) || a.id - b.id,
+    );
+  for (const candidate of candidates) {
+    if (seatStars(current()).length >= stars.places[tier]) break;
+    const first = !players.some((player) => player.starSince !== null);
+    candidate.starSince = season;
+    newStarIds.push(candidate.id);
+    if (first)
+      found.push(
+        landmarks.starLandmark(
+          "firstStar",
+          turn,
+          quarter,
+          countryId,
+          season,
+          candidate.id,
+          lineOf(candidate)?.clubId ?? candidate.clubId,
+        ),
+      );
   }
 
   // Backed players who played the season at the seat grow in influence.
@@ -768,7 +783,9 @@ function playersSeasonEnd(
   // Stars may move up to a stronger club without a star; the clubs swap leading players.
   const ratingOf = new Map(flagship.clubs.map((club) => [club.id, club.rating]));
   for (const mover of seatStars(current())) {
-    if (mover.finalSeason || nextFloat(rng) >= stars.moveChance) continue;
+    // Unbacked stars wander (GDD v1.35).
+    const chance = stars.moveChance * (mover.backing === null ? stars.unbackedMoveFactor : 1);
+    if (mover.finalSeason || nextFloat(rng) >= chance) continue;
     const own = ratingOf.get(mover.clubId) ?? 0;
     const targets = activeClubs(flagship)
       .filter((club) => club.rating > own)
@@ -845,7 +862,7 @@ function playersSeasonEnd(
       );
     }
   }
-  return { flagship: current(), newStarId, landmarks: found };
+  return { flagship: current(), newStarIds, landmarks: found };
 }
 
 /** The season's top scorer: most scores, then fewer matches, then the lower id. */
@@ -1414,7 +1431,7 @@ export function stepFlagshipQuarter(
         playoffs: playoffs.matches,
         startRatings: flagship.startRatings,
         topScorer: tallies === null ? null : topScorer(flagship, tallies),
-        newStarId: null,
+        newStarIds: [],
         crowd: seasonCrowd(nextCountries, world, flagship.countryId),
         recordCrowd: false,
         venueLevel: current.venue.level,
@@ -1452,7 +1469,7 @@ export function stepFlagshipQuarter(
         newQuarter,
       );
       flagship = ended.flagship;
-      summary.newStarId = ended.newStarId;
+      summary.newStarIds = ended.newStarIds;
       found.push(...ended.landmarks);
       found.push(
         landmarks.seasonChampion(

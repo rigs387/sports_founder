@@ -22,6 +22,7 @@ import {
   countryIndex,
   setupFor,
   withConfig,
+  withoutStarEvents,
   withoutTraditionEvents,
   world,
 } from "./helpers";
@@ -155,7 +156,7 @@ describe("save format 11", () => {
     // A format 10 save has no players, tallies or top scorers.
     const { players: _p, nextPlayerId: _n, tallies: _t, ...rest } = played.flagship;
     const flagship = { ...rest, seasons: rest.seasons.map(({ topScorer: _s, ...s }) => s) };
-    const events = withoutTraditionEvents(played.events);
+    const events = withoutStarEvents(withoutTraditionEvents(played.events));
     const v10 = JSON.stringify({ formatVersion: 10, state: { ...played, flagship, events } });
     const loaded = deserializeSave(v10, world);
     const active = activeClubs(loaded.flagship).map((club) => club.id);

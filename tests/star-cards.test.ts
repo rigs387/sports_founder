@@ -85,7 +85,7 @@ describe("star cards", () => {
     const state = toSeason(createCampaign(base, setupFor(11, "brazil")), 1, base);
     const summary = state.flagship.seasons[0];
     const card = pendingCard(state, "star-breakout");
-    const star = state.flagship.players.find((p) => p.id === summary?.newStarId);
+    const star = state.flagship.players.find((p) => p.id === summary?.newStarIds[0]);
     const line = star?.career[0];
     expect(card?.facts.star).toMatchObject({
       playerId: star?.id,

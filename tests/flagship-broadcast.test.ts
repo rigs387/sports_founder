@@ -47,7 +47,7 @@ function summary(season: number, championId: number, runnerUpId: number, gap: nu
     playoffs: [],
     startRatings: [1, 2, 3, 4, 5, 6, 7, 8].map((clubId) => ({ clubId, rating: 40 + clubId })),
     topScorer: null,
-    newStarId: null,
+    newStarIds: [],
     crowd: null,
     recordCrowd: false,
     playerOfSeason: null,

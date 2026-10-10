@@ -19,7 +19,15 @@ import {
   updateCulture,
 } from "../src/sim";
 import { clubIds, fresh, withSeason, withTradition } from "./culture-helpers";
-import { awardless, countryIndex, migratedHall, setupFor, withConfig, world } from "./helpers";
+import {
+  awardless,
+  countryIndex,
+  migratedHall,
+  setupFor,
+  withConfig,
+  withoutHallEvents,
+  world,
+} from "./helpers";
 
 // The Hall of Fame (GDD v1.31, tech plan 2.18).
 
@@ -85,7 +93,7 @@ describe("Hall of Fame state (tech plan 2.18 step 1)", () => {
   });
 
   it("a format 22 save migrates to an empty Hall counting from now, with no class facts", () => {
-    const played = afterFirstSeason();
+    const played = withoutHallEvents(afterFirstSeason());
     const strip = (list: GameState["events"]["pending"]) =>
       list.map(({ facts: { hall: _h, ...facts }, ...event }) => ({ ...event, facts }));
     const { hallOfFame: _hall, ...rest } = played;

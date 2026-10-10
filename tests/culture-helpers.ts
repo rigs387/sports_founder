@@ -19,7 +19,7 @@ export function withSeason(
   options: {
     format?: "european" | "american";
     host?: number;
-    newStarId?: number;
+    newStarIds?: number[];
     recordCrowd?: boolean;
     /** An unbeaten champion (GDD v1.35: the Invincibles); otherwise every club lost once. */
     unbeaten?: boolean;
@@ -63,7 +63,7 @@ export function withSeason(
         : [],
     startRatings: [],
     topScorer: null,
-    newStarId: options.newStarId ?? null,
+    newStarIds: options.newStarIds ?? [],
     crowd: null,
     recordCrowd: options.recordCrowd ?? false,
     playerOfSeason: null,

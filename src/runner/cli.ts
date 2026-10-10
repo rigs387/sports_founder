@@ -759,7 +759,7 @@ function main(): number {
       `  Flagship: seasons median ${fmt(flagship.seasons.median)}; different champions median ${fmt(flagship.distinctChampions.median)}; the most successful club's share of titles median ${pct(flagship.mostTitlesShare.median ?? 0)}, max ${pct(flagship.mostTitlesShare.max ?? 0)}`,
     );
     console.log(
-      `  Stars: made per campaign median ${fmt(flagship.starsMade.median)}; backed median ${fmt(flagship.starsBacked.median)} (in ${flagship.backedIn}/${results.length} campaigns), first backed at turn median ${fmt(flagship.firstBackTurn.median)}`,
+      `  Stars: made per campaign median ${fmt(flagship.starsMade.median)}; backed median ${fmt(flagship.starsBacked.median)} (in ${flagship.backedIn}/${results.length} campaigns), first backed at turn median ${fmt(flagship.firstBackTurn.median)}; first star in season median ${fmt(flagship.firstStarSeason.median)} (max ${fmt(flagship.firstStarSeason.max)}); stars playing over backing slots, second half, median ${fmt(flagship.starsOverSlots.median)} (target 1–2)`,
     );
     const [low, high] = world.config.balanceTargets.flagshipBroadcastShare;
     const broadcast = flagship.broadcastShare;

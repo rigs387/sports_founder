@@ -196,7 +196,14 @@ describe("Hall of Fame front pages and firsts with scale", () => {
 describe("presentation (tech plan 2.19 step 2)", () => {
   it("collects every minor moment at once, and only minor ones", () => {
     let state = createCampaign(world, setupFor(5, "brazil"));
-    while (minorMomentIds(state, world).length < 2 && state.turn < 40)
+    // Two minor moments, one of them paying PP (a star's move or the first award pays none).
+    const paying = (s: GameState) =>
+      eventSnapshots(s, world).some(
+        (e) =>
+          minorMomentIds(s, world).includes(e.id) &&
+          e.effects.some((effect) => effect.type === "pp" && effect.amount > 0),
+      );
+    while ((minorMomentIds(state, world).length < 2 || !paying(state)) && state.turn < 60)
       state = endTurn(state, world);
     const minor = minorMomentIds(state, world);
     expect(minor.length).toBeGreaterThanOrEqual(2);

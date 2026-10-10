@@ -41,6 +41,8 @@ export const eventEffectSchema = z.union([
   z.strictObject({ type: z.literal("starHonors") }),
   z.strictObject({ type: z.literal("starMentor") }),
   z.strictObject({ type: z.literal("starKeep") }),
+  /** Backs the new star from their breakout card at the backing price (GDD v1.35). */
+  z.strictObject({ type: z.literal("starBack") }),
   // The repeat-final card only (GDD v1.22): one extra meeting toward a derby between the two clubs.
   z.strictObject({ type: z.literal("derbyStoke") }),
 ]);
@@ -68,6 +70,7 @@ export const TRADITION_CARD_IDS: readonly (readonly [string, TraditionCard])[] =
 /** The flagship star facts a card can tell (GDD v1.16). */
 export const STAR_CARDS = [
   "breakout",
+  "backable",
   "finalSeason",
   "retired",
   "moved",
@@ -77,11 +80,12 @@ export const STAR_CARDS = [
   "dropped",
 ] as const;
 export type StarCard = (typeof STAR_CARDS)[number];
-const STAR_DECISIONS: readonly StarCard[] = ["succession", "keepOrMove", "dropped"];
+const STAR_DECISIONS: readonly StarCard[] = ["succession", "keepOrMove", "dropped", "backable"];
 const STAR_EFFECT_CARD = {
   starHonors: "succession",
   starMentor: "succession",
   starKeep: "keepOrMove",
+  starBack: "backable",
 };
 /** The flagship season facts a card can tell (GDD v1.15), highest priority first after the champion. */
 export const SEASON_STORIES = [

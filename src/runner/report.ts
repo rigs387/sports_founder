@@ -119,6 +119,12 @@ export interface CampaignResult {
     /** Flagship stars made, and stars the bot backed (GDD v1.16). */
     starsMade: number;
     starsBacked: number;
+    /** The first star's season, if any (GDD v1.35: about season 8 at the latest). */
+    firstStarSeason: number | null;
+    /** Median stars playing a season over the campaign's second half. */
+    starsPlaying: number;
+    /** Backing slots at the end. */
+    backingSlots: number;
     firstBackTurn: number | null;
   };
   /** Flagship deals (GDD v1.28). */
@@ -406,6 +412,14 @@ export function flagshipAggregate(results: CampaignResult[]) {
     ),
     starsMade: distribution(results.map((r) => r.flagship.starsMade)),
     starsBacked: distribution(results.map((r) => r.flagship.starsBacked)),
+    firstStarSeason: distribution(
+      results.flatMap((r) =>
+        r.flagship.firstStarSeason === null ? [] : [r.flagship.firstStarSeason],
+      ),
+    ),
+    starsOverSlots: distribution(
+      results.map((r) => r.flagship.starsPlaying - r.flagship.backingSlots),
+    ),
     backedIn: results.filter((r) => r.flagship.starsBacked > 0).length,
     // Judged where the seat could broadcast: a small media market reaches nowhere by design.
     broadcastShare: distribution(

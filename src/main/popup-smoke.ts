@@ -67,7 +67,9 @@ export async function verifyPopups(
     );
   let headline = false;
   let bigSeen = false;
-  for (let more = 0; !headline && more < 30; more += 1) {
+  // Since GDD v1.35 the first star comes in the first season, before this step: wait for the next
+  // headline (an era, a Hall class, a rare champion story).
+  for (let more = 0; !headline && more < 60; more += 1) {
     for (let k = 0; k < 10; k += 1) {
       const weight = await windowWeight();
       if (!weight) break;
@@ -93,12 +95,19 @@ export async function verifyPopups(
       const country = await evaluate<string>(
         `document.querySelector('[data-testid="moment-window"]').dataset.country`,
       );
-      if (
-        (await evaluate<string>(
-          `document.querySelector('[data-testid="world-map"]').dataset.highlighted`,
-        )) !== country
-      )
-        throw new Error("A big moment must outline its country on the map.");
+      // The outline can trail the window by a frame: give it a moment.
+      const outline = `document.querySelector('[data-testid="world-map"]').dataset.highlighted`;
+      for (let tries = 0; tries < 20 && (await evaluate<string>(outline)) !== country; tries += 1)
+        await delay(50);
+      const outlined = await evaluate<string>(outline);
+      if (outlined !== country) {
+        const template = await evaluate<string>(
+          `document.querySelector('[data-testid="moment-window"]').dataset.eventTemplate ?? ""`,
+        );
+        throw new Error(
+          `A big moment must outline its country on the map (${template} in ${country}, outlined ${outlined}).`,
+        );
+      }
       await click('[data-testid="moment-window-collect"]');
       await wait(`document.querySelector('[data-testid="game"]').dataset.status === 'ready'`);
       await delay();
@@ -108,11 +117,12 @@ export async function verifyPopups(
       await click('[data-testid="event-popup-later"]');
     await endTurn();
   }
-  if (!headline) throw new Error("No headline moment came up in 30 turns.");
+  if (!headline) throw new Error("No headline moment came up in 60 turns.");
 
+  const decisionStart = turnsPlayed;
   for (;;) {
     await collectNews();
-    if ((await exists('[data-testid="event-popup"]')) || turnsPlayed >= 30) break;
+    if ((await exists('[data-testid="event-popup"]')) || turnsPlayed >= decisionStart + 30) break;
     await endTurn();
   }
   if (!(await exists('[data-testid="event-popup"]')))

@@ -36,6 +36,7 @@ import {
   setupFor,
   venueless,
   withConfig,
+  withoutHallEvents,
   world,
 } from "./helpers";
 
@@ -80,7 +81,7 @@ describe("venue state (tech plan 2.17 step 1)", () => {
   });
 
   it("a format 21 save migrates to level 1 venues and crowdless seasons", () => {
-    const played = afterFirstSeason();
+    const played = withoutHallEvents(afterFirstSeason());
     const v21 = {
       ...played,
       countries: played.countries.map((c) => {
@@ -203,7 +204,15 @@ describe("money (tech plan 2.17 step 2)", () => {
   });
 
   it("a star's wage rises with seasons as a star and influence, and ends when they leave the seat", () => {
-    const state = afterFirstSeason();
+    // One star only: the first season makes several since GDD v1.35.
+    const first = afterFirstSeason();
+    const state: GameState = {
+      ...first,
+      flagship: {
+        ...first.flagship,
+        players: first.flagship.players.map((p) => ({ ...p, starSince: null })),
+      },
+    };
     const season = state.flagship.season;
     const { wageShare, perSeason, perInfluence } = world.config.flagship.payroll;
     const tier = state.countries[brazil]?.league?.tier ?? "amateur";

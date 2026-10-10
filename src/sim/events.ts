@@ -3,7 +3,7 @@ import { offerCountermoveCards } from "./countermove-cards";
 import { venueStrength } from "./culture";
 import { offerDealCards } from "./deal-cards";
 import type { EventRecord, EventState } from "./events-state";
-import { activeClubs, moveClubRatings } from "./flagship";
+import { activeClubs, backingPrice, moveClubRatings } from "./flagship";
 import { offerAwardCards, offerHallCards } from "./hall-cards";
 import { classHeadline, classPP } from "./hall-of-fame";
 import { outletOf, wireOutlet } from "./press";
@@ -298,6 +298,12 @@ export function eventEffects(
   event: Pick<EventRecord, "facts" | "countryId">,
   choiceId: string | null,
 ): EventEffect[] {
+  // A backable breakout (GDD v1.35) pays the breakout's PP whatever the answer.
+  if (card.star === "backable")
+    return [
+      { type: "pp", amount: breakoutPP(world, event) },
+      ...(card.choices.find((choice) => choice.id === choiceId)?.effects ?? card.effects),
+    ];
   if (choiceId !== null)
     return card.choices.find((choice) => choice.id === choiceId)?.effects ?? [];
   if (card.star === "breakout")
@@ -318,12 +324,12 @@ export function eventChoiceCost(
   card: EventTemplate,
   choiceId: string | null,
 ): number {
+  const choice = card.choices.find((entry) => entry.id === choiceId);
+  // Backing from a breakout card costs what backing costs anywhere (GDD v1.35).
+  if (choice?.effects.some((effect) => effect.type === "starBack"))
+    return backingPrice(state, world);
   // Quarters of income (GDD v1.34).
-  return ppPrice(
-    state,
-    world,
-    card.choices.find((choice) => choice.id === choiceId)?.quarters ?? 0,
-  );
+  return ppPrice(state, world, choice?.quarters ?? 0);
 }
 export type EventBlocker =
   | "missing"
@@ -333,6 +339,7 @@ export type EventBlocker =
   | "rival"
   | "flagship"
   | "star"
+  | "slots"
   | "ended";
 export function eventBlocker(
   state: GameState,
@@ -385,7 +392,8 @@ function applyEffects(
     if (
       effect.type === "starHonors" ||
       effect.type === "starMentor" ||
-      effect.type === "starKeep"
+      effect.type === "starKeep" ||
+      effect.type === "starBack"
     ) {
       next = applyStarEffect(next, world, event, effect);
       continue;

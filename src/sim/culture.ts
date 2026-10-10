@@ -432,8 +432,8 @@ class CultureUpdate {
     }
 
     // Star legacies are renewed when a star of their club breaks out.
-    if (summary.newStarId !== null) {
-      const star = state.flagship.players.find((p) => p.id === summary.newStarId);
+    for (const starId of summary.newStarIds) {
+      const star = state.flagship.players.find((p) => p.id === starId);
       for (const legacy of this.traditions)
         if (legacy.type === "legacy" && living(legacy) && legacy.clubIds[0] === star?.clubId)
           this.renew(legacy, year);
@@ -779,10 +779,14 @@ class CultureUpdate {
     this.nationalNames(year);
   }
 
-  /** Whether the sport is a country's #1 with fans of its own there (GDD v1.35). */
+  /**
+   * Whether the sport is a country's #1 there, with fans of its own and a league (GDD v1.35: a
+   * folded league's national name is lost with it and not reborn until a league forms again).
+   */
   numberOne(index: number): boolean {
-    const fans = this.state.countries[index]?.fans[PLAYER_INDEX];
-    if (!fans || fans.casual + fans.hardcore <= 0) return false;
+    const country = this.state.countries[index];
+    const fans = country?.fans[PLAYER_INDEX];
+    if (!country?.league || !fans || fans.casual + fans.hardcore <= 0) return false;
     return localRank(this.state, this.world, index) === 1;
   }
 

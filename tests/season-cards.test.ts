@@ -75,7 +75,7 @@ function summary(
     playoffs: [],
     startRatings: [1, 2, 3, 4, 5, 6, 7, 8].map((clubId) => ({ clubId, rating: 40 + clubId })),
     topScorer: null,
-    newStarId: null,
+    newStarIds: [],
     crowd: null,
     recordCrowd: false,
     playerOfSeason: null,
@@ -368,7 +368,8 @@ describe("season cards in play", () => {
   it("migrates a version 8 save: start ratings now, no season facts, nothing offered", () => {
     const noSeasonCards = withWorld(world, (content) => {
       content.events.cards = content.events.cards.filter(
-        (c) => !["seasonEnd", "tradition", "venue", "hall", "award"].includes(c.trigger),
+        // Star cards too: stars come from season 1 since GDD v1.35, and format 8 had none.
+        (c) => !["seasonEnd", "tradition", "venue", "hall", "award", "star"].includes(c.trigger),
       );
     });
     const played = runTurns(createCampaign(world, setupFor(5, "brazil")), noSeasonCards, 14);

@@ -1206,6 +1206,16 @@ capped by max capacity while fans outnumber seats stays as it is.
     slots.
   - *The breakout card asks:* the first star stays a headline; later breakouts are big cards that
     name the open slots ("Back her? 0 of 2 slots free") and offer Back directly at its price.
+  - *Built 2026-10-09 (calls made at build).* The Player of the Season and the top scorer become
+    stars outright, so the first star now comes in season 1; other club leaders need a club share
+    of 35% / 31% / 30% (low / medium / high scoring), tuned so the second half of a campaign has
+    a median of 2 more stars playing than backing slots (0 at the old 40% / 35% / 34%, 3 at 30% /
+    27% / 26%). Later breakouts are a decision card (Back, or Not now for free; both pay the
+    breakout's PP); the Back choice says the free slots and is blocked when they are full. Bot
+    campaigns (pacing, 36 campaigns, 200 turns): 64 stars a campaign (17 before), pacing passes,
+    #1 lost before the win in 22 of 35 (24 of 35 after topic 2) and 26/36 won. Knock-on, left for
+    a decision: star legacies 55 and signature moves 27 a campaign (about 0.4 and 0.2 a season
+    over ~128 seasons) and 48 Hall players (topic 4 retunes the Hall).
 - *Topic 4, a Hall that remembers careers.* 4 players in 41 seasons. Points counted only star
   seasons, awards, titles, top-scorer seasons and the record, never careers: the #4 all-time
   scorer (15,510) had 0 points and was not even waiting; a four-time top scorer had 13 of 24.

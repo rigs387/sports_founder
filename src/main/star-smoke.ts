@@ -3,7 +3,8 @@ import { COLLECT_NEWS } from "./smoke-news";
 
 /**
  * Flagship stars as cards (GDD v1.16): plays turns until a star card arrives (usually the
- * breakout moment), then opens it on the story board and checks it names a real player and club
+ * breakout moment, a backable one if it comes within 40 turns: GDD v1.35), then opens it on the
+ * story board and checks it names a real player and club
  * from the record.
  */
 export async function verifyStarCards(
@@ -35,8 +36,13 @@ export async function verifyStarCards(
     const found = await evaluate<string[]>(
       `[...${starTickets}].filter((t) => t.dataset.eventKind !== 'history').map((t) => t.dataset.eventTemplate)`,
     );
-    if (found.length > 0) {
-      const id = found[0] ?? "";
+    // A backable breakout (GDD v1.35) if one comes within 20 turns, else any star card.
+    const id = found.includes("star-backable")
+      ? "star-backable"
+      : played >= 40
+        ? found[0]
+        : undefined;
+    if (id) {
       await click(`.event-ticket[data-event-template="${id}"]`);
       await wait(`!!document.querySelector('[data-testid="event-story"] h3')`);
       const card = await evaluate<{ title: string; body: string }>(`(() => {
@@ -49,6 +55,8 @@ export async function verifyStarCards(
       // A missing name would leave an empty slot ("scored 3 times in 14 matches for  in ...").
       if (!card.title || !card.body || card.body.includes("{{") || card.body.includes("  "))
         throw new Error(`The star card is missing its text: ${JSON.stringify(card)}`);
+      if (id === "star-backable" && !/backing slots free/.test(card.body))
+        throw new Error(`The backable breakout must name the free slots: ${card.body}`);
       await screenshot("35-star-card.png");
       await click('[data-testid="events-close"]');
       return { card: id, ...card, turnsPlayed: played };

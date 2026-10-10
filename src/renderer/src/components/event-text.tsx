@@ -51,6 +51,7 @@ export function Effect({ effect, star = {} }: { effect: EventEffect; star?: Star
   if (effect.type === "clubRating")
     return <li>{t(`events.effects.clubRating_${effect.target}`, { count: effect.steps })}</li>;
   if (effect.type === "derbyStoke") return <li>{t("events.effects.derbyStoke")}</li>;
+  if (effect.type === "starBack") return <li>{t("events.effects.starBack")}</li>;
   return (
     <li className={effect.type === "hardcoreDemotion" ? "event-tradeoff" : undefined}>
       {t(`events.effects.${effect.type === "fanShift" ? effect.target : effect.type}`, {
@@ -171,6 +172,9 @@ export function useEventText() {
       matches: star.matches,
       seasons: star.seasons,
       share: star.clubScores > 0 ? star.scores / star.clubScores : 0,
+      // The backable breakout names the open backing slots (GDD v1.35).
+      free: Math.max(0, snapshot.flagship.backing.slots - snapshot.flagship.backing.used),
+      slots: snapshot.flagship.backing.slots,
       context: star.candidateId === null ? undefined : "mentor",
     };
   };

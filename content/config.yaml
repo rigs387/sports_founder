@@ -808,11 +808,14 @@ flagship:
   # medium 17%, high 16%), the first star at median season 5 / 2 / 5, and half fill the Amateur
   # star place. Stars lift runaway and foregone-league stories by a few points.
   stars:
-    # Refitted in GDD v1.34 with the realistic scorelines (more scores make shares steadier): each
-    # rule's top scorer passes as often as before (measured 2026-10-09, Brazil, 6 seeds × 25
-    # seasons: low 23%, medium 24%, high 29% of seasons).
-    share: { low: 0.4, medium: 0.354, high: 0.342 }
-    places: { amateur: 1, semi-pro: 2, professional: 3, elite: 4 }
+    # More stars than slots (GDD v1.35, replacing the top scorer's share bar): any standout season
+    # makes a star while places are open: the Player of the Season and the top scorer outright, or
+    # a club's leading player whose share of the club's scores reaches clubShare. Tuned on pacing
+    # (36 campaigns, 200 turns) to a median of 2 more stars playing than backing slots late on.
+    # Unbacked stars move clubs unbackedMoveFactor times as often.
+    clubShare: { low: 0.35, medium: 0.31, high: 0.3 }
+    unbackedMoveFactor: 2
+    places: { amateur: 2, semi-pro: 3, professional: 5, elite: 6 }
     strengthPerSkill: 0.08
     moveChance: 0.25
     # Star cards (step 6). The breakout moment's PP by league tier (it takes no moment slot).

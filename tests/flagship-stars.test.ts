@@ -47,31 +47,38 @@ const allToStars = (moveChance = 0) =>
   });
 
 describe("stars", () => {
-  it("makes the top scorer a star when they clear the bar and a place is open", () => {
+  it("makes standout seasons stars, standouts first, several a season while places are open", () => {
     const content = allToStars();
     const state = playSeasons(start(content), 6, content);
-    const [first, ...later] = state.flagship.seasons;
-    expect(first?.newStarId).toBe(first?.topScorer?.playerId);
+    const [first] = state.flagship.seasons;
+    const places = content.config.flagship.stars.places.amateur;
+    // Every leading player carries their club: the places fill in the first season.
+    expect(first?.newStarIds).toHaveLength(places);
+    const standouts = [first?.playerOfSeason, first?.topScorer?.playerId];
+    expect(standouts).toContain(first?.newStarIds[0]);
     expect(state.landmarks.filter((l) => l.kind === "firstStar")).toEqual([
-      expect.objectContaining({ season: 1, playerId: first?.newStarId }),
+      expect.objectContaining({ season: 1, playerId: first?.newStarIds[0] }),
     ]);
-    // Amateur has one star place: no new star while the first one plays.
-    const star = state.flagship.players.find((p) => p.id === first?.newStarId);
-    for (const summary of later) {
-      if (star?.retiredSeason === null || summary.season <= (star?.retiredSeason ?? 0)) {
-        expect(summary.newStarId).toBeNull();
-      }
-    }
-    expect(seatStars(state.flagship).length).toBeLessThanOrEqual(1);
+    expect(seatStars(state.flagship).length).toBeLessThanOrEqual(places);
   });
 
-  it("makes no star below the bar", () => {
+  it("makes only the standouts stars when no club leader reaches the club share", () => {
     const content = withConfig(world, (config) => {
-      config.flagship.stars.share = { low: 1.01, medium: 1.01, high: 1.01 };
+      config.flagship.stars.clubShare = { low: 1.01, medium: 1.01, high: 1.01 };
+    });
+    const state = playSeasons(start(content), 4, content);
+    for (const summary of state.flagship.seasons)
+      for (const id of summary.newStarIds)
+        expect([summary.playerOfSeason, summary.topScorer?.playerId]).toContain(id);
+  });
+
+  it("makes no star when no place is open", () => {
+    const content = withConfig(world, (config) => {
+      config.flagship.stars.places = { amateur: 0, "semi-pro": 0, professional: 0, elite: 0 };
     });
     const state = playSeasons(start(content), 4, content);
     expect(state.flagship.players.every((p) => p.starSince === null)).toBe(true);
-    expect(state.flagship.seasons.every((s) => s.newStarId === null)).toBe(true);
+    expect(state.flagship.seasons.every((s) => s.newStarIds.length === 0)).toBe(true);
   });
 
   it("adds strength to a star's club only", () => {
@@ -115,7 +122,11 @@ describe("careers", () => {
   });
 
   it("retires players after a final season and replaces them with young players at the club", () => {
-    const state = playSeasons(start(), 12);
+    // Stars stay put, so a retired player's club is still theirs when the replacement arrives.
+    const content = withConfig(world, (config) => {
+      config.flagship.stars.moveChance = 0;
+    });
+    const state = playSeasons(start(content), 12, content);
     const { players } = state.flagship;
     const retired = players.filter((p) => p.retiredSeason !== null);
     expect(retired.length).toBeGreaterThan(0);
@@ -167,7 +178,7 @@ describe("save format 13", () => {
       flagship: {
         ...played.flagship,
         players: plain.map(({ starSince: _s, finalSeason: _f, retiredSeason: _r, ...p }) => p),
-        seasons: played.flagship.seasons.map(({ newStarId: _n, ...s }) => s),
+        seasons: played.flagship.seasons.map(({ newStarIds: _n, ...s }) => s),
       },
     };
     const loaded = deserializeSave(JSON.stringify({ formatVersion: 12, state: v12 }), world);
@@ -177,7 +188,7 @@ describe("save format 13", () => {
       flagship: {
         ...played.flagship,
         players: plain,
-        seasons: crowdless(played.flagship.seasons).map((s) => ({ ...s, newStarId: null })),
+        seasons: crowdless(played.flagship.seasons).map((s) => ({ ...s, newStarIds: [] })),
       },
       culture: migratedCulture(played),
       hallOfFame: migratedHall(played),

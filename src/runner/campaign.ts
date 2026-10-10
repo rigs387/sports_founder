@@ -519,8 +519,34 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           distinctChampions: titles.size,
           mostTitles: Math.max(0, ...titles.values()),
           starsMade: state.flagship.players.filter((p) => p.starSince !== null).length,
-          starsBacked: actions.filter((a) => a.type === "backStar").length,
+          // Backed on the offseason screen or from a breakout card (GDD v1.35).
+          starsBacked:
+            actions.filter((a) => a.type === "backStar").length +
+            actions.filter((a) => a.type === "chooseEvent" && a.choiceId === "back").length,
           firstBackTurn,
+          firstStarSeason:
+            state.flagship.players.reduce<number | null>(
+              (first, p) =>
+                p.starSince === null ? first : Math.min(first ?? p.starSince, p.starSince),
+              null,
+            ) ?? null,
+          // Stars playing a season, over the second half of the campaign's seasons, and the
+          // backing slots at the end (GDD v1.35: one or two more stars than slots).
+          starsPlaying: (() => {
+            const seasons = state.flagship.seasons.map((s) => s.season);
+            const late = seasons.slice(Math.floor(seasons.length / 2));
+            const playing = (s: number) =>
+              state.flagship.players.filter(
+                (p) =>
+                  p.starSince !== null &&
+                  p.starSince <= s &&
+                  (p.retiredSeason === null || p.retiredSeason >= s),
+              ).length;
+            const counts = late.map(playing).sort((a, b) => a - b);
+            return counts[Math.floor(counts.length / 2)] ?? 0;
+          })(),
+          backingSlots:
+            world.config.ppTiers.find((t) => t.tier === state.ppTier)?.backingSlots ?? 0,
         };
       })(),
       deals: {
