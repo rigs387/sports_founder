@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.36 | October 11, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size; v1.36: fourth playtest follow-ups)*
+*Version 1.37 | October 12, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size; v1.36: fourth playtest follow-ups; v1.37: the world stage — standouts in other leagues, talent pull, a signing card and Player of the Year; national teams assembled for each championship; the World Championship founded, hosted and played on its own page)*
 
 ---
 
@@ -813,6 +813,75 @@ the game does not stop that, it makes them play differently.
   club football — a country without a pro league can field a strong team from stars abroad.
 - **Upsets:** matches are simulated with genuine upset chances; an underdog's deep run gives a
   large boost in that country ("Tuvalu reaches the semifinal").
+
+**The world stage, topic 1: standouts in other leagues (decided 2026-10-12, v1.37).** The first of
+three topics; national teams and the World Championship follow. Every number is config
+(`standouts`).
+- *Who has them:* every Professional or Elite league other than the flagship: 2 at Professional,
+  3 at Elite (config). Amateur and Semi-Pro leagues have none.
+- *They persist:* a standout is created when its league reaches Professional, born in a real place
+  of the league's country with a name from its pool, and has a hidden skill on the flagship's
+  career curve. They age, retire and are replaced by the flagship's rules. They play no matches,
+  belong to no club and score nothing. A league that folds or drops below Professional loses its
+  standouts. This replaces v1.12's "created only when they are needed": a national team's star
+  needs a real past.
+- *No effect on their own:* a name on the country card and in the leagues table. Their payoff is
+  the national team (topic 2).
+- *Talent pull:* each offseason, while the flagship is Professional or Elite, the best standout
+  abroad may join a flagship club as its leading player (chance and a cap per offseason in
+  config). The home league loses them and gets a replacement by the usual rule. Their home country
+  follows them: the flagship's broadcast into that country is lifted while they play (config).
+  They keep their nationality, so a country with a weak league can still field a strong team.
+- *The signing card:* a decision card names a standout abroad who is ready to move. Paying PP
+  brings them to the flagship now; the free default changes nothing. A standing PP purchase for
+  signing players is not built for now.
+- *Player of the Year:* a line only, no card. The flagship's Player of the Season against every
+  standout, weighted by league tier (config); it is recorded each season and listed in the
+  Almanac. Skill itself stays hidden.
+- *The Hall of Fame stays the flagship's.* Standouts are not inducted; topic 3 decides whether
+  championship records count.
+
+**The world stage, topic 2: national teams (decided 2026-10-12, v1.37).** Every number is config
+(`nationalTeams`).
+- *Who can field a team:* any country with a league at Semi-Pro or above. A team with no named
+  players plays on its league alone. The market size ceilings keep countries under 50,000 people
+  at Amateur, so the smallest markets enter only as the seat or as host (topic 3).
+- *Strength:* a base from the country's league tier and hardcore fan share, plus its best named
+  nationals wherever they play (weights in config). A star at the flagship lifts their home team.
+- *Three players count:* the best 3 named nationals (config), flagship leading players and
+  standouts alike. Nationality is the country of birth and never changes.
+- *Assembled, not kept:* no team exists between championships. A squad is read from the records
+  when a championship begins and stays as that tournament's record. No friendlies, no rankings
+  simulated in between.
+- *On screen:* a national teams list ranked by strength, naming each team's players. Strength
+  numbers stay hidden, like skill; the list shows the order.
+- *No cost to the flagship:* national duty does not tire or weaken a flagship club. (Choose pain
+  was offered and declined here.)
+
+**The world stage, topic 3: the World Championship (decided 2026-10-12, v1.37).** It fills in the
+Phase 2 outline above, which stands. Every number is config (`worldChampionship`).
+- *Founding is a paid choice:* an offseason action, open once 16 countries can field a team
+  (config), priced in PP (quarters of income) and named by the player, with a default name. The
+  first tournament is played the year after, then every 4 years, so the founding year sets the
+  calendar for good.
+- *No protection from rival years:* if a tournament falls in a rival's championship year, both
+  run and both lifts land. The player chose the year.
+- *Hosting:* in the offseason before each tournament 3–4 countries bid (config), drawn from
+  countries with a league and weighted by wealth; the player picks one. The market the player
+  wants may not bid. The host enters whatever its league's tier. With no pick, the wealthiest
+  bidder hosts.
+- *One turn, with pomp:* the whole tournament plays in one turn and opens its own championship
+  page, as the offseason does: the draw, the bracket round by round, the champion. The champion is
+  also a headline. Story cards tell the seat country's run and an underdog's deep run. The page
+  keeps every past tournament's bracket.
+- *Effects:* a casual lift for a year in every participating country, larger the further its team
+  went and sized like the rivals' championships; PP pickups; a large hardcore conversion and cash
+  boost for the host; a large boost for an underdog's deep run. A favorite (a top seed, config)
+  knocked out in the first round loses casual fans at home.
+- *The Hall of Fame:* flagship players on the winning team earn Hall points (config). Standouts
+  are still never inducted.
+- *Measure after building:* this is new ground gained against the rivals; the #1 contest (about
+  half lose #1 before the win) is remeasured and the lifts tuned to keep it.
 
 **Hall of Fame:** Annual classes selected automatically from retained records (career thresholds in
 config). Wings: players, league directors, founding-family members, and a Moments wing for landmark
@@ -2206,9 +2275,6 @@ Items flagged during the interview that need further discussion in future sessio
 - Water as a genome surface option (parked 2026-09-13).
 - Women's sports (parked 2026-10-03): a women's version of the player's sport, as an option built
   much later. Until then every sport is men's (players, name pools, text).
-- Flagship talent pull (parked 2026-10-05, v1.23): the flagship should work like the Premier
-  League or the NBA, a top flight that draws the world's best players. Foreign stars moving in
-  need named standouts in other leagues first; build it with them, not with the broadcast.
 - Standing policies (parked 2026-10-07, v1.30): nothing to delegate while other leagues have no
   business; they return with individual deals or venues at other leagues.
 - Flagship ticket pricing (parked 2026-10-07, v1.30): a cheap, standard or premium stance (more
@@ -2226,8 +2292,6 @@ Items flagged during the interview that need further discussion in future sessio
 - Late rewards in what is scarce late (parked 2026-10-08, v1.32): late in a campaign PP piles up
   (~100K banked) and card PP rewards are noise, but scaling them up ends the #1 contest. Late cards
   could pay in fans, cash or culture instead. Needs a design session.
-- Player of the Year (parked 2026-10-08, v1.33): a global award once other leagues have named
-  players; until then it would always name the flagship's Player of the Season.
 - Collective bargaining agreement (parked 2026-10-09, third playtest): late leagues pile up cash
   with nothing to spend it on (a turn-89 save held $2.87 trillion across leagues; the flagship
   earned $1.6B a quarter against $80M of costs). A CBA with a players' union would claim a share

@@ -27,10 +27,11 @@ import { newLeague } from "./leagues";
 import { newFront, newRivalState } from "./rivals";
 import { MAX_SEED } from "./rng";
 import { defaultGenome } from "./setup";
+import { newStandouts } from "./standouts";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 26;
+export const SAVE_FORMAT_VERSION = 27;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -614,6 +615,22 @@ const gameStateSchema = z.strictObject({
     nextId: z.int().min(1),
     ballots: z.array(z.strictObject({ playerId: z.int().min(1), classes: z.int().min(1) })),
   }),
+  standouts: z.strictObject({
+    rng: z.array(z.number()).min(1),
+    season: z.int().min(1),
+    players: z.array(
+      z.strictObject({
+        id: z.int().min(1),
+        name: z.string().min(1),
+        countryId: z.string().min(1),
+        birthplace: z.string().min(1),
+        birthSeason: z.int(),
+        peakSkill: z.number(),
+        skill: z.number(),
+        finalSeason: z.boolean(),
+      }),
+    ),
+  }),
 });
 
 const saveFileSchema = z.strictObject({
@@ -632,6 +649,17 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 26 → 27: standouts (GDD v1.37). None yet; leagues fill their places at the next turn's end.
+  26: (save) => {
+    const flagship = save.state.flagship as FlagshipState;
+    return {
+      formatVersion: 27,
+      state: {
+        ...save.state,
+        standouts: newStandouts(save.state.seed as number, flagship.season),
+      },
+    };
+  },
   // 25 → 26: growth tracks (GDD v1.35). Old nodes the tracks still have are kept, in order, while
   // their track's rules hold (the levels before, a side of the fork before, no fork sibling); the
   // rest are dropped without a refund.

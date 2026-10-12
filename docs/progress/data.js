@@ -1,8 +1,8 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-11",
-  design: "GDD v1.36",
+  updated: "2026-10-12",
+  design: "GDD v1.37",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -12,11 +12,11 @@ window.SF_PROGRESS = {
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
-    date: "2026-10-11",
-    tests: 613,
-    files: 64,
-    note: "npm run check passed after the fourth playtest follow-ups (type checks, Biome, purity, 613 tests in 64 files). Lint has existing visual-study warnings.",
-    smokeDate: "2026-10-10",
+    date: "2026-10-12",
+    tests: 619,
+    files: 65,
+    note: "npm run check passed after standouts were built (type checks, Biome, purity, 619 tests in 65 files). Lint has existing visual-study warnings.",
+    smokeDate: "2026-10-12",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
   },
@@ -82,13 +82,13 @@ window.SF_PROGRESS = {
   watch: [
     {
       title: "Early upgrades feel automatic",
-      text: "Five growth nodes were over-selected across strategies. Revisit prices, prerequisites and early forks.",
-      date: "2026-09-22",
+      text: "Five growth nodes were over-selected across strategies on the old tree. The tracks replaced it on 2026-10-10 (bots buy 46 of 48 levels in 200 turns), so the choice now lies in the forks. No fork side shares are recorded here yet: measure them with the options experiment.",
+      date: "2026-10-12",
       system: "growth",
     },
     {
       title: "The #1 hold is now a contest",
-      text: "Lead lost before the win in 36 of 70 campaigns (51%), on target, after Culture (traditions shelter the player's hardcore fans from rivals). Builder, 12 typical anchors × 6 seeds, 200 turns. Championships and rich-market defense carry it. Remeasure when new pressure lands.",
+      text: "Lead lost before the win in 36 of 70 campaigns (51%), on target, after Culture (traditions shelter the player's hardcore fans from rivals). Builder, 12 typical anchors × 6 seeds, 200 turns. Championships and rich-market defense carry it. With the growth tracks it held at 13 of 24 (2026-10-10). Not yet remeasured with two-quarter turns at tier 5 (GDD v1.36).",
       date: "2026-10-04",
       system: "rivals",
     },
@@ -100,6 +100,24 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-12",
+      type: "Built",
+      title: "Standouts in other leagues",
+      text: "Tech plan 2.23, build order 1 of 7 (GDD v1.37): Professional leagues other than the flagship have two named standouts and Elite leagues three, born in real places of their country. They age, announce a final season and retire by the flagship's career rules, and a young replacement takes a retiree's place; a league that folds, steps down or takes the seat loses them. They have no effect yet. The country card names them and the leagues table has a Standouts column. Save format 27. One builder campaign (Germany, 140 turns) ended with 472 standouts in 173 leagues. npm run check: 619 tests in 65 files; smoke passed, though its short campaign has no Professional league abroad, so the names themselves were not seen on screen.",
+    },
+    {
+      date: "2026-10-12",
+      type: "Design",
+      title: "The world stage: standouts in other leagues",
+      text: "GDD v1.37, tech plan 2.23 (planned, nothing built). The first of three topics toward the World Championship. Professional and Elite leagues other than the flagship get persistent named standouts (2 / 3) with a hidden skill and no matches or effect of their own. Talent pull: each offseason the best standout abroad may join a flagship club, the home country follows through the broadcast, and they keep their nationality. A signing card lets the player pay PP to bring one in. Player of the Year becomes a line. The Hall stays the flagship's. National teams (topic 2): any country with a Semi-Pro or better league fields one, on a base from its league plus its best three named nationals wherever they play, assembled when a championship begins and shown as a ranked list. The World Championship (topic 3): founded in an offseason for PP once 16 countries can field a team, played the year after and every four years; three or four countries bid to host and the player picks; it plays in one turn on its own page with a draw, a bracket and a champion; lifts by how far each team went, a host boost, and casual losses at home for a top seed out in round one; Hall points for flagship players who win it. Build order in tech plan 2.23, seven steps.",
+    },
+    {
+      date: "2026-10-12",
+      type: "Review",
+      title: "Dashboard brought up to date",
+      text: "Checklists compared with the code, content and GDD v1.36. Corrected: the growth card described the old 20-node tree (now four tracks of 12 levels with three forks each); Venues & youth listed the flagship's venue levels as planned (built in v1.30); the Hall card still had the Moments wing (dropped in v1.35); the event library read 26 cards (42 in content/events.yaml); auto-advance was listed as planned (dropped in v1.25). Added what was built but unlisted: saves folder and autosaves, standings and the #1 sport map view, the leagues table, bulk promotion and market size ceilings, the v1.35 stars and traditions, and the v1.36 rivalries. No game code changed.",
+    },
     {
       date: "2026-10-11",
       type: "Built",
@@ -525,6 +543,7 @@ window.SF_PROGRESS = {
         ["built", "Victory hold, anchor loss and continued post-win play"],
         ["built", "Atomic saves, migrations and deterministic resume"],
         ["built", "Permanent landmarks and annual world fan snapshots"],
+        ["built", "Saves folder, a Load list and three rolling autosaves (GDD v1.35)"],
         ["planned", "Post-win legacy goals and retirement retrospective"],
       ],
     },
@@ -547,9 +566,15 @@ window.SF_PROGRESS = {
         ["built", "Focus slots and cold-launch costs"],
         ["built", "Big markets: genome fit softens in giants; four wealth levels weigh Prestige"],
         ["built", "Interactive map, market selection and real trends"],
-        ["partial", "Map lenses: fandom and rival signals exist; the full set remains"],
+        [
+          "built",
+          "Standings: every sport's Fandom Score, fans and countries led by year; each country's local rank (GDD v1.35)",
+        ],
+        [
+          "partial",
+          "Map lenses: fandom, rival signals and the #1 sport view exist; league health, finances, spread channels and affinity remain",
+        ],
         ["planned", "Animated turn recap and story pickups on the map"],
-        ["planned", "Auto-advance: Play / Pause with speeds, stopping when something needs you"],
       ],
     },
     {
@@ -590,20 +615,30 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 3",
       icon: "04",
-      summary: "Permanent global investments with forks, local conditions and rising prices.",
-      next: "Break up automatic early purchases; extend categories as their underlying systems arrive.",
+      summary:
+        "Four tracks of permanent global investments, with forks that shape the sport, local conditions and rising prices.",
+      next: "Measure fork side shares with the options experiment; decide whether the original Infrastructure and Global categories still belong.",
       depends: ["world"],
       sources: [
         ["Playable growth board", "../growth-tree/production.md"],
         ["Node definitions", "../../content/growth-tree.yaml"],
       ],
       items: [
-        ["built", "20 Grassroots and Media nodes with four exclusive forks"],
-        ["built", "Prerequisites, tier locks and sport-size price scaling"],
-        ["built", "Live board with effect details and fork confirmation"],
-        ["partial", "Meaningful build diversity: five early nodes remain over-selected"],
-        ["built", "Culture category: ten nodes nurturing traditions, with one fork"],
-        ["planned", "Infrastructure and Global categories"],
+        [
+          "built",
+          "Four tracks (Grassroots, Media, Institutions, Culture) of 12 levels, each with a two-sided fork at levels 4, 8 and 12 (GDD v1.35)",
+        ],
+        ["built", "Levels in order, tier locks and prices in quarters of PP income (GDD v1.34)"],
+        ["built", "Live board with effect previews in the top markets and fork confirmation"],
+        [
+          "partial",
+          "Meaningful build diversity: bots buy nearly every level, so the forks carry the choice; fork side shares not yet recorded",
+        ],
+        ["built", "Culture track nurtures traditions; shaping forks change the sport everywhere"],
+        [
+          "planned",
+          "Infrastructure and Global categories from the original tree (not among the four tracks; needs a decision)",
+        ],
       ],
     },
     {
@@ -613,7 +648,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
       summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
-      next: "Talent pull waits for named players in other leagues; venues (upkeep, payroll, standing policies) come with the business layer.",
+      next: "Talent pull waits for named players in other leagues; standing policies and league directors are parked until other leagues have business of their own.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
@@ -637,13 +672,24 @@ window.SF_PROGRESS = {
           "built",
           "Flagship broadcast: media reach where it airs by season interest and health, pulses, ripple (GDD v1.23, v1.27)",
         ],
+        ["planned", "Talent pull toward the flagship and a signing card (designed, GDD v1.37)"],
+        [
+          "built",
+          "Leagues overview: a sortable table of every league and bulk promotion (GDD v1.34)",
+        ],
+        [
+          "built",
+          "Market size ceilings: a league's tier is capped by its country's population (GDD v1.35)",
+        ],
         [
           "planned",
-          "Talent pull toward the flagship (parked until other leagues have named players)",
+          "Deeper player tiers, transfers and contracts beyond the flagship's leading players",
         ],
-        ["planned", "Tiered player depth, careers, transfers and payroll contracts"],
-        ["planned", "Standing policies and hired league directors"],
-        ["planned", "Anchor purist resentment from neglect, rule changes and seat moves"],
+        ["planned", "Standing policies and hired league directors (parked, GDD v1.30)"],
+        [
+          "partial",
+          "Anchor resentment: rule changes and seat moves cost anchor purists (a stand-in); resentment itself and neglect remain",
+        ],
       ],
     },
     {
@@ -653,7 +699,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 5",
       icon: "06",
       summary: "Real campaign facts produce playable moments and decisions.",
-      next: "Add bot choice policies and expand stories as teams and stars supply richer facts.",
+      next: "Broader negative events and personal stories as teams and stars supply richer facts.",
       depends: ["foundation"],
       sources: [
         ["Event board and initial deck", "../events/README.md"],
@@ -670,10 +716,7 @@ window.SF_PROGRESS = {
           "Moments have weight: big back pages and headline front pages that wait for you (GDD v1.26)",
         ],
         ["built", "Auto-collect for minor moments (on by default, GDD v1.32)"],
-        [
-          "partial",
-          "Event library: 26 of a planned 40–60 cards (8 season, 8 star, 2 rival contest cards)",
-        ],
+        ["built", "Event library: 42 cards in content/events.yaml (planned 40–60)"],
         ["planned", "Broader tier-weighted negative events and personal stories"],
         ["built", "Bots that weigh and choose non-default options"],
       ],
@@ -776,7 +819,7 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Flagship stars are built and on screen (tech plan 2.6). Lightweight standouts in other leagues remain planned.",
+      next: "Standouts exist in other leagues (tech plan 2.23, build order 1). Next: talent pull toward the flagship, the broadcast follow and the signing card (build order 2).",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
@@ -798,13 +841,23 @@ window.SF_PROGRESS = {
         ["built", "Scoring frequency sets flagship match chances, fixed per season"],
         ["built", "Each club's named leading player, born in a real place (simulation only)"],
         ["built", "Scores credited to leading players; career lines and top scorers"],
-        ["built", "Stars made by a season: top scorer, club share, 1–4 places by tier"],
+        [
+          "built",
+          "Stars made by a season: the Player of the Season, the top scorer and dominant club scorers, several a season while places are open (GDD v1.35)",
+        ],
+        [
+          "built",
+          "Later stars break out as a Back decision; unbacked stars move clubs more often (GDD v1.35)",
+        ],
         ["built", "Star cards: breakout, final season, retirement, moves, records"],
         [
           "built",
           "Stars panel: recorded facts, influence bars, backing with a review step, names on the table and map",
         ],
-        ["planned", "Lightweight standouts in leagues other than the flagship"],
+        [
+          "built",
+          "Named standouts in Professional and Elite leagues other than the flagship: careers, no effect yet (GDD v1.37)",
+        ],
         [
           "built",
           "Persistent careers: skill curve, final seasons, retirement, moves and league scoring records",
@@ -821,7 +874,7 @@ window.SF_PROGRESS = {
       icon: "11",
       summary:
         "Derbies, club rites, star legacies, national names, famous grounds and the trophy are born from what happened; they shelter fans and resist betrayal.",
-      next: "Bots still never buy Culture nodes (0 of 36 campaigns, 2026-10-07): give them a reason or a weight. Films and books later, as flavor.",
+      next: "Films and books later, as flavor.",
       depends: ["leagues", "stars", "creation"],
       sources: [
         ["Culture and artifacts design", "../../sports-founder-gdd.md#progression--economy"],
@@ -841,6 +894,14 @@ window.SF_PROGRESS = {
           "Famous grounds, the trophy, and chants and anthems that spread with their fans (the homegrown gear brand stays a deal partner, GDD v1.31)",
         ],
         ["built", "Culture upgrades nurture existing traditions; never buy fame"],
+        [
+          "built",
+          "National names where the sport is a country's #1; curses and redemptions, eras, the Invincibles, signature moves and matchday food (GDD v1.35)",
+        ],
+        [
+          "built",
+          "Rivalries from close races, playoff meetings and shared towns; titles and a heritage floor keep traditions alive (GDD v1.36)",
+        ],
       ],
     },
     {
@@ -849,14 +910,22 @@ window.SF_PROGRESS = {
       group: "core",
       gdd: "GDD system 9 · simple version in Phase 1",
       icon: "12",
-      summary: "Cash investments that grow local commitment and homegrown talent.",
-      next: "Build simple league capacity and youth levels alongside the business layer.",
+      summary:
+        "The flagship builds its ground with league cash; youth programs and homegrown talent are parked.",
+      next: "Youth programs, ticket pricing and venues at other leagues are parked (GDD v1.30).",
       depends: ["business"],
-      sources: [["Venues and youth design", "../../sports-founder-gdd.md#progression--economy"]],
+      sources: [
+        ["Venues and youth design", "../../sports-founder-gdd.md#progression--economy"],
+        ["Venues and payroll", "../venues/README.md"],
+      ],
       items: [
-        ["planned", "Cash-funded venue levels, construction and gate caps"],
-        ["planned", "Youth levels, upkeep and local conversion effects"],
-        ["planned", "Homegrown player quality and deeper venue identity"],
+        [
+          "built",
+          "Flagship venue levels 1–5: built with league cash over seasons, upkeep, a gate cap and a conversion lift (GDD v1.30)",
+        ],
+        ["built", "Max capacity and attendance a game, sellouts and record crowds (GDD v1.34)"],
+        ["planned", "Youth programs and their local conversion effects (parked)"],
+        ["planned", "Homegrown player quality and flagship ticket pricing (parked)"],
       ],
     },
     {
@@ -866,7 +935,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 10 · light version in Phase 1",
       icon: "13",
       summary:
-        "A lightweight Hall of Fame (players and the sport's firsts) chosen from retained records each season, and an Almanac tab with plaques, a Waiting list and records.",
+        "A players-only Hall of Fame voted each season from a ballot of retired careers, and an Almanac tab with plaques, the Ballot, the sport's history and records.",
       next: "League directors and founding family when those people exist; all-time leaderboards, the heatmap timelapse and history charts in the Almanac.",
       depends: ["stars", "leagues"],
       sources: [
@@ -884,12 +953,17 @@ window.SF_PROGRESS = {
           "Record-based induction and home-country stickiness (shrine weight inside the cap)",
         ],
         [
+          "built",
+          "Classes voted from a ballot on career points, with near-misses and players passed over (GDD v1.35)",
+        ],
+        ["built", "The sport's firsts as dated history in the Almanac, never inducted (GDD v1.35)"],
+        [
           "partial",
-          "Players and Moments wings built; league directors and founding family wait for those people",
+          "Players wing built; league directors and founding family wait for those people",
         ],
         [
           "partial",
-          "Browsable Almanac with plaques, a Waiting list and records; leaderboards and retrospective charts later",
+          "Browsable Almanac with plaques, the Ballot, history, records and the roll of champions; all-time leaderboards, the heatmap timelapse and retrospective charts later",
         ],
       ],
     },
@@ -915,13 +989,22 @@ window.SF_PROGRESS = {
       gdd: "GDD system 12",
       icon: "15",
       summary: "Found and name the sport's international competition.",
-      next: "Wait for teams and player strength; then add a four-year knockout tournament.",
+      next: "Designed (GDD v1.37). Build after standouts and national teams: tech plan 2.23, steps 5–7.",
       depends: ["national"],
       sources: [["Championship design", "../../sports-founder-gdd.md#progression--economy"]],
       items: [
-        ["planned", "Player-founded and named four-year championship"],
-        ["planned", "Host bids, selection and local benefits"],
-        ["planned", "16/32-team knockout, genuine upsets and growth effects"],
+        [
+          "planned",
+          "Player-founded and named four-year championship, a paid offseason action (designed, GDD v1.37)",
+        ],
+        [
+          "planned",
+          "Host bids (3–4, weighted by wealth), selection and local benefits (designed, GDD v1.37)",
+        ],
+        [
+          "planned",
+          "16/32-team knockout in one turn on its own page; upsets, lifts by round and the favorite's flop (designed, GDD v1.37)",
+        ],
       ],
     },
     {
@@ -935,8 +1018,14 @@ window.SF_PROGRESS = {
       depends: ["stars"],
       sources: [["National team design", "../../sports-founder-gdd.md#progression--economy"]],
       items: [
-        ["planned", "Nationality-based selection from club players"],
-        ["planned", "Team strength for international tournament results"],
+        [
+          "planned",
+          "Nationality-based selection: the best three named nationals wherever they play (designed, GDD v1.37)",
+        ],
+        [
+          "planned",
+          "Team strength from league tier, hardcore share and named players; a ranked list (designed, GDD v1.37)",
+        ],
       ],
     },
     {

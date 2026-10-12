@@ -322,6 +322,13 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   player's hardcore fans fall away (`quieten`), and are betrayed by modernizing the grounds. A
   chant's first follower abroad is a `chantSpread` landmark and a toast. The homegrown gear brand
   is not a tradition.
+- Standouts (GDD v1.37) live in `src/sim/standouts.ts` and `GameState.standouts`: named players
+  of Professional and Elite leagues other than the flagship (`standouts.places`), with a career
+  curve and no club, matches or effect. `updateStandouts` runs once per `endTurn` after culture,
+  on its own random stream: they age and retire by the flagship's career rules when the flagship
+  starts a new season, and leagues are trimmed and filled to their places. Ids come from
+  `flagship.nextPlayerId`. Skill stays out of the snapshot (`CountrySnapshot.standouts`). Talent
+  pull, national teams and the World Championship are designed, not built (tech plan 2.23).
 - The win hold is a contest (GDD v1.8): near #1 (`rivalAI.nearTop`) rival intensity peaks just past
   parity, rivals defend wherever the player holds ground in their territory, and they may buy more
   countermoves per quarter. The runner reports how many campaigns lost #1 before winning; the
@@ -400,6 +407,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 25 makes the Hall players only (GDD v1.35): ballots, near-misses, career units and
   all-time rank on inductee facts. Format 24 migrates with the Moments wing dropped, nobody passed
   over and no near-misses.
+- Save format 27 adds standouts (GDD v1.37): `GameState.standouts`. Format 26 migrates with none;
+  leagues fill their places at the next turn's end.
 - The saves folder (GDD v1.35) is `savesFolder` in `src/main/save-files.ts`: Saved Games\Sports
   Founder on Windows. Each session save carries a `header` for the Load screen (the Campaign
   menu's list, `campaign:list` / `campaign:open-named`); an autosave after each turn keeps

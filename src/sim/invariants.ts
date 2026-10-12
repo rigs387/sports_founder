@@ -8,6 +8,7 @@ import { forkOf } from "./growth";
 import { hallProblems } from "./hall-of-fame";
 import { identityStateProblems } from "./identity";
 import { rulesProblems } from "./rules";
+import { standoutProblems } from "./standouts";
 import {
   ESCALATION_LEVELS,
   type GameState,
@@ -32,6 +33,7 @@ export function invariantsOf(state: GameState, world: World): string[] {
     ...rulesProblems(state),
     ...cultureProblems(state, world),
     ...hallProblems(state),
+    ...standoutProblems(state, world),
   ];
 
   if (!Number.isInteger(state.turn) || state.turn < 1)

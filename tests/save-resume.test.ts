@@ -21,6 +21,7 @@ import {
   firstAnchor,
   migratedCulture,
   migratedHall,
+  migratedStandouts,
   presetGenome,
   setupFor,
   venueless,
@@ -350,6 +351,7 @@ describe("saves with the growth tree (format 5)", () => {
         rules: { amendments: [] },
         culture: migratedCulture({ ...withoutTree, ...migratedFlagship(withoutTree) }),
         hallOfFame: migratedHall({ ...withoutTree, ...migratedFlagship(withoutTree) }),
+        standouts: migratedStandouts({ ...withoutTree, ...migratedFlagship(withoutTree) }),
       }),
     );
     const later = playWithPolicy(loaded, 6);
@@ -378,6 +380,7 @@ describe("saves with the growth tree (format 5)", () => {
       rules: { amendments: [] },
       culture: migratedCulture({ ...current, ...migratedFlagship(current) }),
       hallOfFame: migratedHall({ ...current, ...migratedFlagship(current) }),
+      standouts: migratedStandouts({ ...current, ...migratedFlagship(current) }),
     };
     expect(serializeSave(loaded)).toBe(serializeSave(migrated));
     expect(playWithPolicy(loaded, 6)).toStrictEqual(playWithPolicy(migrated, 6));

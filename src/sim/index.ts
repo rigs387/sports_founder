@@ -34,6 +34,7 @@ export * from "./shape";
 export * from "./snapshot";
 export * from "./spread";
 export * from "./standings";
+export * from "./standouts";
 export * from "./star-cards";
 export * from "./tiers";
 export * from "./tournaments";

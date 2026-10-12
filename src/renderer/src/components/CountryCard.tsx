@@ -101,6 +101,14 @@ export function CountryCard({
                 ? t("map.maxTierSeat")
                 : t("map.maxTier", { tier: t(`league.tiers.${country.maxTier}`) })}
             </p>
+            {country.standouts.length > 0 && (
+              <p className="wealth-level" data-testid="country-standouts">
+                {t("map.standouts", {
+                  count: country.standouts.length,
+                  names: country.standouts.map((player) => player.name),
+                })}
+              </p>
+            )}
           </div>
           <button
             type="button"

@@ -843,6 +843,36 @@ export interface GameState {
   culture: CultureState;
   /** The Hall of Fame's inductees (GDD v1.31). */
   hallOfFame: HallOfFameState;
+  /** Named standouts in leagues other than the flagship (GDD v1.37). */
+  standouts: StandoutsState;
+}
+
+/**
+ * A named standout of a Professional or Elite league other than the flagship (GDD v1.37): a
+ * person with a career curve and no club, matches or scores.
+ */
+export interface Standout {
+  /** Unique within the campaign, from the same sequence as the flagship's players. */
+  id: number;
+  name: string;
+  /** The league's country, where the standout was born in one of its real places. */
+  countryId: string;
+  birthplace: string;
+  /** The flagship season the standout was born in, as for the flagship's players. */
+  birthSeason: number;
+  peakSkill: number;
+  skill: number;
+  /** Whether the season being played is their last. */
+  finalSeason: boolean;
+}
+
+export interface StandoutsState {
+  /** The standouts' own random stream, so the world's sequence never depends on them. */
+  rng: number[];
+  /** The flagship season the standouts were last aged into. */
+  season: number;
+  /** Everyone playing, in id order. */
+  players: Standout[];
 }
 
 /** The career facts a player's induction quotes, read from retained records (GDD v1.31). */

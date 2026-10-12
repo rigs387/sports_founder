@@ -17,6 +17,7 @@ import {
   crowdless,
   migratedCulture,
   migratedHall,
+  migratedStandouts,
   setupFor,
   venueless,
   world,
@@ -160,6 +161,7 @@ describe("save format 10", () => {
         },
         culture: migratedCulture(played),
         hallOfFame: migratedHall(played),
+        standouts: migratedStandouts(played),
       }),
     );
     const next = closeOffseason(playSeasons(loaded, 3), world);

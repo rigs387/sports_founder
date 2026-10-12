@@ -602,8 +602,11 @@
         "health": "Health",
         "hardcore": "Hardcore",
         "cash": "Cash",
+        "standouts": "Standouts",
         "promotion": "Promotion"
       },
+      "standouts": "{{names, list}}",
+      "noStandouts": "—",
       "top": "Top tier",
       "noLimit": "No limit (seat)",
       "ready": "Ready for {{tier}}",
@@ -1286,6 +1289,8 @@
     "backedStars_other": "Backed stars: {{names, list}}",
     "wealthLevel": "Spending power: {{level}}",
     "maxTier": "League ceiling: {{tier}}",
+    "standouts_one": "League standout: {{names, list}}",
+    "standouts_other": "League standouts: {{names, list}}",
     "maxTierSeat": "League ceiling: none while it holds the seat",
     "wealthLevels": {
       "shoestring": "Shoestring",

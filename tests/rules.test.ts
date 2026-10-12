@@ -25,6 +25,7 @@ import {
   crowdless,
   migratedCulture,
   migratedHall,
+  migratedStandouts,
   setupFor,
   venueless,
   withConfig,
@@ -212,6 +213,7 @@ describe("the review and saves", () => {
           flagship: { ...state.flagship, seasons: crowdless(state.flagship.seasons) },
           culture: migratedCulture(state),
           hallOfFame: migratedHall(state),
+          standouts: migratedStandouts(state),
         }),
       ),
     );

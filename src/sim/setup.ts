@@ -9,6 +9,7 @@ import { newLeague } from "./leagues";
 import { landmarks } from "./records";
 import { newFront, newRivalState } from "./rivals";
 import { createRngState, MAX_SEED } from "./rng";
+import { newStandouts } from "./standouts";
 import {
   type CampaignSetup,
   type CountryState,
@@ -96,7 +97,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     i === 0 ? setup.anchorCountryId : null,
   );
 
-  const founded: Omit<GameState, "identity" | "rules" | "culture" | "hallOfFame"> = {
+  const founded: Omit<GameState, "identity" | "rules" | "culture" | "hallOfFame" | "standouts"> = {
     seed: setup.seed,
     rng: createRngState(setup.seed),
     anchorCountryId: setup.anchorCountryId,
@@ -140,6 +141,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     rules: { amendments: [] },
     culture: newCulture(setup.seed, 1, founded.landmarks.length, 0, world),
     hallOfFame: newHallOfFame(1),
+    standouts: newStandouts(setup.seed, 1),
   };
 }
 

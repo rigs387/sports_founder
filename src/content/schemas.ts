@@ -1183,6 +1183,14 @@ export const configFileSchema = z.strictObject({
     leaders: z.int().min(1),
     awardLeaders: z.int().min(1),
   }),
+  /**
+   * Standouts (GDD v1.37): named players in leagues other than the flagship. places is how many a
+   * league has by tier; peakLean is added to a new standout's peak skill by the league's tier.
+   */
+  standouts: z.strictObject({
+    places: byLeagueTier(z.int().min(0)),
+    peakLean: byLeagueTier(z.number()),
+  }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({
     nameMinLength: z.int().min(1),

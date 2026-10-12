@@ -128,10 +128,10 @@ export function foundingClubOf(clubs: readonly Club[], anchorCountryId: string):
  * place and name takes the first unused nickname instead.
  */
 export function foundSport(
-  state: Omit<GameState, "identity" | "rules" | "culture" | "hallOfFame">,
+  state: Omit<GameState, "identity" | "rules" | "culture" | "hallOfFame" | "standouts">,
   world: World,
   setup: IdentitySetup,
-): Omit<GameState, "rules" | "culture" | "hallOfFame"> {
+): Omit<GameState, "rules" | "culture" | "hallOfFame" | "standouts"> {
   const founding = foundingClubOf(state.flagship.clubs, state.anchorCountryId);
   if (!founding) throw new Error(`No flagship club at "${state.anchorCountryId}"`);
   const clubName = tidyName(setup.clubName);

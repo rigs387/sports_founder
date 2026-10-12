@@ -6,6 +6,7 @@ import { offerEvents, settleEvents } from "./events";
 import { closeOffseason, returnSeatIfFolded } from "./flagship";
 import { evaluateLeagues } from "./leagues";
 import { stepQuarter } from "./quarter";
+import { updateStandouts } from "./standouts";
 import { applyDefaultSlotDrops, updateTierTrack } from "./tiers";
 import type { GameState, World } from "./types";
 import { updateWinTrack } from "./win";
@@ -26,7 +27,8 @@ export class CampaignOverError extends Error {
  * 5. the win hold is checked (src/sim/win.ts). Winning never ends the campaign;
  * 6. culture reads the turn's facts: traditions are born, renewed, decay and are lost
  *    (src/sim/culture.ts);
- * 7. an open offseason gets its deal offers, once (src/sim/deals.ts).
+ * 7. other leagues' standouts age, retire and fill their places (src/sim/standouts.ts);
+ * 8. an open offseason gets its deal offers, once (src/sim/deals.ts).
  * Turns always complete. Refuses to play a campaign that has already ended.
  */
 export function endTurn(state: GameState, world: World): GameState {
@@ -64,6 +66,8 @@ export function endTurn(state: GameState, world: World): GameState {
   next = updateWinTrack(next, world);
   // Traditions read the turn's recorded facts (GDD v1.22).
   next = updateCulture(next, world);
+  // Other leagues' standouts age with the flagship's seasons and fill their places (GDD v1.37).
+  next = updateStandouts(next, world);
   // An open offseason's deal offers, once, after culture so new famous grounds count (GDD v1.28).
   // Clauses are judged first, so a deal in its final season is judged before it ends (v1.29).
   next = offerDeals(judgeClauses(next, world), world);

@@ -1397,6 +1397,72 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    Tests: `tests/standings.test.ts`, the session header, autosave and load by name. All of 2.22
    is built.
 
+### 2.23 Build Plan: The World Stage (GDD v1.37)
+
+Topics are settled one at a time; steps are added as each is decided. Nothing here is built yet.
+
+1. **Standouts in other leagues (topic 1).** Config `standouts`: places by tier (professional 2,
+   elite 3), the talent pull's chance and cap per offseason, the broadcast lift for a followed
+   player, the signing card's price in quarters, Player of the Year tier weights. State:
+   standouts on each league other than the flagship (the flagship's `Player` shape without a
+   club or career lines; ids from `nextPlayerId`), on their own random stream so the world's
+   sequence does not change. Created when a league reaches Professional, aged and retired once a
+   year with the flagship's career rules, removed when the league folds or drops below
+   Professional. Talent pull runs when the offseason closes: the best standout abroad replaces a
+   flagship club's leading player, keeps their birthplace, and the home league draws a
+   replacement; a landmark records the move. Broadcast: a per-country lift in
+   `broadcastEffects` while a player from that country leads a flagship club. The signing card
+   is a decision in `content/events.yaml` told from a named standout, with a paid choice and a
+   free default with no effect. Player of the Year on each season summary, a line in the Almanac
+   and the season review. Snapshot: standout names on country and league rows; skill stays out.
+   Save format bump, no migration work (only the designer plays). Tests: two anchors or fewer.
+
+   *Build order 1 built 2026-10-12 (standouts exist).* `src/sim/standouts.ts`:
+   `GameState.standouts` (its own random stream, the flagship season last aged into, players
+   in id order), `updateStandouts` once per `endTurn` after culture (retire, age and announce
+   final seasons when the flagship starts a new season; trim to the league's places, weakest
+   first; fill, a retiree's place with a young replacement), `standoutsIn`,
+   `standoutProblems`. Config `standouts.places` and `standouts.peakLean` by league tier.
+   Ids come from `flagship.nextPlayerId`. Snapshot: `CountrySnapshot.standouts` (name,
+   birthplace, age, final season; no skill). Renderer: a line on the country card and a
+   Standouts column in the leagues table. Save format 27 (26 migrates with none). Tests:
+   `tests/standouts.test.ts`. Measured on one builder campaign (Germany, 140 turns): 472
+   standouts in 173 leagues, invariants clean. Not yet seen on screen with names: the smoke's
+   short campaign has no Professional league abroad.
+
+2. **National teams (topic 2).** Config `nationalTeams`: the lowest league tier that fields a
+   team (semi-pro), base weights for league tier and hardcore share, the weight of a named
+   player's skill, players counted (3). A pure function in a new `src/sim/national-teams.ts`
+   reads the state and returns each eligible country's squad (the best named nationals by
+   birthplace country, flagship leading players and standouts alike) and strength; nothing is
+   saved between championships. The snapshot carries the list in strength order with player
+   names and no numbers. Renderer: a national teams list (its home is decided with topic 3's
+   championship screen). No effect on flagship clubs.
+
+3. **The World Championship (topic 3).** Config `worldChampionship`: countries needed to found
+   (16), the founding price in quarters, years between (4), bids per tournament (3–4) and their
+   wealth weight, field sizes (16 / 32), match upset odds, the casual lift by round and its
+   length, the host's hardcore and cash boost, the underdog boost, top seeds and the flop's casual
+   loss, PP by round, Hall points for a title. State: `GameState.worldChampionship` (name,
+   founding year, the bids on the table, the chosen host, past tournaments with full brackets,
+   its own random stream). Actions through `applyAction`: `foundChampionship` (offseason
+   only), `pickHost`. `src/sim/world-championship.ts`: bids offered at the end of the turn that
+   opens the offseason before a tournament year; the tournament plays in the turn of its year
+   (squads from `national-teams.ts`, seeded by strength, single elimination); effects land as
+   temporary per-country effects like the rivals' championships; landmarks for founding, host
+   and champion. Cards: the champion headline, the seat country's run, an underdog's run.
+   Renderer: a championship page that opens itself when a tournament has played (draw, bracket
+   by round, champion; past brackets; the national teams list), founding and host picking on the
+   offseason screen. Hall points in `hall-of-fame.ts`. Bots found it when affordable and pick
+   the bidder with the most fans to gain. Runner: a championship line (founded when, hosts,
+   winners). Smoke: found, pick a host, see the page. Then the pacing experiment for the #1
+   contest.
+
+**Build order.** (1) Standouts exist: state, lifecycle, names on screen. (2) Talent pull, the
+broadcast follow and the signing card. (3) Player of the Year. (4) National teams and their
+list. (5) Founding, bids and the host. (6) The tournament, its effects and cards. (7) The
+championship page, Hall points, bots and the #1 contest measurement.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

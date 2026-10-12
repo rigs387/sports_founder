@@ -20,6 +20,7 @@ import {
   crowdless,
   migratedCulture,
   migratedHall,
+  migratedStandouts,
   setupFor,
   venueless,
   withConfig,
@@ -192,6 +193,7 @@ describe("save format 13", () => {
       },
       culture: migratedCulture(played),
       hallOfFame: migratedHall(played),
+      standouts: migratedStandouts(played),
     };
     expect(serializeSave(loaded)).toBe(serializeSave(awardless(expected)));
   });

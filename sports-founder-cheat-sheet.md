@@ -254,6 +254,23 @@ Saves live in Saved Games\Sports Founder with a Load screen and 3 rotating autos
 top bar rank opens Standings (every sport's Fandom Score, fans, #1 countries, trend chart); the
 country panel shows each sport there and the map has a "#1 sport" view.
 
+**The world stage (v1.37, topic 1):** Professional and Elite leagues other than the flagship have
+named standouts (2 / 3): persistent, a hidden skill on the flagship's career curve, no matches, no
+effect on their own. Talent pull: each offseason the best standout abroad may join a flagship club
+as its leading player; the home country follows through the broadcast and they keep their
+nationality. A signing card lets the player pay PP to bring one in. Player of the Year is a line
+(flagship Player of the Season against the standouts, by tier). The Hall stays the flagship's.
+National teams (topic 2): any country with a Semi-Pro or better league fields one; strength is a
+base from league tier and hardcore share plus its best 3 named nationals wherever they play;
+assembled from the records when a championship begins, never kept between; a ranked list on
+screen with numbers hidden; no cost to flagship clubs. The World Championship (topic 3): founded
+in an offseason for PP once 16 countries can field a team, named by the player, first played the
+year after and then every 4 years, rival years or not; 3–4 countries bid to host and the player
+picks; it plays in one turn on its own championship page (draw, bracket, champion) plus a headline
+and story cards; a casual lift by how far each team went, a big boost for the host and an
+underdog, casual losses at home for a top seed out in round one; Hall points for flagship players
+who win it. Remeasure the #1 contest after building.
+
 **Awards (v1.33):** the flagship's Player of the Season (composite of scores, club finish, playoff
 and final scores) and the top scorer's prize; Hall of Fame points; named after the first Hall of
 Fame player once there is one; lines on the champion card, season review, Almanac and Stars panel,

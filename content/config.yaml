@@ -734,6 +734,15 @@ identity:
 # league in depth: named clubs, a season a year that ends in the seasonal window, a champion. Its
 # matches roll on their own random stream, so the world's random sequence (fans, spread, rivals)
 # is the same whether or not the flagship plays.
+# Standouts (GDD v1.37): named players in leagues other than the flagship, by the league's tier.
+# They are created when a league reaches a tier with places, born in a real place of its country,
+# and age, announce a final season and retire by flagship.players' career rules; a retired
+# standout's place goes to a young replacement. They play no matches. peakLean is added to a new
+# standout's peak skill: Elite leagues raise better players.
+standouts:
+  places: { amateur: 0, semi-pro: 0, professional: 2, elite: 3 }
+  peakLean: { amateur: 0, semi-pro: 0, professional: 0, elite: 8 }
+
 flagship:
   # Clubs by the flagship league's tier. Promotion admits generated expansion clubs at the next
   # season start; a step-down drops the newest clubs.

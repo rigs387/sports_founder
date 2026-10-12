@@ -3,7 +3,15 @@ import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { CountrySnapshot, TurnSnapshot } from "../../../sim";
 
-type Column = "country" | "tier" | "maxTier" | "health" | "hardcore" | "cash" | "promotion";
+type Column =
+  | "country"
+  | "tier"
+  | "maxTier"
+  | "health"
+  | "hardcore"
+  | "cash"
+  | "standouts"
+  | "promotion";
 const TIER_ORDER = ["amateur", "semi-pro", "professional", "elite"];
 const HEALTH_ORDER = ["near-collapse", "struggling", "healthy"];
 
@@ -52,6 +60,8 @@ export function LeaguesTable({
         return country.hardcore;
       case "cash":
         return league?.cash ?? 0;
+      case "standouts":
+        return country.standouts.length;
       case "promotion":
         return promotion(country).order;
     }
@@ -97,6 +107,7 @@ export function LeaguesTable({
             {header("health")}
             {header("hardcore")}
             {header("cash")}
+            {header("standouts")}
             {header("promotion")}
           </tr>
         </thead>
@@ -131,6 +142,13 @@ export function LeaguesTable({
                 </td>
                 <td>{t("format.compact", { value: country.hardcore })}</td>
                 <td>{t("format.money", { value: league.cash })}</td>
+                <td className="standouts-cell">
+                  {country.standouts.length > 0
+                    ? t("league.table.standouts", {
+                        names: country.standouts.map((player) => player.name),
+                      })
+                    : t("league.table.noStandouts")}
+                </td>
                 <td className={promote.order === 2 ? "is-ready" : undefined}>{promote.text}</td>
               </tr>
             );

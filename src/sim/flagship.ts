@@ -149,7 +149,7 @@ function clamp(value: number, low: number, high: number): number {
 }
 
 /** One of the market's real places, weighted by population ^ placeWeightExponent. */
-function drawPlace(world: World, rng: Rng, countryId: string): string {
+export function drawPlace(world: World, rng: Rng, countryId: string): string {
   const places = world.places[countryId];
   if (!places || places.length === 0) throw new Error(`No places for "${countryId}"`);
   const exponent = world.config.flagship.placeWeightExponent;
@@ -252,7 +252,12 @@ function pick<T>(rng: Rng, items: readonly T[]): T {
 }
 
 /** A name from the market's pool, redrawn (a few times) if someone in the league has it. */
-function drawName(world: World, rng: Rng, countryId: string, taken: ReadonlySet<string>): string {
+export function drawName(
+  world: World,
+  rng: Rng,
+  countryId: string,
+  taken: ReadonlySet<string>,
+): string {
   const pool = namePool(world, countryId);
   let name = "";
   for (let attempt = 0; attempt <= world.config.flagship.players.nameRetries; attempt += 1) {
@@ -656,7 +661,11 @@ export function dropStar(state: GameState, world: World, playerId: number): Game
 }
 
 /** The chance that next season is a player's last, at next season's age. */
-export function finalSeasonChance(player: Player, age: number, world: World): number {
+export function finalSeasonChance(
+  player: Pick<Player, "peakSkill" | "skill">,
+  age: number,
+  world: World,
+): number {
   const rule = world.config.flagship.players.finalSeason;
   if (age < rule.fromAge) return 0;
   if (age >= rule.lastAge) return 1;

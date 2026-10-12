@@ -31,6 +31,7 @@ import {
   type StandingsSnapshot,
   standingsSnapshot,
 } from "./standings";
+import { standoutsIn } from "./standouts";
 import { tierStatus } from "./tiers";
 import {
   type EscalationLevel,
@@ -95,6 +96,11 @@ export interface CountrySnapshot {
   leaderSportId: string | null;
   /** The highest league tier the market can hold unless it has the seat (GDD v1.35). */
   maxTier: LeagueTierId;
+  /**
+   * The league's named standouts, best first (GDD v1.37): none at the seat or below Professional.
+   * Skill stays out of the snapshot; the order is all that shows.
+   */
+  standouts: StandoutSnapshot[];
   casual: number;
   hardcore: number;
   fandomScore: number;
@@ -356,6 +362,15 @@ export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeS
   });
 }
 
+/** A league standout as the UI names them: recorded facts only. */
+export interface StandoutSnapshot {
+  playerId: number;
+  name: string;
+  birthplace: string;
+  age: number;
+  finalSeason: boolean;
+}
+
 export function snapshot(state: GameState, world: World): TurnSnapshot {
   const exposure = computeExposure(state, world);
   const broadcast = broadcastEffects(state, world);
@@ -375,6 +390,13 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
       wealthLevel:
         world.config.wealthLevels.levels[world.derived[index]?.wealthLevel ?? 0]?.id ?? "",
       maxTier: world.derived[index]?.maxTier ?? "elite",
+      standouts: standoutsIn(state, country.id).map((player) => ({
+        playerId: player.id,
+        name: player.name,
+        birthplace: player.birthplace,
+        age: state.flagship.season - player.birthSeason,
+        finalSeason: player.finalSeason,
+      })),
       sports: countryStandings(state, world, index),
       localRank: localRank(state, world, index),
       leaderSportId: leadingSport(state, world, index),
