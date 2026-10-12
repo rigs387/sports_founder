@@ -313,9 +313,9 @@ export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeS
     const after = discreteEffect
       ? shapeFactors(world, [...state.growthNodes.filter((id) => id !== node.id), node.id])
       : now;
-    const discrete = (base: number, from: number, to: number) => {
-      const before = Math.round(base * from);
-      const next = Math.round(base * to);
+    const discrete = (base: number, from: number, to: number, extra = false) => {
+      const before = extra ? base + Math.round(from - 1) : Math.round(base * from);
+      const next = extra ? base + Math.round(to - 1) : Math.round(base * to);
       return before === next ? null : { from: before, to: next };
     };
     const preview: GrowthPreview = {
@@ -329,7 +329,12 @@ export function growthNodeSnapshots(state: GameState, world: World): GrowthNodeS
         ? discrete(world.config.flagship.clubs[seat.tier], now.flagshipClubs, after.flagshipClubs)
         : null,
       starPlaces: seat
-        ? discrete(world.config.flagship.stars.places[seat.tier], now.starPlaces, after.starPlaces)
+        ? discrete(
+            world.config.flagship.stars.places[seat.tier],
+            now.starPlaces,
+            after.starPlaces,
+            true,
+          )
         : null,
     };
     return {

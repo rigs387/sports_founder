@@ -727,7 +727,7 @@ function playersSeasonEnd(
     );
   for (const candidate of candidates) {
     // Star pay and an attacking style make room for more stars (GDD v1.35).
-    if (seatStars(current()).length >= Math.round(stars.places[tier] * shape.starPlaces)) break;
+    if (seatStars(current()).length >= stars.places[tier] + Math.round(shape.starPlaces - 1)) break;
     const first = !players.some((player) => player.starSince !== null);
     candidate.starSince = season;
     newStarIds.push(candidate.id);

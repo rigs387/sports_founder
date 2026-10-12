@@ -1,8 +1,8 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-10",
-  design: "GDD v1.35",
+  updated: "2026-10-11",
+  design: "GDD v1.36",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -12,10 +12,10 @@ window.SF_PROGRESS = {
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
-    date: "2026-10-10",
-    tests: 603,
-    files: 62,
-    note: "npm run check passed after saves and standings (type checks, Biome, purity, 603 tests in 62 files). Lint has existing visual-study warnings.",
+    date: "2026-10-11",
+    tests: 613,
+    files: 64,
+    note: "npm run check passed after the fourth playtest follow-ups (type checks, Biome, purity, 613 tests in 64 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-10",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
@@ -100,6 +100,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-11",
+      type: "Built",
+      title: "Fourth playtest follow-ups",
+      text: "GDD v1.36, from the designer's notes. Star places are +1 a node, not +20%. A turn is never longer than two quarters (PP tier 5 was a year). A lifted curse pays PP by how long it lasted and the card says so. Rivalries come from close title races, side-by-side finishes, playoff meetings and shared towns, and grow with every meeting. Traditions are kept alive by a club's titles (echoes) and a heritage floor after 15 years. The Rulebook groups traditions by kind and each opens its own page. Still to measure: pacing and the #1 contest with two-quarter turns at tier 5.",
+    },
     {
       date: "2026-10-10",
       type: "Built",

@@ -1,4 +1,4 @@
-import { RULE_AXES, TRADITION_TYPES, type TraditionType } from "../content";
+import { type Config, RULE_AXES, TRADITION_TYPES, type TraditionType } from "../content";
 import { yearOfQuarter } from "./calendar";
 import { localRank } from "./fandom";
 import { chooseClass, classLandmark, shrineWeights } from "./hall-of-fame";
@@ -214,6 +214,70 @@ export function ethosFactor(
 const seasonYear = (summary: SeasonSummary, world: World) =>
   yearOfQuarter(Math.max(0, summary.quarter - 1), world.config);
 
+type DerbyRules = Pick<Config["culture"]["derby"], "closeTop" | "closeWins" | "weights">;
+
+/** What a finished season says about each pair of clubs (GDD v1.36), as weighted facts. */
+export function rivalryFacts(
+  summary: SeasonSummary,
+  clubs: readonly Club[],
+  rules: DerbyRules,
+): { pair: [number, number]; weight: number }[] {
+  const facts = new Map<string, { pair: [number, number]; weight: number }>();
+  const add = (a: number, b: number, weight: number) => {
+    if (a === b) return;
+    const pair: [number, number] = [Math.min(a, b), Math.max(a, b)];
+    const key = `${pair[0]}-${pair[1]}`;
+    const known = facts.get(key);
+    if (known) known.weight += weight;
+    else facts.set(key, { pair, weight });
+  };
+  const table = summary.standings;
+  const gap = (a: number, b: number) =>
+    Math.abs(
+      (table.find((r) => r.clubId === a)?.won ?? 0) - (table.find((r) => r.clubId === b)?.won ?? 0),
+    );
+  const close = (a: number, b: number) => gap(a, b) <= rules.closeWins;
+  const { championId, runnerUpId } = summary;
+  // The top two: a fact, and a decisive one (counted twice) when the title was close.
+  add(
+    championId,
+    runnerUpId,
+    rules.weights.topTwo + (close(championId, runnerUpId) ? rules.weights.decisive : 0),
+  );
+  // Side by side near the top.
+  const top = table.slice(0, rules.closeTop);
+  top.forEach((a, i) => {
+    const b = top[i + 1];
+    if (!b || samePair([a.clubId, b.clubId].sort(), [championId, runnerUpId].sort())) return;
+    if (close(a.clubId, b.clubId)) add(a.clubId, b.clubId, rules.weights.sideBySide);
+  });
+  // The playoffs: a meeting is a fact, and one that sends the lower-rated club through counts twice.
+  const rating = (clubId: number) => summary.startRatings.find((r) => r.clubId === clubId)?.rating;
+  const met = new Set<string>();
+  for (const match of summary.playoffs) {
+    const key = `${Math.min(match.homeId, match.awayId)}-${Math.max(match.homeId, match.awayId)}`;
+    if (met.has(key)) continue;
+    met.add(key);
+    let winner: number | null = match.decidedFor;
+    if (winner === null && match.homeScore !== match.awayScore)
+      winner = match.homeScore > match.awayScore ? match.homeId : match.awayId;
+    const loser = winner === match.homeId ? match.awayId : match.homeId;
+    const upset = winner !== null && (rating(winner) ?? 0) < (rating(loser) ?? 0);
+    add(match.homeId, match.awayId, rules.weights.playoff + (upset ? rules.weights.upset : 0));
+  }
+  // One town, both in the top half.
+  const half = table.slice(0, Math.ceil(table.length / 2));
+  half.forEach((a, i) => {
+    for (const b of half.slice(i + 1)) {
+      const here = clubs.find((c) => c.id === a.clubId);
+      const there = clubs.find((c) => c.id === b.clubId);
+      if (here && there && here.place === there.place)
+        add(a.clubId, b.clubId, rules.weights.neighbours);
+    }
+  });
+  return [...facts.values()];
+}
+
 const samePair = (a: readonly number[], b: readonly number[]) =>
   a.length === 2 &&
   b.length === 2 &&
@@ -355,9 +419,9 @@ class CultureUpdate {
     return tradition;
   }
 
-  renew(tradition: Tradition, year: number): void {
+  renew(tradition: Tradition, year: number, weight = 1): void {
     const { strength } = cultureFactors(this.world, this.state.growthNodes, tradition.type);
-    tradition.strength = Math.min(1, tradition.strength + this.config.renewal * strength);
+    tradition.strength = Math.min(1, tradition.strength + this.config.renewal * strength * weight);
     tradition.renewedYear = Math.max(tradition.renewedYear, year);
   }
 
@@ -430,8 +494,8 @@ class CultureUpdate {
         );
     }
 
-    // The derby: the same two clubs first and second (or in the final).
-    this.derby([summary.championId, summary.runnerUpId], countryId, summary.season, year);
+    // Rivalries: clubs that meet at the top, side by side, in the playoffs or in one town.
+    this.rivalries(summary, year);
 
     // Famous grounds: titles won, finals hosted and record crowds (one more fact each).
     const host = finalHost(summary);
@@ -478,6 +542,38 @@ class CultureUpdate {
     this.invincibles(summary, leagueSeasons, year);
     this.curses(summary, leagueSeasons, year);
     this.signatureMoves(summary, year);
+    this.echoes(summary, year);
+  }
+
+  /**
+   * Keeping traditions alive (GDD v1.36): a club's title echoes through its era, Invincibles,
+   * redemption, legacy and move, a star at the move's club takes it up, and a champion that
+   * nearly goes unbeaten stirs every Invincibles in the league. Each renews at the echo weight,
+   * and never twice in a year.
+   */
+  echoes(summary: SeasonSummary, year: number): void {
+    const { echo } = this.config.keeping;
+    const { maxLosses } = this.config.invincibles;
+    const { state } = this;
+    const champion = summary.standings.find((r) => r.clubId === summary.championId);
+    const chase = champion !== undefined && champion.lost <= maxLosses;
+    const staffed = (clubId: number | undefined) =>
+      state.flagship.players.some(
+        (p) =>
+          p.starSince !== null &&
+          p.starSince <= summary.season &&
+          p.career.find((line) => line.season === summary.season)?.clubId === clubId,
+      );
+    for (const tradition of this.traditions) {
+      if (!living(tradition) || tradition.countryId !== summary.countryId) continue;
+      if (!echo.types.includes(tradition.type) || tradition.renewedYear >= year) continue;
+      const clubId = tradition.clubIds[0];
+      const stirred =
+        clubId === summary.championId ||
+        (tradition.type === "invincibles" && chase) ||
+        (tradition.type === "signatureMove" && staffed(clubId));
+      if (stirred) this.renew(tradition, year, echo.weight);
+    }
   }
 
   /** Matchday food (GDD v1.35): one per club, flavor only, named by the birthplace's pool. */
@@ -566,7 +662,8 @@ class CultureUpdate {
         this.born(
           "redemption",
           summary.countryId,
-          { clubIds: [clubId], seasons: [summary.season] },
+          // The curse's first season and the title's: the gap is how long it lasted (v1.36).
+          { clubIds: [clubId], seasons: [curse.seasons[0] ?? summary.season, summary.season] },
           year,
           redemptionBonus,
         );
@@ -731,9 +828,18 @@ class CultureUpdate {
     this.born("legacy", club.countryId, { clubIds: [club.id], playerId, seasons }, year, honors);
   }
 
-  /** Whether a pair of clubs has met often enough lately (with stokes) to found a derby. */
+  /** A season's rivalry facts (GDD v1.36): every pair the season brought together. */
+  rivalries(summary: SeasonSummary, year: number): void {
+    const facts = rivalryFacts(summary, this.state.flagship.clubs, this.config.derby);
+    for (const { pair } of facts) this.derby(pair, summary.countryId, summary.season, year);
+  }
+
+  /**
+   * Whether a pair of clubs has met often enough lately (with stokes) to found a derby, or, if it
+   * has one, a season's facts renew it by their weight and the meeting is recorded.
+   */
   derby(pair: number[], countryId: string, season: number, year: number, renewing = true): void {
-    const { state, world } = this;
+    const { state } = this;
     if (pair[0] === pair[1]) return;
     const existing = this.livingOf("derby", (t) => samePair(t.clubIds, pair));
     const { meetings, seasons: span } = this.config.derby;
@@ -741,25 +847,29 @@ class CultureUpdate {
       this.lostSince("derby", (t) => samePair(t.clubIds, pair)),
       season - span + 1,
     );
-    const met = state.flagship.seasons
-      .filter(
-        (s) =>
-          s.countryId === countryId &&
-          s.season >= since &&
-          s.season <= season &&
-          samePair([s.championId, s.runnerUpId], pair),
-      )
-      .map((s) => s.season);
+    const heard: { season: number; weight: number }[] = [];
+    for (const s of state.flagship.seasons) {
+      if (s.countryId !== countryId || s.season < since || s.season > season) continue;
+      const fact = rivalryFacts(s, state.flagship.clubs, this.config.derby).find((f) =>
+        samePair(f.pair, pair),
+      );
+      if (fact) heard.push({ season: s.season, weight: fact.weight });
+    }
     if (existing) {
-      if (renewing && met.includes(season)) this.renew(existing, year);
+      const now = heard.find((fact) => fact.season === season);
+      if (renewing && now && !existing.seasons.includes(season)) {
+        this.renew(existing, year, now.weight);
+        existing.seasons.push(season);
+      }
       return;
     }
     const stoked = state.culture.stokes.filter(
       (stoke) => samePair(stoke.clubIds, pair) && stoke.season >= since && stoke.season <= season,
     ).length;
-    if (met.length + stoked >= this.threshold("derby", meetings)) {
+    const total = heard.reduce((sum, fact) => sum + fact.weight, 0);
+    if (total + stoked >= this.threshold("derby", meetings)) {
       const clubIds = [Math.min(...pair), Math.max(...pair)];
-      this.born("derby", countryId, { clubIds, seasons: met }, year);
+      this.born("derby", countryId, { clubIds, seasons: heard.map((fact) => fact.season) }, year);
     }
   }
 
@@ -788,7 +898,18 @@ class CultureUpdate {
       }
       if (tradition.renewedYear < year) {
         const { strength } = cultureFactors(world, state.growthNodes, tradition.type);
-        tradition.strength = Math.max(0, tradition.strength - this.config.decayPerYear / strength);
+        // An old rivalry is harder to kill (GDD v1.36): its decay shrinks as the meetings pile up.
+        const { matureMeetings, matureDecayCut } = this.config.derby;
+        const mature =
+          tradition.type === "derby"
+            ? 1 - matureDecayCut * Math.min(1, tradition.seasons.length / matureMeetings)
+            : 1;
+        const faded = tradition.strength - (this.config.decayPerYear * mature) / strength;
+        // A tradition that has stood long enough never fades away (GDD v1.36).
+        const { years, floor, except } = this.config.keeping.heritage;
+        const stood = year - yearOfQuarter(tradition.bornQuarter, world.config);
+        const kept = stood >= years && !except.includes(tradition.type);
+        tradition.strength = Math.max(kept ? Math.min(floor, tradition.strength) : 0, faded);
         if (tradition.strength <= 1e-9) {
           this.lose(tradition, "faded");
           continue;

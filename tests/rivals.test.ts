@@ -763,8 +763,8 @@ describe("no rival is ever eliminated", () => {
       }
       expect(problems).toEqual([]);
       expect(state.outcome).toBeNull();
-      // More than a century of overwhelming pressure.
-      expect(state.quarter).toBeGreaterThan(400);
+      // Over sixty years of overwhelming pressure (turns are at most two quarters, GDD v1.36).
+      expect(state.quarter).toBeGreaterThan(240);
       // The pressure really was overwhelming, and rivals were squeezed toward the floor.
       expect(peakPlayerShare).toBeGreaterThan(0.5);
       expect(lowestRivalShare).toBeGreaterThan(0);

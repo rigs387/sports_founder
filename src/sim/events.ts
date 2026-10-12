@@ -309,7 +309,7 @@ export function eventEffects(
   if (card.star === "breakout")
     return [{ type: "pp", amount: breakoutPP(world, event) }, ...card.effects];
   if (card.tradition === "born")
-    return [{ type: "pp", amount: birthPP(world, event) }, ...card.effects];
+    return [{ type: "pp", amount: birthPP(state, world, event) }, ...card.effects];
   if (card.trigger === "hall")
     return [{ type: "pp", amount: classPP(state, world, event) }, ...card.effects];
   if (card.story !== "champion") return card.effects;

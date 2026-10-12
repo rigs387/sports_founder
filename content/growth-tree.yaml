@@ -30,7 +30,7 @@
 #                ratingParity   how fast flagship club strength returns to the league's mean
 #                flagshipClubs  the flagship's club count (rounded)
 #                wageFactor     star wages and the payroll at the seat
-#                starPlaces     star places by league tier (rounded)
+#                starPlaces     extra star places at every league tier (+1 a level; total, not a factor)
 #                starMoves      a star's chance to move clubs
 #                scoring        scoring chances in flagship matches
 #                starPull       a backed star's pull on casual conversion
@@ -406,7 +406,7 @@ nodes:
     effects:
       - { type: wageFactor, amount: 0.25 }
       - { type: starMoves, amount: -0.5 }
-      - { type: starPlaces, amount: 0.2 }
+      - { type: starPlaces, amount: 1 }
 
   # Culture
   - id: oral-history
@@ -436,7 +436,7 @@ nodes:
     requires: [club-museums]
     effects:
       - { type: scoring, amount: 0.1 }
-      - { type: starPlaces, amount: 0.2 }
+      - { type: starPlaces, amount: 1 }
       - { type: casualConversion, amount: 0.04 }
   - id: defensive-style
     category: culture

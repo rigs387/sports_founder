@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.35 | October 9, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size)*
+*Version 1.36 | October 11, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size; v1.36: fourth playtest follow-ups)*
 
 ---
 
@@ -1333,6 +1333,46 @@ capped by max capacity while fans outnumber seats stays as it is.
   clubs' ratings and credit rises with skill toward a 60% cap that never binds. Tim Seidel's 37%
   matches real basketball's all-time ceiling (Jordan about 32%, Kobe 2006 about 36%). Left as it
   is: an all-time great is welcome, and topic 3's per-club star threshold already rewards one.
+
+**Fourth playtest follow-ups (decided 2026-10-11, v1.36).** The player's notes after the last
+playthrough, settled one at a time.
+- *Star places are +1, not +20%.* A rounded 20% did nothing at Amateur (2 places stayed 2). The
+  two nodes that raised star places (the Star pay fork side, the Attacking style fork side) now
+  add one place at every league tier each. Built 2026-10-11 (`starPlaces` is the extra places).
+- *A turn is never longer than two quarters.* PP tier 5 was a year a turn (one turn a year); the
+  player does not like it. The limit is two turns a year: tier 5's turn is two quarters, and
+  content validation rejects a longer one. Seasons still end on turn boundaries. Built
+  2026-10-11; pacing, tier-5 turn counts and the #1 contest to be re-measured.
+- *A lifted curse is a big deal (built 2026-10-11).* Winning the title with a cursed club
+  already lifts the curse into a headline redemption. It now also pays Prestige Points that grow
+  with how long the curse lasted (seasons from its birth to the title), so a long curse's end is
+  worth far more than a short one's: 12 PP plus 3 for each season it lasted, at most 60. The
+  card and the Culture list say how long it lasted ("the curse is over after 23 seasons").
+- *Rivalries are more than repeat finals (built 2026-10-11).* A derby is still founded by weighted
+  meetings within five seasons (3 needed, eased or hardened by the birthplace), but a season now
+  brings a pair together four ways: finishing first and second (1, plus 1 when the title was won
+  by a win or less), finishing side by side in the top three within a win (0.5), meeting in the
+  playoffs (0.5, plus 1 when the lower-rated club went through) and sharing a town while both
+  finish in the top half (0.5). Rivalries grow with time: every later meeting renews the derby by
+  its weight and goes on its record (the card says "keep meeting when it matters"), and an old
+  rivalry decays up to half as fast, reached at ten meetings. In bot campaigns derbies went from
+  11 to 18 a campaign (150 turns).
+- *Traditions that keep going (built 2026-10-11).* Style, moves and the like faded because nothing
+  renewed them after their birth. Two fixes. Echoes: a title by a tradition's club renews its
+  era, Invincibles, redemption, star legacy and signature move at half a fact; a signature move
+  also lives while any star plays for its club (a new star takes it up), and the Invincibles
+  while any champion nearly goes unbeaten (someone is chasing them). Heritage: a tradition that
+  has stood 15 years never fades below 0.15 strength, so a long-lived one is weakened, never
+  lost; only a fold or a betrayal ends it. National names, curses and matchday food are
+  excepted (they follow their own rules).
+- *Traditions under your sport, by kind (built 2026-10-11).* The Rulebook's Traditions are
+  grouped: Rivalries (derbies), People (star legacies, signature moves), Clubs and grounds
+  (rites, chants, famous grounds), Eras and records (eras, Invincibles, curses, redemptions) and
+  Country and league (national names, trophies, matchday food); the living and strongest first,
+  lost ones last. A tradition's name opens its own page: name, standing, and a history (born,
+  how it began, seasons on record, where else it is kept, why it was lost). The page is a list of
+  sections (`TRADITION_PAGE_SECTIONS`), so later content for a tradition (stories, items,
+  choices) is a new section reading its recorded facts, without reshaping the screen.
 
 **Press coverage:** Presentation only; no press sentiment system. Fictional outlets per country
 (in the names data file); headlines built from record-backed Moments, with English-only flavor

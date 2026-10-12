@@ -40,8 +40,8 @@ ppPrices:
 money:
   dollarsPerCash: 9100
 
-# PP tier table (GDD Global PP Tier Track). Turn length is in quarters (1 = quarter, 2 = half-year,
-# 4 = year).
+# PP tier table (GDD Global PP Tier Track). Turn length is in quarters (1 = quarter, 2 = half-year;
+# never longer than 2: GDD v1.36).
 #   fandomScoreRequired    Fandom Score needed to tier up into this tier
 #   breadth                the tier's breadth condition, also what demotion is judged on:
 #                            anchorLeagueTier     the anchor's league has reached leagueTier
@@ -92,7 +92,7 @@ ppTiers:
   - tier: 5
     fandomScoreRequired: 1600000000
     breadth: { type: globalRank, rank: 3 }
-    turnLengthQuarters: 4
+    turnLengthQuarters: 2
     focusSlots: 5
     backingSlots: 3
     mediaRevenueMultiplier: 17
@@ -600,7 +600,16 @@ culture:
   honorsBonus: 0.2
   # Births. Thresholds are divided by the birthplace's ease for the type and rounded (at least 1).
   # Facts count only from culture.startSeason (no retroactive history for older saves).
-  derby: { meetings: 3, seasons: 5 }
+  derby:
+    meetings: 3
+    seasons: 5
+    closeTop: 3
+    closeWins: 1
+    # What each kind of fact counts toward meetings (GDD v1.36); decisive and upset add to the
+    # top two's and the playoff meeting's own weight.
+    weights: { topTwo: 1, decisive: 1, sideBySide: 0.5, playoff: 0.5, upset: 1, neighbours: 0.5 }
+    matureMeetings: 10
+    matureDecayCut: 0.5
   venue: { fameFacts: 3, foundingFacts: 1 }
   # Star legacies have no threshold: one is born when its player enters the Hall of Fame (GDD v1.35).
   # Effects. A country's weight is the strength its traditions hold there (abroad at
@@ -646,15 +655,24 @@ culture:
   # the bigMarkets most populous markets. Curses are the one negative tradition: a former champion
   # droughtSeasons without a title, or lostFinals second places since its last title; while held
   # they raise the player's hardcore turnover there by turnoverPenalty × strength, and a title
-  # lifts them into a redemption born redemptionBonus stronger (a headline). Eras: straightTitles in
+  # lifts them into a redemption born redemptionBonus stronger (a headline) that pays
+  # birthPP.redemption + redemptionPerSeason for each season the curse lasted, up to redemptionMaxPP (v1.36). Eras: straightTitles in
   # a row. The Invincibles: a champion with at most maxLosses losses. Signature moves: a star's
   # starSeasons-th star season or the scoring record, born startBonus stronger, reaching abroad like
   # chants. Matchday food is flavor (no weight, no decay), born with a league's first season. Target about one tradition beyond
   # national names every 2 seasons at the flagship (runner: traditions by type).
   nationalName: { bigMarkets: 20 }
+  # Keeping traditions alive (GDD v1.36). A title by a tradition's club renews its era, Invincibles,
+  # redemption, star legacy and signature move at echo.weight of a full fact; a signature move
+  # also lives while any star plays for its club. A tradition that has stood heritage.years years
+  # never fades below heritage.floor (national names, curses and food excepted).
+  keeping:
+    echo: { weight: 0.5, types: [era, invincibles, redemption, legacy, signatureMove] }
+    heritage: { years: 15, floor: 0.15, except: [nationalName, curse, matchdayFood] }
   # One living curse a league at a time (maxLiving): measured at build, thresholds alone gave
   # 23-34 curses a 150-turn campaign.
-  curse: { droughtSeasons: 20, lostFinals: 4, maxLiving: 1, turnoverPenalty: 0.3, redemptionBonus: 0.5 }
+  curse: { droughtSeasons: 20, lostFinals: 4, maxLiving: 1, turnoverPenalty: 0.3, redemptionBonus: 0.5,
+           redemptionPerSeason: 3, redemptionMaxPP: 60 }
   era: { straightTitles: 3 }
   # Measured at build: no champion went unbeaten (at least 3 losses in 41 seasons of a playtest),
   # so a champion that sets the league's record for the fewest losses (as a share of its matches)

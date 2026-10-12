@@ -90,8 +90,22 @@ export function offerTraditionCards(
   return { ...events, pending, nextId };
 }
 
-/** A birth moment's PP by the tradition's type. */
-export function birthPP(world: World, event: Pick<EventRecord, "facts">): number {
-  const type = event.facts.tradition?.type;
-  return type ? world.config.culture.birthPP[type] : 0;
+/** The seasons a redemption's curse lasted: its first season to the title's (GDD v1.36). */
+export function seasonsCursed(seasons: readonly number[]): number {
+  return Math.max(0, (seasons.at(-1) ?? 0) - (seasons[0] ?? 0));
+}
+
+/** A birth moment's PP by the tradition's type; a lifted curse pays by how long it lasted. */
+export function birthPP(
+  state: Pick<GameState, "culture">,
+  world: World,
+  event: Pick<EventRecord, "facts">,
+): number {
+  const told = event.facts.tradition;
+  if (!told) return 0;
+  const { birthPP: base, curse } = world.config.culture;
+  if (told.type !== "redemption") return base[told.type];
+  const tradition = state.culture.traditions.find((t) => t.id === told.traditionId);
+  const lasted = tradition ? seasonsCursed(tradition.seasons) : 0;
+  return Math.min(curse.redemptionMaxPP, base.redemption + curse.redemptionPerSeason * lasted);
 }

@@ -667,7 +667,7 @@ export const ppTierSchema = z.strictObject({
   tier: z.int().min(1),
   fandomScoreRequired: z.number().min(0),
   breadth: breadthConditionSchema,
-  turnLengthQuarters: z.int().min(1).max(4),
+  turnLengthQuarters: z.int().min(1).max(2),
   focusSlots: z.int().min(1),
   backingSlots: z.int().min(0),
   mediaRevenueMultiplier: z.number().positive(),
@@ -1040,7 +1040,31 @@ export const configFileSchema = z.strictObject({
     renewal: unitInterval,
     decayPerYear: unitInterval,
     honorsBonus: unitInterval,
-    derby: z.strictObject({ meetings: z.int().min(1), seasons: z.int().min(1) }),
+    /**
+     * Rivalries (GDD v1.36). A pair's season counts a fact for each of: finishing first and second
+     * (decisive when the title was won by `closeWins` wins or fewer), finishing side by side in
+     * the top `closeTop` within `closeWins` wins, meeting in the playoffs (decisive when the
+     * lower-rated club went through), and sharing a town while both finish in the top half.
+     * `meetings` weighted facts within `seasons` seasons found a derby; every later fact renews it
+     * by its weight, and an old rivalry decays up to `matureDecayCut` slower, reached at
+     * `matureMeetings` meetings.
+     */
+    derby: z.strictObject({
+      meetings: z.int().min(1),
+      seasons: z.int().min(1),
+      closeTop: z.int().min(2),
+      closeWins: z.int().min(0),
+      weights: z.strictObject({
+        topTwo: z.number().min(0),
+        decisive: z.number().min(0),
+        sideBySide: z.number().min(0),
+        playoff: z.number().min(0),
+        upset: z.number().min(0),
+        neighbours: z.number().min(0),
+      }),
+      matureMeetings: z.int().min(1),
+      matureDecayCut: unitInterval,
+    }),
     venue: z.strictObject({ fameFacts: z.int().min(1), foundingFacts: z.int().min(0) }),
     weightCap: z.number().positive(),
     turnoverCut: unitInterval,
@@ -1073,10 +1097,26 @@ export const configFileSchema = z.strictObject({
      */
     nationalName: z.strictObject({ bigMarkets: z.int().min(0) }),
     /**
+     * Keeping traditions alive (GDD v1.36). Echoes: a title by a tradition's club renews it at
+     * `weight` of a full fact (the club still lives its story), for the listed types; a signature
+     * move also lives on while any star plays for its club, and the Invincibles while any
+     * champion here comes close to going unbeaten. Heritage: a tradition of a weighing type that
+     * has stood `years` years never fades below `floor`; only a fold or a betrayal ends it.
+     */
+    keeping: z.strictObject({
+      echo: z.strictObject({ weight: unitInterval, types: z.array(traditionTypeSchema) }),
+      heritage: z.strictObject({
+        years: z.int().min(1),
+        floor: unitInterval,
+        except: z.array(traditionTypeSchema),
+      }),
+    }),
+    /**
      * Curses (GDD v1.35): a former champion without a title for droughtSeasons, or a club with
      * lostFinals second places since its last title. Hardcore turnover × (1 + turnoverPenalty ×
      * the curse strength held) where it is held. A title lifts it into a redemption born
-     * redemptionBonus stronger.
+     * redemptionBonus stronger and pays PP that grows with the seasons the curse lasted
+     * (v1.36): birthPP.redemption plus redemptionPerSeason a season, at most redemptionMaxPP.
      */
     curse: z.strictObject({
       droughtSeasons: z.int().min(1),
@@ -1085,6 +1125,8 @@ export const configFileSchema = z.strictObject({
       maxLiving: z.int().min(1),
       turnoverPenalty: z.number().min(0),
       redemptionBonus: unitInterval,
+      redemptionPerSeason: z.number().min(0),
+      redemptionMaxPP: z.number().min(0),
     }),
     /** Eras (GDD v1.35): straightTitles titles in a row. */
     era: z.strictObject({ straightTitles: z.int().min(2) }),

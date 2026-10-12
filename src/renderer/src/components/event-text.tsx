@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { EventEffect } from "../../../content";
 import type { EventRecord } from "../../../sim";
 import { useAwardWords } from "../awards/words";
-import { useTraditionWords } from "../culture/traditions";
+import { cursedSeasons, useTraditionWords } from "../culture/traditions";
 import { useDealPartnerName } from "../deals/partners";
 import { PLAIN_TERMS, useTermVars } from "../identity/terms";
 import { variantOf } from "../press/outlet";
@@ -137,7 +137,13 @@ export function useEventText() {
       tradition.type === "chant" &&
       snapshot.culture.traditions.find((t) => t.type === "chant")?.id === tradition.id;
     return {
-      ...termVars({ seasons: born ? snapshot.culture.derby.seasons : tradition.seasons.length }),
+      ...termVars({
+        seasons: born
+          ? snapshot.culture.derby.seasons
+          : tradition.type === "redemption"
+            ? cursedSeasons(tradition)
+            : tradition.seasons.length,
+      }),
       name: words.name(tradition),
       club: club(tradition.clubIds[0]),
       clubA: club(tradition.clubIds[0]),
@@ -146,6 +152,7 @@ export function useEventText() {
       player: player(tradition.playerId),
       country: country(tradition.countryId),
       count: tradition.seasons.length,
+      cursed: cursedSeasons(tradition),
       span: snapshot.culture.derby.seasons,
       // A chant's first follower abroad is the card's own country.
       abroad: country(event.countryId),

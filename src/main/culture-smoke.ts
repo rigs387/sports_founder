@@ -64,6 +64,17 @@ export async function verifyTraditions(
     "43-traditions.png",
     "44-traditions-narrow.png",
   );
+  // A tradition's page (GDD v1.36): grouped by kind, a name opens its history, back returns.
+  const groups = await evaluate<number>(
+    `document.querySelectorAll('[data-testid="tradition-group"]').length`,
+  );
+  if (groups < 1) throw new Error("The Rulebook groups no traditions by kind.");
+  await click('[data-testid="tradition-open"]');
+  await wait(`!!document.querySelector('[data-testid="tradition-page"]')`);
+  checkText("A tradition's page", await text('[data-testid="tradition-page"]'));
+  await screenshot("43b-tradition-page.png");
+  await click(".tradition-back");
+  await wait(`!!document.querySelector('[data-testid="tradition-group"]')`);
   await click(".overview-dialog > header .icon-button");
 
   // The flagship: the trophy card and tradition tags on club rows.

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  birthPP,
   curseWeights,
   eventSnapshots,
   type GameState,
@@ -91,6 +92,16 @@ describe("curses", () => {
     const [redemption] = ofType(lifted, "redemption");
     expect(redemption?.clubIds).toEqual([b]);
     expect(redemption?.strength).toBeGreaterThan(world.config.culture.startStrength);
+    // The redemption pays by how long the curse lasted (GDD v1.36).
+    const lasted = (redemption?.seasons.at(-1) ?? 0) - (redemption?.seasons[0] ?? 0);
+    expect(lasted).toBeGreaterThan(0);
+    const { curse: rules, birthPP: base } = world.config.culture;
+    const redeemed = offerEvents(lifted, world, 4).events.pending.find(
+      (e) => e.facts.tradition?.type === "redemption",
+    );
+    expect(redeemed && birthPP(lifted, world, redeemed)).toBe(
+      Math.min(rules.redemptionMaxPP, base.redemption + rules.redemptionPerSeason * lasted),
+    );
     const told = eventSnapshots(offerEvents(lifted, world, 4), world);
     expect(
       told.some((e) => e.templateId === "tradition-lost" && e.facts.tradition?.type === "curse"),

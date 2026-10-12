@@ -23,6 +23,8 @@ export function withSeason(
     recordCrowd?: boolean;
     /** An unbeaten champion (GDD v1.35: the Invincibles); otherwise every club lost once. */
     unbeaten?: boolean;
+    /** The runner-up finished one win behind (GDD v1.36: a decisive meeting); else three. */
+    close?: boolean;
   } = {},
 ): GameState {
   const clubs = activeClubs(state.flagship);
@@ -39,10 +41,12 @@ export function withSeason(
     scoring: "medium",
     championId,
     runnerUpId,
-    standings: order.map((clubId) => ({
+    // Wins fall three a place (a close title race: the runner-up one behind), so only a
+    // chosen race counts as a rivalry fact beyond the top two.
+    standings: order.map((clubId, place) => ({
       clubId,
       played: 0,
-      won: 0,
+      won: 30 - place * 3 + (options.close && place === 1 ? 2 : 0),
       drawn: 0,
       lost: options.unbeaten && clubId === championId ? 0 : 1,
       scoreFor: 0,

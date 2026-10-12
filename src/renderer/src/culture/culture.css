@@ -75,6 +75,75 @@
   background: #d8b23a;
 }
 
+.tradition-group {
+  margin: 10px 0;
+}
+
+.tradition-group > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tradition-open {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.95em;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  cursor: pointer;
+}
+
+.tradition-open::first-letter {
+  text-transform: uppercase;
+}
+
+.tradition-page {
+  display: grid;
+  gap: 8px;
+  scroll-margin-top: 48px;
+}
+
+.tradition-back {
+  justify-self: start;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.85em;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tradition-page h3 {
+  margin: 4px 0 0;
+}
+
+.tradition-page h3::first-letter {
+  text-transform: uppercase;
+}
+
+.tradition-history {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 12px;
+  margin: 0;
+}
+
+.tradition-history dt {
+  opacity: 0.7;
+}
+
+.tradition-history dd {
+  margin: 0;
+}
+
 .culture-section h3 {
   margin: 12px 0 6px;
 }

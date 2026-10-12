@@ -309,7 +309,7 @@
         "title": "A tradition is born: {{name}}",
         "title_v1": "{{name}} becomes a tradition",
         "title_v2": "Fans keep a new tradition: {{name}}",
-        "body_derby": "{{clubA}} and {{clubB}} finished on top together in {{count}} of the last {{span}} {{seasonsNoun}}. Their fans now call it {{name}}.",
+        "body_derby": "{{clubA}} and {{clubB}} keep meeting when it matters: {{count}} times in the last {{span}} {{seasonsNoun}}. Their fans now call it {{name}}.",
         "body_rite": "{{club}} won their first title. Before every home {{matchOne}} their fans now keep {{name}}.",
         "body_legacy": "{{player}} retired after a great career as a star. In {{country}} people now call that way of playing {{name}}.",
         "body_nationalName": "Your sport is now the most followed in {{country}}, and people there have their own name for it: {{name}}.",
@@ -318,7 +318,7 @@
         "body_invincibles": "{{club}} won the title without losing once all {{seasonNoun}}. They will be remembered as {{name}}.",
         "body_signatureMove": "{{player}} has done it so often that the move has a name: {{name}}. Kids everywhere are trying it.",
         "body_matchdayFood": "At {{ground}}, no {{matchOne}} is complete without {{name}}.",
-        "body_redemption": "The curse is over: {{club}} are champions at last. Their fans will never forget {{name}}.",
+        "body_redemption": "The curse is over after {{cursed}} {{seasonsNoun}}: {{club}} are champions at last. Their fans will never forget {{name}}.",
         "body_venue": "{{ground}} has seen {{count}} titles and finals. It is now one of the famous grounds of the sport.",
         "body_trophy": "The first {{seasonNoun}} of the league in {{country}} is over, and its champions lifted {{name}}. You can give the trophy its own name now, free, on the flagship screen.",
         "body_chant": "{{club}} won a title nobody will forget, and their fans sang {{name}} all the way home. They have not stopped since.",
@@ -1894,7 +1894,7 @@
       "redemption": "the {{nickname}} Miracle"
     },
     "facts": {
-      "derby": "Born {{year}}: {{clubA}} and {{clubB}} on top together in {{count}} {{seasonsNoun}}.",
+      "derby": "Born {{year}}: {{clubA}} and {{clubB}}, rivals after {{count}} meetings so far.",
       "rite": "Born {{year}}: the first title of {{club}}.",
       "legacy": "Born {{year}}: {{player}} retired after a great career.",
       "nationalName": "Born {{year}}: the sport became the most followed in {{country}}.",
@@ -1906,7 +1906,7 @@
       "invincibles": "Born {{year}}: {{club}} won the title without losing a {{matchOne}}.",
       "signatureMove": "Born {{year}}: {{player}} made the move their own.",
       "matchdayFood": "Born {{year}}: a matchday tradition at the ground of {{club}}.",
-      "redemption": "Born {{year}}: {{club}} lifted their curse."
+      "redemption": "Born {{year}}: {{club}} lifted a curse that lasted {{cursed}} {{seasonsNoun}}."
     },
     "lost": {
       "faded": "Faded away in {{year}}.",
@@ -1914,6 +1914,22 @@
       "broken": "Broken by a rule change in {{year}}.",
       "renamed": "Renamed in {{year}}.",
       "lifted": "Lifted in {{year}}."
+    },
+    "groups": {
+      "rivalries": "Rivalries",
+      "people": "People",
+      "clubs": "Clubs and grounds",
+      "records": "Eras and records",
+      "country": "Country and league"
+    },
+    "page": {
+      "back": "All traditions",
+      "born": "Born",
+      "bornIn": "{{year}}, in {{country}}",
+      "origin": "How it began",
+      "seasons": "Seasons on record",
+      "followers": "Also kept in",
+      "lost": "Lost"
     },
     "byType": {
       "derby": "Derbies",

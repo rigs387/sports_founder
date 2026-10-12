@@ -11,7 +11,7 @@ import type { World } from "./types";
 //   ratingParity   flagship clubs' reversion to the league mean (flagship.ts driftRatings)
 //   flagshipClubs  the flagship's club count by tier (flagship.ts clubTarget)
 //   wageFactor     star wages and the payroll baseline at the seat (league-costs.ts)
-//   starPlaces     star places by league tier (flagship.ts)
+//   starPlaces     extra star places at every tier, 1 + total (flagship.ts)
 //   starMoves      a star's chance to move clubs (flagship.ts)
 //   scoring        scoring chances in flagship matches (flagship.ts)
 //   starPull       a backed star's casual conversion lift (flagship.ts backingEffects)
