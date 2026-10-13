@@ -184,6 +184,16 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     backed: z.boolean(),
   }),
   z.strictObject({
+    kind: z.literal("talentJoined"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    playerId: z.int().min(1),
+    clubId: z.int().min(1),
+    signed: z.boolean(),
+  }),
+  z.strictObject({
     kind: z.literal("scoringRecord"),
     turn: z.int().min(1),
     quarter: count,

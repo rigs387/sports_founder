@@ -835,6 +835,15 @@ three topics; national teams and the World Championship follow. Every number is 
 - *The signing card:* a decision card names a standout abroad who is ready to move. Paying PP
   brings them to the flagship now; the free default changes nothing. A standing PP purchase for
   signing players is not built for now.
+  - *Built 2026-10-12:* a newcomer takes the place of a retired leading player's untried young
+    replacement, so nobody who has played is pushed out. Clubs with such an opening take the best
+    standout abroad who is better than the replacement, the strongest club first: on their own
+    when the offseason closes (a 50% chance per club; at most 1 an offseason at a Professional
+    seat, 2 at Elite), or at once from the signing card (4 quarters of PP income, offered at most
+    once in 3 seasons, the map outlining the player's home). A seat about to move pulls no one.
+    A player who comes on their own is big news told from their home country; one the player
+    signed is no news. The follow adds 0.25 to the broadcast's link into the home country, 0.5
+    for a star, up to the strongest link. The home country's card names who it follows.
 - *Player of the Year:* a line only, no card. The flagship's Player of the Season against every
   standout, weighted by league tier (config); it is recorded each season and listed in the
   Almanac. Skill itself stays hidden.

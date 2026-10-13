@@ -156,6 +156,12 @@ function effectValue(
       const { casualConversion, mediaReach, influenceSeasons } = world.config.flagship.backing;
       return influenceSeasons * (casualConversion * weights.casual + mediaReach * weights.media);
     }
+    case "starSign": {
+      // A player from abroad (GDD v1.37): the broadcast's link into their home market grows
+      // while they play, for the seasons a backing takes to grow.
+      const { influenceSeasons } = world.config.flagship.backing;
+      return influenceSeasons * world.config.standouts.follow.link * weights.media;
+    }
     case "starKeep": {
       // A typical star's strength (bots never read hidden skill) stays with the weaker club, in
       // rating steps of competitive balance, against the share of league cash it costs.

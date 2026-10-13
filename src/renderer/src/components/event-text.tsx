@@ -52,6 +52,7 @@ export function Effect({ effect, star = {} }: { effect: EventEffect; star?: Star
     return <li>{t(`events.effects.clubRating_${effect.target}`, { count: effect.steps })}</li>;
   if (effect.type === "derbyStoke") return <li>{t("events.effects.derbyStoke")}</li>;
   if (effect.type === "starBack") return <li>{t("events.effects.starBack")}</li>;
+  if (effect.type === "starSign") return <li>{t("events.effects.starSign")}</li>;
   return (
     <li className={effect.type === "hardcoreDemotion" ? "event-tradeoff" : undefined}>
       {t(`events.effects.${effect.type === "fanShift" ? effect.target : effect.type}`, {
@@ -75,8 +76,11 @@ export function useEventText() {
     const found = snapshot.flagship.clubs.find((c) => c.id === id);
     return found ? t("flagship.club", { place: found.place, nickname: found.nickname }) : "";
   };
+  // A flagship player, or a standout still in their home league (GDD v1.37).
   const player = (id: number | null | undefined) =>
-    snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
+    snapshot.flagship.players.find((p) => p.id === id)?.name ??
+    snapshot.countries.flatMap((c) => c.standouts).find((p) => p.playerId === id)?.name ??
+    "";
   // The Hall of Fame's class card (GDD v1.31) names the class's year and size.
   const hallText = (event: EventRecord) => {
     const hall = event.facts.hall;
@@ -171,6 +175,8 @@ export function useEventText() {
     if (!star) return traditionText(event);
     return {
       player: player(star.playerId),
+      // The card's country: a player from abroad's home (GDD v1.37).
+      country: country(event.countryId),
       club: club(star.clubId),
       otherClub: club(star.otherClubId ?? undefined),
       candidate: player(star.candidateId),

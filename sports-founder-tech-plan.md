@@ -1430,6 +1430,20 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    standouts in 173 leagues, invariants clean. Not yet seen on screen with names: the smoke's
    short campaign has no Professional league abroad.
 
+   *Build order 2 built 2026-10-12 (talent pull, the follow, the signing card).*
+   `src/sim/talent.ts`: `openings` (offseason only: an active seat club whose leader retired
+   last season and whose replacement is untried), `bestAbroad`, `signingOffer`,
+   `joinFlagship` (the standout becomes the club's `Player` with their id and birthplace, the
+   replacement is removed, `departStandout` gives the home league a young one, a
+   `talentJoined` landmark), `pullTalent` (in `endTurn` before `closeOffseason`, on the
+   standouts' stream). Config `standouts.talentPull` and `standouts.follow`. Broadcast:
+   `followedReach` in `flagship.ts` adds to the reach into each foreign leading player's home.
+   Cards: star cards `signing` (decision `star-signing`, effect `starSign`, a season cooldown
+   in `events.seasonOffered`) and `arrived` (big moment `talent-arrived`, no slot), told from
+   the season's end and the landmark in `star-cards.ts`. Snapshot: `CountrySnapshot.atFlagship`.
+   Bots weigh signing by the follow's media reach. No save format change (a new landmark kind
+   and effect type only). Tests: `tests/talent.test.ts`.
+
 2. **National teams (topic 2).** Config `nationalTeams`: the lowest league tier that fields a
    team (semi-pro), base weights for league tier and hardcore share, the weight of a named
    player's skill, players counted (3). A pure function in a new `src/sim/national-teams.ts`

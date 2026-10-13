@@ -2,6 +2,7 @@ import type { EventEffect, EventTemplate, StarCard } from "../content";
 import type { EventRecord, EventState, StarFacts } from "./events-state";
 import { backStarBlocker, clubSeasonScores } from "./flagship";
 import { runningCostPerQuarter } from "./leagues";
+import { canJoin, joinFlagship, signingOffer } from "./talent";
 import { type GameState, type Landmark, PLAYER_INDEX, type Player, type World } from "./types";
 
 // Flagship stars as cards (GDD v1.16). Every card is built from recorded facts: a season summary's
@@ -55,7 +56,28 @@ function starFacts(state: GameState, world: World, landmark: Landmark): StarFact
   const summary = state.flagship.seasons.find((s) => s.season === landmark.season);
   if (!summary) return [];
   const first = state.landmarks.find((l) => l.kind === "firstStar");
-  return summary.newStarIds.flatMap((starId): StarFactCard[] => {
+  // A standout abroad the player may sign for a club whose leader retired (GDD v1.37).
+  const offer = signingOffer(state, world);
+  const signing: StarFactCard[] = offer
+    ? [
+        {
+          card: "signing",
+          countryId: offer.standout.countryId,
+          facts: {
+            playerId: offer.standout.id,
+            clubId: offer.opening.club.id,
+            otherClubId: null,
+            candidateId: null,
+            season: summary.season,
+            scores: 0,
+            matches: 0,
+            clubScores: 0,
+            seasons: 0,
+          },
+        },
+      ]
+    : [];
+  const breakouts = summary.newStarIds.flatMap((starId): StarFactCard[] => {
     const star = state.flagship.players.find((p) => p.id === starId);
     const line = star?.career.find((l) => l.season === landmark.season);
     if (!star || !line) return [];
@@ -79,6 +101,7 @@ function starFacts(state: GameState, world: World, landmark: Landmark): StarFact
       },
     ];
   });
+  return [...breakouts, ...signing];
 }
 
 /** The card a star landmark other than a season's end calls for, and its facts; null if none. */
@@ -143,6 +166,16 @@ function starFact(state: GameState, world: World, landmark: Landmark): StarFactC
         facts: { ...base(star, star.clubId, landmark.season), scores: landmark.scores },
       };
     }
+    case "talentJoined": {
+      // A signed player's arrival was the player's own choice: no news of it.
+      const star = find(landmark.playerId);
+      if (!star || landmark.signed) return null;
+      return {
+        card: "arrived",
+        countryId: landmark.countryId,
+        facts: base(star, landmark.clubId, landmark.season),
+      };
+    }
     case "starDropped": {
       const star = find(landmark.playerId);
       if (!star) return null;
@@ -166,6 +199,8 @@ export function takesNoSlot(card: EventTemplate | undefined): boolean {
     card?.story === "champion" ||
     card?.star === "breakout" ||
     card?.star === "backable" ||
+    // A player arriving from abroad changes where the league airs (GDD v1.37).
+    card?.star === "arrived" ||
     card?.deal != null ||
     card?.trigger === "hall" ||
     card?.trigger === "award" ||
@@ -186,12 +221,21 @@ export function offerStarCards(
 ): EventState {
   const pending = [...events.pending];
   const modifiers = [...events.modifiers];
+  const seasonOffered = { ...events.seasonOffered };
   let nextId = events.nextId;
   const left = { ...room };
   for (const landmark of recent)
     for (const fact of starFacts(state, world, landmark)) {
       const card = world.events.cards.find((c) => c.star === fact.card);
       if (!card || state.ppTier < card.minTier) continue;
+      if (fact.card === "signing") {
+        // Offered at most once in cardEverySeasons (GDD v1.37).
+        const last = seasonOffered[card.id];
+        const { cardEverySeasons } = world.config.standouts.talentPull;
+        if (last !== undefined && fact.facts.season - last < cardEverySeasons) continue;
+        if (left.decision <= 0) continue;
+        seasonOffered[card.id] = fact.facts.season;
+      }
       if (!takesNoSlot(card)) {
         if (left[card.kind] <= 0) continue;
         left[card.kind] -= 1;
@@ -231,7 +275,7 @@ export function offerStarCards(
           endQuarter: state.quarter + effect.quarters,
         });
     }
-  return { ...events, pending, modifiers, nextId };
+  return { ...events, pending, modifiers, seasonOffered, nextId };
 }
 
 /** The league cash a keep-or-let-move card's keep choice costs now. */
@@ -284,6 +328,9 @@ export function starEffectBlocker(
       if (blocker === "slots") return "slots";
       return blocker === null || blocker === "pp" ? null : "star";
     }
+    case "starSign":
+      // The standout must still be abroad and the club's place still open (GDD v1.37).
+      return canJoin(state, facts.playerId, facts.clubId) ? null : "star";
     case "starKeep": {
       // Both clubs must still have the players the move swapped.
       const other = state.flagship.players.find(
@@ -309,6 +356,8 @@ export function applyStarEffect(
 ): GameState {
   const facts = event.facts.star;
   if (!facts) throw new Error("Star effect without star facts");
+  if (effect.type === "starSign")
+    return joinFlagship(state, world, facts.playerId, facts.clubId, true);
   const players = state.flagship.players.map((player) => ({ ...player }));
   const star = players.find((p) => p.id === facts.playerId);
   if (!star) throw new Error("Star effect names an unknown player");

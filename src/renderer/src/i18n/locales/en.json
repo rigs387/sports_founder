@@ -87,6 +87,7 @@
       "starMentor": "{{candidate}} gets a lift to their scoring this {{seasonNoun}}, then takes the backing with {{share, number(style: percent)}} of the influence.",
       "starKeep": "Costs the league {{cash, money}}. The move is canceled.",
       "starBack": "Backs the star now: their influence grows each season they play here.",
+      "starSign": "They join the club now as its leading player. The league's broadcast reaches further into their home country while they play.",
       "derbyStoke": "Counts as one more meeting toward a derby between these two clubs."
     },
     "blockers": {
@@ -251,6 +252,18 @@
           "back": "Back this star",
           "not-now": "Not now"
         }
+      },
+      "star-signing": {
+        "title": "{{player}} wants the big stage",
+        "body": "{{player}}, the best player in {{country}}, is ready to leave home. {{club}} lost their leader to retirement and would build around the newcomer. {{country}} would follow every {{matchNoun}}.",
+        "choices": {
+          "sign": "Bring them in",
+          "not-now": "Not now"
+        }
+      },
+      "talent-arrived": {
+        "title": "{{player}} joins {{club}}",
+        "body": "{{player}} has left {{country}} to lead {{club}}. Fans in {{country}} now follow the league to watch one of their own."
       },
       "star-final-season": {
         "title": "One last {{seasonNoun}}",
@@ -1289,6 +1302,8 @@
     "backedStars_other": "Backed stars: {{names, list}}",
     "wealthLevel": "Spending power: {{level}}",
     "maxTier": "League ceiling: {{tier}}",
+    "atFlagship_one": "Followed abroad: {{names, list}} plays in the flagship league",
+    "atFlagship_other": "Followed abroad: {{names, list}} play in the flagship league",
     "standouts_one": "League standout: {{names, list}}",
     "standouts_other": "League standouts: {{names, list}}",
     "maxTierSeat": "League ceiling: none while it holds the seat",

@@ -13,14 +13,14 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-12",
-    tests: 619,
-    files: 65,
-    note: "npm run check passed after standouts were built (type checks, Biome, purity, 619 tests in 65 files). Lint has existing visual-study warnings.",
+    tests: 625,
+    files: 66,
+    note: "npm run check passed after the talent pull was built (type checks, Biome, purity, 625 tests in 66 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-12",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
   },
-  eventDeck: { current: 42, target: "40–60" },
+  eventDeck: { current: 44, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -88,8 +88,8 @@ window.SF_PROGRESS = {
     },
     {
       title: "The #1 hold is now a contest",
-      text: "Lead lost before the win in 36 of 70 campaigns (51%), on target, after Culture (traditions shelter the player's hardcore fans from rivals). Builder, 12 typical anchors × 6 seeds, 200 turns. Championships and rich-market defense carry it. With the growth tracks it held at 13 of 24 (2026-10-10). Not yet remeasured with two-quarter turns at tier 5 (GDD v1.36).",
-      date: "2026-10-04",
+      text: "Lead lost before the win in 36 of 70 campaigns (51%), on target, after Culture (traditions shelter the player's hardcore fans from rivals). Builder, 12 typical anchors × 6 seeds, 200 turns. Championships and rich-market defense carry it. With the growth tracks it held at 13 of 24 (2026-10-10). With two-quarter turns at tier 5 (GDD v1.36) and the talent pull (GDD v1.37): 17 of 35 (49%), builder, 12 typical anchors × 3 seeds, 200 turns; pacing passes. Remeasure after the World Championship.",
+      date: "2026-10-12",
       system: "rivals",
     },
     {
@@ -100,6 +100,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-12",
+      type: "Built",
+      title: "Talent pull and the signing card",
+      text: "Tech plan 2.23, build order 2 of 7 (GDD v1.37): the flagship draws the best standouts abroad. A newcomer takes the place of a retired leading player's untried young replacement: on their own when the offseason closes (a 50% chance per club, at most 1 an offseason at a Professional seat and 2 at Elite), or at once from a signing card for 4 quarters of PP income, offered at most once in 3 seasons. They keep their birthplace; the broadcast's link into their home country gains 0.25 (0.5 for a star), and the home country's card names who it follows. An unpaid arrival is big news from the player's home. One builder campaign (Germany, 140 turns): 31 joined, 1 signed, 5 leading clubs at the end, all stars. Pacing (12 anchors × 3 seeds, 200 turns): passes, #1 lost before the win in 17 of 35. A 200-turn campaign now takes 6–8 s, so the pacing experiment needs --campaigns 3 to fit five minutes; standouts are under a tenth of that. npm run check: 625 tests in 66 files; smoke passed, though its short campaign never reaches a Professional seat, so the two new cards were not seen on screen.",
+    },
     {
       date: "2026-10-12",
       type: "Built",
@@ -672,7 +678,10 @@ window.SF_PROGRESS = {
           "built",
           "Flagship broadcast: media reach where it airs by season interest and health, pulses, ripple (GDD v1.23, v1.27)",
         ],
-        ["planned", "Talent pull toward the flagship and a signing card (designed, GDD v1.37)"],
+        [
+          "built",
+          "Talent pull toward the flagship, the broadcast follow at home and a signing card (GDD v1.37)",
+        ],
         [
           "built",
           "Leagues overview: a sortable table of every league and bulk promotion (GDD v1.34)",
@@ -716,7 +725,7 @@ window.SF_PROGRESS = {
           "Moments have weight: big back pages and headline front pages that wait for you (GDD v1.26)",
         ],
         ["built", "Auto-collect for minor moments (on by default, GDD v1.32)"],
-        ["built", "Event library: 42 cards in content/events.yaml (planned 40–60)"],
+        ["built", "Event library: 44 cards in content/events.yaml (planned 40–60)"],
         ["planned", "Broader tier-weighted negative events and personal stories"],
         ["built", "Bots that weigh and choose non-default options"],
       ],
@@ -819,7 +828,7 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Standouts exist in other leagues (tech plan 2.23, build order 1). Next: talent pull toward the flagship, the broadcast follow and the signing card (build order 2).",
+      next: "Standouts exist in other leagues (tech plan 2.23, build order 1). Talent pull, the broadcast follow and the signing card are built (build order 2). Next: Player of the Year (build order 3).",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],

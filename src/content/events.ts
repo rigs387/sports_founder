@@ -43,6 +43,8 @@ export const eventEffectSchema = z.union([
   z.strictObject({ type: z.literal("starKeep") }),
   /** Backs the new star from their breakout card at the backing price (GDD v1.35). */
   z.strictObject({ type: z.literal("starBack") }),
+  /** Brings the named standout from abroad to the flagship now (GDD v1.37). */
+  z.strictObject({ type: z.literal("starSign") }),
   // The repeat-final card only (GDD v1.22): one extra meeting toward a derby between the two clubs.
   z.strictObject({ type: z.literal("derbyStoke") }),
 ]);
@@ -78,14 +80,24 @@ export const STAR_CARDS = [
   "succession",
   "keepOrMove",
   "dropped",
+  // Talent from abroad (GDD v1.37): a standout the player may sign, and one who came on their own.
+  "signing",
+  "arrived",
 ] as const;
 export type StarCard = (typeof STAR_CARDS)[number];
-const STAR_DECISIONS: readonly StarCard[] = ["succession", "keepOrMove", "dropped", "backable"];
+const STAR_DECISIONS: readonly StarCard[] = [
+  "succession",
+  "keepOrMove",
+  "dropped",
+  "backable",
+  "signing",
+];
 const STAR_EFFECT_CARD = {
   starHonors: "succession",
   starMentor: "succession",
   starKeep: "keepOrMove",
   starBack: "backable",
+  starSign: "signing",
 };
 /** The flagship season facts a card can tell (GDD v1.15), highest priority first after the champion. */
 export const SEASON_STORIES = [
@@ -270,7 +282,8 @@ const template = z
       if (
         (effect.type === "starHonors" ||
           effect.type === "starMentor" ||
-          effect.type === "starKeep") &&
+          effect.type === "starKeep" ||
+          effect.type === "starSign") &&
         card.star !== STAR_EFFECT_CARD[effect.type]
       )
         issue(`${effect.type} belongs to the ${STAR_EFFECT_CARD[effect.type]} star card only`);

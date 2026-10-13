@@ -393,7 +393,8 @@ function applyEffects(
       effect.type === "starHonors" ||
       effect.type === "starMentor" ||
       effect.type === "starKeep" ||
-      effect.type === "starBack"
+      effect.type === "starBack" ||
+      effect.type === "starSign"
     ) {
       next = applyStarEffect(next, world, event, effect);
       continue;
@@ -700,7 +701,12 @@ export function eventProblems(state: GameState, world: World): string[] {
   }
   for (const [templateId, season] of Object.entries(state.events.seasonOffered)) {
     const card = world.events.cards.find((c) => c.id === templateId);
-    if (!card || card.story === null || season >= state.flagship.season)
+    // Season cards, and the signing card's own season cooldown (GDD v1.37).
+    if (
+      !card ||
+      (card.story === null && card.star !== "signing") ||
+      season >= state.flagship.season
+    )
       problems.push("Invalid season card cooldown");
   }
   for (const modifier of state.events.modifiers)

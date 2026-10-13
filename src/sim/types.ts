@@ -531,6 +531,21 @@ export type Landmark =
       clubId: number;
       backed: boolean;
     }
+  /**
+   * A standout from abroad joined a flagship club as its leading player (GDD v1.37). The country
+   * is the player's home, the season the one just finished; `signed` is whether the player paid
+   * for it on the signing card.
+   */
+  | {
+      kind: "talentJoined";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      playerId: number;
+      clubId: number;
+      signed: boolean;
+    }
   /** A player became the league's all-time top scorer. */
   | {
       kind: "scoringRecord";

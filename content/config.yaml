@@ -742,6 +742,19 @@ identity:
 standouts:
   places: { amateur: 0, semi-pro: 0, professional: 2, elite: 3 }
   peakLean: { amateur: 0, semi-pro: 0, professional: 0, elite: 8 }
+  # Talent pull (GDD v1.37). A flagship club whose leading player retired gets a young
+  # replacement at the season's end. While the offseason is open the best standout abroad who is
+  # better than that replacement may take the place instead: on their own when the offseason
+  # closes (chance per club, at most perOffseason by the seat league's tier), or at once when the
+  # player pays for the signing card, offered at most once in cardEverySeasons. The home league
+  # gets a young replacement.
+  talentPull:
+    perOffseason: { amateur: 0, semi-pro: 0, professional: 1, elite: 2 }
+    chance: 0.5
+    cardEverySeasons: 3
+  # A flagship leading player born abroad is followed at home: the broadcast's link into their
+  # country (0–1, a share of the seat's strongest media link) gains link, × starFactor for a star.
+  follow: { link: 0.25, starFactor: 2 }
 
 flagship:
   # Clubs by the flagship league's tier. Promotion admits generated expansion clubs at the next

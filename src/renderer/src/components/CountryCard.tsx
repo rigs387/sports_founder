@@ -101,6 +101,14 @@ export function CountryCard({
                 ? t("map.maxTierSeat")
                 : t("map.maxTier", { tier: t(`league.tiers.${country.maxTier}`) })}
             </p>
+            {country.atFlagship.length > 0 && (
+              <p className="wealth-level" data-testid="country-at-flagship">
+                {t("map.atFlagship", {
+                  count: country.atFlagship.length,
+                  names: country.atFlagship,
+                })}
+              </p>
+            )}
             {country.standouts.length > 0 && (
               <p className="wealth-level" data-testid="country-standouts">
                 {t("map.standouts", {

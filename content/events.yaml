@@ -760,6 +760,48 @@ cards:
         quarters: 0
         effects: [{ type: starBack }]
       - { id: not-now, quarters: 0, effects: [] }
+  # Talent from abroad (GDD v1.37). The signing card names the best standout abroad and a
+  # flagship club whose leading player just retired; signing costs quarters of PP income and
+  # brings them in at once. The free default changes nothing (the pull may still bring someone).
+  - id: star-signing
+    kind: decision
+    tone: positive
+    priority: 200
+    trigger: star
+    star: signing
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    defaultChoice: not-now
+    choices:
+      - id: sign
+        quarters: 4
+        effects: [{ type: starSign }]
+      - { id: not-now, quarters: 0, effects: [] }
+  - id: talent-arrived
+    kind: moment
+    weight: big
+    tone: positive
+    priority: 200
+    trigger: star
+    star: arrived
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   - id: star-final-season
     kind: moment
     weight: minor

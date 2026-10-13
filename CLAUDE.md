@@ -46,7 +46,7 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   as prove the point.
 - `npm run sim -- --campaigns 5 --turns 100`: headless runner, which writes to `runs/latest/`.
   `--help` lists the options, bots (greedy-spread, builder, anchor-turtle, media-rush, random) and
-  experiments. A 200-turn campaign takes about 2-3 s. Every run prints its plan (campaign count)
+  experiments. A 200-turn campaign takes about 6-8 s (measured 2026-10-12). Every run prints its plan (campaign count)
   first and progress every 15 s, and stops after its first campaign if it is projected to run past
   `--max-minutes` (default 5), saying how to shrink it (`src/runner/budget.ts`). Raise the budget
   only when the user asks for a long run. Bots answer event decisions by their own weights
@@ -56,8 +56,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   at Near-Collapse and the deal slate by league tier against `balanceTargets.dealSlateShare`,
   and a Remembers line (GDD v1.31): Hall of Fame inductees, chants and their spread, the anchor's
   shrine weight and how often bots buy Culture nodes.
-- `npm run sim -- --experiment pacing --turns 200`: one balance experiment (12 anchors × 5 seeds,
-  about 3 minutes; it also gives the win contest). Experiments: differentiation, collapse, hard-anchor, pacing, options, rivals,
+- `npm run sim -- --experiment pacing --turns 200 --campaigns 3`: one balance experiment (12
+  anchors × 3 seeds, about 3 minutes; the default 5 seeds no longer fits the 5-minute budget; it
+  also gives the win contest). Experiments: differentiation, collapse, hard-anchor, pacing, options, rivals,
   benchmark. Misses are reported, never counted as passes. Defaults are sized to finish in minutes:
   balanceTargets.experimentAnchors (12) sampled anchors with 5 seeds each (spread beats
   repetition: 5 anchors misread the win contest as 19% when 12 read 36%), optionsGenomesPerAnchor (40),
@@ -327,8 +328,17 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   curve and no club, matches or effect. `updateStandouts` runs once per `endTurn` after culture,
   on its own random stream: they age and retire by the flagship's career rules when the flagship
   starts a new season, and leagues are trimmed and filled to their places. Ids come from
-  `flagship.nextPlayerId`. Skill stays out of the snapshot (`CountrySnapshot.standouts`). Talent
-  pull, national teams and the World Championship are designed, not built (tech plan 2.23).
+  `flagship.nextPlayerId`. Skill stays out of the snapshot (`CountrySnapshot.standouts`).
+  National teams and the World Championship are designed, not built (tech plan 2.23).
+- Talent pull (GDD v1.37) is `src/sim/talent.ts`. An opening is an active seat club whose leader
+  retired last season and whose young replacement has not played (`openings`, offseason only).
+  `pullTalent` runs in `endTurn` before `closeOffseason`: by chance, up to
+  `standouts.talentPull.perOffseason` by the seat's tier, the best standout abroad takes an
+  opening (`joinFlagship`: same id and birthplace, a `talentJoined` landmark, a young
+  replacement at home). The signing card (`star-signing`, effect `starSign`) does the same at
+  once for PP; an unpaid arrival is the `talent-arrived` moment. A flagship leading player born
+  abroad lifts the broadcast's reach into their home (`followedReach`, `standouts.follow`);
+  so a flagship `Player.countryId` is the birth country, not always the seat.
 - The win hold is a contest (GDD v1.8): near #1 (`rivalAI.nearTop`) rival intensity peaks just past
   parity, rivals defend wherever the player holds ground in their territory, and they may buy more
   countermoves per quarter. The runner reports how many campaigns lost #1 before winning; the

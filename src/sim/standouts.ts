@@ -151,6 +151,41 @@ export function updateStandouts(state: GameState, world: World): GameState {
   };
 }
 
+/**
+ * A standout leaves their league for the flagship (GDD v1.37): they are no longer a standout, and
+ * the league's place goes to a young replacement while it still has one.
+ */
+export function departStandout(state: GameState, world: World, standoutId: number): GameState {
+  const leaving = state.standouts.players.find((player) => player.id === standoutId);
+  if (!leaving) return state;
+  const players = state.standouts.players.filter((player) => player.id !== standoutId);
+  const index = state.countries.findIndex((c) => c.countryId === leaving.countryId);
+  const tier = state.countries[index]?.league?.tier;
+  const here = players.filter((player) => player.countryId === leaving.countryId).length;
+  if (!tier || here >= standoutPlaces(state, world, index))
+    return { ...state, standouts: { ...state.standouts, players } };
+  const rng = restoreRng(state.standouts.rng);
+  const taken = new Set([
+    ...state.flagship.players.map((player) => player.name),
+    ...state.standouts.players.map((player) => player.name),
+  ]);
+  const young = newStandout(
+    world,
+    rng,
+    state.flagship.nextPlayerId,
+    leaving.countryId,
+    tier,
+    state.flagship.season,
+    taken,
+    true,
+  );
+  return {
+    ...state,
+    flagship: { ...state.flagship, nextPlayerId: state.flagship.nextPlayerId + 1 },
+    standouts: { ...state.standouts, rng: saveRng(rng), players: [...players, young] },
+  };
+}
+
 /** Every way the standouts are invalid. */
 export function standoutProblems(state: GameState, world: World): string[] {
   const problems: string[] = [];

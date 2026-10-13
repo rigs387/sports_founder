@@ -6,7 +6,7 @@ import { leagueIncomePerQuarter } from "./deals";
 import { type EventSnapshot, eventSnapshots } from "./events";
 import type { EventState } from "./events-state";
 import { fandomScore, localRank, type SportTotals, sportTotals } from "./fandom";
-import { broadcastEffects, type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
+import { activeClubs, broadcastEffects, type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import {
   effectValue,
@@ -101,6 +101,11 @@ export interface CountrySnapshot {
    * Skill stays out of the snapshot; the order is all that shows.
    */
   standouts: StandoutSnapshot[];
+  /**
+   * Players born here who lead a flagship club abroad (GDD v1.37), by name: the broadcast reaches
+   * further into their home while they play.
+   */
+  atFlagship: string[];
   casual: number;
   hardcore: number;
   fandomScore: number;
@@ -376,6 +381,14 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
   const broadcast = broadcastEffects(state, world);
   const { casualWeight } = world.config.fandomScore;
   const shape = shapeFactors(world, state.growthNodes);
+  // Leading players of the seat's active clubs who were born in another market (GDD v1.37).
+  const seatClubs = new Set(activeClubs(state.flagship).map((club) => club.id));
+  const abroad = state.flagship.players.filter(
+    (player) =>
+      player.retiredSeason === null &&
+      seatClubs.has(player.clubId) &&
+      player.countryId !== state.flagship.countryId,
+  );
   const countries = state.countries.map((countryState, index): CountrySnapshot => {
     const country = world.countries[index];
     const fans = countryState.fans[PLAYER_INDEX];
@@ -397,6 +410,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
         age: state.flagship.season - player.birthSeason,
         finalSeason: player.finalSeason,
       })),
+      atFlagship: abroad.filter((player) => player.countryId === country.id).map((p) => p.name),
       sports: countryStandings(state, world, index),
       localRank: localRank(state, world, index),
       leaderSportId: leadingSport(state, world, index),

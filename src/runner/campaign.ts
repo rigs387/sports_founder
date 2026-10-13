@@ -17,6 +17,7 @@ import {
   type Genome,
   leagueCosts,
   leagueIncomePerQuarter,
+  mediaReachFrom,
   PLAYER_INDEX,
   payingDeals,
   QUARTERS_PER_YEAR,
@@ -167,7 +168,12 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       );
     }
     broadcastShares.push(media > 0 ? broadcast / media : 0);
-    broadcastReaches ||= broadcastEffects(current, world).reach.size > 0;
+    // The seat's own media links only: a player from abroad followed at home (GDD v1.37) does not
+    // make a small media market a large one.
+    const seatIndex = world.countries.findIndex((c) => c.id === current.flagship.countryId);
+    broadcastReaches ||=
+      broadcastEffects(current, world).countryId !== null &&
+      mediaReachFrom(world, seatIndex).size > 0;
     const seat = world.countries.findIndex((c) => c.id === current.flagship.countryId);
     const seatLeague = current.countries[seat]?.league ?? null;
     if (seatLeague) {

@@ -1190,6 +1190,22 @@ export const configFileSchema = z.strictObject({
   standouts: z.strictObject({
     places: byLeagueTier(z.int().min(0)),
     peakLean: byLeagueTier(z.number()),
+    /**
+     * Talent pull: while the offseason is open, each flagship club whose leading player just
+     * retired may take the best standout abroad instead of its young replacement, with chance
+     * `chance`, at most perOffseason by the seat league's tier. The signing card is offered at
+     * most once in cardEverySeasons.
+     */
+    talentPull: z.strictObject({
+      perOffseason: byLeagueTier(z.int().min(0)),
+      chance: unitInterval,
+      cardEverySeasons: z.int().min(1),
+    }),
+    /**
+     * A flagship leading player born abroad is followed at home: the broadcast's link into their
+     * country gains `link` (× starFactor for a star), up to the strongest link.
+     */
+    follow: z.strictObject({ link: unitInterval, starFactor: z.number().min(1) }),
   }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({

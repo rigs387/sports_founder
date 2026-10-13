@@ -36,6 +36,7 @@ export * from "./spread";
 export * from "./standings";
 export * from "./standouts";
 export * from "./star-cards";
+export * from "./talent";
 export * from "./tiers";
 export * from "./tournaments";
 export * from "./tradition-cards";

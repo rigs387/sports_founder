@@ -7,6 +7,7 @@ import { closeOffseason, returnSeatIfFolded } from "./flagship";
 import { evaluateLeagues } from "./leagues";
 import { stepQuarter } from "./quarter";
 import { updateStandouts } from "./standouts";
+import { pullTalent } from "./talent";
 import { applyDefaultSlotDrops, updateTierTrack } from "./tiers";
 import type { GameState, World } from "./types";
 import { updateWinTrack } from "./win";
@@ -40,7 +41,8 @@ export function endTurn(state: GameState, world: World): GameState {
   const opened = state.flagship.offseason;
   // Closing the offseason may move the seat or pass a rule demand's deadline (GDD v1.28).
   const start = breakDeals(
-    closeOffseason(applyDefaultSlotDrops(settleEvents(state, world)), world),
+    // The best standouts abroad may join the flagship before its clubs are fitted (GDD v1.37).
+    closeOffseason(pullTalent(applyDefaultSlotDrops(settleEvents(state, world)), world), world),
     world,
     opened,
   );

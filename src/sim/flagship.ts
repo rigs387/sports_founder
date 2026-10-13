@@ -488,6 +488,32 @@ export function mediaReachFrom(world: World, source: number): ReadonlyMap<number
 const NOWHERE: ReadonlyMap<number, number> = new Map();
 
 /**
+ * The seat's reach with its players from abroad followed at home (GDD v1.37): each leading player
+ * of an active club who was born in another market adds to the link into that market, more for a
+ * star, up to the strongest link.
+ */
+function followedReach(
+  flagship: FlagshipState,
+  world: World,
+  reach: ReadonlyMap<number, number>,
+): ReadonlyMap<number, number> {
+  const { link, starFactor } = world.config.standouts.follow;
+  const active = new Set(activeClubs(flagship).map((club) => club.id));
+  const abroad = flagship.players.filter(
+    (player) =>
+      playing(player) && active.has(player.clubId) && player.countryId !== flagship.countryId,
+  );
+  if (abroad.length === 0 || link <= 0) return reach;
+  const followed = new Map(reach);
+  for (const player of abroad) {
+    const home = indexOf(world, player.countryId);
+    const lift = link * (player.starSince === null ? 1 : starFactor);
+    followed.set(home, Math.min(1, (followed.get(home) ?? 0) + lift));
+  }
+  return followed;
+}
+
+/**
  * The flagship's broadcast (GDD v1.23, revised v1.27): while a league holds the seat, media reach
  * into every market its media reaches is multiplied by 1 + (ceiling × interest × health + a pulse
  * fading from the last season's end) × the market's link from the seat ÷ the strongest. A league
@@ -523,7 +549,7 @@ export function broadcastEffects(
   const since = own ? state.quarter - (flagship.seasons[last]?.quarter ?? 0) : Infinity;
   const fade = Math.max(0, 1 - since / settings.pulse.fadeQuarters);
   const pulse = ceiling * settings.pulse.size * settings.pulse.story[interest] * health * fade;
-  const reach = mediaReachFrom(world, seat);
+  const reach = followedReach(flagship, world, mediaReachFrom(world, seat));
   const ripple =
     league.health === "near-collapse"
       ? new Map([...reach].map(([target, link]) => [target, settings.rippleShare * link]))
