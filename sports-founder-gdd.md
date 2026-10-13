@@ -905,6 +905,13 @@ Phase 2 outline above, which stands. Every number is config (`worldChampionship`
   knocked out in the first round loses casual fans at home.
 - *The Hall of Fame:* flagship players on the winning team earn Hall points (config). Standouts
   are still never inducted.
+- *Built 2026-10-12 (founding, calendar and hosts; the tournament itself is not built yet):*
+  founding costs 12 quarters of PP income and needs 16 countries able to field a team. The
+  calendar runs on flagship seasons: a tournament is played when a season ends, the first at the
+  end of the season that starts after the founding offseason, then every 4 seasons. Bids (3 or 4,
+  drawn by 2 ^ wealth level from countries with a league, never the last host) arrive at once on
+  founding, and after that in the offseason before each tournament. The pick is final. Until the
+  tournament is built, its date passes with only the host on record.
 - *Measure after building:* this is new ground gained against the rivals; the #1 contest (about
   half lose #1 before the win) is remeasured and the lifts tuned to keep it.
 

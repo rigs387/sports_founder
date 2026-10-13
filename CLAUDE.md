@@ -336,8 +336,16 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   never saved: a country with a league at `nationalTeams.minTier` or above fields one, on its
   league tier, the player's hardcore share and its best named nationals wherever they play
   (flagship leaders by birth country, and standouts). Strength and skill stay out of the
-  snapshot (`TurnSnapshot.nationalTeams`: rank and names); the list is in the Almanac. The
-  World Championship is designed, not built (tech plan 2.23).
+  snapshot (`TurnSnapshot.nationalTeams`: rank and names); the list is in the Almanac.
+- The World Championship (GDD v1.37) lives in `src/sim/world-championship.ts` and
+  `GameState.worldChampionship`. Built so far: founding (`foundChampionship`, offseason only,
+  `worldChampionship.foundingTeams` national teams, a PP price), the calendar and hosts. The
+  calendar runs on flagship seasons: `nextSeason` is the season whose end the next tournament
+  is played at. Bids are drawn on founding and by `updateChampionship` (end of `endTurn`) in
+  the offseason before each tournament; `pickHost` is final, and `settleHost` gives an
+  unpicked one to the wealthiest bidder before `closeOffseason`. The tournament itself is not
+  built: its date passes with only the host on record (tech plan 2.23, build order 6). The UI
+  is `src/renderer/src/championship/ChampionshipCard.tsx`, on the offseason screen only.
 - Talent pull (GDD v1.37) is `src/sim/talent.ts`. An opening is an active seat club whose leader
   retired last season and whose young replacement has not played (`openings`, offseason only).
   `pullTalent` runs in `endTurn` before `closeOffseason`: by chance, up to
@@ -429,6 +437,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   leagues fill their places at the next turn's end.
 - Save format 28 adds Player of the Year (GDD v1.37): `StandoutsState.playersOfYear`. Format 27
   migrates with no winners.
+- Save format 29 adds the World Championship (GDD v1.37): `GameState.worldChampionship`.
+  Format 28 migrates with it unfounded.
 - The saves folder (GDD v1.35) is `savesFolder` in `src/main/save-files.ts`: Saved Games\Sports
   Founder on Windows. Each session save carries a `header` for the Load screen (the Campaign
   menu's list, `campaign:list` / `campaign:open-named`); an autosave after each turn keeps

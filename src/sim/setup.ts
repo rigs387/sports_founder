@@ -21,6 +21,7 @@ import {
   type SportState,
   type World,
 } from "./types";
+import { newWorldChampionship } from "./world-championship";
 
 export function createCampaign(world: World, setup: CampaignSetup): GameState {
   if (!Number.isInteger(setup.seed) || setup.seed < 0 || setup.seed > MAX_SEED) {
@@ -97,7 +98,10 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     i === 0 ? setup.anchorCountryId : null,
   );
 
-  const founded: Omit<GameState, "identity" | "rules" | "culture" | "hallOfFame" | "standouts"> = {
+  const founded: Omit<
+    GameState,
+    "identity" | "rules" | "culture" | "hallOfFame" | "standouts" | "worldChampionship"
+  > = {
     seed: setup.seed,
     rng: createRngState(setup.seed),
     anchorCountryId: setup.anchorCountryId,
@@ -142,6 +146,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     culture: newCulture(setup.seed, 1, founded.landmarks.length, 0, world),
     hallOfFame: newHallOfFame(1),
     standouts: newStandouts(setup.seed, 1),
+    worldChampionship: newWorldChampionship(setup.seed),
   };
 }
 

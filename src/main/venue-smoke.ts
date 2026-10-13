@@ -74,6 +74,17 @@ export async function verifyVenue(win: BrowserWindow, screenshot: (name: string)
   await evaluate(`document.querySelector('${CARD}').scrollIntoView()`);
   await screenshot("53-venue-building.png");
 
+  // The World Championship card (GDD v1.37), below the trophy on the same screen.
+  const championship = await evaluate<string>(
+    `document.querySelector('[data-testid="championship"]')?.textContent ?? ""`,
+  );
+  if (championship === "" || championship.includes("{{"))
+    throw new Error(
+      `The World Championship card is missing or has unfilled words: ${championship}`,
+    );
+  await evaluate(`document.querySelector('[data-testid="championship"]').scrollIntoView()`);
+  await screenshot("53b-championship.png");
+
   win.setContentSize(390, 844);
   await delay();
   await evaluate(`document.querySelector('${CARD}').scrollIntoView()`);

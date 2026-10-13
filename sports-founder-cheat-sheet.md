@@ -274,7 +274,8 @@ year after and then every 4 years, rival years or not; 3–4 countries bid to ho
 picks; it plays in one turn on its own championship page (draw, bracket, champion) plus a headline
 and story cards; a casual lift by how far each team went, a big boost for the host and an
 underdog, casual losses at home for a top seed out in round one; Hall points for flagship players
-who win it. Remeasure the #1 contest after building.
+who win it. Remeasure the #1 contest after building. (Built so far: founding for 12 quarters of
+PP, the calendar on flagship seasons, bids and the host; the tournament itself is next.)
 
 **Awards (v1.33):** the flagship's Player of the Season (composite of scores, club finish, playoff
 and final scores) and the top scorer's prize; Hall of Fame points; named after the first Hall of

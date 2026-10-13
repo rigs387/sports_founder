@@ -219,6 +219,19 @@ export const landmarks = {
     clubId,
     signed,
   }),
+  championshipFounded: (turn: number, quarter: number, countryId: string): Landmark => ({
+    kind: "championshipFounded",
+    turn,
+    quarter,
+    countryId,
+  }),
+  championshipHost: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    season: number,
+    picked: boolean,
+  ): Landmark => ({ kind: "championshipHost", turn, quarter, countryId, season, picked }),
   scoringRecord: (
     turn: number,
     quarter: number,

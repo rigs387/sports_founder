@@ -33,6 +33,13 @@ import {
   type World,
 } from "./types";
 import { buildVenue, venueBlocker } from "./venue-actions";
+import {
+  foundBlocker,
+  foundChampionship,
+  foundingPrice,
+  hostBlocker,
+  pickHost,
+} from "./world-championship";
 
 // The player's legal actions. Every action, from the UI or a bot, goes through applyAction, which
 // validates legality first, so nothing can bypass the rules.
@@ -51,6 +58,8 @@ import { buildVenue, venueBlocker } from "./venue-actions";
 //   amendRule       change one rule trait, in the offseason, once a year (GDD v1.20)
 //   nameTrophy      name the flagship's newborn trophy, free, while its champion card is open
 //                   (GDD v1.22)
+//   foundChampionship  found and name the World Championship in the offseason, for PP
+//   pickHost        pick the next World Championship's host from the bids, in the offseason
 //   renameTrophy    rename the seat's trophy in the offseason: the old trophy tradition
 //                   ends and its followers' purists turn casual (GDD v1.22)
 //   signDeal        sign a flagship deal offer, in the offseason; the slot's other offers are
@@ -76,6 +85,8 @@ export type Action =
   | { type: "amendRule"; axis: AxisId; option: string }
   | { type: "nameTrophy"; name: string }
   | { type: "renameTrophy"; name: string }
+  | { type: "foundChampionship"; name: string }
+  | { type: "pickHost"; countryId: string }
   | { type: "signDeal"; offerId: number }
   | { type: "buildVenue" };
 
@@ -211,6 +222,36 @@ export function checkAction(state: GameState, world: World, action: Action): str
         return "there is no newborn trophy to name";
       case "name":
         return "the trophy's name is too short or too long";
+      case null:
+        return null;
+    }
+  }
+  if (action.type === "foundChampionship") {
+    switch (foundBlocker(state, world, action.name)) {
+      case "founded":
+        return "the World Championship is already founded";
+      case "window":
+        return "the World Championship can only be founded in the offseason";
+      case "teams":
+        return "too few countries can field a national team";
+      case "name":
+        return "the championship's name is too short or too long";
+      case "pp":
+        return `not enough PP: costs ${money(foundingPrice(state, world))}, you have ${money(state.pp)}`;
+      case null:
+        return null;
+    }
+  }
+  if (action.type === "pickHost") {
+    switch (hostBlocker(state, action.countryId)) {
+      case "none":
+        return "no bids to host the World Championship are on the table";
+      case "window":
+        return "a host can only be picked in the offseason";
+      case "chosen":
+        return "the next World Championship already has its host";
+      case "bidder":
+        return `"${action.countryId}" did not bid to host`;
       case null:
         return null;
     }
@@ -430,6 +471,10 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
       return nameTrophy(state, action.name);
     case "renameTrophy":
       return renameTrophy(state, world, action.name);
+    case "foundChampionship":
+      return foundChampionship(state, world, action.name);
+    case "pickHost":
+      return pickHost(state, action.countryId);
     case "backStar":
       return backStar(state, world, action.playerId);
     case "signDeal": {

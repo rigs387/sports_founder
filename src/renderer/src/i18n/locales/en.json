@@ -1204,6 +1204,8 @@
       "amendRule": "{{trait}} is now {{option}}. The amendment is in the rulebook.",
       "nameTrophy": "The trophy is now called {{name}}.",
       "renameTrophy": "The trophy is now called {{name}}. Its old name is history.",
+      "foundChampionship": "{{name}} is founded. Its first tournament is played next year.",
+      "pickHost": "{{country}} will host the next tournament.",
       "signDeal": "Deal signed. It pays from the next season.",
       "buildVenue": "Building has started. The new level opens in a later offseason."
     },
@@ -2007,6 +2009,36 @@
     },
     "marker": "{{count}} traditions held here",
     "rule": "{{trait}}: {{option}}"
+  },
+  "championship": {
+    "heading": "World Championship",
+    "defaultName": "{{sport}} World Championship",
+    "pitch_one": "Found your sport's own tournament of national teams, played every year. It needs {{teams}} countries that can field a team.",
+    "pitch_other": "Found your sport's own tournament of national teams, played every {{count}} years. It needs {{teams}} countries that can field a team.",
+    "teams_one": "{{count}} country of the {{needed}} needed can field a team.",
+    "teams_other": "{{count}} countries of the {{needed}} needed can field a team.",
+    "nameLabel": "Championship name",
+    "found": "Found it for {{price, number(maximumFractionDigits: 0)}} PP",
+    "review_one": "Found {{name}} for {{price, number(maximumFractionDigits: 0)}} PP. The first tournament is played next year, then every year. The name and the calendar are fixed for good.",
+    "review_other": "Found {{name}} for {{price, number(maximumFractionDigits: 0)}} PP. The first tournament is played next year, then every {{count}} years. The name and the calendar are fixed for good.",
+    "confirm": "Found it",
+    "cancel": "Not yet",
+    "blockers": {
+      "window": "The championship can be founded only in the offseason.",
+      "teams": "Too few countries can field a team yet. A country needs a Semi-Pro league or better.",
+      "pp": "Founding costs {{price, number(maximumFractionDigits: 0)}} PP."
+    },
+    "founded": "Founded in {{year}}.",
+    "next": "Founded in {{founded}}. The next tournament is played in {{year}}.",
+    "host": "{{country}} will host it.",
+    "bidsIntro_one": "One country has bid to host. Pick it, or the bid stands when the offseason closes.",
+    "bidsIntro_other": "{{count}} countries have bid to host. Pick one before the offseason closes.",
+    "bidsNote": "The pick is final. With no pick, the wealthiest bidder hosts.",
+    "bidsLater": "Countries bid to host in the offseason before each tournament.",
+    "pick": "Pick as host",
+    "pickConfirm": "Confirm the host",
+    "past": "Hosted before: {{hosts, list}}.",
+    "pastOne": "{{country}} ({{year}})"
   },
   "standings": {
     "eyebrow": "Standings",

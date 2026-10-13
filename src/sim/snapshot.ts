@@ -51,6 +51,7 @@ import {
 } from "./types";
 import { groundSize, matchCrowd, seasonMatchCrowd, seatedCrowd, venueCapacity } from "./venues";
 import { countsTowardHold, standing } from "./win";
+import { type ChampionshipSnapshot, championshipSnapshot } from "./world-championship";
 
 const QUARTERS_PER_YEAR = 4;
 
@@ -260,6 +261,8 @@ export interface TurnSnapshot {
   playersOfYear: PlayerOfYear[];
   /** Every national team that could be fielded now, strongest first (GDD v1.37). */
   nationalTeams: NationalTeamSnapshot[];
+  /** The World Championship: founding, the next tournament, bids and hosts (GDD v1.37). */
+  worldChampionship: ChampionshipSnapshot;
 }
 
 /** Attendance and max capacity as the venue card shows them (GDD v1.34). */
@@ -539,5 +542,6 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     hallOfFame: hallSnapshot(state, world),
     playersOfYear: state.standouts.playersOfYear,
     nationalTeams: nationalTeamSnapshots(state, world),
+    worldChampionship: championshipSnapshot(state, world),
   };
 }

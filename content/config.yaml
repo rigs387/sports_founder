@@ -777,6 +777,19 @@ nationalTeams:
   players: 3
   skillWeight: 0.15
 
+# The World Championship (GDD v1.37). Founding is an offseason action, open once foundingTeams
+# countries can field a national team, for foundingQuarters of PP income. The first tournament is
+# played when the season then starting ends, and every everySeasons seasons after. In the
+# offseason before each, bids.min–bids.max countries with a league bid, drawn without repeats by
+# bidWealthBase ^ wealth level (0–3), never the last host; the player picks, or the wealthiest
+# bidder hosts.
+worldChampionship:
+  foundingTeams: 16
+  foundingQuarters: 12
+  everySeasons: 4
+  bids: { min: 3, max: 4 }
+  bidWealthBase: 2
+
 flagship:
   # Clubs by the flagship league's tier. Promotion admits generated expansion clubs at the next
   # season start; a step-down drops the newest clubs.

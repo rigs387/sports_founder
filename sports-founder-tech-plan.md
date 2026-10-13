@@ -1488,6 +1488,20 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    winners). Smoke: found, pick a host, see the page. Then the pacing experiment for the #1
    contest.
 
+   *Build order 5 built 2026-10-12 (founding, bids and the host).*
+   `src/sim/world-championship.ts` and `GameState.worldChampionship` (its own stream,
+   `founded`, `nextSeason`, `bids`, `hostId`, `tournaments`). Actions
+   `foundChampionship` and `pickHost`, with `foundBlocker` and `hostBlocker`. In
+   `endTurn`: `settleHost` before `closeOffseason` (the wealthiest bidder when nobody
+   picked) and `updateChampionship` after the deal offers (a tournament whose season has ended
+   goes on record with its host and the next is set; bids are drawn in the offseason whose
+   coming season is `nextSeason`). Landmarks `championshipFounded` and `championshipHost`.
+   Snapshot `TurnSnapshot.worldChampionship`. Renderer:
+   `src/renderer/src/championship/ChampionshipCard.tsx` on the offseason screen (founding with
+   a review step; picking with a confirm). Save format 29 (28 migrates unfounded). Smoke:
+   `53b-championship.png`. Tests: `tests/world-championship.test.ts`. Bots do not found it
+   yet (build order 7).
+
 **Build order.** (1) Standouts exist: state, lifecycle, names on screen. (2) Talent pull, the
 broadcast follow and the signing card. (3) Player of the Year. (4) National teams and their
 list. (5) Founding, bids and the host. (6) The tournament, its effects and cards. (7) The

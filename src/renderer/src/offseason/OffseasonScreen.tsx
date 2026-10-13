@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
 import type { Action, CountrySnapshot, TurnSnapshot } from "../../../sim";
+import { ChampionshipCard } from "../championship/ChampionshipCard";
 import { BulkPromotion } from "../components/BulkPromotion";
 import { TrophyCard } from "../culture/TrophyCard";
 import { DealsPanel } from "../deals/DealsPanel";
@@ -96,6 +97,7 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
           <Promotions snapshot={snapshot} country={country} busy={busy} onAction={onAction} />
           <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} />
+          <ChampionshipCard snapshot={snapshot} country={country} busy={busy} onAction={onAction} />
         </div>
       </div>
     </section>

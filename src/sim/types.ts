@@ -546,6 +546,20 @@ export type Landmark =
       clubId: number;
       signed: boolean;
     }
+  /** The player founded the World Championship (GDD v1.37); the country is the seat's. */
+  | { kind: "championshipFounded"; turn: number; quarter: number; countryId: string }
+  /**
+   * A World Championship host was chosen for the tournament after `season`: by the player
+   * (`picked`), or the wealthiest bidder when nobody chose.
+   */
+  | {
+      kind: "championshipHost";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      picked: boolean;
+    }
   /** A player became the league's all-time top scorer. */
   | {
       kind: "scoringRecord";
@@ -860,6 +874,23 @@ export interface GameState {
   hallOfFame: HallOfFameState;
   /** Named standouts in leagues other than the flagship (GDD v1.37). */
   standouts: StandoutsState;
+  /** The sport's World Championship: its founding, calendar and hosts (GDD v1.37). */
+  worldChampionship: WorldChampionshipState;
+}
+
+export interface WorldChampionshipState {
+  /** The championship's own random stream (bids now, matches later). */
+  rng: number[];
+  /** Its name and when the player founded it; null until then. */
+  founded: { name: string; turn: number; year: number } | null;
+  /** The flagship season whose end the next tournament is played at; null until founded. */
+  nextSeason: number | null;
+  /** Countries bidding to host the next tournament, in the order drawn; empty once one is chosen. */
+  bids: string[];
+  /** The next tournament's host, once chosen. */
+  hostId: string | null;
+  /** Past tournaments, oldest first. */
+  tournaments: { season: number; year: number; hostId: string }[];
 }
 
 /**

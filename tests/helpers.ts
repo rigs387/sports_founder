@@ -13,6 +13,7 @@ import {
   newCulture,
   newHallOfFame,
   newStandouts,
+  newWorldChampionship,
 } from "../src/sim";
 
 export const world = loadWorldFromDisk();
@@ -96,6 +97,11 @@ export function migratedHall(state: GameState) {
 /** The standouts an older save gains on loading (format 27): none yet, aged from now. */
 export function migratedStandouts(state: GameState) {
   return newStandouts(state.seed, state.flagship.season);
+}
+
+/** The World Championship an older save gains on loading (format 29): not founded. */
+export function migratedChampionship(state: GameState) {
+  return newWorldChampionship(state.seed);
 }
 
 /** Awards as an older save gains them on loading (format 24): no winners and no award facts. */

@@ -29,9 +29,10 @@ import { MAX_SEED } from "./rng";
 import { defaultGenome } from "./setup";
 import { newStandouts } from "./standouts";
 import type { FlagshipState, GameState, Genome, World } from "./types";
+import { newWorldChampionship } from "./world-championship";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 28;
+export const SAVE_FORMAT_VERSION = 29;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -192,6 +193,20 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     playerId: z.int().min(1),
     clubId: z.int().min(1),
     signed: z.boolean(),
+  }),
+  z.strictObject({
+    kind: z.literal("championshipFounded"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal("championshipHost"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    picked: z.boolean(),
   }),
   z.strictObject({
     kind: z.literal("scoringRecord"),
@@ -650,6 +665,18 @@ const gameStateSchema = z.strictObject({
       }),
     ),
   }),
+  worldChampionship: z.strictObject({
+    rng: z.array(z.number()).min(1),
+    founded: z
+      .strictObject({ name: z.string().min(1), turn: z.int().min(1), year: z.int() })
+      .nullable(),
+    nextSeason: z.int().min(1).nullable(),
+    bids: z.array(z.string().min(1)),
+    hostId: z.string().min(1).nullable(),
+    tournaments: z.array(
+      z.strictObject({ season: z.int().min(1), year: z.int(), hostId: z.string().min(1) }),
+    ),
+  }),
 });
 
 const saveFileSchema = z.strictObject({
@@ -668,6 +695,11 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 28 → 29: the World Championship (GDD v1.37). Not founded.
+  28: (save) => ({
+    formatVersion: 29,
+    state: { ...save.state, worldChampionship: newWorldChampionship(save.state.seed as number) },
+  }),
   // 27 → 28: Player of the Year (GDD v1.37). No past winners.
   27: (save) => ({
     formatVersion: 28,

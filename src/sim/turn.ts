@@ -11,6 +11,7 @@ import { pullTalent } from "./talent";
 import { applyDefaultSlotDrops, updateTierTrack } from "./tiers";
 import type { GameState, World } from "./types";
 import { updateWinTrack } from "./win";
+import { settleHost, updateChampionship } from "./world-championship";
 
 export class CampaignOverError extends Error {
   override name = "CampaignOverError";
@@ -29,7 +30,8 @@ export class CampaignOverError extends Error {
  * 6. culture reads the turn's facts: traditions are born, renewed, decay and are lost
  *    (src/sim/culture.ts);
  * 7. other leagues' standouts age, retire and fill their places (src/sim/standouts.ts);
- * 8. an open offseason gets its deal offers, once (src/sim/deals.ts).
+ * 8. an open offseason gets its deal offers, once (src/sim/deals.ts);
+ * 9. the World Championship's calendar moves on and bids arrive (src/sim/world-championship.ts).
  * Turns always complete. Refuses to play a campaign that has already ended.
  */
 export function endTurn(state: GameState, world: World): GameState {
@@ -42,7 +44,11 @@ export function endTurn(state: GameState, world: World): GameState {
   // Closing the offseason may move the seat or pass a rule demand's deadline (GDD v1.28).
   const start = breakDeals(
     // The best standouts abroad may join the flagship before its clubs are fitted (GDD v1.37).
-    closeOffseason(pullTalent(applyDefaultSlotDrops(settleEvents(state, world)), world), world),
+    // Bids for the World Championship nobody chose from go to the wealthiest bidder.
+    closeOffseason(
+      settleHost(pullTalent(applyDefaultSlotDrops(settleEvents(state, world)), world), world),
+      world,
+    ),
     world,
     opened,
   );
@@ -73,6 +79,8 @@ export function endTurn(state: GameState, world: World): GameState {
   // An open offseason's deal offers, once, after culture so new famous grounds count (GDD v1.28).
   // Clauses are judged first, so a deal in its final season is judged before it ends (v1.29).
   next = offerDeals(judgeClauses(next, world), world);
+  // The World Championship's calendar moves on and the next tournament's bids arrive (GDD v1.37).
+  next = updateChampionship(next, world);
   return offerEvents({ ...next, turn: start.turn + 1 }, world, quarters);
 }
 

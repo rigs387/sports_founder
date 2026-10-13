@@ -47,3 +47,4 @@ export * from "./venue-actions";
 export * from "./venue-cards";
 export * from "./venues";
 export * from "./win";
+export * from "./world-championship";

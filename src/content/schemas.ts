@@ -1230,6 +1230,21 @@ export const configFileSchema = z.strictObject({
     players: z.int().min(1),
     skillWeight: z.number().min(0),
   }),
+  /**
+   * The World Championship (GDD v1.37): founded in an offseason once foundingTeams countries can
+   * field a team, for foundingQuarters of PP income; played after the season then starting and
+   * every everySeasons after. In the offseason before each, bids.min–bids.max countries with a
+   * league bid, drawn by bidWealthBase ^ wealth level.
+   */
+  worldChampionship: z.strictObject({
+    foundingTeams: z.int().min(2),
+    foundingQuarters: z.number().min(0),
+    everySeasons: z.int().min(1),
+    bids: z
+      .strictObject({ min: z.int().min(1), max: z.int().min(1) })
+      .refine((bids) => bids.max >= bids.min, "bids.max must be at least bids.min"),
+    bidWealthBase: z.number().positive(),
+  }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({
     nameMinLength: z.int().min(1),

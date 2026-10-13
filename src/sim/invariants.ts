@@ -18,6 +18,7 @@ import {
   PLAYER_SPORT_ID,
   type World,
 } from "./types";
+import { championshipProblems } from "./world-championship";
 
 /** Returns every way `state` is invalid for `world`. An empty list means the state is valid. */
 export function checkInvariants(state: GameState, world: World): string[] {
@@ -34,6 +35,7 @@ export function invariantsOf(state: GameState, world: World): string[] {
     ...cultureProblems(state, world),
     ...hallProblems(state),
     ...standoutProblems(state, world),
+    ...championshipProblems(state, world),
   ];
 
   if (!Number.isInteger(state.turn) || state.turn < 1)
