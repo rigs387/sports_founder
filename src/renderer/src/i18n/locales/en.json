@@ -363,6 +363,22 @@
         "body_one": "One name joins the Hall of Fame this year. It stays there for good.",
         "body_other": "{{count}} names join the Hall of Fame this year. They stay there for good."
       },
+      "championship-champion": {
+        "title": "{{country}} are world champions",
+        "body": "{{country}} beat {{opponent}} in the final of {{name}} in {{host}}. The whole country watched, and many will stay.",
+        "body_host": "{{country}} beat {{opponent}} in the final of {{name}}, on home soil. The whole country watched, and many will stay."
+      },
+      "championship-seat-run": {
+        "title": "{{country}} go out to {{opponent}}",
+        "title_final": "{{country}} fall in the final",
+        "body": "The home of the top league went out of {{name}} in round {{round}} of {{rounds}}, beaten by {{opponent}}.",
+        "body_final": "The home of the top league reached the final of {{name}} and lost it to {{opponent}}."
+      },
+      "championship-underdog": {
+        "title": "{{country}} shock the world",
+        "body": "Nobody gave {{country}} a chance at {{name}}. They reached the last four before {{opponent}} ended the run, and the sport has a new home.",
+        "body_final": "Nobody gave {{country}} a chance at {{name}}. They reached the final before {{opponent}} ended the run, and the sport has a new home."
+      },
       "rival-countermove": {
         "title": "{{rival}} hits back in {{country}}",
         "title_broadcastDeal": "{{rival}}'s broadcaster locks up the {{country}} airwaves",
@@ -2037,8 +2053,8 @@
     "bidsLater": "Countries bid to host in the offseason before each tournament.",
     "pick": "Pick as host",
     "pickConfirm": "Confirm the host",
-    "past": "Hosted before: {{hosts, list}}.",
-    "pastOne": "{{country}} ({{year}})"
+    "past": "Past tournaments: {{hosts, list}}.",
+    "pastOne": "{{champion}} won in {{country}} ({{year}})"
   },
   "standings": {
     "eyebrow": "Standings",

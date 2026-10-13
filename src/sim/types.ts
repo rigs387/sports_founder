@@ -560,6 +560,15 @@ export type Landmark =
       season: number;
       picked: boolean;
     }
+  /** A World Championship was played (GDD v1.37): the country is the champion's. */
+  | {
+      kind: "championshipPlayed";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      season: number;
+      hostId: string;
+    }
   /** A player became the league's all-time top scorer. */
   | {
       kind: "scoringRecord";
@@ -890,7 +899,46 @@ export interface WorldChampionshipState {
   /** The next tournament's host, once chosen. */
   hostId: string | null;
   /** Past tournaments, oldest first. */
-  tournaments: { season: number; year: number; hostId: string }[];
+  tournaments: ChampionshipTournament[];
+  /** What past tournaments still do to fans where their teams came from. */
+  lifts: ChampionshipLift[];
+}
+
+/** A national team as a tournament recorded it: its seed and the players it was built from. */
+export interface ChampionshipTeam {
+  countryId: string;
+  /** 1 is the strongest team in the field. */
+  seed: number;
+  players: { playerId: number; name: string }[];
+}
+
+export interface ChampionshipMatch {
+  a: string;
+  b: string;
+  winner: string;
+}
+
+/** A World Championship that was played (GDD v1.37): the whole bracket is kept. */
+export interface ChampionshipTournament {
+  /** The flagship season whose end it was played at. */
+  season: number;
+  year: number;
+  hostId: string;
+  /** The field in seed order. */
+  teams: ChampionshipTeam[];
+  /** Each round's matches in bracket order, the first round first, the final last. */
+  rounds: ChampionshipMatch[][];
+  championId: string;
+}
+
+/** A tournament's effect on the player's fans in one country, until `endQuarter`. */
+export interface ChampionshipLift {
+  countryId: string;
+  /** Multiplies casual conversion. */
+  casual: number;
+  /** Multiplies hardcore conversion (the host). */
+  hardcore: number;
+  endQuarter: number;
 }
 
 /**

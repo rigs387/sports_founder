@@ -64,6 +64,7 @@ export function offerDealCards(
         venue: null,
         hall: null,
         countermove: null,
+        championship: null,
       },
       resolution: null,
     });

@@ -944,6 +944,63 @@ cards:
       - { id: hold, quarters: 0, effects: [] }
   # A rival's countermove at the seat (GDD v1.34): a playtest lost its TV offers to a rival's
   # broadcast deal twice and was never told. Told from the landmark; it takes no moment slot.
+  # The World Championship (GDD v1.37), told from the tournament on record; none takes a slot.
+  # The champion is a headline from the champion's country and pays PP; the seat country's run
+  # and an underdog's deep run are told only when they are not the champion's.
+  - id: championship-champion
+    kind: moment
+    weight: headline
+    tone: positive
+    priority: 200
+    trigger: championship
+    championship: champion
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: [{ type: pp, amount: 20 }]
+    choices: []
+    defaultChoice: null
+  - id: championship-seat-run
+    kind: moment
+    weight: big
+    tone: positive
+    priority: 200
+    trigger: championship
+    championship: seatRun
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
+  - id: championship-underdog
+    kind: moment
+    weight: big
+    tone: positive
+    priority: 200
+    trigger: championship
+    championship: underdog
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: [{ type: pp, amount: 8 }]
+    choices: []
+    defaultChoice: null
   - id: rival-countermove
     kind: moment
     weight: big

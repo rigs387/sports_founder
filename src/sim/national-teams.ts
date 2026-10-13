@@ -59,17 +59,23 @@ function namedByCountry(state: GameState): Map<string, NationalPlayer[]> {
 }
 
 /**
- * Every national team that can be fielded now, strongest first (ties by content order). Strength
+ * Every national team that can be fielded now, strongest first (ties by content order); a guest
+ * needs a league of any tier. Strength
  * is a base for the league's tier, plus the player's hardcore share of the population up to
  * `hardcore.fullShare`, plus the skill of the best `players` named nationals wherever they play.
  */
-export function nationalTeams(state: GameState, world: World): NationalTeam[] {
+export function nationalTeams(
+  state: GameState,
+  world: World,
+  /** A country fielded whatever its league's tier: a World Championship's host. */
+  guestId: string | null = null,
+): NationalTeam[] {
   const rules = world.config.nationalTeams;
   const named = namedByCountry(state);
   const teams: (NationalTeam & { index: number })[] = [];
   state.countries.forEach((country, index) => {
     const league = country.league;
-    if (!league || !fieldsTeam(state, world, index)) return;
+    if (!league || !(fieldsTeam(state, world, index) || country.countryId === guestId)) return;
     const population = world.countries[index]?.population ?? 0;
     const hardcore = country.fans[PLAYER_INDEX]?.hardcore ?? 0;
     const share = population > 0 ? hardcore / population : 0;

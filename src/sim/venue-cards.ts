@@ -59,6 +59,7 @@ export function offerVenueCards(
             : { level: landmark.level, crowd: null, clubId: null, matchCrowd: null },
         hall: null,
         countermove: null,
+        championship: null,
       },
       resolution: null,
     });

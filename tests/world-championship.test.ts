@@ -29,7 +29,8 @@ function withTeams(state: GameState, count: number): GameState {
       if (country.countryId === state.flagship.countryId || left <= 0) return country;
       left -= 1;
       const league = country.league ?? newLeague(world, index, state.quarter, 0, []);
-      return { ...country, league: { ...league, tier: "semi-pro" as const } };
+      // Cash to last: a league with no fans would fold before a tournament.
+      return { ...country, league: { ...league, tier: "semi-pro" as const, cash: 1e12 } };
     }),
   };
 }
@@ -131,16 +132,15 @@ describe("the World Championship", () => {
     if (!pick) throw new Error("no bids");
     state = applyAction(state, world, { type: "pickHost", countryId: pick });
     while (state.worldChampionship.tournaments.length === 0) state = endTurn(state, world);
-    expect(state.worldChampionship.tournaments).toEqual([
-      {
-        season: firstSeason,
-        year: yearOfQuarter(
-          state.flagship.seasons.find((s) => s.season === firstSeason)?.quarter ?? -1,
-          world.config,
-        ),
-        hostId: pick,
-      },
-    ]);
+    expect(state.worldChampionship.tournaments).toHaveLength(1);
+    expect(state.worldChampionship.tournaments[0]).toMatchObject({
+      season: firstSeason,
+      year: yearOfQuarter(
+        state.flagship.seasons.find((s) => s.season === firstSeason)?.quarter ?? -1,
+        world.config,
+      ),
+      hostId: pick,
+    });
     expect(state.worldChampionship.nextSeason).toBe(firstSeason + rules.everySeasons);
     expect(state.worldChampionship.hostId).toBeNull();
     // No bids until the offseason before the next tournament.

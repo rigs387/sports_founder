@@ -47,6 +47,7 @@ export function offerCountermoveCards(
           endQuarter: landmark.endQuarter,
           endYear: yearOfQuarter(landmark.endQuarter, world.config),
         },
+        championship: null,
       },
       resolution: null,
     });

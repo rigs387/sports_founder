@@ -89,9 +89,30 @@ export function useEventText() {
     return { year: first?.year ?? 0, count: hall.inducteeIds.length };
   };
   // A rival's countermove at the seat (GDD v1.34) names the move, its end and the TV cut.
+  // A World Championship story (GDD v1.37) names the tournament, its host and the opponent.
+  const championshipText = (event: EventRecord) => {
+    const cup = event.facts.championship;
+    if (!cup) return hallText(event);
+    const lostFinal = !cup.champion && cup.roundsWon === cup.rounds - 1;
+    return {
+      name: snapshot.worldChampionship.founded?.name ?? "",
+      host: country(cup.hostId),
+      opponent: country(cup.opponentId ?? ""),
+      round: cup.roundsWon + 1,
+      rounds: cup.rounds,
+      year: cup.year,
+      context: cup.champion
+        ? cup.hostId === event.countryId
+          ? "host"
+          : undefined
+        : lostFinal
+          ? "final"
+          : undefined,
+    };
+  };
   const countermoveText = (event: EventRecord) => {
     const move = event.facts.countermove;
-    if (!move) return hallText(event);
+    if (!move) return championshipText(event);
     return {
       year: move.endYear,
       cut: snapshot.flagship.deals.tvLockout?.cut ?? 0.5,

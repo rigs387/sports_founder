@@ -32,7 +32,7 @@ import type { FlagshipState, GameState, Genome, World } from "./types";
 import { newWorldChampionship } from "./world-championship";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 29;
+export const SAVE_FORMAT_VERSION = 30;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -207,6 +207,14 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     countryId: z.string().min(1),
     season: z.int().min(1),
     picked: z.boolean(),
+  }),
+  z.strictObject({
+    kind: z.literal("championshipPlayed"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    hostId: z.string().min(1),
   }),
   z.strictObject({
     kind: z.literal("scoringRecord"),
@@ -674,7 +682,36 @@ const gameStateSchema = z.strictObject({
     bids: z.array(z.string().min(1)),
     hostId: z.string().min(1).nullable(),
     tournaments: z.array(
-      z.strictObject({ season: z.int().min(1), year: z.int(), hostId: z.string().min(1) }),
+      z.strictObject({
+        season: z.int().min(1),
+        year: z.int(),
+        hostId: z.string().min(1),
+        teams: z.array(
+          z.strictObject({
+            countryId: z.string().min(1),
+            seed: z.int().min(1),
+            players: z.array(z.strictObject({ playerId: z.int().min(1), name: z.string().min(1) })),
+          }),
+        ),
+        rounds: z.array(
+          z.array(
+            z.strictObject({
+              a: z.string().min(1),
+              b: z.string().min(1),
+              winner: z.string().min(1),
+            }),
+          ),
+        ),
+        championId: z.string().min(1),
+      }),
+    ),
+    lifts: z.array(
+      z.strictObject({
+        countryId: z.string().min(1),
+        casual: z.number().positive(),
+        hardcore: z.number().positive(),
+        endQuarter: z.int().min(0),
+      }),
     ),
   }),
 });
@@ -695,10 +732,28 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 29 → 30: tournaments are played (GDD v1.37). Hosts recorded without a tournament are
+  // dropped: nothing was played.
+  29: (save) => ({
+    formatVersion: 30,
+    state: {
+      ...save.state,
+      worldChampionship: {
+        ...(save.state.worldChampionship as Record<string, unknown>),
+        tournaments: [],
+        lifts: [],
+      },
+    },
+  }),
   // 28 → 29: the World Championship (GDD v1.37). Not founded.
   28: (save) => ({
     formatVersion: 29,
-    state: { ...save.state, worldChampionship: newWorldChampionship(save.state.seed as number) },
+    state: {
+      ...save.state,
+      worldChampionship: (({ lifts: _none, ...championship }) => championship)(
+        newWorldChampionship(save.state.seed as number),
+      ),
+    },
   }),
   // 27 → 28: Player of the Year (GDD v1.37). No past winners.
   27: (save) => ({

@@ -186,6 +186,7 @@ export function ChampionshipCard({
                 hosts: championship.tournaments.map((tournament) =>
                   t("championship.pastOne", {
                     year: tournament.year,
+                    champion: country(tournament.championId),
                     country: country(tournament.hostId),
                   }),
                 ),

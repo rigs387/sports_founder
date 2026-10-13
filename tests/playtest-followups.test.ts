@@ -42,6 +42,7 @@ function championCard(state: GameState, tier: "amateur" | "professional"): GameS
       venue: null,
       hall: null,
       countermove: null,
+      championship: null,
     },
     resolution: null,
   };
@@ -160,6 +161,7 @@ describe("Hall of Fame front pages and firsts with scale", () => {
                     venue: null,
                     hall: card.facts.hall,
                     countermove: null,
+                    championship: null,
                   },
                   resolution: null,
                 },

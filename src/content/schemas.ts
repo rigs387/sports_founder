@@ -1244,6 +1244,29 @@ export const configFileSchema = z.strictObject({
       .strictObject({ min: z.int().min(1), max: z.int().min(1) })
       .refine((bids) => bids.max >= bids.min, "bids.max must be at least bids.min"),
     bidWealthBase: z.number().positive(),
+    /**
+     * The tournament: the strongest fieldSizes[i] teams that fit (the host always enters),
+     * seeded by strength, single elimination. A strength gap of upsetScale is 10:1 odds; the host
+     * plays hostBonus stronger.
+     */
+    fieldSizes: z.array(z.int().min(2)).min(1),
+    upsetScale: z.number().positive(),
+    hostBonus: z.number().min(0),
+    /**
+     * Effects, for liftQuarters: every team's country converts casual fans × (1 + casualPerRound
+     * × rounds played), the champion's + championBonus, an underdog's (seeded below seedShare of
+     * the field, in the last four) + underdog.bonus; the host's hardcore conversion × hostHardcore
+     * and its league gains hostCashQuarters of its running cost. A top-topSeeds seed out in the
+     * first round loses flopCasualLoss of the player's casual fans at home.
+     */
+    liftQuarters: z.int().min(1),
+    casualPerRound: z.number().min(0),
+    championBonus: z.number().min(0),
+    hostHardcore: z.number().min(1),
+    hostCashQuarters: z.number().min(0),
+    underdog: z.strictObject({ seedShare: unitInterval, bonus: z.number().min(0) }),
+    topSeeds: z.int().min(0),
+    flopCasualLoss: unitInterval,
   }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({

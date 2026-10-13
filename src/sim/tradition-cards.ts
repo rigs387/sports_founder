@@ -83,6 +83,7 @@ export function offerTraditionCards(
         venue: null,
         hall: null,
         countermove: null,
+        championship: null,
       },
       resolution: null,
     });

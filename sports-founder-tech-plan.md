@@ -1502,6 +1502,20 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    `53b-championship.png`. Tests: `tests/world-championship.test.ts`. Bots do not found it
    yet (build order 7).
 
+   *Build order 6 built 2026-10-12 (the tournament, its effects and cards).* In
+   `world-championship.ts`: `drawField` (largest `fieldSizes` entry that fits, the host as
+   a guest of `nationalTeams`), `playKnockout` (`seedOrder`, odds by strength gap over
+   `upsetScale`, on the championship's stream), `playTournament` (called by
+   `updateChampionship` when the due season has ended: the record, the lifts, the flop's fan
+   loss, the host's cash, a `championshipPlayed` landmark), `roundsWon`, `underdogs`,
+   `flops`, `championshipFactors` (read by `quarter.ts` beside the event factors). State:
+   `tournaments` keep the field with seeds and squad names and every round;
+   `WorldChampionshipState.lifts` expire by quarter. Cards: trigger `championship`, card
+   field `championship` (champion, seatRun, underdog), `src/sim/championship-cards.ts`,
+   event facts `championship`; words in `event-text.tsx`. Fewer than two teams, or no host:
+   nothing is played. Save format 30 (29 migrates with no tournaments). Tests:
+   `tests/championship-tournament.test.ts`.
+
 **Build order.** (1) Standouts exist: state, lifecycle, names on screen. (2) Talent pull, the
 broadcast follow and the signing card. (3) Player of the Year. (4) National teams and their
 list. (5) Founding, bids and the host. (6) The tournament, its effects and cards. (7) The

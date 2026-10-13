@@ -13,14 +13,14 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-12",
-    tests: 635,
-    files: 68,
-    note: "npm run check passed after the World Championship's founding was built (type checks, Biome, purity, 635 tests in 68 files). Lint has existing visual-study warnings.",
+    tests: 640,
+    files: 69,
+    note: "npm run check passed after the World Championship's tournament was built (type checks, Biome, purity, 640 tests in 69 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-12",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
   },
-  eventDeck: { current: 44, target: "40–60" },
+  eventDeck: { current: 47, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -100,6 +100,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-12",
+      type: "Built",
+      title: "The World Championship is played",
+      text: "Tech plan 2.23, build order 6 of 7 (GDD v1.37): the tournament plays in the turn its season ends: the strongest 32 national teams (16 if fewer can be fielded) with the host always in, seeded, single elimination, the whole bracket kept. For a year every team's country converts casual fans faster, more the further it went, with extras for the champion and an underdog in the last four; the host converts hardcore fans faster and its league is paid; a top seed out in the first round loses casual fans at home. Three cards that take no slot: the champion as a headline, the seat country's run, an underdog's run. Tuned: at the first upset scale the late champions were seeds 18, 21 and 25, so it was halved; top-three seeds then won five of nine tournaments in one campaign with 200 teams. Found on the way: the flop left fractional fans (fixed, whole fans only). Bots still do not found it, so the #1 contest is not remeasured yet. Save format 30. npm run check: 640 tests in 69 files; smoke passed, but its campaign cannot found a championship, so the cards were not seen on screen.",
+    },
     {
       date: "2026-10-12",
       type: "Built",
@@ -743,7 +749,7 @@ window.SF_PROGRESS = {
           "Moments have weight: big back pages and headline front pages that wait for you (GDD v1.26)",
         ],
         ["built", "Auto-collect for minor moments (on by default, GDD v1.32)"],
-        ["built", "Event library: 44 cards in content/events.yaml (planned 40–60)"],
+        ["built", "Event library: 47 cards in content/events.yaml (planned 40–60)"],
         ["planned", "Broader tier-weighted negative events and personal stories"],
         ["built", "Bots that weigh and choose non-default options"],
       ],
@@ -846,7 +852,7 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Standouts exist in other leagues (tech plan 2.23, build order 1). Talent pull, the broadcast follow and the signing card are built (build order 2). Player of the Year is built (build order 3). National teams are built (build order 4). The World Championship's founding and hosts are built (build order 5). Next: the tournament (build order 6).",
+      next: "Standouts exist in other leagues (tech plan 2.23, build order 1). Talent pull, the broadcast follow and the signing card are built (build order 2). Player of the Year is built (build order 3). National teams are built (build order 4). The World Championship's founding and hosts are built (build order 5). The tournament, its effects and cards are built (build order 6). Next: the championship page, Hall points and bots (build order 7).",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
@@ -1016,7 +1022,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 12",
       icon: "15",
       summary: "Found and name the sport's international competition.",
-      next: "Founding, the calendar and hosts are built. Next: the tournament itself, its effects and cards (tech plan 2.23, build order 6).",
+      next: "Founding, hosts, the tournament, its effects and cards are built. Last: the championship page, Hall points, bots and the #1 contest measurement (tech plan 2.23, build order 7).",
       depends: ["national"],
       sources: [["Championship design", "../../sports-founder-gdd.md#progression--economy"]],
       items: [
@@ -1025,12 +1031,12 @@ window.SF_PROGRESS = {
           "Player-founded and named four-year championship, a paid offseason action (GDD v1.37)",
         ],
         [
-          "partial",
-          "Host bids (3–4, weighted by wealth) and selection built; the host's local benefits come with the tournament (GDD v1.37)",
+          "built",
+          "Host bids (3–4, weighted by wealth), selection and the host's hardcore and cash boost (GDD v1.37)",
         ],
         [
-          "planned",
-          "16/32-team knockout in one turn on its own page; upsets, lifts by round and the favorite's flop (designed, GDD v1.37)",
+          "partial",
+          "16/32-team knockout in one turn; upsets, lifts by round and the favorite's flop built; its own page comes last (GDD v1.37)",
         ],
       ],
     },

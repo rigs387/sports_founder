@@ -789,6 +789,29 @@ worldChampionship:
   everySeasons: 4
   bids: { min: 3, max: 4 }
   bidWealthBase: 2
+  # The tournament plays in the turn its season ends. Field: the strongest 32 national teams if
+  # 32 can be fielded, else 16 (fewer only if leagues have folded); the host always enters.
+  # Seeded by strength, single elimination. A strength gap of upsetScale is 10:1 odds (a gap of
+  # 10, a tier of league, is about 87%); the host plays hostBonus stronger. Measured on one
+  # campaign with 200 teams (2026-10-12): at 25 the late champions were seeds 18, 21 and 25 and
+  # every tournament had an underdog in the last four; at 12 top-three seeds won five of nine.
+  fieldSizes: [16, 32]
+  upsetScale: 12
+  hostBonus: 5
+  # Effects last liftQuarters. Casual conversion in a team's country × (1 + casualPerRound per
+  # round played): 1.03 for a first-round exit, 1.15 + championBonus for the champion of 32
+  # (about the rivals' own championships, which lift 12% everywhere). An underdog (seeded in the
+  # bottom half, reaching the last four) gets underdog.bonus more. The host converts hardcore
+  # fans × hostHardcore and its league gains hostCashQuarters of its running cost. A top seed out
+  # in the first round loses flopCasualLoss of the sport's casual fans at home, at once.
+  liftQuarters: 4
+  casualPerRound: 0.03
+  championBonus: 0.06
+  hostHardcore: 1.4
+  hostCashQuarters: 8
+  underdog: { seedShare: 0.5, bonus: 0.15 }
+  topSeeds: 4
+  flopCasualLoss: 0.05
 
 flagship:
   # Clubs by the flagship league's tier. Promotion admits generated expansion clubs at the next

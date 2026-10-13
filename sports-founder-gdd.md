@@ -912,6 +912,19 @@ Phase 2 outline above, which stands. Every number is config (`worldChampionship`
   drawn by 2 ^ wealth level from countries with a league, never the last host) arrive at once on
   founding, and after that in the offseason before each tournament. The pick is final. Until the
   tournament is built, its date passes with only the host on record.
+- *Built 2026-10-12 (the tournament, its effects and cards):* it plays in the turn its season
+  ends. Field: the strongest 32 national teams, or 16 if fewer than 32 can be fielded; the host
+  always enters, in the weakest place if it would not qualify. Seeded 1 against 32 and so on. A
+  match goes to a side by the odds of the strength gap (a gap of 12 is 10:1; the host plays 5
+  stronger). Effects for a year: casual conversion × (1 + 0.03 per round played), + 0.06 for
+  the champion, + 0.15 for an underdog (seeded in the bottom half, reaching the last four); the
+  host converts hardcore fans × 1.4 and its league gains 8 quarters of its running cost; a
+  top-four seed out in the first round loses 5% of the sport's casual fans at home at once.
+  Three cards, none taking a slot: the champion (a headline from the champion's country, 20
+  PP), the seat country's run when it is not the champion, and the deepest underdog run (8 PP).
+  The whole bracket is kept. Measured on one campaign with 200 teams and nine tournaments: top
+  three seeds won five, a host never qualified on strength, and the seat's country won none.
+  The page, Hall points and bots are the last build step.
 - *Measure after building:* this is new ground gained against the rivals; the #1 contest (about
   half lose #1 before the win) is remeasured and the lifts tuned to keep it.
 

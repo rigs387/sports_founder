@@ -275,7 +275,9 @@ picks; it plays in one turn on its own championship page (draw, bracket, champio
 and story cards; a casual lift by how far each team went, a big boost for the host and an
 underdog, casual losses at home for a top seed out in round one; Hall points for flagship players
 who win it. Remeasure the #1 contest after building. (Built so far: founding for 12 quarters of
-PP, the calendar on flagship seasons, bids and the host; the tournament itself is next.)
+PP, the calendar on flagship seasons, bids and the host; a seeded knockout of 32 or 16 played
+in the turn its season ends, lifts by round for a year, the host's boost, the underdog bonus and
+the flop; three cards. The championship page, Hall points and bots are next.)
 
 **Awards (v1.33):** the flagship's Player of the Season (composite of scores, club finish, playoff
 and final scores) and the top scorer's prize; Hall of Fame points; named after the first Hall of

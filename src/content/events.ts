@@ -69,6 +69,9 @@ export const TRADITION_CARD_IDS: readonly (readonly [string, TraditionCard])[] =
   ["national-name-lost", "lost"],
   ["curse-born", "born"],
 ];
+/** A World Championship's stories (GDD v1.37): the champion, the seat's run, an underdog's. */
+export const CHAMPIONSHIP_CARDS = ["champion", "seatRun", "underdog"] as const;
+export type ChampionshipCard = (typeof CHAMPIONSHIP_CARDS)[number];
 /** The flagship star facts a card can tell (GDD v1.16). */
 export const STAR_CARDS = [
   "breakout",
@@ -142,11 +145,14 @@ const template = z
       "hall",
       "award",
       "countermove",
+      "championship",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),
     /** star cards only: the star fact the card tells. */
     star: z.enum(STAR_CARDS).nullable().default(null),
+    /** championship cards only: which of a World Championship's stories the card tells. */
+    championship: z.enum(CHAMPIONSHIP_CARDS).nullable().default(null),
     /** tradition cards only: whether the card tells a birth or a loss. */
     tradition: z.enum(TRADITION_CARDS).nullable().default(null),
     /** deal cards only: whether the card tells a breach or a deal's end (GDD v1.28). */
@@ -247,6 +253,15 @@ const template = z
       if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
         issue("Countermove cards belong to the seat: campaign scope, no anchor or health filter");
     }
+    // A World Championship's stories (GDD v1.37): moments told from the tournament on record.
+    if ((card.trigger === "championship") !== (card.championship !== null))
+      issue("Championship cards need the championship trigger");
+    if (card.trigger === "championship") {
+      if (card.kind !== "moment" || card.cooldownTurns !== null)
+        issue("Championship cards are moments that follow recorded facts: no cooldown");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("Championship cards belong to the sport: campaign scope, no anchor or health filter");
+    }
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");
     if (star) {
@@ -337,6 +352,13 @@ export const eventsFileSchema = z
       ctx.addIssue({ code: "custom", path: ["cards"], message: "Only one Hall of Fame card" });
     if (data.cards.filter((c) => c.trigger === "award").length > 1)
       ctx.addIssue({ code: "custom", path: ["cards"], message: "Only one award card" });
+    const cups = data.cards.flatMap((c) => (c.championship === null ? [] : [c.championship]));
+    if (new Set(cups).size !== cups.length)
+      ctx.addIssue({
+        code: "custom",
+        path: ["cards"],
+        message: "Two cards tell the same championship story",
+      });
     const stars = data.cards.flatMap((c) => (c.star === null ? [] : [c.star]));
     if (new Set(stars).size !== stars.length)
       ctx.addIssue({

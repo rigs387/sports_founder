@@ -28,6 +28,7 @@ import {
   type World,
 } from "./types";
 import { venueConversion } from "./venues";
+import { championshipFactors } from "./world-championship";
 
 // Quarterly simulation (GDD Fan Model, Sport Genome, Spread Model, Rival AI, Business Layer). Every
 // rate is config.
@@ -131,6 +132,8 @@ export function stepQuarter(
     }
     const levers = leverMultipliers(world, state.genome, index, shape.climateFit);
     const eventRates = eventFactors(state, world, country.id);
+    // A World Championship lifts the sport where its teams came from (GDD v1.37).
+    const cup = championshipFactors(state, country.id);
     const rivalry = similarityEffect(
       world,
       state.genome,
@@ -149,6 +152,7 @@ export function stepQuarter(
         (countryExposure.focused ? config.focus.conversionMultiplier : 1) *
         factors.casualConversion *
         eventRates.casual *
+        cup.casual *
         (country.id === backing.countryId ? backing.casualConversion : 1) *
         // Pilgrimage to a famous ground (GDD v1.22).
         (1 + config.culture.pilgrimage * (venues[index] ?? 0)),
@@ -167,6 +171,7 @@ export function stepQuarter(
         (countryExposure.focused ? config.focus.conversionMultiplier : 1) *
         factors.hardcoreConversion *
         eventRates.hardcore *
+        cup.hardcore *
         venueConversion(state, world, index),
     };
     const moved = stepCountryFans(

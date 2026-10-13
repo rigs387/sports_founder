@@ -232,6 +232,13 @@ export const landmarks = {
     season: number,
     picked: boolean,
   ): Landmark => ({ kind: "championshipHost", turn, quarter, countryId, season, picked }),
+  championshipPlayed: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    season: number,
+    hostId: string,
+  ): Landmark => ({ kind: "championshipPlayed", turn, quarter, countryId, season, hostId }),
   scoringRecord: (
     turn: number,
     quarter: number,

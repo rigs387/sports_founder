@@ -45,6 +45,22 @@ export const starFactsSchema = z.strictObject({
   seasons: z.int().nonnegative(),
 });
 
+/**
+ * A World Championship story (GDD v1.37): the tournament and how the card's country fared. The
+ * opponent is who knocked it out, or for the champion, whom it beat in the final.
+ */
+export const championshipFactsSchema = z.strictObject({
+  season: z.int().positive(),
+  year: z.int(),
+  /** The tournament's number, 1 for the first. */
+  number: z.int().positive(),
+  hostId: z.string().min(1),
+  roundsWon: z.int().nonnegative(),
+  rounds: z.int().positive(),
+  opponentId: z.string().min(1).nullable(),
+  champion: z.boolean(),
+});
+
 /** The tradition a tradition card tells (GDD v1.22): its id and type, as recorded. */
 export const traditionFactsSchema = z.strictObject({
   traditionId: z.int().positive(),
@@ -111,6 +127,8 @@ export const eventRecordSchema = z.strictObject({
       })
       .nullable()
       .default(null),
+    /** A World Championship story (GDD v1.37); absent in older records. */
+    championship: championshipFactsSchema.nullable().default(null),
   }),
   resolution: z
     .strictObject({
@@ -147,6 +165,7 @@ export type TraditionFacts = z.infer<typeof traditionFactsSchema>;
 export type DealFacts = z.infer<typeof dealFactsSchema>;
 export type VenueFacts = z.infer<typeof venueFactsSchema>;
 export type HallFacts = z.infer<typeof hallFactsSchema>;
+export type ChampionshipFacts = z.infer<typeof championshipFactsSchema>;
 export type EventState = z.infer<typeof eventStateSchema>;
 export const emptyEvents = (landmarkCursor: number): EventState => ({
   nextId: 1,
