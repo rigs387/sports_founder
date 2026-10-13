@@ -888,6 +888,20 @@ export interface StandoutsState {
   season: number;
   /** Everyone playing, in id order. */
   players: Standout[];
+  /** Each season's Player of the Year, oldest first (GDD v1.37). */
+  playersOfYear: PlayerOfYear[];
+}
+
+/**
+ * A season's Player of the Year (GDD v1.37), kept by name: a standout leaves the state when they
+ * retire. `clubId` is the flagship club of a flagship winner, null for a standout abroad.
+ */
+export interface PlayerOfYear {
+  season: number;
+  playerId: number;
+  name: string;
+  countryId: string;
+  clubId: number | null;
 }
 
 /** The career facts a player's induction quotes, read from retained records (GDD v1.31). */

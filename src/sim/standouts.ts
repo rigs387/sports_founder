@@ -1,6 +1,13 @@
 import { careerShare, drawName, drawPlace, finalSeasonChance } from "./flagship";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
-import type { GameState, LeagueTierId, Standout, StandoutsState, World } from "./types";
+import type {
+  GameState,
+  LeagueTierId,
+  PlayerOfYear,
+  Standout,
+  StandoutsState,
+  World,
+} from "./types";
 
 // Standouts (GDD v1.37): the named players of Professional and Elite leagues other than the
 // flagship. They are people with a career curve and nothing else: no club, no matches, no scores
@@ -10,7 +17,12 @@ import type { GameState, LeagueTierId, Standout, StandoutsState, World } from ".
 const STANDOUTS_STREAM = 0x3c6e_f372;
 
 export function newStandouts(seed: number, season: number): StandoutsState {
-  return { rng: createRngState((seed ^ STANDOUTS_STREAM) >>> 0), season, players: [] };
+  return {
+    rng: createRngState((seed ^ STANDOUTS_STREAM) >>> 0),
+    season,
+    players: [],
+    playersOfYear: [],
+  };
 }
 
 /** How many standouts a country's league has: none at the seat, none without a league. */
@@ -64,8 +76,51 @@ function newStandout(
 }
 
 /**
+ * The Player of the Year for the flagship season just finished (GDD v1.37): the flagship's Player
+ * of the Season against every standout, on skill × their league tier's weight × the season's
+ * form. Null while no other league has a standout, or if the season was never recorded.
+ */
+function choosePlayerOfYear(state: GameState, world: World, rng: Rng): PlayerOfYear | null {
+  const season = state.flagship.season - 1;
+  const summary = state.flagship.seasons.find((s) => s.season === season);
+  if (!summary || state.standouts.players.length === 0) return null;
+  const { tierWeight, flagshipWeight, form } = world.config.standouts.playerOfYear;
+  const tierOf = (countryId: string) =>
+    state.countries.find((country) => country.countryId === countryId)?.league?.tier;
+  const rate = (skill: number, tier: LeagueTierId) =>
+    skill * tierWeight[tier] * (1 + form * (2 * nextFloat(rng) - 1));
+  let best: { rating: number; winner: PlayerOfYear } | null = null;
+  const consider = (rating: number, winner: PlayerOfYear) => {
+    if (best === null || rating > best.rating) best = { rating, winner };
+  };
+  const seatTier = tierOf(summary.countryId);
+  const home = state.flagship.players.find((player) => player.id === summary.playerOfSeason);
+  if (home && seatTier)
+    consider(flagshipWeight * rate(home.skill, seatTier), {
+      season,
+      playerId: home.id,
+      name: home.name,
+      countryId: home.countryId,
+      clubId: home.career.find((line) => line.season === season)?.clubId ?? home.clubId,
+    });
+  for (const player of state.standouts.players) {
+    const tier = tierOf(player.countryId);
+    if (!tier) continue;
+    consider(rate(player.skill, tier), {
+      season,
+      playerId: player.id,
+      name: player.name,
+      countryId: player.countryId,
+      clubId: null,
+    });
+  }
+  return (best as { rating: number; winner: PlayerOfYear } | null)?.winner ?? null;
+}
+
+/**
  * The standouts' turn (GDD v1.37), once per `endTurn`. When the flagship has started a new season
- * a year has passed: standouts who played their final season retire, and the rest age (skill,
+ * a year has passed: the Player of the Year is named, standouts who played their final season
+ * retire, and the rest age (skill,
  * and perhaps a final season announced) by the flagship's career rules. Then every league is
  * brought to its places: a league that folded, dropped below its places or took the seat loses
  * standouts (the weakest first), and open places are filled, a retired standout's by a young
@@ -85,7 +140,10 @@ export function updateStandouts(state: GameState, world: World): GameState {
   const rules = world.config.flagship.players;
   const retired = new Map<string, number>();
   let players = before.players;
+  let playersOfYear = before.playersOfYear;
   if (newYear) {
+    const winner = choosePlayerOfYear(state, world, rng);
+    if (winner) playersOfYear = [...playersOfYear, winner];
     players = [];
     for (const player of before.players) {
       if (player.finalSeason) {
@@ -147,7 +205,7 @@ export function updateStandouts(state: GameState, world: World): GameState {
       nextPlayerId === state.flagship.nextPlayerId
         ? state.flagship
         : { ...state.flagship, nextPlayerId },
-    standouts: { rng: saveRng(rng), season, players: kept },
+    standouts: { rng: saveRng(rng), season, players: kept, playersOfYear },
   };
 }
 
@@ -220,5 +278,13 @@ export function standoutProblems(state: GameState, world: World): string[] {
   }
   for (const countryId of counts.keys())
     problems.push(`standouts in unknown country "${countryId}"`);
+  let lastSeason = 0;
+  for (const winner of state.standouts.playersOfYear) {
+    if (winner.season <= lastSeason || winner.season >= state.flagship.season)
+      problems.push(`Player of the Year for season ${winner.season} is out of order`);
+    lastSeason = winner.season;
+    if (winner.playerId >= state.flagship.nextPlayerId)
+      problems.push(`Player of the Year ${winner.playerId} is unknown`);
+  }
   return problems;
 }

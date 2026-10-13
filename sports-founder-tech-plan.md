@@ -1444,6 +1444,14 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    Bots weigh signing by the follow's media reach. No save format change (a new landmark kind
    and effect type only). Tests: `tests/talent.test.ts`.
 
+   *Build order 3 built 2026-10-12 (Player of the Year).* `choosePlayerOfYear` in
+   `standouts.ts`, called by `updateStandouts` when the flagship has started a new season,
+   before anyone ages: the finished season's `playerOfSeason` against every standout, on the
+   standouts' stream. Kept by name in `StandoutsState.playersOfYear` (standouts leave the
+   state when they retire) and passed whole to `TurnSnapshot.playersOfYear`. Config
+   `standouts.playerOfYear` (`tierWeight`, `flagshipWeight`, `form`). Renderer: a line in
+   `SeasonRecap` and in the Almanac's roll. Save format 28 (27 migrates with no winners).
+
 2. **National teams (topic 2).** Config `nationalTeams`: the lowest league tier that fields a
    team (semi-pro), base weights for league tier and hardcore share, the weight of a named
    player's skill, players counted (3). A pure function in a new `src/sim/national-teams.ts`

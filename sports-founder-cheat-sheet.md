@@ -258,7 +258,8 @@ country panel shows each sport there and the map has a "#1 sport" view.
 named standouts (2 / 3): persistent, a hidden skill on the flagship's career curve, no matches, no
 effect on their own. Talent pull: each offseason the best standout abroad may join a flagship club
 as its leading player; the home country follows through the broadcast and they keep their
-nationality. A signing card lets the player pay PP to bring one in. (Built: a newcomer replaces
+nationality. Player of the Year (built): skill × tier weight × form, ×1.25 for the flagship's
+candidate, who wins about six in ten. A signing card lets the player pay PP to bring one in. (Built: a newcomer replaces
 a retired leader's untried replacement; 1 / 2 an offseason at a Professional / Elite seat; the
 home country's broadcast link gains 0.25, 0.5 for a star.) Player of the Year is a line
 (flagship Player of the Season against the standouts, by tier). The Hall stays the flagship's.

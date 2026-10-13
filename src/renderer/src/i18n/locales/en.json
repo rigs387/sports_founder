@@ -1791,7 +1791,9 @@
       "heading": "Roll of champions",
       "empty": "No season has finished yet.",
       "scorer": "Top scorer: {{player}}, {{count}} {{scoreNoun}}",
-      "award": "{{player}} won {{award}}"
+      "award": "{{player}} won {{award}}",
+      "playerOfYear": "Player of the Year: {{player}} ({{club}})",
+      "playerOfYear_abroad": "Player of the Year: {{player}} ({{country}})"
     },
     "stats": {
       "starSeasons": "Star seasons",
@@ -1835,6 +1837,8 @@
     "named_start": "The {{name}} Medal",
     "crown": "the {{Score}} Crown",
     "winner": "{{player}} ({{club}}) won {{award}}.",
+    "playerOfYear": "Player of the Year: {{player}} ({{club}}).",
+    "playerOfYear_abroad": "Player of the Year: {{player}}, who plays at home in {{country}}.",
     "count_one": "Won {{award}} once",
     "count_other": "Won {{award}} {{count}} times"
   },

@@ -31,7 +31,7 @@ import { newStandouts } from "./standouts";
 import type { FlagshipState, GameState, Genome, World } from "./types";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 27;
+export const SAVE_FORMAT_VERSION = 28;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -640,6 +640,15 @@ const gameStateSchema = z.strictObject({
         finalSeason: z.boolean(),
       }),
     ),
+    playersOfYear: z.array(
+      z.strictObject({
+        season: z.int().min(1),
+        playerId: z.int().min(1),
+        name: z.string().min(1),
+        countryId: z.string().min(1),
+        clubId: z.int().min(1).nullable(),
+      }),
+    ),
   }),
 });
 
@@ -659,6 +668,14 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 27 → 28: Player of the Year (GDD v1.37). No past winners.
+  27: (save) => ({
+    formatVersion: 28,
+    state: {
+      ...save.state,
+      standouts: { ...(save.state.standouts as Record<string, unknown>), playersOfYear: [] },
+    },
+  }),
   // 26 → 27: standouts (GDD v1.37). None yet; leagues fill their places at the next turn's end.
   26: (save) => {
     const flagship = save.state.flagship as FlagshipState;
@@ -666,7 +683,9 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
       formatVersion: 27,
       state: {
         ...save.state,
-        standouts: newStandouts(save.state.seed as number, flagship.season),
+        standouts: (({ playersOfYear: _none, ...standouts }) => standouts)(
+          newStandouts(save.state.seed as number, flagship.season),
+        ),
       },
     };
   },

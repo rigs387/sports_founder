@@ -329,6 +329,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   on its own random stream: they age and retire by the flagship's career rules when the flagship
   starts a new season, and leagues are trimmed and filled to their places. Ids come from
   `flagship.nextPlayerId`. Skill stays out of the snapshot (`CountrySnapshot.standouts`).
+  Player of the Year (`choosePlayerOfYear`, config `standouts.playerOfYear`) is named there for
+  each finished flagship season once standouts exist, kept by name in
+  `StandoutsState.playersOfYear`; a line in the season recap and the Almanac's roll, no effect.
   National teams and the World Championship are designed, not built (tech plan 2.23).
 - Talent pull (GDD v1.37) is `src/sim/talent.ts`. An opening is an active seat club whose leader
   retired last season and whose young replacement has not played (`openings`, offseason only).
@@ -419,6 +422,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   over and no near-misses.
 - Save format 27 adds standouts (GDD v1.37): `GameState.standouts`. Format 26 migrates with none;
   leagues fill their places at the next turn's end.
+- Save format 28 adds Player of the Year (GDD v1.37): `StandoutsState.playersOfYear`. Format 27
+  migrates with no winners.
 - The saves folder (GDD v1.35) is `savesFolder` in `src/main/save-files.ts`: Saved Games\Sports
   Founder on Windows. Each session save carries a `header` for the Load screen (the Campaign
   menu's list, `campaign:list` / `campaign:open-named`); an autosave after each turn keeps

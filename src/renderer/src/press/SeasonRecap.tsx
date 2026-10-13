@@ -12,9 +12,11 @@ import "./press.css";
 export function SeasonRecap({
   snapshot,
   clubName,
+  countryName,
 }: {
   snapshot: TurnSnapshot;
   clubName: (id: number) => string;
+  countryName: (id: string) => string;
 }) {
   const { t, i18n } = useTranslation();
   const flagship = snapshot.flagship;
@@ -106,6 +108,18 @@ export function SeasonRecap({
                 })}
               </li>
             )}
+            {snapshot.playersOfYear
+              .filter((winner) => winner.season === last.season)
+              .map((winner) => (
+                <li key={winner.playerId} data-testid="offseason-player-of-year">
+                  {t("awards.playerOfYear", {
+                    context: winner.clubId === null ? "abroad" : undefined,
+                    player: winner.name,
+                    club: clubName(winner.clubId ?? 0),
+                    country: countryName(winner.countryId),
+                  })}
+                </li>
+              ))}
             {last.topScorer && (
               <li>
                 {t("events.seasonScorer", {

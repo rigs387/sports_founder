@@ -847,6 +847,13 @@ three topics; national teams and the World Championship follow. Every number is 
 - *Player of the Year:* a line only, no card. The flagship's Player of the Season against every
   standout, weighted by league tier (config); it is recorded each season and listed in the
   Almanac. Skill itself stays hidden.
+  - *Built 2026-10-12:* named for each finished flagship season once any other league has a
+    standout. Each candidate is rated on skill × their league tier's weight (Amateur 0.5,
+    Semi-Pro 0.7, Professional 0.9, Elite 1) × the season's form (±10%); the flagship's
+    candidate also gets ×1.25, the top flight being watched most. Without that weight the best of
+    several hundred standouts won 48 of 52 awards; with it the flagship's player wins about six
+    in ten (30 of 52 and 38 of 57 in two bot campaigns), most of them players who came from
+    abroad. A line in the season review and in the Almanac's roll of champions.
 - *The Hall of Fame stays the flagship's.* Standouts are not inducted; topic 3 decides whether
   championship records count.
 

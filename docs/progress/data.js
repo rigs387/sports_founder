@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-12",
-    tests: 625,
+    tests: 626,
     files: 66,
-    note: "npm run check passed after the talent pull was built (type checks, Biome, purity, 625 tests in 66 files). Lint has existing visual-study warnings.",
+    note: "npm run check passed after Player of the Year was built (type checks, Biome, purity, 626 tests in 66 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-12",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
@@ -100,6 +100,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-12",
+      type: "Built",
+      title: "Player of the Year",
+      text: "Tech plan 2.23, build order 3 of 7 (GDD v1.37): once any other league has a standout, each finished flagship season names a Player of the Year: the flagship's Player of the Season against every standout, on skill × league tier weight × the season's form. A line in the season review and the Almanac's roll of champions; no other effect. Tuned: without a top-flight weight the best of several hundred standouts won 48 of 52 awards, so the flagship's candidate gets ×1.25 and now wins about six in ten (30 of 52 and 38 of 57 in two builder campaigns), mostly players who came from abroad. Save format 28. npm run check: 626 tests in 66 files; smoke passed, though its short campaign has no standouts, so the line itself was not seen on screen.",
+    },
     {
       date: "2026-10-12",
       type: "Built",
@@ -828,7 +834,7 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Standouts exist in other leagues (tech plan 2.23, build order 1). Talent pull, the broadcast follow and the signing card are built (build order 2). Next: Player of the Year (build order 3).",
+      next: "Standouts exist in other leagues (tech plan 2.23, build order 1). Talent pull, the broadcast follow and the signing card are built (build order 2). Player of the Year is built (build order 3). Next: national teams (build order 4).",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
@@ -1044,17 +1050,18 @@ window.SF_PROGRESS = {
       gdd: "GDD system 14 · light version in Phase 1",
       icon: "17",
       summary: "Season achievements become stories, star power and legacy.",
-      next: "Player of the Year once other leagues have named players (parked); star power toward the flagship with the parked talent pull.",
+      next: "Awards do not yet weigh who the talent pull draws; national teams are next (tech plan 2.23, build order 4).",
       depends: ["stars", "leagues"],
       sources: [["Awards design", "../../sports-founder-gdd.md#progression--economy"]],
       items: [
+        ["built", "The flagship's Player of the Season and the top scorer's Crown (GDD v1.33)"],
         [
-          "partial",
-          "The flagship's Player of the Season and the top scorer's Crown built (GDD v1.33); Player of the Year waits for named players in other leagues",
+          "built",
+          "Player of the Year: the flagship's winner against every league's standouts (GDD v1.37)",
         ],
         [
           "partial",
-          "Awards feed stories and Hall of Fame eligibility; star power waits for the talent pull",
+          "Awards feed stories and Hall of Fame eligibility; they do not yet raise a player's pull toward the flagship",
         ],
       ],
     },

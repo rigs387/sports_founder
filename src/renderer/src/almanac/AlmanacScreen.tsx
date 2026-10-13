@@ -214,6 +214,18 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
                           })}
                         </small>
                       )}
+                      {snapshot.playersOfYear
+                        .filter((winner) => winner.season === season.season)
+                        .map((winner) => (
+                          <small key={winner.playerId} data-testid="almanac-player-of-year">
+                            {t("almanac.roll.playerOfYear", {
+                              context: winner.clubId === null ? "abroad" : undefined,
+                              player: winner.name,
+                              club: club(winner.clubId),
+                              country: country(winner.countryId),
+                            })}
+                          </small>
+                        ))}
                     </span>
                   </li>
                 ))}

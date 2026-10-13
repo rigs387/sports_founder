@@ -1206,6 +1206,16 @@ export const configFileSchema = z.strictObject({
      * country gains `link` (× starFactor for a star), up to the strongest link.
      */
     follow: z.strictObject({ link: unitInterval, starFactor: z.number().min(1) }),
+    /**
+     * Player of the Year: the flagship's Player of the Season against every standout, each on
+     * skill × their league tier's weight × a season's form (1 ± form).
+     */
+    playerOfYear: z.strictObject({
+      tierWeight: byLeagueTier(z.number().min(0)),
+      /** Multiplies the flagship candidate's rating: the top flight is watched most. */
+      flagshipWeight: z.number().positive(),
+      form: unitInterval,
+    }),
   }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({

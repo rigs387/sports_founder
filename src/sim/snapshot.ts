@@ -44,6 +44,7 @@ import {
   type LeagueTierId,
   type PendingTierUp,
   PLAYER_INDEX,
+  type PlayerOfYear,
   type TimedCountermoveKind,
   type World,
 } from "./types";
@@ -254,6 +255,8 @@ export interface TurnSnapshot {
   culture: CultureSnapshot;
   /** The Hall of Fame and the Almanac's records (GDD v1.31). */
   hallOfFame: HallSnapshot;
+  /** Each season's Player of the Year, oldest first (GDD v1.37); empty until standouts exist. */
+  playersOfYear: PlayerOfYear[];
 }
 
 /** Attendance and max capacity as the venue card shows them (GDD v1.34). */
@@ -531,5 +534,6 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     rules: rulesSnapshot(state, world),
     culture: cultureSnapshot(state, world, offseasonOpen(state)),
     hallOfFame: hallSnapshot(state, world),
+    playersOfYear: state.standouts.playersOfYear,
   };
 }

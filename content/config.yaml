@@ -755,6 +755,14 @@ standouts:
   # A flagship leading player born abroad is followed at home: the broadcast's link into their
   # country (0–1, a share of the seat's strongest media link) gains link, × starFactor for a star.
   follow: { link: 0.25, starFactor: 2 }
+  # Player of the Year (GDD v1.37): once other leagues have standouts, each finished flagship
+  # season names one. The flagship's Player of the Season and every standout are rated on skill ×
+  # their league tier's weight × the season's form (1 ± form, rolled); the best wins. A line in
+  # the season review and the Almanac; no other effect.
+  playerOfYear:
+    tierWeight: { amateur: 0.5, semi-pro: 0.7, professional: 0.9, elite: 1 }
+    flagshipWeight: 1.25
+    form: 0.1
 
 flagship:
   # Clubs by the flagship league's tier. Promotion admits generated expansion clubs at the next

@@ -3,6 +3,7 @@ import {
   checkInvariants,
   createCampaign,
   deserializeSave,
+  endTurn,
   type GameState,
   type LeagueTierId,
   newLeague,
@@ -10,7 +11,7 @@ import {
   snapshot,
   updateStandouts,
 } from "../src/sim";
-import { countryIndex, setupFor, world } from "./helpers";
+import { countryIndex, setupFor, withConfig, world } from "./helpers";
 
 // Standouts (GDD v1.37): named players in Professional and Elite leagues other than the flagship.
 
@@ -121,6 +122,59 @@ describe("standouts", () => {
         .map((player) => player.id)
         .sort(),
     ).toEqual(best.map((player) => player.id).sort());
+  });
+
+  it("name a Player of the Year each season once other leagues have standouts", () => {
+    const still = withConfig(world, (config) => {
+      config.standouts.playerOfYear.form = 0;
+    });
+    let played = createCampaign(world, setupFor(7, "brazil"));
+    while (!played.flagship.offseason) played = endTurn(played, world);
+    // No standouts anywhere: no award for the first season.
+    expect(played.standouts.playersOfYear).toEqual([]);
+    const first = played.flagship.seasons[0];
+    if (!first) throw new Error("no season");
+    const withStandouts = updateStandouts(withLeagues(played, leagues), still);
+    // A second season, told as the first was.
+    const second: GameState = {
+      ...withStandouts,
+      flagship: {
+        ...withStandouts.flagship,
+        season: 3,
+        seasons: [first, { ...first, season: 2 }],
+      },
+    };
+    const { tierWeight, flagshipWeight } = still.config.standouts.playerOfYear;
+    const rated = second.standouts.players
+      .map((player) => ({
+        id: player.id,
+        rating: player.skill * tierWeight[leagues[player.countryId as "japan" | "germany"]],
+      }))
+      .sort((a, b) => b.rating - a.rating);
+    const home = second.flagship.players.find((player) => player.id === first.playerOfSeason);
+    const homeRating = (home?.skill ?? 0) * tierWeight.amateur * flagshipWeight;
+    const awarded = updateStandouts(second, still);
+    expect(awarded.standouts.playersOfYear).toHaveLength(1);
+    const winner = awarded.standouts.playersOfYear[0];
+    expect(winner?.season).toBe(2);
+    if ((rated[0]?.rating ?? 0) > homeRating) {
+      expect(winner?.playerId).toBe(rated[0]?.id);
+      expect(winner?.clubId).toBeNull();
+    } else {
+      expect(winner?.playerId).toBe(home?.id);
+      expect(winner?.clubId).not.toBeNull();
+    }
+    expect(snapshot(awarded, still).playersOfYear).toEqual(awarded.standouts.playersOfYear);
+    expect(deserializeSave(serializeSave(awarded), still).standouts).toEqual(awarded.standouts);
+    // The flagship's own winner takes it when the standouts are weak.
+    const weak: GameState = {
+      ...second,
+      standouts: {
+        ...second.standouts,
+        players: second.standouts.players.map((player) => ({ ...player, skill: 1 })),
+      },
+    };
+    expect(updateStandouts(weak, still).standouts.playersOfYear[0]?.playerId).toBe(home?.id);
   });
 
   it("are named on the country, best first, without their skill, and survive a save", () => {

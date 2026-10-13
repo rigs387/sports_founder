@@ -67,7 +67,7 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
       )}
       <section className="flagship-card offseason-review" aria-labelledby="offseason-review">
         <h2 id="offseason-review">{t("offseason.review.heading", nouns)}</h2>
-        <SeasonRecap snapshot={snapshot} clubName={clubName} />
+        <SeasonRecap snapshot={snapshot} clubName={clubName} countryName={country} />
         {decisions > 0 && (
           <p className="offseason-decisions">
             {t("offseason.review.decisions", { count: decisions })}{" "}
