@@ -588,6 +588,18 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         modernized: state.landmarks.filter((l) => l.kind === "venueOpened" && l.modernized).length,
         records: state.landmarks.filter((l) => l.kind === "recordCrowd").length,
       },
+      championship: (() => {
+        const { founded, tournaments } = state.worldChampionship;
+        const seed = (t: (typeof tournaments)[number]) =>
+          t.teams.find((team) => team.countryId === t.championId)?.seed ?? 0;
+        return {
+          foundedTurn: founded?.turn ?? null,
+          tournaments: tournaments.length,
+          seatTitles: tournaments.filter((t) => t.championId === state.flagship.countryId).length,
+          champions: new Set(tournaments.map((t) => t.championId)).size,
+          topSeedTitles: tournaments.filter((t) => seed(t) <= 4).length,
+        };
+      })(),
       remembers: {
         players: state.hallOfFame.inductees.length,
         // Seasons since the flagship's league first turned Professional (GDD v1.35: the Hall aims at

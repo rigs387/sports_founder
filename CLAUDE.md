@@ -352,8 +352,12 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   quarter, read through `championshipFactors` in `quarter.ts`), the host league's cash and a
   flopped top seed's casual loss (whole fans only). Cards come from the `championshipPlayed`
   landmark (`src/sim/championship-cards.ts`, trigger `championship`, event facts
-  `championship`) and take no slot. The championship page, Hall points and bots are not built
-  (tech plan 2.23, build order 7).
+  `championship`) and take no slot. A world title counts for the Hall
+  (`InducteeFacts.worldTitles`, read from the champion's recorded squad). The page is
+  `src/renderer/src/championship/ChampionshipScreen.tsx`: a nav tab once founded, opened by
+  `App.tsx` when a tournament has just been played, before the offseason screen. Bots hold
+  the founding price back (`championshipReserve` in `src/runner/policy.ts`) until they found
+  it; every run prints a World Championship line.
 - Talent pull (GDD v1.37) is `src/sim/talent.ts`. An opening is an active seat club whose leader
   retired last season and whose young replacement has not played (`openings`, offseason only).
   `pullTalent` runs in `endTurn` before `closeOffseason`: by chance, up to
@@ -449,6 +453,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   Format 28 migrates with it unfounded.
 - Save format 30 adds played tournaments (GDD v1.37): each tournament's field, rounds and
   champion, and `WorldChampionshipState.lifts`. Format 29 migrates with no tournaments.
+- Save format 31 adds world titles to Hall inductees' facts (GDD v1.37). Format 30 migrates
+  with none.
 - The saves folder (GDD v1.35) is `savesFolder` in `src/main/save-files.ts`: Saved Games\Sports
   Founder on Windows. Each session save carries a `header` for the Load screen (the Campaign
   menu's list, `campaign:list` / `campaign:open-named`); an autosave after each turn keeps

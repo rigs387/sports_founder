@@ -17,3 +17,132 @@
 .championship-bids small {
   color: #5e768a;
 }
+
+/* The championship's own page (GDD v1.37). */
+.championship-years {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.championship-years button {
+  padding: 4px 12px;
+  border: 1px solid #b9cbd8;
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.championship-years button.active {
+  border-color: var(--bronze);
+  background: var(--bronze-soft);
+}
+
+.championship-champion {
+  margin-bottom: 16px;
+  padding: 22px 24px;
+  border: 1px solid #d9c48a;
+  border-top: 5px solid var(--bronze);
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--bronze-soft), #fffdf6);
+  text-align: center;
+}
+
+.championship-champion h2 {
+  margin: 6px 0;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.championship-champion h2 button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.championship-champion p {
+  margin: 4px 0;
+}
+
+.championship-squad {
+  color: #526d80;
+}
+
+.championship-screen .almanac-card {
+  margin-bottom: 16px;
+}
+
+.championship-bracket {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(150px, 1fr);
+  gap: 12px;
+  overflow-x: auto;
+  align-items: center;
+}
+
+.championship-bracket h3 {
+  margin: 0 0 6px;
+}
+
+.championship-bracket ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.championship-bracket li {
+  display: grid;
+  padding: 6px 8px;
+  border: 1px solid #d5e2ea;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+}
+
+.championship-bracket .won {
+  font-weight: 800;
+}
+
+.championship-bracket .lost {
+  color: #6f8696;
+}
+
+.championship-bracket small {
+  display: inline-block;
+  min-width: 18px;
+  color: #6f8696;
+}
+
+.championship-draw {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.championship-draw li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.championship-draw li span:last-child {
+  display: grid;
+}
+
+.championship-draw small {
+  color: #526d80;
+}

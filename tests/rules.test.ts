@@ -23,6 +23,7 @@ import {
 import {
   awardless,
   crowdless,
+  migratedChampionship,
   migratedCulture,
   migratedHall,
   migratedStandouts,
@@ -214,6 +215,7 @@ describe("the review and saves", () => {
           culture: migratedCulture(state),
           hallOfFame: migratedHall(state),
           standouts: migratedStandouts(state),
+          worldChampionship: migratedChampionship(state),
         }),
       ),
     );

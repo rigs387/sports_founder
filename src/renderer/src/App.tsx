@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlmanacScreen } from "./almanac/AlmanacScreen";
+import { ChampionshipScreen } from "./championship/ChampionshipScreen";
 import { ActionFeedback } from "./components/ActionFeedback";
 import { CampaignOverview, type Overview } from "./components/CampaignOverview";
 import { CampaignSetupScreen } from "./components/CampaignSetupScreen";
@@ -57,7 +58,8 @@ export function App() {
     overview === "growth" ||
     overview === "flagship" ||
     overview === "almanac" ||
-    overview === "offseason";
+    overview === "offseason" ||
+    overview === "championship";
   // On narrow screens the nav scrolls; keep the current view's tab in sight.
   useEffect(() => {
     document
@@ -67,19 +69,31 @@ export function App() {
   // The offseason opens on its own screen (GDD v1.24), once each time it opens, if the player is
   // on the world map; elsewhere its tab appears and waits. The season's big news comes first
   // (GDD v1.26): the screen opens once it has been collected.
+  // A World Championship that has just been played opens its own page first (GDD v1.37), the
+  // same way; the offseason screen follows when the player moves on from it.
   const offseasonOpen = snapshot?.offseasonOpen ?? false;
   const wasOpen = useRef(offseasonOpen);
   const owed = useRef(false);
+  const played = snapshot?.worldChampionship.tournaments.length ?? 0;
+  const seen = useRef({ revision: campaignRevision, played });
+  const cupOwed = useRef(false);
   useEffect(() => {
+    // A campaign that was just started or loaded owes nothing for tournaments already on record.
+    if (seen.current.revision !== campaignRevision) cupOwed.current = false;
+    else if (played > seen.current.played) cupOwed.current = overview === null;
+    seen.current = { revision: campaignRevision, played };
     if (offseasonOpen && !wasOpen.current) owed.current = overview === null;
     if (!offseasonOpen) owed.current = false;
-    if (owed.current && news === 0 && overview === null) {
+    if (cupOwed.current && news === 0 && overview === null) {
+      cupOwed.current = false;
+      setOverview("championship");
+    } else if (owed.current && !cupOwed.current && news === 0 && overview === null) {
       owed.current = false;
       setOverview("offseason");
     }
     if (!offseasonOpen && overview === "offseason") setOverview(null);
     wasOpen.current = offseasonOpen;
-  }, [offseasonOpen, overview, news]);
+  }, [offseasonOpen, overview, news, played, campaignRevision]);
   // A pop-up card outlines its country on the map (GDD v1.25), leaving the selection alone.
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const navigate = (kind: MapCommand["kind"], market?: string) =>
@@ -165,6 +179,17 @@ export function App() {
               {t(`map.nav.${view}`)}
             </button>
           ))}
+          {snapshot.worldChampionship.founded !== null && (
+            <button
+              type="button"
+              data-view="championship"
+              className={overview === "championship" ? "active" : undefined}
+              aria-current={overview === "championship" ? "page" : undefined}
+              onClick={() => setOverview("championship")}
+            >
+              {t("map.nav.championship")}
+            </button>
+          )}
           {offseasonOpen && (
             <button
               type="button"
@@ -249,6 +274,22 @@ export function App() {
           snapshot={snapshot}
           names={names}
           active={overview === "almanac"}
+          onCountry={(id) => {
+            setOverview(null);
+            selectCountry(id);
+            navigate("locate", id);
+          }}
+        />
+      )}
+      {names && (
+        <ChampionshipScreen
+          snapshot={snapshot}
+          names={names}
+          active={overview === "championship"}
+          onContinue={() => {
+            owed.current = false;
+            setOverview(offseasonOpen ? "offseason" : null);
+          }}
           onCountry={(id) => {
             setOverview(null);
             selectCountry(id);

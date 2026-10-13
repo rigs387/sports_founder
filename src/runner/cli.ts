@@ -33,6 +33,7 @@ import {
   type CampaignResult,
   type CountryRow,
   campaignsCsv,
+  championshipAggregate,
   countriesCsv,
   dealsAggregate,
   eventAggregate,
@@ -812,6 +813,10 @@ function main(): number {
         .join(
           ", ",
         )}; levels opened ${venues.opened}, modernized ${venues.modernized}; record crowds ${venues.records}; payroll baseline ${pct(venues.payrollShare.median ?? 0)} and star wages ${pct(venues.wagesShare.median ?? 0)} of the seat's costs (median)`,
+    );
+    const cup = championshipAggregate(results);
+    console.log(
+      `  World Championship: founded in ${cup.founded}/${results.length} campaigns, at turn median ${fmt(cup.foundedTurn)}; tournaments per campaign median ${fmt(cup.tournaments)}, different champions median ${fmt(cup.champions)}; of ${cup.played} tournaments, a top-four seed won ${cup.topSeedTitles} and the seat's country ${cup.seatTitles}`,
     );
     const remembers = remembersAggregate(results);
     console.log(

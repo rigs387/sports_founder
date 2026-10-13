@@ -906,7 +906,8 @@ Phase 2 outline above, which stands. Every number is config (`worldChampionship`
 - *The Hall of Fame:* flagship players on the winning team earn Hall points (config). Standouts
   are still never inducted.
 - *Built 2026-10-12 (founding, calendar and hosts; the tournament itself is not built yet):*
-  founding costs 12 quarters of PP income and needs 16 countries able to field a team. The
+  founding costs 6 quarters of PP income (12 at first; see the measurement below) and needs 16
+  countries able to field a team. The
   calendar runs on flagship seasons: a tournament is played when a season ends, the first at the
   end of the season that starts after the founding offseason, then every 4 seasons. Bids (3 or 4,
   drawn by 2 ^ wealth level from countries with a league, never the last host) arrive at once on
@@ -925,6 +926,17 @@ Phase 2 outline above, which stands. Every number is config (`worldChampionship`
   The whole bracket is kept. Measured on one campaign with 200 teams and nine tournaments: top
   three seeds won five, a host never qualified on strength, and the seat's country won none.
   The page, Hall points and bots are the last build step.
+- *Built 2026-10-13 (the page, Hall points, bots; the contest measured):* the championship has
+  its own page, with a nav tab once it is founded: the champion on a banner, the bracket round
+  by round, the draw with each team's players, and every past tournament by year. It opens
+  itself when a tournament has been played, before the offseason screen. A world title is worth
+  4 Hall points to a flagship player on the winning team, and shows on the plaque. Bots save
+  for the founding price once enough teams exist, found it, and pick the bidder with the most
+  people left to win. Measured (pacing, 12 anchors × 3 seeds, 200 turns): at a founding price
+  of 12 quarters, saving held bots' growth back: founded in 28 of 36 campaigns, #1 lost before
+  the win in 23 of 34 (68%). At 6 quarters: founded in 36 of 36 at median turn 60, pacing
+  passes, #1 lost first in 20 of 35 (57%, inside the noise of "about half"); of 607 tournaments
+  a top-four seed won 344 and the seat's country 65. The price stays at 6.
 - *Measure after building:* this is new ground gained against the rivals; the #1 contest (about
   half lose #1 before the win) is remeasured and the lifts tuned to keep it.
 

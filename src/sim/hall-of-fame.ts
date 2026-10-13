@@ -64,7 +64,7 @@ function allTimeRank(units: ReadonlyMap<number, number>, playerId: number): numb
 
 /** A player's career as the Hall reads it: star seasons, titles, awards, the record, the career. */
 export function inducteeFacts(
-  state: Pick<GameState, "flagship" | "landmarks">,
+  state: Pick<GameState, "flagship" | "landmarks"> & Partial<Pick<GameState, "worldChampionship">>,
   world: World,
   player: Player,
   units: ReadonlyMap<number, number> = careerUnitsById(state.flagship, world),
@@ -82,6 +82,12 @@ export function inducteeFacts(
     scores: player.career.reduce((sum, line) => sum + line.scores, 0),
     careerUnits: units.get(player.id) ?? 0,
     allTimeRank: allTimeRank(units, player.id),
+    // A tournament records its squads by player id (GDD v1.37).
+    worldTitles: (state.worldChampionship?.tournaments ?? []).filter((tournament) =>
+      tournament.teams
+        .find((team) => team.countryId === tournament.championId)
+        ?.players.some((member) => member.playerId === player.id),
+    ).length,
   };
 }
 
@@ -95,7 +101,8 @@ export function hallPoints(facts: InducteeFacts, world: World): number {
     facts.awards * points.playerOfSeason +
     (facts.record ? points.record : 0) +
     Math.floor(facts.careerUnits / points.careerUnits) +
-    (facts.allTimeRank <= topRank ? points.topTen : 0)
+    (facts.allTimeRank <= topRank ? points.topTen : 0) +
+    facts.worldTitles * points.worldTitle
   );
 }
 

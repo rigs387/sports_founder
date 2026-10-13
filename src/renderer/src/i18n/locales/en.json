@@ -1239,6 +1239,7 @@
       "flagship": "Flagship",
       "growth": "Growth",
       "almanac": "Almanac",
+      "championship": "Championship",
       "offseason": "Offseason"
     },
     "prestige": "Prestige",
@@ -1822,6 +1823,7 @@
       "playerOfYear_abroad": "Player of the Year: {{player}} ({{country}})"
     },
     "stats": {
+      "worldTitles": "World titles",
       "starSeasons": "Star seasons",
       "titles": "Titles",
       "topScorer": "Top scorer",
@@ -2053,6 +2055,29 @@
     "bidsLater": "Countries bid to host in the offseason before each tournament.",
     "pick": "Pick as host",
     "pickConfirm": "Confirm the host",
+    "page": {
+      "eyebrow": "The world stage",
+      "toOffseason": "On to the offseason",
+      "toMap": "Back to the world",
+      "unfounded": "The championship has not been founded yet.",
+      "waiting": "The first tournament is played in {{year}}.",
+      "waitingHost": "The first tournament is played in {{year}}, in {{country}}.",
+      "past": "Past tournaments",
+      "edition": "{{year}} · hosted by {{host}} · {{count}} teams",
+      "champions": "{{country}} are world champions",
+      "final": "{{country}}, seeded {{seed}}, beat {{opponent}} in the final.",
+      "squad": "Led by {{names, list}}.",
+      "bracket": "The bracket",
+      "draw": "The draw",
+      "hostMark": " (host)",
+      "rounds": {
+        "first": "First round",
+        "sixteen": "Round of 16",
+        "quarter": "Quarterfinals",
+        "semi": "Semifinals",
+        "final": "Final"
+      }
+    },
     "past": "Past tournaments: {{hosts, list}}.",
     "pastOne": "{{champion}} won in {{country}} ({{year}})"
   },

@@ -159,6 +159,7 @@ describe("Hall of Fame classes (tech plan 2.18 step 2, GDD v1.35)", () => {
       scores: 40,
       careerUnits: expect.closeTo(units, 9),
       allTimeRank: 1,
+      worldTitles: 0,
     });
     const { points } = world.config.hallOfFame;
     expect(hallPoints(facts, world)).toBe(

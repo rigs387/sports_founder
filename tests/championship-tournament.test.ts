@@ -7,6 +7,8 @@ import {
   endTurn,
   flops,
   type GameState,
+  hallPoints,
+  inducteeFacts,
   type LeagueTierId,
   nationalTeams,
   newLeague,
@@ -154,14 +156,36 @@ describe("a World Championship tournament", () => {
     expect(card?.facts.championship?.opponentId).toBe(beaten);
     // Brazil's Amateur league fields no team, so there is no seat story.
     expect(view.events.some((event) => event.templateId === "championship-seat-run")).toBe(false);
-    expect(view.worldChampionship.tournaments).toEqual([
-      {
-        season: tournament.season,
-        year: tournament.year,
-        hostId: tournament.hostId,
-        championId: tournament.championId,
+    // The page gets the whole bracket.
+    expect(view.worldChampionship.tournaments).toEqual([tournament]);
+  });
+
+  it("counts a world title toward the Hall of Fame for a flagship player on the winning team", () => {
+    const leader = played.flagship.players[0];
+    if (!leader) throw new Error("no flagship player");
+    const none = inducteeFacts(played, world, leader);
+    expect(none.worldTitles).toBe(0);
+    const won: GameState = {
+      ...played,
+      worldChampionship: {
+        ...played.worldChampionship,
+        tournaments: [
+          {
+            ...tournament,
+            teams: tournament.teams.map((team) =>
+              team.countryId === tournament.championId
+                ? { ...team, players: [{ playerId: leader.id, name: leader.name }] }
+                : team,
+            ),
+          },
+        ],
       },
-    ]);
+    };
+    const facts = inducteeFacts(won, world, leader);
+    expect(facts.worldTitles).toBe(1);
+    expect(hallPoints(facts, world) - hallPoints(none, world)).toBe(
+      world.config.hallOfFame.points.worldTitle,
+    );
   });
 
   it("goes to the favorites when upsets are impossible", () => {

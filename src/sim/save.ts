@@ -32,7 +32,7 @@ import type { FlagshipState, GameState, Genome, World } from "./types";
 import { newWorldChampionship } from "./world-championship";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 30;
+export const SAVE_FORMAT_VERSION = 31;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -642,6 +642,7 @@ const gameStateSchema = z.strictObject({
           scores: count,
           careerUnits: z.number().min(0),
           allTimeRank: z.int().min(1),
+          worldTitles: count,
         }),
       }),
     ),
@@ -732,6 +733,23 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 30 → 31: world titles count for the Hall (GDD v1.37). Inductees so far have none on record.
+  30: (save) => {
+    const hall = save.state.hallOfFame as { inductees: Record<string, unknown>[] };
+    return {
+      formatVersion: 31,
+      state: {
+        ...save.state,
+        hallOfFame: {
+          ...hall,
+          inductees: hall.inductees.map((inductee) => ({
+            ...inductee,
+            facts: { ...(inductee.facts as Record<string, unknown>), worldTitles: 0 },
+          })),
+        },
+      },
+    };
+  },
   // 29 → 30: tournaments are played (GDD v1.37). Hosts recorded without a tournament are
   // dropped: nothing was played.
   29: (save) => ({

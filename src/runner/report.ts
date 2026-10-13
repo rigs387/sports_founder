@@ -158,6 +158,18 @@ export interface CampaignResult {
     modernized: number;
     records: number;
   };
+  /** The World Championship (GDD v1.37). */
+  championship: {
+    /** The turn it was founded, if it was. */
+    foundedTurn: number | null;
+    tournaments: number;
+    /** Tournaments won by the country holding the seat at the campaign's end. */
+    seatTitles: number;
+    /** Different champions. */
+    champions: number;
+    /** Tournaments won by one of the top four seeds. */
+    topSeedTitles: number;
+  };
   /** What the sport remembers (GDD v1.31): the Hall of Fame, chants, Culture nodes. */
   remembers: {
     players: number;
@@ -430,6 +442,22 @@ export function flagshipAggregate(results: CampaignResult[]) {
     firstBackTurn: distribution(
       results.flatMap((r) => (r.flagship.firstBackTurn === null ? [] : [r.flagship.firstBackTurn])),
     ),
+  };
+}
+
+/** The World Championship across campaigns (GDD v1.37). */
+export function championshipAggregate(results: CampaignResult[]) {
+  const founded = results.filter((r) => r.championship.foundedTurn !== null);
+  const total = (pick: (r: CampaignResult) => number) =>
+    results.reduce((sum, r) => sum + pick(r), 0);
+  return {
+    founded: founded.length,
+    foundedTurn: median(founded.map((r) => r.championship.foundedTurn ?? 0)),
+    tournaments: median(founded.map((r) => r.championship.tournaments)),
+    played: total((r) => r.championship.tournaments),
+    seatTitles: total((r) => r.championship.seatTitles),
+    topSeedTitles: total((r) => r.championship.topSeedTitles),
+    champions: median(founded.map((r) => r.championship.champions)),
   };
 }
 

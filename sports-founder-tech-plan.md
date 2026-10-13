@@ -1516,6 +1516,18 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    nothing is played. Save format 30 (29 migrates with no tournaments). Tests:
    `tests/championship-tournament.test.ts`.
 
+   *Build order 7 built 2026-10-13 (the page, Hall points, bots, the measurement).* Renderer:
+   `src/renderer/src/championship/ChampionshipScreen.tsx` (overview `championship`; a nav tab
+   once founded; `App.tsx` opens it when `worldChampionship.tournaments` grows, before the
+   offseason screen, never for a campaign just loaded). The snapshot carries whole tournaments.
+   Hall: `InducteeFacts.worldTitles` read from the champion's recorded squad,
+   `hallOfFame.points.worldTitle`. Bots (`policy.ts`): `championshipReserve` is held back
+   from growth levels and paid event choices until it is founded; `runChampionship` founds and
+   picks the bidder with the most people left to win. Runner: a World Championship line
+   (`championshipAggregate`). Config: `foundingQuarters` 12 → 6 after measuring. Save format
+   31 (30 migrates inductees with no world titles). All of 2.23 is built. Not seen on screen:
+   the smoke's campaign cannot found a championship.
+
 **Build order.** (1) Standouts exist: state, lifecycle, names on screen. (2) Talent pull, the
 broadcast follow and the signing card. (3) Player of the Year. (4) National teams and their
 list. (5) Founding, bids and the host. (6) The tournament, its effects and cards. (7) The

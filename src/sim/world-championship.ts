@@ -432,8 +432,8 @@ export interface ChampionshipSnapshot {
   /** Whether a bid can be picked now. */
   canPick: boolean;
   hostId: string | null;
-  /** Past tournaments, oldest first: when, where and who won. */
-  tournaments: { season: number; year: number; hostId: string; championId: string }[];
+  /** Past tournaments, oldest first, with their whole brackets. */
+  tournaments: ChampionshipTournament[];
 }
 
 export function championshipSnapshot(state: GameState, world: World): ChampionshipSnapshot {
@@ -461,12 +461,7 @@ export function championshipSnapshot(state: GameState, world: World): Championsh
     }),
     canPick: championship.bids.length > 0 && championship.hostId === null && offseasonOpen(state),
     hostId: championship.hostId,
-    tournaments: championship.tournaments.map(({ season, year, hostId, championId }) => ({
-      season,
-      year,
-      hostId,
-      championId,
-    })),
+    tournaments: championship.tournaments,
   };
 }
 

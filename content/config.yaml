@@ -705,7 +705,7 @@ awards: { score: 1, champion: 10, runnerUp: 5, playoffScore: 1, finalScore: 2 }
 # Bar measured on pacing (24 campaigns, 200 turns): 24 inducted 0.51 players a season from
 # Professional on, 16 inducts 0.66, about two in three retiring leading players (each club has one).
 hallOfFame:
-  points: { starSeason: 3, playerOfSeason: 3, title: 2, topScorer: 2, record: 5, careerUnits: 15, topTen: 5 }
+  points: { starSeason: 3, playerOfSeason: 3, title: 2, topScorer: 2, record: 5, careerUnits: 15, topTen: 5, worldTitle: 4 }
   topRank: 10
   bar: 16
   waitSeasons: 2
@@ -783,9 +783,12 @@ nationalTeams:
 # offseason before each, bids.min–bids.max countries with a league bid, drawn without repeats by
 # bidWealthBase ^ wealth level (0–3), never the last host; the player picks, or the wealthiest
 # bidder hosts.
+# foundingQuarters measured on pacing (12 anchors × 3 seeds, 200 turns, 2026-10-13): at 12, bots
+# saving for it founded in 28 of 36 campaigns and lost #1 before the win in 23 of 34 (68%); at
+# 6 they found in 36 of 36 at median turn 60 and lose #1 first in 20 of 35 (57%).
 worldChampionship:
   foundingTeams: 16
-  foundingQuarters: 12
+  foundingQuarters: 6
   everySeasons: 4
   bids: { min: 3, max: 4 }
   bidWealthBase: 2

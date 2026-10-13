@@ -998,6 +998,8 @@ export interface InducteeFacts {
   careerUnits: number;
   /** Place among every flagship player by career units when the facts were read, 1 = first. */
   allTimeRank: number;
+  /** World Championships won with their country while leading a flagship club (GDD v1.37). */
+  worldTitles: number;
 }
 
 /** One Hall of Fame inductee: a player (GDD v1.35: the Hall is for people). */

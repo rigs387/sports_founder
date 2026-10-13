@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { builder } from "../src/runner/policy";
 import {
   applyAction,
   checkInvariants,
@@ -85,6 +86,23 @@ describe("the World Championship", () => {
     expect(view.canPick).toBe(true);
     expect(checkInvariants(founded, world)).toEqual([]);
     expect(deserializeSave(serializeSave(founded), world).worldChampionship).toEqual(championship);
+  });
+
+  it("is founded by bots as soon as they can, and they pick the bidder with the most people to win", () => {
+    const step = builder(ready, world);
+    const types = step.actions.map((action) => action.type);
+    expect(types).toContain("foundChampionship");
+    expect(types).toContain("pickHost");
+    const founded = found(ready);
+    const room = (id: string) => {
+      const index = world.countries.findIndex((country) => country.id === id);
+      const fans = founded.countries[index]?.fans[0];
+      return (
+        (world.countries[index]?.population ?? 0) - (fans?.casual ?? 0) - (fans?.hardcore ?? 0)
+      );
+    };
+    const best = [...founded.worldChampionship.bids].sort((a, b) => room(b) - room(a))[0];
+    expect(step.state.worldChampionship.hostId).toBe(best);
   });
 
   it("lets the player pick a bidder as host, once", () => {

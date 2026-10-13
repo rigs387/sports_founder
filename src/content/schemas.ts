@@ -1167,6 +1167,8 @@ export const configFileSchema = z.strictObject({
       careerUnits: z.number().positive(),
       /** For a career in the all-time top topRank by score units. */
       topTen: z.number().min(0),
+      /** For each World Championship won with their country (GDD v1.37). */
+      worldTitle: z.number().min(0),
     }),
     topRank: z.int().min(1),
     bar: z.number().positive(),

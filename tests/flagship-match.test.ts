@@ -15,6 +15,7 @@ import {
   baseGenome,
   cardless,
   crowdless,
+  migratedChampionship,
   migratedCulture,
   migratedHall,
   migratedStandouts,
@@ -162,6 +163,7 @@ describe("save format 10", () => {
         culture: migratedCulture(played),
         hallOfFame: migratedHall(played),
         standouts: migratedStandouts(played),
+        worldChampionship: migratedChampionship(played),
       }),
     );
     const next = closeOffseason(playSeasons(loaded, 3), world);

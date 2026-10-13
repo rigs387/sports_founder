@@ -22,6 +22,7 @@ import {
   awardless,
   countryIndex,
   crowdless,
+  migratedChampionship,
   migratedCulture,
   migratedHall,
   migratedStandouts,
@@ -203,6 +204,7 @@ describe("bots and saves", () => {
           culture: migratedCulture(state),
           hallOfFame: migratedHall(state),
           standouts: migratedStandouts(state),
+          worldChampionship: migratedChampionship(state),
         }),
       ),
     );

@@ -19,6 +19,7 @@ import {
 } from "../src/sim";
 import {
   firstAnchor,
+  migratedChampionship,
   migratedCulture,
   migratedHall,
   migratedStandouts,
@@ -352,6 +353,10 @@ describe("saves with the growth tree (format 5)", () => {
         culture: migratedCulture({ ...withoutTree, ...migratedFlagship(withoutTree) }),
         hallOfFame: migratedHall({ ...withoutTree, ...migratedFlagship(withoutTree) }),
         standouts: migratedStandouts({ ...withoutTree, ...migratedFlagship(withoutTree) }),
+        worldChampionship: migratedChampionship({
+          ...withoutTree,
+          ...migratedFlagship(withoutTree),
+        }),
       }),
     );
     const later = playWithPolicy(loaded, 6);
@@ -381,6 +386,7 @@ describe("saves with the growth tree (format 5)", () => {
       culture: migratedCulture({ ...current, ...migratedFlagship(current) }),
       hallOfFame: migratedHall({ ...current, ...migratedFlagship(current) }),
       standouts: migratedStandouts({ ...current, ...migratedFlagship(current) }),
+      worldChampionship: migratedChampionship({ ...current, ...migratedFlagship(current) }),
     };
     expect(serializeSave(loaded)).toBe(serializeSave(migrated));
     expect(playWithPolicy(loaded, 6)).toStrictEqual(playWithPolicy(migrated, 6));

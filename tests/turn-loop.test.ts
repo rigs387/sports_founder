@@ -165,6 +165,8 @@ describe("state stays valid", () => {
       config.dynamics.player.casualChurnRate = 0;
       config.dynamics.player.casualDecayRate = 0;
       config.dynamics.rival.casualChurnRate = 0;
+      // A World Championship flop is casual churn too (GDD v1.37).
+      config.worldChampionship.flopCasualLoss = 0;
     });
     // After turn 80 the player stops converting new hardcore fans, so its losses to rival poaching
     // show up as falling hardcore counts instead of hiding under growth.

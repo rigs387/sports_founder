@@ -296,6 +296,9 @@ function Plaque({
     [t("almanac.stats.titles"), facts.titles],
     [t("almanac.stats.topScorer"), facts.topScorerSeasons],
     [t("almanac.stats.awards"), facts.awards],
+    ...(facts.worldTitles > 0
+      ? ([[t("almanac.stats.worldTitles"), facts.worldTitles]] as [string, number][])
+      : []),
     [t("almanac.stats.scores", { scoresNoun: nouns().scoresNoun }), facts.scores],
   ];
   return (

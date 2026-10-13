@@ -24,12 +24,14 @@ import {
   computeExposure,
   effectValue,
   fandomScore,
+  foundingPrice,
   type GameState,
   growthNode,
   heldStrength,
   leagueCosts,
   leagueIncomePerQuarter,
   leverMultipliers,
+  nationalTeams,
   nodeCost,
   offseasonOpen,
   optionNetDelta,
@@ -133,7 +135,8 @@ export interface BotStep {
 
 /** Answers pending decision cards before the bot spends PP elsewhere. */
 function answerEvents(state: GameState, world: World, weights: EventWeights, reserve: number) {
-  const answered = chooseEvents(state, world, weights, reserve);
+  // Paid choices wait too while a bot saves for the World Championship (GDD v1.37).
+  const answered = chooseEvents(state, world, weights, reserve + championshipReserve(state, world));
   return { state: answered.state, actions: answered.actions } satisfies BotStep;
 }
 
@@ -269,9 +272,12 @@ function buyNodes(
   reserve: number,
   pick: (candidates: string[]) => string | null,
 ): void {
+  // Once the World Championship can be founded, bots keep its price back until they have (GDD
+  // v1.37): growth levels would otherwise always take the PP first.
+  const hold = reserve + championshipReserve(step.state, world);
   for (;;) {
     const candidates = buyableNodes(step.state, world).filter(
-      (nodeId) => step.state.pp - nodeCost(step.state, world, nodeId) >= reserve,
+      (nodeId) => step.state.pp - nodeCost(step.state, world, nodeId) >= hold,
     );
     const choice = candidates.length > 0 ? pick(candidates) : null;
     if (choice === null || !attempt(step, world, { type: "buyNode", nodeId: choice })) return;
@@ -308,6 +314,7 @@ function greedySpreadTurn(state: GameState, world: World): BotStep {
   backStars(step, world, 0);
   buildVenues(step, world, VENUE_FULL.other, VENUE_RESERVE_QUARTERS.other);
   signDeals(step, world);
+  runChampionship(step, world);
   buyNodes(step, world, 0, cheapest(step, world));
   return step;
 }
@@ -405,6 +412,34 @@ function backStars(step: BotStep, world: World, reserve: number): void {
   }
 }
 
+/** The founding price while the World Championship is unfounded and enough teams exist, else 0. */
+function championshipReserve(state: GameState, world: World): number {
+  if (state.worldChampionship.founded !== null) return 0;
+  const enough = nationalTeams(state, world).length >= world.config.worldChampionship.foundingTeams;
+  return enough ? foundingPrice(state, world) : 0;
+}
+
+/** The name bots give the World Championship: the player's is theirs to choose. */
+const BOT_CHAMPIONSHIP_NAME = "World Championship";
+
+/**
+ * The World Championship (GDD v1.37): bots found it as soon as they can afford it, and pick the
+ * bidder where the sport has the most people left to win (population less its fans there).
+ */
+function runChampionship(step: BotStep, world: World): void {
+  if (!offseasonOpen(step.state)) return;
+  attempt(step, world, { type: "foundChampionship", name: BOT_CHAMPIONSHIP_NAME });
+  const { bids, hostId } = step.state.worldChampionship;
+  if (hostId !== null || bids.length === 0) return;
+  const room = (countryId: string) => {
+    const index = indexOf(world, countryId);
+    const fans = step.state.countries[index]?.fans[PLAYER_INDEX];
+    return (world.countries[index]?.population ?? 0) - (fans?.casual ?? 0) - (fans?.hardcore ?? 0);
+  };
+  const pick = [...bids].sort((a, b) => room(b) - room(a) || a.localeCompare(b))[0];
+  if (pick) attempt(step, world, { type: "pickHost", countryId: pick });
+}
+
 /**
  * Signs the highest-value offer in each slot (GDD v1.28), demands included; ties go to the
  * earliest offer. Bots play on as usual, so their demands are kept or broken by their plans.
@@ -493,6 +528,7 @@ function builderTurn(state: GameState, world: World, options: BotOptions): BotSt
   backStars(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   buildVenues(step, world, VENUE_FULL.builder, VENUE_RESERVE_QUARTERS.builder);
   signDeals(step, world);
+  runChampionship(step, world);
   buyNodes(
     step,
     world,
@@ -560,6 +596,7 @@ function anchorTurtleTurn(state: GameState, world: World): BotStep {
   backStars(step, world, bailoutReserve(step.state, world, TURTLE_RESERVE_BAILOUTS));
   buildVenues(step, world, VENUE_FULL.other, VENUE_RESERVE_QUARTERS.other);
   signDeals(step, world);
+  runChampionship(step, world);
   buyNodes(step, world, bailoutReserve(step.state, world, TURTLE_RESERVE_BAILOUTS), (candidates) =>
     pickCheapest(candidates.filter((id) => nodeValue(step.state, world, id, anchorIndex) > 0)),
   );
@@ -602,6 +639,7 @@ function mediaRushTurn(state: GameState, world: World): BotStep {
   backStars(step, world, reserve);
   buildVenues(step, world, VENUE_FULL.other, VENUE_RESERVE_QUARTERS.other);
   signDeals(step, world);
+  runChampionship(step, world);
   const pickCheapest = cheapest(step, world);
   buyNodes(step, world, reserve, (candidates) =>
     pickCheapest(candidates.filter((id) => wanted.includes(id))),
