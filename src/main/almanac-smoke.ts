@@ -97,12 +97,12 @@ export async function verifyAlmanac(
   );
   if (history < 1) throw new Error("The Almanac's history lists no first after many seasons.");
   await screenshot("56-almanac.png");
-  // National teams (GDD v1.37): the ranked list, lower on the page.
+  // Legacy goals (GDD v1.38) and national teams (GDD v1.37), lower on the page.
   const teams = await evaluate<number>(
     `document.querySelectorAll('[data-testid="almanac-teams"] li').length`,
   );
   await evaluate(
-    `document.getElementById("almanac-teams-heading").scrollIntoView({ block: "start" })`,
+    `document.getElementById("almanac-legacy-heading").scrollIntoView({ block: "start" })`,
   );
   await delay();
   await screenshot("56b-almanac-teams.png");

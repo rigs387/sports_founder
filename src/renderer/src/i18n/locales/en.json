@@ -379,6 +379,24 @@
         "body": "Nobody gave {{country}} a chance at {{name}}. They reached the last four before {{opponent}} ended the run, and the sport has a new home.",
         "body_final": "Nobody gave {{country}} a chance at {{name}}. They reached the final before {{opponent}} ended the run, and the sport has a new home."
       },
+      "legacy-goal": {
+        "title": "A legacy goal is met",
+        "title_everyContinent": "{{sport}} is #1 on every continent",
+        "title_heartlands": "{{sport}} takes {{rival}}'s heartlands",
+        "title_eliteLeagues": "{{count}} Elite leagues",
+        "title_everyMarket": "A league in every market",
+        "title_century": "A century at the top",
+        "title_hostEveryContinent": "The world has hosted",
+        "title_anchorChampion": "The birthplace are world champions",
+        "body": "The sport has met one of its legacy goals. It is in the Almanac for good.",
+        "body_everyContinent": "On every continent, more people now follow {{sport}} than any rival. Leads can be lost, but this day is in the Almanac for good.",
+        "body_heartlands": "{{sport}} now leads {{rival}} in all {{count}} of the markets where {{rival}} was strongest when you began.",
+        "body_eliteLeagues": "{{count}} countries now have an Elite league. The top of the sport is no longer one place.",
+        "body_everyMarket": "Every one of the world's {{count}} markets has a league of its own.",
+        "body_century": "{{sport}} has ended {{count}} years as the world's #1.",
+        "body_hostEveryContinent": "The championship has now been played on every continent.",
+        "body_anchorChampion": "{{country}}, where it all started, have won the championship they gave the world."
+      },
       "rival-countermove": {
         "title": "{{rival}} hits back in {{country}}",
         "title_broadcastDeal": "{{rival}}'s broadcaster locks up the {{country}} airwaves",
@@ -1805,6 +1823,21 @@
       "scorers": "All-time top {{scoresNoun}}",
       "noScorers": "Nobody has scored yet.",
       "mostAwards": "Won {{award}} most often"
+    },
+    "legacy": {
+      "heading": "Legacy goals",
+      "note": "Met at any time, before or after the win. A goal once met stays met.",
+      "progress": "{{have, number}} of {{need, number}}",
+      "met": "Met in {{year}}",
+      "goals": {
+        "everyContinent": "Be #1 on every continent",
+        "heartlands": "Lead {{rival}} in its heartlands",
+        "eliteLeagues": "Elite leagues around the world",
+        "everyMarket": "A league in every market",
+        "century": "Years as the world's #1",
+        "hostEveryContinent": "Host the championship on every continent",
+        "anchorChampion": "Your birthplace wins the championship"
+      }
     },
     "teams": {
       "heading": "National teams",

@@ -89,10 +89,22 @@ export function useEventText() {
     return { year: first?.year ?? 0, count: hall.inducteeIds.length };
   };
   // A rival's countermove at the seat (GDD v1.34) names the move, its end and the TV cut.
+  // A legacy goal met (GDD v1.38): the card's words are the goal's own.
+  const legacyText = (event: EventRecord) => {
+    const told = event.facts.legacy;
+    if (!told) return hallText(event);
+    const goal = snapshot.legacy.goals.find((entry) => entry.goalId === told.goalId);
+    return {
+      sport: snapshot.identity.sportName,
+      rival: names?.sports[snapshot.legacy.heartlandSportId] ?? "",
+      count: goal?.need ?? 0,
+      context: told.goalId,
+    };
+  };
   // A World Championship story (GDD v1.37) names the tournament, its host and the opponent.
   const championshipText = (event: EventRecord) => {
     const cup = event.facts.championship;
-    if (!cup) return hallText(event);
+    if (!cup) return legacyText(event);
     const lostFinal = !cup.champion && cup.roundsWon === cup.rounds - 1;
     return {
       name: snapshot.worldChampionship.founded?.name ?? "",

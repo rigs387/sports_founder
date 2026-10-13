@@ -65,6 +65,7 @@ export function offerDealCards(
         hall: null,
         countermove: null,
         championship: null,
+        legacy: null,
       },
       resolution: null,
     });

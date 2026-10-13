@@ -130,11 +130,14 @@ export function foundingClubOf(clubs: readonly Club[], anchorCountryId: string):
 export function foundSport(
   state: Omit<
     GameState,
-    "identity" | "rules" | "culture" | "hallOfFame" | "standouts" | "worldChampionship"
+    "identity" | "rules" | "culture" | "hallOfFame" | "standouts" | "worldChampionship" | "legacy"
   >,
   world: World,
   setup: IdentitySetup,
-): Omit<GameState, "rules" | "culture" | "hallOfFame" | "standouts" | "worldChampionship"> {
+): Omit<
+  GameState,
+  "rules" | "culture" | "hallOfFame" | "standouts" | "worldChampionship" | "legacy"
+> {
   const founding = foundingClubOf(state.flagship.clubs, state.anchorCountryId);
   if (!founding) throw new Error(`No flagship club at "${state.anchorCountryId}"`);
   const clubName = tidyName(setup.clubName);

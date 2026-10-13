@@ -46,6 +46,7 @@ export function offerHallCards(
         hall: { season: landmark.season, inducteeIds, nearMissId: landmark.nearMissId },
         countermove: null,
         championship: null,
+        legacy: null,
       },
       resolution: null,
     });
@@ -101,6 +102,7 @@ export function offerAwardCards(
           hall: null,
           countermove: null,
           championship: null,
+          legacy: null,
         },
         resolution: null,
       },

@@ -5,6 +5,7 @@ import { breakDeals, offerDeals } from "./deals";
 import { offerEvents, settleEvents } from "./events";
 import { closeOffseason, returnSeatIfFolded } from "./flagship";
 import { evaluateLeagues } from "./leagues";
+import { updateLegacy } from "./legacy";
 import { stepQuarter } from "./quarter";
 import { updateStandouts } from "./standouts";
 import { pullTalent } from "./talent";
@@ -31,7 +32,8 @@ export class CampaignOverError extends Error {
  *    (src/sim/culture.ts);
  * 7. other leagues' standouts age, retire and fill their places (src/sim/standouts.ts);
  * 8. an open offseason gets its deal offers, once (src/sim/deals.ts);
- * 9. the World Championship's calendar moves on and bids arrive (src/sim/world-championship.ts).
+ * 9. the World Championship's calendar moves on and bids arrive (src/sim/world-championship.ts);
+ * 10. legacy goals newly met are recorded (src/sim/legacy.ts).
  * Turns always complete. Refuses to play a campaign that has already ended.
  */
 export function endTurn(state: GameState, world: World): GameState {
@@ -81,6 +83,8 @@ export function endTurn(state: GameState, world: World): GameState {
   next = offerDeals(judgeClauses(next, world), world);
   // The World Championship's calendar moves on and the next tournament's bids arrive (GDD v1.37).
   next = updateChampionship(next, world);
+  // Legacy goals newly met go on record (GDD v1.38).
+  next = updateLegacy(next, world);
   return offerEvents({ ...next, turn: start.turn + 1 }, world, quarters);
 }
 

@@ -20,6 +20,7 @@ import { type HallSnapshot, hallSnapshot } from "./hall-of-fame";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
 import { bulkPromotable, type LeagueActions, leagueActions } from "./league-actions";
 import { type LeagueCosts, leagueCosts } from "./league-costs";
+import { type LegacySnapshot, legacySnapshot } from "./legacy";
 import { type NationalTeamSnapshot, nationalTeamSnapshots } from "./national-teams";
 import { ppWeights, quarterPpIncome } from "./prices";
 import { type RulesSnapshot, rulesSnapshot } from "./rules";
@@ -263,6 +264,8 @@ export interface TurnSnapshot {
   nationalTeams: NationalTeamSnapshot[];
   /** The World Championship: founding, the next tournament, bids and hosts (GDD v1.37). */
   worldChampionship: ChampionshipSnapshot;
+  /** The legacy goals: progress on each, and when it was met (GDD v1.38). */
+  legacy: LegacySnapshot;
 }
 
 /** Attendance and max capacity as the venue card shows them (GDD v1.34). */
@@ -543,5 +546,6 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     playersOfYear: state.standouts.playersOfYear,
     nationalTeams: nationalTeamSnapshots(state, world),
     worldChampionship: championshipSnapshot(state, world),
+    legacy: legacySnapshot(state, world),
   };
 }

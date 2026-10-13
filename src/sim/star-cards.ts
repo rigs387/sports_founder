@@ -205,7 +205,8 @@ export function takesNoSlot(card: EventTemplate | undefined): boolean {
     card?.trigger === "hall" ||
     card?.trigger === "award" ||
     card?.trigger === "countermove" ||
-    card?.trigger === "championship"
+    card?.trigger === "championship" ||
+    card?.trigger === "legacy"
   );
 }
 
@@ -266,6 +267,7 @@ export function offerStarCards(
           hall: null,
           countermove: null,
           championship: null,
+          legacy: null,
         },
         resolution: null,
       });

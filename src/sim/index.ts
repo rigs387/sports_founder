@@ -20,6 +20,7 @@ export * from "./invariants";
 export * from "./league-actions";
 export * from "./league-costs";
 export * from "./leagues";
+export * from "./legacy";
 export * from "./national-teams";
 export * from "./poaching";
 export * from "./press";

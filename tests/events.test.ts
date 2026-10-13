@@ -53,7 +53,7 @@ function templateEvent(templateId: string, edit?: (state: GameState) => GameStat
 
 describe("event content", () => {
   it("ships translated cards with real triggers and a neutral decision default", () => {
-    expect(world.events.cards).toHaveLength(47);
+    expect(world.events.cards).toHaveLength(48);
     expect(eventsFileSchema.safeParse(world.events).success).toBe(true);
     const text = en.events.cards as unknown as Record<
       string,

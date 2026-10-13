@@ -22,6 +22,7 @@ import {
   migratedChampionship,
   migratedCulture,
   migratedHall,
+  migratedLegacy,
   migratedStandouts,
   presetGenome,
   setupFor,
@@ -357,6 +358,7 @@ describe("saves with the growth tree (format 5)", () => {
           ...withoutTree,
           ...migratedFlagship(withoutTree),
         }),
+        legacy: migratedLegacy(),
       }),
     );
     const later = playWithPolicy(loaded, 6);
@@ -387,6 +389,7 @@ describe("saves with the growth tree (format 5)", () => {
       hallOfFame: migratedHall({ ...current, ...migratedFlagship(current) }),
       standouts: migratedStandouts({ ...current, ...migratedFlagship(current) }),
       worldChampionship: migratedChampionship({ ...current, ...migratedFlagship(current) }),
+      legacy: migratedLegacy(),
     };
     expect(serializeSave(loaded)).toBe(serializeSave(migrated));
     expect(playWithPolicy(loaded, 6)).toStrictEqual(playWithPolicy(migrated, 6));

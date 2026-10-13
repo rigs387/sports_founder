@@ -6,6 +6,7 @@ import { newFlagship } from "./flagship";
 import { newHallOfFame } from "./hall-of-fame";
 import { defaultIdentitySetup, foundSport, identityProblems } from "./identity";
 import { newLeague } from "./leagues";
+import { newLegacy } from "./legacy";
 import { landmarks } from "./records";
 import { newFront, newRivalState } from "./rivals";
 import { createRngState, MAX_SEED } from "./rng";
@@ -100,7 +101,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
 
   const founded: Omit<
     GameState,
-    "identity" | "rules" | "culture" | "hallOfFame" | "standouts" | "worldChampionship"
+    "identity" | "rules" | "culture" | "hallOfFame" | "standouts" | "worldChampionship" | "legacy"
   > = {
     seed: setup.seed,
     rng: createRngState(setup.seed),
@@ -147,6 +148,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     hallOfFame: newHallOfFame(1),
     standouts: newStandouts(setup.seed, 1),
     worldChampionship: newWorldChampionship(setup.seed),
+    legacy: newLegacy(),
   };
 }
 

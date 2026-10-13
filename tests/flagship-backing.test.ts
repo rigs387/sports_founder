@@ -25,6 +25,7 @@ import {
   migratedChampionship,
   migratedCulture,
   migratedHall,
+  migratedLegacy,
   migratedStandouts,
   setupFor,
   venueless,
@@ -205,6 +206,7 @@ describe("bots and saves", () => {
           hallOfFame: migratedHall(state),
           standouts: migratedStandouts(state),
           worldChampionship: migratedChampionship(state),
+          legacy: migratedLegacy(),
         }),
       ),
     );

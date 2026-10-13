@@ -1001,6 +1001,24 @@ cards:
     effects: [{ type: pp, amount: 8 }]
     choices: []
     defaultChoice: null
+  # A legacy goal met (GDD v1.38): a headline, no reward, no slot.
+  - id: legacy-goal
+    kind: moment
+    weight: headline
+    tone: positive
+    priority: 200
+    trigger: legacy
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   - id: rival-countermove
     kind: moment
     weight: big

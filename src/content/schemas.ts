@@ -1270,6 +1270,16 @@ export const configFileSchema = z.strictObject({
     topSeeds: z.int().min(0),
     flopCasualLoss: unitInterval,
   }),
+  /**
+   * Legacy goals (GDD v1.38): eliteLeagues leagues at Elite; centuryYears recorded years as the
+   * world's #1; and leading heartlands.sportId in the heartlands.countries markets where it
+   * started with the most hardcore fans.
+   */
+  legacyGoals: z.strictObject({
+    eliteLeagues: z.int().min(1),
+    centuryYears: z.int().min(1),
+    heartlands: z.strictObject({ sportId: z.string().min(1), countries: z.int().min(1) }),
+  }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({
     nameMinLength: z.int().min(1),

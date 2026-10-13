@@ -1533,6 +1533,28 @@ broadcast follow and the signing card. (3) Player of the Year. (4) National team
 list. (5) Founding, bids and the host. (6) The tournament, its effects and cards. (7) The
 championship page, Hall points, bots and the #1 contest measurement.
 
+### 2.24 Build Plan: A Late Game with an Ending (GDD v1.38)
+
+The topic's decisions were taken by default (the recommended option on each); see the GDD.
+
+1. **Legacy goals.** *Built 2026-10-13.* `src/sim/legacy.ts`: `LEGACY_GOALS` (the ids live in
+   `events-state.ts` as `LEGACY_GOAL_IDS`, re-exported by `types.ts`), `legacyProgress`
+   (each goal's have and need, read from fans, leagues, the yearly records and the
+   championship's tournaments), `heartlands`, `updateLegacy` (end of `endTurn`: newly met
+   goals go into `GameState.legacy.done` with a `legacyGoal` landmark), `legacySnapshot`,
+   `offerLegacyCards` (trigger `legacy`, event facts `legacy`, the headline `legacy-goal`
+   card, no slot). Config `legacyGoals`. Renderer: a Legacy goals list in the Almanac. Save
+   format 32 (31 migrates with nothing met; goals already met are found at the next turn's
+   end). Tests: `tests/legacy.test.ts`. Smoke: the Almanac screenshot `56b` shows the list.
+
+2. **Retiring and the retrospective.** Not built. A `retire` action, legal once
+   `win.won` is set: it sets an outcome of a new kind (`retired`), so `endTurn` refuses to
+   continue as after a collapse, and the save stays loadable. A retrospective screen opens
+   from that outcome: landmarks as a timeline, the standings series as the fan chart, the
+   rulebook's amendments, Hall of Fame inductees, the championship's winners and the legacy
+   goals met. Snapshot: what the screen needs beyond what it already carries (the timeline).
+   Bots never retire.
+
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
 These come from the GDD review. Items 1–4 must be specified before Phase 0 implementation begins.

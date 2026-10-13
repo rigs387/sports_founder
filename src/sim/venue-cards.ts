@@ -60,6 +60,7 @@ export function offerVenueCards(
         hall: null,
         countermove: null,
         championship: null,
+        legacy: null,
       },
       resolution: null,
     });

@@ -7,6 +7,7 @@ import type {
   GameState,
   Landmark,
   LeagueTierId,
+  LegacyGoalId,
   TimedCountermoveKind,
   TraditionLossReason,
   TraditionType,
@@ -239,6 +240,12 @@ export const landmarks = {
     season: number,
     hostId: string,
   ): Landmark => ({ kind: "championshipPlayed", turn, quarter, countryId, season, hostId }),
+  legacyGoal: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    goalId: LegacyGoalId,
+  ): Landmark => ({ kind: "legacyGoal", turn, quarter, countryId, goalId }),
   scoringRecord: (
     turn: number,
     quarter: number,

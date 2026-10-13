@@ -45,6 +45,17 @@ export const starFactsSchema = z.strictObject({
   seasons: z.int().nonnegative(),
 });
 
+/** The legacy goals' ids (GDD v1.38), as the simulation lists them (LEGACY_GOALS). */
+export const LEGACY_GOAL_IDS = [
+  "everyContinent",
+  "heartlands",
+  "eliteLeagues",
+  "everyMarket",
+  "century",
+  "hostEveryContinent",
+  "anchorChampion",
+] as const;
+
 /**
  * A World Championship story (GDD v1.37): the tournament and how the card's country fared. The
  * opponent is who knocked it out, or for the champion, whom it beat in the final.
@@ -129,6 +140,11 @@ export const eventRecordSchema = z.strictObject({
       .default(null),
     /** A World Championship story (GDD v1.37); absent in older records. */
     championship: championshipFactsSchema.nullable().default(null),
+    /** The legacy goal a legacy card tells (GDD v1.38); absent in older records. */
+    legacy: z
+      .strictObject({ goalId: z.enum(LEGACY_GOAL_IDS) })
+      .nullable()
+      .default(null),
   }),
   resolution: z
     .strictObject({

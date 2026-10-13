@@ -146,6 +146,7 @@ const template = z
       "award",
       "countermove",
       "championship",
+      "legacy",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),
@@ -262,6 +263,13 @@ const template = z
       if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
         issue("Championship cards belong to the sport: campaign scope, no anchor or health filter");
     }
+    // A legacy goal met (GDD v1.38): one moment told from the landmark.
+    if (card.trigger === "legacy") {
+      if (card.kind !== "moment" || card.cooldownTurns !== null)
+        issue("The legacy card is a moment that follows a recorded fact: no cooldown");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("The legacy card belongs to the sport: campaign scope, no anchor or health filter");
+    }
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");
     if (star) {
@@ -350,6 +358,8 @@ export const eventsFileSchema = z
     }
     if (data.cards.filter((c) => c.trigger === "hall").length > 1)
       ctx.addIssue({ code: "custom", path: ["cards"], message: "Only one Hall of Fame card" });
+    if (data.cards.filter((c) => c.trigger === "legacy").length > 1)
+      ctx.addIssue({ code: "custom", path: ["cards"], message: "Only one legacy card" });
     if (data.cards.filter((c) => c.trigger === "award").length > 1)
       ctx.addIssue({ code: "custom", path: ["cards"], message: "Only one award card" });
     const cups = data.cards.flatMap((c) => (c.championship === null ? [] : [c.championship]));

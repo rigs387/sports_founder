@@ -7,6 +7,7 @@ import type { EventRecord, EventState } from "./events-state";
 import { activeClubs, backingPrice, moveClubRatings } from "./flagship";
 import { offerAwardCards, offerHallCards } from "./hall-cards";
 import { classHeadline, classPP } from "./hall-of-fame";
+import { offerLegacyCards } from "./legacy";
 import { outletOf, wireOutlet } from "./press";
 import { ppPrice } from "./prices";
 import { seasonFacts, seasonStories } from "./season-stories";
@@ -89,6 +90,7 @@ function offerSeasonCards(
           hall: null,
           countermove: null,
           championship: null,
+          legacy: null,
         },
         resolution: null,
       });
@@ -180,15 +182,26 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   // Deal news (GDD v1.28) and venue news (GDD v1.30) take no slot.
   // A rival's countermove at the seat (GDD v1.34) takes no slot either.
   // A World Championship's stories (GDD v1.37) take none either.
-  const dealEvents = offerChampionshipCards(
+  // A legacy goal met (GDD v1.38) is told last, and takes none.
+  const dealEvents = offerLegacyCards(
     state,
     world,
     recent,
-    offerCountermoveCards(
+    offerChampionshipCards(
       state,
       world,
       recent,
-      offerVenueCards(state, world, recent, offerDealCards(state, world, recent, traditionEvents)),
+      offerCountermoveCards(
+        state,
+        world,
+        recent,
+        offerVenueCards(
+          state,
+          world,
+          recent,
+          offerDealCards(state, world, recent, traditionEvents),
+        ),
+      ),
     ),
   );
   const pending = [...dealEvents.pending];
@@ -204,7 +217,8 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
       card.trigger === "hall" ||
       card.trigger === "award" ||
       card.trigger === "countermove" ||
-      card.trigger === "championship"
+      card.trigger === "championship" ||
+      card.trigger === "legacy"
     )
       continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
@@ -278,6 +292,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
           hall: null,
           countermove: null,
           championship: null,
+          legacy: null,
         },
         resolution: null,
       });

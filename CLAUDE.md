@@ -367,6 +367,12 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   once for PP; an unpaid arrival is the `talent-arrived` moment. A flagship leading player born
   abroad lifts the broadcast's reach into their home (`followedReach`, `standouts.follow`);
   so a flagship `Player.countryId` is the birth country, not always the seat.
+- Legacy goals (GDD v1.38) live in `src/sim/legacy.ts` and `GameState.legacy`: seven long
+  targets (`LEGACY_GOALS`, numbers in config `legacyGoals`) read from fans, leagues, the
+  yearly records and the championship's tournaments. `updateLegacy` runs at the end of
+  `endTurn`; a goal once met stays met, with a `legacyGoal` landmark and the headline
+  `legacy-goal` card (trigger `legacy`, no slot). No reward. The Almanac lists them from the
+  start. Retiring and the retrospective are designed, not built (tech plan 2.24).
 - The win hold is a contest (GDD v1.8): near #1 (`rivalAI.nearTop`) rival intensity peaks just past
   parity, rivals defend wherever the player holds ground in their territory, and they may buy more
   countermoves per quarter. The runner reports how many campaigns lost #1 before winning; the
@@ -455,6 +461,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   champion, and `WorldChampionshipState.lifts`. Format 29 migrates with no tournaments.
 - Save format 31 adds world titles to Hall inductees' facts (GDD v1.37). Format 30 migrates
   with none.
+- Save format 32 adds legacy goals (GDD v1.38): `GameState.legacy`. Format 31 migrates with
+  nothing met.
 - The saves folder (GDD v1.35) is `savesFolder` in `src/main/save-files.ts`: Saved Games\Sports
   Founder on Windows. Each session save carries a `header` for the Load screen (the Campaign
   menu's list, `campaign:list` / `campaign:open-named`); an autosave after each turn keeps

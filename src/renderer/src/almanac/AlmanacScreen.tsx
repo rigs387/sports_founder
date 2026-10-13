@@ -186,6 +186,30 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
               </ol>
             </section>
           )}
+          <section className="almanac-card" aria-labelledby="almanac-legacy-heading">
+            <h2 id="almanac-legacy-heading">{t("almanac.legacy.heading")}</h2>
+            <ul className="legacy-goals" data-testid="almanac-legacy">
+              {snapshot.legacy.goals.map((goal) => (
+                <li
+                  key={goal.goalId}
+                  className={goal.done ? "met" : undefined}
+                  data-goal={goal.goalId}
+                >
+                  <span>
+                    {t(`almanac.legacy.goals.${goal.goalId}`, {
+                      rival: names.sports[snapshot.legacy.heartlandSportId] ?? "",
+                    })}
+                  </span>
+                  <b>
+                    {goal.done
+                      ? t("almanac.legacy.met", { year: goal.done.year })
+                      : t("almanac.legacy.progress", { have: goal.have, need: goal.need })}
+                  </b>
+                </li>
+              ))}
+            </ul>
+            <p className="almanac-note">{t("almanac.legacy.note")}</p>
+          </section>
           <section className="almanac-card" aria-labelledby="almanac-teams-heading">
             <h2 id="almanac-teams-heading">{t("almanac.teams.heading")}</h2>
             {snapshot.nationalTeams.length === 0 ? (

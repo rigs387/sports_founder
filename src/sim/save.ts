@@ -18,7 +18,7 @@ import {
 import { tierEntry } from "./calendar";
 import { newCulture } from "./culture";
 import { newDeals } from "./deals";
-import { emptyEvents, eventStateSchema } from "./events-state";
+import { emptyEvents, eventStateSchema, LEGACY_GOAL_IDS } from "./events-state";
 import { newFlagship, staffFlagship } from "./flagship";
 import { inducteeFacts, newHallOfFame } from "./hall-of-fame";
 import { defaultGroundName, defaultIdentitySetup, foundingClubOf } from "./identity";
@@ -32,7 +32,7 @@ import type { FlagshipState, GameState, Genome, World } from "./types";
 import { newWorldChampionship } from "./world-championship";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 31;
+export const SAVE_FORMAT_VERSION = 32;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -215,6 +215,13 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     countryId: z.string().min(1),
     season: z.int().min(1),
     hostId: z.string().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal("legacyGoal"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    goalId: z.enum(LEGACY_GOAL_IDS),
   }),
   z.strictObject({
     kind: z.literal("scoringRecord"),
@@ -715,6 +722,15 @@ const gameStateSchema = z.strictObject({
       }),
     ),
   }),
+  legacy: z.strictObject({
+    done: z.array(
+      z.strictObject({
+        goalId: z.enum(LEGACY_GOAL_IDS),
+        turn: z.int().min(1),
+        year: z.int(),
+      }),
+    ),
+  }),
 });
 
 const saveFileSchema = z.strictObject({
@@ -733,6 +749,9 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 31 → 32: legacy goals (GDD v1.38). None on record; goals already met are found at the next
+  // turn's end.
+  31: (save) => ({ formatVersion: 32, state: { ...save.state, legacy: { done: [] } } }),
   // 30 → 31: world titles count for the Hall (GDD v1.37). Inductees so far have none on record.
   30: (save) => {
     const hall = save.state.hallOfFame as { inductees: Record<string, unknown>[] };

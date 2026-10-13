@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-13",
-  design: "GDD v1.37",
+  design: "GDD v1.38",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -13,14 +13,14 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-13",
-    tests: 642,
-    files: 69,
-    note: "npm run check passed after the World Championship's page, Hall points and bots were built (type checks, Biome, purity, 642 tests in 69 files). Lint has existing visual-study warnings.",
+    tests: 647,
+    files: 70,
+    note: "npm run check passed after legacy goals were built (type checks, Biome, purity, 647 tests in 70 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-13",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
   },
-  eventDeck: { current: 47, target: "40–60" },
+  eventDeck: { current: 48, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -106,6 +106,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-13",
+      type: "Built",
+      title: "Legacy goals",
+      text: "GDD v1.38, tech plan 2.24 step 1 of 2. The topic's six decisions were offered and not answered, so the recommended option was taken on each and recorded as such. Seven legacy goals, listed in the Almanac from the start and earned at any time: #1 on every continent, lead soccer in its ten heartlands, five Elite leagues, a league in every market, a hundred years as #1, host the World Championship on every continent, the birthplace wins it. A goal once met stays met; it pays nothing and is told once as a headline. In two 200-turn builder campaigns three were met by turn 94 and four were not; five Elite leagues and a league in every market come as early as turns 53–77. Retiring and the retrospective are designed, not built. Save format 32. npm run check: 647 tests in 70 files; smoke passed and its Almanac screenshot shows the list with real progress (212 of 213 markets with a league).",
+    },
     {
       date: "2026-10-13",
       type: "Built",
@@ -586,7 +592,10 @@ window.SF_PROGRESS = {
         ["built", "Atomic saves, migrations and deterministic resume"],
         ["built", "Permanent landmarks and annual world fan snapshots"],
         ["built", "Saves folder, a Load list and three rolling autosaves (GDD v1.35)"],
-        ["planned", "Post-win legacy goals and retirement retrospective"],
+        [
+          "partial",
+          "Legacy goals built (GDD v1.38); retiring and the retrospective are designed, not built",
+        ],
       ],
     },
     {
@@ -761,7 +770,7 @@ window.SF_PROGRESS = {
           "Moments have weight: big back pages and headline front pages that wait for you (GDD v1.26)",
         ],
         ["built", "Auto-collect for minor moments (on by default, GDD v1.32)"],
-        ["built", "Event library: 47 cards in content/events.yaml (planned 40–60)"],
+        ["built", "Event library: 48 cards in content/events.yaml (planned 40–60)"],
         ["planned", "Broader tier-weighted negative events and personal stories"],
         ["built", "Bots that weigh and choose non-default options"],
       ],

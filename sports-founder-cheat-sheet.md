@@ -280,6 +280,13 @@ in the turn its season ends, lifts by round for a year, the host's boost, the un
 the flop; three cards; its own page with the bracket and the draw; 4 Hall points for a world
 title; bots found it. Contest with it: #1 lost before the win in 20 of 35.)
 
+**Late game (v1.38):** seven legacy goals, listed from the start, earned at any time, met for
+good, no reward but a headline and an Almanac line: #1 on every continent, lead soccer in its 10
+heartlands, five Elite leagues, a league in every market, 100 years as #1, host on every
+continent, the birthplace wins the championship. (Built.) Retiring after the win ends the
+campaign with a one-page retrospective. (Designed, not built.) The decisions were taken by
+default, not confirmed.
+
 **Awards (v1.33):** the flagship's Player of the Season (composite of scores, club finish, playoff
 and final scores) and the top scorer's prize; Hall of Fame points; named after the first Hall of
 Fame player once there is one; lines on the champion card, season review, Almanac and Stars panel,

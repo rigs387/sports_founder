@@ -246,6 +246,30 @@
   padding-bottom: 6px;
   border-bottom: 1px solid #e3ecf7;
 }
+.legacy-goals {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.legacy-goals li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.legacy-goals li b {
+  white-space: nowrap;
+  color: #526d80;
+}
+
+.legacy-goals li.met b {
+  color: var(--bronze);
+}
+
 .roll .team-country {
   padding: 0;
   border: 0;

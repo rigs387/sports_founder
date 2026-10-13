@@ -816,6 +816,15 @@ worldChampionship:
   topSeeds: 4
   flopCasualLoss: 0.05
 
+# Legacy goals (GDD v1.38): long targets, listed from the start and earned at any time; met once,
+# met for good; no reward but a headline and a line in the Almanac. The list itself is fixed in
+# the simulation (LEGACY_GOALS); these are its numbers. Heartlands are the markets where
+# heartlands.sportId started with the most hardcore fans.
+legacyGoals:
+  eliteLeagues: 5
+  centuryYears: 100
+  heartlands: { sportId: soccer, countries: 10 }
+
 flagship:
   # Clubs by the flagship league's tier. Promotion admits generated expansion clubs at the next
   # season start; a step-down drops the newest clubs.

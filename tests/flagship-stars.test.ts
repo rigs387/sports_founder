@@ -21,6 +21,7 @@ import {
   migratedChampionship,
   migratedCulture,
   migratedHall,
+  migratedLegacy,
   migratedStandouts,
   setupFor,
   venueless,
@@ -196,6 +197,7 @@ describe("save format 13", () => {
       hallOfFame: migratedHall(played),
       standouts: migratedStandouts(played),
       worldChampionship: migratedChampionship(played),
+      legacy: migratedLegacy(),
     };
     expect(serializeSave(loaded)).toBe(serializeSave(awardless(expected)));
   });

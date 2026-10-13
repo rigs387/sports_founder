@@ -12,6 +12,7 @@ import {
   type GameState,
   newCulture,
   newHallOfFame,
+  newLegacy,
   newStandouts,
   newWorldChampionship,
 } from "../src/sim";
@@ -97,6 +98,11 @@ export function migratedHall(state: GameState) {
 /** The standouts an older save gains on loading (format 27): none yet, aged from now. */
 export function migratedStandouts(state: GameState) {
   return newStandouts(state.seed, state.flagship.season);
+}
+
+/** The legacy record an older save gains on loading (format 32): nothing met yet. */
+export function migratedLegacy() {
+  return newLegacy();
 }
 
 /** The World Championship an older save gains on loading (format 29): not founded. */

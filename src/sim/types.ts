@@ -46,6 +46,8 @@ export {
   PLAYER_SPORT_ID,
 } from "../content";
 
+import { LEGACY_GOAL_IDS } from "./events-state";
+
 /** "other" is the passive bucket of every unmodeled sport's hardcore fans (GDD Rival AI). */
 export type SportKind = "player" | "rival" | "other";
 
@@ -569,6 +571,8 @@ export type Landmark =
       season: number;
       hostId: string;
     }
+  /** A legacy goal was met (GDD v1.38); the country is the anchor. */
+  | { kind: "legacyGoal"; turn: number; quarter: number; countryId: string; goalId: LegacyGoalId }
   /** A player became the league's all-time top scorer. */
   | {
       kind: "scoringRecord";
@@ -885,7 +889,13 @@ export interface GameState {
   standouts: StandoutsState;
   /** The sport's World Championship: its founding, calendar and hosts (GDD v1.37). */
   worldChampionship: WorldChampionshipState;
+  /** Legacy goals met so far, in the order they were met (GDD v1.38). */
+  legacy: { done: { goalId: LegacyGoalId; turn: number; year: number }[] };
 }
+
+/** The legacy goals (GDD v1.38), in the order the Almanac lists them. */
+export const LEGACY_GOALS = LEGACY_GOAL_IDS;
+export type LegacyGoalId = (typeof LEGACY_GOALS)[number];
 
 export interface WorldChampionshipState {
   /** The championship's own random stream (bids now, matches later). */

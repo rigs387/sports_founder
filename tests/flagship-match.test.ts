@@ -18,6 +18,7 @@ import {
   migratedChampionship,
   migratedCulture,
   migratedHall,
+  migratedLegacy,
   migratedStandouts,
   setupFor,
   venueless,
@@ -164,6 +165,7 @@ describe("save format 10", () => {
         hallOfFame: migratedHall(played),
         standouts: migratedStandouts(played),
         worldChampionship: migratedChampionship(played),
+        legacy: migratedLegacy(),
       }),
     );
     const next = closeOffseason(playSeasons(loaded, 3), world);

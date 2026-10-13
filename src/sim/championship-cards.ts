@@ -91,6 +91,7 @@ export function offerChampionshipCards(
           hall: null,
           countermove: null,
           championship: factsFor(tournament, country.countryId, index + 1),
+          legacy: null,
         },
         resolution: null,
       });
