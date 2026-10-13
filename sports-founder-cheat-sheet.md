@@ -266,7 +266,9 @@ home country's broadcast link gains 0.25, 0.5 for a star.) Player of the Year is
 National teams (topic 2): any country with a Semi-Pro or better league fields one; strength is a
 base from league tier and hardcore share plus its best 3 named nationals wherever they play;
 assembled from the records when a championship begins, never kept between; a ranked list on
-screen with numbers hidden; no cost to flagship clubs. The World Championship (topic 3): founded
+screen with numbers hidden; no cost to flagship clubs. (Built: tier base 20 / 35 / 45, up to 15
+for hardcore share, 0.15 × skill for each of three players; listed in the Almanac. Late on the
+top 32 are within a tenth of each other.) The World Championship (topic 3): founded
 in an offseason for PP once 16 countries can field a team, named by the player, first played the
 year after and then every 4 years, rival years or not; 3–4 countries bid to host and the player
 picks; it plays in one turn on its own championship page (draw, bracket, champion) plus a headline

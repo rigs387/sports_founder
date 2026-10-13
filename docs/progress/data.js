@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-12",
-    tests: 626,
-    files: 66,
-    note: "npm run check passed after Player of the Year was built (type checks, Biome, purity, 626 tests in 66 files). Lint has existing visual-study warnings.",
+    tests: 630,
+    files: 67,
+    note: "npm run check passed after national teams were built (type checks, Biome, purity, 630 tests in 67 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-12",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
@@ -100,6 +100,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-12",
+      type: "Built",
+      title: "National teams",
+      text: "Tech plan 2.23, build order 4 of 7 (GDD v1.37): any country with a Semi-Pro league or better can field a team, read from the state and never saved. Strength is a base for the league's tier, plus the player's hardcore share of the population, plus the skill of its best three named nationals wherever they play, so a player at the flagship lifts their home team. The Almanac lists the teams strongest first with their players' names and no numbers. One builder campaign (Germany): 24 teams at turn 60, 201 at turn 160. Watch for the championship: late on the top 32 sit within a tenth of each other and the seat's own country ranked 26th. npm run check: 630 tests in 67 files; smoke passed and photographs the section, but its campaign promotes no league, so only the empty list was seen on screen.",
+    },
     {
       date: "2026-10-12",
       type: "Built",
@@ -834,7 +840,7 @@ window.SF_PROGRESS = {
       gdd: "GDD v1.12, v1.16 · system 4 extension",
       icon: "10",
       summary: "Persistent people whose careers make growth feel earned.",
-      next: "Standouts exist in other leagues (tech plan 2.23, build order 1). Talent pull, the broadcast follow and the signing card are built (build order 2). Player of the Year is built (build order 3). Next: national teams (build order 4).",
+      next: "Standouts exist in other leagues (tech plan 2.23, build order 1). Talent pull, the broadcast follow and the signing card are built (build order 2). Player of the Year is built (build order 3). National teams are built (build order 4). Next: founding the World Championship, bids and the host (build order 5).",
       depends: ["leagues"],
       sources: [
         ["Stars design", "../../sports-founder-gdd.md#progression--economy"],
@@ -1029,17 +1035,17 @@ window.SF_PROGRESS = {
       gdd: "GDD system 13",
       icon: "16",
       summary: "A country's best players represent it, wherever their clubs are based.",
-      next: "Derive lightweight rosters from named players when the championship needs them.",
+      next: "Built; the World Championship plays them next (tech plan 2.23, build order 5). Strengths are very even late on: tune with the championship.",
       depends: ["stars"],
       sources: [["National team design", "../../sports-founder-gdd.md#progression--economy"]],
       items: [
         [
-          "planned",
-          "Nationality-based selection: the best three named nationals wherever they play (designed, GDD v1.37)",
+          "built",
+          "Nationality-based selection: the best three named nationals wherever they play (GDD v1.37)",
         ],
         [
-          "planned",
-          "Team strength from league tier, hardcore share and named players; a ranked list (designed, GDD v1.37)",
+          "built",
+          "Team strength from league tier, hardcore share and named players; a ranked list in the Almanac (GDD v1.37)",
         ],
       ],
     },

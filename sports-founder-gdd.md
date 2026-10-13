@@ -873,6 +873,15 @@ three topics; national teams and the World Championship follow. Every number is 
   numbers stay hidden, like skill; the list shows the order.
 - *No cost to the flagship:* national duty does not tire or weaken a flagship club. (Choose pain
   was offered and declined here.)
+- *Built 2026-10-12:* strength = a base for the league's tier (Semi-Pro 20, Professional 35,
+  Elite 45) + up to 15 for the player's hardcore share of the population (full at 20%) + 0.15 ×
+  the skill of each of the best three named nationals. The list is in the Almanac until the
+  championship page exists. Measured on one bot campaign (Germany): 24 teams at turn 60, 201 at
+  turn 160. Watch item for topic 3's tuning: late on almost every league is Elite with a full
+  hardcore share, so the top 32 sit within a tenth of each other (81–92) and small countries
+  lead as often as big ones; the seat's own country ranked 26th, its clubs being led by players
+  from abroad. A talent pool by population or hardcore fans is the obvious lever if the
+  championship needs clearer favorites.
 
 **The world stage, topic 3: the World Championship (decided 2026-10-12, v1.37).** It fills in the
 Phase 2 outline above, which stands. Every number is config (`worldChampionship`).

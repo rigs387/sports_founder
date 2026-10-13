@@ -1787,6 +1787,14 @@
       "noScorers": "Nobody has scored yet.",
       "mostAwards": "Won {{award}} most often"
     },
+    "teams": {
+      "heading": "National teams",
+      "note": "Any country with a Semi-Pro league or better can field a team, built from its best players wherever they play. Strongest first.",
+      "empty": "No country can field a team yet.",
+      "players": "{{names, list}}",
+      "noPlayers": "No named players",
+      "atFlagship": "{{name}} ★"
+    },
     "roll": {
       "heading": "Roll of champions",
       "empty": "No season has finished yet.",

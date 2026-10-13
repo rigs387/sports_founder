@@ -764,6 +764,19 @@ standouts:
     flagshipWeight: 1.25
     form: 0.1
 
+# National teams (GDD v1.37). Any country with a league at minTier or above fields one; nothing is
+# saved between championships. Strength (never shown as a number) = tierBase for the league, plus
+# up to hardcore.weight for the player's hardcore share of the population (full at fullShare),
+# plus skillWeight × the skill (1–100) of each of the best `players` named nationals, wherever
+# they play. So three stars are worth about as much as an Elite league: a country with a weak
+# league and its best players at the flagship can still be strong.
+nationalTeams:
+  minTier: semi-pro
+  tierBase: { amateur: 0, semi-pro: 20, professional: 35, elite: 45 }
+  hardcore: { weight: 15, fullShare: 0.2 }
+  players: 3
+  skillWeight: 0.15
+
 flagship:
   # Clubs by the flagship league's tier. Promotion admits generated expansion clubs at the next
   # season start; a step-down drops the newest clubs.

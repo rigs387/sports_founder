@@ -1461,6 +1461,14 @@ Topics are settled one at a time; steps are added as each is decided. Nothing he
    names and no numbers. Renderer: a national teams list (its home is decided with topic 3's
    championship screen). No effect on flagship clubs.
 
+   *Build order 4 built 2026-10-12.* `src/sim/national-teams.ts`: `fieldsTeam`,
+   `nationalTeams` (strongest first, with strength and each squad's skills, for the
+   championship to use) and `nationalTeamSnapshots` (rank and names only) on
+   `TurnSnapshot.nationalTeams`. Config `nationalTeams`. Renderer: a National teams list in
+   the Almanac (a team's country opens its card; a star marks a player at the flagship). Smoke:
+   the list is photographed (`56b-almanac-teams.png`). Tests: `tests/national-teams.test.ts`.
+   No save change.
+
 3. **The World Championship (topic 3).** Config `worldChampionship`: countries needed to found
    (16), the founding price in quarters, years between (4), bids per tournament (3–4) and their
    wealth weight, field sizes (16 / 32), match upset odds, the casual lift by round and its

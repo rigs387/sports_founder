@@ -186,6 +186,41 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
               </ol>
             </section>
           )}
+          <section className="almanac-card" aria-labelledby="almanac-teams-heading">
+            <h2 id="almanac-teams-heading">{t("almanac.teams.heading")}</h2>
+            {snapshot.nationalTeams.length === 0 ? (
+              <p className="almanac-empty">{t("almanac.teams.empty")}</p>
+            ) : (
+              <ol className="roll" data-testid="almanac-teams">
+                {snapshot.nationalTeams.map((team) => (
+                  <li key={team.countryId}>
+                    <span className="roll-year">{team.rank}</span>
+                    <span>
+                      <button
+                        type="button"
+                        className="team-country"
+                        onClick={() => onCountry(team.countryId)}
+                      >
+                        <strong>{country(team.countryId)}</strong>
+                      </button>
+                      <small>
+                        {team.players.length === 0
+                          ? t("almanac.teams.noPlayers")
+                          : t("almanac.teams.players", {
+                              names: team.players.map((member) =>
+                                member.atFlagship
+                                  ? t("almanac.teams.atFlagship", { name: member.name })
+                                  : member.name,
+                              ),
+                            })}
+                      </small>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <p className="almanac-note">{t("almanac.teams.note")}</p>
+          </section>
           <section className="almanac-card" aria-labelledby="almanac-roll-heading">
             <h2 id="almanac-roll-heading">{t("almanac.roll.heading")}</h2>
             {champions.length === 0 ? (

@@ -20,6 +20,7 @@ import { type HallSnapshot, hallSnapshot } from "./hall-of-fame";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
 import { bulkPromotable, type LeagueActions, leagueActions } from "./league-actions";
 import { type LeagueCosts, leagueCosts } from "./league-costs";
+import { type NationalTeamSnapshot, nationalTeamSnapshots } from "./national-teams";
 import { ppWeights, quarterPpIncome } from "./prices";
 import { type RulesSnapshot, rulesSnapshot } from "./rules";
 import { shapeFactors } from "./shape";
@@ -257,6 +258,8 @@ export interface TurnSnapshot {
   hallOfFame: HallSnapshot;
   /** Each season's Player of the Year, oldest first (GDD v1.37); empty until standouts exist. */
   playersOfYear: PlayerOfYear[];
+  /** Every national team that could be fielded now, strongest first (GDD v1.37). */
+  nationalTeams: NationalTeamSnapshot[];
 }
 
 /** Attendance and max capacity as the venue card shows them (GDD v1.34). */
@@ -535,5 +538,6 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     culture: cultureSnapshot(state, world, offseasonOpen(state)),
     hallOfFame: hallSnapshot(state, world),
     playersOfYear: state.standouts.playersOfYear,
+    nationalTeams: nationalTeamSnapshots(state, world),
   };
 }

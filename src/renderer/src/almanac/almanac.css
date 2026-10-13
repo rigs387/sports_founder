@@ -246,6 +246,21 @@
   padding-bottom: 6px;
   border-bottom: 1px solid #e3ecf7;
 }
+.roll .team-country {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.roll .team-country:hover strong,
+.roll .team-country:focus-visible strong {
+  text-decoration: underline;
+}
+
 .roll-year {
   font-weight: 800;
   color: var(--second);

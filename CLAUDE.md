@@ -332,7 +332,12 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   Player of the Year (`choosePlayerOfYear`, config `standouts.playerOfYear`) is named there for
   each finished flagship season once standouts exist, kept by name in
   `StandoutsState.playersOfYear`; a line in the season recap and the Almanac's roll, no effect.
-  National teams and the World Championship are designed, not built (tech plan 2.23).
+- National teams (GDD v1.37) are `src/sim/national-teams.ts`, pure functions of the state and
+  never saved: a country with a league at `nationalTeams.minTier` or above fields one, on its
+  league tier, the player's hardcore share and its best named nationals wherever they play
+  (flagship leaders by birth country, and standouts). Strength and skill stay out of the
+  snapshot (`TurnSnapshot.nationalTeams`: rank and names); the list is in the Almanac. The
+  World Championship is designed, not built (tech plan 2.23).
 - Talent pull (GDD v1.37) is `src/sim/talent.ts`. An opening is an active seat club whose leader
   retired last season and whose young replacement has not played (`openings`, offseason only).
   `pullTalent` runs in `endTurn` before `closeOffseason`: by chance, up to

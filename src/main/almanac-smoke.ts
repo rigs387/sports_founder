@@ -97,6 +97,16 @@ export async function verifyAlmanac(
   );
   if (history < 1) throw new Error("The Almanac's history lists no first after many seasons.");
   await screenshot("56-almanac.png");
+  // National teams (GDD v1.37): the ranked list, lower on the page.
+  const teams = await evaluate<number>(
+    `document.querySelectorAll('[data-testid="almanac-teams"] li').length`,
+  );
+  await evaluate(
+    `document.getElementById("almanac-teams-heading").scrollIntoView({ block: "start" })`,
+  );
+  await delay();
+  await screenshot("56b-almanac-teams.png");
+  await evaluate(`document.getElementById("almanac-title").scrollIntoView({ block: "start" })`);
   win.setContentSize(390, 844);
   await delay();
   const overflow = await evaluate<boolean>("document.documentElement.scrollWidth > innerWidth");
@@ -118,5 +128,5 @@ export async function verifyAlmanac(
     await screenshot("58-hall-country.png");
     await click(".card-close");
   } else await click(".game-nav [data-view=world]");
-  return { turnsPlayed, players, history, roll, card: card.slice(0, 200), country };
+  return { turnsPlayed, players, history, roll, teams, card: card.slice(0, 200), country };
 }

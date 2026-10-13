@@ -1217,6 +1217,19 @@ export const configFileSchema = z.strictObject({
       form: unitInterval,
     }),
   }),
+  /**
+   * National teams (GDD v1.37): a country with a league at minTier or above fields one. Strength
+   * is tierBase for its league, plus hardcore.weight × the player's hardcore share of the
+   * population (full at hardcore.fullShare), plus skillWeight × the skill of each of its best
+   * `players` named nationals, wherever they play.
+   */
+  nationalTeams: z.strictObject({
+    minTier: leagueTierSchema,
+    tierBase: byLeagueTier(z.number().min(0)),
+    hardcore: z.strictObject({ weight: z.number().min(0), fullShare: z.number().positive() }),
+    players: z.int().min(1),
+    skillWeight: z.number().min(0),
+  }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
   identity: z.strictObject({
     nameMinLength: z.int().min(1),
