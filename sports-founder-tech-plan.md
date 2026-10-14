@@ -1535,7 +1535,8 @@ championship page, Hall points, bots and the #1 contest measurement.
 
 ### 2.24 Build Plan: A Late Game with an Ending (GDD v1.38)
 
-The topic's decisions were taken by default (the recommended option on each); see the GDD.
+The topic's decisions were taken by default (the recommended option on each) and confirmed by
+the designer on 2026-10-13; see the GDD.
 
 1. **Legacy goals.** *Built 2026-10-13.* `src/sim/legacy.ts`: `LEGACY_GOALS` (the ids live in
    `events-state.ts` as `LEGACY_GOAL_IDS`, re-exported by `types.ts`), `legacyProgress`
@@ -1547,13 +1548,31 @@ The topic's decisions were taken by default (the recommended option on each); se
    format 32 (31 migrates with nothing met; goals already met are found at the next turn's
    end). Tests: `tests/legacy.test.ts`. Smoke: the Almanac screenshot `56b` shows the list.
 
-2. **Retiring and the retrospective.** Not built. A `retire` action, legal once
-   `win.won` is set: it sets an outcome of a new kind (`retired`), so `endTurn` refuses to
-   continue as after a collapse, and the save stays loadable. A retrospective screen opens
-   from that outcome: landmarks as a timeline, the standings series as the fan chart, the
-   rulebook's amendments, Hall of Fame inductees, the championship's winners and the legacy
-   goals met. Snapshot: what the screen needs beyond what it already carries (the timeline).
-   Bots never retire.
+2. **Retiring and the retrospective.** *Built 2026-10-13.* The `retire` action
+   (`src/sim/actions.ts`), legal once `win.won` is set: it sets `outcome` to the new kind
+   `retired` (`GameOutcome.kind`; turn, quarter and the anchor), so `endTurn` and every action
+   refuse as after a collapse. No landmark and no save format change: the outcome's kind was
+   widened, so every older save is still valid. Invariants: `retired` needs the win; a collapse
+   after the win is still invalid. `src/sim/retrospective.ts`: `timeline` (turning points read
+   from the landmarks: firsts once, each new peak tier, every change at #1, legacy goals, the
+   retirement from the outcome) and `retrospectiveSnapshot`. Snapshot: `canRetire` and
+   `retrospective` (null until retired: founded and retired years and the timeline); the rest
+   of the page reads what the snapshot already carried. Renderer:
+   `src/renderer/src/retrospective/` (`RetireControl` on the objective card with a confirming
+   dialog; `RetrospectiveScreen`, which reuses the standings chart, exported as
+   `StandingsChart`); `App.tsx` opens it when a campaign is retired or a retired save is
+   loaded, shows its nav tab, and hides the Offseason tab and both self-opening pages once a
+   campaign has ended. The store autosaves after a successful `retire`. Bots never retire
+   (tested for every bot). Legacy goal number: `legacyGoals.eliteLeagues` 5 to 100. Tests:
+   `tests/retire.test.ts`. Smoke: `scripts/smoke.ts` has the builder bot play 200 turns from
+   Nigeria (a few seconds) and saves it as `late-game.sfsave`; `src/main/retire-smoke.ts` loads
+   it, screenshots the World Championship page with real tournaments (`60`), retires through
+   the dialog (`61`–`62`), checks and screenshots the retrospective wide and narrow
+   (`63`–`65`), checks no turn can be played (`66`), then saves the retired campaign and loads
+   it back onto the retrospective.
+
+3. **The late PP and cash surplus.** Not designed. Needs a design session before any code:
+   late rewards in what is scarce late, and the collective bargaining agreement.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 

@@ -521,7 +521,7 @@ const gameStateSchema = z.strictObject({
   }),
   outcome: z
     .strictObject({
-      kind: z.literal("anchorCollapse"),
+      kind: z.enum(["anchorCollapse", "retired"]),
       turn: z.int().min(1),
       quarter: count,
       countryId: z.string().min(1),

@@ -124,7 +124,7 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   the `TurnSnapshot`.
 - Every player action goes through `applyAction` in `src/sim/actions.ts`; bots use the same path.
 - An anchor league collapse before the win sets `outcome` and ends the campaign; `endTurn` refuses
-  to continue.
+  to continue. Retiring after the win is the other ending (`outcome.kind`).
 - The flagship league (GDD v1.11, v1.13, v1.14) lives in `src/sim/flagship.ts` and
   `GameState.flagship`. The anchor holds the commissioner's seat from turn 1. Clubs are based in real
   places (`content/places.yaml`) with invented nicknames; never invent places. One season a year; the
@@ -372,7 +372,18 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   yearly records and the championship's tournaments. `updateLegacy` runs at the end of
   `endTurn`; a goal once met stays met, with a `legacyGoal` landmark and the headline
   `legacy-goal` card (trigger `legacy`, no slot). No reward. The Almanac lists them from the
-  start. Retiring and the retrospective are designed, not built (tech plan 2.24).
+  start.
+- Retiring and the retrospective (GDD v1.38): the `retire` action is legal once `win.won` is
+  set and sets `outcome` to kind `retired` (no landmark, no save format change), so `endTurn`
+  and every action refuse as after a collapse. Check `outcome.kind`, not just `outcome`, when
+  the two endings differ. `src/sim/retrospective.ts` gives the snapshot's `retrospective`
+  (null until retired): the timeline of turning points read from the landmarks. The page is
+  `src/renderer/src/retrospective/RetrospectiveScreen.tsx`, opened by `App.tsx` on retiring
+  and on loading a retired save; `RetireControl` sits on the world map's objective card. Bots
+  never retire.
+- The late-game smoke step (`src/main/retire-smoke.ts`) runs last on its own campaign:
+  `scripts/smoke.ts` has a bot play 200 turns and saves `late-game.sfsave` before launching.
+  Use that save for any screen the young smoke campaign cannot reach.
 - The win hold is a contest (GDD v1.8): near #1 (`rivalAI.nearTop`) rival intensity peaks just past
   parity, rivals defend wherever the player holds ground in their territory, and they may buy more
   countermoves per quarter. The runner reports how many campaigns lost #1 before winning; the
@@ -462,7 +473,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Save format 31 adds world titles to Hall inductees' facts (GDD v1.37). Format 30 migrates
   with none.
 - Save format 32 adds legacy goals (GDD v1.38): `GameState.legacy`. Format 31 migrates with
-  nothing met.
+  nothing met. The `retired` outcome kind joined format 32 without a bump (older saves stay
+  valid).
 - The saves folder (GDD v1.35) is `savesFolder` in `src/main/save-files.ts`: Saved Games\Sports
   Founder on Windows. Each session save carries a `header` for the Load screen (the Campaign
   menu's list, `campaign:list` / `campaign:open-named`); an autosave after each turn keeps

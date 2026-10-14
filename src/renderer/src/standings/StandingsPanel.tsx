@@ -29,7 +29,16 @@ function tenYearChange(snapshot: TurnSnapshot, sportId: string): number | null {
   return now / then - 1;
 }
 
-function Chart({ snapshot, names }: { snapshot: TurnSnapshot; names: Names | null }) {
+/** The world Fandom Score of each sport by recorded year; the retrospective shows it too. */
+export function StandingsChart({
+  snapshot,
+  names,
+  testId = "standings-chart",
+}: {
+  snapshot: TurnSnapshot;
+  names: Names | null;
+  testId?: string;
+}) {
   const { t } = useTranslation();
   const series = snapshot.standings.series;
   const sports = snapshot.standings.sports.map((s) => s.sportId);
@@ -49,7 +58,7 @@ function Chart({ snapshot, names }: { snapshot: TurnSnapshot; names: Names | nul
       viewBox={`0 0 ${width} ${height}`}
       role="img"
       aria-label={t("standings.chartLabel", { from: first, to: last })}
-      data-testid="standings-chart"
+      data-testid={testId}
     >
       {[0, 0.5, 1].map((share) => (
         <g key={share}>
@@ -194,7 +203,7 @@ export function StandingsPanel({
           })}
         </tbody>
       </table>
-      <Chart snapshot={snapshot} names={names} />
+      <StandingsChart snapshot={snapshot} names={names} />
       <p className="standings-note">{t("standings.note")}</p>
     </dialog>
   );

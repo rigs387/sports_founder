@@ -66,6 +66,7 @@ import {
 //                   withdrawn (GDD v1.28)
 //   buildVenue      start building the seat's next venue level with league cash, in the
 //                   offseason, one level at a time (GDD v1.30)
+//   retire          end the campaign, at any time after the win (GDD v1.38); it cannot be undone
 
 export type Action =
   | { type: "collectMoment"; eventId: number }
@@ -88,7 +89,8 @@ export type Action =
   | { type: "foundChampionship"; name: string }
   | { type: "pickHost"; countryId: string }
   | { type: "signDeal"; offerId: number }
-  | { type: "buildVenue" };
+  | { type: "buildVenue" }
+  | { type: "retire" };
 
 export class IllegalActionError extends Error {
   override name = "IllegalActionError";
@@ -137,6 +139,8 @@ const money = (value: number) => value.toFixed(1);
 /** Returns why an action is illegal, or null if it is legal. */
 export function checkAction(state: GameState, world: World, action: Action): string | null {
   if (state.outcome !== null) return "the campaign has ended";
+  if (action.type === "retire")
+    return state.win.won === null ? "you can retire only after the win" : null;
   if (action.type === "collectMinorMoments")
     return minorMomentIds(state, world).length === 0 ? "no minor moment waits" : null;
   if (action.type === "collectMoment" || action.type === "chooseEvent")
@@ -487,6 +491,16 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
       return dropStar(state, world, action.playerId);
     case "buildVenue":
       return buildVenue(state, world);
+    case "retire":
+      return {
+        ...state,
+        outcome: {
+          kind: "retired",
+          turn: state.turn,
+          quarter: state.quarter,
+          countryId: state.anchorCountryId,
+        },
+      };
     case "moveSeat":
       return {
         ...state,

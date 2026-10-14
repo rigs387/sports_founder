@@ -282,10 +282,13 @@ title; bots found it. Contest with it: #1 lost before the win in 20 of 35.)
 
 **Late game (v1.38):** seven legacy goals, listed from the start, earned at any time, met for
 good, no reward but a headline and an Almanac line: #1 on every continent, lead soccer in its 10
-heartlands, five Elite leagues, a league in every market, 100 years as #1, host on every
-continent, the birthplace wins the championship. (Built.) Retiring after the win ends the
-campaign with a one-page retrospective. (Designed, not built.) The decisions were taken by
-default, not confirmed.
+heartlands, 100 Elite leagues (raised from five: bots reached five by turn 68), a league in
+every market, 100 years as #1, host on every continent, the birthplace wins the championship.
+Retire, any time after the win, behind a confirmation: it ends the campaign for good and opens a
+one-page retrospective (stats, fans by year, a timeline of turning points, legacy goals, world
+champions, Hall of Fame highlights, rule amendments); the save stays loadable and opens on that
+page. (All built; the six decisions were confirmed 2026-10-13.) Next: the late PP and cash
+surplus, a design session first.
 
 **Awards (v1.33):** the flagship's Player of the Season (composite of scores, club finish, playoff
 and final scores) and the top scorer's prize; Hall of Fame points; named after the first Hall of

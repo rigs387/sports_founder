@@ -18,6 +18,8 @@ import { Emblem } from "./identity/Emblem";
 import { heatBand, mapSettings } from "./map/model";
 import { type MapCommand, type MapHover, WorldMap } from "./map/WorldMap";
 import { OffseasonScreen } from "./offseason/OffseasonScreen";
+import { RetireControl } from "./retrospective/RetireControl";
+import { RetrospectiveScreen } from "./retrospective/RetrospectiveScreen";
 import { StandingsPanel } from "./standings/StandingsPanel";
 import { useGameStore } from "./state/game-store";
 
@@ -59,7 +61,8 @@ export function App() {
     overview === "flagship" ||
     overview === "almanac" ||
     overview === "offseason" ||
-    overview === "championship";
+    overview === "championship" ||
+    overview === "retrospective";
   // On narrow screens the nav scrolls; keep the current view's tab in sight.
   useEffect(() => {
     document
@@ -72,6 +75,7 @@ export function App() {
   // A World Championship that has just been played opens its own page first (GDD v1.37), the
   // same way; the offseason screen follows when the player moves on from it.
   const offseasonOpen = snapshot?.offseasonOpen ?? false;
+  const ended = !!snapshot?.outcome;
   const wasOpen = useRef(offseasonOpen);
   const owed = useRef(false);
   const played = snapshot?.worldChampionship.tournaments.length ?? 0;
@@ -84,6 +88,11 @@ export function App() {
     seen.current = { revision: campaignRevision, played };
     if (offseasonOpen && !wasOpen.current) owed.current = overview === null;
     if (!offseasonOpen) owed.current = false;
+    // A finished campaign has no league business left: neither page opens itself.
+    if (ended) {
+      owed.current = false;
+      cupOwed.current = false;
+    }
     if (cupOwed.current && news === 0 && overview === null) {
       cupOwed.current = false;
       setOverview("championship");
@@ -93,7 +102,14 @@ export function App() {
     }
     if (!offseasonOpen && overview === "offseason") setOverview(null);
     wasOpen.current = offseasonOpen;
-  }, [offseasonOpen, overview, news, played, campaignRevision]);
+  }, [offseasonOpen, overview, news, played, campaignRevision, ended]);
+  // A retired campaign opens on its retrospective (GDD v1.38): when the player retires, and when
+  // a retired save is loaded.
+  const retired = !!snapshot?.retrospective;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a loaded campaign opens it again
+  useEffect(() => {
+    if (retired) setOverview("retrospective");
+  }, [retired, campaignRevision]);
   // A pop-up card outlines its country on the map (GDD v1.25), leaving the selection alone.
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const navigate = (kind: MapCommand["kind"], market?: string) =>
@@ -190,7 +206,18 @@ export function App() {
               {t("map.nav.championship")}
             </button>
           )}
-          {offseasonOpen && (
+          {retired && (
+            <button
+              type="button"
+              data-view="retrospective"
+              className={overview === "retrospective" ? "active" : undefined}
+              aria-current={overview === "retrospective" ? "page" : undefined}
+              onClick={() => setOverview("retrospective")}
+            >
+              {t("map.nav.retrospective")}
+            </button>
+          )}
+          {offseasonOpen && !ended && (
             <button
               type="button"
               data-view="offseason"
@@ -307,6 +334,14 @@ export function App() {
           onWorld={() => setOverview(null)}
         />
       )}
+      {names && (
+        <RetrospectiveScreen
+          snapshot={snapshot}
+          names={names}
+          active={overview === "retrospective"}
+          onWorld={() => setOverview(null)}
+        />
+      )}
       <section className="world-stage" hidden={fullPage} aria-label={t("map.stage")}>
         {snapshot && (
           <WorldMap
@@ -369,12 +404,17 @@ export function App() {
             {t("status.error", { message: error })}
           </p>
         )}
-        {snapshot?.outcome && (
+        {snapshot.outcome?.kind === "anchorCollapse" && (
           <p className="outcome-notice" role="alert">
             {t("campaign.over", {
               country: countryName(snapshot.outcome.countryId),
               turn: snapshot.outcome.turn,
             })}
+          </p>
+        )}
+        {snapshot.retrospective && (
+          <p className="outcome-notice retired" role="status" data-testid="retired-notice">
+            {t("campaign.retired", { year: snapshot.retrospective.retiredYear })}
           </p>
         )}
         {!overview && (
@@ -528,7 +568,14 @@ export function App() {
                 })}
               </strong>
               <p>{stateMessage}</p>
-              {snapshot.win.won && <p>{t("win.won", { turn: snapshot.win.won.turn })}</p>}
+              {snapshot.win.won && !retired && (
+                <p>{t("win.won", { turn: snapshot.win.won.turn })}</p>
+              )}
+              <RetireControl
+                snapshot={snapshot}
+                busy={status !== "ready"}
+                onAction={(action) => void dispatchAction(action)}
+              />
               {snapshot.tierTrack.atRisk && (
                 <p className="warning">
                   {t("campaign.atRisk", { count: snapshot.tierTrack.atRisk.turnsUntilDemotion })}

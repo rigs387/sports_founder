@@ -237,10 +237,13 @@ export function invariantsOf(state: GameState, world: World): string[] {
   if (won !== null && (won.turn >= state.turn || won.quarter > state.quarter)) {
     problems.push(`the win is dated turn ${won.turn}, quarter ${won.quarter}, in the future`);
   }
-  if (won !== null && state.outcome !== null) {
+  if (won !== null && state.outcome?.kind === "anchorCollapse") {
     problems.push(
       "the campaign ended after the win, but winning makes an anchor collapse survivable",
     );
+  }
+  if (won === null && state.outcome?.kind === "retired") {
+    problems.push("the player retired before the win");
   }
   if (state.outcome !== null && state.outcome.countryId !== state.anchorCountryId) {
     problems.push(`the campaign ended on "${state.outcome.countryId}", which is not the anchor`);

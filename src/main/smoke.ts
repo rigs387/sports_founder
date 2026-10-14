@@ -12,6 +12,7 @@ import { verifyRulebook } from "./identity-smoke";
 import { verifyLeagues } from "./league-smoke";
 import { verifyMap } from "./map-smoke";
 import { verifyPopups } from "./popup-smoke";
+import { verifyRetirement } from "./retire-smoke";
 import { verifyAmendment } from "./rules-smoke";
 import type { FilePrompts } from "./save-files";
 import { verifySaves } from "./save-smoke";
@@ -165,6 +166,7 @@ async function run(
   const almanac = await verifyAlmanac(win, screenshot);
   const standings = await verifyStandings(win, screenshot);
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
+  const retirement = await verifyRetirement(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
   const report = {
@@ -192,6 +194,7 @@ async function run(
     traditions,
     almanac,
     saves,
+    retirement,
     errors,
     remoteRequests,
   };

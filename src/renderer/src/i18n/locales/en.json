@@ -614,7 +614,8 @@
     "approaching": "Approaching tier {{tier}}: {{name}} in {{count}} turn(s)",
     "atRisk_one": "Tier at risk: demotion in {{count}} turn unless it recovers",
     "atRisk_other": "Tier at risk: demotion in {{count}} turns unless it recovers",
-    "over": "Campaign over: the {{country}} league collapsed on turn {{turn}}. The sport has lost its birthplace."
+    "over": "Campaign over: the {{country}} league collapsed on turn {{turn}}. The sport has lost its birthplace.",
+    "retired": "You retired in {{year}}. The campaign is finished; its story is on the Retrospective tab."
   },
   "win": {
     "chasing": "Ranked #{{rank}} worldwide, behind {{leader}}. To win, hold #1 for {{hold}} turns in a row at tier {{tier}}: {{name}}.",
@@ -624,6 +625,68 @@
     "top": "#1 worldwide.",
     "retake": "Ranked #{{rank}} worldwide, behind {{leader}}. #1 can be retaken.",
     "won": "Won on turn {{turn}}: the world's #1 sport. The campaign goes on."
+  },
+  "retire": {
+    "open": "Retire…",
+    "heading": "Retire from {{sport}}?",
+    "body": "You have won: {{sport}} became the world's #1 sport. Retiring ends the campaign and opens its retrospective: the timeline, the fans by year, the rules you changed, the Hall of Fame, the world champions and the legacy goals you met.",
+    "warning": "This cannot be undone. No more turns can be played. The save stays, and loading it opens the retrospective.",
+    "cancel": "Keep playing",
+    "confirm": "Retire"
+  },
+  "retrospective": {
+    "eyebrow": "Retrospective",
+    "title": "{{sport}}, {{from}}–{{to}}",
+    "lede": "Founded in {{country}} in {{from}}, and left in other hands in {{to}}. This is what {{sport}} became while you ran it.",
+    "toWorld": "See the world",
+    "stats": {
+      "years": "Years",
+      "fans": "Fans",
+      "rank": "World rank",
+      "rankValue": "#{{rank}}",
+      "leagues": "Leagues",
+      "seasons": "Flagship seasons",
+      "hall": "Hall of Fame"
+    },
+    "fans": {
+      "heading": "Fans by year",
+      "note": "World Fandom Score of each sport, by recorded year."
+    },
+    "timeline": {
+      "heading": "Timeline",
+      "founded": "{{sport}} is founded in {{country}}.",
+      "firstLeagueAbroad": "The first league abroad forms, in {{country}}.",
+      "tier": "The sport reaches a new tier: {{name}}.",
+      "firstElite": "{{country}} has the sport's first Elite league.",
+      "firstStar": "{{player}} becomes the sport's first star.",
+      "rankOneTaken": "{{sport}} becomes the world's #1 sport.",
+      "rankOneLost": "{{rival}} takes #1 back.",
+      "won": "The win: #1 held long enough to settle it.",
+      "seatMoved": "The commissioner's seat moves to {{country}}.",
+      "championshipFounded": "{{name}} is founded.",
+      "birthplaceOutlived": "The league in {{country}} collapses. The sport outlives its birthplace.",
+      "legacyGoal": "Legacy goal met: {{goal}}.",
+      "retired": "The founder retires."
+    },
+    "legacy": {
+      "heading": "Legacy goals: {{met, number}} of {{of, number}} met"
+    },
+    "champions": {
+      "heading": "World champions",
+      "unfounded": "No World Championship was founded.",
+      "unplayed": "The World Championship was founded, but no tournament was played.",
+      "host": "Hosted by {{country}}"
+    },
+    "hall": {
+      "heading": "Hall of Fame highlights",
+      "empty": "No player was inducted.",
+      "facts": "{{country}} · Titles: {{titles, number}} · Star seasons: {{starSeasons, number}}"
+    },
+    "rules": {
+      "heading": "Rule amendments",
+      "empty": "The rules never changed.",
+      "change": "{{from}} to {{to}}"
+    }
   },
   "league": {
     "bulk": {
@@ -1241,7 +1304,8 @@
       "foundChampionship": "{{name}} is founded. Its first tournament is played next year.",
       "pickHost": "{{country}} will host the next tournament.",
       "signDeal": "Deal signed. It pays from the next season.",
-      "buildVenue": "Building has started. The new level opens in a later offseason."
+      "buildVenue": "Building has started. The new level opens in a later offseason.",
+      "retire": "You have retired. The campaign is finished."
     },
     "lockForkFirst": "Choose {{nodes}} first: the fork before this level."
   },
@@ -1258,7 +1322,8 @@
       "growth": "Growth",
       "almanac": "Almanac",
       "championship": "Championship",
-      "offseason": "Offseason"
+      "offseason": "Offseason",
+      "retrospective": "Retrospective"
     },
     "prestige": "Prestige",
     "home": "World view",

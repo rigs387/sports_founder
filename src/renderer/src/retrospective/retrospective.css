@@ -1,0 +1,122 @@
+/* The retrospective (GDD v1.38): the page a retired campaign ends on. It borrows the Almanac's
+   layout and cards. */
+.retrospective-lede {
+  max-width: 760px;
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #3d566b;
+}
+.retrospective-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 0 0 16px;
+}
+.retrospective-stats div {
+  padding: 10px 12px;
+  background: var(--bronze-soft);
+  border: 1px solid #d9c48f;
+  border-top: 4px solid var(--bronze);
+  border-radius: 8px;
+}
+.retrospective-stats dt {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--bronze);
+}
+.retrospective-stats dd {
+  margin: 2px 0 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+.retrospective-screen .standings-chart {
+  width: 100%;
+  height: auto;
+}
+.retrospective-timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  font-size: 13px;
+}
+.retrospective-timeline li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 8px;
+  padding: 7px 0 7px 12px;
+  border-left: 3px solid #c5d6ea;
+  line-height: 1.4;
+}
+.retrospective-timeline li[data-kind="founded"],
+.retrospective-timeline li[data-kind="won"],
+.retrospective-timeline li[data-kind="retired"] {
+  border-left-color: var(--bronze);
+  font-weight: 800;
+}
+.retrospective-timeline li[data-kind="rankOneLost"],
+.retrospective-timeline li[data-kind="birthplaceOutlived"] {
+  border-left-color: #b86551;
+}
+.retrospective-screen .legacy-goals li.unmet {
+  color: var(--muted);
+}
+.retrospective-screen .roll {
+  max-height: none;
+}
+
+/* Retiring: a quiet button on the objective card, then a confirmation. */
+.retire-open {
+  margin-top: 8px;
+  padding: 4px 10px;
+  border: 1px solid #b9c9da;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.retire-open:hover,
+.retire-open:focus-visible {
+  color: var(--ink);
+  border-color: #2d5482;
+}
+.retire-dialog {
+  width: min(460px, calc(100vw - 32px));
+  padding: 20px 22px;
+  border: 0;
+  border-radius: 14px;
+  color: var(--ink);
+  background: #fbfcfd;
+}
+.retire-dialog::backdrop {
+  background: rgba(16, 32, 52, 0.45);
+}
+.retire-dialog h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+.retire-dialog p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.retire-dialog .retire-warning {
+  color: var(--warning);
+  font-weight: 700;
+}
+.retire-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+.outcome-notice.retired {
+  background: #f6efdc;
+  color: #5c4712;
+  border-color: #d9c48f;
+}

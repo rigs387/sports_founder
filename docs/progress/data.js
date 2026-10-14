@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-13",
-    tests: 647,
-    files: 70,
-    note: "npm run check passed after legacy goals were built (type checks, Biome, purity, 647 tests in 70 files). Lint has existing visual-study warnings.",
+    tests: 653,
+    files: 71,
+    note: "npm run check passed after retiring and the retrospective were built (type checks, Biome, purity, 653 tests in 71 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-13",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
@@ -106,6 +106,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-13",
+      type: "Built",
+      title: "Retiring and the retrospective",
+      text: "GDD v1.38, tech plan 2.24 step 2 of 2. The designer confirmed the topic's six decisions and asked for a harder Elite goal: measured in four 200-turn builder campaigns, a small raise does nothing because bots promote in bulk (5 leagues at turns 52–68, 15 at 56–72), so the goal is now 100 Elite leagues (turns 72–88; the win came at 144–162). Retire is offered on the objective card after the win, behind a confirmation; it sets a new outcome kind, so no more turns or actions are possible, the campaign is autosaved, and a retired save opens on its retrospective. The retrospective is one page from retained records: stats, the fans-by-year chart, a timeline of turning points, the legacy goals, the world champions, Hall of Fame highlights and the rule amendments. No save format change. The smoke test now has a bot play a 200-turn campaign and loads it, so the retrospective and, for the first time, the World Championship page were seen on screen with real data (20 tournaments, an 18-line timeline, 4 of 7 goals met). npm run check: 653 tests in 71 files; smoke passed. Next is a design session on the late PP and cash surplus; no code before it.",
+    },
     {
       date: "2026-10-13",
       type: "Built",
@@ -592,10 +598,7 @@ window.SF_PROGRESS = {
         ["built", "Atomic saves, migrations and deterministic resume"],
         ["built", "Permanent landmarks and annual world fan snapshots"],
         ["built", "Saves folder, a Load list and three rolling autosaves (GDD v1.35)"],
-        [
-          "partial",
-          "Legacy goals built (GDD v1.38); retiring and the retrospective are designed, not built",
-        ],
+        ["built", "Legacy goals, retiring after the win and the retrospective page (GDD v1.38)"],
       ],
     },
     {
@@ -1043,7 +1046,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 12",
       icon: "15",
       summary: "Found and name the sport's international competition.",
-      next: "Built (tech plan 2.23). Play it in a real campaign: the page and cards have not been seen on screen. Strengths are very even late on; a talent pool by fans is the lever if favorites should be clearer.",
+      next: "Built (tech plan 2.23). The page has been seen on screen with real tournaments (the late-game smoke step); founding, host picking and its cards have not. Play it in a real campaign. Strengths are very even late on; a talent pool by fans is the lever if favorites should be clearer.",
       depends: ["national"],
       sources: [["Championship design", "../../sports-founder-gdd.md#progression--economy"]],
       items: [

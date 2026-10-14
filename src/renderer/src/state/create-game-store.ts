@@ -228,6 +228,8 @@ export const createGameStore = (sim: GameClient, historyLimit: number, files?: S
             dirty: get().dirty || result.ok,
             fileNotice: null,
           });
+          // Retiring ends the campaign (GDD v1.38): keep it, as a finished turn is kept.
+          if (result.ok && action.type === "retire") void autosave();
         } catch {
           // A transport failure is not a rules rejection: don't allow another spend against stale state.
           set({ status: "error", actionError: "unavailable", dirty: true });

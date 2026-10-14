@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.38 | October 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size; v1.36: fourth playtest follow-ups; v1.37: the world stage — standouts in other leagues, talent pull, a signing card and Player of the Year; national teams assembled for each championship; the World Championship founded, hosted and played on its own page; v1.38: a late game with an ending — legacy goals built, retiring designed)*
+*Version 1.38 | October 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size; v1.36: fourth playtest follow-ups; v1.37: the world stage — standouts in other leagues, talent pull, a signing card and Player of the Year; national teams assembled for each championship; the World Championship founded, hosted and played on its own page; v1.38: a late game with an ending — legacy goals, retiring and the retrospective built)*
 
 ---
 
@@ -326,7 +326,7 @@ campaign — the player can keep playing past the win.
 - **Anchor collapse no longer ends the campaign** after the win. It becomes a major Moment ("The
   sport has outlived its birthplace") recorded permanently.
 - **Legacy goals:** optional post-win targets (e.g., #1 on every continent, overtake soccer in its
-  heartlands, five Elite leagues, a league in every market, a century as #1). Natural Steam
+  heartlands, Elite leagues (100 since v1.38), a league in every market, a century as #1). Natural Steam
   achievements.
 - **Rivals can retake #1.** Losing #1 is a Moment and it can be regained; the original win stays in
   the Almanac.
@@ -334,10 +334,10 @@ campaign — the player can keep playing past the win.
   rulebook amendment history, Hall of Fame highlights) as a 9x16 key moment.
 
 **A late game with an ending, topic 1: legacy goals and retiring (v1.38, 2026-10-13).** The six
-decisions were offered and not answered; the recommended option was taken on each so the build
-could go on. *Any of them can still be overruled.*
+decisions were first taken on the recommended option because they were not answered; *the
+designer confirmed all six on 2026-10-13*, and asked for the Elite goal to be harder (below).
 - *The goals (1a):* the five above plus two from the world stage, as one checklist: #1 on every
-  continent; lead soccer in its heartlands; five Elite leagues; a league in every market; a
+  continent; lead soccer in its heartlands; 100 Elite leagues; a league in every market; a
   century as #1; host the World Championship on every continent; the birthplace wins the World
   Championship.
 - *Seen and earned at any time (2a):* listed from the start, earned before or after the win.
@@ -345,10 +345,10 @@ could go on. *Any of them can still be overruled.*
 - *No reward (3a):* a permanent landmark, a headline card and a line in the Almanac. Nothing
   that makes #1 easier.
 - *Retiring (4a):* any time after the win; it ends the campaign with the retrospective and the
-  save stays loadable. Not built yet.
+  save stays loadable.
 - *The retrospective (5a):* one page from retained records: the timeline of landmarks, the fan
   chart by year, the rulebook's amendments, Hall of Fame highlights, the world champions and
-  the legacy goals met. The animated heatmap timelapse waits. Not built yet.
+  the legacy goals met. The animated heatmap timelapse waits.
 - *The late PP and cash surplus (6a)* is its own topic, after this one.
 - *Built 2026-10-13 (the goals):* how each is read, with numbers in config (`legacyGoals`). A
   continent is led when the sport's Fandom Score there beats every rival's. The heartlands are
@@ -358,6 +358,22 @@ could go on. *Any of them can still be overruled.*
   market, the birthplace's title) and four were not: 3 of 6 continents, 4–5 of 10 heartlands,
   36–45 of 100 years, 5 of 6 host continents. Five Elite leagues and a league in every market
   come early (turns 53–77); they may want to be harder.
+- *The Elite goal is 100 leagues (2026-10-13, the designer's call to raise it).* Measured in four
+  200-turn bot campaigns before choosing the number: bots promote in bulk, so a small raise does
+  nothing (5 leagues at turns 52–68, 15 at 56–72, 30 at 58–74). 100 comes at turns 72–88, about
+  twenty turns later than five did; all 127 markets big enough for Elite come at 110–120; the win
+  at 144–162. A league in every market stays as it is, the list's early goal.
+- *Built 2026-10-13 (retiring and the retrospective).* Retire is offered on the world map's
+  objective card once the sport has won, behind a confirmation that says it cannot be undone.
+  It ends the campaign: no more turns and no more actions. The campaign is autosaved as it
+  ends, can be saved by hand, and a retired save opens on its retrospective. The page: years,
+  fans, world rank, leagues, flagship seasons and Hall of Fame members; the fans-by-year chart
+  against the rival sports; a timeline; the legacy goals with the years they were met; every
+  world champion and host; the six most decorated Hall of Fame players; the rule amendments.
+  The timeline keeps turning points only: the founding, the first star, the first league abroad,
+  each new tier, the first Elite league, the championship's founding, every time #1 was taken or
+  lost, the win, seat moves, the birthplace outlived, legacy goals, the retirement. The world
+  map can still be looked at; the offseason screen no longer opens. Bots never retire.
 
 **Loss condition:** Before the win, the game ends if your *starting/anchor country's* league collapses (see League
 Health Ladder below). A collapse on the turn the hold would complete still ends the game: the loss

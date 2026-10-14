@@ -14,6 +14,7 @@ export type Overview =
   | "growth"
   | "almanac"
   | "offseason"
+  | "retrospective"
   | "championship";
 interface Props {
   view: Exclude<Overview, "growth" | "flagship" | "almanac">;

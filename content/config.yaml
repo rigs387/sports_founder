@@ -821,7 +821,7 @@ worldChampionship:
 # the simulation (LEGACY_GOALS); these are its numbers. Heartlands are the markets where
 # heartlands.sportId started with the most hardcore fans.
 legacyGoals:
-  eliteLeagues: 5
+  eliteLeagues: 100
   centuryYears: 100
   heartlands: { sportId: soccer, countries: 10 }
 

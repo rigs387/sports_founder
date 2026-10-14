@@ -62,6 +62,8 @@ button {
   min-height: 630px;
   display: grid;
   grid-template-rows: 78px minmax(0, 1fr) 82px;
+  /* A crowded top bar must not widen the pages under it. */
+  grid-template-columns: minmax(0, 1fr);
   overflow: hidden;
 }
 .game-topbar {

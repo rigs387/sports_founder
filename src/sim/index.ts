@@ -27,6 +27,7 @@ export * from "./press";
 export * from "./prices";
 export * from "./quarter";
 export * from "./records";
+export * from "./retrospective";
 export * from "./rivals";
 export { MAX_SEED, SEED_WARM_UP_DRAWS } from "./rng";
 export * from "./rules";

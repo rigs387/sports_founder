@@ -717,11 +717,11 @@ export interface YearlySnapshot {
 }
 
 /**
- * How a campaign ended. Only an anchor collapse before the win ends one; winning is not an ending
- * (see WinTrack).
+ * How a campaign ended: an anchor collapse before the win, or the player retiring after it
+ * (GDD v1.38). Winning is not an ending (see WinTrack). The country is the anchor.
  */
 export interface GameOutcome {
-  kind: "anchorCollapse";
+  kind: "anchorCollapse" | "retired";
   turn: number;
   quarter: number;
   countryId: string;

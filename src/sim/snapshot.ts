@@ -23,6 +23,7 @@ import { type LeagueCosts, leagueCosts } from "./league-costs";
 import { type LegacySnapshot, legacySnapshot } from "./legacy";
 import { type NationalTeamSnapshot, nationalTeamSnapshots } from "./national-teams";
 import { ppWeights, quarterPpIncome } from "./prices";
+import { type RetrospectiveSnapshot, retrospectiveSnapshot } from "./retrospective";
 import { type RulesSnapshot, rulesSnapshot } from "./rules";
 import { shapeFactors } from "./shape";
 import { computeExposure } from "./spread";
@@ -266,6 +267,10 @@ export interface TurnSnapshot {
   worldChampionship: ChampionshipSnapshot;
   /** The legacy goals: progress on each, and when it was met (GDD v1.38). */
   legacy: LegacySnapshot;
+  /** Whether the player may retire now: after the win, while the campaign runs (GDD v1.38). */
+  canRetire: boolean;
+  /** What a retired campaign looks back on (GDD v1.38); null until the player retires. */
+  retrospective: RetrospectiveSnapshot | null;
 }
 
 /** Attendance and max capacity as the venue card shows them (GDD v1.34). */
@@ -547,5 +552,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     nationalTeams: nationalTeamSnapshots(state, world),
     worldChampionship: championshipSnapshot(state, world),
     legacy: legacySnapshot(state, world),
+    canRetire: state.outcome === null && state.win.won !== null,
+    retrospective: retrospectiveSnapshot(state, world),
   };
 }
