@@ -1571,8 +1571,46 @@ the designer on 2026-10-13; see the GDD.
    (`63`–`65`), checks no turn can be played (`66`), then saves the retired campaign and loads
    it back onto the retrospective.
 
-3. **The late PP and cash surplus.** Not designed. Needs a design session before any code:
-   late rewards in what is scarce late, and the collective bargaining agreement.
+3. **The late surplus (GDD v1.39).** Designed 2026-10-13; built as section 2.25.
+
+### 2.25 Build Plan: The Late Surplus (GDD v1.39)
+
+Designed, nothing built. Eight decisions, all in the GDD ("the late surplus"). One step per
+session; each ends with `npm run check`, `npm run smoke`, the docs and a commit.
+
+1. **The payout and the fixed share (money only, no talks).** Every league pays cash above its
+   reserve out to the clubs each quarter (it leaves the game): reserve = the larger of
+   `reserveYears` of costs and the next venue level's price, in config. Leagues at Professional
+   and above pay players a share of revenue: `payroll` becomes a share of revenue there, not
+   `payroll.baselineShare` of the running cost (`src/sim/league-costs.ts`,
+   `leagueIncomePerQuarter`, the caller of `stepLeagueQuarter`). The flagship runs on a default
+   agreement (the middle of every lever) until step 2. Amateur and Semi-Pro are unchanged.
+   Measure before and after: league cash by tier, folds, turns at Near-Collapse, the Elite seat's
+   income mix (`balanceTargets.money`), the deal slate, and the collapse experiment. Risk: this
+   step can break mid-game solvency; it is the one to tune hardest.
+2. **The agreement and the talks.** `GameState.agreement` (a new save format): the levers in
+   force (share, term, cap, minimum wage), the season it expires, its own random stream. The
+   union's ask and its read of an offer (`will sign`, a chance, `will refuse`) are computed in
+   the sim from the levers, league profit and the number of stars. Action `proposeAgreement`
+   (offseason only, when the agreement has expired or the union has just formed); one roll on
+   confirming. If the player proposes nothing, End Turn takes the union's ask (the free default
+   never rolls). UI: a review step on the offseason screen, like `AmendRules`. Bots answer by a
+   policy weight. The runner reports agreements signed, the share paid and stoppages.
+3. **What the levers do.** The cap: flagship club strength drifts apart less and star wages are
+   limited (`flagship.ts`, `league-costs.ts`). The minimum wage: adds to the payroll line and
+   raises `standouts.talentPull.chance` (`talent.ts`).
+4. **The stoppage.** A lost flagship season: no matches and no champion, no gate or media at the
+   seat, `broadcastEffects` off, deal clauses judged missed, hardcore demotion at the seat,
+   careers aged a year, then the union's ask on the shortest term. Everything that reads a
+   finished season must accept one with no champion: `seasonInterest`, the season cards, the
+   awards, the Hall class, culture's season facts, and the World Championship's calendar (it
+   runs on flagship seasons). A headline card, a landmark and an Almanac line.
+5. **Late card rewards by kind.** From PP tier 4 a moment card's reward is by its `family`
+   instead of PP: season and business pay cash into the flagship's reserve; tradition adds
+   tradition weight in the card's country; star extends a star's pull by a season; rival and
+   sport win casual fans in the card's country. Numbers in `content/events.yaml` settings;
+   new effect types join the closed vocabulary validated at load. Measure the #1 contest
+   before and after: it must not move.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 

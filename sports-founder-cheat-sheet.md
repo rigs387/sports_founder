@@ -287,8 +287,25 @@ every market, 100 years as #1, host on every continent, the birthplace wins the 
 Retire, any time after the win, behind a confirmation: it ends the campaign for good and opens a
 one-page retrospective (stats, fans by year, a timeline of turning points, legacy goals, world
 champions, Hall of Fame highlights, rule amendments); the save stays loadable and opens on that
-page. (All built; the six decisions were confirmed 2026-10-13.) Next: the late PP and cash
-surplus, a design session first.
+page. (All built; the six decisions were confirmed 2026-10-13.)
+
+**The late surplus (v1.39, designed, nothing built):** the surplus is cash, not PP
+(turn 200: the flagship holds $260–647B against $0.5B of costs a year; the other leagues $10
+trillion). Decided so far: a collective bargaining agreement closes it. Players claim a share of
+revenue; you negotiate it at the flagship every few seasons, a strike or lockout if talks fail;
+other leagues pay a fixed share with no decision. Players take about half of revenue; the league
+keeps a reserve of a few years of costs and pays everything above it out to the clubs (gone from
+the game), so venues and bailouts need saving up. The talks have four levers: the players'
+share (about 45–55% of revenue), the term (3, 5 or 7 seasons), a salary cap (on: closer clubs
+and limited star wages, but the union dislikes it, more with more stars) and a minimum wage
+(low, standard, high: a high floor draws standouts from abroad). A review step shows the union's
+read (will sign, on the edge with the chance as a number, will refuse); one roll on confirming.
+A stoppage loses the whole flagship season (no champion, no gate or TV, the broadcast dark, deal
+clauses missed, hardcore fans at the seat turn casual, players age) and ends on the union's ask.
+The union forms when the flagship reaches Professional; Amateur and Semi-Pro leagues pay as today.
+Late cards: early tiers keep PP; from tier 4 a card pays by its kind (season and business: cash
+into the flagship's reserve; tradition: tradition weight; star: a season more of pull; rival and
+sport: casual fans there). No PP sink is added: bots show no PP surplus since the growth tracks.
 
 **Awards (v1.33):** the flagship's Player of the Season (composite of scores, club finish, playoff
 and final scores) and the top scorer's prize; Hall of Fame points; named after the first Hall of

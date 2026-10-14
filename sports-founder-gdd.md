@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.38 | October 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size; v1.36: fourth playtest follow-ups; v1.37: the world stage — standouts in other leagues, talent pull, a signing card and Player of the Year; national teams assembled for each championship; the World Championship founded, hosted and played on its own page; v1.38: a late game with an ending — legacy goals, retiring and the retrospective built)*
+*Version 1.39 | October 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size; v1.36: fourth playtest follow-ups; v1.37: the world stage — standouts in other leagues, talent pull, a signing card and Player of the Year; national teams assembled for each championship; the World Championship founded, hosted and played on its own page; v1.38: a late game with an ending — legacy goals, retiring and the retrospective built; v1.39: the late surplus — a collective bargaining agreement at the flagship and late card rewards by kind, designed)*
 
 ---
 
@@ -374,6 +374,79 @@ designer confirmed all six on 2026-10-13*, and asked for the Elite goal to be ha
   each new tier, the first Elite league, the championship's founding, every time #1 was taken or
   lost, the win, seat moves, the birthplace outlived, legacy goals, the retirement. The world
   map can still be looked at; the offseason screen no longer opens. Bots never retire.
+
+**A late game with an ending, topic 2: the late surplus (v1.39, 2026-10-13; designed, nothing
+built; build plan in tech plan 2.25).** Measured first, in two 200-turn bot campaigns (Nigeria, Germany): the
+surplus is in cash, not PP. At turn 200 the flagship league held $260–647B against $0.4–0.5B of
+costs a year (income $4.5–10.2B a year); all other leagues together held $10–11 trillion and
+added $190–205B a year. PP on hand was 1–2 turns of income with 23–26 of 60 growth levels still
+unbought, so bots show no PP surplus; the third playtest did (about 100K banked), and that half
+is the second part of this topic. Cash comes first.
+- *Decision 1, what closes the cash gap (1a):* a collective bargaining agreement. Players claim
+  a share of league revenue. At the flagship the player negotiates it every few seasons, and
+  talks that fail mean a strike or a lockout. Every other league pays a fixed share with no
+  decision (the flagship is deep, the others stay simple). Not chosen: a silent revenue share
+  everywhere (no gameplay), new things to buy with cash (spending would have to grow 10 to 20
+  times), flattening late income (undoes the v1.34 money scale).
+- *Decision 2, where the rest goes (2a):* a players' share alone leaves about half the surplus
+  piling up, so the clubs take the rest. Players get their share (about half of revenue). The
+  league keeps a reserve of a few years of costs; anything above it is paid out to the clubs and
+  leaves the game. Cash becomes a cushion that can be lost, not a score that only grows. Venue
+  building and bailouts are paid from the reserve, so big projects need saving up. Not chosen:
+  clubs take everything each quarter (venues would need a new way to be paid for), a players'
+  share only (the problem returns later), a share set to close the gap alone (about 90%, far
+  from any real league).
+- *Decision 3, how the talks work (3b, against the recommendation of a single answer to the
+  union's ask):* several levers on the table. The player sets the players' share, the term
+  length, a salary cap and a minimum wage, each with its own effect. Deeper and closer to real
+  bargaining; it is several times the build and balance work of one answer, and four numbers to
+  explain. Not chosen: one answer to the union's ask (accept, meet in the middle, hold the
+  line), and no talks at all (the share drifting by itself, strikes as event cards).
+- *Decision 4, what the levers do (4a):* each lever touches one system, and the union weighs all
+  four when it answers.
+  - *Share* (about 45 to 55% of revenue): the cost, and the union's main want.
+  - *Term* (3, 5 or 7 seasons): longer buys quiet, and the union wants more for it.
+  - *Salary cap* (off or on): on, the flagship's clubs stay closer in strength, so title races
+    are tighter, and star wages are limited. The union counts it against the offer, more so the
+    more stars the league has.
+  - *Minimum wage* (low, standard, high): costs up to a few points of revenue; a high floor makes
+    standouts abroad more willing to join the flagship (talent pull).
+  Not chosen: fans taking sides over a stingy deal (hardcore loss at the seat even when the
+  union signs), and levers that move only money and strike odds.
+- *Decision 5, how the union answers (5a):* a stated risk, then one roll. As the levers move, a
+  review step shows the union's read: will sign, on the edge (the chance of a stoppage as a
+  number), or will refuse. The player confirms once and the roll is made then, on the
+  agreement's own random stream. Certainty can always be bought by giving more. Not chosen: no
+  dice (a shown line the union signs at, so a stoppage is only ever chosen), and a mood in words
+  with the odds hidden.
+- *Decision 6, what a stoppage costs (6a):* the season is lost. No flagship season that year:
+  no matches, no champion, no gate or TV income at the seat, and the broadcast into other
+  markets goes dark. Deal clauses count as missed. Hardcore fans at the seat turn casual, as
+  after a betrayal. Players age a year. It ends with the union's ask as the deal, on a short
+  term: the fight and the season are both lost. Not chosen: a stoppage that runs on until the
+  player gives in or wins (a second lost season), and a shortened season with a champion.
+- *Decision 7, when the union arrives (7a):* at Professional. Amateur and Semi-Pro players are
+  not professionals, and those leagues pay as they do today, so the fragile early game is
+  untouched. When the flagship reaches Professional the union forms and the first agreement is
+  negotiated that offseason. Other leagues pay the fixed share from Professional up. The payout
+  above the reserve applies to every league at every tier (it does nothing while a league has
+  no surplus). Not chosen: at Elite only (cash would still pile up through the Professional
+  years), and from the first season (the whole early economy would need retuning).
+- *Starting numbers, not decided (tuning, to be set in config and measured):* other leagues' fixed
+  share 50% of revenue; a reserve of 3 years of costs. The reserve must still let a league save
+  for its next venue level; if 3 years of costs is less than that price, the reserve is the
+  larger of the two.
+- *Decision 8, late rewards (8a):* the PP half, measured before deciding. Bots show no PP surplus
+  since the growth tracks (1–2 turns of income on hand at turn 200, 23–26 of 60 levels unbought);
+  the playtest that showed one predates the tracks. What is broken is that late cards pay noise:
+  a champion card paid 22.5 PP against about 4,700 PP of income a turn. So early tiers keep PP,
+  and from tier 4 a card pays in what its story is about: season and business cards pay cash
+  into the flagship's reserve; tradition cards add a little tradition weight where they
+  happened; star cards extend a star's pull for a season; rival and sport cards win casual fans
+  in the card's country. All small, all local, none of it PP, so the #1 contest is not sped up
+  (scaling card PP up ended it, v1.32). Not chosen: cash only, new PP sinks (no surplus to sink
+  yet), and waiting for a playtest. No late PP sink is added; revisit after a long playtest with
+  the tracks.
 
 **Loss condition:** Before the win, the game ends if your *starting/anchor country's* league collapses (see League
 Health Ladder below). A collapse on the turn the hold would complete still ends the game: the loss
@@ -2391,7 +2464,8 @@ Items flagged during the interview that need further discussion in future sessio
 - Late rewards in what is scarce late (parked 2026-10-08, v1.32): late in a campaign PP piles up
   (~100K banked) and card PP rewards are noise, but scaling them up ends the #1 contest. Late cards
   could pay in fans, cash or culture instead. Needs a design session.
-- Collective bargaining agreement (parked 2026-10-09, third playtest): late leagues pile up cash
+- Collective bargaining agreement (parked 2026-10-09, third playtest; designed 2026-10-13 in
+  v1.39, see "the late surplus", with the late card rewards above it): late leagues pile up cash
   with nothing to spend it on (a turn-89 save held $2.87 trillion across leagues; the flagship
   earned $1.6B a quarter against $80M of costs). A CBA with a players' union would claim a share
   of league revenue through negotiated terms, with strikes or lockouts when talks fail, and act as

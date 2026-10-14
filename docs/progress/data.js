@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-10-13",
-  design: "GDD v1.38",
+  design: "GDD v1.39",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -106,6 +106,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-13",
+      type: "Designed",
+      title: "The late surplus: a collective bargaining agreement",
+      text: "GDD v1.39, tech plan 2.25 (planned, nothing built). Eight decisions, each recorded as it was settled. Measured in two 200-turn builder campaigns: the late surplus is cash, not PP. At turn 200 the flagship league held $260–647B against $0.5B of costs a year and the other leagues $10–11 trillion together, while PP on hand was 1–2 turns of income. Decision 1: a collective bargaining agreement closes the gap. Players claim a share of revenue, negotiated at the flagship every few seasons with a strike or lockout if talks fail; other leagues pay a fixed share with no decision. Decision 2: players take about half of revenue, the league keeps a reserve of a few years of costs, and cash above it is paid out to the clubs and leaves the game. Decision 3 (against the recommendation of a single answer): the talks have four levers the player sets, the share, the term, a salary cap and a minimum wage. Decision 4: each lever touches one system (the cap keeps clubs closer and limits star wages; a high minimum wage draws standouts from abroad). Decision 5: the review step shows the union's read with the chance of a stoppage as a number, and one roll is made on confirming. Decision 6: a stoppage loses the whole flagship season and ends on the union's ask. Decision 7: the union forms when the flagship reaches Professional; Amateur and Semi-Pro leagues pay as today. Decision 8, the PP half: bots show no PP surplus since the growth tracks, but late cards pay noise (22.5 PP against 4,700 a turn), so from tier 4 a card pays by its kind (cash into the flagship's reserve, tradition weight, a star's pull, casual fans) and no PP sink is added. Build order: the payout and fixed share, the agreement and talks, the lever effects, the stoppage, late card rewards.",
+    },
     {
       date: "2026-10-13",
       type: "Built",
