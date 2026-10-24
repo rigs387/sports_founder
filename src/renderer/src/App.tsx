@@ -145,6 +145,15 @@ export function App() {
         },
       )
     : "";
+  // The objective card shows only when it carries something to act on or watch: a tier at risk,
+  // focus slots to drop, a tier-up coming, the hold under way, or the win and Retire. The win
+  // rule itself lives in the Standings panel.
+  const needsAttention = !!snapshot?.tierTrack.atRisk || (snapshot?.tierTrack.slotsToDrop ?? 0) > 0;
+  const objectiveDue =
+    needsAttention ||
+    !!snapshot?.tierTrack.pendingTierUp ||
+    !!snapshot?.win.holding ||
+    (!!snapshot?.win.won && !retired);
 
   if (!snapshot) return <CampaignSetupScreen />;
 
@@ -557,8 +566,12 @@ export function App() {
             </div>
           </div>
         )}
-        {snapshot && (
-          <div className="objective-card" data-testid="race" data-rank={snapshot.win.rank}>
+        {snapshot && objectiveDue && (
+          <div
+            className={`objective-card${needsAttention ? " is-warning" : ""}`}
+            data-testid="race"
+            data-rank={snapshot.win.rank}
+          >
             <span aria-hidden="true">&#10022;</span>
             <div>
               <span className="eyebrow">{t("map.bigPicture")}</span>

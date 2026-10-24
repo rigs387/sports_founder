@@ -107,6 +107,12 @@ window.SF_PROGRESS = {
   ],
   history: [
     {
+      date: "2026-10-24",
+      type: "Built",
+      title: "World map cards straightened",
+      text: "Playtest polish. The country card and the objective card are no longer tilted. The objective card (The big picture) now shows only when it carries something: a tier at risk or focus slots to drop (outlined in the warning color), a tier-up coming, the #1 hold under way, or the win and Retire. The win rule stays in the Standings panel. The top bar keeps the Prestige and Fandom Score readouts on one line each; when the bar is tight its gaps narrow and only the nav gives way. npm run check: 653 tests in 71 files; smoke passed.",
+    },
+    {
       date: "2026-10-13",
       type: "Designed",
       title: "The late surplus: a collective bargaining agreement",

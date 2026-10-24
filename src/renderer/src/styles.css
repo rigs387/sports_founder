@@ -69,12 +69,16 @@ button {
 .game-topbar {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: clamp(12px, 1.4vw, 28px);
   padding: 0 27px;
   background: #213e6a;
   color: #fff;
   border-bottom: 3px solid #2d5482;
   z-index: 2;
+}
+/* Only the nav gives way when the bar is tight; it scrolls before anything else is squeezed. */
+.game-topbar > :not(.game-nav) {
+  flex-shrink: 0;
 }
 .game-brand {
   display: flex;
@@ -112,10 +116,15 @@ button {
 .game-nav {
   display: flex;
   align-self: stretch;
-  gap: 26px;
-  margin-left: 23px;
+  min-width: 0;
+  gap: clamp(10px, 1.2vw, 26px);
+  margin-left: clamp(0px, 1.6vw, 23px);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 .game-nav button {
+  flex: none;
+  white-space: nowrap;
   color: #c0d5ef;
   border: 0;
   border-bottom: 3px solid transparent;
@@ -131,15 +140,19 @@ button {
 }
 .resources {
   display: flex;
-  gap: 25px;
+  flex-shrink: 0;
+  gap: clamp(18px, 1.6vw, 32px);
   margin-left: auto;
+  padding-inline: 8px;
 }
-.resources > div {
+.resources > div,
+.resources > .stat-button {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 10px;
 }
-.resources > :where(div) > span {
+.resources > :where(div, .stat-button) > span {
   font-size: 28px;
   color: #86d3ec;
 }
@@ -152,6 +165,7 @@ button {
 }
 .resources b {
   font-size: 20px;
+  white-space: nowrap;
 }
 .icon-button {
   width: 37px;
@@ -277,7 +291,6 @@ h1 em {
   box-shadow:
     5px 7px #7da6bf,
     inset 0 0 0 4px #edf5ff;
-  transform: rotate(-0.65deg);
   scrollbar-width: thin;
 }
 .card-series {
@@ -571,7 +584,6 @@ h2 {
   border-left: 6px solid #3b79d5;
   border-radius: 9px;
   box-shadow: 4px 4px #7da6bf;
-  transform: rotate(-1.4deg);
 }
 .objective-card > span {
   color: var(--second);
@@ -589,6 +601,12 @@ h2 {
   line-height: 1.4;
 }
 .objective-card .warning {
+  color: var(--warning);
+}
+.objective-card.is-warning {
+  border-color: var(--warning);
+}
+.objective-card.is-warning > span {
   color: var(--warning);
 }
 .quick-stat {
@@ -909,7 +927,7 @@ h2 {
     padding-inline: 20px;
   }
   .resources {
-    gap: 13px;
+    gap: 20px;
   }
   .world-note {
     display: none;
