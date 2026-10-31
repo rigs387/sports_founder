@@ -7,7 +7,7 @@ import { fandomScore } from "./fandom";
 import { backingEffects, broadcastEffects, closeOffseason, stepFlagshipQuarter } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { type GrowthFactors, growthFactors } from "./growth";
-import { leagueCosts } from "./league-costs";
+import { leagueCosts, leagueReserve } from "./league-costs";
 import { stepLeagueQuarter } from "./leagues";
 import { poachableHardcore, poachingRates } from "./poaching";
 import { ppWeights, quarterPpIncome } from "./prices";
@@ -193,6 +193,7 @@ export function stepQuarter(
       quarter,
       leagueIncomePerQuarter(state, world, index, moved),
       leagueCosts(state, world, index, moved).total,
+      leagueReserve(state, world, index, moved),
     );
     if (business.landmark) found.push(business.landmark);
     return business.country;

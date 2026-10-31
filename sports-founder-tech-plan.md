@@ -1575,8 +1575,8 @@ the designer on 2026-10-13; see the GDD.
 
 ### 2.25 Build Plan: The Late Surplus (GDD v1.39)
 
-Designed, nothing built. Eight decisions, all in the GDD ("the late surplus"). One step per
-session; each ends with `npm run check`, `npm run smoke`, the docs and a commit.
+Designed; step 1 built 2026-10-30. Eight decisions, all in the GDD ("the late surplus"). One
+step per session; each ends with `npm run check`, `npm run smoke`, the docs and a commit.
 
 1. **The payout and the fixed share (money only, no talks).** Every league pays cash above its
    reserve out to the clubs each quarter (it leaves the game): reserve = the larger of
@@ -1588,6 +1588,12 @@ session; each ends with `npm run check`, `npm run smoke`, the docs and a commit.
    Measure before and after: league cash by tier, folds, turns at Near-Collapse, the Elite seat's
    income mix (`balanceTargets.money`), the deal slate, and the collapse experiment. Risk: this
    step can break mid-game solvency; it is the one to tune hardest.
+   *Built 2026-10-30:* `leagues.players` and `leagues.payout` in config, the default agreement
+   in `flagship.agreement`; `leagueReserve` and `playersShare` in `league-costs.ts`, the payout
+   in `stepLeagueQuarter`, `LeagueState.paidOut` (no format bump; old saves default to 0).
+   The payout takes only a quarter's profit, and the health check reads operating flow with
+   payouts added back: otherwise a league held at its reserve read every dip as a growing loss.
+   Measurements are in the GDD.
 2. **The agreement and the talks.** `GameState.agreement` (a new save format): the levers in
    force (share, term, cap, minimum wage), the season it expires, its own random stream. The
    union's ask and its read of an offer (`will sign`, a chance, `will refuse`) are computed in

@@ -145,6 +145,9 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   };
   const CLAUSE_KINDS = ["balance", "star", "fans"];
   let seatTurns = 0;
+  // Every league's turns, and those at Near-Collapse (GDD v1.39: the payout must not break them).
+  let leagueTurns = 0;
+  let leagueNearCollapseTurns = 0;
   // Venues and payroll at the seat (GDD v1.30).
   let gateLost = 0;
   let payrollShare = 0;
@@ -174,6 +177,11 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     broadcastReaches ||=
       broadcastEffects(current, world).countryId !== null &&
       mediaReachFrom(world, seatIndex).size > 0;
+    for (const country of current.countries) {
+      if (!country.league) continue;
+      leagueTurns += 1;
+      if (country.league.health === "near-collapse") leagueNearCollapseTurns += 1;
+    }
     const seat = world.countries.findIndex((c) => c.id === current.flagship.countryId);
     const seatLeague = current.countries[seat]?.league ?? null;
     if (seatLeague) {
@@ -600,6 +608,27 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           topSeedTitles: tournaments.filter((t) => seed(t) <= 4).length,
         };
       })(),
+      money: {
+        // Each league's cash at the end in years of its costs, by tier (GDD v1.39).
+        cashYears: state.countries.flatMap((country, i) => {
+          const league = country.league;
+          if (!league) return [];
+          const costs = leagueCosts(state, world, i).total;
+          return [
+            {
+              tier: league.tier,
+              cash: league.cash,
+              years: costs > 0 ? league.cash / (4 * costs) : 0,
+            },
+          ];
+        }),
+        seatCash: (() => {
+          const i = world.countries.findIndex((c) => c.id === state.flagship.countryId);
+          return state.countries[i]?.league?.cash ?? 0;
+        })(),
+        folds: state.landmarks.filter((l) => l.kind === "leagueFolded").length,
+        nearCollapseShare: leagueNearCollapseTurns / Math.max(1, leagueTurns),
+      },
       remembers: {
         players: state.hallOfFame.inductees.length,
         // Seasons since the flagship's league first turned Professional (GDD v1.35: the Hall aims at

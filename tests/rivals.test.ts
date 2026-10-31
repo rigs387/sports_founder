@@ -548,6 +548,7 @@ describe("each countermove has its effect", () => {
         1,
         leagueIncomePerQuarter(state, world, index, country),
         leagueCosts(state, world, index, country).total,
+        Infinity,
       ).country.league?.cash ?? 0;
     const cashOpen = cash(open);
     const cashLocked = cash(locked);

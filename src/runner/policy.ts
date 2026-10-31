@@ -30,6 +30,7 @@ import {
   heldStrength,
   leagueCosts,
   leagueIncomePerQuarter,
+  leagueReserve,
   leverMultipliers,
   nationalTeams,
   nodeCost,
@@ -464,7 +465,11 @@ function buildVenues(step: BotStep, world: World, full: number, reserveQuarters:
   const hardcore = country?.fans[PLAYER_INDEX]?.hardcore ?? 0;
   if (!terms || !league) return;
   if (hardcore < full * venueCapacity(world, index, league.venue.level)) return;
-  const reserve = reserveQuarters * leagueCosts(step.state, world, index).total;
+  // The league's own reserve may be the venue's price alone (GDD v1.39): cash never passes it.
+  const reserve = Math.min(
+    reserveQuarters * leagueCosts(step.state, world, index).total,
+    leagueReserve(step.state, world, index) - terms.price,
+  );
   if (league.cash - terms.price < reserve) return;
   attempt(step, world, { type: "buildVenue" });
 }

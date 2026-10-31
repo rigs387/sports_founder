@@ -781,6 +781,8 @@
       "newRunningCosts": "Quarterly running costs: {{current, money}} now; {{next, money}} after the change.",
       "newIncome": "Quarterly income at the new tier with today's fans and venue: {{income, money}}.",
       "shortfall": "That is {{gap, money}} a quarter less than it will cost to run. The league would lose cash every quarter until it grows into the tier.",
+      "paidOut": "Paid out to clubs",
+      "reserveNote": "The league keeps a reserve of {{reserve, money}}. Profit above it is paid out to the clubs.",
       "costLines": "Operations {{operations, money}} · payroll {{payroll, money}} · star wages {{wages, money}} · venue upkeep {{upkeep, money}}.",
       "restructureLoss": "{{share, number(style: percent)}} of hardcore fans become casual ({{count, number}} fans). They remain fans of your sport.",
       "restructureCash": "No cash or Prestige is spent. The current cash reserve is kept.",

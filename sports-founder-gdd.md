@@ -396,6 +396,18 @@ is the second part of this topic. Cash comes first.
   clubs take everything each quarter (venues would need a new way to be paid for), a players'
   share only (the problem returns later), a share set to close the gap alone (about 90%, far
   from any real league).
+- *Built 2026-10-30 (tech plan 2.25 step 1, the payout and the fixed share):* every league keeps
+  a reserve, the larger of 3 years of its costs and its next venue level's price; a quarter's
+  profit above it is paid out to the clubs, never more than that quarter's profit, so a one-off
+  windfall (hosting) stays until it is spent or lost. From Professional up the players take
+  50% of income in place of the payroll baseline; the flagship runs on a default agreement at
+  50% until the talks. A payout is not a loss: league health reads operating flow, payouts
+  added back. Measured in three 200-turn builder campaigns: Elite league cash at the end fell
+  from $10.6T to $0.44T a campaign (834 to 3.0 years of costs), the seat's from $5.5B to $0.3B;
+  wins 3/3 both, the win median turn 146 to 153 (the seat promotes later), #1 lost before the
+  win in 2/3 (1/3 before); no folds and no Near-Collapse; the collapse experiment unchanged.
+  The league card shows the reserve and what is paid out. Away from the seat the reserve still
+  counts the next venue level, which only the seat builds, so small leagues never pay out.
 - *Decision 3, how the talks work (3b, against the recommendation of a single answer to the
   union's ask):* several levers on the table. The player sets the players' share, the term
   length, a salary cap and a minimum wage, each with its own effect. Deeper and closer to real

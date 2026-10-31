@@ -158,6 +158,15 @@ export interface CampaignResult {
     modernized: number;
     records: number;
   };
+  /** League money at the end (GDD v1.39). */
+  money: {
+    /** Every league's cash, and cash in years of its costs. */
+    cashYears: { tier: LeagueTierId; cash: number; years: number }[];
+    seatCash: number;
+    folds: number;
+    /** Share of every league's turns spent at Near-Collapse. */
+    nearCollapseShare: number;
+  };
   /** The World Championship (GDD v1.37). */
   championship: {
     /** The turn it was founded, if it was. */
@@ -515,6 +524,25 @@ export function venuesAggregate(results: CampaignResult[]) {
     opened: total((r) => r.venues.opened),
     modernized: total((r) => r.venues.modernized),
     records: total((r) => r.venues.records),
+  };
+}
+
+/** League money across campaigns (GDD v1.39): cash by tier at the end, folds, Near-Collapse. */
+export function moneyAggregate(results: CampaignResult[]) {
+  const tiers = LEAGUE_TIERS.map((tier) => {
+    const at = results.flatMap((r) => r.money.cashYears.filter((l) => l.tier === tier));
+    return {
+      tier,
+      leagues: at.length / Math.max(1, results.length),
+      years: median(at.map((l) => l.years)),
+      cash: at.reduce((sum, l) => sum + l.cash, 0) / Math.max(1, results.length),
+    };
+  });
+  return {
+    tiers,
+    seatCash: median(results.map((r) => r.money.seatCash)),
+    folds: distribution(results.map((r) => r.money.folds)),
+    nearCollapseShare: distribution(results.map((r) => r.money.nearCollapseShare)),
   };
 }
 

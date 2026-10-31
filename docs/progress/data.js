@@ -1,7 +1,7 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-13",
+  updated: "2026-10-30",
   design: "GDD v1.39",
   stage: "Phase 1 · make it matter",
   markets: 213,
@@ -12,11 +12,11 @@ window.SF_PROGRESS = {
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
-    date: "2026-10-13",
-    tests: 653,
-    files: 71,
-    note: "npm run check passed after retiring and the retrospective were built (type checks, Biome, purity, 653 tests in 71 files). Lint has existing visual-study warnings.",
-    smokeDate: "2026-10-13",
+    date: "2026-10-30",
+    tests: 658,
+    files: 72,
+    note: "npm run check passed after the late surplus's payout and players' share were built (type checks, Biome, purity, 658 tests in 72 files). Lint has existing visual-study warnings.",
+    smokeDate: "2026-10-30",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
   },
@@ -106,6 +106,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-30",
+      type: "Built",
+      title: "The payout and the players' share",
+      text: "GDD v1.39, tech plan 2.25 step 1 of 5 (money only, no talks). Every league keeps a reserve, the larger of 3 years of its costs and its next venue level's price; a quarter's profit above it is paid out to the clubs and leaves the game, never more than that quarter's profit. From Professional up the players are paid 50% of income instead of the payroll baseline (the flagship on its default agreement, also 50%, until the talks). The health check now reads operating flow, payouts included: without that a league held at its reserve read every dip as a growing loss, the seat sat at Struggling, its broadcast weakened and bots spent their PP on bailouts (wins fell from 3/3 to 1/3). The league card shows the reserve and what is paid out. Measured in three 200-turn builder campaigns, before and after: Elite league cash at the end $10.6T to $0.44T a campaign (834 to 3.0 years of costs), Professional $54B to $1.7B, the seat league $5.5B to $0.3B; wins 3/3 both, win turn median 146 to 153 (the seat promotes later), #1 lost before the win in 1/3 to 2/3; no folds, Near-Collapse 0% both; growth nodes 41 to 39; the Elite income mix unchanged; the Semi-Pro deal slate 115% to 109% (target 110–160%, more Semi-Pro seasons sampled). The collapse experiment (greedy-spread, Hungary, Nigeria, Germany, 15 seeds, 80 turns) is identical before and after. The runner prints league cash by tier, folds and Near-Collapse. npm run check: 658 tests in 72 files; smoke passed.",
+    },
     {
       date: "2026-10-24",
       type: "Built",
@@ -831,7 +837,7 @@ window.SF_PROGRESS = {
       icon: "08",
       summary:
         "The flagship signs TV, sponsor and naming-rights deals with demands, builds its venue and pays its stars; other leagues keep one media line.",
-      next: "Watch the Elite deal slate (at 120%, the top of its band); youth programs, standing policies and ticket pricing are parked.",
+      next: "The players' agreement and its talks (tech plan 2.25 step 2); watch the Semi-Pro deal slate (109%, just under its band).",
       depends: ["leagues"],
       sources: [
         ["Current league finances", "../league-management/README.md"],
@@ -849,6 +855,14 @@ window.SF_PROGRESS = {
         ["built", "Deal demands, exclusivity, breaches, renewals and the naming-rights betrayal"],
         ["built", "Flagship venues: a gate cap, levels built over seasons, upkeep (GDD v1.30)"],
         ["built", "Flagship payroll: star wages rising with careers (GDD v1.30)"],
+        [
+          "built",
+          "The late surplus: a reserve with profit above it paid out, players paid a share of income from Professional up (GDD v1.39)",
+        ],
+        [
+          "planned",
+          "The players' agreement at the flagship: talks, levers and the stoppage (tech plan 2.25 steps 2–4)",
+        ],
       ],
     },
     {

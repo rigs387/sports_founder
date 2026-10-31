@@ -40,6 +40,7 @@ import {
   flagshipAggregate,
   growthAggregate,
   median,
+  moneyAggregate,
   nodeOutcomesCsv,
   optionOutcomesCsv,
   remembersAggregate,
@@ -805,6 +806,19 @@ function main(): number {
       )
       .join("; ");
     console.log(`  Deal clauses: ${clauseLine || "none signed"}`);
+    const money = moneyAggregate(results);
+    const dollars = (cash: number) =>
+      `$${((cash * world.config.money.dollarsPerCash) / 1e9).toFixed(1)}B`;
+    console.log(
+      `  League cash at the end, by tier (leagues per campaign, median years of costs held, total dollars per campaign): ${money.tiers
+        .filter((t) => t.leagues > 0)
+        .map(
+          (t) => `${t.tier} ${fmt(t.leagues)} (${(t.years ?? 0).toFixed(1)} y, ${dollars(t.cash)})`,
+        )
+        .join(
+          "; ",
+        )}; seat league median ${dollars(money.seatCash ?? 0)}; leagues folded per campaign median ${fmt(money.folds.median)} (max ${fmt(money.folds.max)}); league-turns at Near-Collapse median ${pct(money.nearCollapseShare.median ?? 0)}`,
+    );
     const venues = venuesAggregate(results);
     console.log(
       `  Venues: gate lost to the cap median ${pct(venues.gateLost.median ?? 0)} (max ${pct(venues.gateLost.max ?? 0)}); level at the offseason by league tier ${venues.levels

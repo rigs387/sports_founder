@@ -47,6 +47,8 @@ const leagueSchema = z.strictObject({
   tier: leagueTierSchema,
   health: healthLevelSchema,
   cash: z.number(),
+  // Joined format 32 without a bump (GDD v1.39): older saves have paid nothing out.
+  paidOut: z.number().min(0).default(0),
   lastFlowPerQuarter: z.number().nullable(),
   hardcoreAtLastEval: count,
   formedQuarter: count,

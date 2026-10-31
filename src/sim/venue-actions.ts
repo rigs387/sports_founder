@@ -1,6 +1,6 @@
 import { offseasonOpen } from "./calendar";
 import { modernizeGrounds } from "./culture";
-import { venueCostBasis } from "./leagues";
+import { nextVenuePrice, venueCostBasis } from "./leagues";
 import { landmarks } from "./records";
 import type { GameState, Landmark, World } from "./types";
 import { groundSize, venueCapacity } from "./venues";
@@ -36,13 +36,13 @@ export function venueTerms(state: GameState, world: World): VenueTerms | null {
   if (!league) return null;
   const settings = world.config.leagues.venue;
   const level = league.venue.level + 1;
-  const priceQuarters = settings.priceQuarters[level - 2];
+  const price = nextVenuePrice(world, index, league.tier, league.venue.level, state.growthNodes);
   const seasons = settings.buildSeasons[level - 2];
-  if (priceQuarters === undefined || seasons === undefined) return null;
+  if (price === null || seasons === undefined) return null;
   const basis = venueCostBasis(world, index, league.tier, level, state.growthNodes);
   return {
     level,
-    price: priceQuarters * basis,
+    price,
     seasons,
     opensSeason: state.flagship.season + seasons,
     capacity: venueCapacity(world, index, level),

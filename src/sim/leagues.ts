@@ -73,6 +73,19 @@ export function venueCostBasis(
   return runningCostPerQuarter(world, countryIndex, basis, owned);
 }
 
+/** The price of a league's next venue level (GDD v1.30), or null at the top. */
+export function nextVenuePrice(
+  world: World,
+  countryIndex: number,
+  tier: LeagueTierId,
+  level: number,
+  owned: readonly string[],
+): number | null {
+  const priceQuarters = world.config.leagues.venue.priceQuarters[level - 1];
+  if (priceQuarters === undefined) return null;
+  return priceQuarters * venueCostBasis(world, countryIndex, tier, level + 1, owned);
+}
+
 /** Upkeep a quarter on every venue level above 1 (GDD v1.30), each at its own cost basis. */
 export function venueUpkeep(
   world: World,
@@ -155,6 +168,7 @@ export function newLeague(
     tier: "amateur",
     health: "healthy",
     cash,
+    paidOut: 0,
     lastFlowPerQuarter: null,
     hardcoreAtLastEval: hardcore,
     formedQuarter: quarter,
@@ -238,6 +252,8 @@ export function stepLeagueQuarter(
   income: number,
   /** The league's costs this quarter (leagueCosts in src/sim/league-costs.ts). */
   cost: number,
+  /** The cash it keeps (leagueReserve): profit above it is paid out (GDD v1.39). */
+  reserve: number,
 ): QuarterLeagueResult {
   const fans = country.fans[PLAYER_INDEX];
   if (!fans) throw new Error(`No player fans in "${country.countryId}"`);
@@ -260,8 +276,13 @@ export function stepLeagueQuarter(
   }
 
   const league = country.league;
+  const cash = league.cash + income - cost;
+  const paidOut = Math.max(0, Math.min(income - cost, cash - reserve));
   return {
-    country: { ...country, league: { ...league, cash: league.cash + income - cost } },
+    country: {
+      ...country,
+      league: { ...league, cash: cash - paidOut, paidOut: league.paidOut + paidOut },
+    },
     landmark: null,
   };
 }
@@ -347,7 +368,8 @@ export function evaluateLeagues(
     const fans = country.fans[PLAYER_INDEX];
     if (!fans) throw new Error(`No player fans in "${country.countryId}"`);
 
-    const flowPerQuarter = (league.cash - prior.cash) / quarters;
+    // Operating flow: a payout to the clubs is profit, not a loss (GDD v1.39).
+    const flowPerQuarter = (league.cash + league.paidOut - prior.cash - prior.paidOut) / quarters;
     const base = Math.max(1, league.hardcoreAtLastEval);
     const signals: HealthSignals = {
       cash: league.cash,
@@ -358,6 +380,7 @@ export function evaluateLeagues(
     const step = stepHealth(prior.health, targetSeverity(signals, world.config));
     const evaluated: LeagueState = {
       ...league,
+      paidOut: 0,
       lastFlowPerQuarter: flowPerQuarter,
       hardcoreAtLastEval: fans.hardcore,
     };

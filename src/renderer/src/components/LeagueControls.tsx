@@ -240,7 +240,16 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
             })}
           </dd>
         </div>
+        {league.paidOutPerQuarter > 0 && (
+          <div data-testid="league-paid-out">
+            <dt>{t("league.manage.paidOut")}</dt>
+            <dd>{t("league.manage.money", { value: league.paidOutPerQuarter })}</dd>
+          </div>
+        )}
       </dl>
+      <p className="league-finance-note">
+        {t("league.manage.reserveNote", { reserve: league.reserve })}
+      </p>
       {league.costs.payroll + league.costs.wages + league.costs.upkeep > 0 && (
         <p className="league-finance-note" data-testid="league-cost-lines">
           {t("league.manage.costLines", { ...league.costs })}

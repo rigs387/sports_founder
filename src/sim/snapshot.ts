@@ -19,7 +19,7 @@ import {
 import { type HallSnapshot, hallSnapshot } from "./hall-of-fame";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
 import { bulkPromotable, type LeagueActions, leagueActions } from "./league-actions";
-import { type LeagueCosts, leagueCosts } from "./league-costs";
+import { type LeagueCosts, leagueCosts, leagueReserve } from "./league-costs";
 import { type LegacySnapshot, legacySnapshot } from "./legacy";
 import { type NationalTeamSnapshot, nationalTeamSnapshots } from "./national-teams";
 import { ppWeights, quarterPpIncome } from "./prices";
@@ -68,6 +68,10 @@ export interface LeagueSnapshot {
   /** The cost lines (GDD v1.30): payroll and wages only at the seat. */
   costs: LeagueCosts;
   lastFlowPerQuarter: number | null;
+  /** The cash it keeps (GDD v1.39); profit above it is paid out to the clubs. */
+  reserve: number;
+  /** What a quarter at today's income and costs would pay out to the clubs. */
+  paidOutPerQuarter: number;
   /** The venue (GDD v1.30): capacity caps the gate only at the seat. */
   venue: {
     level: number;
@@ -414,6 +418,8 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     const score = fandomScore(fans.casual, fans.hardcore, casualWeight);
     const league = countryState.league;
     const costs = leagueCosts(state, world, index);
+    const income = leagueIncomePerQuarter(state, world, index);
+    const reserve = leagueReserve(state, world, index);
     return {
       countryId: country.id,
       population: country.population,
@@ -457,10 +463,15 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
             actions: leagueActions(state, world, index) as LeagueActions,
             health: league.health,
             cash: league.cash,
-            revenuePerQuarter: leagueIncomePerQuarter(state, world, index),
+            revenuePerQuarter: income,
             runningCostPerQuarter: costs.total,
             costs,
             lastFlowPerQuarter: league.lastFlowPerQuarter,
+            reserve,
+            paidOutPerQuarter: Math.max(
+              0,
+              Math.min(income - costs.total, league.cash + income - costs.total - reserve),
+            ),
             venue: {
               level: league.venue.level,
               capacity: venueCapacity(world, index, league.venue.level),

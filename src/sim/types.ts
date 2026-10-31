@@ -74,6 +74,8 @@ export interface LeagueState {
   health: HealthLevel;
   /** League cash. May go below zero, which is what collapse means. */
   cash: number;
+  /** Profit paid out to the clubs since the last health evaluation (GDD v1.39). */
+  paidOut: number;
   /** Operating cash flow per quarter over the last evaluated turn; null before the first. */
   lastFlowPerQuarter: number | null;
   /** Player hardcore fans in the country at the last health evaluation (before demotions). */

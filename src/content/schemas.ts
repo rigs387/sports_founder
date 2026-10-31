@@ -943,6 +943,10 @@ export const configFileSchema = z.strictObject({
         (bands) => bands.every((band, i) => i === 0 || band.below > (bands[i - 1]?.below ?? 0)),
         "ceilings must be in ascending population order",
       ),
+    /** The players' share from fromTier up (GDD v1.39). */
+    players: z.strictObject({ fromTier: leagueTierSchema, share: unitInterval }),
+    /** Cash above the reserve is paid out to the clubs (GDD v1.39). */
+    payout: z.strictObject({ reserveYears: z.number().positive() }),
     bailout: z.strictObject({
       ppQuarters: z.number().min(0),
       cashQuarters: z.number().min(0),
@@ -1327,6 +1331,8 @@ export const configFileSchema = z.strictObject({
     }),
     /** A new club's place is drawn with weight population ^ placeWeightExponent. */
     placeWeightExponent: z.number().min(0),
+    /** The default players' agreement (GDD v1.39). */
+    agreement: z.strictObject({ share: unitInterval }),
     /** Payroll (GDD v1.30): star wages as shares of the league's running cost. */
     payroll: z.strictObject({
       baselineShare: unitInterval,

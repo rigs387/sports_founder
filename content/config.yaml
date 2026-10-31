@@ -476,6 +476,18 @@ leagues:
       struggling: 0.02
       near-collapse: 0.05
       collapsed: 0.25
+  # The late surplus (GDD v1.39). From fromTier up, a league's players are paid a share of its
+  # income (the payroll line) instead of payroll.baselineShare of the running cost; the rest of
+  # the running cost is operations. Other leagues pay share; the flagship pays its agreement's
+  # (flagship.agreement). Every league keeps a reserve: the larger of reserveYears of its costs
+  # and the price of its next venue level. A quarter's profit above the reserve is paid out to
+  # the clubs and leaves the game; the payout never takes more than that quarter's profit, so
+  # it never reads as a loss to the health check.
+  players:
+    fromTier: professional
+    share: 0.5
+  payout:
+    reserveYears: 3
   # Voluntary step-down at Near-Collapse: one tier down, reset to Struggling, demote this share.
   stepDown:
     hardcoreDemotionShare: 0.05
@@ -962,6 +974,10 @@ flagship:
   # league without stars) plus each star's wage per quarter = wageShare × the running cost × (1 +
   # perSeason × seasons as a star after the first) × (1 + perInfluence × backed influence). A wage
   # ends when the star retires or moves. Never from skill.
+  # The players' agreement at the flagship (GDD v1.39). Until the talks are built (tech plan 2.25
+  # step 2) it runs on the default, the middle of every lever: share of income to the players.
+  agreement:
+    share: 0.5
   payroll:
     baselineShare: 0.3
     wageShare: 0.06
