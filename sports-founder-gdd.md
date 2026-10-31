@@ -479,6 +479,8 @@ is the second part of this topic. Cash comes first.
   league folded. Wins by turn 150 fell from 3/3 to 1/3, #1 was lost 6 times instead of 3, the
   longest hold max 43 to 39 turns. Stoppages make the late cap matter more: it was already priced
   past the safe range late (6–8 stars), and a refusal now costs a season, so it is out of reach.
+  *Decided 2026-10-31:* a late cap that is hard to get is fine; it stays as it is. Bots' stoppage
+  risk is not tuned (media-rush's 40% is a bot's choice, not a balance target).
 - *Decision 7, when the union arrives (7a):* at Professional. Amateur and Semi-Pro players are
   not professionals, and those leagues pay as they do today, so the fragile early game is
   untouched. When the flagship reaches Professional the union forms and the first agreement is

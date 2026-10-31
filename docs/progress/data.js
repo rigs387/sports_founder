@@ -855,7 +855,7 @@ window.SF_PROGRESS = {
       icon: "08",
       summary:
         "The flagship signs TV, sponsor and naming-rights deals with demands, builds its venue and pays its stars; other leagues keep one media line.",
-      next: "Late card rewards by kind (tech plan 2.25 step 5); decide whether the cap should stay out of reach late (6–8 stars price it past the share range, and now a refusal costs a season); decide whether bots should take less stoppage risk (media-rush loses 6 seasons a campaign); watch the Semi-Pro deal slate (109%, just under its band).",
+      next: "Late card rewards by kind (tech plan 2.25 step 5); watch the Semi-Pro deal slate (109%, just under its band).",
       depends: ["leagues"],
       sources: [
         ["Current league finances", "../league-management/README.md"],
