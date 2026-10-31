@@ -1,7 +1,7 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-30",
+  updated: "2026-10-31",
   design: "GDD v1.39",
   stage: "Phase 1 · make it matter",
   markets: 213,
@@ -106,6 +106,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-31",
+      type: "Built",
+      title: "What the agreement's levers do",
+      text: "GDD v1.39, tech plan 2.25 step 3 of 5. With a salary cap in force the flagship's club ratings revert to the league mean 50% harder at each season's end and drift at random 25% less, and no star's wage rises past 1.5 times a new star's. The minimum wage scales the chance that an opening draws a standout from abroad on its own (× 0.6 low, × 1 standard, × 1.4 high). The union now counts minimum-wage points at half a share point; one for one, a high floor traded for share points would have been free once it drew talent. The growth tree's Salary Cap and Star Pay no longer scale the negotiated players' share from Professional up (a 50% share paid 37.5% or 62.5%); they still scale star wages and the payroll baseline below Professional, and the node's cap stacks with the agreement's. The card's cap and minimum wage hints say what they do. The builder bot values the cap at 3 pay points, so the runner sees it; the runner prints close finishes, capped seasons, talents pulled and the caps and minimum wages signed. Three 200-turn builder campaigns, before and after: the cap in 5 of 79 agreements (15 seasons, early, while few stars played); the most successful club's share of titles 15% to 12%, different champions 16 to 17, close finishes 41% both; star wages 7% of the seat's costs both; talents pulled 60 to 54 a campaign (low minimum wage in 2 agreements, high in none); wins 3/3 both, win turn median 151 to 145, #1 lost before the win 2/3 to 1/3. Late the cap cannot be bought without a stoppage risk: 6–8 stars make it worth 4–5 points to the union while its ask is already 55%, the top of the range. Checks: type check, Biome, purity and the new lever tests pass; 8 long tests time out at 30 s on a slow machine, the same 8 before the change, and the 7 files pass with a longer timeout. Smoke failed twice in the star step: auto-collect held a Next Turn click on the shifted campaign path; the step now clicks again, not yet re-run (the run was stopped for low memory).",
+    },
     {
       date: "2026-10-30",
       type: "Built",
@@ -843,7 +849,7 @@ window.SF_PROGRESS = {
       icon: "08",
       summary:
         "The flagship signs TV, sponsor and naming-rights deals with demands, builds its venue and pays its stars; other leagues keep one media line.",
-      next: "What the levers do: the cap and the minimum wage's talent pull (tech plan 2.25 step 3); watch the Semi-Pro deal slate (109%, just under its band).",
+      next: "The stoppage's lost season (tech plan 2.25 step 4); decide whether the cap should stay out of reach late (6–8 stars price it past the share range); watch the Semi-Pro deal slate (109%, just under its band).",
       depends: ["leagues"],
       sources: [
         ["Current league finances", "../league-management/README.md"],
@@ -870,9 +876,10 @@ window.SF_PROGRESS = {
           "The players' agreement at the flagship: the union, four levers, its read and one roll (GDD v1.39)",
         ],
         [
-          "planned",
-          "What the cap and minimum wage do, and the stoppage's lost season (tech plan 2.25 steps 3–4)",
+          "built",
+          "What the levers do: the cap evens clubs and limits star wages, the minimum wage moves talent pull (tech plan 2.25 step 3)",
         ],
+        ["planned", "The stoppage's lost season (tech plan 2.25 step 4)"],
       ],
     },
     {

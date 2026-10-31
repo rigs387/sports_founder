@@ -262,8 +262,13 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   `agreementSigned` landmark. Shares are whole percent; `termsInForce` and
   `agreementPayShare` (`league-costs.ts`) price the seat's payroll. The card is
   `src/renderer/src/agreement/AgreementCard.tsx`, on the offseason screen only; its smoke step
-  (`src/main/agreement-smoke.ts`) runs after the retirement step on the late-game save. Next:
-  the cap and the minimum wage's talent pull (step 3), then the stoppage's lost season (step 4).
+  (`src/main/agreement-smoke.ts`) runs after the retirement step on the late-game save.
+  The levers (step 3, config `flagship.agreement.cap` and `.talentPull`): a cap in force
+  (`capInForce`, `flagship.ts`) evens ratings in `driftRatings` and limits `starWage`; the
+  minimum wage scales `pullChance` (`talent.ts`); the union counts minimum-wage points at
+  `union.minWageWeight`. The agreement owns pay from Professional up: the growth tree's
+  `wageFactor` scales star wages and the payroll baseline below it, never the negotiated share.
+  Next: the stoppage's lost season (step 4).
 - Venues and payroll (GDD v1.30) are the flagship's only: `LeagueState.venue` (level 1–5, a build,
   the record crowd) on every league, built only at the seat. `src/sim/venues.ts` (capacity, the
   conversion lift), `src/sim/venue-actions.ts` (`buildVenue` in the offseason; `openVenues` when

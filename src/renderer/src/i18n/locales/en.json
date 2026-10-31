@@ -1192,9 +1192,9 @@
     "seasons_one": "{{count}} {{seasonNoun}}",
     "seasons_other": "{{count}} {{seasonsNoun}}",
     "cap": "Salary cap",
-    "capHint": "Keeps the clubs closer in strength and limits star wages. The union counts it against the offer, more so with more stars.",
+    "capHint": "Keeps the clubs closer in strength, so title races are tighter, and stops star wages rising after a few seasons. The union counts it against the offer, more so with more stars.",
     "minWageLabel": "Minimum wage",
-    "minWageHint": "A high floor costs a little more and draws standouts from abroad.",
+    "minWageHint": "A high floor costs more than the union credits it and makes standouts abroad keener to join. A low one saves a little and puts them off.",
     "read": {
       "sign": "The union will sign.",
       "edge": "On the edge: {{chance, number(style: percent; maximumFractionDigits: 0)}} chance of a stoppage.",

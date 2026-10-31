@@ -136,6 +136,12 @@ const TURTLE_RESERVE_BAILOUTS = 2;
  * deal. The random bot proposes nothing, so End Turn takes the union's ask.
  */
 const AGREEMENT_RISK = { greedySpread: 0.5, builder: 0, anchorTurtle: 0, mediaRush: 0.4 };
+/**
+ * What a salary cap is worth to the builder in pay points (GDD v1.39): closer title races mean
+ * gripping seasons for the broadcast and kept balance clauses. It takes the cap while the union
+ * counts it at no more than this; with many stars at the seat the cap costs more and it drops it.
+ */
+const BUILDER_CAP_WORTH = 3;
 
 export interface BotStep {
   state: GameState;
@@ -451,13 +457,14 @@ function runChampionship(step: BotStep, world: World): void {
 }
 
 /**
- * Puts the cheapest agreement to the union (the lowest pay share, then the longest term) whose
- * chance of a stoppage is at most `risk` (GDD v1.39).
+ * Puts the cheapest agreement to the union (the lowest pay share, less `capWorth` points for a
+ * salary cap, then the longest term) whose chance of a stoppage is at most `risk` (GDD v1.39).
  */
-function negotiate(step: BotStep, world: World, risk: number): void {
+function negotiate(step: BotStep, world: World, risk: number, capWorth = 0): void {
   if (!talksOpen(step.state, world)) return;
   const { offers, minWages } = agreementSnapshot(step.state, world);
-  const pay = (terms: AgreementTerms) => terms.share + minWages[terms.minWage];
+  const pay = (terms: AgreementTerms) =>
+    terms.share + minWages[terms.minWage] - (terms.cap ? capWorth : 0);
   let best: AgreementTerms | null = null;
   for (const offer of offers) {
     if (offer.chance > risk) continue;
@@ -563,7 +570,7 @@ function builderTurn(state: GameState, world: World, options: BotOptions): BotSt
   backStars(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   buildVenues(step, world, VENUE_FULL.builder, VENUE_RESERVE_QUARTERS.builder);
   signDeals(step, world);
-  negotiate(step, world, AGREEMENT_RISK.builder);
+  negotiate(step, world, AGREEMENT_RISK.builder, BUILDER_CAP_WORTH);
   runChampionship(step, world);
   buyNodes(
     step,

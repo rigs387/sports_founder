@@ -982,12 +982,18 @@ flagship:
   #   terms     seasons an agreement may run, shortest first
   #   minWages  payroll points of income on top of the share, by minimum wage
   # The union (tuning, GDD decisions 4 and 5) values an offer in share points: share + the
-  # minimum wage's points − capValue (+ capValuePerStar × stars playing at the seat) if the cap
+  # minimum wage's points × minWageWeight (a floor lifts only the lowest paid, so a high one costs
+  # more than it buys and a low one saves more than it loses) − capValue (+ capValuePerStar × stars playing at the seat) if the cap
   # is on − termValue for its term. Its ask is the shortest term, no cap, a standard minimum wage
   # and a share of baseAsk + profitWeight × (operating margin − profitReference), rounded and
   # kept in range; the margin is (income − costs other than the players) ÷ income at the seat.
   # An offer worth less than the ask by gap points is refused with chance gap ÷ edge (sign below
   # 0, certain refusal at edge or more). One roll on confirming; End Turn takes the ask.
+  # What the levers do (GDD v1.39 decision 4, tech plan 2.25 step 3), while the terms are in force:
+  #   cap        on: at each season's end club ratings revert to the league mean × (1 + parity)
+  #              and drift at random × drift; no star's wage passes starWageLimit × a new star's
+  #              (payroll.wageShare of the running cost), before the growth tree's wage factor
+  #   talentPull standouts.talentPull.chance × this, by minimum wage (standard is 1)
   agreement:
     default: { share: 50, term: 5, cap: false, minWage: standard }
     shares: [45, 55]
@@ -1000,7 +1006,10 @@ flagship:
       termValue: [0, 1, 2]
       capValue: 1
       capValuePerStar: 0.5
+      minWageWeight: 0.5
       edge: 3
+    cap: { parity: 0.5, drift: 0.75, starWageLimit: 1.5 }
+    talentPull: { low: 0.6, standard: 1, high: 1.4 }
   payroll:
     baselineShare: 0.3
     wageShare: 0.06

@@ -1575,7 +1575,7 @@ the designer on 2026-10-13; see the GDD.
 
 ### 2.25 Build Plan: The Late Surplus (GDD v1.39)
 
-Designed; steps 1 and 2 built 2026-10-30. Eight decisions, all in the GDD ("the late surplus"). One
+Designed; steps 1 and 2 built 2026-10-30, step 3 2026-10-31. Eight decisions, all in the GDD ("the late surplus"). One
 step per session; each ends with `npm run check`, `npm run smoke`, the docs and a commit.
 
 1. **The payout and the fixed share (money only, no talks).** Every league pays cash above its
@@ -1613,6 +1613,16 @@ step per session; each ends with `npm run check`, `npm run smoke`, the docs and 
 3. **What the levers do.** The cap: flagship club strength drifts apart less and star wages are
    limited (`flagship.ts`, `league-costs.ts`). The minimum wage: adds to the payroll line and
    raises `standouts.talentPull.chance` (`talent.ts`).
+   *Built 2026-10-31:* config `flagship.agreement.cap` (`parity`, `drift`, `starWageLimit`) and
+   `flagship.agreement.talentPull` (by minimum wage, standard fixed at 1 by the schema).
+   `capInForce` (`flagship.ts`) feeds `driftRatings` and `starWage`'s limit; `pullChance`
+   (`talent.ts`) scales the pull. Three calls beyond the plan: the growth tree's `wageFactor`
+   no longer scales the negotiated share from Professional up (it made a 50% share pay 37.5% or
+   62.5%; the designer chose that the agreement owns pay); the union counts minimum-wage points
+   at `union.minWageWeight` (0.5), since one for one a high floor traded for share points was free
+   once it drew talent; the builder bot values the cap at 3 pay points (`BUILDER_CAP_WORTH`),
+   so the runner sees it. The runner prints close finishes, capped seasons, talents pulled
+   and signed, and the caps and minimum wages signed. Measurements are in the GDD.
 4. **The stoppage.** A lost flagship season: no matches and no champion, no gate or media at the
    seat, `broadcastEffects` off, deal clauses judged missed, hardcore demotion at the seat,
    careers aged a year, then the union's ask on the shortest term. Everything that reads a

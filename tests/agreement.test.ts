@@ -12,6 +12,7 @@ import {
   leagueIncomePerQuarter,
   newAgreement,
   PLAYER_INDEX,
+  pullChance,
   serializeSave,
   snapshot,
   talksOpen,
@@ -145,6 +146,94 @@ describe("confirming an offer", () => {
     expect(
       next.landmarks.find((l) => l.kind === "agreementSigned" && !l.proposed && !l.stoppage),
     ).toBeDefined();
+  });
+});
+
+// What the levers do (GDD v1.39 decision 4, tech plan 2.25 step 3).
+
+/** `state` with `terms` in force from the season under way. */
+function withTerms(state: GameState, terms: AgreementTerms): GameState {
+  const fromSeason = state.flagship.season;
+  return {
+    ...state,
+    agreement: {
+      ...state.agreement,
+      current: { ...terms, fromSeason, throughSeason: fromSeason + terms.term - 1 },
+    },
+  };
+}
+
+/** The spread of the seat's active club ratings (largest − smallest). */
+const ratingSpread = (state: GameState) => {
+  const ratings = state.flagship.clubs.filter((club) => club.active).map((club) => club.rating);
+  return Math.max(...ratings) - Math.min(...ratings);
+};
+
+describe("what the levers do", () => {
+  it("a salary cap keeps the clubs closer at the season's end and limits a veteran star's wage", () => {
+    const state = firstOffseason();
+    const open = withTerms(state, rules.default);
+    const capped = withTerms(state, { ...rules.default, cap: true });
+    // A season played from the founding, the same draws either way.
+    const seasonEnd = (terms: AgreementTerms) => {
+      let next = withTerms(createCampaign(world, setupFor(5, "brazil")), terms);
+      while (!next.flagship.offseason) next = endTurn(next, world);
+      return next;
+    };
+    expect(ratingSpread(seasonEnd({ ...rules.default, cap: true }))).toBeLessThan(
+      ratingSpread(seasonEnd(rules.default)),
+    );
+
+    // The only star at the seat, of many seasons: the cap holds the wage at the limit.
+    const active = new Set(state.flagship.clubs.filter((c) => c.active).map((c) => c.id));
+    const leader = state.flagship.players.find(
+      (p) => p.retiredSeason === null && active.has(p.clubId) && p.backing === null,
+    );
+    if (!leader) throw new Error("no leading player");
+    const veteran = (from: GameState): GameState => ({
+      ...from,
+      flagship: {
+        ...from.flagship,
+        players: from.flagship.players.map((p) =>
+          p.id === leader.id
+            ? { ...p, starSince: from.flagship.season - 10 }
+            : { ...p, starSince: null },
+        ),
+      },
+    });
+    const free = leagueCosts(veteran(open), world, brazil).wages;
+    const limited = leagueCosts(veteran(capped), world, brazil).wages;
+    expect(limited).toBeLessThan(free);
+    expect(free / limited).toBeCloseTo(
+      (1 + world.config.flagship.payroll.perSeason * 9) / rules.cap.starWageLimit,
+      9,
+    );
+  });
+
+  it("the growth tree's salary cap leaves the negotiated share alone from Professional up", () => {
+    const state = withTerms(firstOffseason(), rules.default);
+    const noded = { ...state, growthNodes: [...state.growthNodes, "salary-cap"] };
+    expect(leagueCosts(noded, world, brazil).payroll).toBeCloseTo(
+      leagueCosts(state, world, brazil).payroll,
+      9,
+    );
+  });
+
+  it("the minimum wage moves talent pull, and the union counts its points at a weight", () => {
+    const state = firstOffseason();
+    const chance = (minWage: AgreementTerms["minWage"]) =>
+      pullChance(withTerms(state, { ...rules.default, minWage }), world);
+    expect(chance("standard")).toBe(world.config.standouts.talentPull.chance);
+    expect(chance("low")).toBeLessThan(chance("standard"));
+    expect(chance("high")).toBeGreaterThan(chance("standard"));
+    // A high floor buys the union less than it costs: a share point lower nets the same read.
+    const base = { ...unionAsk(state, world), share: 50 };
+    const traded = {
+      ...base,
+      share: 50 - rules.union.minWageWeight * rules.minWages.high,
+      minWage: "high" as const,
+    };
+    expect(unionRead(state, world, traded)).toEqual(unionRead(state, world, base));
   });
 });
 

@@ -75,7 +75,10 @@ function unionValue(terms: AgreementTerms, state: GameState, world: World): numb
     ? rules.union.capValue + rules.union.capValuePerStar * seatStars(state.flagship).length
     : 0;
   return (
-    terms.share + rules.minWages[terms.minWage] - cap - (rules.union.termValue[termIndex] ?? 0)
+    terms.share +
+    rules.union.minWageWeight * rules.minWages[terms.minWage] -
+    cap -
+    (rules.union.termValue[termIndex] ?? 0)
   );
 }
 

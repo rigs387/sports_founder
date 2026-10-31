@@ -1350,7 +1350,18 @@ export const configFileSchema = z.strictObject({
           termValue: z.array(z.number().min(0)),
           capValue: z.number().min(0),
           capValuePerStar: z.number().min(0),
+          minWageWeight: z.number().min(0),
           edge: z.number().positive(),
+        }),
+        cap: z.strictObject({
+          parity: z.number().min(0),
+          drift: z.number().min(0).max(1),
+          starWageLimit: z.number().min(1),
+        }),
+        talentPull: z.strictObject({
+          low: z.number().min(0),
+          standard: z.literal(1),
+          high: z.number().min(0),
         }),
       })
       .refine((a) => a.shares[0] <= a.shares[1], "shares must be [lowest, highest]")

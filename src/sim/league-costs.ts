@@ -1,5 +1,5 @@
 import { leagueIncomePerQuarter } from "./deals";
-import { seatStars, starWage } from "./flagship";
+import { capInForce, seatStars, starWage } from "./flagship";
 import { leagueTierIndex, nextVenuePrice, runningCostPerQuarter, venueUpkeep } from "./leagues";
 import { shapeFactors } from "./shape";
 import type { AgreementTerms, CountryState, GameState, LeagueTierId, World } from "./types";
@@ -81,13 +81,16 @@ export function leagueCosts(
   if (!atSeat) {
     return { operations, payroll: players, wages: 0, upkeep, total: operations + players + upkeep };
   }
-  // A salary cap or star pay scales the payroll and star wages (GDD v1.35).
+  // The growth tree's salary cap or star pay scales star wages, and the payroll baseline below
+  // Professional (GDD v1.35); from Professional up the agreement's share is what is paid
+  // (GDD v1.39). The agreement's own cap limits each star's wage.
   const wage = shapeFactors(world, state.growthNodes).wageFactor;
-  const payroll = players * wage;
+  const payroll = share === null ? players * wage : players;
+  const capped = capInForce(state, world);
   const wages =
     wage *
     seatStars(state.flagship).reduce(
-      (sum, star) => sum + starWage(star, state.flagship, running, world),
+      (sum, star) => sum + starWage(star, state.flagship, running, world, capped),
       0,
     );
   return { operations, payroll, wages, upkeep, total: operations + payroll + wages + upkeep };

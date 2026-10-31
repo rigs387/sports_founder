@@ -419,6 +419,22 @@ is the second part of this topic. Cash comes first.
   shown as the levers move: will sign, on the edge with the chance, will refuse. The default
   terms before the first agreement are the middle of each lever. Between talks the card shows
   the terms in force and when talks reopen.
+- *Built 2026-10-31 (tech plan 2.25 step 3, what the levers do):* with the cap in force, club
+  ratings revert to the league mean 50% harder at each season's end and drift at random 25%
+  less, and no star's wage rises past 1.5 times a new star's. The growth tree's Salary Cap and
+  Star Pay no longer touch the players' share from Professional up (the agreement owns pay
+  there; they still scale star wages and the payroll baseline below Professional), and the
+  agreement's cap stacks with the node's. The minimum wage scales the chance that an opening
+  draws a standout on its own: × 0.6 low, × 1 standard, × 1.4 high. Because a high floor now
+  buys something, the union counts minimum-wage points at half a share point: a high floor costs
+  the player a net point at the table, and a low one saves half a point. Measured in three
+  200-turn builder campaigns, the builder taking the cap while the union counts it at 3 points or
+  less: the cap was in 5 of 79 agreements (15 seasons, early, while few stars played), the most
+  successful club's share of titles fell from 15% to 12%, close finishes stayed at 41%, star
+  wages stayed at 7% of the seat's costs, and talents pulled went from 60 to 54 a campaign
+  (low minimum wage in 2 agreements, high in none). Wins 3/3 both, win turn median 151 to 145,
+  #1 lost before the win 2/3 to 1/3. Late, the cap cannot be bought safely: 6–8 stars make it
+  worth 4–5 points to the union while the ask is already at the top of the share range.
 - *Decision 3, how the talks work (3b, against the recommendation of a single answer to the
   union's ask):* several levers on the table. The player sets the players' share, the term
   length, a salary cap and a minimum wage, each with its own effect. Deeper and closer to real

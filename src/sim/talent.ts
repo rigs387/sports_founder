@@ -1,5 +1,6 @@
 import { offseasonOpen } from "./calendar";
 import { activeClubs } from "./flagship";
+import { termsInForce } from "./league-costs";
 import { landmarks } from "./records";
 import { nextFloat, restoreRng, saveRng } from "./rng";
 import { departStandout } from "./standouts";
@@ -53,6 +54,18 @@ export function bestAbroad(state: GameState, skill: number): Standout | null {
 export function pullPlaces(state: GameState, world: World): number {
   const seat = state.countries.find((country) => country.countryId === state.flagship.countryId);
   return seat?.league ? world.config.standouts.talentPull.perOffseason[seat.league.tier] : 0;
+}
+
+/**
+ * The chance an opening draws a standout on its own: the minimum wage in force at the flagship
+ * makes them more or less willing (GDD v1.39).
+ */
+export function pullChance(state: Pick<GameState, "agreement">, world: World): number {
+  const { minWage } = termsInForce(state, world);
+  return Math.min(
+    1,
+    world.config.standouts.talentPull.chance * world.config.flagship.agreement.talentPull[minWage],
+  );
 }
 
 /** The standout and the opening a signing card would name now, or null. */
@@ -140,7 +153,7 @@ export function pullTalent(state: GameState, world: World): GameState {
   if (!offseasonOpen(state) || places <= 0 || state.flagship.pendingCountryId !== null)
     return state;
   if (state.standouts.players.length === 0 || openings(state).length === 0) return state;
-  const { chance } = world.config.standouts.talentPull;
+  const chance = pullChance(state, world);
   const rng = restoreRng(state.standouts.rng);
   const picked: Opening[] = [];
   for (const opening of openings(state)) {

@@ -65,6 +65,23 @@ export async function verifyStarCards(
     const next = (await turn()) + 1;
     await win.webContents.executeJavaScript(COLLECT_NEWS, true);
     await click('[data-testid="end-turn"]');
+    // Auto-collect may be collecting minor moments when Next Turn is clicked (status "acting"),
+    // and the click is then ignored: click again once the game is ready on the same turn.
+    const deadline = Date.now() + 20_000;
+    while (Date.now() < deadline) {
+      const now = await evaluate<{ status: string; turn: number }>(
+        `(() => { const g=document.querySelector('[data-testid="game"]'); return { status: g.dataset.status, turn: Number(g.dataset.turn) }; })()`,
+      );
+      if (now.status === "ready" && now.turn >= next) break;
+      if (now.status === "ready") {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        await win.webContents.executeJavaScript(COLLECT_NEWS, true);
+        await evaluate(
+          `(() => { const g=document.querySelector('[data-testid="game"]'); const b=document.querySelector('[data-testid="end-turn"]'); if (g.dataset.status==='ready' && Number(g.dataset.turn) < ${next} && !b.disabled) b.click(); })()`,
+        );
+      }
+      await new Promise((resolve) => setTimeout(resolve, 60));
+    }
     await readyAt(next);
   }
   throw new Error("No star card arrived within 80 turns");

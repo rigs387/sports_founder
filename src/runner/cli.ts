@@ -766,7 +766,7 @@ function main(): number {
     );
     printEvents(events);
     console.log(
-      `  Flagship: seasons median ${fmt(flagship.seasons.median)}; different champions median ${fmt(flagship.distinctChampions.median)}; the most successful club's share of titles median ${pct(flagship.mostTitlesShare.median ?? 0)}, max ${pct(flagship.mostTitlesShare.max ?? 0)}`,
+      `  Flagship: seasons median ${fmt(flagship.seasons.median)}; different champions median ${fmt(flagship.distinctChampions.median)}; the most successful club's share of titles median ${pct(flagship.mostTitlesShare.median ?? 0)}, max ${pct(flagship.mostTitlesShare.max ?? 0)}; close finishes median ${pct(flagship.closeShare.median ?? 0)} of seasons; under a salary cap ${flagship.cappedSeasons} seasons, ${flagship.cappedClose} close; talents pulled per campaign median ${fmt(flagship.talentsPulled.median)}, signed by card ${fmt(flagship.talentsSigned.median)}`,
     );
     console.log(
       `  Stars: made per campaign median ${fmt(flagship.starsMade.median)}; backed median ${fmt(flagship.starsBacked.median)} (in ${flagship.backedIn}/${results.length} campaigns), first backed at turn median ${fmt(flagship.firstBackTurn.median)}; first star in season median ${fmt(flagship.firstStarSeason.median)} (max ${fmt(flagship.firstStarSeason.max)}); stars playing over backing slots, second half, median ${fmt(flagship.starsOverSlots.median)} (target 1–2)`,
@@ -823,7 +823,7 @@ function main(): number {
     console.log(
       deal.total === 0
         ? "  Players' agreements: none signed (no Professional seat)"
-        : `  Players' agreements: per campaign median ${fmt(deal.perCampaign.median)}; ${deal.proposed} of ${deal.total} proposed (the rest the union's ask at End Turn); stoppages ${deal.stoppages}; share median ${fmt(deal.share)}%, term median ${fmt(deal.term)} seasons`,
+        : `  Players' agreements: per campaign median ${fmt(deal.perCampaign.median)}; ${deal.proposed} of ${deal.total} proposed (the rest the union's ask at End Turn); stoppages ${deal.stoppages}; share median ${fmt(deal.share)}%, term median ${fmt(deal.term)} seasons; salary cap in ${deal.capped}; minimum wage low ${deal.minWages.low} / standard ${deal.minWages.standard} / high ${deal.minWages.high}`,
     );
     const venues = venuesAggregate(results);
     console.log(
@@ -832,7 +832,7 @@ function main(): number {
         .map((l) => `${l.tier} ${fmt(l.level)} (n ${l.samples})`)
         .join(
           ", ",
-        )}; levels opened ${venues.opened}, modernized ${venues.modernized}; record crowds ${venues.records}; payroll baseline ${pct(venues.payrollShare.median ?? 0)} and star wages ${pct(venues.wagesShare.median ?? 0)} of the seat's costs (median)`,
+        )}; levels opened ${venues.opened}, modernized ${venues.modernized}; record crowds ${venues.records}; players' pay ${pct(venues.payrollShare.median ?? 0)} and star wages ${pct(venues.wagesShare.median ?? 0)} of the seat's costs (median)`,
     );
     const cup = championshipAggregate(results);
     console.log(

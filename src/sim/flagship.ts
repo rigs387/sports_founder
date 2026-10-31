@@ -353,19 +353,23 @@ export function starStrength(flagship: FlagshipState, clubId: number, world: Wor
 
 /**
  * A star's wage a quarter at a league with running cost `running` (GDD v1.30): rising with each
- * season as a star after the first and with backed influence. Never from skill.
+ * season as a star after the first and with backed influence. Never from skill. Under a salary
+ * cap (GDD v1.39) it stops at `agreement.cap.starWageLimit` times a new star's.
  */
 export function starWage(
   player: Player,
   flagship: FlagshipState,
   running: number,
   world: World,
+  capped = false,
 ): number {
   if (player.starSince === null) return 0;
   const { wageShare, perSeason, perInfluence } = world.config.flagship.payroll;
   const seasons = Math.max(0, flagship.season - player.starSince - 1);
   const influence = player.backing?.influence ?? 0;
-  return wageShare * running * (1 + perSeason * seasons) * (1 + perInfluence * influence);
+  const rise = (1 + perSeason * seasons) * (1 + perInfluence * influence);
+  const limit = capped ? world.config.flagship.agreement.cap.starWageLimit : rise;
+  return wageShare * running * Math.min(rise, limit);
 }
 
 /** The stars at the seat's active clubs: the ones holding the league's star places. */
@@ -1253,15 +1257,30 @@ export interface FlagshipQuarter {
   landmarks: Landmark[];
 }
 
-/** Ratings drift at the season's end, pulled toward the league's financial health. */
+/**
+ * Whether the players' agreement in force at the flagship has a salary cap (GDD v1.39); the
+ * default terms before the first agreement.
+ */
+export function capInForce(state: Pick<GameState, "agreement">, world: World): boolean {
+  return state.agreement.current?.cap ?? world.config.flagship.agreement.default.cap;
+}
+
+/**
+ * Ratings drift at the season's end, pulled toward the league's financial health. A salary cap
+ * keeps the clubs closer (GDD v1.39): stronger reversion, smaller random drift.
+ */
 function driftRatings(
   flagship: FlagshipState,
   world: World,
   rng: Rng,
   league: LeagueState,
   parity = 1,
+  capped = false,
 ) {
   const { rating } = world.config.flagship;
+  const cap = world.config.flagship.agreement.cap;
+  const reversion = rating.reversion * parity * (capped ? 1 + cap.parity : 1);
+  const drift = rating.drift * (capped ? cap.drift : 1);
   const active = activeClubs(flagship);
   const mean = meanRating(active, world);
   const pull = rating.financePull * (rating.healthTarget[league.health] - mean);
@@ -1270,9 +1289,9 @@ function driftRatings(
       club.id,
       clamp(
         club.rating +
-          rating.drift * (2 * nextFloat(rng) - 1) +
+          drift * (2 * nextFloat(rng) - 1) +
           // A draft evens clubs out faster, an open market slower (GDD v1.35).
-          rating.reversion * parity * (mean - club.rating) +
+          reversion * (mean - club.rating) +
           pull,
         rating.min,
         rating.max,
@@ -1396,6 +1415,7 @@ export function stepFlagshipQuarter(
     | "culture"
     | "growthNodes"
     | "identity"
+    | "agreement"
   >,
   countries: CountryState[],
   world: World,
@@ -1568,6 +1588,7 @@ export function stepFlagshipQuarter(
         rng,
         current,
         shape.ratingParity,
+        capInForce(state, world),
       );
     }
     // The offseason opens; the next season starts when it closes. Retired players are replaced
@@ -2184,7 +2205,9 @@ function starSnapshots(state: GameState, world: World): StarSnapshot[] {
         },
         backBlocker: backStarBlocker(state, world, player.id),
         dropBlocker: dropStarBlocker(state, world, player.id),
-        wage: atSeat.has(player) ? starWage(player, flagship, running, world) : 0,
+        wage: atSeat.has(player)
+          ? starWage(player, flagship, running, world, capInForce(state, world))
+          : 0,
         awards: flagship.seasons.filter((s) => s.playerOfSeason === player.id).length,
       };
     });

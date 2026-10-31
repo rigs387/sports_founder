@@ -10,7 +10,7 @@ import {
   type LeagueTierId,
   TRADITION_TYPES,
 } from "../content";
-import type { SportTotals } from "../sim";
+import { MIN_WAGES, type MinWage, type SportTotals } from "../sim";
 import type { BotId } from "./policy";
 
 /** Turns at which PP banked and spent are sampled for the growth tree report. */
@@ -116,6 +116,13 @@ export interface CampaignResult {
     seasons: number;
     distinctChampions: number;
     mostTitles: number;
+    /** Seasons with a close finish; seasons under a salary cap, and their close finishes. */
+    closeFinishes: number;
+    cappedSeasons: number;
+    cappedClose: number;
+    /** Standouts who joined the flagship on their own, and by the signing card. */
+    talentsPulled: number;
+    talentsSigned: number;
     /** Flagship stars made, and stars the bot backed (GDD v1.16). */
     starsMade: number;
     starsBacked: number;
@@ -167,7 +174,14 @@ export interface CampaignResult {
     /** Share of every league's turns spent at Near-Collapse. */
     nearCollapseShare: number;
     /** Players' agreements signed at the flagship, in order (GDD v1.39). */
-    agreements: { share: number; term: number; proposed: boolean; stoppage: boolean }[];
+    agreements: {
+      share: number;
+      term: number;
+      cap: boolean;
+      minWage: MinWage;
+      proposed: boolean;
+      stoppage: boolean;
+    }[];
   };
   /** The World Championship (GDD v1.37). */
   championship: {
@@ -434,6 +448,11 @@ export function flagshipAggregate(results: CampaignResult[]) {
     mostTitlesShare: distribution(
       withSeasons.map((r) => r.flagship.mostTitles / r.flagship.seasons),
     ),
+    closeShare: distribution(withSeasons.map((r) => r.flagship.closeFinishes / r.flagship.seasons)),
+    cappedSeasons: results.reduce((sum, r) => sum + r.flagship.cappedSeasons, 0),
+    cappedClose: results.reduce((sum, r) => sum + r.flagship.cappedClose, 0),
+    talentsPulled: distribution(results.map((r) => r.flagship.talentsPulled)),
+    talentsSigned: distribution(results.map((r) => r.flagship.talentsSigned)),
     starsMade: distribution(results.map((r) => r.flagship.starsMade)),
     starsBacked: distribution(results.map((r) => r.flagship.starsBacked)),
     firstStarSeason: distribution(
@@ -550,6 +569,10 @@ export function moneyAggregate(results: CampaignResult[]) {
       total: agreements.length,
       share: median(agreements.map((a) => a.share)),
       term: median(agreements.map((a) => a.term)),
+      capped: agreements.filter((a) => a.cap).length,
+      minWages: Object.fromEntries(
+        MIN_WAGES.map((wage) => [wage, agreements.filter((a) => a.minWage === wage).length]),
+      ) as Record<MinWage, number>,
     },
     seatCash: median(results.map((r) => r.money.seatCash)),
     folds: distribution(results.map((r) => r.money.folds)),

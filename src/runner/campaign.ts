@@ -22,6 +22,7 @@ import {
   payingDeals,
   QUARTERS_PER_YEAR,
   revenuePerQuarter,
+  seasonStories,
   seatedCrowd,
   shrineWeights,
   snapshot,
@@ -532,6 +533,32 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           seasons: state.flagship.seasons.length,
           distinctChampions: titles.size,
           mostTitles: Math.max(0, ...titles.values()),
+          // Close finishes (GDD v1.15 stories), and the seasons played under a salary cap with
+          // theirs (GDD v1.39).
+          ...(() => {
+            const capped = new Set(
+              state.landmarks.flatMap((l) =>
+                l.kind === "agreementSigned" && l.terms.cap
+                  ? Array.from({ length: l.terms.term }, (_, i) => l.season + i)
+                  : [],
+              ),
+            );
+            const seasons = state.flagship.seasons;
+            const close = seasons.map((_, i) =>
+              seasonStories(seasons, i, world).includes("closeFinish"),
+            );
+            const cappedAt = seasons.map((s) => capped.has(s.season));
+            return {
+              closeFinishes: close.filter(Boolean).length,
+              cappedSeasons: cappedAt.filter(Boolean).length,
+              cappedClose: close.filter((c, i) => c && cappedAt[i]).length,
+            };
+          })(),
+          // Standouts who joined the flagship on their own and by the signing card (GDD v1.37).
+          talentsPulled: state.landmarks.filter((l) => l.kind === "talentJoined" && !l.signed)
+            .length,
+          talentsSigned: state.landmarks.filter((l) => l.kind === "talentJoined" && l.signed)
+            .length,
           starsMade: state.flagship.players.filter((p) => p.starSince !== null).length,
           // Backed on the offseason screen or from a breakout card (GDD v1.35).
           starsBacked:
@@ -635,6 +662,8 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
                 {
                   share: l.terms.share,
                   term: l.terms.term,
+                  cap: l.terms.cap,
+                  minWage: l.terms.minWage,
                   proposed: l.proposed,
                   stoppage: l.stoppage,
                 },
