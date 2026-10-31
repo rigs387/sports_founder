@@ -1,7 +1,7 @@
 import type { HallFirst, LeagueTierId } from "../content";
 import { yearOfQuarter } from "./calendar";
 import type { EventRecord } from "./events-state";
-import { scoreUnit } from "./flagship";
+import { lostSeasons, scoreUnit } from "./flagship";
 import { landmarks } from "./records";
 import type {
   BallotEntry,
@@ -387,6 +387,8 @@ export interface HallSnapshot {
       crowd: number | null;
       playerOfSeason: number | null;
     }[];
+    /** Seasons lost to a stoppage (GDD v1.39), newest first: a line in the roll of champions. */
+    lost: { season: number; year: number }[];
     /** The all-time top scorers by career scores (config hallOfFame.leaders), best first. */
     scorers: { playerId: number; clubId: number; scores: number; retired: boolean }[];
     /** The best crowd any flagship season drew, if one was recorded. */
@@ -508,6 +510,7 @@ export function hallSnapshot(state: GameState, world: World): HallSnapshot {
         crowd: perGame.get(s.season) ?? null,
         playerOfSeason: s.playerOfSeason,
       })),
+      lost: lostSeasons(state, world).reverse(),
       scorers,
       crowd,
       mostAwards,

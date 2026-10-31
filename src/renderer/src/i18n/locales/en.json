@@ -379,6 +379,10 @@
         "body": "Nobody gave {{country}} a chance at {{name}}. They reached the last four before {{opponent}} ended the run, and the sport has a new home.",
         "body_final": "Nobody gave {{country}} a chance at {{name}}. They reached the final before {{opponent}} ended the run, and the sport has a new home."
       },
+      "season-lost": {
+        "title": "Players walk out: the {{seasonNoun}} is cancelled",
+        "body": "The talks in {{country}} have failed. There will be no {{seasonNoun}} {{season}}: no matches, no champion, no gate or TV money, and the broadcast goes dark. Lifelong fans are walking away. The union's terms run {{seasons}} {{seasonsNoun}}, this lost one among them."
+      },
       "legacy-goal": {
         "title": "A legacy goal is met",
         "title_everyContinent": "{{sport}} is #1 on every continent",
@@ -1486,6 +1490,7 @@
       "american": "American format: the top {{count}} clubs play off for the title."
     },
     "paused": "{{country}} has no league right now. The {{seasonNoun}} is on hold until one forms.",
+    "stoppage": "The players are out, and the {{seasonNoun}} is lost: no matches, no champion, no gate or TV money, and the broadcast is dark until the next offseason.",
     "club": "{{place}} {{nickname}}",
     "titles_one": "{{count}} title",
     "titles_other": "{{count}} titles",
@@ -1544,6 +1549,7 @@
         "near-collapse": "Off the air. Its troubles are news: casual fans drift away wherever it was watched."
       },
       "noLeague": "No league plays in {{country}}: nothing is broadcast.",
+      "dark": "Dark: no matches to air while the players are out. The broadcast returns with the next {{seasonNoun}}.",
       "smallMarket": "{{country}} is a small media market: the league is barely seen abroad. A seat in a big media market carries further.",
       "reach": "It airs in {{count}} markets, lifting media reach there by up to +{{boost, number(style: percent; maximumFractionDigits: 0)}}, most where {{country}}'s media is strongest.",
       "pulse": "Of which +{{pulse, number(style: percent; maximumFractionDigits: 0)}} from the {{seasonNoun}}'s end, fading.",
@@ -1971,6 +1977,7 @@
     "roll": {
       "heading": "Roll of champions",
       "empty": "No season has finished yet.",
+      "lost": "No champion: the {{seasonNoun}} was lost to a players' stoppage",
       "scorer": "Top scorer: {{player}}, {{count}} {{scoreNoun}}",
       "award": "{{player}} won {{award}}",
       "playerOfYear": "Player of the Year: {{player}} ({{club}})",
@@ -1991,6 +1998,8 @@
     "local": "{{place}} {{word}}",
     "dateline": "{{SeasonNoun}} {{season}} · {{year}}",
     "recap": "{{SeasonNoun}} {{season}} in review · {{year}}",
+    "recapLost": "No champion this year",
+    "recapLostBody": "The {{seasonNoun}} was lost to the players' stoppage. Not a match was played; the players are a year older, and the union's terms now stand.",
     "recapTable": "Final table",
     "recapPoints_one": "{{count}} pt",
     "recapPoints_other": "{{count}} pts",

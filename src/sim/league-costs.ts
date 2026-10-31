@@ -1,3 +1,4 @@
+import { seasonStopped } from "./calendar";
 import { leagueIncomePerQuarter } from "./deals";
 import { capInForce, seatStars, starWage } from "./flagship";
 import { leagueTierIndex, nextVenuePrice, runningCostPerQuarter, venueUpkeep } from "./leagues";
@@ -81,6 +82,9 @@ export function leagueCosts(
   if (!atSeat) {
     return { operations, payroll: players, wages: 0, upkeep, total: operations + players + upkeep };
   }
+  // Nobody is paid in a season lost to a stoppage (GDD v1.39).
+  if (seasonStopped(state))
+    return { operations, payroll: 0, wages: 0, upkeep, total: operations + upkeep };
   // The growth tree's salary cap or star pay scales star wages, and the payroll baseline below
   // Professional (GDD v1.35); from Professional up the agreement's share is what is paid
   // (GDD v1.39). The agreement's own cap limits each star's wage.

@@ -184,6 +184,7 @@ export function offerLegacyCards(
         countermove: null,
         championship: null,
         legacy: { goalId: landmark.goalId },
+        stoppage: null,
       },
       resolution: null,
     });

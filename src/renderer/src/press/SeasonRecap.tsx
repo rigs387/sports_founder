@@ -25,6 +25,20 @@ export function SeasonRecap({
   const words = useTraditionWords(snapshot);
   const last = flagship.recentSeasons[0];
   const page = flagship.frontPage;
+  // The season just finished was lost to a stoppage (GDD v1.39): nothing to review.
+  const lost = flagship.lostSeasons.find((season) => season.season === flagship.season - 1);
+  if (lost)
+    return (
+      <article className="season-recap" data-testid="season-recap" data-story="lost">
+        <header className="recap-header">
+          <small>{t("press.recap", { ...nouns(), season: lost.season, year: lost.year })}</small>
+          <h3 className="offseason-champion" data-testid="offseason-champion">
+            {t("press.recapLost", nouns())}
+          </h3>
+          <p>{t("press.recapLostBody", nouns())}</p>
+        </header>
+      </article>
+    );
   if (!last || !page)
     return <p className="flagship-empty">{t("flagship.champions.none", nouns())}</p>;
   const player = (id: number | null) => flagship.players.find((p) => p.id === id)?.name ?? "";

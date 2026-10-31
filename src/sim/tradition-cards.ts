@@ -85,6 +85,7 @@ export function offerTraditionCards(
         countermove: null,
         championship: null,
         legacy: null,
+        stoppage: null,
       },
       resolution: null,
     });

@@ -109,6 +109,12 @@ window.SF_PROGRESS = {
     {
       date: "2026-10-31",
       type: "Built",
+      title: "The stoppage: a lost season",
+      text: "GDD v1.39, tech plan 2.25 step 4 of 5. A refused offer now costs the season it was for. When the offseason closes the season starts with no matches; 8% of the player's hardcore fans at the seat turn casual (config flagship.agreement.stoppage) and a seasonLost landmark is recorded. For that year the seat earns only its sponsors and naming rights (no gate, media line or TV deal), pays no players or star wages, and the broadcast is dark; its deal clauses count as missed. At the year's end there is no champion and no season summary, but the season number is spent: players who announced their final season retire and everyone still playing ages a year. A lost season is a gap in the seasons, not a summary with no champion, so seasonInterest, the season cards, the awards, the Hall class, culture, Player of the Year and the World Championship's calendar read it with no change (the tournament still goes ahead: national teams are not on strike). Shown as the headline season-lost card, a notice and a dark broadcast on the Flagship tab, a lost season in review on the offseason screen, and a line in the Almanac's roll of champions. No save format bump: the saved state keeps its shape (the landmark and the card's facts are additive). The runner prints seasons lost and the seat league's cash and health as each began and after. Three 150-turn media-rush campaigns, same seeds before and after: stoppages 22 of 52 agreements both (median 6 a campaign, max 10: the bot takes up to 40% risk each time); the seat held a median 3.0 years of costs as one began and 3.3 after (the reserve absorbs the year), but health went from healthy 20 / struggling 2 before to healthy 6 / struggling 16 after; no league folded. Wins by turn 150 went from 3/3 to 1/3, #1 lost 3 to 6 times (before the win in 3/3 both), longest hold max 43 to 39 turns. Checks: npm run check passes (74 files, 672 tests). Smoke passes, including the star step with its Next Turn retry (40 turns to the star card) and a new stoppage step after the agreement step (refused offer, headline card, Flagship notice, the season in review, the Almanac line). The smoke now finishes CSS animations before each capture: headline windows fade in, and a hidden window never ran the fade, so every headline screenshot (27f, 55) had shown an empty map.",
+    },
+    {
+      date: "2026-10-31",
+      type: "Built",
       title: "What the agreement's levers do",
       text: "GDD v1.39, tech plan 2.25 step 3 of 5. With a salary cap in force the flagship's club ratings revert to the league mean 50% harder at each season's end and drift at random 25% less, and no star's wage rises past 1.5 times a new star's. The minimum wage scales the chance that an opening draws a standout from abroad on its own (× 0.6 low, × 1 standard, × 1.4 high). The union now counts minimum-wage points at half a share point; one for one, a high floor traded for share points would have been free once it drew talent. The growth tree's Salary Cap and Star Pay no longer scale the negotiated players' share from Professional up (a 50% share paid 37.5% or 62.5%); they still scale star wages and the payroll baseline below Professional, and the node's cap stacks with the agreement's. The card's cap and minimum wage hints say what they do. The builder bot values the cap at 3 pay points, so the runner sees it; the runner prints close finishes, capped seasons, talents pulled and the caps and minimum wages signed. Three 200-turn builder campaigns, before and after: the cap in 5 of 79 agreements (15 seasons, early, while few stars played); the most successful club's share of titles 15% to 12%, different champions 16 to 17, close finishes 41% both; star wages 7% of the seat's costs both; talents pulled 60 to 54 a campaign (low minimum wage in 2 agreements, high in none); wins 3/3 both, win turn median 151 to 145, #1 lost before the win 2/3 to 1/3. Late the cap cannot be bought without a stoppage risk: 6–8 stars make it worth 4–5 points to the union while its ask is already 55%, the top of the range. Checks: type check, Biome, purity and the new lever tests pass; 8 long tests time out at 30 s on a slow machine, the same 8 before the change, and the 7 files pass with a longer timeout. Smoke failed twice in the star step: auto-collect held a Next Turn click on the shifted campaign path; the step now clicks again, not yet re-run (the run was stopped for low memory).",
     },
@@ -849,7 +855,7 @@ window.SF_PROGRESS = {
       icon: "08",
       summary:
         "The flagship signs TV, sponsor and naming-rights deals with demands, builds its venue and pays its stars; other leagues keep one media line.",
-      next: "The stoppage's lost season (tech plan 2.25 step 4); decide whether the cap should stay out of reach late (6–8 stars price it past the share range); watch the Semi-Pro deal slate (109%, just under its band).",
+      next: "Late card rewards by kind (tech plan 2.25 step 5); decide whether the cap should stay out of reach late (6–8 stars price it past the share range, and now a refusal costs a season); decide whether bots should take less stoppage risk (media-rush loses 6 seasons a campaign); watch the Semi-Pro deal slate (109%, just under its band).",
       depends: ["leagues"],
       sources: [
         ["Current league finances", "../league-management/README.md"],
@@ -879,7 +885,10 @@ window.SF_PROGRESS = {
           "built",
           "What the levers do: the cap evens clubs and limits star wages, the minimum wage moves talent pull (tech plan 2.25 step 3)",
         ],
-        ["planned", "The stoppage's lost season (tech plan 2.25 step 4)"],
+        [
+          "built",
+          "The stoppage: a refused offer loses the season, with no gate or TV, a dark broadcast, missed clauses and purists lost at the seat (tech plan 2.25 step 4)",
+        ],
       ],
     },
     {

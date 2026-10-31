@@ -1629,6 +1629,19 @@ step per session; each ends with `npm run check`, `npm run smoke`, the docs and 
    finished season must accept one with no champion: `seasonInterest`, the season cards, the
    awards, the Hall class, culture's season facts, and the World Championship's calendar (it
    runs on flagship seasons). A headline card, a landmark and an Almanac line.
+   *Built 2026-10-31:* `seasonStopped` (`calendar.ts`: the season under way is
+   `agreement.stoppageSeason`, outside the offseason) gates each effect where it bites: no
+   rounds and `lostSeasonEnd` at the year's end (`flagship.ts`: retirements and aging, shared
+   with `playersSeasonEnd` through `retirePlayers` and `agePlayers`), the seat's income to
+   sponsors and naming rights (`deals.ts`), no payroll or wages (`league-costs.ts`), the
+   broadcast dark, clauses missed (`deal-clauses.ts`), and at `closeOffseason` the hardcore
+   demotion (config `flagship.agreement.stoppage`) and the `seasonLost` landmark. The headline
+   `season-lost` card (trigger `stoppage`, `offerStoppageCards` in `agreement.ts`, event facts
+   `stoppage`) takes no slot. A lost season is a gap: no `SeasonSummary`, the number spent, so
+   every reader of finished seasons is unchanged and the World Championship is still played.
+   Snapshot: `flagship.stoppage`, `flagship.lostSeasons`, `hallOfFame.records.lost`. No save
+   format bump (the state keeps its shape). Smoke: `src/main/stoppage-smoke.ts` after the
+   agreement step. Measurements are in the GDD.
 5. **Late card rewards by kind.** From PP tier 4 a moment card's reward is by its `family`
    instead of PP: season and business pay cash into the flagship's reserve; tradition adds
    tradition weight in the card's country; star extends a star's pull by a season; rival and

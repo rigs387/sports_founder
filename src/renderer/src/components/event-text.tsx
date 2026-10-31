@@ -88,11 +88,21 @@ export function useEventText() {
     const first = snapshot.hallOfFame.inductees.find((i) => hall.inducteeIds.includes(i.id));
     return { year: first?.year ?? 0, count: hall.inducteeIds.length };
   };
+  // A season lost to a stoppage (GDD v1.39) names the season and the union's term.
+  const stoppageText = (event: EventRecord) => {
+    const stoppage = event.facts.stoppage;
+    if (!stoppage) return hallText(event);
+    return {
+      season: stoppage.season,
+      seasons: stoppage.term,
+      country: country(event.countryId),
+    };
+  };
   // A rival's countermove at the seat (GDD v1.34) names the move, its end and the TV cut.
   // A legacy goal met (GDD v1.38): the card's words are the goal's own.
   const legacyText = (event: EventRecord) => {
     const told = event.facts.legacy;
-    if (!told) return hallText(event);
+    if (!told) return stoppageText(event);
     const goal = snapshot.legacy.goals.find((entry) => entry.goalId === told.goalId);
     return {
       sport: snapshot.identity.sportName,

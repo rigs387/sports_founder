@@ -1,4 +1,5 @@
 import type { EventEffect, EventTemplate, MomentWeight } from "../content";
+import { offerStoppageCards } from "./agreement";
 import { offerChampionshipCards } from "./championship-cards";
 import { offerCountermoveCards } from "./countermove-cards";
 import { venueStrength } from "./culture";
@@ -91,6 +92,7 @@ function offerSeasonCards(
           countermove: null,
           championship: null,
           legacy: null,
+          stoppage: null,
         },
         resolution: null,
       });
@@ -183,23 +185,29 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   // A rival's countermove at the seat (GDD v1.34) takes no slot either.
   // A World Championship's stories (GDD v1.37) take none either.
   // A legacy goal met (GDD v1.38) is told last, and takes none.
-  const dealEvents = offerLegacyCards(
+  // A season lost to a stoppage (GDD v1.39) takes none either.
+  const dealEvents = offerStoppageCards(
     state,
     world,
     recent,
-    offerChampionshipCards(
+    offerLegacyCards(
       state,
       world,
       recent,
-      offerCountermoveCards(
+      offerChampionshipCards(
         state,
         world,
         recent,
-        offerVenueCards(
+        offerCountermoveCards(
           state,
           world,
           recent,
-          offerDealCards(state, world, recent, traditionEvents),
+          offerVenueCards(
+            state,
+            world,
+            recent,
+            offerDealCards(state, world, recent, traditionEvents),
+          ),
         ),
       ),
     ),
@@ -218,7 +226,8 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
       card.trigger === "award" ||
       card.trigger === "countermove" ||
       card.trigger === "championship" ||
-      card.trigger === "legacy"
+      card.trigger === "legacy" ||
+      card.trigger === "stoppage"
     )
       continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
@@ -293,6 +302,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
           countermove: null,
           championship: null,
           legacy: null,
+          stoppage: null,
         },
         resolution: null,
       });

@@ -1,5 +1,5 @@
 import { type AxisId, type DealSlot, GEAR_BRAND_ID, GENOME_AXES, LEAGUE_TIERS } from "../content";
-import { offseasonOpen, tierEntry, yearOfQuarter } from "./calendar";
+import { offseasonOpen, seasonStopped, tierEntry, yearOfQuarter } from "./calendar";
 import { hasCountermove, mediaRevenueFactor } from "./countermoves";
 import { growthFactorsAt } from "./growth";
 import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
@@ -464,10 +464,12 @@ export function exclusiveTv(flagship: FlagshipState): boolean {
  * A league's income a quarter: gate plus the media line, cut by a rival's sponsor lockout. At
  * the flagship the gate is paid only on the hardcore fans its venue seats (GDD v1.30), the media
  * line keeps only its baseline share and signed deals pay on top; they are locked, so no
- * countermove cuts them (GDD v1.28). `country` and `tier` default to the state's.
+ * countermove cuts them (GDD v1.28). In a season lost to a stoppage (GDD v1.39) the seat earns
+ * only its sponsors and naming rights: no gate, no media line, no TV deal. `country` and `tier`
+ * default to the state's.
  */
 export function leagueIncomePerQuarter(
-  state: Pick<GameState, "countries" | "flagship" | "ppTier" | "growthNodes">,
+  state: Pick<GameState, "countries" | "flagship" | "ppTier" | "growthNodes" | "agreement">,
   world: World,
   index: number,
   country: CountryState | undefined = state.countries[index],
@@ -491,6 +493,10 @@ export function leagueIncomePerQuarter(
     ) * shapeFactors(world, state.growthNodes).mediaRevenue,
   );
   if (!atSeat) return revenue.total;
+  if (seasonStopped(state))
+    return payingDeals(state.flagship)
+      .filter((deal) => deal.slot !== "tv")
+      .reduce((sum, deal) => sum + deal.annualValue / 4, 0);
   return (
     revenue.gate +
     revenue.media * flagshipMediaShare(state.flagship, world) +

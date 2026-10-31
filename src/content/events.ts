@@ -147,6 +147,7 @@ const template = z
       "countermove",
       "championship",
       "legacy",
+      "stoppage",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),
@@ -269,6 +270,13 @@ const template = z
         issue("The legacy card is a moment that follows a recorded fact: no cooldown");
       if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
         issue("The legacy card belongs to the sport: campaign scope, no anchor or health filter");
+    }
+    // A season lost to a stoppage (GDD v1.39): one moment told from the landmark.
+    if (card.trigger === "stoppage") {
+      if (card.kind !== "moment" || card.cooldownTurns !== null)
+        issue("The stoppage card is a moment that follows a recorded fact: no cooldown");
+      if (card.scope !== "campaign" || card.anchorOnly || card.health.length)
+        issue("The stoppage card belongs to the seat: campaign scope, no anchor or health filter");
     }
     if (!season && card.cooldownSeasons !== null)
       issue("Only flagship season cards count cooldowns in seasons");

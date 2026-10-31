@@ -144,6 +144,7 @@ describe("famous venues", () => {
         countermove: null,
         championship: null,
         legacy: null,
+        stoppage: null,
       },
     };
     const pp = (s: GameState) => {

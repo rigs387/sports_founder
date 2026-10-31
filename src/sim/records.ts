@@ -259,6 +259,13 @@ export const landmarks = {
     proposed,
     stoppage,
   }),
+  seasonLost: (turn: number, quarter: number, countryId: string, season: number): Landmark => ({
+    kind: "seasonLost",
+    turn,
+    quarter,
+    countryId,
+    season,
+  }),
   legacyGoal: (
     turn: number,
     quarter: number,

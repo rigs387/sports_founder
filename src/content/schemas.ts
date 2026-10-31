@@ -1363,6 +1363,7 @@ export const configFileSchema = z.strictObject({
           standard: z.literal(1),
           high: z.number().min(0),
         }),
+        stoppage: z.strictObject({ hardcoreDemotionShare: z.number().min(0).max(1) }),
       })
       .refine((a) => a.shares[0] <= a.shares[1], "shares must be [lowest, highest]")
       .refine(

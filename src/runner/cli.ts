@@ -825,6 +825,15 @@ function main(): number {
         ? "  Players' agreements: none signed (no Professional seat)"
         : `  Players' agreements: per campaign median ${fmt(deal.perCampaign.median)}; ${deal.proposed} of ${deal.total} proposed (the rest the union's ask at End Turn); stoppages ${deal.stoppages}; share median ${fmt(deal.share)}%, term median ${fmt(deal.term)} seasons; salary cap in ${deal.capped}; minimum wage low ${deal.minWages.low} / standard ${deal.minWages.standard} / high ${deal.minWages.high}`,
     );
+    const lost = money.lost;
+    const healthLine = (counts: Record<string, number>) =>
+      Object.entries(counts)
+        .map(([health, n]) => `${health} ${n}`)
+        .join(" / ");
+    if (lost.total > 0)
+      console.log(
+        `  Seasons lost to a stoppage: ${lost.total} (per campaign median ${fmt(lost.perCampaign.median)}, max ${fmt(lost.perCampaign.max)}); seat cash as one began median ${(lost.yearsBefore ?? 0).toFixed(1)} y of costs, after ${(lost.yearsAfter ?? 0).toFixed(1)} y; seat health before ${healthLine(lost.healthBefore)}; after ${healthLine(lost.healthAfter)}`,
+      );
     const venues = venuesAggregate(results);
     console.log(
       `  Venues: gate lost to the cap median ${pct(venues.gateLost.median ?? 0)} (max ${pct(venues.gateLost.max ?? 0)}); level at the offseason by league tier ${venues.levels

@@ -587,6 +587,11 @@ export type Landmark =
       /** The talks failed: a stoppage, then the union's ask on the shortest term. */
       stoppage: boolean;
     }
+  /**
+   * A flagship season lost to a stoppage (GDD v1.39), recorded when it would have started; the
+   * country is the seat.
+   */
+  | { kind: "seasonLost"; turn: number; quarter: number; countryId: string; season: number }
   /** A legacy goal was met (GDD v1.38); the country is the anchor. */
   | { kind: "legacyGoal"; turn: number; quarter: number; countryId: string; goalId: LegacyGoalId }
   /** A player became the league's all-time top scorer. */
@@ -929,7 +934,7 @@ export interface AgreementState {
   rng: number[];
   /** The agreement in force and the seasons it covers; null before the union forms. */
   current: (AgreementTerms & { fromSeason: number; throughSeason: number }) | null;
-  /** The flagship season a stoppage lost, if the last talks failed (its effects: step 4). */
+  /** The flagship season the last stoppage lost (GDD v1.39), if talks ever failed. */
   stoppageSeason: number | null;
 }
 

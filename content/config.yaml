@@ -994,6 +994,10 @@ flagship:
   #              and drift at random × drift; no star's wage passes starWageLimit × a new star's
   #              (payroll.wageShare of the running cost), before the growth tree's wage factor
   #   talentPull standouts.talentPull.chance × this, by minimum wage (standard is 1)
+  # A stoppage (GDD v1.39 decision 6) loses the season the refused talks were for: no matches,
+  # no gate, media or TV deal at the seat, no players paid, the broadcast dark, its clauses
+  # missed. When it would have started, hardcoreDemotionShare of the player's hardcore fans at
+  # the seat turn casual, as after a betrayal.
   agreement:
     default: { share: 50, term: 5, cap: false, minWage: standard }
     shares: [45, 55]
@@ -1010,6 +1014,7 @@ flagship:
       edge: 3
     cap: { parity: 0.5, drift: 0.75, starWageLimit: 1.5 }
     talentPull: { low: 0.6, standard: 1, high: 1.4 }
+    stoppage: { hardcoreDemotionShare: 0.08 }
   payroll:
     baselineShare: 0.3
     wageShare: 0.06

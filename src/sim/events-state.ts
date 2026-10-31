@@ -145,6 +145,11 @@ export const eventRecordSchema = z.strictObject({
       .strictObject({ goalId: z.enum(LEGACY_GOAL_IDS) })
       .nullable()
       .default(null),
+    /** The season a stoppage lost and the union's term that ended it (GDD v1.39). */
+    stoppage: z
+      .strictObject({ season: z.int().positive(), term: z.int().positive() })
+      .nullable()
+      .default(null),
   }),
   resolution: z
     .strictObject({

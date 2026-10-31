@@ -78,6 +78,11 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
           {t("flagship.paused", { ...nouns, country: seatName })}
         </p>
       )}
+      {flagship.playing && flagship.stoppage && (
+        <p className="flagship-paused" role="status" data-testid="flagship-stoppage">
+          {t("flagship.stoppage", { ...nouns, season: flagship.season, country: seatName })}
+        </p>
+      )}
       <div className="flagship-layout">
         <div className="flagship-main">
           <StarsPanel
@@ -145,7 +150,11 @@ function Broadcast({
           {t(`flagship.broadcast.health.${broadcast.health}`, vars)}
         </p>
       )}
-      {broadcast.reaches === 0 ? (
+      {snapshot.flagship.stoppage ? (
+        <p className="broadcast-reach broadcast-ripple" data-testid="broadcast-dark">
+          {t("flagship.broadcast.dark", vars)}
+        </p>
+      ) : broadcast.reaches === 0 ? (
         <p className="broadcast-reach">{t("flagship.broadcast.smallMarket", vars)}</p>
       ) : broadcast.ripple ? (
         <p className="broadcast-reach broadcast-ripple">

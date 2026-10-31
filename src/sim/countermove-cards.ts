@@ -49,6 +49,7 @@ export function offerCountermoveCards(
         },
         championship: null,
         legacy: null,
+        stoppage: null,
       },
       resolution: null,
     });

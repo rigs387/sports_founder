@@ -246,6 +246,12 @@
   padding-bottom: 6px;
   border-bottom: 1px solid #e3ecf7;
 }
+/* A season lost to a stoppage (GDD v1.39): its place in the roll, struck through in tone. */
+.roll li.roll-lost strong {
+  color: var(--muted);
+  font-weight: 600;
+  font-style: italic;
+}
 .legacy-goals {
   display: grid;
   gap: 6px;

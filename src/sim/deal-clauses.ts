@@ -10,6 +10,12 @@ import { type Deal, type GameState, type Landmark, PLAYER_INDEX, type World } fr
 // renewal edge, src/sim/deals.ts). Missed: one more miss in a row; enough and the partner walks,
 // with the rest of the deal lost but no penalty and no shunning. Runs once an offseason, before
 // its offers are made (src/sim/turn.ts), so a deal in its final season is judged before it ends.
+// A season lost to a stoppage (GDD v1.39) misses every clause.
+
+const CLAUSE_KINDS: readonly string[] = ["balance", "star", "fans"];
+
+/** Whether `season` was lost to the last stoppage. */
+const lostSeason = (state: GameState, season: number) => state.agreement.stoppageSeason === season;
 
 /**
  * Whether a deal's clause was met in the season just finished, against the seat country's
@@ -18,6 +24,8 @@ import { type Deal, type GameState, type Landmark, PLAYER_INDEX, type World } fr
  */
 export function clauseMet(state: GameState, world: World, deal: Deal, fans: number): boolean {
   const { flagship } = state;
+  if (CLAUSE_KINDS.includes(deal.demand?.kind ?? "") && lostSeason(state, flagship.season - 1))
+    return false;
   switch (deal.demand?.kind) {
     case "balance": {
       const last = flagship.seasons.length - 1;
@@ -32,8 +40,6 @@ export function clauseMet(state: GameState, world: World, deal: Deal, fans: numb
       return true;
   }
 }
-
-const CLAUSE_KINDS: readonly string[] = ["balance", "star", "fans"];
 
 /**
  * Judges every clause of a deal that paid in the season just finished, once an offseason (the

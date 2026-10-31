@@ -268,7 +268,17 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   minimum wage scales `pullChance` (`talent.ts`); the union counts minimum-wage points at
   `union.minWageWeight`. The agreement owns pay from Professional up: the growth tree's
   `wageFactor` scales star wages and the payroll baseline below it, never the negotiated share.
-  Next: the stoppage's lost season (step 4).
+- The stoppage (GDD v1.39, tech plan 2.25 step 4): a refused offer loses the season
+  `agreement.stoppageSeason`. `seasonStopped` (`calendar.ts`) is read where each effect
+  bites: no rounds and `lostSeasonEnd` (retirements and aging only) in `stepFlagshipQuarter`,
+  sponsors and naming rights only in `leagueIncomePerQuarter`, no payroll or wages in
+  `leagueCosts`, a dark `broadcastEffects`, missed clauses in `clauseMet`; `closeOffseason`
+  demotes the seat's hardcore fans (`flagship.agreement.stoppage`) and records `seasonLost`.
+  A lost season is a gap: no `SeasonSummary`, its number spent, so never assume the summaries'
+  seasons are consecutive; read lost ones with `lostSeasons` (from the landmarks). The headline
+  card is `season-lost` (trigger `stoppage`, `offerStoppageCards` in `agreement.ts`, no slot).
+  Its smoke step (`src/main/stoppage-smoke.ts`) runs after the agreement step. The smoke's
+  `screenshot` finishes CSS animations first: a hidden window never runs a fade-in.
 - Venues and payroll (GDD v1.30) are the flagship's only: `LeagueState.venue` (level 1–5, a build,
   the record crowd) on every league, built only at the seat. `src/sim/venues.ts` (capacity, the
   conversion lift), `src/sim/venue-actions.ts` (`buildVenue` in the offseason; `openVenues` when

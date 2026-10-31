@@ -237,6 +237,13 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     stoppage: z.boolean(),
   }),
   z.strictObject({
+    kind: z.literal("seasonLost"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+  }),
+  z.strictObject({
     kind: z.literal("legacyGoal"),
     turn: z.int().min(1),
     quarter: count,

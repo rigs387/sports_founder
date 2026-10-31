@@ -1,5 +1,6 @@
 import { offseasonOpen } from "./calendar";
 import { leagueIncomePerQuarter } from "./deals";
+import type { EventState } from "./events-state";
 import { seatStars } from "./flagship";
 import { agreementPayShare, leagueCosts, termsInForce } from "./league-costs";
 import { leagueTierIndex } from "./leagues";
@@ -9,8 +10,10 @@ import {
   type AgreementState,
   type AgreementTerms,
   type GameState,
+  type Landmark,
   MIN_WAGES,
   type MinWage,
+  PLAYER_INDEX,
   type World,
 } from "./types";
 
@@ -19,7 +22,10 @@ import {
 // agreement in force does not cover. The player sets four levers and sees the union's read (will
 // sign, a chance of a stoppage, will refuse); confirming makes one roll on the talks' own stream.
 // End Turn takes the union's ask, which never rolls. A failed roll is a stoppage: the season is
-// lost (its effects are step 4) and the union's ask is signed on the shortest term.
+// lost and the union's ask is signed on the shortest term. The lost season's effects live where
+// they bite (`seasonStopped` in calendar.ts): no matches (flagship.ts), no gate, media or TV deal
+// (deals.ts), nobody paid (league-costs.ts), the broadcast dark, clauses missed
+// (deal-clauses.ts), and the seat's hardcore demotion as it would have begun (`closeOffseason`).
 
 const AGREEMENT_STREAM = 0x510e_527f;
 
@@ -184,6 +190,54 @@ export function proposeAgreement(state: GameState, world: World, offer: Agreemen
 export function settleAgreement(state: GameState, world: World): GameState {
   if (!talksOpen(state, world)) return state;
   return sign(state, unionAsk(state, world), state.agreement.rng, false, false);
+}
+
+/**
+ * The headline card for each season lost to a stoppage in the turn's landmarks (GDD v1.39), told
+ * at the seat with the union's term that ended it. It takes no moment slot.
+ */
+export function offerStoppageCards(
+  state: GameState,
+  world: World,
+  recent: readonly Landmark[],
+  events: EventState,
+): EventState {
+  const card = world.events.cards.find((c) => c.trigger === "stoppage");
+  if (!card || state.ppTier < card.minTier) return events;
+  const pending = [...events.pending];
+  let nextId = events.nextId;
+  for (const landmark of recent) {
+    if (landmark.kind !== "seasonLost") continue;
+    const country = state.countries.find((c) => c.countryId === landmark.countryId);
+    const fans = country?.fans[PLAYER_INDEX];
+    if (!country || !fans) continue;
+    pending.push({
+      id: nextId++,
+      templateId: card.id,
+      countryId: country.countryId,
+      turn: state.turn,
+      quarter: landmark.quarter,
+      facts: {
+        casual: fans.casual,
+        hardcore: fans.hardcore,
+        leagueTier: country.league?.tier ?? null,
+        health: country.league?.health ?? null,
+        rivalId: null,
+        season: null,
+        star: null,
+        tradition: null,
+        deal: null,
+        venue: null,
+        hall: null,
+        countermove: null,
+        championship: null,
+        legacy: null,
+        stoppage: { season: landmark.season, term: state.agreement.current?.term ?? 1 },
+      },
+      resolution: null,
+    });
+  }
+  return { ...events, pending, nextId };
 }
 
 export interface AgreementOffer {

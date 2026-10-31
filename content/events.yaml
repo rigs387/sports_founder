@@ -1019,6 +1019,24 @@ cards:
     effects: []
     choices: []
     defaultChoice: null
+  # A season lost to a stoppage (GDD v1.39): a headline, no slot.
+  - id: season-lost
+    kind: moment
+    weight: headline
+    tone: pressure
+    priority: 200
+    trigger: stoppage
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    choices: []
+    defaultChoice: null
   - id: rival-countermove
     kind: moment
     weight: big

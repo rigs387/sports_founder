@@ -47,6 +47,7 @@ export function offerHallCards(
         countermove: null,
         championship: null,
         legacy: null,
+        stoppage: null,
       },
       resolution: null,
     });
@@ -103,6 +104,7 @@ export function offerAwardCards(
           countermove: null,
           championship: null,
           legacy: null,
+          stoppage: null,
         },
         resolution: null,
       },

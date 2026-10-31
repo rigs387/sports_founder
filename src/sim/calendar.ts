@@ -26,3 +26,11 @@ export function yearOfQuarter(quarter: number, config: Config): number {
 export function offseasonOpen(state: Pick<GameState, "flagship">): boolean {
   return state.flagship.offseason;
 }
+
+/**
+ * Whether the flagship season under way is lost to a stoppage (GDD v1.39): the refused talks
+ * were for it. Not while the offseason is open.
+ */
+export function seasonStopped(state: Pick<GameState, "agreement" | "flagship">): boolean {
+  return !state.flagship.offseason && state.agreement.stoppageSeason === state.flagship.season;
+}

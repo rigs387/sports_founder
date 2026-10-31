@@ -83,6 +83,7 @@ describe("stoking a repeat final", () => {
         countermove: null,
         championship: null,
         legacy: null,
+        stoppage: null,
       },
       resolution: null,
     };

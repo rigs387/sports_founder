@@ -66,7 +66,10 @@ export function unblockedMediaReach(
 
 /** Exposure to the player's sport in every country at the current state. */
 export function computeExposure(
-  state: Pick<GameState, "countries" | "focus" | "growthNodes" | "events" | "quarter" | "flagship">,
+  state: Pick<
+    GameState,
+    "countries" | "focus" | "growthNodes" | "events" | "quarter" | "flagship" | "agreement"
+  >,
   world: World,
 ): CountryExposure[] {
   const { exposure: settings, focus: focusSettings } = world.config;

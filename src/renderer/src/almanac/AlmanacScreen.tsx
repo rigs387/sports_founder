@@ -33,6 +33,11 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
     snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
   const players = [...hall.inductees].reverse();
   const { champions, scorers, crowd, mostAwards } = hall.records;
+  // Seasons lost to a stoppage (GDD v1.39) keep their place in the roll, newest first.
+  const roll = [
+    ...champions.map((season) => ({ ...season, lost: false as const })),
+    ...hall.records.lost.map((season) => ({ ...season, lost: true as const })),
+  ].sort((a, b) => b.season - a.season);
 
   return (
     <section
@@ -247,47 +252,56 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
           </section>
           <section className="almanac-card" aria-labelledby="almanac-roll-heading">
             <h2 id="almanac-roll-heading">{t("almanac.roll.heading")}</h2>
-            {champions.length === 0 ? (
+            {roll.length === 0 ? (
               <p className="almanac-empty">{t("almanac.roll.empty")}</p>
             ) : (
               <ol className="roll" data-testid="almanac-roll">
-                {champions.map((season) => (
-                  <li key={season.season}>
-                    <span className="roll-year">{season.year}</span>
-                    <span>
-                      <strong>{club(season.championId)}</strong>
-                      {season.topScorer && (
-                        <small>
-                          {t("almanac.roll.scorer", {
-                            ...nouns({ score: season.topScorer.scores }),
-                            player: player(season.topScorer.playerId),
-                            count: season.topScorer.scores,
-                          })}
-                        </small>
-                      )}
-                      {season.playerOfSeason !== null && (
-                        <small>
-                          {t("almanac.roll.award", {
-                            award: awards.award,
-                            player: player(season.playerOfSeason),
-                          })}
-                        </small>
-                      )}
-                      {snapshot.playersOfYear
-                        .filter((winner) => winner.season === season.season)
-                        .map((winner) => (
-                          <small key={winner.playerId} data-testid="almanac-player-of-year">
-                            {t("almanac.roll.playerOfYear", {
-                              context: winner.clubId === null ? "abroad" : undefined,
-                              player: winner.name,
-                              club: club(winner.clubId),
-                              country: country(winner.countryId),
+                {roll.map((season) =>
+                  season.lost ? (
+                    <li key={season.season} className="roll-lost" data-testid="almanac-lost-season">
+                      <span className="roll-year">{season.year}</span>
+                      <span>
+                        <strong>{t("almanac.roll.lost", nouns())}</strong>
+                      </span>
+                    </li>
+                  ) : (
+                    <li key={season.season}>
+                      <span className="roll-year">{season.year}</span>
+                      <span>
+                        <strong>{club(season.championId)}</strong>
+                        {season.topScorer && (
+                          <small>
+                            {t("almanac.roll.scorer", {
+                              ...nouns({ score: season.topScorer.scores }),
+                              player: player(season.topScorer.playerId),
+                              count: season.topScorer.scores,
                             })}
                           </small>
-                        ))}
-                    </span>
-                  </li>
-                ))}
+                        )}
+                        {season.playerOfSeason !== null && (
+                          <small>
+                            {t("almanac.roll.award", {
+                              award: awards.award,
+                              player: player(season.playerOfSeason),
+                            })}
+                          </small>
+                        )}
+                        {snapshot.playersOfYear
+                          .filter((winner) => winner.season === season.season)
+                          .map((winner) => (
+                            <small key={winner.playerId} data-testid="almanac-player-of-year">
+                              {t("almanac.roll.playerOfYear", {
+                                context: winner.clubId === null ? "abroad" : undefined,
+                                player: winner.name,
+                                club: club(winner.clubId),
+                                country: country(winner.countryId),
+                              })}
+                            </small>
+                          ))}
+                      </span>
+                    </li>
+                  ),
+                )}
               </ol>
             )}
           </section>

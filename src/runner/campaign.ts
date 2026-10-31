@@ -154,6 +154,16 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   let payrollShare = 0;
   let wagesShare = 0;
   const venueLevels: CampaignResult["venues"]["levels"] = [];
+  // Seasons lost to a stoppage (GDD v1.39): the seat league's cash and health as each began and
+  // once it was over.
+  const stoppages: CampaignResult["money"]["stoppages"] = [];
+  const seatMoney = (current: GameState) => {
+    const i = world.countries.findIndex((c) => c.id === current.flagship.countryId);
+    const league = current.countries[i]?.league ?? null;
+    if (!league) return null;
+    const costs = leagueCosts(current, world, i).total;
+    return { years: costs > 0 ? league.cash / (4 * costs) : 0, health: league.health };
+  };
   let levelSeason: number | null = null;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
@@ -327,6 +337,12 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     // deal that ended at its term (judged just before it expired, in the same turn), walks.
     {
       const fresh = state.landmarks.slice(before.landmarks.length);
+      for (const lost of fresh)
+        if (lost.kind === "seasonLost")
+          stoppages.push({ season: lost.season, before: seatMoney(before), after: null });
+      const open = stoppages.at(-1);
+      if (open && open.after === null && state.flagship.season > open.season)
+        open.after = seatMoney(state);
       const now = new Map(state.flagship.deals.signed.map((deal) => [deal.id, deal]));
       const seat = state.countries.find((c) => c.countryId === state.flagship.countryId);
       const fans =
@@ -655,6 +671,7 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         })(),
         folds: state.landmarks.filter((l) => l.kind === "leagueFolded").length,
         nearCollapseShare: leagueNearCollapseTurns / Math.max(1, leagueTurns),
+        stoppages,
         // The players' agreements signed at the flagship (GDD v1.39).
         agreements: state.landmarks.flatMap((l) =>
           l.kind === "agreementSigned"

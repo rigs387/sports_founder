@@ -23,6 +23,7 @@ import { COLLECT_NEWS } from "./smoke-news";
 import { verifyStandings } from "./standings-smoke";
 import { verifyStarCards } from "./star-smoke";
 import { verifyStarsPanel } from "./stars-smoke";
+import { verifyStoppage } from "./stoppage-smoke";
 import { verifyVenue } from "./venue-smoke";
 
 // Development-only self-check, enabled by the SF_SMOKE_OUT environment variable (see
@@ -109,7 +110,12 @@ async function run(
   };
 
   const screenshot = async (name: string) => {
-    // Hidden Chromium windows can return the last composited frame on the first capture.
+    // A hidden window runs no CSS animations, so a window fading in would stay invisible: finish
+    // them. Hidden Chromium windows can also return the last composited frame on the first capture.
+    await win.webContents.executeJavaScript(
+      "document.getAnimations().forEach((a) => { try { a.finish(); } catch {} })",
+      true,
+    );
     await win.webContents.capturePage();
     await delay(300);
     const image = await win.webContents.capturePage();
@@ -169,6 +175,7 @@ async function run(
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
   const retirement = await verifyRetirement(win, outDir, filePrompts, screenshot);
   const agreement = await verifyAgreement(win, outDir, filePrompts, screenshot);
+  const stoppage = await verifyStoppage(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
   const report = {
@@ -197,6 +204,7 @@ async function run(
     almanac,
     saves,
     agreement,
+    stoppage,
     retirement,
     errors,
     remoteRequests,

@@ -464,6 +464,21 @@ is the second part of this topic. Cash comes first.
   after a betrayal. Players age a year. It ends with the union's ask as the deal, on a short
   term: the fight and the season are both lost. Not chosen: a stoppage that runs on until the
   player gives in or wins (a second lost season), and a shortened season with a champion.
+- *Built 2026-10-31 (tech plan 2.25 step 4, the stoppage):* as decided, with these calls. The
+  lost season is a gap in the league's history (no champion, its number spent), not a season
+  with no champion. 8% of the hardcore fans at the seat turn casual as it would have begun. The
+  seat keeps its sponsors and naming rights; the gate, the media line and the TV deal stop, and
+  no players are paid (a strike pays nothing). The term signed after a refusal counts the lost
+  season as its first, so talks reopen two played seasons later. National teams are not on
+  strike: a World Championship due that year is still played. Shown as a headline card, a notice
+  and a dark broadcast on the Flagship tab, the season in review, and a line in the Almanac's
+  roll of champions. Measured in three 150-turn media-rush campaigns (the bot accepts up to a
+  40% chance of refusal), same seeds before and after: 22 stoppages in 52 agreements (median 6
+  seasons lost a campaign, max 10). The seat's reserve absorbs the year (a median 3.0 years of
+  costs as one began, 3.3 after), but its health fell to Struggling in 16 of 22 (2 before); no
+  league folded. Wins by turn 150 fell from 3/3 to 1/3, #1 was lost 6 times instead of 3, the
+  longest hold max 43 to 39 turns. Stoppages make the late cap matter more: it was already priced
+  past the safe range late (6–8 stars), and a refusal now costs a season, so it is out of reach.
 - *Decision 7, when the union arrives (7a):* at Professional. Amateur and Semi-Pro players are
   not professionals, and those leagues pay as they do today, so the fragile early game is
   untouched. When the flagship reaches Professional the union forms and the first agreement is

@@ -10,7 +10,7 @@ import {
   type LeagueTierId,
   TRADITION_TYPES,
 } from "../content";
-import { MIN_WAGES, type MinWage, type SportTotals } from "../sim";
+import { type HealthLevel, MIN_WAGES, type MinWage, type SportTotals } from "../sim";
 import type { BotId } from "./policy";
 
 /** Turns at which PP banked and spent are sampled for the growth tree report. */
@@ -173,6 +173,15 @@ export interface CampaignResult {
     folds: number;
     /** Share of every league's turns spent at Near-Collapse. */
     nearCollapseShare: number;
+    /**
+     * Seasons lost to a stoppage (GDD v1.39): the seat league's cash in years of costs and health
+     * as each began and once it was over (null if the league was gone, or it had not ended).
+     */
+    stoppages: {
+      season: number;
+      before: { years: number; health: HealthLevel } | null;
+      after: { years: number; health: HealthLevel } | null;
+    }[];
     /** Players' agreements signed at the flagship, in order (GDD v1.39). */
     agreements: {
       share: number;
@@ -560,8 +569,23 @@ export function moneyAggregate(results: CampaignResult[]) {
     };
   });
   const agreements = results.flatMap((r) => r.money.agreements);
+  const stoppages = results.flatMap((r) => r.money.stoppages);
+  const healths = (pick: (s: (typeof stoppages)[number]) => { health: HealthLevel } | null) =>
+    stoppages.reduce<Record<string, number>>((counts, s) => {
+      const key = pick(s)?.health ?? "none";
+      counts[key] = (counts[key] ?? 0) + 1;
+      return counts;
+    }, {});
   return {
     tiers,
+    lost: {
+      perCampaign: distribution(results.map((r) => r.money.stoppages.length)),
+      total: stoppages.length,
+      yearsBefore: median(stoppages.flatMap((s) => (s.before ? [s.before.years] : []))),
+      yearsAfter: median(stoppages.flatMap((s) => (s.after ? [s.after.years] : []))),
+      healthBefore: healths((s) => s.before),
+      healthAfter: healths((s) => s.after),
+    },
     agreements: {
       perCampaign: distribution(results.map((r) => r.money.agreements.length)),
       proposed: agreements.filter((a) => a.proposed).length,
