@@ -573,6 +573,20 @@ export type Landmark =
       season: number;
       hostId: string;
     }
+  /** A players' agreement was signed at the flagship (GDD v1.39); the country is the seat. */
+  | {
+      kind: "agreementSigned";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      /** The first season it covers. */
+      season: number;
+      terms: AgreementTerms;
+      /** Proposed by the player (false: the union's ask, taken by End Turn). */
+      proposed: boolean;
+      /** The talks failed: a stoppage, then the union's ask on the shortest term. */
+      stoppage: boolean;
+    }
   /** A legacy goal was met (GDD v1.38); the country is the anchor. */
   | { kind: "legacyGoal"; turn: number; quarter: number; countryId: string; goalId: LegacyGoalId }
   /** A player became the league's all-time top scorer. */
@@ -893,6 +907,30 @@ export interface GameState {
   worldChampionship: WorldChampionshipState;
   /** Legacy goals met so far, in the order they were met (GDD v1.38). */
   legacy: { done: { goalId: LegacyGoalId; turn: number; year: number }[] };
+  /** The players' agreement at the flagship (GDD v1.39). */
+  agreement: AgreementState;
+}
+
+export const MIN_WAGES = ["low", "standard", "high"] as const;
+export type MinWage = (typeof MIN_WAGES)[number];
+
+/** The levers of a players' agreement (GDD v1.39). */
+export interface AgreementTerms {
+  /** The players' share of the seat league's income, in whole percent. */
+  share: number;
+  /** Seasons it runs. */
+  term: number;
+  cap: boolean;
+  minWage: MinWage;
+}
+
+export interface AgreementState {
+  /** The talks' own random stream: one roll for each offer confirmed. */
+  rng: number[];
+  /** The agreement in force and the seasons it covers; null before the union forms. */
+  current: (AgreementTerms & { fromSeason: number; throughSeason: number }) | null;
+  /** The flagship season a stoppage lost, if the last talks failed (its effects: step 4). */
+  stoppageSeason: number | null;
 }
 
 /** The legacy goals (GDD v1.38), in the order the Almanac lists them. */

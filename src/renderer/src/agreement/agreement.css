@@ -1,0 +1,49 @@
+/* The players' agreement (GDD v1.39): the terms in force, the levers and the union's read. */
+.agreement-card p {
+  margin: 6px 0;
+}
+.agreement-card .warning {
+  color: var(--warning);
+  font-weight: 700;
+}
+.agreement-ask {
+  font-weight: 700;
+}
+.agreement-levers .agreement-share {
+  display: grid;
+  gap: 6px;
+  cursor: default;
+}
+.agreement-share input {
+  width: 100%;
+}
+.agreement-choices {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+.agreement-choices > span {
+  display: grid;
+  gap: 2px;
+}
+.agreement-choices small {
+  color: var(--muted);
+}
+.agreement-choices > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.agreement-choices label {
+  align-items: center;
+}
+.agreement-read {
+  font-weight: 700;
+}
+.agreement-read-sign {
+  color: var(--second);
+}
+.agreement-read-edge,
+.agreement-read-refuse {
+  color: var(--warning);
+}

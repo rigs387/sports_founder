@@ -1160,6 +1160,59 @@
     "affinity": "Affinity",
     "focusedName": "{{name}} ★"
   },
+  "agreement": {
+    "heading": "Players' agreement",
+    "noUnion": "The players form a union when the league reaches Professional. Until then there is nothing to bargain over.",
+    "summary_one": "{{share}}% of income to the players, {{count}} {{seasonNoun}}, {{cap}}, {{minWage}} minimum wage",
+    "summary_other": "{{share}}% of income to the players, {{count}} {{seasonsNoun}}, {{cap}}, {{minWage}} minimum wage",
+    "capOn": "salary cap",
+    "capOff": "no salary cap",
+    "minWage": {
+      "low": "a low",
+      "standard": "a standard",
+      "high": "a high"
+    },
+    "off": "Off",
+    "on": "On",
+    "minWageOption": {
+      "low": "Low",
+      "standard": "Standard",
+      "high": "High"
+    },
+    "inForce": "In force for {{seasonsNoun}} {{from}}–{{through}}: {{terms}}.",
+    "default": "The players are paid on the league's standing terms until the first agreement: {{terms}}.",
+    "stopped": "{{SeasonNoun}} {{season}} was lost to a stoppage.",
+    "nextTalks": "Talks reopen in the offseason before {{seasonNoun}} {{season}}.",
+    "ask": "The union asks for {{terms}}, from {{seasonNoun}} {{season}}.",
+    "levers": "Your offer",
+    "share": "Players' share: {{share}}%",
+    "shareHint": "The share of the league's income paid to the players. The union's main want.",
+    "term": "Term",
+    "termHint": "Longer buys quiet, and the union wants more for it.",
+    "seasons_one": "{{count}} {{seasonNoun}}",
+    "seasons_other": "{{count}} {{seasonsNoun}}",
+    "cap": "Salary cap",
+    "capHint": "Keeps the clubs closer in strength and limits star wages. The union counts it against the offer, more so with more stars.",
+    "minWageLabel": "Minimum wage",
+    "minWageHint": "A high floor costs a little more and draws standouts from abroad.",
+    "read": {
+      "sign": "The union will sign.",
+      "edge": "On the edge: {{chance, number(style: percent; maximumFractionDigits: 0)}} chance of a stoppage.",
+      "refuse": "The union will refuse."
+    },
+    "pay": "The players get {{share}}% of income: {{value, money}} a quarter at today's income.",
+    "review": "Review the offer",
+    "toAsk": "Back to the union's ask",
+    "reviewText": "Offer {{terms}}, from {{seasonNoun}} {{season}}.",
+    "reviewRead": {
+      "sign": "The union will sign it.",
+      "edge": "{{chance, number(style: percent; maximumFractionDigits: 0)}} chance the union refuses. Then {{seasonNoun}} {{season}} is lost to a stoppage, and the union's ask is signed for the shortest term.",
+      "refuse": "The union will refuse it. {{SeasonNoun}} {{season}} will be lost to a stoppage, and the union's ask signed for the shortest term."
+    },
+    "confirm": "Put it to the union",
+    "back": "Back",
+    "endTurnDefault": "If no offer is made, Next Turn signs the union's ask."
+  },
   "venue": {
     "heading": "The venue",
     "noLeague": "{{country}} has no league to play in.",
@@ -1307,6 +1360,7 @@
       "pickHost": "{{country}} will host the next tournament.",
       "signDeal": "Deal signed. It pays from the next season.",
       "buildVenue": "Building has started. The new level opens in a later offseason.",
+      "proposeAgreement": "The offer went to the union. Its answer is on the agreement card.",
       "retire": "You have retired. The campaign is finished."
     },
     "lockForkFirst": "Choose {{nodes}} first: the fork before this level."

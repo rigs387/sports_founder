@@ -11,6 +11,7 @@ import {
   endTurn,
   foundingClubOf,
   type GameState,
+  newAgreement,
   newFlagship,
   runTurns,
   SAVE_FORMAT_VERSION,
@@ -359,6 +360,7 @@ describe("saves with the growth tree (format 5)", () => {
           ...migratedFlagship(withoutTree),
         }),
         legacy: migratedLegacy(),
+        agreement: newAgreement(withoutTree.seed),
       }),
     );
     const later = playWithPolicy(loaded, 6);

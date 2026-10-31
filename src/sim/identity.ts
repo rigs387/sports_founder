@@ -130,13 +130,20 @@ export function foundingClubOf(clubs: readonly Club[], anchorCountryId: string):
 export function foundSport(
   state: Omit<
     GameState,
-    "identity" | "rules" | "culture" | "hallOfFame" | "standouts" | "worldChampionship" | "legacy"
+    | "identity"
+    | "rules"
+    | "culture"
+    | "hallOfFame"
+    | "standouts"
+    | "worldChampionship"
+    | "legacy"
+    | "agreement"
   >,
   world: World,
   setup: IdentitySetup,
 ): Omit<
   GameState,
-  "rules" | "culture" | "hallOfFame" | "standouts" | "worldChampionship" | "legacy"
+  "rules" | "culture" | "hallOfFame" | "standouts" | "worldChampionship" | "legacy" | "agreement"
 > {
   const founding = foundingClubOf(state.flagship.clubs, state.anchorCountryId);
   if (!founding) throw new Error(`No flagship club at "${state.anchorCountryId}"`);

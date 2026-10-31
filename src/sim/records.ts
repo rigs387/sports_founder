@@ -1,4 +1,5 @@
 import type {
+  AgreementTerms,
   AxisId,
   DealClause,
   DealDemand,
@@ -240,6 +241,24 @@ export const landmarks = {
     season: number,
     hostId: string,
   ): Landmark => ({ kind: "championshipPlayed", turn, quarter, countryId, season, hostId }),
+  agreementSigned: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    season: number,
+    terms: AgreementTerms,
+    proposed: boolean,
+    stoppage: boolean,
+  ): Landmark => ({
+    kind: "agreementSigned",
+    turn,
+    quarter,
+    countryId,
+    season,
+    terms,
+    proposed,
+    stoppage,
+  }),
   legacyGoal: (
     turn: number,
     quarter: number,

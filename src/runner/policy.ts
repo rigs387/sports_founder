@@ -11,6 +11,8 @@ import {
 } from "../content";
 import {
   type Action,
+  type AgreementTerms,
+  agreementSnapshot,
   amendBlocker,
   amendedThisYear,
   amendmentJump,
@@ -40,6 +42,7 @@ import {
   promotionTerms,
   SEED_WARM_UP_DRAWS,
   seatStars,
+  talksOpen,
   venueBlocker,
   venueCapacity,
   venueTerms,
@@ -128,6 +131,11 @@ const AMEND_MARGIN = 0.05;
 const VENUE_FULL = { builder: 0.8, other: 1 };
 const VENUE_RESERVE_QUARTERS = { builder: 4, other: 0 };
 const TURTLE_RESERVE_BAILOUTS = 2;
+/**
+ * The players' agreement (GDD v1.39): the chance of a stoppage each bot accepts for a cheaper
+ * deal. The random bot proposes nothing, so End Turn takes the union's ask.
+ */
+const AGREEMENT_RISK = { greedySpread: 0.5, builder: 0, anchorTurtle: 0, mediaRush: 0.4 };
 
 export interface BotStep {
   state: GameState;
@@ -315,6 +323,7 @@ function greedySpreadTurn(state: GameState, world: World): BotStep {
   backStars(step, world, 0);
   buildVenues(step, world, VENUE_FULL.other, VENUE_RESERVE_QUARTERS.other);
   signDeals(step, world);
+  negotiate(step, world, AGREEMENT_RISK.greedySpread);
   runChampionship(step, world);
   buyNodes(step, world, 0, cheapest(step, world));
   return step;
@@ -442,6 +451,27 @@ function runChampionship(step: BotStep, world: World): void {
 }
 
 /**
+ * Puts the cheapest agreement to the union (the lowest pay share, then the longest term) whose
+ * chance of a stoppage is at most `risk` (GDD v1.39).
+ */
+function negotiate(step: BotStep, world: World, risk: number): void {
+  if (!talksOpen(step.state, world)) return;
+  const { offers, minWages } = agreementSnapshot(step.state, world);
+  const pay = (terms: AgreementTerms) => terms.share + minWages[terms.minWage];
+  let best: AgreementTerms | null = null;
+  for (const offer of offers) {
+    if (offer.chance > risk) continue;
+    if (
+      best === null ||
+      pay(offer.terms) < pay(best) ||
+      (pay(offer.terms) === pay(best) && offer.terms.term > best.term)
+    )
+      best = offer.terms;
+  }
+  if (best) attempt(step, world, { type: "proposeAgreement", terms: best });
+}
+
+/**
  * Signs the highest-value offer in each slot (GDD v1.28), demands included; ties go to the
  * earliest offer. Bots play on as usual, so their demands are kept or broken by their plans.
  */
@@ -533,6 +563,7 @@ function builderTurn(state: GameState, world: World, options: BotOptions): BotSt
   backStars(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   buildVenues(step, world, VENUE_FULL.builder, VENUE_RESERVE_QUARTERS.builder);
   signDeals(step, world);
+  negotiate(step, world, AGREEMENT_RISK.builder);
   runChampionship(step, world);
   buyNodes(
     step,
@@ -601,6 +632,7 @@ function anchorTurtleTurn(state: GameState, world: World): BotStep {
   backStars(step, world, bailoutReserve(step.state, world, TURTLE_RESERVE_BAILOUTS));
   buildVenues(step, world, VENUE_FULL.other, VENUE_RESERVE_QUARTERS.other);
   signDeals(step, world);
+  negotiate(step, world, AGREEMENT_RISK.anchorTurtle);
   runChampionship(step, world);
   buyNodes(step, world, bailoutReserve(step.state, world, TURTLE_RESERVE_BAILOUTS), (candidates) =>
     pickCheapest(candidates.filter((id) => nodeValue(step.state, world, id, anchorIndex) > 0)),
@@ -644,6 +676,7 @@ function mediaRushTurn(state: GameState, world: World): BotStep {
   backStars(step, world, reserve);
   buildVenues(step, world, VENUE_FULL.other, VENUE_RESERVE_QUARTERS.other);
   signDeals(step, world);
+  negotiate(step, world, AGREEMENT_RISK.mediaRush);
   runChampionship(step, world);
   const pickCheapest = cheapest(step, world);
   buyNodes(step, world, reserve, (candidates) =>

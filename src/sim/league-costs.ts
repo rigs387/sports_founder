@@ -2,14 +2,15 @@ import { leagueIncomePerQuarter } from "./deals";
 import { seatStars, starWage } from "./flagship";
 import { leagueTierIndex, nextVenuePrice, runningCostPerQuarter, venueUpkeep } from "./leagues";
 import { shapeFactors } from "./shape";
-import type { CountryState, GameState, LeagueTierId, World } from "./types";
+import type { AgreementTerms, CountryState, GameState, LeagueTierId, World } from "./types";
 
 // A league's costs a quarter (GDD v1.30). Every league pays its running cost (tier × wealth ×
 // size, cut by growth nodes) and upkeep on venue levels above 1. At the seat the running cost is
 // split into operations and the payroll baseline, and each star playing there adds a wage that
 // rises with their seasons as a star and their backed influence. Never from skill.
 // From Professional up (GDD v1.39) the players are paid a share of the league's income instead
-// of the baseline: the flagship's agreement at the seat, the fixed share everywhere else.
+// of the baseline: the flagship's agreement at the seat (its share and minimum wage), the fixed
+// share everywhere else.
 
 export interface LeagueCosts {
   /** The running cost less the payroll baseline (all of it away from the seat below Professional). */
@@ -24,11 +25,24 @@ export interface LeagueCosts {
 
 const NO_COSTS: LeagueCosts = { operations: 0, payroll: 0, wages: 0, upkeep: 0, total: 0 };
 
-type CostState = Pick<GameState, "countries" | "flagship" | "growthNodes" | "ppTier">;
+type CostState = Pick<GameState, "countries" | "flagship" | "growthNodes" | "ppTier" | "agreement">;
+
+/** The flagship's agreement in force (GDD v1.39), or the default before the first. */
+export function termsInForce(state: Pick<GameState, "agreement">, world: World): AgreementTerms {
+  const current = state.agreement.current;
+  if (!current) return world.config.flagship.agreement.default;
+  const { share, term, cap, minWage } = current;
+  return { share, term, cap, minWage };
+}
+
+/** What an agreement pays the players, as a share of income: its share and minimum wage. */
+export function agreementPayShare(terms: AgreementTerms, world: World): number {
+  return (terms.share + world.config.flagship.agreement.minWages[terms.minWage]) / 100;
+}
 
 /** The players' share of income at this tier, or null below `leagues.players.fromTier`. */
 export function playersShare(
-  state: Pick<GameState, "flagship">,
+  state: Pick<GameState, "flagship" | "agreement">,
   world: World,
   index: number,
   tier: LeagueTierId,
@@ -36,7 +50,7 @@ export function playersShare(
   const { players } = world.config.leagues;
   if (leagueTierIndex(tier) < leagueTierIndex(players.fromTier)) return null;
   return world.countries[index]?.id === state.flagship.countryId
-    ? world.config.flagship.agreement.share
+    ? agreementPayShare(termsInForce(state, world), world)
     : players.share;
 }
 

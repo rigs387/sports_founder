@@ -408,6 +408,17 @@ is the second part of this topic. Cash comes first.
   win in 2/3 (1/3 before); no folds and no Near-Collapse; the collapse experiment unchanged.
   The league card shows the reserve and what is paid out. Away from the seat the reserve still
   counts the next venue level, which only the seat builds, so small leagues never pay out.
+- *Built 2026-10-30 (tech plan 2.25 step 2, the agreement and the talks):* the levers are a
+  share of 45–55% in whole points, a term of 3, 5 or 7 seasons, the cap off or on, and a low,
+  standard or high minimum wage (1 point less, nothing, 2 points more on the payroll; live
+  now). The union counts an offer in share points: the share, plus the minimum wage's cost, less
+  1 point for the cap and half a point for each star playing, less 1 or 2 points for a 5- or
+  7-season term. Its ask is the shortest term, no cap, a standard minimum wage and a share of
+  50 + 10 × (the seat's operating margin before the players − 0.5), kept in range: late, rich
+  leagues are asked 55%. An offer short of the ask by g points is refused with chance g ÷ 3,
+  shown as the levers move: will sign, on the edge with the chance, will refuse. The default
+  terms before the first agreement are the middle of each lever. Between talks the card shows
+  the terms in force and when talks reopen.
 - *Decision 3, how the talks work (3b, against the recommendation of a single answer to the
   union's ask):* several levers on the table. The player sets the players' share, the term
   length, a salary cap and a minimum wage, each with its own effect. Deeper and closer to real

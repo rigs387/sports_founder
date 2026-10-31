@@ -252,7 +252,18 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   health check adds payouts back to read operating flow. From `leagues.players.fromTier` the
   payroll line is a share of income (`playersShare`: `flagship.agreement.share` at the seat,
   `leagues.players.share` elsewhere) in place of the baseline. The runner prints league cash by
-  tier. Next: the agreement and the talks (step 2).
+  tier and the agreements.
+- The players' agreement (GDD v1.39, tech plan 2.25 step 2) is `src/sim/agreement.ts` and
+  `GameState.agreement` (terms in force, seasons covered, `stoppageSeason`, its own random
+  stream). The union forms with a Professional seat; talks open in the offseason before the
+  first uncovered season (`talksOpen`). `proposeAgreement` makes one roll against `unionRead`;
+  a refusal records a stoppage and signs `unionAsk` on the shortest term; `settleAgreement`
+  (End Turn, before `closeOffseason`) takes the ask with no roll. Each signing is an
+  `agreementSigned` landmark. Shares are whole percent; `termsInForce` and
+  `agreementPayShare` (`league-costs.ts`) price the seat's payroll. The card is
+  `src/renderer/src/agreement/AgreementCard.tsx`, on the offseason screen only; its smoke step
+  (`src/main/agreement-smoke.ts`) runs after the retirement step on the late-game save. Next:
+  the cap and the minimum wage's talent pull (step 3), then the stoppage's lost season (step 4).
 - Venues and payroll (GDD v1.30) are the flagship's only: `LeagueState.venue` (level 1–5, a build,
   the record crowd) on every league, built only at the seat. `src/sim/venues.ts` (capacity, the
   conversion lift), `src/sim/venue-actions.ts` (`buildVenue` in the offseason; `openVenues` when
@@ -389,7 +400,7 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   `src/renderer/src/retrospective/RetrospectiveScreen.tsx`, opened by `App.tsx` on retiring
   and on loading a retired save; `RetireControl` sits on the world map's objective card. Bots
   never retire.
-- The late-game smoke step (`src/main/retire-smoke.ts`) runs last on its own campaign:
+- The late-game smoke step (`src/main/retire-smoke.ts`) runs last but one on its own campaign:
   `scripts/smoke.ts` has a bot play 200 turns and saves `late-game.sfsave` before launching.
   Use that save for any screen the young smoke campaign cannot reach.
 - The win hold is a contest (GDD v1.8): near #1 (`rivalAI.nearTop`) rival intensity peaks just past
@@ -480,6 +491,9 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   champion, and `WorldChampionshipState.lifts`. Format 29 migrates with no tournaments.
 - Save format 31 adds world titles to Hall inductees' facts (GDD v1.37). Format 30 migrates
   with none.
+- Save format 33 adds the players' agreement (GDD v1.39): `GameState.agreement`. Format 32
+  migrates with no union and the default terms. `LeagueState.paidOut` joined format 32
+  without a bump (it defaults to 0).
 - Save format 32 adds legacy goals (GDD v1.38): `GameState.legacy`. Format 31 migrates with
   nothing met. The `retired` outcome kind joined format 32 without a bump (older saves stay
   valid).

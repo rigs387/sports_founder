@@ -819,6 +819,12 @@ function main(): number {
           "; ",
         )}; seat league median ${dollars(money.seatCash ?? 0)}; leagues folded per campaign median ${fmt(money.folds.median)} (max ${fmt(money.folds.max)}); league-turns at Near-Collapse median ${pct(money.nearCollapseShare.median ?? 0)}`,
     );
+    const deal = money.agreements;
+    console.log(
+      deal.total === 0
+        ? "  Players' agreements: none signed (no Professional seat)"
+        : `  Players' agreements: per campaign median ${fmt(deal.perCampaign.median)}; ${deal.proposed} of ${deal.total} proposed (the rest the union's ask at End Turn); stoppages ${deal.stoppages}; share median ${fmt(deal.share)}%, term median ${fmt(deal.term)} seasons`,
+    );
     const venues = venuesAggregate(results);
     console.log(
       `  Venues: gate lost to the cap median ${pct(venues.gateLost.median ?? 0)} (max ${pct(venues.gateLost.max ?? 0)}); level at the offseason by league tier ${venues.levels

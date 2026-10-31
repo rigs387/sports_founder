@@ -1,3 +1,4 @@
+import { settleAgreement } from "./agreement";
 import { turnLengthQuarters } from "./calendar";
 import { updateCulture } from "./culture";
 import { judgeClauses } from "./deal-clauses";
@@ -21,7 +22,8 @@ export class CampaignOverError extends Error {
 /**
  * Ends the current turn (GDD Turn anatomy, Time advancement rules):
  * 1. focus slots still owed after a demotion are dropped by default (highest-numbered first), and
- *    an open offseason closes: a requested seat move happens and the next season starts (GDD v1.24);
+ *    an open offseason closes: talks still open take the union's ask (GDD v1.39), a requested
+ *    seat move happens and the next season starts (GDD v1.24);
  * 2. the turn's quarters are simulated, with length set by the PP tier at the start of the turn;
  * 3. every league's health is evaluated once and moves at most one rung; collapses fold leagues,
  *    and an anchor collapse ends the campaign unless the sport has already won; a folded
@@ -47,8 +49,12 @@ export function endTurn(state: GameState, world: World): GameState {
   const start = breakDeals(
     // The best standouts abroad may join the flagship before its clubs are fitted (GDD v1.37).
     // Bids for the World Championship nobody chose from go to the wealthiest bidder.
+    // Talks still open take the union's ask (GDD v1.39).
     closeOffseason(
-      settleHost(pullTalent(applyDefaultSlotDrops(settleEvents(state, world)), world), world),
+      settleAgreement(
+        settleHost(pullTalent(applyDefaultSlotDrops(settleEvents(state, world)), world), world),
+        world,
+      ),
       world,
     ),
     world,

@@ -1,4 +1,5 @@
 import { AXIS_IDS, GENOME_AXES } from "../content";
+import { agreementBlocker, proposeAgreement } from "./agreement";
 import { offseasonOpen } from "./calendar";
 import {
   betrayGround,
@@ -25,6 +26,7 @@ import { amendBlocker, amendmentJump, amendmentPrice, amendRule } from "./rules"
 import { puristBacklash } from "./shape";
 import { computeExposure } from "./spread";
 import {
+  type AgreementTerms,
   type AxisId,
   type GameState,
   LEAGUE_TIERS,
@@ -66,6 +68,8 @@ import {
 //                   withdrawn (GDD v1.28)
 //   buildVenue      start building the seat's next venue level with league cash, in the
 //                   offseason, one level at a time (GDD v1.30)
+//   proposeAgreement  put a players' agreement to the union, in the offseason while talks are
+//                   open (GDD v1.39); one roll against the union's read, a stoppage if refused
 //   retire          end the campaign, at any time after the win (GDD v1.38); it cannot be undone
 
 export type Action =
@@ -90,6 +94,7 @@ export type Action =
   | { type: "pickHost"; countryId: string }
   | { type: "signDeal"; offerId: number }
   | { type: "buildVenue" }
+  | { type: "proposeAgreement"; terms: AgreementTerms }
   | { type: "retire" };
 
 export class IllegalActionError extends Error {
@@ -273,6 +278,20 @@ export function checkAction(state: GameState, world: World, action: Action): str
         return "the trophy's name is too short or too long";
       case "same":
         return "the trophy already has that name";
+      case null:
+        return null;
+    }
+  }
+  if (action.type === "proposeAgreement") {
+    switch (agreementBlocker(state, world, action.terms)) {
+      case "window":
+        return "an agreement is negotiated only in the offseason";
+      case "union":
+        return "there is no union before the seat's league is Professional";
+      case "inForce":
+        return "the agreement in force still covers next season";
+      case "terms":
+        return "those terms are not on the table";
       case null:
         return null;
     }
@@ -491,6 +510,8 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
       return dropStar(state, world, action.playerId);
     case "buildVenue":
       return buildVenue(state, world);
+    case "proposeAgreement":
+      return proposeAgreement(state, world, action.terms);
     case "retire":
       return {
         ...state,

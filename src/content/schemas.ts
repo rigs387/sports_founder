@@ -1331,8 +1331,42 @@ export const configFileSchema = z.strictObject({
     }),
     /** A new club's place is drawn with weight population ^ placeWeightExponent. */
     placeWeightExponent: z.number().min(0),
-    /** The default players' agreement (GDD v1.39). */
-    agreement: z.strictObject({ share: unitInterval }),
+    /** The players' agreement and the union (GDD v1.39). */
+    agreement: z
+      .strictObject({
+        default: z.strictObject({
+          share: z.int().min(0).max(100),
+          term: z.int().positive(),
+          cap: z.boolean(),
+          minWage: z.enum(["low", "standard", "high"]),
+        }),
+        shares: z.tuple([z.int().min(0).max(100), z.int().min(0).max(100)]),
+        terms: z.array(z.int().positive()).min(1),
+        minWages: z.strictObject({ low: z.number(), standard: z.number(), high: z.number() }),
+        union: z.strictObject({
+          baseAsk: z.number(),
+          profitWeight: z.number().min(0),
+          profitReference: z.number(),
+          termValue: z.array(z.number().min(0)),
+          capValue: z.number().min(0),
+          capValuePerStar: z.number().min(0),
+          edge: z.number().positive(),
+        }),
+      })
+      .refine((a) => a.shares[0] <= a.shares[1], "shares must be [lowest, highest]")
+      .refine(
+        (a) => a.default.share >= a.shares[0] && a.default.share <= a.shares[1],
+        "the default share must be in range",
+      )
+      .refine((a) => a.terms.includes(a.default.term), "the default term must be one of terms")
+      .refine(
+        (a) => a.terms.every((t, i) => i === 0 || t > (a.terms[i - 1] ?? 0)),
+        "terms must be shortest first",
+      )
+      .refine(
+        (a) => a.union.termValue.length === a.terms.length,
+        "union.termValue needs one value per term",
+      ),
     /** Payroll (GDD v1.30): star wages as shares of the league's running cost. */
     payroll: z.strictObject({
       baselineShare: unitInterval,

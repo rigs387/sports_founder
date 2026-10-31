@@ -72,7 +72,7 @@ describe("the players' share (tech plan 2.25 step 1)", () => {
     const seat = withLeague(brazil, "elite", 0);
     const income = leagueIncomePerQuarter(seat, world, brazil);
     expect(leagueCosts(seat, world, brazil).payroll).toBeCloseTo(
-      world.config.flagship.agreement.share * income,
+      (world.config.flagship.agreement.default.share / 100) * income,
       9,
     );
   });

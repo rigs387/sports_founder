@@ -166,6 +166,8 @@ export interface CampaignResult {
     folds: number;
     /** Share of every league's turns spent at Near-Collapse. */
     nearCollapseShare: number;
+    /** Players' agreements signed at the flagship, in order (GDD v1.39). */
+    agreements: { share: number; term: number; proposed: boolean; stoppage: boolean }[];
   };
   /** The World Championship (GDD v1.37). */
   championship: {
@@ -538,8 +540,17 @@ export function moneyAggregate(results: CampaignResult[]) {
       cash: at.reduce((sum, l) => sum + l.cash, 0) / Math.max(1, results.length),
     };
   });
+  const agreements = results.flatMap((r) => r.money.agreements);
   return {
     tiers,
+    agreements: {
+      perCampaign: distribution(results.map((r) => r.money.agreements.length)),
+      proposed: agreements.filter((a) => a.proposed).length,
+      stoppages: agreements.filter((a) => a.stoppage).length,
+      total: agreements.length,
+      share: median(agreements.map((a) => a.share)),
+      term: median(agreements.map((a) => a.term)),
+    },
     seatCash: median(results.map((r) => r.money.seatCash)),
     folds: distribution(results.map((r) => r.money.folds)),
     nearCollapseShare: distribution(results.map((r) => r.money.nearCollapseShare)),

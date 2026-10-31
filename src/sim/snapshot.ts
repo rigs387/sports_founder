@@ -1,5 +1,6 @@
 import type { NodeEffect } from "../content";
 import { focusCostFromExposure } from "./actions";
+import { type AgreementSnapshot, agreementSnapshot } from "./agreement";
 import { offseasonOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
 import { type CultureSnapshot, cultureSnapshot } from "./culture";
 import { leagueIncomePerQuarter } from "./deals";
@@ -271,6 +272,8 @@ export interface TurnSnapshot {
   worldChampionship: ChampionshipSnapshot;
   /** The legacy goals: progress on each, and when it was met (GDD v1.38). */
   legacy: LegacySnapshot;
+  /** The players' agreement and, while talks are open, the union's read of every offer. */
+  agreement: AgreementSnapshot;
   /** Whether the player may retire now: after the win, while the campaign runs (GDD v1.38). */
   canRetire: boolean;
   /** What a retired campaign looks back on (GDD v1.38); null until the player retires. */
@@ -563,6 +566,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     nationalTeams: nationalTeamSnapshots(state, world),
     worldChampionship: championshipSnapshot(state, world),
     legacy: legacySnapshot(state, world),
+    agreement: agreementSnapshot(state, world),
     canRetire: state.outcome === null && state.win.won !== null,
     retrospective: retrospectiveSnapshot(state, world),
   };

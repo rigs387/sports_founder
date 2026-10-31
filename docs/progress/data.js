@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-10-30",
-    tests: 658,
-    files: 72,
-    note: "npm run check passed after the late surplus's payout and players' share were built (type checks, Biome, purity, 658 tests in 72 files). Lint has existing visual-study warnings.",
+    tests: 665,
+    files: 73,
+    note: "npm run check passed after the players' agreement and the talks were built (type checks, Biome, purity, 665 tests in 73 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-10-30",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
@@ -106,6 +106,12 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-30",
+      type: "Built",
+      title: "The players' agreement and the talks",
+      text: "GDD v1.39, tech plan 2.25 step 2 of 5. Save format 33 adds GameState.agreement (the terms in force, the seasons they cover, a stoppage season, the talks' own random stream); format 32 migrates with no union. The union forms when the seat's league reaches Professional, and talks open in the offseason before the first season no agreement covers. Four levers: the players' share (45–55% of income), the term (3, 5 or 7 seasons), a salary cap and a minimum wage (low, standard, high: -1, 0, +2 payroll points). The union values an offer in share points (the minimum wage at its cost, the cap against it, more with more stars, a longer term against it) and asks for the shortest term, no cap, a standard minimum wage and a share that rises with the seat's operating margin. An offer worth less than the ask is refused with a chance of the gap over 3 points; the read (will sign, on the edge with the chance, will refuse) shows as the levers move, and confirming makes one roll. A refusal records a stoppage and signs the ask on the shortest term; End Turn takes the ask with no roll. The minimum wage's payroll cost is live now; the cap's effects, talent pull and the lost season itself are steps 3 and 4. The card is on the offseason screen; the smoke test loads the late-game campaign after the retirement step and signs the ask through the review. Bots offer the cheapest terms within a risk each bot accepts (builder and anchor-turtle none, media-rush 40%, greedy-spread 50%). Three 200-turn builder campaigns: 27 agreements a campaign, all proposed, no stoppages, share median 52%, always 3 seasons (a longer term costs and bots do not value quiet); wins 3/3, win turn median 151. Two 150-turn media-rush campaigns: 16 stoppages in 35 agreements (no effect yet). npm run check: 665 tests in 73 files; smoke passed.",
+    },
     {
       date: "2026-10-30",
       type: "Built",
@@ -837,7 +843,7 @@ window.SF_PROGRESS = {
       icon: "08",
       summary:
         "The flagship signs TV, sponsor and naming-rights deals with demands, builds its venue and pays its stars; other leagues keep one media line.",
-      next: "The players' agreement and its talks (tech plan 2.25 step 2); watch the Semi-Pro deal slate (109%, just under its band).",
+      next: "What the levers do: the cap and the minimum wage's talent pull (tech plan 2.25 step 3); watch the Semi-Pro deal slate (109%, just under its band).",
       depends: ["leagues"],
       sources: [
         ["Current league finances", "../league-management/README.md"],
@@ -860,8 +866,12 @@ window.SF_PROGRESS = {
           "The late surplus: a reserve with profit above it paid out, players paid a share of income from Professional up (GDD v1.39)",
         ],
         [
+          "built",
+          "The players' agreement at the flagship: the union, four levers, its read and one roll (GDD v1.39)",
+        ],
+        [
           "planned",
-          "The players' agreement at the flagship: talks, levers and the stoppage (tech plan 2.25 steps 2–4)",
+          "What the cap and minimum wage do, and the stoppage's lost season (tech plan 2.25 steps 3–4)",
         ],
       ],
     },

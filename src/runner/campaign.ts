@@ -628,6 +628,19 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         })(),
         folds: state.landmarks.filter((l) => l.kind === "leagueFolded").length,
         nearCollapseShare: leagueNearCollapseTurns / Math.max(1, leagueTurns),
+        // The players' agreements signed at the flagship (GDD v1.39).
+        agreements: state.landmarks.flatMap((l) =>
+          l.kind === "agreementSigned"
+            ? [
+                {
+                  share: l.terms.share,
+                  term: l.terms.term,
+                  proposed: l.proposed,
+                  stoppage: l.stoppage,
+                },
+              ]
+            : [],
+        ),
       },
       remembers: {
         players: state.hallOfFame.inductees.length,

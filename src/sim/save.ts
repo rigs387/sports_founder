@@ -15,6 +15,7 @@ import {
   timedCountermoveSchema,
   traditionTypeSchema,
 } from "../content";
+import { newAgreement } from "./agreement";
 import { tierEntry } from "./calendar";
 import { newCulture } from "./culture";
 import { newDeals } from "./deals";
@@ -28,11 +29,11 @@ import { newFront, newRivalState } from "./rivals";
 import { MAX_SEED } from "./rng";
 import { defaultGenome } from "./setup";
 import { newStandouts } from "./standouts";
-import type { FlagshipState, GameState, Genome, World } from "./types";
+import { type FlagshipState, type GameState, type Genome, MIN_WAGES, type World } from "./types";
 import { newWorldChampionship } from "./world-championship";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 32;
+export const SAVE_FORMAT_VERSION = 33;
 
 export class SaveError extends Error {
   override name = "SaveError";
@@ -60,6 +61,13 @@ const leagueSchema = z.strictObject({
       .nullable(),
     record: count.nullable(),
   }),
+});
+
+const agreementTermsSchema = z.strictObject({
+  share: z.int().min(0).max(100),
+  term: z.int().min(1),
+  cap: z.boolean(),
+  minWage: z.enum(MIN_WAGES),
 });
 
 const lossReasonSchema = z.enum(["faded", "folded", "broken", "renamed", "lifted"]);
@@ -217,6 +225,16 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     countryId: z.string().min(1),
     season: z.int().min(1),
     hostId: z.string().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal("agreementSigned"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    season: z.int().min(1),
+    terms: agreementTermsSchema,
+    proposed: z.boolean(),
+    stoppage: z.boolean(),
   }),
   z.strictObject({
     kind: z.literal("legacyGoal"),
@@ -733,6 +751,20 @@ const gameStateSchema = z.strictObject({
       }),
     ),
   }),
+  agreement: z.strictObject({
+    rng: z.array(z.number()).min(1),
+    current: z
+      .strictObject({
+        share: z.int().min(0).max(100),
+        term: z.int().min(1),
+        cap: z.boolean(),
+        minWage: z.enum(MIN_WAGES),
+        fromSeason: z.int().min(1),
+        throughSeason: z.int().min(1),
+      })
+      .nullable(),
+    stoppageSeason: z.int().min(1).nullable(),
+  }),
 });
 
 const saveFileSchema = z.strictObject({
@@ -751,6 +783,12 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 32 → 33: the players' agreement (GDD v1.39). No union yet: talks open at the next offseason
+  // with a Professional seat, and the default terms hold until then.
+  32: (save) => ({
+    formatVersion: 33,
+    state: { ...save.state, agreement: newAgreement(save.state.seed as number) },
+  }),
   // 31 → 32: legacy goals (GDD v1.38). None on record; goals already met are found at the next
   // turn's end.
   31: (save) => ({ formatVersion: 32, state: { ...save.state, legacy: { done: [] } } }),

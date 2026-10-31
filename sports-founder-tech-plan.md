@@ -1575,7 +1575,7 @@ the designer on 2026-10-13; see the GDD.
 
 ### 2.25 Build Plan: The Late Surplus (GDD v1.39)
 
-Designed; step 1 built 2026-10-30. Eight decisions, all in the GDD ("the late surplus"). One
+Designed; steps 1 and 2 built 2026-10-30. Eight decisions, all in the GDD ("the late surplus"). One
 step per session; each ends with `npm run check`, `npm run smoke`, the docs and a commit.
 
 1. **The payout and the fixed share (money only, no talks).** Every league pays cash above its
@@ -1602,6 +1602,14 @@ step per session; each ends with `npm run check`, `npm run smoke`, the docs and 
    confirming. If the player proposes nothing, End Turn takes the union's ask (the free default
    never rolls). UI: a review step on the offseason screen, like `AmendRules`. Bots answer by a
    policy weight. The runner reports agreements signed, the share paid and stoppages.
+   *Built 2026-10-30:* `src/sim/agreement.ts` (`unionAsk`, `unionRead`, `proposeAgreement`,
+   `settleAgreement` before `closeOffseason`), config `flagship.agreement` (shares in whole
+   percent; the union's values in share points), save format 33, landmark `agreementSigned`
+   (`proposed`, `stoppage`), `AgreementCard` on the offseason screen, `negotiate` in the bots
+   with `AGREEMENT_RISK`. Two calls beyond the plan: the minimum wage's payroll points are live
+   now (a free sweetener otherwise), and a refused offer already records `stoppageSeason` and
+   signs the ask on the shortest term, so step 4 adds only the lost season's effects. The
+   agreement smoke step runs after the retirement step, on the late-game save reloaded.
 3. **What the levers do.** The cap: flagship club strength drifts apart less and star wages are
    limited (`flagship.ts`, `league-costs.ts`). The minimum wage: adds to the payroll line and
    raises `standouts.talentPull.chance` (`talent.ts`).
