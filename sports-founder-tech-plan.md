@@ -87,6 +87,14 @@ surface before playtesting or during it.
 | 2026-10-08 | Card PP scaling reverted (GDD v1.32): scaling card PP like node prices made bots buy out the tree and never lose #1 before the win (0/36; size^0.5 25%, tier only 39%, before 53%). Rewards stay unscaled, costs scale by tier; late rewards in scarce currencies parked | Decided |
 | 2026-10-08 | Awards and press, topic 1 (GDD v1.33): flagship Player of the Season (composite of scores, club finish, playoff and final scores) and the top scorer as a named prize; Hall of Fame points, no other effect; named after the first Hall of Fame player, fixed; lines on existing screens, the first award a toast; Player of the Year parked | Decided |
 | 2026-10-08 | Awards and press, topic 2 (GDD v1.33): an invented outlet per country (biggest place + sports-paper word) once its league forms, the sport's paper before; outlet mastheads with family sections; 2–3 headline variants for frequent cards by stable hash; the offseason's season in review becomes the seat outlet's front page; presentation only, nothing saved | Decided |
+| 2026-11-01 | Parked items, topic 1 (GDD v1.40): league directors only in focus countries' leagues (not the seat's), drawn when focus lands, gone when it leaves; one trait bending the simple model, salary from league cash, replaced in the offseason for severance; one proposal card a year from a director or a deal partner (no PP price, counts toward the limit; declining a partner is a clause miss); a Builders wing in the Hall; standing policies cut | Decided |
+| 2026-11-01 | Parked items, topic 2 (GDD v1.40): only the flagship ever signs deals; when the anchor league folds after the win, a decision card moves the seat free to an eligible league (default: most hardcore fans); a seat league abroad stepping down below Professional loses the seat at the offseason's close with the purist cost; the playtest-thinness question closed | Decided |
+| 2026-11-01 | Parked items, topic 3 (GDD v1.40): youth programs at the seat and in focus countries; a small conversion boost and better homegrown players, raising only players drawn after a level opens; bought with league cash in the offseason, opening after a season, upkeep that runs after focus leaves (no upgrades then), a level lost a year when unpaid | Decided |
+| 2026-11-01 | Parked items, topic 4 (GDD v1.40): flagship ticket pricing, three stances at the seat set in the offseason; gate per seated fan against seat conversion; each step up demotes a share of the seat's hardcore fans, heavier with tradition weight; lowering is free | Decided |
+| 2026-11-01 | Parked items, topic 6 (GDD v1.40): the founding family as flavor; the founder named at setup, heirs keep the family name; the torch passes every ~30 years in the offseason (minor card, landmark); a Family wing outside the ballot, no shrine weight; retiring is the head stepping down | Decided |
+| 2026-11-01 | Parked items, topic 7 (GDD v1.40): women's sports stay parked as a post-release option; water as a surface, scores worth points by term and the sim in dollars are cut; regional English player pools and outlet words by language sphere, content only | Decided |
+| 2026-11-01 | Parked items, topic 8 (GDD v1.40): anchor resentment as a stored 0–1 value shown on the anchor's card; raised by neglect (no focus after a grace), casual-friendly amendments and the seat away, only once a league exists abroad; lowered by focus, faster with the seat home, and purist amendments; a hardcore demotion and a health drag at home; it replaces the fixed anchor stand-ins | Decided |
+| 2026-11-01 | Parked items, topics 5 and 9 (GDD v1.40): players beyond the leading players stay parked, nothing decided; music is decided with sound at release; commercial decisions wait for a playable game and the Steam page; competitor analysis and the black-hole risk review stay deferred | Decided |
 | 2026-10-08 | Awards and press, topic 3 (GDD v1.33): save format 24 stores each season's Player of the Season (no retroactive awards); the top scorer's prize is the {Score} Crown; starting weights (score 1, champion +10, runner-up +5, playoff +1, final +2; Hall: award 3, prize 2, bar 20); the Almanac names winners, counts awards and lists the most awarded | Decided |
 
 ---
@@ -1660,6 +1668,121 @@ step per session; each ends with `npm run check`, `npm run smoke`, the docs and 
    (the payout takes only operating profit), so it stays. `resolution.reward` is defaulted (no
    format bump). The runner prints the rewards and the income share's PP; the smoke's
    `late-rewards-smoke.ts` runs after the stoppage step. Measurements are in the GDD.
+
+### 2.26 Build Plan: Other Leagues' People (GDD v1.40)
+
+Designed 2026-11-01 (parked items, topic 1). Five decisions, all in the GDD (Delegation, Rules
+Evolution, Hall of Fame). Not built. No save migration (only the designer plays): the new save
+format starts campaigns fresh. One step per session; each ends with `npm run check`,
+`npm run smoke`, the docs and a commit.
+
+1. **Directors.** `GameState.directors` (serving and past terms, its own random stream);
+   `src/sim/directors.ts` draws one when a focused country's league forms or focus lands on a
+   country with a league (never the seat's league), ends the term when focus leaves, pays the
+   salary from league cash by tier, and applies the trait's factors to the simple model
+   (traits in content, numbers in config `directors`). The `replaceDirector` action
+   (offseason): severance, then a pick among `directors.candidates`. Scandal-prone story cards.
+   The snapshot carries name, trait and term; the country card shows them, the offseason
+   screen has the replace review. The runner prints directors served, traits and salary paid
+   against league cash; measure that no trait dominates (the options experiment's share check).
+2. **Proposal cards.** One a year at most, in the offseason, from a director or a flagship deal
+   partner: an amendment chosen for the proposer's country or market fit. Accept applies it
+   through the `amendRule` path with no PP price (counts toward the yearly limit, backlash as
+   normal); declining a partner's counts as a clause miss (`judgeClauses`). Bots answer by
+   their event weights.
+3. **The Builders wing.** Points from directors' recorded terms (config
+   `hallOfFame.builders`), a separate ballot and class cap, plaques in the Almanac, the class
+   card naming builders. Measure classes per campaign so the wing is neither empty nor
+   crowded.
+
+### 2.27 Build Plan: Seat Follow-ups (GDD v1.40)
+
+Designed 2026-11-01 (parked items, topic 2). Not built. One session.
+
+1. **The birthplace outlived.** When `returnSeatIfFolded` (`flagship.ts`) finds the anchor
+   holding the seat with no league after the win, offer the `seat-orphaned` decision card (no
+   slot): one choice per eligible league (`seatEligible`), free default the one with the most
+   hardcore fans. Its effect moves the seat at once with no purist cost and a `seatMoved`
+   landmark ("returned"-style reason, a new `orphaned` kind); clubs are fitted and a season
+   starts as in the folded-abroad path. No eligible league: the card is offered again when one
+   qualifies. A league re-formed at the anchor first keeps the seat home.
+2. **Stepping down loses the seat.** `stepDownLeague` on a seat league abroad to below
+   Professional sets `pendingCountryId` to the anchor; `closeOffseason` moves it with the
+   normal leave cost (`seatLeaveShare`). The step-down review says so before confirming.
+   Outside the offseason the move waits for the next close; the anchor is exempt.
+3. Tests on one anchor each; the smoke needs no new step (headless tests cover both paths).
+
+### 2.28 Build Plan: Youth Programs (GDD v1.40)
+
+Designed 2026-11-01 (parked items, topic 3). Not built. Two sessions.
+
+1. **Levels, money and conversion.** `LeagueState.youth` (level 0–5, a build opening after a
+   season, the season it opened), `src/sim/youth.ts`: the `buildYouth` action (offseason, the
+   seat's league or a focus country's, price and upkeep by level and tier in config `youth`),
+   opening in `closeOffseason` like venues, upkeep in `leagueCosts`, a level lost a year when
+   cash cannot cover it, and the hardcore conversion factor in `quarter.ts`. A card on the
+   offseason screen (review step) and a line on the country card. The runner prints levels
+   bought, upkeep against league cash, and conversion added; measure the #1 contest is unmoved.
+2. **Homegrown quality.** Each youth level records when it opened; a player drawn after that
+   (standouts in `standouts.ts`, the flagship's young replacements in `newPlayer`,
+   `flagship.ts`) born in that country draws peak skill raised by the level then open
+   (`youth.skillLift`). Skill stays out of the snapshot. Measure national team ranks and
+   world titles for countries with programs over a 200-turn campaign.
+
+### 2.29 Build Plan: Flagship Ticket Pricing (GDD v1.40)
+
+Designed 2026-11-01 (parked items, topic 4). Not built. One session.
+
+1. `FlagshipState.tickets` (stance, the stance pending for next season) and a `setTickets`
+   action (offseason only); `closeOffseason` applies it and, for each step up, demotes the seat's
+   hardcore share (`flagship.tickets.raiseDemotion` × the tradition weight factor) with a
+   landmark. The stance multiplies gate per seated fan in `leagueIncomePerQuarter` and hardcore
+   conversion at the seat in `quarter.ts` (config `flagship.tickets.stances`).
+2. A ticket card on the offseason screen (review step stating the demotion) and a read-only line
+   on the Flagship tab. Bots keep standard unless a policy weight says otherwise; the runner
+   prints stance seasons, gate share and conversion added. Measure the gate share band
+   (`balanceTargets.money`) and the #1 contest with a cheap-stance bot.
+
+### 2.30 Build Plan: The Founding Family (GDD v1.40)
+
+Designed 2026-11-01 (parked items, topic 6). Not built. One session. Flavor only: no number
+reads the family.
+
+1. `GameState.identity.family` (heads in order: name, took over, handed over); the founder's
+   name on the founding setup page (default from the birthplace's name pool on identity's
+   stream). `updateFamily` at the end of `endTurn`, in the offseason every
+   `family.generationYears`: a `familyHandoff` landmark and the minor `family-handoff` card
+   (no slot). Retiring records the current head's hand-over.
+2. The Family wing: heads inducted at hand-over outside the ballot, plaques built from the
+   landmarks of their tenure; the Almanac shows it; the retrospective names each tenure. Press
+   and the season in review sign with the current head's name.
+
+### 2.31 Build Plan: Names by Language (GDD v1.40)
+
+Designed 2026-11-01 (parked items, topic 7). Not built. One short session, content first.
+
+1. Regional English player pools in `content/names.yaml` (`north-american`,
+   `australasian`, `caribbean`; `english` stays British) assigned through
+   `playerNames.countries`; avoid famous real athletes' pairs, as before.
+2. `press.words` by language sphere (`press.wordsBySphere`, English words the default) for
+   Spanish, French, Portuguese, German and Italian; `src/sim/press.ts` picks by the outlet
+   country's primary sphere. Schema and content validation; a test on two countries.
+
+### 2.32 Build Plan: Anchor Resentment (GDD v1.40)
+
+Designed 2026-11-01 (parked items, topic 8). Not built. Two sessions; the second is mostly
+measurement.
+
+1. **The value.** `GameState.resentment` (0–1 and the quarter the anchor last held focus);
+   `src/sim/resentment.ts` steps it each quarter in `quarter.ts` (neglect after
+   `anchorResentment.graceQuarters`, seat away, decay with focus and faster with the seat
+   home; nothing before the first league abroad) and on each amendment in `rules.ts` (casual
+   traits up, purist traits down). Effects: the quarterly hardcore demotion at home and a
+   health drag read by the league evaluation (`leagues.ts`). The anchor's backlash weight and
+   seat-leaving share scale with it in place of the fixed stand-ins (`rules.ts`,
+   `seatLeaveShare`). The snapshot carries the value and its reasons; the country card shows it.
+2. **Measure.** Collapse and pacing experiments on few anchors, a naive bot that never focuses
+   home (it should fold or nearly), and the #1 contest. Tune grace, rates and the drag in config.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 

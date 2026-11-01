@@ -1,8 +1,8 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-10-31",
-  design: "GDD v1.39",
+  updated: "2026-11-01",
+  design: "GDD v1.40",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -106,6 +106,62 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-11-01",
+      type: "Design",
+      title: "Parked items reviewed (GDD v1.40)",
+      text: "Topics 5 and 9 of the parked-items review. Players beyond the leading players (rosters, contracts, transfers, injuries) stay parked with nothing decided. Music direction is decided with sound in the release work; commercial decisions wait until the game is playable end to end and the Steam page is near; competitor analysis and the black-hole risk review stay deferred. Seven build plans came out of the review: tech plan 2.26 to 2.32.",
+      system: "release",
+    },
+    {
+      date: "2026-11-01",
+      type: "Design",
+      title: "Parked items, topic 8: anchor resentment",
+      text: "GDD v1.40, tech plan 2.32 (not built). A stored resentment value (0–1) on the anchor's card: raised by neglect (no focus after a grace), casual-friendly amendments and the seat away, only once the sport has a league abroad; lowered by focus, faster with the seat home, and purist amendments. It demotes hardcore fans at home each quarter and drags the anchor league's health, which can end the campaign before the win. It replaces the fixed anchor stand-ins in rule backlash and the seat's leaving cost.",
+      system: "leagues",
+    },
+    {
+      date: "2026-11-01",
+      type: "Design",
+      title: "Parked items, topic 7: flavor items",
+      text: "GDD v1.40, tech plan 2.31 (not built). Regional English player name pools (North American, Australia and New Zealand, Caribbean, British) and outlet words by language sphere (Spanish, French, Portuguese, German, Italian), content only. Women's sports stay parked as a post-release option. Water as a surface, scores worth points by term and the sim in dollars are cut.",
+      system: "press",
+    },
+    {
+      date: "2026-11-01",
+      type: "Design",
+      title: "Parked items, topic 6: the founding family",
+      text: "GDD v1.40, tech plan 2.30 (not built). Flavor only. The founder is named on the founding page; heirs keep the family name. The torch passes every ~30 years in the offseason (a minor card and a landmark). Each head is inducted into a Family wing outside the ballot, with no shrine weight, the plaque listing their watch. Retiring is the current head stepping down; the retrospective names each tenure.",
+      system: "culture",
+    },
+    {
+      date: "2026-11-01",
+      type: "Design",
+      title: "Parked items, topic 4: flagship ticket pricing",
+      text: "GDD v1.40, tech plan 2.29 (not built). Three stances at the seat, set in the offseason for the season: cheap pays less gate per seated fan and converts faster at the seat, premium the reverse. Each step up demotes a share of the seat's hardcore fans once, heavier with tradition weight; lowering is free.",
+      system: "business",
+    },
+    {
+      date: "2026-11-01",
+      type: "Design",
+      title: "Parked items, topic 3: youth programs",
+      text: "GDD v1.40, tech plan 2.28 (not built). Youth programs at the seat's league and in focus countries: a small hardcore conversion boost and better homegrown players, raising only players drawn after a level opens (standouts and the flagship's young replacements born there), so national teams feel it years later. Bought with league cash in the offseason, opening after a season; upkeep keeps running after focus leaves (no upgrades then) and an unpaid program loses a level a year.",
+      system: "leagues",
+    },
+    {
+      date: "2026-11-01",
+      type: "Design",
+      title: "Parked items, topic 2: seat follow-ups",
+      text: "GDD v1.40, tech plan 2.27 (not built). Only the flagship ever signs deals. When the anchor league folds after the win, a decision card moves the seat free to an eligible Professional or Elite league (default: the most hardcore fans); with none eligible it waits dark at the anchor. A seat league abroad that steps down below Professional loses the seat when the offseason closes, paying the purist cost. The playtest-thinness question is closed and moves to the next playtest's checklist.",
+      system: "leagues",
+    },
+    {
+      date: "2026-11-01",
+      type: "Design",
+      title: "Parked items, topic 1: other leagues' people",
+      text: "GDD v1.40, tech plan 2.26 (not built). League directors exist only in focus countries' leagues (never the seat's): drawn when focus lands, gone when it leaves, one trait that bends the simple model, salary from league cash, replaced in the offseason for severance. At most one rule proposal card a year, from a director or a flagship deal partner: no PP price, counts toward the yearly limit, declining a partner's is a clause miss. A Builders wing in the Hall of Fame reads directors' terms. Standing policies are cut. Late rewards and the CBA left the parking lot (built).",
+      system: "leagues",
+    },
     {
       date: "2026-10-31",
       type: "Built",
@@ -745,7 +801,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
       summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
-      next: "Talent pull waits for named players in other leagues; standing policies and league directors are parked until other leagues have business of their own.",
+      next: "League directors in focus countries (tech plan 2.26) and the seat follow-ups (tech plan 2.27), GDD v1.40; standing policies were cut.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
@@ -785,10 +841,17 @@ window.SF_PROGRESS = {
           "planned",
           "Deeper player tiers, transfers and contracts beyond the flagship's leading players",
         ],
-        ["planned", "Standing policies and hired league directors (parked, GDD v1.30)"],
+        [
+          "planned",
+          "Seat follow-ups: a free forced move when the birthplace is outlived; stepping down below Professional loses the seat (tech plan 2.27, GDD v1.40)",
+        ],
+        [
+          "planned",
+          "League directors in focus countries' leagues: one trait, salary, replaced in the offseason (tech plan 2.26, GDD v1.40); standing policies cut",
+        ],
         [
           "partial",
-          "Anchor resentment: rule changes and seat moves cost anchor purists (a stand-in); resentment itself and neglect remain",
+          "Anchor resentment: rule changes and seat moves cost anchor purists (a stand-in); the stored resentment value with neglect is designed (tech plan 2.32, GDD v1.40)",
         ],
       ],
     },
@@ -910,7 +973,7 @@ window.SF_PROGRESS = {
       icon: "09",
       summary:
         "Amend one rule a year in the seasonal window; purists push back, and the Rulebook keeps the dates.",
-      next: "Proposals from league directors, with standing policies.",
+      next: "Proposal cards from league directors and flagship deal partners (tech plan 2.26 step 2, GDD v1.40).",
       depends: ["creation"],
       sources: [
         ["Rules evolution design", "../../sports-founder-gdd.md#progression--economy"],
@@ -929,7 +992,10 @@ window.SF_PROGRESS = {
           "Backlash by hardcore base, rule age, jump, anchor, fit lost and the traditions offended",
         ],
         ["built", "Rule demands from broadcasters and sponsors, with deals (GDD v1.28)"],
-        ["planned", "Rule proposals from league directors"],
+        [
+          "planned",
+          "Rule proposals from league directors and deal partners, one card a year (tech plan 2.26, GDD v1.40)",
+        ],
       ],
     },
     {
@@ -1032,7 +1098,7 @@ window.SF_PROGRESS = {
       icon: "12",
       summary:
         "The flagship builds its ground with league cash; youth programs and homegrown talent are parked.",
-      next: "Youth programs, ticket pricing and venues at other leagues are parked (GDD v1.30).",
+      next: "Youth programs (tech plan 2.28, GDD v1.40); ticket pricing (tech plan 2.29); venues at other leagues stay flagship-only.",
       depends: ["business"],
       sources: [
         ["Venues and youth design", "../../sports-founder-gdd.md#progression--economy"],
@@ -1044,8 +1110,14 @@ window.SF_PROGRESS = {
           "Flagship venue levels 1–5: built with league cash over seasons, upkeep, a gate cap and a conversion lift (GDD v1.30)",
         ],
         ["built", "Max capacity and attendance a game, sellouts and record crowds (GDD v1.34)"],
-        ["planned", "Youth programs and their local conversion effects (parked)"],
-        ["planned", "Homegrown player quality and flagship ticket pricing (parked)"],
+        [
+          "planned",
+          "Youth programs at the seat and in focus countries: conversion and homegrown players (tech plan 2.28, GDD v1.40)",
+        ],
+        [
+          "planned",
+          "Homegrown quality raises players drawn after a youth level opens (tech plan 2.28); flagship ticket pricing: cheap, standard, premium, with a cost for raising (tech plan 2.29, GDD v1.40)",
+        ],
       ],
     },
     {
@@ -1079,7 +1151,7 @@ window.SF_PROGRESS = {
         ["built", "The sport's firsts as dated history in the Almanac, never inducted (GDD v1.35)"],
         [
           "partial",
-          "Players wing built; league directors and founding family wait for those people",
+          "Players wing built; a Builders wing for league directors is designed (tech plan 2.26, GDD v1.40); the founding family's Family wing is designed (tech plan 2.30, GDD v1.40)",
         ],
         [
           "partial",
@@ -1094,7 +1166,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 11 · light version in Phase 1",
       icon: "14",
       summary: "Fictional outlets tell the stories that the simulation can prove.",
-      next: "More headline variants as the deck grows; a turn recap front page was considered and declined (too many interruptions).",
+      next: "Outlet words by language sphere and regional English player names (tech plan 2.31, GDD v1.40); more headline variants as the deck grows; a turn recap front page was considered and declined (too many interruptions).",
       depends: ["events"],
       sources: [["Press design", "../../sports-founder-gdd.md#progression--economy"]],
       items: [
@@ -1220,7 +1292,7 @@ window.SF_PROGRESS = {
         ["planned", "Founder's Notebook and plain-language driver tooltips"],
         ["planned", "Full controller navigation, scaling, rebinding and Deck validation"],
         ["planned", "Steam integration, packaging and platform QA"],
-        ["planned", "Release localization, sound and store/demo materials"],
+        ["planned", "Release localization, sound and music direction, and store/demo materials"],
       ],
     },
   ],

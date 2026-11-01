@@ -90,7 +90,7 @@ their country's league; promotion at the seat needs venue level 1/2/3 for Semi-P
 and its review shows costs against capped revenue. Youth programs parked. Payroll (v1.30): flagship running cost splits into
 operations + payroll (same total without stars); each star adds a wage rising with seasons as a
 star and backed influence, shown in the Stars panel, never from skill; letting a star move saves it.
-Standing policies parked (nothing to delegate); flagship ticket pricing parked until the cap is measured.
+Standing policies cut (v1.40); youth programs at the seat and in focus countries (v1.40: conversion and homegrown players drawn after a level opens, upkeep from league cash); flagship ticket pricing: cheap, standard or premium at the seat, set in the offseason; raising it demotes hardcore fans (v1.40) until the cap is measured.
 Costs: payroll, operations, venues. Cash builds local hardcore via venues/youth, never PP. No
 cross-country transfers; PP-funded bailouts. Phase 0: gate + one media/sponsor line.
 
@@ -140,13 +140,13 @@ per amendment, priced and punished by the jump; purists turn casual everywhere, 
 where the old rule fit better and the older the rule; the review shows price, loss and hints for
 the anchor and top five markets; dated amendments in the Rulebook; world proposals come with deals. Backlash scales with hardcore base
 and rule age (tradition). Global rulebook. Proposals from player, broadcasters, sponsors,
-league directors.
+league directors (v1.40: one card a year at most, no PP price; declining a partner is a clause miss).
 
 **History:** Permanent landmarks, season summaries, career totals, records, and yearly world
 fan snapshots; match detail pruned per season. Headlines may only claim what records prove.
 Almanac screen in Phase 2.
 
-**Late-Game Pressure:** Anchor purists resent neglect and TV-friendly rule changes; hardcore fans
+**Late-Game Pressure:** Anchor purists resent neglect, the seat away and TV-friendly rule changes (v1.40: a stored 0–1 value on the anchor card, demoting hardcore fans and dragging league health; focus and the seat home ease it); hardcore fans
 age out (yours and rivals', demoting to casual; rivals recruit replacements, you don't; "other"
 is exempt); pro leagues cost more and fall faster, with a minimum cost even in tiny countries;
 rivals defend hardest when you near #1.
@@ -156,10 +156,11 @@ Amateur → Semi-Pro → Professional → Elite (player-chosen promotion). One p
 league worldwide, and the player is its commissioner: it starts at the anchor and is the only league
 with deep management (named teams, standings, stars, real sponsor and TV deals with demands).
 Moving the seat happens only in the offseason and costs purists in the old country, whose league
-drops to the simple model. Flagship sim depth grows with tier: teams → stars → full rosters
-(contracts drive payroll cost, not negotiation); other leagues stay simple. Delegation: standing
-policies everywhere; hands-on business only in focus countries; trait-driven league directors
-(Phase 1); intervene anywhere anytime. No inbox: the map signals trouble, business happens in
+drops to the simple model. Only the flagship signs deals (v1.40). The birthplace outlived after the
+win moves the seat free by decision card; a seat league stepping down below Professional loses it. Flagship sim depth grows with tier: teams → stars → full rosters
+(contracts drive payroll cost, not negotiation); other leagues stay simple. Delegation: no standing
+policies (cut v1.40); league directors only in focus countries, one trait each bending the simple
+model, paid from league cash, replaceable in the offseason; intervene anywhere anytime. No inbox: the map signals trouble, business happens in
 offseasons, crises arrive as decision cards.
 
 **Culture:** Never bought. Traditions (derbies, styles of play, nicknames, rites) emerge from real
@@ -319,7 +320,7 @@ stores each season's Player of the Season (no retroactive awards); the top score
 classes at 17–20 players a campaign once awards counted.
 
 **Legacy & Flavor:** Hall of Fame (auto classes from records; inductees add hardcore stickiness at
-home; v1.31 lightweight build: Players and Moments wings, players on points from star seasons,
+home; v1.40 adds a Builders wing for league directors, from their recorded terms, and a Family wing: each founding-family head inducted at hand-over, flavor only; v1.31 lightweight build: Players and Moments wings, players on points from star seasons,
 titles, top-scorer seasons, awards and the scoring record (bar 24), eligible 2 seasons after retiring, at most 2 a
 class; Moments are a list of firsts, one a class; each player inductee adds permanent shrine weight
 at home inside the tradition weight cap; a class each offseason; lives on a new Almanac tab with

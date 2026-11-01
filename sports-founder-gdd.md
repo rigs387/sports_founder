@@ -1,5 +1,5 @@
 # Sports Founder — Game Design Document
-*Version 1.39 | October 13, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size; v1.36: fourth playtest follow-ups; v1.37: the world stage — standouts in other leagues, talent pull, a signing card and Player of the Year; national teams assembled for each championship; the World Championship founded, hosted and played on its own page; v1.38: a late game with an ending — legacy goals, retiring and the retrospective built; v1.39: the late surplus — a collective bargaining agreement at the flagship and late card rewards by kind, built)*
+*Version 1.40 | November 1, 2026 — all core and Phase 2 design decisions made; Phase 0 build gaps being closed (v1.4: slow hardcore poaching between sports; v1.5: Phase 0 growth tree, generational turnover rules, "choose pain"; v1.6: the real-world dataset as built; v1.7: the win needs tier 5, rivals hold their ground; v1.8: the win hold is a contest; v1.9: growth node prices grow with the sport; v1.10: climate conditions are relative to the world; v1.11: the player is commissioner of the flagship league; v1.12: culture emerges as traditions, founding character, backed stars, artifacts and famous venues; v1.13: the seat moves only to Professional leagues and returns home when a flagship folds; v1.14: the flagship season — club counts by tier, a European or American format chosen at creation, drifting club strength, the purist cost of moving the seat; v1.15: the flagship season as event cards; v1.16: flagship stars; v1.17: rivals win ground back near #1 — reclaim and world championships; v1.18: sport identity — names, founding club and ground, founding character, terms, emblem, rulebook and field diagram; v1.19: turn-based core kept, auto-advance as the real-time feel; v1.20: rules evolution, first build — amendments, purist backlash, dated rulebook; v1.21: big markets are many audiences, wealth levels weigh Prestige and rival defense, purists remember the founding rules; v1.22: culture, first build — six tradition types born from facts, stickiness, betrayal, founding character, the Culture category; v1.23: the flagship broadcasts — media reach earned by season interest and league health, season pulses, a ripple when it fails; v1.24: living time — play and pause with speeds, cards pop up as they happen, the offseason screen; v1.25: the clock is dropped after playtest — Next Turn stays, cards pop up after each turn; v1.26: moments have weight — minor toasts, big back pages, headline front pages, flagship scaling with its tier; v1.27: the broadcast lifts all media where it airs; v1.28: flagship deals — slots, offers, locked terms, demands that never block, rule demands rare; v1.29: partners want the product — balance, star and fan clauses, satisfaction instead of a cliff; v1.30: venues — a hard gate cap, built over seasons, record crowds and modernization; payroll — star wages that rise with careers; standing policies parked; v1.31: what the sport remembers — a lightweight Hall of Fame and the Almanac, chants and anthems; the gear brand stays a deal partner; v1.32: playtest follow-ups — no worthless deal offers, minor news collects itself, front pages for rare stories only, firsts with scale; card PP scaling tried and reverted; v1.33: awards and lightweight press; v1.34: second playtest follow-ups — PP prices in quarters of income, money in dollars benchmarked on real leagues, rival TV lockouts cut offers instead of blocking, attendance against max capacity, realistic scorelines, digital press by weight, a leagues overview with bulk promotion, stale firsts skipped; no Britishisms by default; v1.35: third playtest follow-ups — league tiers capped by market size; v1.36: fourth playtest follow-ups; v1.37: the world stage — standouts in other leagues, talent pull, a signing card and Player of the Year; national teams assembled for each championship; the World Championship founded, hosted and played on its own page; v1.38: a late game with an ending — legacy goals, retiring and the retrospective built; v1.39: the late surplus — a collective bargaining agreement at the flagship and late card rewards by kind, built; v1.40: the parked items reviewed — league directors in focus countries, rule proposals from directors and deal partners, a Builders wing; standing policies cut; only the flagship signs deals, a forced free seat move when the birthplace is outlived, a seat league stepping down below Professional loses the seat; youth programs at the seat and in focus countries, paying off in generations; flagship ticket pricing with a cost for raising it; the founding family as flavor, with a Family wing; regional name pools and outlet words by language; water, term points and the sim in dollars cut; anchor resentment as a stored value)*
 
 ---
 
@@ -188,14 +188,15 @@ no list or inbox anywhere:
   slots; anything that doesn't surface takes its free default (standing policies parked, v1.30).
 
 **Delegation (scaling to 30+ markets):**
-- **Standing policies (parked 2026-10-07, v1.30):** as first designed, a small set of global
+- **Standing policies (cut 2026-11-01, v1.40; parked 2026-10-07, v1.30):** league directors'
+  traits replace them. As first designed, a small set of global
   defaults with per-country overrides (minimum acceptable sponsor offer, ticket pricing stance,
   routine-crisis response) resolving offseason business the player doesn't touch. Since v1.11 there
   is nothing to delegate: other leagues run on the simple model with no business of their own,
   untouched flagship offers lapse, and event cards fall to their free defaults. Policies return if
-  other leagues ever gain business (see the parking lot).
+  other leagues ever gain business. Cut in v1.40: directors' traits bend the simple model instead.
 - **Focus slots define hands-on involvement.** Offseason business surfaces to the player only
-  in focus countries; elsewhere it resolves via policy and reports as Moments. Focus means both
+  in focus countries, through their league directors (v1.40); elsewhere leagues run on the simple model. Focus means both
   "where I push growth" and "where I personally operate," which feeds anchor-neglect pressure.
 - **The player is the commissioner of one league: the flagship (decided 2026-09-26).** Deep league
   management (named teams, standings, stars, real sponsor and TV deals) happens there and only
@@ -205,7 +206,29 @@ no list or inbox anywhere:
   flagship; execute policies with trait-driven bias (e.g., Frugal banks cash and skips marginal
   sponsors; Showman pushes early promotion; Scandal-prone gets results but generates story
   events). Paid from league cash. They are also the advisor voice for league issues. (Named
-  "commissioners" before v1.11.)
+  "commissioners" before v1.11.) Revised in v1.40, below.
+- **Parked items, topic 1: other leagues' people (decided 2026-11-01, v1.40).** Every number is
+  config (`directors`); trait names and effects are content.
+  - *Directors only in focus countries.* A league in a focus country, other than the seat's
+    league, has a league director while the country holds a focus slot. Focus already means
+    "where I personally operate"; a director is that attention made a person, and the cap keeps
+    it manageable (1 to 5 directors). A focus country with no league has none.
+  - *Arrival and departure.* When a focused country's league forms, or focus lands on a country
+    with a league, a director is drawn on the directors' own random stream. When the focus slot
+    leaves, the director leaves with it (their term ends; no severance) and their trait stops
+    applying. Focus that returns draws a new director.
+  - *One trait, no policies.* Each director has one trait that bends the simple model's numbers
+    for their league only (rates, income lines, costs, promotion readiness) and may bring story
+    cards. Starting set: Frugal (lower costs, slower conversion), Showman (more gate and media,
+    higher costs), Grassroots (faster hardcore conversion, less revenue), Scandal-prone (better
+    results, scandal story cards). The list is content and tuned by measurement.
+  - *Salary from league cash,* by tier (config), a money sink where cash piles up late.
+  - *Replacing a director* is an offseason action: severance (quarters of salary, config) from
+    the league's cash, then a choice among a few drawn candidates (`directors.candidates`)
+    with their traits shown.
+  - *Advisor voice.* A league's cards in a director's country carry the director's name.
+  - *Faces of the past.* Every director's term is recorded (league, tier on arrival and on
+    leaving, promotions, years); the Builders wing reads those records.
 - **The player can always intervene** in any country directly. Delegation is a default, not a
   lock.
 
@@ -239,8 +262,8 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
     Backyard Game stretch and ties the deepest league to the one whose collapse ends the run.
   - *Moving the seat hurts (choose pain).* The flagship is reassignable only during the
     offseason. The former flagship's country pays a purist cost (it feeds anchor resentment when the
-    anchor is left), and its league drops to the simple model (or a
-    league director, once they exist).
+    anchor is left), and its league drops to the simple model (with a league
+    director if the country holds a focus slot, v1.40).
   - *Only Professional or Elite leagues can take the seat (decided 2026-10-02).* The anchor is the
     one exception: it holds the seat from turn 1 at any tier. Moving the seat abroad needs a
     league that has already professionalized, so the player cannot park the seat in a fresh
@@ -249,6 +272,22 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
     collapses, the seat returns to the anchor at once, outside the offseason. The return is
     free: the collapse itself is the pain (its fans, cash and stories are lost), and the anchor
     gets its commissioner back.
+  - *Parked items, topic 2: seat follow-ups (decided 2026-11-01, v1.40).*
+    - *Only the flagship signs deals, for good.* Deals are the commissioner's work; other
+      leagues keep one combined revenue line, bent by a league director's trait (topic 1).
+    - *The birthplace outlived sends the seat abroad, free.* When the anchor league folds after
+      the win while holding the seat, a decision card asks where the seat goes among the
+      Professional and Elite leagues; its free default is the eligible league with the most
+      hardcore fans. The move is immediate, outside the offseason, with no purist cost (the
+      collapse is the pain). With no eligible league the seat waits dark at the anchor and the
+      card returns once one qualifies. If a league re-forms at the anchor first, the seat stays
+      home with it.
+    - *A seat league abroad that steps down below Professional loses the seat (choose pain).*
+      The seat returns home when the offseason closes, and the league pays the purist cost of
+      being left, as for any seat move. This closes the loophole around seat eligibility. The
+      anchor stays exempt: it holds the seat at any tier.
+    - *Too few decisions or nothing to get attached to?* Closed as a design question: the seat,
+      stars, traditions and the offseason answer it. The next playtest watches for it.
   - *First build of the seat's depth:* named teams, results, standings and a few named stars
     (system 4), plus real sponsor and TV deals with length, annual value and demands (system 7).
     Venues, youth programs, expansion teams and full rosters come later.
@@ -265,8 +304,8 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
     struggling league plays worse. Stars plug into this rating when they arrive.
   - *The purist cost of moving the seat (decided 2026-10-02).* The country the seat leaves loses
     a config share of its player hardcore fans to casual, a larger share when it leaves the
-    anchor, and more where traditions are held (v1.22). Anchor resentment can replace the anchor share
-    once it exists. The return home after a folded
+    anchor, and more where traditions are held (v1.22). Anchor resentment replaces the anchor share
+    (v1.40, Late-Game Pressure). The return home after a folded
     flagship costs nothing.
   - *Every other league* stays on the simple model: fan buckets, one cash line, the League Health
     Ladder, promotion and bailouts.
@@ -611,7 +650,7 @@ breadth alone cannot win — depth is required.
 | Rules complexity | Simple / Moderate / Intricate | Rule |
 | Play structure | Continuous / Stop-start / Innings | Rule |
 
-Water as a surface option is parked for later.
+Water as a surface option was cut (2026-11-01, v1.40): it would mostly measure coastline and turn a field sport into another genre.
 
 - **Affinity = genome traits × country attributes.** Phase 0 country attributes: climate, wealth,
   urban density, existing sport culture (also the source of rival strength), media market size,
@@ -1129,6 +1168,12 @@ hardcore stickiness in their home country.
 lightweight build. Every number is config (`hallOfFame`).
 - *Wings:* Players and Moments. League directors and founding-family members wait until those
   people exist (parking lot).
+- *A Builders wing (decided 2026-11-01, v1.40),* built with league directors. Directors whose
+  league rose while they held the job (promotions, reaching Elite, health and hardcore growth
+  over their term) earn points from their recorded terms; retired directors reach a Builders
+  ballot after a wait, with their own bar and class cap (config `hallOfFame.builders`).
+  Founding-family members get a Family wing outside the ballot (v1.40, see the founder across 120
+  years).
 - *Players are inducted on points from retained records only:* star seasons, titles won while at
   the club, seasons as the league's top scorer (the stand-in for awards until Player of the Season
   exists) and holding the all-time scoring record. A player is eligible a few seasons after
@@ -1325,7 +1370,7 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
   - *One conversion, the sim unchanged:* config `dollarsPerCash` turns the sim's cash into dollars
     for display, calibrated so a US-scale Elite flagship earns in the NFL's range. Deal and revenue
     rates are then retuned so the revenue mix and deal sizes match the benchmarks. Converting the
-    sim itself to dollars is parked.
+    sim itself to dollars was cut (2026-11-01, v1.40): no gameplay gain.
   - *Benchmarks:* a sourced table of real leagues by tier (Amateur local leagues, Semi-pro
     USL/National League class, Professional MLS class, Elite NFL/Premier League class): annual
     revenue, the mix (media, sponsors, gate) and top sponsor and naming-rights deals as shares of
@@ -1384,7 +1429,9 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
   - *Everything counted in scores is normalized* by the rule's average: top scorer tallies, the
     scoring record, Player of the Season and Hall of Fame points, the star threshold and the close
     final margin, so a high-scoring sport does not flood the Hall or the awards.
-  - *Term values parked:* scores worth different points by the sport's term (a try 5, a kick 3).
+  - *Term values cut (2026-11-01, v1.40):* scores worth different points by the sport's term (a try
+    5, a kick 3) would change displayed totals only and risk everything that divides by
+    `scoreUnit`.
   - *Built 2026-10-09 (calls made at build).* The stronger club's *expected result* (wins plus half
     the draws) is what stays fixed: fewer draws in high-scoring sports become wins and losses. Star
     thresholds were refitted too: more scores make a top scorer's share steadier.
@@ -1397,6 +1444,11 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
     front pages.
   - *Outlet names:* place + a modern, neutral word (Sports Desk, Live, Daily, Insider, Report,
     Network, Pulse, Now): "Houston Sports Desk". Pools by language sphere are parked.
+  - *Names by language (decided 2026-11-01, v1.40, parked items topic 7):* content only. English
+    player names split into regional pools (North American, Australia and New Zealand,
+    Caribbean, British) through the existing `playerNames.countries` overrides; outlet words
+    by language sphere for the big spheres (Spanish "Deportes Hoy", French "Sport Matin",
+    Portuguese, German, Italian), English words elsewhere.
   - *One headline, one recap:* the champion moment keeps the headline look; the offseason's season
     in review becomes a stats recap (final standings, the playoff path, awards, records, traditions
     born, a Hall class), not a second front page.
@@ -1974,9 +2026,36 @@ purchased traits and percentage modifiers alone do not make culture.
 - *Youth programs:* bought with cash; upkeep; accelerate hardcore conversion and improve homegrown
   player quality (stronger national teams).
 - Simple version in Phase 1; Phase 2 adds depth (e.g., a named stadium for the flagship league).
+- **Parked items, topic 3: youth programs (decided 2026-11-01, v1.40).** Every number is config
+  (`youth`).
+  - *Where:* the seat's league and leagues in focus countries, the places the player personally
+    operates (at most about six).
+  - *Two effects:* a small hardcore conversion boost in that country, and better homegrown
+    players.
+  - *Quality pays off in generations (choose pain):* a level raises the skill drawn for players
+    who come through after it opens, never players already playing: standouts drawn in that
+    country, and the flagship's young replacements born there. National teams, the talent pull
+    and the Hall of Fame feel it years later.
+  - *Buying and keeping:* a level is bought with league cash in the offseason and opens after a
+    season. Upkeep is paid from league cash every quarter. When focus leaves the country the
+    program stays and its upkeep runs, but it cannot be upgraded; a league that cannot pay the
+    upkeep loses a level a year. Rivals' youth programs (a countermove) are unrelated.
+- **Parked items, topic 4: flagship ticket pricing (decided 2026-11-01, v1.40).** Every number
+  is config (`flagship.tickets`).
+  - *Three stances at the seat only* (venues exist only there): cheap, standard (the default) and
+    premium.
+  - *What a stance changes:* gate per seated fan, and casual → hardcore conversion in the seat
+    country. Cheap pays less gate and converts faster; premium pays more and converts slower.
+    Capacity, attendance and record crowds are unchanged.
+  - *Set in the offseason only,* for the whole season, with the rest of league business.
+  - *Raising prices angers the faithful (choose pain):* each step up demotes a share of the seat's
+    hardcore fans to casual once, in that offseason, heavier with the seat country's tradition
+    weight. Lowering prices is free.
+  - *Late cash:* cheap is how spare cash at the seat becomes fans; measure the #1 contest.
 - **Venues, first build (decided 2026-10-07, v1.30).** Every number is config.
   - *Scope:* the flagship only; other leagues stay on the Phase 0 model. Youth programs are parked
-    (their payoff, stronger national teams, waits for the World Championship).
+    (their payoff, stronger national teams, waits for the World Championship). Designed in v1.40,
+    below.
   - *A hard gate cap (choose pain):* gate is paid only on hardcore fans up to the venue's
     capacity. Capacity at levels 1–5 is a share of the country's population, keyed roughly to the
     promotion thresholds, so level 1 bites around Semi-Pro and a growing flagship stalls on gate
@@ -2030,6 +2109,12 @@ lengths — lives in config files. No balance values in code.
   seasonal-window action with a review step, the PP price, purist backlash, dated amendments in
   the Rulebook, and bots that amend. Proposals from broadcasters, sponsors and league directors
   arrive with the deals build, since those are the proposers.
+- **Proposals, decided 2026-11-01 (v1.40).** At most one proposal card a year, in the offseason,
+  from a league director (an amendment that suits their country's fit) or a flagship deal partner
+  (one that suits its market or product). Accepting skips the PP price but counts toward the yearly
+  amendment limit, and purist backlash applies as for the player's own. Declining a partner's
+  proposal counts as a clause miss on that deal (choose pain); declining a director's costs
+  nothing. Rival rule copying stays as designed.
   - *One amendment changes one rule trait* to any of its options. Its size is the jump: one step
     along contact, team size, match length, scoring or complexity counts 1, two steps count 2,
     and changing the play structure always counts 2.
@@ -2097,7 +2182,7 @@ produces PP; it can only build fans locally through venues and youth programs.
 
 **Business Layer (per country league):** the full layer below runs at the flagship, where the
 player is commissioner (v1.11). Other leagues keep the Phase 0 subset (one combined revenue line);
-whether they later gain individual deals is open.
+they never gain individual deals (decided 2026-11-01, v1.40).
 - **Revenue:** *gate* = hardcore fans × country wealth, capped by venue capacity; *TV* = casual
   reach × media market size; *sponsors* = total reach × wealth. PP tier caps the size of TV and
   sponsor deals on offer.
@@ -2249,6 +2334,20 @@ snowballing. Works alongside tier-scaled costs, tier-scaled negative events, and
 - **Anchor resentment.** As the sport globalizes, anchor-country purists feel abandoned. Driven by
   time since the anchor last held a focus slot and by the number of TV/casual-friendly rule
   changes. Expressed as hardcore demotion and league health drag at home.
+  - *Parked items, topic 8 (decided 2026-11-01, v1.40).* Every number is config
+    (`anchorResentment`).
+    - *A stored value* from 0 to 1 in the game state, shown on the anchor's country card with
+      the reasons, so the player sees it coming.
+    - *What raises it:* each quarter the anchor holds no focus slot (after a grace period), each
+      casual-friendly amendment (shorter matches, more scoring, less complexity), and each
+      quarter the seat is away from the anchor. It grows only once the sport has a league abroad.
+    - *What lowers it:* decay while the anchor holds a focus slot, faster while the seat is home;
+      a purist-friendly amendment lowers it a step.
+    - *What it does:* a quarterly hardcore demotion at home scaled by resentment, and a drag on
+      the anchor league's health that can walk it down the ladder; before the win that can end
+      the campaign (choose pain).
+    - *The stand-ins go:* the anchor's fixed ×2 rule backlash and its larger seat-leaving share
+      scale with resentment instead, so a well-tended home forgives more.
 - **Generational turnover.** A small annual share of hardcore fans ages out everywhere (low rate,
   config). Mature markets must keep converting new fans; no base lasts forever without upkeep.
   Rules (decided 2026-09-13): aging fans demote to casual about the same sport (hardcore loss is
@@ -2383,6 +2482,21 @@ scale rival aggression and economy values via config.
 
 **The founder across 120 years:** The player is the founding family. Leadership passes through
 the family across generations as flavor only — no succession mechanics.
+- **Parked items, topic 6: the founding family (decided 2026-11-01, v1.40).** Flavor only: no
+  effect on any number. Every number is config (`family`).
+  - *Names:* the founder is named on the founding setup page, defaulting to a draw from the
+    birthplace's name pool on the seed (identity's own stream), editable. Heirs get drawn given
+    names and keep the family name.
+  - *The torch passes* every `family.generationYears` years (about 30), in the offseason: a
+    minor card with no slot names the new head, and a `familyHandoff` landmark is kept (about
+    four heads in a 120-year campaign).
+  - *The head signs the commissioner's lines:* press, the season in review and the
+    retrospective name the current head.
+  - *A Family wing in the Hall of Fame,* outside the ballot: each head is inducted when they hand
+    over, the plaque listing what happened on their watch (tiers reached, leagues abroad, #1 taken
+    or lost, the championship founded). No shrine weight.
+  - *Retiring is the current head stepping down;* the retrospective's timeline names each
+    generation's tenure.
 
 ---
 
@@ -2497,7 +2611,8 @@ deadline forcing exclusions. Instead:
   (systems 1–8) is complete.
 - **Deferred analysis:** Black-hole risk assessment (which systems could swallow unlimited dev
   time) and sequel/future scope planning were explicitly deferred as premature at this design
-  stage. Revisit both once Phase 1 is built and real development velocity is known.
+  stage. Revisit both once Phase 1 is built and real development velocity is known. Reviewed
+  2026-11-01 (v1.40): both stay deferred.
 
 ---
 
@@ -2505,41 +2620,21 @@ deadline forcing exclusions. Instead:
 
 Items flagged during the interview that need further discussion in future sessions:
 
-- Music direction: postponed by choice; revisit late in production if ever.
+- Music direction: postponed by choice. Reviewed 2026-11-01 (v1.40): decided with sound in the
+  release work (Player readiness checklist), not "if ever".
 - Commercial decisions — deferred by choice (2026-09-13): price, Early Access timing, demo scope,
-  DLC, Steam page timing, platforms. Tech plan §11 holds the current thinking.
-- Competitor analysis: a thorough Steam tag sweep (research task, not a design decision).
-- Water as a genome surface option (parked 2026-09-13).
+  DLC, Steam page timing, platforms. Tech plan §11 holds the current thinking. Reviewed 2026-11-01
+  (v1.40): decided once the game is playable end to end and the Steam page is about to go up.
+- Competitor analysis: a thorough Steam tag sweep (research task, not a design decision). Reviewed
+  2026-11-01: stays parked.
 - Women's sports (parked 2026-10-03): a women's version of the player's sport, as an option built
-  much later. Until then every sport is men's (players, name pools, text).
-- Standing policies (parked 2026-10-07, v1.30): nothing to delegate while other leagues have no
-  business; they return with individual deals or venues at other leagues.
-- Flagship ticket pricing (parked 2026-10-07, v1.30): a cheap, standard or premium stance (more
-  gate per fan against slower conversion), tied to the venue cap. Revisit after the cap is
-  measured.
-- Hall of Fame wings for league directors and founding-family members (parked 2026-10-07,
-  v1.31): they wait until those people exist in the simulation.
-- Outlet words and player names by language sphere and country (parked 2026-10-08, v1.34): e.g.
-  "Deportes Hoy"; the United States draws British given and family names today.
-- Scores worth points by the sport's term (parked 2026-10-08, v1.34): a try 5, a kick 3, a
-  basket 2 or 3, on top of the refitted engine's totals. Flavor only.
-- The sim in dollars (parked 2026-10-08, v1.34): convert every money number in the sim and config
-  to dollars instead of a display conversion (`dollarsPerCash`). No gameplay gain; come back when
-  the money model is next reworked.
-- Late rewards in what is scarce late (parked 2026-10-08, v1.32): late in a campaign PP piles up
-  (~100K banked) and card PP rewards are noise, but scaling them up ends the #1 contest. Late cards
-  could pay in fans, cash or culture instead. Needs a design session.
-- Collective bargaining agreement (parked 2026-10-09, third playtest; designed 2026-10-13 in
-  v1.39, see "the late surplus", with the late card rewards above it): late leagues pile up cash
-  with nothing to spend it on (a turn-89 save held $2.87 trillion across leagues; the flagship
-  earned $1.6B a quarter against $80M of costs). A CBA with a players' union would claim a share
-  of league revenue through negotiated terms, with strikes or lockouts when talks fail, and act as
-  the money sink. Other late ideas may close the gap first; design it with them.
+  much later. Until then every sport is men's (players, name pools, text). Reviewed 2026-11-01
+  (v1.40): stays parked as a post-release option (an update or DLC).
 - Star injuries (parked 2026-10-03): a negative event that needs the flagship match engine to
   handle missed matches; deferred from the Phase 1 stars build.
-- Commissioner's seat follow-ups (parked 2026-09-26; seat eligibility and the folded-flagship
-  rule decided 2026-10-02): whether other leagues ever get individual deals; where the seat goes
-  when the anchor league has folded after the win; whether a flagship restructured below
-  Professional keeps the seat; and whether playtest thinness
-  was too few decisions per turn or nothing to get attached to (the seat answers the second
-  directly, the first only at the flagship).
+- Players beyond the leading players (reviewed 2026-11-01, v1.40, parked items topic 5; nothing
+  decided): full rosters at Professional and Elite, contracts, an outward transfer pull and star
+  injuries were discussed and left for later. The options on the table: one leading player per
+  club for good or a small named squad; contracts cut (the agreement prices payroll); today's
+  moves and talent pull as the transfer model, or an outward pull from rich leagues abroad;
+  injuries as a decision (rest or rush back).
