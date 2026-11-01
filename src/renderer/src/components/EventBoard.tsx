@@ -219,13 +219,21 @@ export function EventBoard() {
                     </strong>
                     <p>
                       {t(
-                        selected.resolution.automatic
-                          ? "events.autoResolution"
-                          : "events.manualResolution",
+                        `events.${selected.resolution.automatic ? "auto" : "manual"}Resolution${
+                          selected.resolution.reward ? "Reward" : ""
+                        }`,
                         {
                           turn: selected.resolution.turn,
                           cost: selected.resolution.cost,
                           gained: selected.resolution.ppGained,
+                          // A late card's reward by kind (GDD v1.39).
+                          reward: selected.resolution.reward
+                            ? t(`events.rewards.${selected.resolution.reward.kind}`, {
+                                count: selected.resolution.reward.amount,
+                                cash: selected.resolution.reward.amount,
+                                value: selected.resolution.reward.amount,
+                              })
+                            : "",
                         },
                       )}
                     </p>

@@ -133,6 +133,13 @@ function effectValue(
       return effect.steps * weights.league;
     case "pp":
       return (effect.amount * weights.ppPrice) / priceLevel(state, world);
+    // Late rewards by kind (GDD v1.39), valued like the effects they resemble.
+    case "leagueCash": {
+      const league = state.countries.find((c) => c.countryId === effect.countryId)?.league;
+      return league ? (effect.amount / Math.max(1, league.cash)) * weights.league : 0;
+    }
+    case "traditionWeight":
+      return effect.strength * weights.hardcore;
     // Star cards (GDD v1.16). Honors and mentoring keep some of a backed star's influence working
     // after they retire; keeping a star holds their strength at their old club for league cash.
     case "starHonors":

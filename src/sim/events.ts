@@ -8,6 +8,7 @@ import type { EventRecord, EventState } from "./events-state";
 import { activeClubs, backingPrice, moveClubRatings } from "./flagship";
 import { offerAwardCards, offerHallCards } from "./hall-cards";
 import { classHeadline, classPP } from "./hall-of-fame";
+import { eventFamily, lateReward, lateRewardsOn, rewardRecord } from "./late-rewards";
 import { offerLegacyCards } from "./legacy";
 import { outletOf, wireOutlet } from "./press";
 import { ppPrice } from "./prices";
@@ -322,11 +323,29 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
 }
 
 /**
- * A card's effects for one answer. The champion moment's PP follows the league tier (config),
- * raised by the famous grounds of the league's country (GDD v1.22). Card PP does not grow with
- * the sport (GDD v1.32: measured, any scaling that made late rewards matter ended the #1 contest).
+ * A card's effects for one answer. Card PP does not grow with the sport (GDD v1.32: measured, any
+ * scaling that made late rewards matter ended the #1 contest); from the late tiers a card's PP is
+ * paid by its kind instead (GDD v1.39, `late-rewards.ts`), and no PP line is left.
  */
 export function eventEffects(
+  state: GameState,
+  world: World,
+  card: EventTemplate,
+  event: Pick<EventRecord, "facts" | "countryId">,
+  choiceId: string | null,
+): EventEffect[] {
+  const effects = ppEffects(state, world, card, event, choiceId);
+  if (!lateRewardsOn(state, world)) return effects;
+  const paid = effects.some((effect) => effect.type === "pp" && effect.amount > 0);
+  const reward = paid ? lateReward(state, world, event) : null;
+  return [...(reward ? [reward] : []), ...effects.filter((effect) => effect.type !== "pp")];
+}
+
+/**
+ * A card's effects with its PP. The champion moment's PP follows the league tier (config), raised
+ * by the famous grounds of the league's country (GDD v1.22).
+ */
+function ppEffects(
   state: Pick<GameState, "culture" | "hallOfFame">,
   world: World,
   card: EventTemplate,
@@ -434,6 +453,28 @@ function applyEffects(
       next = applyStarEffect(next, world, event, effect);
       continue;
     }
+    if (effect.type === "leagueCash") {
+      // Not profit (GDD v1.39): the payout takes only a quarter's operating profit, so it stays.
+      const at = next.countries.findIndex((c) => c.countryId === effect.countryId);
+      const held = next.countries[at];
+      if (!held?.league) continue;
+      const countries = [...next.countries];
+      countries[at] = {
+        ...held,
+        league: { ...held.league, cash: held.league.cash + effect.amount },
+      };
+      next = { ...next, countries };
+      continue;
+    }
+    if (effect.type === "traditionWeight") {
+      const traditions = next.culture.traditions.map((t) =>
+        t.id === effect.traditionId
+          ? { ...t, strength: Math.min(1, t.strength + effect.strength) }
+          : t,
+      );
+      next = { ...next, culture: { ...next.culture, traditions } };
+      continue;
+    }
     if (effect.type === "derbyStoke") {
       // One extra meeting toward a derby between the season's top two (GDD v1.22).
       const season = event.facts.season;
@@ -533,7 +574,15 @@ export function resolveEvent(
   const next = applyEffects({ ...state, pp: state.pp - cost }, world, event, effects);
   const settled: EventRecord = {
     ...event,
-    resolution: { choiceId, automatic, turn: state.turn, quarter: state.quarter, cost, ppGained },
+    resolution: {
+      choiceId,
+      automatic,
+      turn: state.turn,
+      quarter: state.quarter,
+      cost,
+      ppGained,
+      reward: rewardRecord(state, effects),
+    },
   };
   return {
     ...next,
@@ -554,18 +603,6 @@ export function settleEvents(state: GameState, world: World): GameState {
     next = resolveEvent(next, world, event.id, card.defaultChoice, true);
   }
   return next;
-}
-
-/** Which news section a card belongs to (GDD v1.26): each family has its own look. */
-export type EventFamily = "season" | "star" | "tradition" | "hall" | "rival" | "business" | "sport";
-function eventFamily(event: EventRecord): EventFamily {
-  if (event.facts.hall) return "hall";
-  if (event.facts.deal || event.facts.venue) return "business";
-  if (event.facts.season) return "season";
-  if (event.facts.star) return "star";
-  if (event.facts.tradition) return "tradition";
-  if (event.facts.rivalId) return "rival";
-  return "sport";
 }
 
 /**

@@ -120,6 +120,29 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   /** Decision answers by "card/choice"; a decision left to End Turn counts as its default. */
   const eventAnswers: Record<string, number> = {};
   let ppSpentOnEvents = 0;
+  // Late card rewards by kind (GDD v1.39), read once from each card as it is settled.
+  const lateRewards = {
+    cards: 0,
+    seatCash: 0,
+    leagueCash: 0,
+    tradition: 0,
+    latePP: 0,
+    incomePP: 0,
+  };
+  const settledIds = new Set<number>();
+  const lateTier = (at: GameState) => at.ppTier >= world.events.settings.lateRewards.fromTier;
+  const tallyRewards = (settled: GameState, late: boolean) => {
+    for (const event of settled.events.history) {
+      if (settledIds.has(event.id)) continue;
+      settledIds.add(event.id);
+      const reward = event.resolution?.reward;
+      if (reward) {
+        lateRewards.cards += 1;
+        lateRewards[reward.kind] += reward.amount;
+      }
+      if (late) lateRewards.latePP += event.resolution?.ppGained ?? 0;
+    }
+  };
   const ppTimeline: CampaignResult["ppTimeline"] = [];
   let anchorOvertakeYears: number | null = null;
   let firstTopTurn: number | null = null;
@@ -330,9 +353,11 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       nodesBought.push({ nodeId: landmark.nodeId, turn: t + 1, cost: landmark.cost });
       ppSpentOnNodes += landmark.cost;
     }
+    tallyRewards(step.state, lateTier(step.state));
     const tierBefore = step.state.ppTier;
     const before = step.state;
     state = endTurn(step.state, world);
+    tallyRewards(state, lateTier(before));
     // Clause judgements this turn: changes on deals still running, the final judgement of a
     // deal that ended at its term (judged just before it expired, in the same turn), walks.
     {
@@ -374,6 +399,11 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     }
 
     const snap = snapshot(state, world);
+    // The PP the late income share adds a turn, at this turn's income (GDD v1.39).
+    if (lateTier(state)) {
+      const share = world.events.settings.lateRewards.incomeShare;
+      lateRewards.incomePP += (snap.ppIncomePerTurn * share) / (1 + share);
+    }
     const player = snap.sports.find((sport) => sport.kind === "player");
     if (!player) throw new Error("Snapshot has no player sport");
     if (snap.win.rank === 1 && firstTopTurn === null) firstTopTurn = t + 1;
@@ -540,6 +570,7 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
       ppSpentOnNodes,
       eventAnswers,
       ppSpentOnEvents,
+      lateRewards,
       flagship: (() => {
         const titles = new Map<number, number>();
         for (const season of state.flagship.seasons) {

@@ -107,6 +107,13 @@ export const hallFactsSchema = z.strictObject({
   nearMissId: z.int().positive().nullable().default(null),
 });
 
+/**
+ * What a late card reward paid in (GDD v1.39): cash into the flagship league, cash into another
+ * league, tradition strength.
+ */
+export const LATE_REWARD_KINDS = ["seatCash", "leagueCash", "tradition"] as const;
+export type LateRewardKind = (typeof LATE_REWARD_KINDS)[number];
+
 export const eventRecordSchema = z.strictObject({
   id: z.int().positive(),
   templateId: z.string(),
@@ -159,6 +166,11 @@ export const eventRecordSchema = z.strictObject({
       quarter: z.int().nonnegative(),
       cost: z.number().nonnegative(),
       ppGained: z.number().nonnegative(),
+      /** The late reward paid in place of PP (GDD v1.39); null for PP, nothing, or older records. */
+      reward: z
+        .strictObject({ kind: z.enum(LATE_REWARD_KINDS), amount: z.number().nonnegative() })
+        .nullable()
+        .default(null),
     })
     .nullable(),
 });

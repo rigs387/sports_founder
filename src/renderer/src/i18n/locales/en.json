@@ -45,6 +45,8 @@
     "popup": {
       "collected_one": "One minor story collected automatically: +{{pp, number(maximumFractionDigits: 0)}} PP. The journal keeps it.",
       "collected_other": "{{count}} minor stories collected automatically: +{{pp, number(maximumFractionDigits: 0)}} PP. The journal keeps them.",
+      "collectedPlain_one": "One minor story collected automatically. The journal keeps it.",
+      "collectedPlain_other": "{{count}} minor stories collected automatically. The journal keeps them.",
       "dateline": "{{country}} · {{date}}",
       "breaking": "Breaking",
       "where": "{{kind}} · {{country}} · {{date}}",
@@ -59,6 +61,13 @@
     "collected": "Moment collected",
     "manualResolution": "Resolved on turn {{turn}}. {{cost, number(maximumFractionDigits: 1)}} PP spent; {{gained, number(maximumFractionDigits: 1)}} PP gained.",
     "autoResolution": "Settled automatically before advancing turn {{turn}}. {{gained, number(maximumFractionDigits: 1)}} PP collected; no decision cost.",
+    "manualResolutionReward": "Resolved on turn {{turn}}. {{cost, number(maximumFractionDigits: 1)}} PP spent. {{reward}}",
+    "autoResolutionReward": "Settled automatically before advancing turn {{turn}}; no decision cost. {{reward}}",
+    "rewards": {
+      "seatCash": "Paid {{cash, money}} into the flagship league's reserve.",
+      "leagueCash": "Paid {{cash, money}} into a league's reserve.",
+      "tradition": "A tradition grew {{value, number(style: percent; maximumFractionDigits: 1)}} stronger."
+    },
     "active": "Local effects in play · {{count}}",
     "footer": "Next Turn collects unopened rewards and takes the neutral option on unanswered decisions. Effects stay local unless stated otherwise.",
     "back": "Back to the world",
@@ -88,7 +97,10 @@
       "starKeep": "Costs the league {{cash, money}}. The move is canceled.",
       "starBack": "Backs the star now: their influence grows each season they play here.",
       "starSign": "They join the club now as its leading player. The league's broadcast reaches further into their home country while they play.",
-      "derbyStoke": "Counts as one more meeting toward a derby between these two clubs."
+      "derbyStoke": "Counts as one more meeting toward a derby between these two clubs.",
+      "leagueCash": "{{cash, money}} into the flagship league's reserve. It stays there: only profit above the reserve is paid out to the clubs.",
+      "leagueCashAt": "{{cash, money}} into the reserve of the league in {{country}}. It stays there: only profit above the reserve is paid out to the clubs.",
+      "traditionWeight": "{{tradition}} grows {{value, number(style: percent; maximumFractionDigits: 1)}} stronger here: its fans hold on longer."
     },
     "blockers": {
       "missing": "This story has already been resolved.",

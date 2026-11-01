@@ -10,6 +10,7 @@ import { verifyDeals } from "./deals-smoke";
 import { verifyEvents } from "./event-smoke";
 import { verifyFlagship } from "./flagship-smoke";
 import { verifyRulebook } from "./identity-smoke";
+import { verifyLateRewards } from "./late-rewards-smoke";
 import { verifyLeagues } from "./league-smoke";
 import { verifyMap } from "./map-smoke";
 import { verifyPopups } from "./popup-smoke";
@@ -176,6 +177,7 @@ async function run(
   const retirement = await verifyRetirement(win, outDir, filePrompts, screenshot);
   const agreement = await verifyAgreement(win, outDir, filePrompts, screenshot);
   const stoppage = await verifyStoppage(win, outDir, filePrompts, screenshot);
+  const lateRewards = await verifyLateRewards(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
     throw new Error(JSON.stringify({ errors, remoteRequests }));
   const report = {
@@ -205,6 +207,7 @@ async function run(
     saves,
     agreement,
     stoppage,
+    lateRewards,
     retirement,
     errors,
     remoteRequests,

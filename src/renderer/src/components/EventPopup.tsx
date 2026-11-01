@@ -258,7 +258,11 @@ function AutoCollect() {
   if (!note) return null;
   return (
     <p className="moment-collected" role="status" data-testid="moment-collected" key={note.key}>
-      {t("events.popup.collected", { count: note.count, pp: note.pp })}
+      {/* Late cards pay by kind, not PP (GDD v1.39): no "+0 PP". */}
+      {t(note.pp > 0 ? "events.popup.collected" : "events.popup.collectedPlain", {
+        count: note.count,
+        pp: note.pp,
+      })}
     </p>
   );
 }

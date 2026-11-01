@@ -279,6 +279,13 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   card is `season-lost` (trigger `stoppage`, `offerStoppageCards` in `agreement.ts`, no slot).
   Its smoke step (`src/main/stoppage-smoke.ts`) runs after the agreement step. The smoke's
   `screenshot` finishes CSS animations first: a hidden window never runs a fade-in.
+- Late card rewards (GDD v1.39, tech plan 2.25 step 5) are `src/sim/late-rewards.ts`, read by
+  `eventEffects`: from `events.settings.lateRewards.fromTier` a card's PP above 0 becomes, by
+  `eventFamily`, `leagueCash` (season, business, star: the seat league; rival, sport: the card's
+  country's league) or `traditionWeight` (tradition, hall). No late reward grows fans (measured:
+  fans won near #1 fed the rivals' defense), and the card PP becomes base income ×
+  `lateIncomeFactor` (`quarter.ts`, the snapshot; never `priceIncome`). Reward cash is not
+  profit, so the payout leaves it. `resolution.reward` records it; the runner prints it.
 - Venues and payroll (GDD v1.30) are the flagship's only: `LeagueState.venue` (level 1–5, a build,
   the record crowd) on every league, built only at the seat. `src/sim/venues.ts` (capacity, the
   conversion lift), `src/sim/venue-actions.ts` (`buildVenue` in the offseason; `openVenues` when

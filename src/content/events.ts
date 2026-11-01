@@ -47,7 +47,22 @@ export const eventEffectSchema = z.union([
   z.strictObject({ type: z.literal("starSign") }),
   // The repeat-final card only (GDD v1.22): one extra meeting toward a derby between the two clubs.
   z.strictObject({ type: z.literal("derbyStoke") }),
+  // Late rewards by kind (GDD v1.39): from settings.lateRewards.fromTier a card's PP becomes one of
+  // these, worked out from settings.lateRewards when the card is shown and collected. Never written
+  // on a card. Cash into a league (sim units), strength added to a tradition.
+  z.strictObject({
+    type: z.literal("leagueCash"),
+    countryId: z.string().min(1),
+    amount: z.number().positive(),
+  }),
+  z.strictObject({
+    type: z.literal("traditionWeight"),
+    traditionId: z.int().positive(),
+    strength: z.number().positive(),
+  }),
 ]);
+/** The late reward effects (GDD v1.39): computed, never written on a card. */
+export const LATE_REWARD_EFFECTS = ["leagueCash", "traditionWeight"] as const;
 /**
  * The tradition facts a card can tell (GDD v1.22): a tradition born or lost, and a chant's first
  * follower abroad (GDD v1.31).
@@ -299,6 +314,8 @@ const template = z
     if (card.arrivalEffects.length && !((season || star) && card.tone === "pressure"))
       issue("Arrival effects belong to pressure season and star cards only");
     for (const effect of [...card.effects, ...card.choices.flatMap((c) => c.effects)]) {
+      if ((LATE_REWARD_EFFECTS as readonly string[]).includes(effect.type))
+        issue(`${effect.type} is a late reward from settings.lateRewards, never written on a card`);
       if (effect.type === "rivalSetback" && card.trigger !== "rivalEscalated")
         issue("Rival setbacks require a recorded rival escalation");
       if (
@@ -339,6 +356,20 @@ export const eventsFileSchema = z
          */
         flagshipHeadlineTiers: z.array(leagueTierSchema),
         headlineStories: z.array(z.enum(SEASON_STORIES)),
+        /**
+         * Late card rewards by kind (GDD v1.39): from this PP tier a card's PP is paid in what
+         * its story is about instead, by family. Season, business and star: cashQuarters of the
+         * flagship league's running cost into its cash; rival and sport: the same for the
+         * league of the card's country. Tradition and hall: traditionStrength added to a
+         * tradition at home in the card's country. The PP the cards stop paying becomes base PP
+         * income × (1 + incomeShare).
+         */
+        lateRewards: z.strictObject({
+          fromTier: z.int().positive(),
+          cashQuarters: z.number().positive(),
+          traditionStrength: z.number().gt(0).max(1),
+          incomeShare: z.number().min(0).max(1),
+        }),
       })
       .refine((s) => s.minFactor <= 1 && s.maxFactor >= 1, "Factor bounds must include 1"),
     cards: z.array(template),

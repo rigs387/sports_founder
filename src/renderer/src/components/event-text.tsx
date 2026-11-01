@@ -19,8 +19,9 @@ interface StarValues {
 
 export function Effect({ effect, star = {} }: { effect: EventEffect; star?: StarValues }) {
   const { t } = useTranslation();
-  const { snapshot } = useGameStore();
+  const { snapshot, names } = useGameStore();
   const termVars = useTermVars(snapshot?.identity.terms ?? PLAIN_TERMS);
+  const traditionWords = useTraditionWords(snapshot);
   if (effect.type === "starHonors" || effect.type === "starMentor" || effect.type === "starKeep") {
     const stars = snapshot?.flagship.starRules;
     return (
@@ -46,6 +47,29 @@ export function Effect({ effect, star = {} }: { effect: EventEffect; star?: Star
       </li>
     );
   if (effect.type === "pp") return <li>{t("events.effects.pp", { amount: effect.amount })}</li>;
+  // Late rewards by kind (GDD v1.39): what the card pays in place of PP.
+  if (effect.type === "leagueCash")
+    return (
+      <li data-effect="leagueCash">
+        {effect.countryId === snapshot?.flagship.countryId
+          ? t("events.effects.leagueCash", { cash: effect.amount })
+          : t("events.effects.leagueCashAt", {
+              cash: effect.amount,
+              country: names?.countries[effect.countryId] ?? effect.countryId,
+            })}
+      </li>
+    );
+  if (effect.type === "traditionWeight") {
+    const tradition = snapshot?.culture.traditions.find((entry) => entry.id === effect.traditionId);
+    return (
+      <li data-effect="traditionWeight">
+        {t("events.effects.traditionWeight", {
+          tradition: tradition ? traditionWords.name(tradition) : "",
+          value: effect.strength,
+        })}
+      </li>
+    );
+  }
   if (effect.type === "leagueHealth")
     return <li>{t(effect.steps > 0 ? "events.effects.healthUp" : "events.effects.healthDown")}</li>;
   if (effect.type === "clubRating")

@@ -111,6 +111,19 @@ export interface CampaignResult {
   eventAnswers: Record<string, number>;
   /** PP paid for decision-card choices. */
   ppSpentOnEvents: number;
+  /**
+   * Late card rewards paid by kind (GDD v1.39): cards that paid one, cash (sim units) into the
+   * flagship league and into other leagues, tradition strength; card PP gained from the late
+   * tiers (none by design) and the PP the late income share added in its place.
+   */
+  lateRewards: {
+    cards: number;
+    seatCash: number;
+    leagueCash: number;
+    tradition: number;
+    latePP: number;
+    incomePP: number;
+  };
   /** Flagship seasons finished, how many clubs won one, and the most titles any club won. */
   flagship: {
     seasons: number;
@@ -687,6 +700,14 @@ export function eventAggregate(results: CampaignResult[]) {
   return {
     answers: Object.fromEntries(Object.entries(answers).sort(([a], [b]) => a.localeCompare(b))),
     ppSpentOnEvents: distribution(results.map((r) => r.ppSpentOnEvents)),
+    lateRewards: {
+      cards: distribution(results.map((r) => r.lateRewards.cards)),
+      seatCash: distribution(results.map((r) => r.lateRewards.seatCash)),
+      leagueCash: distribution(results.map((r) => r.lateRewards.leagueCash)),
+      tradition: distribution(results.map((r) => r.lateRewards.tradition)),
+      latePP: distribution(results.map((r) => r.lateRewards.latePP)),
+      incomePP: distribution(results.map((r) => r.lateRewards.incomePP)),
+    },
   };
 }
 

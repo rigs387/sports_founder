@@ -12,11 +12,11 @@ window.SF_PROGRESS = {
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
-    date: "2026-10-30",
-    tests: 665,
-    files: 73,
-    note: "npm run check passed after the players' agreement and the talks were built (type checks, Biome, purity, 665 tests in 73 files). Lint has existing visual-study warnings.",
-    smokeDate: "2026-10-30",
+    date: "2026-10-31",
+    tests: 678,
+    files: 75,
+    note: "npm run check passed after late card rewards by kind were built (type checks, Biome, purity, 678 tests in 75 files). Lint has existing visual-study warnings.",
+    smokeDate: "2026-10-31",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
   },
@@ -106,6 +106,13 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-10-31",
+      type: "Built",
+      title: "Late card rewards by kind; the late surplus is done",
+      text: "GDD v1.39, tech plan 2.25 step 5 of 5, which finishes 2.25. From PP tier 4 a card that pays PP pays in what its story is about instead (content/events.yaml settings.lateRewards): season, business and star cards put one quarter of the flagship league's running cost into its cash; rival and sport cards the same into the league of the card's country; tradition cards and the Hall's class add 0.05 strength to the card's tradition, or the strongest at home in its country (the class's legacies first). Cash is not profit: the payout takes only a quarter's operating profit, so it stays above the reserve until spent or lost. A card whose kind has no target pays nothing; a card that paid no PP still pays nothing. Two effect types join the closed vocabulary (leagueCash, traditionWeight), rejected at load if written on a card. The card's effect line says what it pays in words, cash in dollars; there is no PP line from tier 4, and the journal records the reward (resolution.reward, defaulted: no save format bump). Measured in 200-turn builder campaigns on the same seeds as HEAD. As first specified (cash, tradition weight, a star's pull, casual fans; card PP gone), #1 was lost before the win in 19/24 against 12/24. Isolated on seeds 1–24: removing the card PP alone 18/24 (about 6,000 PP a campaign, roughly 1% of late income), a star's pull or casual fans with PP kept about 18/24, cash or tradition weight with PP kept no change. Fans won near #1 feed the rivals' gain-keyed defense. Decided 2026-10-31: no reward grows fans (star cards pay seat cash, rival and sport cards cash into their country's league), and the card PP becomes base income × 1.01 from tier 4 (prices measured without it). Then: wins 24/24 both, win turn median 152 to 153, first #1 turn 114 to 113, longest hold median 78 both, #1 lost before the win 12/24 to 13/24; the income share added 6,011 PP a campaign against the 6,028 cards had paid. Per campaign the cards paid 519 rewards: $0.16B into the seat league, $3.65B into other leagues, 12.7 tradition strength. The plain 3-campaign run (seeds 1–3): wins 3/3 both, win turn 145 to 155, #1 lost before the win 1/3 to 2/3 (noise at three seeds), PP on hand at turn 200 7,937 / 5,351 / 6,955 to 6,079 / 6,018 / 5,291, seat league $0.3B to $0.4B. The runner prints a Late card rewards line. Checks: npm run check passes (678 tests in 75 files). Smoke passes with a new step after the stoppage step: the late-game save's champion card pays $70.8M into the flagship league's reserve, no PP.",
+      system: "business",
+    },
     {
       date: "2026-10-31",
       type: "Built",
@@ -855,7 +862,7 @@ window.SF_PROGRESS = {
       icon: "08",
       summary:
         "The flagship signs TV, sponsor and naming-rights deals with demands, builds its venue and pays its stars; other leagues keep one media line.",
-      next: "Late card rewards by kind (tech plan 2.25 step 5); watch the Semi-Pro deal slate (109%, just under its band).",
+      next: "The late surplus (tech plan 2.25) is built; watch the Semi-Pro deal slate (109%, just under its band) and revisit a late PP sink after a long playtest.",
       depends: ["leagues"],
       sources: [
         ["Current league finances", "../league-management/README.md"],
@@ -888,6 +895,10 @@ window.SF_PROGRESS = {
         [
           "built",
           "The stoppage: a refused offer loses the season, with no gate or TV, a dark broadcast, missed clauses and purists lost at the seat (tech plan 2.25 step 4)",
+        ],
+        [
+          "built",
+          "Late card rewards by kind: from PP tier 4 cards pay league cash or tradition weight, and their PP becomes income (tech plan 2.25 step 5)",
         ],
       ],
     },

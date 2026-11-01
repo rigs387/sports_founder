@@ -19,6 +19,7 @@ import {
 } from "./growth";
 import { type HallSnapshot, hallSnapshot } from "./hall-of-fame";
 import { type IdentitySnapshot, identitySnapshot } from "./identity";
+import { lateIncomeFactor } from "./late-rewards";
 import { bulkPromotable, type LeagueActions, leagueActions } from "./league-actions";
 import { type LeagueCosts, leagueCosts, leagueReserve } from "./league-costs";
 import { type LegacySnapshot, legacySnapshot } from "./legacy";
@@ -522,7 +523,9 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
         growthFactors(world, state.growthNodes),
         world.config,
         ppWeights(world),
-      ) * turnLengthQuarters(state.ppTier, world.config),
+      ) *
+      lateIncomeFactor(state, world) *
+      turnLengthQuarters(state.ppTier, world.config),
     offseasonOpen: offseasonOpen(state),
     tierTrack: {
       peakTier: track.peakTier,

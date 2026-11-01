@@ -635,6 +635,9 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
     if (!world.config.ppTiers.some((tier) => tier.tier === card.minTier))
       issue(sources.events, `cards[${index}].minTier`, "unknown PP tier");
   });
+  const late = world.events.settings.lateRewards.fromTier;
+  if (!world.config.ppTiers.some((tier) => tier.tier === late))
+    issue(sources.events, "settings.lateRewards.fromTier", "unknown PP tier");
 }
 
 /**

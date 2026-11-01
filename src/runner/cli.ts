@@ -327,7 +327,7 @@ function printGrowth(growth: ReturnType<typeof growthAggregate>, campaigns: numb
   );
 }
 
-function printEvents(events: ReturnType<typeof eventAggregate>): void {
+function printEvents(events: ReturnType<typeof eventAggregate>, dollarsPerCash: number): void {
   const byCard: Record<string, string[]> = {};
   for (const [key, n] of Object.entries(events.answers)) {
     const [card, choice] = key.split("/");
@@ -341,6 +341,13 @@ function printEvents(events: ReturnType<typeof eventAggregate>): void {
     )
       .map(([card, choices]) => `${card} ${choices.join(" / ")}`)
       .join("; ")}`,
+  );
+  // Late card rewards by kind (GDD v1.39): what cards paid in place of PP from the late tiers.
+  const late = events.lateRewards;
+  const billions = (cash: number | null) =>
+    `$${(((cash ?? 0) * dollarsPerCash) / 1e9).toFixed(2)}B`;
+  console.log(
+    `  Late card rewards (per campaign, median): ${fmt(late.cards.median)} cards paid one; ${billions(late.seatCash.median)} into the seat league, ${billions(late.leagueCash.median)} into other leagues; tradition strength ${(late.tradition.median ?? 0).toFixed(2)}; card PP gained at the late tiers ${fmt(late.latePP.median)}, PP added by the late income share ${fmt(late.incomePP.median)}`,
   );
 }
 
@@ -764,7 +771,7 @@ function main(): number {
     console.log(
       `  Growth pace: a level every ${turnsPerLevel.toFixed(1)} turns (median; target 2–3)`,
     );
-    printEvents(events);
+    printEvents(events, world.config.money.dollarsPerCash);
     console.log(
       `  Flagship: seasons median ${fmt(flagship.seasons.median)}; different champions median ${fmt(flagship.distinctChampions.median)}; the most successful club's share of titles median ${pct(flagship.mostTitlesShare.median ?? 0)}, max ${pct(flagship.mostTitlesShare.max ?? 0)}; close finishes median ${pct(flagship.closeShare.median ?? 0)} of seasons; under a salary cap ${flagship.cappedSeasons} seasons, ${flagship.cappedClose} close; talents pulled per campaign median ${fmt(flagship.talentsPulled.median)}, signed by card ${fmt(flagship.talentsSigned.median)}`,
     );

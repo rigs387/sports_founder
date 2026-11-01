@@ -18,6 +18,7 @@ export * from "./hall-of-fame";
 export * from "./hints";
 export * from "./identity";
 export * from "./invariants";
+export * from "./late-rewards";
 export * from "./league-actions";
 export * from "./league-costs";
 export * from "./leagues";

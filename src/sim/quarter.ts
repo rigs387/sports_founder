@@ -7,6 +7,7 @@ import { fandomScore } from "./fandom";
 import { backingEffects, broadcastEffects, closeOffseason, stepFlagshipQuarter } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
 import { type GrowthFactors, growthFactors } from "./growth";
+import { lateIncomeFactor } from "./late-rewards";
 import { leagueCosts, leagueReserve } from "./league-costs";
 import { stepLeagueQuarter } from "./leagues";
 import { poachableHardcore, poachingRates } from "./poaching";
@@ -205,7 +206,9 @@ export function stepQuarter(
   const flagshipQuarter = stepFlagshipQuarter(state, defended.countries, world, state.quarter);
   found.push(...flagshipQuarter.landmarks);
   const countries = flagshipQuarter.countries;
-  const ppIncome = quarterPpIncome(countries, growth, config, ppWeights(world));
+  // From the late tiers the PP cards stopped paying is income (GDD v1.39).
+  const ppIncome =
+    quarterPpIncome(countries, growth, config, ppWeights(world)) * lateIncomeFactor(state, world);
   const yearEnded = quarter % QUARTERS_PER_YEAR === 0;
 
   return {

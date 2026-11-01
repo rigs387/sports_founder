@@ -15,6 +15,22 @@ settings:
   # v1.32: a playtest saw 62 front pages in 75 seasons); the sport's first star always is one.
   flagshipHeadlineTiers: [professional, elite]
   headlineStories: [firstTitle, underdog, dynasty, foregone]
+  # Late card rewards by kind (GDD v1.39, decision 8a): from PP tier fromTier, card PP is noise (a
+  # champion card paid 22.5 PP against about 4,700 a turn), so a card that pays PP pays in what its
+  # story is about instead; a card that pays no PP still pays nothing. Small and local, never PP,
+  # never fans. Season, business and star: cashQuarters of the flagship league's running cost into
+  # its cash (not profit: it stays above the reserve until spent or lost). Rival and sport: the
+  # same into the league of the card's country. Tradition and the Hall: strength added to the
+  # card's tradition, or the strongest held at home in the card's country (the class's legacies
+  # first). No target, no reward. The PP the cards stop paying (about 6,000 a builder campaign,
+  # 2026-10-31) becomes base PP income × (1 + incomeShare); prices are measured without it.
+  # Measured: taking that PP away, or rewards that won fans (casual fans, a star's pull at the
+  # seat), each made #1 lost before the win far more likely (12/24 builder campaigns to ~18/24).
+  lateRewards:
+    fromTier: 4
+    cashQuarters: 1
+    traditionStrength: 0.05
+    incomeShare: 0.01
 cards:
   - id: open-doors
     kind: decision

@@ -1575,7 +1575,7 @@ the designer on 2026-10-13; see the GDD.
 
 ### 2.25 Build Plan: The Late Surplus (GDD v1.39)
 
-Designed; steps 1 and 2 built 2026-10-30, step 3 2026-10-31. Eight decisions, all in the GDD ("the late surplus"). One
+Built: steps 1 and 2 2026-10-30, steps 3 to 5 2026-10-31. Eight decisions, all in the GDD ("the late surplus"). One
 step per session; each ends with `npm run check`, `npm run smoke`, the docs and a commit.
 
 1. **The payout and the fixed share (money only, no talks).** Every league pays cash above its
@@ -1648,6 +1648,18 @@ step per session; each ends with `npm run check`, `npm run smoke`, the docs and 
    sport win casual fans in the card's country. Numbers in `content/events.yaml` settings;
    new effect types join the closed vocabulary validated at load. Measure the #1 contest
    before and after: it must not move.
+   *Built 2026-10-31:* `src/sim/late-rewards.ts` (`eventFamily` moved there, `lateReward`,
+   `lateIncomeFactor`, `rewardRecord`), settings `lateRewards` (`fromTier`, `cashQuarters`,
+   `traditionStrength`, `incomeShare`), effects `leagueCash` and `traditionWeight` (rejected on
+   a card at load). `eventEffects` replaces any PP above 0 with the family's reward from
+   `fromTier`; a card with no PP gets nothing. Two calls beyond the plan, after measuring:
+   star cards pay seat cash and rival and sport cards cash into their country's league (a
+   star's pull and casual fans both made #1 lost before the win far more likely), and the PP
+   cards stop paying is base income × (1 + `incomeShare`) in `quarter.ts` and the snapshot,
+   never in `priceIncome` (removing it alone moved the contest too). Reward cash is not profit
+   (the payout takes only operating profit), so it stays. `resolution.reward` is defaulted (no
+   format bump). The runner prints the rewards and the income share's PP; the smoke's
+   `late-rewards-smoke.ts` runs after the stoppage step. Measurements are in the GDD.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 
