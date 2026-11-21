@@ -7,6 +7,7 @@ import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
 import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { shapeFactors } from "./shape";
+import { ticketFactors } from "./tickets";
 import type {
   CountryState,
   Deal,
@@ -503,7 +504,8 @@ export function leagueIncomePerQuarter(
       .filter((deal) => deal.slot !== "tv")
       .reduce((sum, deal) => sum + deal.annualValue / 4, 0);
   return (
-    revenue.gate +
+    // Ticket prices (GDD v1.40) bend gate per seated fan.
+    revenue.gate * ticketFactors(state, world, state.flagship.countryId).gate +
     revenue.media * flagshipMediaShare(state.flagship, world) +
     dealIncomePerQuarter(state.flagship)
   );

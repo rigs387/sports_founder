@@ -13,6 +13,7 @@ import {
   healthLevelSchema,
   LEAGUE_TIERS,
   leagueTierSchema,
+  ticketStanceSchema,
   timedCountermoveSchema,
   traditionTypeSchema,
 } from "../content";
@@ -225,6 +226,15 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     partnerId: z.string().min(1),
     axis: axisSchema,
     to: z.string().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal("ticketsSet"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    from: ticketStanceSchema,
+    to: ticketStanceSchema,
+    demoted: count,
   }),
   z.strictObject({
     kind: z.literal("clubMoved"),
@@ -583,6 +593,14 @@ const flagshipSchema = z.strictObject({
     .strictObject({ quarter: count, candidates: z.array(z.string().min(1)).min(1) })
     .nullable()
     .default(null),
+  // Joined format 34 without a bump (GDD v1.40): an empty country is standard everywhere.
+  tickets: z
+    .strictObject({
+      countryId: z.string(),
+      stance: ticketStanceSchema,
+      pending: ticketStanceSchema.nullable(),
+    })
+    .default({ countryId: "", stance: "standard", pending: null }),
   relocation: z
     .strictObject({
       clubId: z.int().min(1),

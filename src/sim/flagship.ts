@@ -1,4 +1,5 @@
-import type { SeasonInterest, SeasonStory } from "../content";
+import type { SeasonInterest, SeasonStory, TicketStance } from "../content";
+import { TICKET_STANCES } from "../content";
 import { offseasonOpen, QUARTERS_PER_YEAR, seasonStopped, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights, weighs } from "./culture";
 import { type DealsSnapshot, dealsSnapshot, exclusiveTv, lapseOffers, newDeals } from "./deals";
@@ -10,6 +11,7 @@ import { landmarks } from "./records";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { seasonStories } from "./season-stories";
 import { NEUTRAL_SHAPE, type ShapeFactors, shapeFactors } from "./shape";
+import { applyTickets, raiseShare, ticketStance, ticketsBlocker } from "./tickets";
 import {
   type CareerLine,
   type Club,
@@ -1131,6 +1133,7 @@ export function newFlagship(
     seasons: [],
     deals: newDeals(seed),
     orphan: null,
+    tickets: { countryId, stance: "standard", pending: null },
     relocation: null,
   };
   const fitted = fitClubs(empty, world, rng, tier);
@@ -1927,14 +1930,18 @@ export function closeOffseason(state: GameState, world: World): GameState {
       landmarks.seasonLost(state.turn, state.quarter, flagship.countryId, flagship.season),
     );
   }
-  // Venue levels due by the new season open (GDD v1.30).
+  // Venue levels due by the new season open (GDD v1.30); next season's ticket prices take
+  // effect at the seat, a new seat from standard (GDD v1.40).
   return openVenues(
-    {
-      ...state,
-      flagship: { ...flagship, rng: saveRng(rng) },
-      countries,
-      landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
-    },
+    applyTickets(
+      {
+        ...state,
+        flagship: { ...flagship, rng: saveRng(rng) },
+        countries,
+        landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
+      },
+      world,
+    ),
     world,
   );
 }
@@ -2240,6 +2247,16 @@ export interface FlagshipSnapshot {
   deals: DealsSnapshot;
   /** The seat's next venue level and why it cannot be built now (GDD v1.30). */
   venue: { terms: VenueTerms | null; blocker: VenueBlocker | null };
+  /**
+   * Ticket pricing (GDD v1.40): the stance in force, the one asked for next season, and each
+   * stance's factors with the hardcore fans a change to it would turn casual now.
+   */
+  tickets: {
+    stance: TicketStance;
+    pending: TicketStance | null;
+    options: { stance: TicketStance; gate: number; conversion: number; demoted: number }[];
+    blocker: "window" | "league" | null;
+  };
 }
 
 /**
@@ -2331,6 +2348,22 @@ export function flagshipSnapshot(state: GameState, world: World): FlagshipSnapsh
     backing: backingSnapshot(state, world),
     deals: dealsSnapshot(state, world),
     venue: { terms: venueTerms(state, world), blocker: venueBlocker(state, world) },
+    tickets: (() => {
+      const stance = ticketStance(state);
+      const hardcore =
+        state.countries[indexOf(world, flagship.countryId)]?.fans[PLAYER_INDEX]?.hardcore ?? 0;
+      return {
+        stance,
+        pending:
+          flagship.tickets.countryId === flagship.countryId ? flagship.tickets.pending : null,
+        options: TICKET_STANCES.map((option) => ({
+          stance: option,
+          ...world.config.flagship.tickets.stances[option],
+          demoted: Math.floor(hardcore * raiseShare(state, world, stance, option)),
+        })),
+        blocker: ticketsBlocker(state, world, "standard"),
+      };
+    })(),
     broadcast: (() => {
       const broadcast = broadcastEffects(state, world);
       return {

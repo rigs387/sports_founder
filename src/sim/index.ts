@@ -47,6 +47,7 @@ export * from "./standings";
 export * from "./standouts";
 export * from "./star-cards";
 export * from "./talent";
+export * from "./tickets";
 export * from "./tiers";
 export * from "./tournaments";
 export * from "./tradition-cards";

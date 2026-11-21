@@ -1358,6 +1358,22 @@
       }
     }
   },
+  "tickets": {
+    "heading": "Ticket prices",
+    "now": "{{stance}} prices at the grounds in {{country}} this season.",
+    "pending": "Next season: {{stance}} prices, from when the offseason closes.",
+    "effects": "gate per fan ×{{gate, number(maximumFractionDigits: 2)}}, lifelong fans won ×{{conversion, number(maximumFractionDigits: 2)}}",
+    "stances": { "cheap": "Cheap", "standard": "Standard", "premium": "Premium" },
+    "review_one": "Raise prices to {{stance}} for next season? The faithful take it badly: {{count, number}} hardcore fan here turns casual when the offseason closes.",
+    "review_other": "Raise prices to {{stance}} for next season? The faithful take it badly: {{count, number}} hardcore fans here turn casual when the offseason closes.",
+    "confirm": "Set {{stance}} prices",
+    "back": "Back",
+    "offseasonOnly": "Prices are set for the whole season, on the offseason screen. Raising them costs hardcore fans; lowering them is free. A new seat starts at standard.",
+    "blockers": {
+      "window": "Prices are set only in the offseason.",
+      "league": "The seat has no league to sell tickets for."
+    }
+  },
   "venue": {
     "heading": "The venue",
     "noLeague": "{{country}} has no league to play in.",
@@ -1505,6 +1521,7 @@
       "pickHost": "{{country}} will host the next tournament.",
       "signDeal": "Deal signed. It pays from the next season.",
       "buildVenue": "Building has started. The new level opens in a later offseason.",
+      "setTickets": "Next season's ticket prices are set. They take effect when the offseason closes.",
       "proposeAgreement": "The offer went to the union. Its answer is on the agreement card.",
       "replaceDirector": "The new league director takes over.",
       "retire": "You have retired. The campaign is finished."

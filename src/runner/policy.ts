@@ -40,6 +40,8 @@ import {
   SEED_WARM_UP_DRAWS,
   seatStars,
   talksOpen,
+  ticketStance,
+  ticketsBlocker,
   venueBlocker,
   venueCapacity,
   venueTerms,
@@ -521,6 +523,33 @@ function buildVenues(step: BotStep, world: World, full: number, reserveQuarters:
 }
 
 /**
+ * The seat league's cash, as multiples of its reserve: the builder prices cheap above `cheap` and
+ * goes back to standard (a raise, which costs fans) only below `standard`.
+ */
+const TICKET_RESERVES = { cheap: 2, standard: 1 };
+
+/**
+ * Ticket prices (GDD v1.40): cheap once the seat league holds TICKET_RESERVES.cheap reserves,
+ * turning spare cash into fans, and standard again below TICKET_RESERVES.standard. Never premium.
+ */
+function priceTickets(step: BotStep, world: World): void {
+  const state = step.state;
+  if (ticketsBlocker(state, world, "standard") !== null) return;
+  const index = indexOf(world, state.flagship.countryId);
+  const league = state.countries[index]?.league;
+  if (!league) return;
+  const reserve = leagueReserve(state, world, index);
+  const asked = state.flagship.tickets.pending ?? ticketStance(state);
+  const wanted =
+    league.cash > TICKET_RESERVES.cheap * reserve
+      ? "cheap"
+      : league.cash < TICKET_RESERVES.standard * reserve
+        ? "standard"
+        : asked;
+  if (asked !== wanted) attempt(step, world, { type: "setTickets", stance: wanted });
+}
+
+/**
  * Amends the rule whose change fits the bot's fans best (GDD v1.20): the fit gain in every market,
  * weighted by its Fandom Score there, less the share of hardcore fans the backlash would turn
  * casual. Only when that beats AMEND_MARGIN and the price leaves `reserve` PP.
@@ -560,6 +589,7 @@ function builderTurn(state: GameState, world: World, options: BotOptions): BotSt
     amendRules(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   backStars(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   buildVenues(step, world, VENUE_FULL.builder, VENUE_RESERVE_QUARTERS.builder);
+  priceTickets(step, world);
   signDeals(step, world);
   negotiate(step, world, AGREEMENT_RISK.builder, BUILDER_CAP_WORTH);
   runChampionship(step, world);

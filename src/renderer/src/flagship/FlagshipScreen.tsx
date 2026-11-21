@@ -8,6 +8,7 @@ import { DealsPanel } from "../deals/DealsPanel";
 import { useDealPartnerName } from "../deals/partners";
 import { Emblem } from "../identity/Emblem";
 import { useTermVars } from "../identity/terms";
+import { TicketsCard } from "../tickets/TicketsCard";
 import { VenueCard } from "../venues/VenueCard";
 import "./flagship.css";
 import { StarsPanel } from "./StarsPanel";
@@ -103,6 +104,7 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
         <div className="flagship-side">
           <Broadcast snapshot={snapshot} seatName={seatName} nouns={nouns} />
           <VenueCard snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
+          <TicketsCard snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
           <DealsPanel snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
           <LatestRound results={flagship.lastRound} clubName={clubName} nouns={nouns} />
           <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} readOnly />

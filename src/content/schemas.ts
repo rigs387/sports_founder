@@ -664,6 +664,10 @@ const dealsSchema = z
 
 export const healthLevelSchema = z.enum(["healthy", "struggling", "near-collapse"]);
 export const HEALTH_LEVELS = healthLevelSchema.options;
+/** Flagship ticket stances (GDD v1.40), cheapest first: a step up is a raise. */
+export const ticketStanceSchema = z.enum(["cheap", "standard", "premium"]);
+export const TICKET_STANCES = ticketStanceSchema.options;
+export type TicketStance = z.infer<typeof ticketStanceSchema>;
 export type HealthLevel = z.infer<typeof healthLevelSchema>;
 
 /** A PP tier's breadth condition (GDD Global PP Tier Track). */
@@ -1548,6 +1552,25 @@ export const configFileSchema = z.strictObject({
     seatMove: z.strictObject({
       hardcoreDemotionShare: unitInterval,
       anchorHardcoreDemotionShare: unitInterval,
+    }),
+    /**
+     * Flagship ticket pricing (GDD v1.40): each stance multiplies gate per seated fan and casual
+     * → hardcore conversion at the seat. Each step up turns raiseDemotion × (1 + the tradition
+     * weight there) of the seat's hardcore fans casual, once, when the offseason closes.
+     */
+    tickets: z.strictObject({
+      stances: z.strictObject({
+        cheap: z.strictObject({ gate: z.number().positive(), conversion: z.number().positive() }),
+        standard: z.strictObject({
+          gate: z.number().positive(),
+          conversion: z.number().positive(),
+        }),
+        premium: z.strictObject({
+          gate: z.number().positive(),
+          conversion: z.number().positive(),
+        }),
+      }),
+      raiseDemotion: unitInterval,
     }),
     /** Club relocation (GDD v1.41): a failing seat club's owners ask to move to a bigger town. */
     relocation: z.strictObject({

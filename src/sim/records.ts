@@ -1,4 +1,4 @@
-import type { DirectorAsk } from "../content";
+import type { DirectorAsk, TicketStance } from "../content";
 import type {
   AgreementTerms,
   AxisId,
@@ -221,6 +221,14 @@ export const landmarks = {
     axis: AxisId,
     to: string,
   ): Landmark => ({ kind: "ruleProposed", turn, quarter, countryId, dealId, partnerId, axis, to }),
+  ticketsSet: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    from: TicketStance,
+    to: TicketStance,
+    demoted: number,
+  ): Landmark => ({ kind: "ticketsSet", turn, quarter, countryId, from, to, demoted }),
   clubMoved: (
     turn: number,
     quarter: number,

@@ -2103,6 +2103,13 @@ purchased traits and percentage modifiers alone do not make culture.
     hardcore fans to casual once, in that offseason, heavier with the seat country's tradition
     weight. Lowering prices is free.
   - *Late cash:* cheap is how spare cash at the seat becomes fans; measure the #1 contest.
+  - *Build decisions (decided 2026-11-21).* (1) Starting sizes: cheap gate ×0.75 and casual →
+    hardcore conversion ×1.2; premium gate ×1.25 and conversion ×0.85; each step up turns 3% of
+    the seat's hardcore fans casual × (1 + the tradition weight there); tuned only if the #1
+    contest or the gate share leaves its band. (2) When the seat moves, the stance resets to
+    standard (choose pain): premium at a new seat costs its fans the raise again; dropping to
+    standard on a move is free. (3) Bots: the builder goes cheap while the seat league holds more
+    than twice its reserve, standard otherwise; other bots stay standard.
 - **Venues, first build (decided 2026-10-07, v1.30).** Every number is config.
   - *Scope:* the flagship only; other leagues stay on the Phase 0 model. Youth programs are parked
     (their payoff, stronger national teams, waits for the World Championship). Designed in v1.40,
@@ -2553,6 +2560,9 @@ the family across generations as flavor only — no succession mechanics.
     or lost, the championship founded). No shrine weight.
   - *Retiring is the current head stepping down;* the retrospective's timeline names each
     generation's tenure.
+  - *Daughters and sons (decided 2026-11-21).* Every name pool gains a women's given-name list;
+    the founder's default and each heir are drawn from both, so heads can be daughters or sons.
+    Flavor only, as the rest of the family.
 
 ---
 

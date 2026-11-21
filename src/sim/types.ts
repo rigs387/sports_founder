@@ -8,6 +8,7 @@ import type {
   Genome,
   HealthLevel,
   LeagueTierId,
+  TicketStance,
   TimedCountermoveKind,
   TraditionType,
 } from "../content";
@@ -378,6 +379,11 @@ export interface FlagshipState {
    * The last relocation ask (GDD v1.41): the club, its old and new town, the quarter asked and the
    * last bad season it was asked on; open until its answer is read when End Turn starts.
    */
+  /**
+   * Ticket pricing (GDD v1.40): the stance in force at `countryId` (a seat elsewhere plays at
+   * standard) and the stance asked for next season, applied when the offseason closes.
+   */
+  tickets: { countryId: string; stance: TicketStance; pending: TicketStance | null };
   relocation: {
     clubId: number;
     from: string;
@@ -578,6 +584,16 @@ export type Landmark =
       partnerId: string;
       axis: AxisId;
       to: string;
+    }
+  | {
+      /** Ticket prices changed at the seat (GDD v1.40); a raise turned `demoted` fans casual. */
+      kind: "ticketsSet";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      from: TicketStance;
+      to: TicketStance;
+      demoted: number;
     }
   | {
       /** A seat club moved to a bigger town at its owners' ask (GDD v1.41). */

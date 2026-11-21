@@ -18,6 +18,7 @@ import { stepRivals } from "./rivals";
 import { nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { shapeFactors } from "./shape";
 import { type CountryExposure, computeExposure } from "./spread";
+import { ticketFactors } from "./tickets";
 import { activeTournament, type Tournament, tournamentsStarting } from "./tournaments";
 import {
   type Config,
@@ -178,7 +179,9 @@ export function stepQuarter(
         eventRates.hardcore *
         cup.hardcore *
         director.hardcoreConversion *
-        venueConversion(state, world, index),
+        venueConversion(state, world, index) *
+        // Ticket prices at the seat (GDD v1.40).
+        ticketFactors(state, world, country.id).conversion,
     };
     const moved = stepCountryFans(
       countryState,

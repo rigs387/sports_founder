@@ -74,6 +74,30 @@ export async function verifyVenue(win: BrowserWindow, screenshot: (name: string)
   await evaluate(`document.querySelector('${CARD}').scrollIntoView()`);
   await screenshot("53-venue-building.png");
 
+  // Ticket prices (GDD v1.40), below the venue: a raise is reviewed with its cost in fans, a cut
+  // is asked for at once. Put back to the stance in force so the campaign plays on unchanged.
+  const TICKETS = `${OFFSEASON} [data-testid="tickets-card"]`;
+  const stance = (name: string) =>
+    `${TICKETS} [data-testid="tickets-choice"][data-stance="${name}"]`;
+  await evaluate(`document.querySelector('${TICKETS}').scrollIntoView()`);
+  await click(stance("premium"));
+  await wait(`!!document.querySelector('${TICKETS} [data-testid="tickets-review"]')`);
+  const ticketReview = await evaluate<string>(
+    `document.querySelector('${TICKETS} [data-testid="tickets-review"]').textContent`,
+  );
+  if (!/turns? casual/.test(ticketReview) || ticketReview.includes("{{"))
+    throw new Error(`The ticket review must state the fans a raise costs: ${ticketReview}`);
+  await screenshot("53a-tickets-review.png");
+  await click(`${TICKETS} .flagship-back`);
+  await click(stance("cheap"));
+  await wait(`!!document.querySelector('${TICKETS} [data-testid="tickets-pending"]')`);
+  const ticketCard = await evaluate<string>(`document.querySelector('${TICKETS}').textContent`);
+  if (ticketCard.includes("{{") || /tickets\./.test(ticketCard))
+    throw new Error(`Unfilled words in the ticket card: ${ticketCard}`);
+  await screenshot("53a-tickets.png");
+  await click(stance("standard"));
+  await wait(`!document.querySelector('${TICKETS} [data-testid="tickets-pending"]')`);
+
   // The World Championship card (GDD v1.37), below the trophy on the same screen.
   const championship = await evaluate<string>(
     `document.querySelector('[data-testid="championship"]')?.textContent ?? ""`,
@@ -113,5 +137,5 @@ export async function verifyVenue(win: BrowserWindow, screenshot: (name: string)
       `The Flagship tab's venue card must be read-only: ${JSON.stringify(flagshipView)}`,
     );
   await click(".game-nav [data-view=world]");
-  return { levelBefore, review, narrowOverflow, turnsPlayed };
+  return { levelBefore, review, ticketReview, narrowOverflow, turnsPlayed };
 }

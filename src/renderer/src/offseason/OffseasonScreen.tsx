@@ -13,6 +13,7 @@ import { StarsPanel } from "../flagship/StarsPanel";
 import { AmendRules } from "../identity/AmendRules";
 import { useTermVars } from "../identity/terms";
 import { SeasonRecap } from "../press/SeasonRecap";
+import { TicketsCard } from "../tickets/TicketsCard";
 import { VenueCard } from "../venues/VenueCard";
 import "../flagship/flagship.css";
 import "./offseason.css";
@@ -98,6 +99,7 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
         </div>
         <div className="offseason-column">
           <VenueCard snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
+          <TicketsCard snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           <Promotions snapshot={snapshot} country={country} busy={busy} onAction={onAction} />
           <DirectorsCard snapshot={snapshot} country={country} busy={busy} onAction={onAction} />
           <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} />

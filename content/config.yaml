@@ -1105,6 +1105,17 @@ flagship:
   seatMove:
     hardcoreDemotionShare: 0.03
     anchorHardcoreDemotionShare: 0.08
+  # Flagship ticket pricing (GDD v1.40): set in the offseason for the next season, at the seat
+  # only. A stance multiplies gate per seated fan and casual → hardcore conversion at the seat.
+  # Each step up (cheap → standard → premium) turns raiseDemotion × (1 + the seat's tradition
+  # weight) of its hardcore fans casual when the offseason closes; lowering is free. A new seat
+  # starts at standard.
+  tickets:
+    stances:
+      cheap: { gate: 0.75, conversion: 1.2 }
+      standard: { gate: 1, conversion: 1 }
+      premium: { gate: 1.25, conversion: 0.85 }
+    raiseDemotion: 0.03
   # Club relocation (GDD v1.41): a seat club in the bottom two of the table badSeasons seasons
   # running, with a bigger real town in the seat country that has no club, has its owners ask to
   # move (one ask an offseason). Moving adds ratingLift to the club, turns hardcoreLoss of the

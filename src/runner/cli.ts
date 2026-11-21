@@ -48,6 +48,7 @@ import {
   remembersAggregate,
   rulesAggregate,
   type TurnRow,
+  ticketsAggregate,
   turnsCsv,
   venuesAggregate,
 } from "./report";
@@ -864,6 +865,14 @@ function main(): number {
           .map(([ask, n]) => `${ask} ${n}`)
           .join(", ") || "none"
       }, ${directors.granted} granted, ${directors.resigned} resignations; partner rule proposals ${directors.proposals}, ${directors.proposalsAccepted} accepted; salary paid ${millions(directors.salaryPaid)} against ${dollars(directors.leagueCash)} league cash at the end (seat excluded)`,
+    );
+    const tickets = ticketsAggregate(results);
+    console.log(
+      `  Tickets: seat quarters ${Object.entries(tickets.shares)
+        .map(([stance, share]) => `${stance} ${(share * 100).toFixed(0)}%`)
+        .join(
+          ", ",
+        )}; ${tickets.raises} raises turned ${tickets.demoted.toLocaleString("en-US")} hardcore fans casual`,
     );
     const relocation = relocationAggregate(results);
     console.log(

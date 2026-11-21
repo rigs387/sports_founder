@@ -1,0 +1,20 @@
+/* Ticket prices at the seat (GDD v1.40): the stance in force, the three stances, a raise reviewed. */
+.tickets-card p {
+  margin: 6px 0;
+}
+.tickets-options {
+  margin: 6px 0;
+  padding-left: 18px;
+}
+.tickets-options li {
+  margin: 2px 0;
+}
+.tickets-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.tickets-choices .action-button[aria-pressed="true"] {
+  opacity: 0.6;
+}

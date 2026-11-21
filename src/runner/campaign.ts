@@ -1,4 +1,5 @@
 import { performance } from "node:perf_hooks";
+import { TICKET_STANCES } from "../content";
 import {
   type Action,
   broadcastEffects,
@@ -27,6 +28,8 @@ import {
   seatedCrowd,
   shrineWeights,
   snapshot,
+  ticketFactors,
+  ticketStance,
   turnLengthQuarters,
   type World,
 } from "../sim";
@@ -196,6 +199,8 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   const acceptedProposals = new Set<number>();
   // Club relocation asks (GDD v1.41), by event id: the owners' losses staying cost, once answered.
   const relocationAsks = new Map<number, number | null>();
+  // Ticket stances at the seat (GDD v1.40): quarters played at each.
+  const stanceQuarters: Record<string, number> = { cheap: 0, standard: 0, premium: 0 };
   let lastTurnQuarters = 1;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
@@ -207,6 +212,10 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         directorSalary += leagueCosts(current, world, i).director * lastTurnQuarters;
       }
     lastTurnQuarters = turnLengthQuarters(current.ppTier, world.config);
+    if (turn > 0) {
+      const stance = ticketStance(current);
+      stanceQuarters[stance] = (stanceQuarters[stance] ?? 0) + lastTurnQuarters;
+    }
     for (const event of [...current.events.pending, ...current.events.history]) {
       const asked = event.facts.relocation;
       if (!asked) continue;
@@ -259,13 +268,9 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         current.ppTier === world.config.ppTiers.length
       ) {
         const seated = seatedCrowd(world, seat, seatLeague.venue.level, fans.hardcore);
-        const gate = revenuePerQuarter(
-          world,
-          seat,
-          "elite",
-          { ...fans, hardcore: seated },
-          current.ppTier,
-        ).gate;
+        const gate =
+          revenuePerQuarter(world, seat, "elite", { ...fans, hardcore: seated }, current.ppTier)
+            .gate * ticketFactors(current, world, current.flagship.countryId).gate;
         const commercial = payingDeals(current.flagship)
           .filter((deal) => deal.slot !== "tv")
           .reduce((sum, deal) => sum + deal.annualValue / 4, 0);
@@ -699,6 +704,18 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         records: state.landmarks.filter((l) => l.kind === "recordCrowd").length,
       },
       // Club relocation (GDD v1.41): asks, moves and the owners' losses paid for staying.
+      tickets: {
+        quarters: stanceQuarters,
+        raises: state.landmarks.filter(
+          (l) =>
+            l.kind === "ticketsSet" &&
+            TICKET_STANCES.indexOf(l.to) > TICKET_STANCES.indexOf(l.from),
+        ).length,
+        demoted: state.landmarks.reduce(
+          (sum, l) => sum + (l.kind === "ticketsSet" ? l.demoted : 0),
+          0,
+        ),
+      },
       relocation: {
         asks: relocationAsks.size,
         moves: state.landmarks.filter((l) => l.kind === "clubMoved").length,

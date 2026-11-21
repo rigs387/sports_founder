@@ -205,6 +205,8 @@ export interface CampaignResult {
       stoppage: boolean;
     }[];
   };
+  /** Ticket pricing (GDD v1.40): quarters at each stance, raises and the fans they turned casual. */
+  tickets: { quarters: Record<string, number>; raises: number; demoted: number };
   /** Club relocation (GDD v1.41): asks, moves, and the owners' losses paid for staying (cash). */
   relocation: { asks: number; moves: number; ownersLoss: number };
   /** League directors (GDD v1.40). */
@@ -566,6 +568,22 @@ export function directorsAggregate(results: CampaignResult[]) {
     proposalsAccepted: total((r) => r.directors.proposalsAccepted),
     salaryPaid: total((r) => r.directors.salaryPaid),
     leagueCash: total((r) => r.directors.leagueCash),
+  };
+}
+
+/** Ticket pricing across campaigns (GDD v1.40): the share of seat quarters at each stance. */
+export function ticketsAggregate(results: CampaignResult[]) {
+  const quarters: Record<string, number> = {};
+  for (const r of results)
+    for (const [stance, n] of Object.entries(r.tickets.quarters))
+      quarters[stance] = (quarters[stance] ?? 0) + n;
+  const all = Object.values(quarters).reduce((sum, n) => sum + n, 0);
+  return {
+    shares: Object.fromEntries(
+      Object.entries(quarters).map(([stance, n]) => [stance, all > 0 ? n / all : 0]),
+    ),
+    raises: results.reduce((sum, r) => sum + r.tickets.raises, 0),
+    demoted: results.reduce((sum, r) => sum + r.tickets.demoted, 0),
   };
 }
 

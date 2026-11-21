@@ -1806,7 +1806,14 @@ Designed 2026-11-01 (parked items, topic 3). Not built. Two sessions.
 
 ### 2.29 Build Plan: Flagship Ticket Pricing (GDD v1.40)
 
-Designed 2026-11-01 (parked items, topic 4). Not built. One session.
+Designed 2026-11-01 (parked items, topic 4). Built 2026-11-21.
+
+*As built:* `src/sim/tickets.ts`. `FlagshipState.tickets` holds the country the stance was
+set for, the stance and the pending one; `ticketStance` reads standard wherever the seat has
+moved, so every kind of seat move resets it with no extra hook. `applyTickets` runs at the end
+of `closeOffseason` (a pending stance from a seat that moved that offseason is dropped). The
+card is `src/renderer/src/tickets/TicketsCard.tsx` (offseason screen; read-only on the
+Flagship tab); the venue smoke step reviews a raise and asks for cheap. Measured with the pacing experiment (12 anchors × 3 seeds, 200 turns): passes; the lead was lost before the win in 19 of 35 (unchanged); the Elite seat's gate share 27% (band 15–35%); the builder priced cheap 31% of seat quarters, with 2 raises in 36 campaigns. A first bot without hysteresis flipped back to standard about 5 times a campaign, paying the raise each time, so it now goes cheap above 2 reserves and back only below 1.
 
 1. `FlagshipState.tickets` (stance, the stance pending for next season) and a `setTickets`
    action (offseason only); `closeOffseason` applies it and, for each step up, demotes the seat's
