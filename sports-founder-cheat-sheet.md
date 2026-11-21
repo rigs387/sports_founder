@@ -144,6 +144,10 @@ league directors (v1.40: one card a year at most, no PP price; declining a partn
 v1.41: deal partners only, one in about 8 seasons, one step on a trait not changed in that window.
 Directors push their own league instead: one ask an offseason (promotion push, hold the money,
 community drive, keep our star, host something), two declines in a row and the director resigns.
+Club relocation (v1.41): a flagship club bottom-two ~3 seasons running, with a bigger clubless
+town at the seat, has its owners ask to move. Moving keeps name and record, lifts its rating and a
+year of casual conversion, betrays its old town's traditions and costs hardcore fans; declining
+costs the league the owners' losses, and the ask returns after the next bad season.
 
 **History:** Permanent landmarks, season summaries, career totals, records, and yearly world
 fan snapshots; match detail pruned per season. Headlines may only claim what records prove.

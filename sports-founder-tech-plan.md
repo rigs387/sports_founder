@@ -88,6 +88,7 @@ surface before playtesting or during it.
 | 2026-10-08 | Awards and press, topic 1 (GDD v1.33): flagship Player of the Season (composite of scores, club finish, playoff and final scores) and the top scorer as a named prize; Hall of Fame points, no other effect; named after the first Hall of Fame player, fixed; lines on existing screens, the first award a toast; Player of the Year parked | Decided |
 | 2026-10-08 | Awards and press, topic 2 (GDD v1.33): an invented outlet per country (biggest place + sports-paper word) once its league forms, the sport's paper before; outlet mastheads with family sections; 2–3 headline variants for frequent cards by stable hash; the offseason's season in review becomes the seat outlet's front page; presentation only, nothing saved | Decided |
 | 2026-11-01 | Parked items, topic 1 (GDD v1.40): league directors only in focus countries' leagues (not the seat's), drawn when focus lands, gone when it leaves; one trait bending the simple model, salary from league cash, replaced in the offseason for severance; one proposal card a year from a director or a deal partner (no PP price, counts toward the limit; declining a partner is a clause miss); a Builders wing in the Hall; standing policies cut | Decided |
+| 2026-11-21 | Club relocation (GDD v1.41): a flagship club in the bottom two for about 3 seasons running, with a bigger real town at the seat without a club, has its owners ask to move (a decision card, one an offseason); moving keeps nickname and record, lifts the club's rating and a year of casual conversion, betrays the old town's traditions and demotes some hardcore fans; declining costs the league the owners' losses and the ask returns after the next bad season | Decided |
 | 2026-11-21 | Directors' asks (GDD v1.41): directors no longer propose rules; one ask an offseason across all directors from a content list by trait (promotion push, hold the money, community drive, keep our star, host something); patience: two declines in a row and the director resigns with a health hit; rule proposals from deal partners only, one in about 8 seasons, one step, never a recently amended trait; scandals stay | Decided |
 | 2026-11-01 | Parked items, topic 2 (GDD v1.40): only the flagship ever signs deals; when the anchor league folds after the win, a decision card moves the seat free to an eligible league (default: most hardcore fans); a seat league abroad stepping down below Professional loses the seat at the offseason's close with the purist cost; the playtest-thinness question closed | Decided |
 | 2026-11-01 | Parked items, topic 3 (GDD v1.40): youth programs at the seat and in focus countries; a small conversion boost and better homegrown players, raising only players drawn after a level opens; bought with league cash in the offseason, opening after a season, upkeep that runs after focus leaves (no upgrades then), a level lost a year when unpaid | Decided |
@@ -1809,6 +1810,24 @@ measurement.
    `seatLeaveShare`). The snapshot carries the value and its reasons; the country card shows it.
 2. **Measure.** Collapse and pacing experiments on few anchors, a naive bot that never focuses
    home (it should fold or nearly), and the #1 contest. Tune grace, rates and the drag in config.
+
+### 2.33 Build Plan: Club Relocation (GDD v1.41)
+
+Designed 2026-11-21. Not built. One session. Numbers in config `flagship.relocation`.
+
+1. **The ask.** In the offseason, `relocationAsk` finds an active seat club in the bottom two
+   of each of the last `badSeasons` season summaries (lost seasons are gaps, read with
+   `lostSeasons`) and the biggest place in `places.yaml` for the seat country larger than its
+   town with no active club. It offers the `club-relocation` decision (no slot, one an
+   offseason, after the season cards). Facts on the record: club, from, to.
+2. **Moving** (`clubMove` effect): the club's place changes, nickname and history kept; a
+   `clubMoved` landmark; `ratingLift` to the club; a year of casual conversion
+   (`conversionLift`) at the seat as a timed modifier; culture betrays the club's derbies,
+   chants, club rite and famous ground in the old town (`betray`, scaled by ethos); the seat's
+   hardcore share `hardcoreLoss` turns casual. Smoke: no new step if headless tests cover it.
+3. **Staying** (the default): `ownersLoss` quarters of the seat league's running cost from
+   its cash. The ask returns after the next bad season, never sooner. Bots answer by event
+   weights; the runner prints asks, moves and the cash lost.
 
 ## 3. Design Prerequisites (GDD Gaps That Block the Build)
 

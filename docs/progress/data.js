@@ -127,6 +127,13 @@ window.SF_PROGRESS = {
     {
       date: "2026-11-21",
       type: "Design",
+      title: "Club relocation (GDD v1.41)",
+      text: "Tech plan 2.33 (not built). A flagship club in the bottom two for about 3 seasons running, with a bigger real town at the seat that has no club, has its owners ask to move. Moving keeps the nickname and record, lifts the club's rating and a year of casual conversion at the seat, betrays the old town's traditions and turns some hardcore fans casual. Declining costs the league the owners' losses, and the ask returns after the next bad season.",
+      system: "leagues",
+    },
+    {
+      date: "2026-11-21",
+      type: "Design",
       title: "Directors push their league, not the rulebook (GDD v1.41)",
       text: "A proposal a year would reshape the sport every decade. Directors no longer propose rules: one ask an offseason across all of them, from a content list by trait (promotion push, hold the money, community drive, keep our star, host something), and two declines in a row make a director resign with a health hit. Rule proposals come from flagship deal partners only, at most one in about 8 seasons, one step on a trait not amended in that window. Scandals stay. Moving an underperforming team is open. Tech plan 2.26 is now four steps.",
       system: "leagues",
@@ -874,6 +881,10 @@ window.SF_PROGRESS = {
         [
           "built",
           "Talent pull toward the flagship, the broadcast follow at home and a signing card (GDD v1.37)",
+        ],
+        [
+          "planned",
+          "Club relocation: owners ask to move a failing club to a bigger town; moving betrays the old town, staying costs cash (tech plan 2.33, GDD v1.41)",
         ],
         [
           "built",
