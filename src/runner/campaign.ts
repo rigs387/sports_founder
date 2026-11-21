@@ -191,6 +191,8 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   let directorSalary = 0;
   // Director asks granted (GDD v1.41): each answered card counted once.
   const grantedAsks = new Set<number>();
+  // Partner proposals accepted (GDD v1.41).
+  const acceptedProposals = new Set<number>();
   let lastTurnQuarters = 1;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
@@ -205,6 +207,8 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     for (const event of current.events.history)
       if (event.facts.director?.ask && event.resolution?.choiceId === "grant")
         grantedAsks.add(event.id);
+      else if (event.facts.proposal && event.resolution?.choiceId === "accept")
+        acceptedProposals.add(event.id);
     // Over the next turn's quarters, as the fans stand now: the season-end pulse fades within a
     // turn, and seasons end on turn boundaries at long turns.
     let media = 0;
@@ -707,6 +711,8 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           }, {}),
           granted: grantedAsks.size,
           resigned: state.landmarks.filter((l) => l.kind === "directorResigned").length,
+          proposals: state.landmarks.filter((l) => l.kind === "ruleProposed").length,
+          proposalsAccepted: acceptedProposals.size,
         };
       })(),
       championship: (() => {

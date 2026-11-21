@@ -599,6 +599,18 @@ rulesEvolution:
     returnFactor: 0.5
     maxShare: 0.25
   previewMarkets: 5
+  # Partner proposals (GDD v1.41): at most one in everySeasons flagship seasons, in the offseason
+  # when no rule has been amended that year, from a paying flagship deal partner whose deal has a
+  # clause (balance, star or fans: partners who care about the product). A partner wants the rule
+  # moved one step toward the first or last of its options, the first of its slot's wants that
+  # can move and was not amended within the window. Accepting is the year's amendment with no PP
+  # price and the usual backlash; declining counts as a missed clause on the deal.
+  proposals:
+    everySeasons: 8
+    wants:
+      tv: [{ axis: matchLength, toward: first }, { axis: scoring, toward: last }]
+      sponsor: [{ axis: scoring, toward: last }, { axis: contact, toward: last }]
+      namingRights: [{ axis: complexity, toward: first }, { axis: teamSize, toward: last }]
 
 # Culture, first build (GDD v1.22). Traditions are born only from recorded facts, held by the
 # player's fans in follower countries, renewed by new facts and faded without them. Founding

@@ -28,6 +28,7 @@ export * from "./national-teams";
 export * from "./poaching";
 export * from "./press";
 export * from "./prices";
+export * from "./proposals";
 export * from "./quarter";
 export * from "./records";
 export * from "./retrospective";

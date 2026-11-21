@@ -1,13 +1,17 @@
 import type { EventEffect } from "../content";
 import {
   type Action,
+  type AxisId,
   activeClubs,
   applyAction,
+  backlashTotal,
   checkAction,
   eventBlocker,
   eventChoiceCost,
+  fandomScore,
   type GameState,
   keepCost,
+  optionNetDelta,
   PLAYER_INDEX,
   priceIncome,
   type World,
@@ -99,6 +103,37 @@ export const EVENT_WEIGHTS = {
   },
 } satisfies Record<string, EventWeights>;
 
+/**
+ * What changing `axis` to `option` is worth to a bot that amends (GDD v1.20): the fit gain in
+ * every market, weighted by its Fandom Score there, less the share of hardcore fans the backlash
+ * would turn casual. The builder's own amendments and partners' proposals (GDD v1.41) both use it.
+ */
+export function amendmentValue(
+  state: GameState,
+  world: World,
+  axis: AxisId,
+  option: string,
+): number {
+  const { casualWeight } = world.config.fandomScore;
+  const current = state.genome[axis];
+  let total = 0;
+  let gain = 0;
+  let hardcore = 0;
+  state.countries.forEach((country, index) => {
+    const fans = country.fans[PLAYER_INDEX];
+    if (!fans) return;
+    hardcore += fans.hardcore;
+    const weight = fandomScore(fans.casual, fans.hardcore, casualWeight);
+    if (weight <= 0) return;
+    total += weight;
+    gain +=
+      weight *
+      (optionNetDelta(world, axis, option, index) - optionNetDelta(world, axis, current, index));
+  });
+  if (total <= 0 || hardcore <= 0) return Number.NEGATIVE_INFINITY;
+  return gain / total - backlashTotal(state, world, axis, option) / hardcore;
+}
+
 function effectValue(
   state: GameState,
   world: World,
@@ -108,6 +143,7 @@ function effectValue(
   starId: number | null,
   effect: EventEffect,
   weights: EventWeights,
+  proposal: { axis: string; to: string } | null = null,
 ): number {
   const index = world.countries.findIndex((country) => country.id === countryId);
   const country = state.countries[index];
@@ -163,6 +199,11 @@ function effectValue(
       const { casualConversion, mediaReach, influenceSeasons } = world.config.flagship.backing;
       return influenceSeasons * (casualConversion * weights.casual + mediaReach * weights.media);
     }
+    case "ruleProposal":
+      // A partner's proposal (GDD v1.41), valued as the builder values its own amendments.
+      return proposal
+        ? amendmentValue(state, world, proposal.axis as AxisId, proposal.to) * weights.hardcore
+        : 0;
     case "directorAsk":
       // A director's ask (GDD v1.41): bots read it as goodwill worth half a league rung, since
       // declining uses up the director's patience.
@@ -228,6 +269,7 @@ export function choiceValue(
         event.facts.star?.playerId ?? null,
         effect,
         weights,
+        event.facts.proposal ?? null,
       ),
     0,
   );
@@ -246,6 +288,8 @@ export function chooseEvents(
   world: World,
   weights: EventWeights,
   reserve: number,
+  /** Whether the bot amends rules: one that never does turns every proposal down (GDD v1.41). */
+  amend = false,
 ): { state: GameState; actions: Action[] } {
   let current = state;
   const actions: Action[] = [];
@@ -255,6 +299,7 @@ export function chooseEvents(
     let best: { choiceId: string; value: number } | null = null;
     for (const choice of card.choices) {
       if (eventBlocker(current, world, event.id, choice.id) !== null) continue;
+      if (!amend && choice.effects.some((effect) => effect.type === "ruleProposal")) continue;
       const cost = eventChoiceCost(current, world, card, choice.id);
       if (cost > 0 && current.pp - cost < reserve) continue;
       const value = choiceValue(current, world, event.id, choice.id, weights);

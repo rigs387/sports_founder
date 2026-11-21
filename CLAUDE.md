@@ -308,6 +308,12 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   live in `DirectorsState` (`kept`, `holds`, `exhibitions`), read by `bestAbroad`,
   `quarter.ts`, the `held` promotion blocker and `followedReach`. Cards say what declining
   costs (`noChange`, `defaultNote` in `event-text.tsx`).
+- Partner rule proposals (GDD v1.41, tech plan 2.26 step 3) are `src/sim/proposals.ts` and
+  `GameState.rules.proposal`: at most one in `rulesEvolution.proposals.everySeasons`, from a
+  paying deal with a clause, one step on its slot's first want not amended in the window.
+  `offerProposal` at End Turn's end (`ruleProposed` landmark, `partner-proposal` card, no
+  slot); accepting is `amendRule(..., free)`; `settleProposal` at End Turn's start reads the
+  answer and a decline adds a clause miss. Directors never propose rules.
 - Venues and payroll (GDD v1.30) are the flagship's only: `LeagueState.venue` (level 1–5, a build,
   the record crowd) on every league, built only at the seat. `src/sim/venues.ts` (capacity, the
   conversion lift), `src/sim/venue-actions.ts` (`buildVenue` in the offseason; `openVenues` when

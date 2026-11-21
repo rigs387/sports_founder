@@ -13,14 +13,14 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-11-21",
-    tests: 687,
-    files: 76,
-    note: "npm run check passed after directors' asks were built (type checks, Biome, purity, 687 tests in 76 files). Lint has existing visual-study warnings.",
+    tests: 690,
+    files: 77,
+    note: "npm run check passed after partner rule proposals were built (type checks, Biome, purity, 690 tests in 77 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-11-21",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click. On the late-game save's offseason it opens the director's ask on the board (declining states the patience it costs), finds five league directors, reviews a candidate (the review states the severance), appoints them, and checks the narrow layout.",
   },
-  eventDeck: { current: 56, target: "40–60" },
+  eventDeck: { current: 57, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Parked items, built in order",
-      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), their asks with patience (step 2 built 2026-11-21), then deal partners' rare rule proposals (step 3, next) and a Builders wing (step 4); seat follow-ups (2.27), youth programs (2.28), flagship ticket pricing (2.29), the founding family (2.30), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
+      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), their asks with patience (step 2 built 2026-11-21), deal partners' rare rule proposals (step 3 built 2026-11-21), then a Builders wing (step 4, next); seat follow-ups (2.27), youth programs (2.28), flagship ticket pricing (2.29), the founding family (2.30), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
       tag: "Next build",
     },
     {
@@ -124,6 +124,13 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-11-21",
+      type: "Built",
+      title: "Partners' rule proposals",
+      text: "GDD v1.41, tech plan 2.26 step 3 of 4. A flagship deal partner whose deal has a clause may ask, at most once in 8 seasons, for one step on a rule its slot wants (TV: shorter matches, then more scoring; sponsors: more scoring, then more contact; naming rights: simpler, then bigger teams), never on a rule changed in that window. Accepting is the year's rule change with no Prestige and the usual backlash; declining, the default, is a missed clause on the deal. Measured in 2 builder campaigns of 150 turns: 13 proposals, about one a decade each, none accepted (the backlash outweighed the fit gain). npm run check passed (690 tests in 77 files) and the smoke passed, but the card has not been seen on screen: the late-game save had none waiting.",
+      system: "rules",
+    },
     {
       date: "2026-11-21",
       type: "Built",
@@ -861,7 +868,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
       summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
-      next: "Partners' rare rule proposals (tech plan 2.26 step 3, GDD v1.41), then the Builders wing (step 4) and the seat follow-ups (tech plan 2.27). Directors' salaries are tiny next to late league cash: tune them before calling them a money sink.",
+      next: "The Builders wing (tech plan 2.26 step 4, GDD v1.40) and the seat follow-ups (tech plan 2.27). Directors' salaries are tiny next to late league cash: tune them before calling them a money sink.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
@@ -1061,8 +1068,8 @@ window.SF_PROGRESS = {
         ],
         ["built", "Rule demands from broadcasters and sponsors, with deals (GDD v1.28)"],
         [
-          "planned",
-          "Rule proposals from flagship deal partners only, one in about 8 seasons, one step (tech plan 2.26 step 3, GDD v1.41)",
+          "built",
+          "Rule proposals from flagship deal partners with a clause, one in about 8 seasons, one step; declining is a missed clause (tech plan 2.26 step 3, GDD v1.41)",
         ],
       ],
     },

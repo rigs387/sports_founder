@@ -212,6 +212,15 @@ export const landmarks = {
     ask: DirectorAsk,
     standoutId: number | null,
   ): Landmark => ({ kind: "directorAsk", turn, quarter, countryId, directorId, ask, standoutId }),
+  ruleProposed: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    dealId: number,
+    partnerId: string,
+    axis: AxisId,
+    to: string,
+  ): Landmark => ({ kind: "ruleProposed", turn, quarter, countryId, dealId, partnerId, axis, to }),
   directorResigned: (
     turn: number,
     quarter: number,

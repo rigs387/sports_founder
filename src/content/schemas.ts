@@ -552,6 +552,11 @@ export const DIRECTOR_ASKS = [
 ] as const;
 export type DirectorAsk = (typeof DIRECTOR_ASKS)[number];
 const askSchema = z.strictObject({ traits: z.array(id).min(1), priority: z.int() });
+/** A partner's wish (GDD v1.41): one of the ordered rule traits, a step toward an end. */
+const proposalWant = z.strictObject({
+  axis: z.enum(["contact", "teamSize", "matchLength", "scoring", "complexity"]),
+  toward: z.enum(["first", "last"]),
+});
 const byLeagueTier = <T extends z.ZodType>(value: T) =>
   z.strictObject({ amateur: value, "semi-pro": value, professional: value, elite: value });
 /** A rule a partner wants: one step of `axis` toward `toward`. Checked against the genome at load. */
@@ -1049,6 +1054,18 @@ export const configFileSchema = z.strictObject({
     }),
     /** Markets besides the anchor whose fit hints a review shows. */
     previewMarkets: z.int().min(0),
+    /**
+     * Partner proposals (GDD v1.41): at most one in everySeasons seasons; each deal slot's wants,
+     * in order: a rule trait moved one step toward its first or last option.
+     */
+    proposals: z.strictObject({
+      everySeasons: z.int().min(1),
+      wants: z.strictObject({
+        tv: z.array(proposalWant),
+        sponsor: z.array(proposalWant),
+        namingRights: z.array(proposalWant),
+      }),
+    }),
   }),
   /** Culture, first build (GDD v1.22). */
   culture: z.strictObject({

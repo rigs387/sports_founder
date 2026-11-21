@@ -159,6 +159,18 @@ export const eventRecordSchema = z.strictObject({
       .nullable()
       .default(null),
     /** A league director's scandal (GDD v1.40): who, and the hardcore fans it cost. */
+    /** A deal partner's rule proposal (GDD v1.41), and the backlash it would bring then. */
+    proposal: z
+      .strictObject({
+        dealId: z.int().positive(),
+        partnerId: z.string().min(1),
+        slot: dealSlotSchema,
+        axis: z.string().min(1),
+        from: z.string().min(1),
+        to: z.string().min(1),
+        demoted: z.int().nonnegative(),
+      })
+      .optional(),
     director: z
       .strictObject({
         name: z.string().min(1),

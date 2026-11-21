@@ -47,6 +47,8 @@ export const eventEffectSchema = z.union([
   z.strictObject({ type: z.literal("starSign") }),
   /** Grants the league director's ask the card tells (GDD v1.41). */
   z.strictObject({ type: z.literal("directorAsk") }),
+  /** Makes the rule change a deal partner proposed (GDD v1.41), with no PP price. */
+  z.strictObject({ type: z.literal("ruleProposal") }),
   // The repeat-final card only (GDD v1.22): one extra meeting toward a derby between the two clubs.
   z.strictObject({ type: z.literal("derbyStoke") }),
   // Late rewards by kind (GDD v1.39): from settings.lateRewards.fromTier a card's PP becomes one of
@@ -171,6 +173,8 @@ const template = z
       "directorAsk",
       /** A director resigned after declines in a row (GDD v1.41). */
       "directorResigned",
+      /** A flagship deal partner proposes a rule change (GDD v1.41), told from the landmark. */
+      "ruleProposed",
     ]),
     /** directorAsk cards only: the ask the card tells. */
     ask: z.enum(DIRECTOR_ASKS).nullable().default(null),
@@ -314,6 +318,23 @@ const template = z
         card.cooldownTurns !== null
       )
         issue("A director's ask follows its own fact: campaign scope, no filters or cooldown");
+    }
+    // A partner's rule proposal (GDD v1.41): accept or decline, declining by default.
+    if (card.trigger === "ruleProposed") {
+      const ids = card.choices.map((c) => c.id).sort();
+      if (
+        card.kind !== "decision" ||
+        ids.join() !== "accept,decline" ||
+        card.defaultChoice !== "decline"
+      )
+        issue("A partner's proposal is a decision: accept or decline, declining by default");
+      if (
+        card.scope !== "campaign" ||
+        card.anchorOnly ||
+        card.health.length ||
+        card.cooldownTurns !== null
+      )
+        issue("A partner's proposal follows its own fact: campaign scope, no filters or cooldown");
     }
     // A season lost to a stoppage (GDD v1.39): one moment told from the landmark.
     if (card.trigger === "stoppage") {

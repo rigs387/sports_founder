@@ -1160,6 +1160,27 @@ cards:
           - { type: conversion, target: hardcore, factor: 1.25, quarters: 4 }
           - { type: directorAsk }
       - { id: decline, quarters: 0, effects: [] }
+  # A deal partner's rule proposal (GDD v1.41): rare, one step, told from the ruleProposed
+  # landmark, no slot. Accepting is the year's amendment with no PP price; declining, the
+  # default, counts as a missed clause on the deal.
+  - id: partner-proposal
+    kind: decision
+    tone: pressure
+    priority: 90
+    trigger: ruleProposed
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    defaultChoice: decline
+    choices:
+      - { id: accept, quarters: 0, effects: [{ type: ruleProposal }] }
+      - { id: decline, quarters: 0, effects: [] }
   # A director out of patience resigns (GDD v1.41).
   - id: director-resigned
     kind: moment

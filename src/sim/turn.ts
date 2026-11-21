@@ -8,6 +8,7 @@ import { offerEvents, settleEvents } from "./events";
 import { closeOffseason, returnSeatIfFolded } from "./flagship";
 import { evaluateLeagues } from "./leagues";
 import { updateLegacy } from "./legacy";
+import { offerProposal, settleProposal } from "./proposals";
 import { stepQuarter } from "./quarter";
 import { updateStandouts } from "./standouts";
 import { pullTalent } from "./talent";
@@ -50,20 +51,23 @@ export function endTurn(state: GameState, world: World): GameState {
   const opened = state.flagship.offseason;
   // Closing the offseason may move the seat or pass a rule demand's deadline (GDD v1.28).
   // The focus set this turn decides who directs each league through its quarters (GDD v1.40).
+  // The last partner proposal's answer is read: declining was a missed clause (GDD v1.41).
   const start = syncDirectors(
-    breakDeals(
-      // The best standouts abroad may join the flagship before its clubs are fitted (GDD v1.37).
-      // Bids for the World Championship nobody chose from go to the wealthiest bidder.
-      // Talks still open take the union's ask (GDD v1.39).
-      closeOffseason(
-        settleAgreement(
-          settleHost(pullTalent(applyDefaultSlotDrops(settleEvents(state, world)), world), world),
+    settleProposal(
+      breakDeals(
+        // The best standouts abroad may join the flagship before its clubs are fitted (GDD v1.37).
+        // Bids for the World Championship nobody chose from go to the wealthiest bidder.
+        // Talks still open take the union's ask (GDD v1.39).
+        closeOffseason(
+          settleAgreement(
+            settleHost(pullTalent(applyDefaultSlotDrops(settleEvents(state, world)), world), world),
+            world,
+          ),
           world,
         ),
         world,
+        opened,
       ),
-      world,
-      opened,
     ),
     world,
   );
@@ -98,6 +102,8 @@ export function endTurn(state: GameState, world: World): GameState {
   next = updateChampionship(next, world);
   // Leagues formed or folded and the seat moved this turn; a scandal-prone director's scandals.
   next = syncDirectors(next, world, quarters);
+  // A deal partner's rare rule proposal (GDD v1.41).
+  next = offerProposal(next, world);
   // Legacy goals newly met go on record (GDD v1.38).
   next = updateLegacy(next, world);
   return offerEvents({ ...next, turn: start.turn + 1 }, world, quarters);

@@ -862,7 +862,7 @@ function main(): number {
         Object.entries(directors.asks)
           .map(([ask, n]) => `${ask} ${n}`)
           .join(", ") || "none"
-      }, ${directors.granted} granted, ${directors.resigned} resignations; salary paid ${millions(directors.salaryPaid)} against ${dollars(directors.leagueCash)} league cash at the end (seat excluded)`,
+      }, ${directors.granted} granted, ${directors.resigned} resignations; partner rule proposals ${directors.proposals}, ${directors.proposalsAccepted} accepted; salary paid ${millions(directors.salaryPaid)} against ${dollars(directors.leagueCash)} league cash at the end (seat excluded)`,
     );
     const cup = championshipAggregate(results);
     console.log(

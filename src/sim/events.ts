@@ -13,6 +13,7 @@ import { eventFamily, lateReward, lateRewardsOn, rewardRecord } from "./late-rew
 import { offerLegacyCards } from "./legacy";
 import { outletOf, wireOutlet } from "./press";
 import { ppPrice } from "./prices";
+import { acceptProposal, proposalBlocker, proposalFacts } from "./proposals";
 import { seasonFacts, seasonStories } from "./season-stories";
 import {
   applyStarEffect,
@@ -43,6 +44,51 @@ function scandalFacts(
     (d) => d.id === fact.directorId,
   );
   return { name: director?.name ?? "", demoted: fact.demoted };
+}
+
+/** A deal partner's rule proposal (GDD v1.41): its card, told from the landmark, takes no slot. */
+function offerProposalCards(
+  state: GameState,
+  world: World,
+  recent: readonly Landmark[],
+  events: EventState,
+): EventState {
+  const pending = [...events.pending];
+  let nextId = events.nextId;
+  for (const landmark of recent) {
+    if (landmark.kind !== "ruleProposed") continue;
+    const card = world.events.cards.find((c) => c.trigger === "ruleProposed");
+    const country = state.countries.find((c) => c.countryId === landmark.countryId);
+    const fans = country?.fans[PLAYER_INDEX];
+    if (!card || !country || !fans) continue;
+    pending.push({
+      id: nextId++,
+      templateId: card.id,
+      countryId: country.countryId,
+      turn: state.turn,
+      quarter: landmark.quarter,
+      facts: {
+        casual: fans.casual,
+        hardcore: fans.hardcore,
+        leagueTier: country.league?.tier ?? null,
+        health: country.league?.health ?? null,
+        rivalId: null,
+        season: null,
+        star: null,
+        tradition: null,
+        deal: null,
+        venue: null,
+        hall: null,
+        countermove: null,
+        championship: null,
+        legacy: null,
+        stoppage: null,
+        proposal: proposalFacts(state, world, landmark),
+      },
+      resolution: null,
+    });
+  }
+  return { ...events, pending, nextId };
 }
 
 /** A league director's ask (GDD v1.41): its card, told from the landmark, takes no slot. */
@@ -258,31 +304,37 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   // A legacy goal met (GDD v1.38) is told last, and takes none.
   // A season lost to a stoppage (GDD v1.39) takes none either.
   // A league director's ask (GDD v1.41), one an offseason, takes none either.
-  const dealEvents = offerDirectorAskCards(
+  // Nor does a deal partner's rule proposal (GDD v1.41).
+  const dealEvents = offerProposalCards(
     state,
     world,
     recent,
-    offerStoppageCards(
+    offerDirectorAskCards(
       state,
       world,
       recent,
-      offerLegacyCards(
+      offerStoppageCards(
         state,
         world,
         recent,
-        offerChampionshipCards(
+        offerLegacyCards(
           state,
           world,
           recent,
-          offerCountermoveCards(
+          offerChampionshipCards(
             state,
             world,
             recent,
-            offerVenueCards(
+            offerCountermoveCards(
               state,
               world,
               recent,
-              offerDealCards(state, world, recent, traditionEvents),
+              offerVenueCards(
+                state,
+                world,
+                recent,
+                offerDealCards(state, world, recent, traditionEvents),
+              ),
             ),
           ),
         ),
@@ -305,7 +357,8 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
       card.trigger === "championship" ||
       card.trigger === "legacy" ||
       card.trigger === "stoppage" ||
-      card.trigger === "directorAsk"
+      card.trigger === "directorAsk" ||
+      card.trigger === "ruleProposed"
     )
       continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
@@ -482,7 +535,9 @@ export type EventBlocker =
   | "slots"
   | "ended"
   /** A director's ask whose director is gone or whose facts no longer hold (GDD v1.41). */
-  | "director";
+  | "director"
+  /** A partner's proposal when the year's amendment is made or the rule moved (GDD v1.41). */
+  | "rules";
 export function eventBlocker(
   state: GameState,
   world: World,
@@ -512,6 +567,8 @@ export function eventBlocker(
       return "rival";
     const star = starEffectBlocker(state, world, event, effect);
     if (star !== null) return star;
+    if (effect.type === "ruleProposal" && proposalBlocker(state, world, event) !== null)
+      return "rules";
     if (effect.type === "directorAsk" && askBlocker(state, world, event) !== null)
       return "director";
   }
@@ -541,6 +598,10 @@ function applyEffects(
       effect.type === "starSign"
     ) {
       next = applyStarEffect(next, world, event, effect);
+      continue;
+    }
+    if (effect.type === "ruleProposal") {
+      next = acceptProposal(next, world, event);
       continue;
     }
     if (effect.type === "directorAsk") {

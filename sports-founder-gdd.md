@@ -232,7 +232,8 @@ no list or inbox anywhere:
   - *Built 2026-11-21 (directors, tech plan 2.26 step 1):* arrival, departure, traits, salary,
     replacing, the scandal card and the advisor voice. A director arrives when End Turn runs
     with the country in a focus slot. Asks and patience built 2026-11-21 (tech plan 2.26 step
-    2); partner rule proposals and the Builders wing are not built.
+    2); partner rule proposals built 2026-11-21 (step 3), from partners whose deal has a
+    clause, so declining is a miss on that clause; the Builders wing is not built.
   - *Directors' asks (decided 2026-11-21, v1.41), replacing their rule proposals.* Directors care
     about their own league, not the global rulebook: the sport cannot be reshaped every decade.
     - *One ask an offseason across all directors:* the most pressing wins, so each stays an

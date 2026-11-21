@@ -221,6 +221,9 @@ export interface CampaignResult {
     asks: Record<string, number>;
     granted: number;
     resigned: number;
+    /** Deal partners' rule proposals (GDD v1.41): made and accepted. */
+    proposals: number;
+    proposalsAccepted: number;
   };
   /** The World Championship (GDD v1.37). */
   championship: {
@@ -551,6 +554,8 @@ export function directorsAggregate(results: CampaignResult[]) {
     }, {}),
     granted: total((r) => r.directors.granted),
     resigned: total((r) => r.directors.resigned),
+    proposals: total((r) => r.directors.proposals),
+    proposalsAccepted: total((r) => r.directors.proposalsAccepted),
     salaryPaid: total((r) => r.directors.salaryPaid),
     leagueCash: total((r) => r.directors.leagueCash),
   };

@@ -153,7 +153,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
   // Key order follows the save schema, so a new campaign re-serializes byte-identically.
   return {
     ...foundSport(founded, world, identitySetup),
-    rules: { amendments: [] },
+    rules: { amendments: [], proposal: null },
     culture: newCulture(setup.seed, 1, founded.landmarks.length, 0, world),
     hallOfFame: newHallOfFame(1),
     standouts: newStandouts(setup.seed, 1),

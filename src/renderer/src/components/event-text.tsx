@@ -78,6 +78,7 @@ export function Effect({ effect, star = {} }: { effect: EventEffect; star?: Star
   if (effect.type === "starBack") return <li>{t("events.effects.starBack")}</li>;
   if (effect.type === "starSign") return <li>{t("events.effects.starSign")}</li>;
   if (effect.type === "directorAsk") return <li>{t("events.effects.directorAsk")}</li>;
+  if (effect.type === "ruleProposal") return <li>{t("events.effects.ruleProposal")}</li>;
   return (
     <li className={effect.type === "hardcoreDemotion" ? "event-tradeoff" : undefined}>
       {t(`events.effects.${effect.type === "fanShift" ? effect.target : effect.type}`, {
@@ -178,10 +179,23 @@ export function useEventText() {
       club: club(venue.clubId ?? undefined),
     };
   };
+  // A deal partner's rule proposal (GDD v1.41) names the partner, the change and its backlash.
+  const proposalText = (event: EventRecord) => {
+    const told = event.facts.proposal;
+    if (!told) return venueText(event);
+    return {
+      partner: dealPartnerName(told.partnerId),
+      slot: t(`deals.slots.${told.slot}`),
+      rule: t(`genome.axes.${told.axis}`),
+      from: t(`genome.options.${told.axis}.${told.from}`),
+      to: t(`genome.options.${told.axis}.${told.to}`),
+      demoted: told.demoted,
+    };
+  };
   // Deal cards (GDD v1.28) name the partner, the slot and what a breach cost.
   const dealText = (event: EventRecord) => {
     const deal = event.facts.deal;
-    if (!deal) return venueText(event);
+    if (!deal) return proposalText(event);
     return {
       partner: dealPartnerName(deal.partnerId),
       slot: t(`deals.slots.${deal.slot}`),
@@ -426,6 +440,10 @@ export function useEventText() {
    * place of "no change" on the decline, and in the note on what Next Turn picks.
    */
   const askNote = (event: EventRecord): string | null => {
+    // A partner's proposal (GDD v1.41): turning it down is a missed clause.
+    const proposal = event.facts.proposal;
+    if (proposal)
+      return t("events.proposalDecline", { partner: dealPartnerName(proposal.partnerId) });
     const told = event.facts.director;
     if (!told?.ask) return null;
     const director = snapshot.directors.serving.find((d) => d.id === told.directorId);
@@ -433,6 +451,13 @@ export function useEventText() {
   };
   const noChange = (event: EventRecord) => askNote(event) ?? t("events.noChange");
   const defaultNote = (event: EventRecord, choice: string) =>
-    t(askNote(event) ? "events.defaultAsk" : "events.default", { choice });
+    t(
+      event.facts.proposal
+        ? "events.defaultProposal"
+        : askNote(event)
+          ? "events.defaultAsk"
+          : "events.default",
+      { choice },
+    );
   return { country, club, player, title, body, factLines, dateOf, termVars, noChange, defaultNote };
 }

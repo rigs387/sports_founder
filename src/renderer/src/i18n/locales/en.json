@@ -26,6 +26,8 @@
     "noChange": "Keep the current approach. No cost or added effect.",
     "review": "Review choice",
     "default": "If left unresolved, Next Turn chooses “{{choice}}” for free, with no added effect.",
+    "defaultProposal": "If left unresolved, Next Turn chooses “{{choice}}”, and that counts as a missed clause on the deal.",
+    "proposalDecline": "Counts as a missed clause on {{partner}}'s deal: miss again and {{partner}} walks.",
     "defaultAsk": "If left unresolved, Next Turn chooses “{{choice}}”, and that counts as turning the director down.",
     "askDecline_one": "{{director}} is out of patience: turn this down and they resign, and the league loses standing.",
     "askDecline_other": "Uses up {{director}}'s patience: {{count}} asks turned down in a row and they resign.",
@@ -101,6 +103,7 @@
       "starBack": "Backs the star now: their influence grows each season they play here.",
       "starSign": "They join the club now as its leading player. The league's broadcast reaches further into their home country while they play.",
       "directorAsk": "The director gets what they asked for.",
+      "ruleProposal": "The rule changes now, as this year's rule change. No Prestige; purists push back as usual.",
       "derbyStoke": "Counts as one more meeting toward a derby between these two clubs.",
       "leagueCash": "{{cash, money}} into the flagship league's reserve. It stays there: only profit above the reserve is paid out to the clubs.",
       "leagueCashAt": "{{cash, money}} into the reserve of the league in {{country}}. It stays there: only profit above the reserve is paid out to the clubs.",
@@ -150,6 +153,14 @@
           "broadcast": "Buy local airtime",
           "neighbourhood": "Work the neighborhood",
           "hold": "Stay with organic growth"
+        }
+      },
+      "partner-proposal": {
+        "title": "{{partner}} wants a rule change",
+        "body": "{{partner}}, who holds the {{slot}} deal, wants {{rule}} changed from {{from}} to {{to}}. Accepting costs no Prestige but is this year's rule change, and purists push back as usual: about {{demoted, number}} hardcore fans would turn casual.",
+        "choices": {
+          "accept": "Make the change",
+          "decline": "Keep the rules"
         }
       },
       "director-keep-star": {

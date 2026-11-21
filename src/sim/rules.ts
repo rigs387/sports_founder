@@ -167,8 +167,17 @@ export function backlashTotal(state: GameState, world: World, axis: AxisId, opti
   );
 }
 
-/** Amends a rule (checked by the caller): the price, the backlash, the record and the new genome. */
-export function amendRule(state: GameState, world: World, axis: AxisId, option: string): GameState {
+/**
+ * Amends a rule (checked by the caller): the price, the backlash, the record and the new genome.
+ * A deal partner's accepted proposal (GDD v1.41) is `free`: no PP price, all else the same.
+ */
+export function amendRule(
+  state: GameState,
+  world: World,
+  axis: AxisId,
+  option: string,
+  free = false,
+): GameState {
   const from = state.genome[axis];
   const jump = amendmentJump(axis, from, option, world);
   const shares = backlashShares(state, world, axis, option);
@@ -206,10 +215,10 @@ export function amendRule(state: GameState, world: World, axis: AxisId, option: 
   );
   return {
     ...worn,
-    pp: state.pp - amendmentPrice(state, world, jump),
+    pp: free ? state.pp : state.pp - amendmentPrice(state, world, jump),
     genome: { ...state.genome, [axis]: option } as Genome,
     countries,
-    rules: { amendments: [...state.rules.amendments, amendment] },
+    rules: { ...state.rules, amendments: [...state.rules.amendments, amendment] },
     landmarks: [
       ...state.landmarks,
       landmarks.ruleAmended(state.turn, state.quarter, axis, from, option, demoted),

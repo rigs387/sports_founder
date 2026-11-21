@@ -49,7 +49,7 @@ const directorSchema = z.strictObject({
   trait: z.string().min(1),
   fromQuarter: z.int().min(0),
   tierOnArrival: leagueTierSchema,
-  declines: z.int().min(0),
+  declines: z.int().min(0).default(0),
 });
 const axisSchema = z.enum(AXIS_IDS as [AxisId, ...AxisId[]]);
 
@@ -213,6 +213,16 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     directorId: z.int().min(1),
     ask: z.enum(DIRECTOR_ASKS),
     standoutId: z.int().min(1).nullable(),
+  }),
+  z.strictObject({
+    kind: z.literal("ruleProposed"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    dealId: z.int().min(1),
+    partnerId: z.string().min(1),
+    axis: axisSchema,
+    to: z.string().min(1),
   }),
   z.strictObject({
     kind: z.literal("directorResigned"),
@@ -662,6 +672,15 @@ const gameStateSchema = z.strictObject({
         demoted: count,
       }),
     ),
+    proposal: z
+      .strictObject({
+        season: z.int().min(1),
+        quarter: count,
+        dealId: z.int().min(1),
+        open: z.boolean(),
+      })
+      .nullable()
+      .default(null),
   }),
   culture: z.strictObject({
     startSeason: z.int().min(1),
@@ -825,11 +844,16 @@ const gameStateSchema = z.strictObject({
         options: z.array(z.strictObject({ name: z.string().min(1), trait: z.string().min(1) })),
       }),
     ),
-    openAsk: z.strictObject({ directorId: z.int().min(1), quarter: count }).nullable(),
-    askedSeason: z.int().min(1).nullable(),
-    kept: z.array(z.int().min(1)),
-    holds: z.array(z.strictObject({ countryId: z.string().min(1), endQuarter: count })),
-    exhibitions: z.array(z.strictObject({ countryId: z.string().min(1), endQuarter: count })),
+    openAsk: z
+      .strictObject({ directorId: z.int().min(1), quarter: count })
+      .nullable()
+      .default(null),
+    askedSeason: z.int().min(1).nullable().default(null),
+    kept: z.array(z.int().min(1)).default([]),
+    holds: z.array(z.strictObject({ countryId: z.string().min(1), endQuarter: count })).default([]),
+    exhibitions: z
+      .array(z.strictObject({ countryId: z.string().min(1), endQuarter: count }))
+      .default([]),
   }),
 });
 

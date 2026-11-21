@@ -1727,6 +1727,20 @@ format starts campaigns fresh. One step per session; each ends with `npm run che
    chosen for its market or product, never a trait amended within the window. Accept applies it
    through the `amendRule` path with no PP price (counts toward the yearly limit, backlash as
    normal); declining counts as a clause miss (`judgeClauses`).
+   *Built 2026-11-21.* `src/sim/proposals.ts`. Only partners whose deal has a clause (balance,
+   star, fans) propose: those are the partners who care about the product, and a declined
+   proposal is then an ordinary miss on that clause (`clauseMisses` + 1; the partner walks at
+   its next judged miss). Each slot's wants are config (`rulesEvolution.proposals.wants`: TV
+   shorter matches then more scoring, sponsors more scoring then more contact, naming rights
+   simpler then bigger teams); a want already at its end is skipped, so a sport that has given
+   partners what they want hears less from them. `offerProposal` at End Turn's end, the
+   `partner-proposal` card (trigger `ruleProposed`, no slot, its facts carry the backlash at
+   the time), `acceptProposal` through `amendRule(..., free)`, and `settleProposal` reads the
+   answer when End Turn starts (`rules.proposal`). The builder judges a proposal as it judges
+   its own amendments (`amendmentValue`); bots that never amend decline. Measured (2 builder
+   campaigns, 150 turns): 13 proposals, about one a decade each, none accepted (the backlash
+   outweighed the fit gain every time). The card has not been seen on screen: the late-game
+   smoke save had none waiting.
 4. **The Builders wing.** Points from directors' recorded terms (config
    `hallOfFame.builders`), a separate ballot and class cap, plaques in the Almanac, the class
    card naming builders. Measure classes per campaign so the wing is neither empty nor

@@ -19,13 +19,11 @@ import {
   amendmentPrice,
   applyAction,
   backingPrice,
-  backlashTotal,
   bailoutTerms,
   categoryUnlockTier,
   checkAction,
   computeExposure,
   effectValue,
-  fandomScore,
   foundingPrice,
   type GameState,
   growthNode,
@@ -37,7 +35,6 @@ import {
   nationalTeams,
   nodeCost,
   offseasonOpen,
-  optionNetDelta,
   PLAYER_INDEX,
   promotionTerms,
   SEED_WARM_UP_DRAWS,
@@ -48,7 +45,7 @@ import {
   venueTerms,
   type World,
 } from "../sim";
-import { chooseEvents, EVENT_WEIGHTS, type EventWeights } from "./event-policy";
+import { amendmentValue, chooseEvents, EVENT_WEIGHTS, type EventWeights } from "./event-policy";
 
 // Bot playtesters (tech plan 2.1). Bots act only through checkAction/applyAction, the same legal
 // actions as the player. The thresholds here shape bot behavior only; they are not game balance.
@@ -149,9 +146,21 @@ export interface BotStep {
 }
 
 /** Answers pending decision cards before the bot spends PP elsewhere. */
-function answerEvents(state: GameState, world: World, weights: EventWeights, reserve: number) {
+function answerEvents(
+  state: GameState,
+  world: World,
+  weights: EventWeights,
+  reserve: number,
+  amend = false,
+) {
   // Paid choices wait too while a bot saves for the World Championship (GDD v1.37).
-  const answered = chooseEvents(state, world, weights, reserve + championshipReserve(state, world));
+  const answered = chooseEvents(
+    state,
+    world,
+    weights,
+    reserve + championshipReserve(state, world),
+    amend,
+  );
   return { state: answered.state, actions: answered.actions } satisfies BotStep;
 }
 
@@ -519,17 +528,6 @@ function buildVenues(step: BotStep, world: World, full: number, reserveQuarters:
 function amendRules(step: BotStep, world: World, reserve: number): void {
   const state = step.state;
   if (!offseasonOpen(state) || amendedThisYear(state, world)) return;
-  const { casualWeight } = world.config.fandomScore;
-  const weights = state.countries.map((country) => {
-    const fans = country.fans[PLAYER_INDEX];
-    return fans ? fandomScore(fans.casual, fans.hardcore, casualWeight) : 0;
-  });
-  const total = weights.reduce((sum, w) => sum + w, 0);
-  const hardcore = state.countries.reduce(
-    (sum, c) => sum + (c.fans[PLAYER_INDEX]?.hardcore ?? 0),
-    0,
-  );
-  if (total <= 0 || hardcore <= 0) return;
   let best: Action | null = null;
   let bestValue = AMEND_MARGIN;
   for (const axis of RULE_AXES) {
@@ -538,15 +536,8 @@ function amendRules(step: BotStep, world: World, reserve: number): void {
       if (option === current || amendBlocker(state, world, axis, option) !== null) continue;
       const jump = amendmentJump(axis, current, option, world);
       if (state.pp - amendmentPrice(state, world, jump) < reserve) continue;
-      let gain = 0;
-      weights.forEach((weight, index) => {
-        if (weight <= 0) return;
-        gain +=
-          weight *
-          (optionNetDelta(world, axis, option, index) -
-            optionNetDelta(world, axis, current, index));
-      });
-      const value = gain / total - backlashTotal(state, world, axis, option) / hardcore;
+      // The same worth a partner's proposal is judged by (GDD v1.41).
+      const value = amendmentValue(state, world, axis, option);
       if (value > bestValue) {
         bestValue = value;
         best = { type: "amendRule", axis, option };
@@ -752,8 +743,9 @@ export function builder(
   options: BotOptions = { amend: true },
 ): BotStep {
   const reserve = bailoutReserve(state, world, BUILDER_RESERVE_BAILOUTS);
-  return afterEvents(answerEvents(state, world, EVENT_WEIGHTS.builder, reserve), (s) =>
-    builderTurn(s, world, options),
+  return afterEvents(
+    answerEvents(state, world, EVENT_WEIGHTS.builder, reserve, options.amend),
+    (s) => builderTurn(s, world, options),
   );
 }
 

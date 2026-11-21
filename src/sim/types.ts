@@ -552,6 +552,17 @@ export type Landmark =
       standoutId: number | null;
     }
   | {
+      /** A flagship deal partner proposed a rule change (GDD v1.41); the country is the seat. */
+      kind: "ruleProposed";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      dealId: number;
+      partnerId: string;
+      axis: AxisId;
+      to: string;
+    }
+  | {
       /** A director resigned after declines in a row (GDD v1.41). */
       kind: "directorResigned";
       turn: number;
@@ -838,6 +849,11 @@ export interface Amendment {
 export interface RulesState {
   /** Every amendment made, oldest first. */
   amendments: Amendment[];
+  /**
+   * The last deal partner's rule proposal (GDD v1.41): the flagship season of its offseason, the
+   * quarter it came, the deal, and whether its answer is still to be read.
+   */
+  proposal: { season: number; quarter: number; dealId: number; open: boolean } | null;
 }
 
 // ---- Culture (GDD v1.22; src/sim/culture.ts) -------------------------------------------------
