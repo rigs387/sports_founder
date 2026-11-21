@@ -99,6 +99,12 @@ window.SF_PROGRESS = {
   ],
   watch: [
     {
+      title: "Late money has no sink",
+      text: "League directors' salaries were meant to drain cash where it piles up late, but they barely register: $4.7M paid against $740B of league cash at the end (2 builder campaigns, 120 turns), and $8–$311 a quarter in the small markets bots focus. Revisit money balance as a whole (salaries, the payout reserve, late league cash) in a later pass; not tuned yet by decision.",
+      date: "2026-11-21",
+      system: "business",
+    },
+    {
       title: "Early upgrades feel automatic",
       text: "Five growth nodes were over-selected across strategies on the old tree. The tracks replaced it on 2026-10-10 (bots buy 46 of 48 levels in 200 turns), so the choice now lies in the forks. No fork side shares are recorded here yet: measure them with the options experiment.",
       date: "2026-10-12",
