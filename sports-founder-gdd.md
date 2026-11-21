@@ -1448,7 +1448,8 @@ States, Hurlball, tier 5 on turn 96, #1 on turn 100) reviewed headlessly, then t
     player names split into regional pools (North American, Australia and New Zealand,
     Caribbean, British) through the existing `playerNames.countries` overrides; outlet words
     by language sphere for the big spheres (Spanish "Deportes Hoy", French "Sport Matin",
-    Portuguese, German, Italian), English words elsewhere.
+    Portuguese, German, Italian), English words elsewhere. *Built 2026-11-21* (`names.yaml`
+    `playerNames` regional pools, `press.wordsBySphere`).
   - *One headline, one recap:* the champion moment keeps the headline look; the offseason's season
     in review becomes a stats recap (final standings, the playoff path, awards, records, traditions
     born, a Hall class), not a second front page.

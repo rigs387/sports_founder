@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import en from "../src/renderer/src/i18n/locales/en.json";
 import {
   createCampaign,
+  drawName,
   endTurn,
   eventSnapshots,
   flagshipSnapshot,
@@ -10,6 +11,7 @@ import {
   outletOf,
   wireOutlet,
 } from "../src/sim";
+import { createRngState, restoreRng } from "../src/sim/rng";
 import { clubIds, fresh, withSeason } from "./culture-helpers";
 import { setupFor, world } from "./helpers";
 
@@ -27,12 +29,27 @@ describe("outlets", () => {
     const local = outletOf(formed, world, "argentina", 6);
     expect(local).toMatchObject({ kind: "local", place: world.places.argentina?.[0]?.name });
     if (local.kind !== "local") throw new Error("No local outlet");
-    expect(world.names.press.words).toContain(local.word);
+    // Argentina is in the Spanish sphere: its paper uses the Spanish words (GDD v1.40).
+    expect(world.names.press.wordsBySphere.spanish).toContain(local.word);
     // The anchor's league forms at the start: its paper is there from turn 1.
     expect(outletOf(state, world, "brazil", 0).kind).toBe("local");
     // Stable for a campaign: the same seed always names the same paper.
     expect(outletOf(formed, world, "argentina", 9)).toEqual(local);
     expect(wireOutlet(world)).toEqual({ kind: "wire", name: world.names.press.wire });
+  });
+
+  it("a sphere without its own words uses the English ones (GDD v1.40)", () => {
+    const state = createCampaign(world, setupFor(5, "brazil"));
+    const formed: GameState = {
+      ...state,
+      landmarks: [...state.landmarks, landmarks.leagueFormed(1, 6, "japan", false)],
+    };
+    const outlet = outletOf(formed, world, "japan", 6);
+    if (outlet.kind !== "local") throw new Error("No local outlet");
+    expect(world.names.press.words).toContain(outlet.word);
+    const brazil = outletOf(state, world, "brazil", 0);
+    if (brazil.kind !== "local") throw new Error("No local outlet");
+    expect(world.names.press.wordsBySphere.portuguese).toContain(brazil.word);
   });
 
   it("every event snapshot names its outlet", () => {
@@ -73,5 +90,26 @@ describe("headline variants", () => {
         expect(card[`title_v${i}`], `${id} v${i}`).toBeTruthy();
     }
     expect(withVariants).toBe(5);
+  });
+});
+
+describe("names by language (GDD v1.40)", () => {
+  it("English-sphere players are named from their region's pool", () => {
+    const { pools } = world.names.playerNames;
+    for (const [countryId, poolId] of [
+      ["united-states", "north-american"],
+      ["jamaica", "caribbean"],
+    ] as const) {
+      const rng = restoreRng(createRngState(7));
+      const pool = pools[poolId];
+      if (!pool) throw new Error(`No pool ${poolId}`);
+      for (let i = 0; i < 5; i += 1) {
+        const [given, ...family] = drawName(world, rng, countryId, new Set()).split(" ");
+        expect(pool.given).toContain(given);
+        expect(pool.family).toContain(family.join(" "));
+      }
+    }
+    // Britain keeps the English pool.
+    expect(world.names.playerNames.countries.england).toBeUndefined();
   });
 });

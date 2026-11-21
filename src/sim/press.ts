@@ -4,9 +4,10 @@ import type { GameState, World } from "./types";
 
 // Press (GDD v1.33): presentation only. Every country gets an invented outlet once its league
 // forms: its biggest real place and a sports-paper word from the names file, picked by a stable
-// key from the seed and the country. Before that its stories run in the sport's own paper; rival
-// world championships run on one invented international wire. Nothing here is saved or changes a
-// number.
+// key from the seed and the country, in its primary language sphere's words where the names file
+// has them (GDD v1.40), else the English ones. Before that its stories run in the sport's own
+// paper; rival world championships run on one invented international wire. Nothing here is saved
+// or changes a number.
 
 export type Outlet =
   | { kind: "local"; place: string; word: string }
@@ -37,7 +38,9 @@ export function outletOf(
     (l) => l.kind === "leagueFormed" && l.countryId === countryId && l.quarter <= quarter,
   );
   const place = world.places[countryId]?.[0]?.name;
-  const { words } = world.names.press;
+  const { press } = world.names;
+  const sphere = world.countries.find((country) => country.id === countryId)?.languages.primary;
+  const words = (sphere && press.wordsBySphere[sphere]) || press.words;
   if (!formed || !place || words.length === 0) return { kind: "sport" };
   const word = words[hash(`${state.seed}|${countryId}`) % words.length] ?? "";
   return { kind: "local", place, word };

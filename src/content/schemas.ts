@@ -295,10 +295,12 @@ export const namesFileSchema = z.strictObject({
   }),
   /**
    * Press (GDD v1.33): sports-paper words for each country's invented outlet ("The {place}
-   * {word}") and the international wire rival world championships run on.
+   * {word}") and the international wire rival world championships run on. `wordsBySphere`
+   * (GDD v1.40) replaces the words for a country whose primary language sphere is listed.
    */
   press: z.strictObject({
     words: z.array(z.string().min(1)).min(1),
+    wordsBySphere: z.record(id, z.array(z.string().min(1)).min(1)),
     wire: z.string().min(1),
   }),
   /**

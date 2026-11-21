@@ -215,6 +215,11 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
       issue(sources.names, `traditions.foods.${birthplace}`, "missing matchday food names");
   if (!traditions.nationalNames.default)
     issue(sources.names, "traditions.nationalNames.default", "missing the default pool");
+  // Outlet words by language sphere (GDD v1.40): each listed sphere is some country's primary.
+  const primarySpheres = new Set(world.countries.map((country) => country.languages.primary));
+  for (const sphere of Object.keys(world.names.press.wordsBySphere))
+    if (!primarySpheres.has(sphere))
+      issue(sources.names, `press.wordsBySphere.${sphere}`, "no country's primary sphere");
   for (const [sportId, list] of Object.entries(traditions.rivals)) {
     if (!rivalIds.has(sportId))
       issue(sources.names, `traditions.rivals.${sportId}`, "unknown rival sport");

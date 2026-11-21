@@ -1759,7 +1759,11 @@ reads the family.
 
 ### 2.31 Build Plan: Names by Language (GDD v1.40)
 
-Designed 2026-11-01 (parked items, topic 7). Not built. One short session, content first.
+Designed 2026-11-01 (parked items, topic 7). *Built 2026-11-21.* One short session, content first.
+The North American pool covers the United States, Canada and Guam; the Australasian pool
+Australia and New Zealand; the Caribbean pool the English-sphere islands, Belize and Guyana.
+Britain, Ireland and the Crown dependencies keep `english`. A `wordsBySphere` key that is no
+country's primary sphere fails content validation.
 
 1. Regional English player pools in `content/names.yaml` (`north-american`,
    `australasian`, `caribbean`; `english` stays British) assigned through

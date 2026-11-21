@@ -326,11 +326,19 @@ traditions:
       - { id: border-derby, type: derby, countryId: india, name: the Border Derby }
       - { id: maidan-game, type: nationalName, countryId: india, name: the Maidan Game }
 
-# Press (GDD v1.33, v1.34): each country's invented outlet is its biggest place and one of these
-# words ("Houston Sports Desk"), picked by a stable key: modern, neutral and digital (v1.34 dropped
-# the British football words), clear of real outlets. Rival world championships run on the wire.
+# Press (GDD v1.33, v1.34, v1.40): each country's invented outlet is its biggest place and one of
+# these words ("Houston Sports Desk"), picked by a stable key: modern, neutral and digital (v1.34
+# dropped the British football words), clear of real outlets. A country whose primary language
+# sphere has its own words uses them ("Bogotá Deportes Hoy"); every other country the English
+# words. Rival world championships run on the wire.
 press:
   words: [Sports Desk, Live, Daily, Insider, Report, Network, Pulse, Now]
+  wordsBySphere:
+    spanish: [Deportes, Deportes Hoy, En Vivo, Al Día, Noticias, Red Deportiva, Pulso, Ahora]
+    french: [Sport, Sport Matin, Direct, Info, Actu, Réseau Sport, Hebdo, Soir]
+    portuguese: [Esporte, Ao Vivo, Diário, Notícias, Agora, Rede Esportiva, Pulso, Hoje]
+    german: [Sport, Sport Heute, Live, Sportnetz, Nachrichten, Am Abend, Puls, Jetzt]
+    italian: [Sport, Sport Oggi, In Diretta, Notizie, Rete Sport, Adesso, Polso, Ora]
   wire: Worldwide Sports Wire
 
 # Flagship deal partners (GDD v1.28): invented broadcasters and sponsors, never real brands or
@@ -473,6 +481,30 @@ playerNames:
     singapore: chinese
     eritrea: amharic
     djibouti: somali
+    united-states: north-american
+    canada: north-american
+    guam: north-american
+    australia: australasian
+    new-zealand: australasian
+    anguilla: caribbean
+    antigua-and-barbuda: caribbean
+    bahamas: caribbean
+    barbados: caribbean
+    belize: caribbean
+    bermuda: caribbean
+    british-virgin-islands: caribbean
+    cayman-islands: caribbean
+    dominica: caribbean
+    grenada: caribbean
+    guyana: caribbean
+    jamaica: caribbean
+    montserrat: caribbean
+    saint-kitts-and-nevis: caribbean
+    saint-lucia: caribbean
+    saint-vincent-and-the-grenadines: caribbean
+    trinidad-and-tobago: caribbean
+    turks-and-caicos-islands: caribbean
+    us-virgin-islands: caribbean
   pools:
     english:
       given: [James, Oliver, Jack, Harry, George, Thomas, William, Daniel, Samuel, Joseph, Michael, Ryan, Liam, Connor, Ethan, Luke, Adam, Callum, Nathan, Owen, Lewis, Ben, Tyler, Jordan, Reece, Aaron, Dylan, Kieran, Jamie, Harvey]
@@ -616,6 +648,15 @@ playerNames:
       given: [Juan, Jose, Mark, John, Paolo, Miguel, Carlo, Rafael, Gabriel, Angelo, Christian, Jerome, Jomar, Noel, Ramon, Ricardo, Enrique, Joaquin, Andres, Emmanuel, Francis, Marvin, Allan, Dennis, Jayson, Rodel, Rommel, Edgar, Chris, Ronnie]
       family: [Santos, Reyes, Cruz, Bautista, Ocampo, Garcia, Mendoza, Torres, Tomas, Andrada, Castillo, Flores, Villanueva, Ramos, Castro, Rivera, Aquino, Navarro, Salazar, Mercado, Dela Cruz, Pascual, Domingo, Manalo, Gonzales, Fernandez, Lopez, Soriano, Tolentino, Aguilar]
 
+    north-american:
+      given: [Tyler, Brandon, Justin, Kevin, Marcus, Derek, Travis, Cody, Austin, Chase, Garrett, Hunter, Logan, Mason, Caleb, Wyatt, Dustin, Trevor, Zachary, Jalen, DeShawn, Malik, Andre, Darius, Carlos, Mateo, Brett, Colton, Grant, Cole]
+      family: [Johnson, Williams, Miller, Davis, Anderson, Wilson, Moore, Jackson, White, Garcia, Lee, Walsh, Nguyen, Hernandez, Sullivan, Kowalski, Peterson, Schmidt, Carter, Mitchell, Parker, Collins, Bennett, Reyes, Foster, Hayes, Brooks, Coleman, Henderson, Novak]
+    australasian:
+      given: [Mitchell, Lachlan, Hamish, Angus, Jarrod, Brodie, Cooper, Riley, Flynn, Bailey, Kane, Blake, Jayden, Nathan, Corey, Shane, Wade, Toby, Heath, Darcy, Archie, Max, Jett, Tama, Rawiri, Wiremu, Nikau, Tane, Ropata, Hayden]
+      family: [Kelly, O'Brien, Ryan, Nguyen, McDonald, Ferguson, Lawson, Hart, Fraser, Gallagher, Byrne, Doherty, Henare, Ngata, Parata, Walters, Kennedy, McKenzie, Sutherland, Russo, Papadopoulos, Chen, Singh, Patel, Pearce, Marshall, Gibson, Dawson, Lowe, Tipene]
+    caribbean:
+      given: [Andre, Dwayne, Kemar, Kevon, Akeem, Romario, Jermaine, Delroy, Courtney, Marlon, Tyrone, Shai, Jevon, Nicholas, Odean, Tevin, Roshane, Kadeem, Damion, Kareem, Ricardo, Winston, Clive, Desmond, Rasheed, Omari, Jason, Devon, Keon, Rayon]
+      family: [Brown, Thompson, Gordon, Bailey, Francis, Joseph, Charles, Edwards, Henry, Simpson, Morgan, Grant, Clarke, Reid, Bishop, Phillip, Sealy, Greaves, Mohammed, Ramsaran, Persaud, Baptiste, Alleyne, Cumberbatch, Mullings, Dacosta, Walcott, Forbes, McKenzie, Richards]
     west-african-anglophone:
       given: [Chinedu, Emeka, Obinna, Tunde, Segun, Kunle, Babajide, Ifeanyi, Chukwudi, Kwame, Kofi, Kwabena, Yaw, Kojo, Nana, Samuel, Daniel, Emmanuel, Joseph, Ibrahim, Musa, Abdul, Mohammed, Victor, Godwin, Felix, Isaac, Ebenezer, Prince, Alhaji]
       family: [Okeke, Okonkwo, Eze, Nwosu, Adeyemi, Adebayo, Ogunleye, Balogun, Olawale, Bello, Danjuma, Abubakar, Mensah, Owusu, Ofori, Asante, Appiah, Osei, Agyeman, Quaye, Kamara, Sesay, Conteh, Bangura, Jallow, Ceesay, Sowe, Kollie, Toure, Dennis]

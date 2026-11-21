@@ -151,7 +151,10 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
 - Press (GDD v1.33) is presentation only and never saved: `src/sim/press.ts` gives each event
   snapshot its `outlet` (a country's biggest place + a `names.yaml press.words` word once its
   league formed; the sport's paper before; the wire for rival championships) and the flagship
-  snapshot its `frontPage` (the season's facts). Digital since v1.34: minor moments are phone
+  snapshot its `frontPage` (the season's facts). Outlet words follow the country's primary
+  language sphere where `press.wordsBySphere` lists it (GDD v1.40), English words elsewhere;
+  English-sphere players are named from regional pools (North American, Australasian,
+  Caribbean; British stays `english`). Digital since v1.34: minor moments are phone
   notifications (the outlet is the app), big ones news-site articles, headlines breaking news; five
   cards have `title_v1`/`title_v2` variants picked by a stable hash; the offseason's season in
   review is the `SeasonRecap` stats card (`src/renderer/src/press/`). Default English is neutral,
