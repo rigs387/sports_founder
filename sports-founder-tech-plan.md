@@ -88,6 +88,7 @@ surface before playtesting or during it.
 | 2026-10-08 | Awards and press, topic 1 (GDD v1.33): flagship Player of the Season (composite of scores, club finish, playoff and final scores) and the top scorer as a named prize; Hall of Fame points, no other effect; named after the first Hall of Fame player, fixed; lines on existing screens, the first award a toast; Player of the Year parked | Decided |
 | 2026-10-08 | Awards and press, topic 2 (GDD v1.33): an invented outlet per country (biggest place + sports-paper word) once its league forms, the sport's paper before; outlet mastheads with family sections; 2–3 headline variants for frequent cards by stable hash; the offseason's season in review becomes the seat outlet's front page; presentation only, nothing saved | Decided |
 | 2026-11-01 | Parked items, topic 1 (GDD v1.40): league directors only in focus countries' leagues (not the seat's), drawn when focus lands, gone when it leaves; one trait bending the simple model, salary from league cash, replaced in the offseason for severance; one proposal card a year from a director or a deal partner (no PP price, counts toward the limit; declining a partner is a clause miss); a Builders wing in the Hall; standing policies cut | Decided |
+| 2026-11-21 | Directors' asks (GDD v1.41): directors no longer propose rules; one ask an offseason across all directors from a content list by trait (promotion push, hold the money, community drive, keep our star, host something); patience: two declines in a row and the director resigns with a health hit; rule proposals from deal partners only, one in about 8 seasons, one step, never a recently amended trait; scandals stay | Decided |
 | 2026-11-01 | Parked items, topic 2 (GDD v1.40): only the flagship ever signs deals; when the anchor league folds after the win, a decision card moves the seat free to an eligible league (default: most hardcore fans); a seat league abroad stepping down below Professional loses the seat at the offseason's close with the purist cost; the playtest-thinness question closed | Decided |
 | 2026-11-01 | Parked items, topic 3 (GDD v1.40): youth programs at the seat and in focus countries; a small conversion boost and better homegrown players, raising only players drawn after a level opens; bought with league cash in the offseason, opening after a season, upkeep that runs after focus leaves (no upgrades then), a level lost a year when unpaid | Decided |
 | 2026-11-01 | Parked items, topic 4 (GDD v1.40): flagship ticket pricing, three stances at the seat set in the offseason; gate per seated fan against seat conversion; each step up demotes a share of the seat's hardcore fans, heavier with tradition weight; lowering is free | Decided |
@@ -1698,12 +1699,20 @@ format starts campaigns fresh. One step per session; each ends with `npm run che
    turns): 52 terms a campaign, traits drawn evenly, salary $4.7M against $740B of league cash.
    The salary is no money sink yet, and bots never replace, so no trait can dominate: both wait
    for tuning.
-2. **Proposal cards.** One a year at most, in the offseason, from a director or a flagship deal
-   partner: an amendment chosen for the proposer's country or market fit. Accept applies it
+2. **Directors' asks** (revised 2026-11-21, GDD v1.41). One ask card an offseason across all
+   directors, the most pressing first, from a content list of asks each tied to traits and to a
+   fact that makes it possible: promotion push, hold the money, community drive, keep our star
+   (when the talent pull targets the league's best standout), host something (a World
+   Championship bid or a flagship exhibition). Each director's patience
+   (`Director.declines`, config `directors.patience`): two declines in a row and they resign
+   (a `directorResigned` landmark, a new director drawn, a health hit). Bots answer by their
+   event weights; the runner prints asks offered, accepted and resignations.
+3. **Partner rule proposals** (revised 2026-11-21, GDD v1.41). At most one in
+   `proposals.everySeasons` seasons, from a flagship deal partner: one step on one rule trait
+   chosen for its market or product, never a trait amended within the window. Accept applies it
    through the `amendRule` path with no PP price (counts toward the yearly limit, backlash as
-   normal); declining a partner's counts as a clause miss (`judgeClauses`). Bots answer by
-   their event weights.
-3. **The Builders wing.** Points from directors' recorded terms (config
+   normal); declining counts as a clause miss (`judgeClauses`).
+4. **The Builders wing.** Points from directors' recorded terms (config
    `hallOfFame.builders`), a separate ballot and class cap, plaques in the Almanac, the class
    card naming builders. Measure classes per campaign so the wing is neither empty nor
    crowded.

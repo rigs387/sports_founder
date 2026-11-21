@@ -2,7 +2,7 @@
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
   updated: "2026-11-21",
-  design: "GDD v1.40",
+  design: "GDD v1.41",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Parked items, built in order",
-      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), then their yearly rule proposals (step 2, next) and a Builders wing (step 3); seat follow-ups (2.27), youth programs (2.28), flagship ticket pricing (2.29), the founding family (2.30), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
+      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), then their asks with patience (step 2, next), deal partners' rare rule proposals (step 3) and a Builders wing (step 4); seat follow-ups (2.27), youth programs (2.28), flagship ticket pricing (2.29), the founding family (2.30), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
       tag: "Next build",
     },
     {
@@ -124,6 +124,13 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-11-21",
+      type: "Design",
+      title: "Directors push their league, not the rulebook (GDD v1.41)",
+      text: "A proposal a year would reshape the sport every decade. Directors no longer propose rules: one ask an offseason across all of them, from a content list by trait (promotion push, hold the money, community drive, keep our star, host something), and two declines in a row make a director resign with a health hit. Rule proposals come from flagship deal partners only, at most one in about 8 seasons, one step on a trait not amended in that window. Scandals stay. Moving an underperforming team is open. Tech plan 2.26 is now four steps.",
+      system: "leagues",
+    },
     {
       date: "2026-11-21",
       type: "Built",
@@ -840,7 +847,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
       summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
-      next: "Rule proposal cards from directors and deal partners (tech plan 2.26 step 2), then the Builders wing (step 3) and the seat follow-ups (tech plan 2.27). Directors' salaries are tiny next to late league cash: tune them before calling them a money sink.",
+      next: "Directors' asks with patience (tech plan 2.26 step 2, GDD v1.41), partners' rare rule proposals (step 3), then the Builders wing (step 4) and the seat follow-ups (tech plan 2.27). Directors' salaries are tiny next to late league cash: tune them before calling them a money sink.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
@@ -1033,7 +1040,7 @@ window.SF_PROGRESS = {
         ["built", "Rule demands from broadcasters and sponsors, with deals (GDD v1.28)"],
         [
           "planned",
-          "Rule proposals from league directors and deal partners, one card a year (tech plan 2.26, GDD v1.40)",
+          "Rule proposals from flagship deal partners only, one in about 8 seasons, one step (tech plan 2.26 step 3, GDD v1.41)",
         ],
       ],
     },

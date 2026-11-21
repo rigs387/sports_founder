@@ -141,6 +141,9 @@ where the old rule fit better and the older the rule; the review shows price, lo
 the anchor and top five markets; dated amendments in the Rulebook; world proposals come with deals. Backlash scales with hardcore base
 and rule age (tradition). Global rulebook. Proposals from player, broadcasters, sponsors,
 league directors (v1.40: one card a year at most, no PP price; declining a partner is a clause miss).
+v1.41: deal partners only, one in about 8 seasons, one step on a trait not changed in that window.
+Directors push their own league instead: one ask an offseason (promotion push, hold the money,
+community drive, keep our star, host something), two declines in a row and the director resigns.
 
 **History:** Permanent landmarks, season summaries, career totals, records, and yearly world
 fan snapshots; match detail pruned per season. Headlines may only claim what records prove.
