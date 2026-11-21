@@ -3,6 +3,7 @@ import { turnLengthQuarters } from "./calendar";
 import { updateCulture } from "./culture";
 import { judgeClauses } from "./deal-clauses";
 import { breakDeals, offerDeals } from "./deals";
+import { syncDirectors } from "./directors";
 import { offerEvents, settleEvents } from "./events";
 import { closeOffseason, returnSeatIfFolded } from "./flagship";
 import { evaluateLeagues } from "./leagues";
@@ -36,6 +37,8 @@ export class CampaignOverError extends Error {
  * 8. an open offseason gets its deal offers, once (src/sim/deals.ts);
  * 9. the World Championship's calendar moves on and bids arrive (src/sim/world-championship.ts);
  * 10. legacy goals newly met are recorded (src/sim/legacy.ts).
+ * League directors follow the focus slots at the turn's start and end; scandals are rolled at
+ * its end (src/sim/directors.ts, GDD v1.40).
  * Turns always complete. Refuses to play a campaign that has already ended.
  */
 export function endTurn(state: GameState, world: World): GameState {
@@ -46,19 +49,23 @@ export function endTurn(state: GameState, world: World): GameState {
   }
   const opened = state.flagship.offseason;
   // Closing the offseason may move the seat or pass a rule demand's deadline (GDD v1.28).
-  const start = breakDeals(
-    // The best standouts abroad may join the flagship before its clubs are fitted (GDD v1.37).
-    // Bids for the World Championship nobody chose from go to the wealthiest bidder.
-    // Talks still open take the union's ask (GDD v1.39).
-    closeOffseason(
-      settleAgreement(
-        settleHost(pullTalent(applyDefaultSlotDrops(settleEvents(state, world)), world), world),
+  // The focus set this turn decides who directs each league through its quarters (GDD v1.40).
+  const start = syncDirectors(
+    breakDeals(
+      // The best standouts abroad may join the flagship before its clubs are fitted (GDD v1.37).
+      // Bids for the World Championship nobody chose from go to the wealthiest bidder.
+      // Talks still open take the union's ask (GDD v1.39).
+      closeOffseason(
+        settleAgreement(
+          settleHost(pullTalent(applyDefaultSlotDrops(settleEvents(state, world)), world), world),
+          world,
+        ),
         world,
       ),
       world,
+      opened,
     ),
     world,
-    opened,
   );
   const quarters = turnLengthQuarters(start.ppTier, world.config);
   let next = start;
@@ -89,6 +96,8 @@ export function endTurn(state: GameState, world: World): GameState {
   next = offerDeals(judgeClauses(next, world), world);
   // The World Championship's calendar moves on and the next tournament's bids arrive (GDD v1.37).
   next = updateChampionship(next, world);
+  // Leagues formed or folded and the seat moved this turn; a scandal-prone director's scandals.
+  next = syncDirectors(next, world, quarters);
   // Legacy goals newly met go on record (GDD v1.38).
   next = updateLegacy(next, world);
   return offerEvents({ ...next, turn: start.turn + 1 }, world, quarters);

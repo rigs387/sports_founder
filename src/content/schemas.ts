@@ -1226,6 +1226,30 @@ export const configFileSchema = z.strictObject({
     }),
   }),
   /**
+   * League directors (GDD v1.40): one in each focus country's league other than the seat's. A
+   * quarter's salary is salaryShare × the league's running cost; replacing one costs
+   * severanceQuarters of salary and offers `candidates` to pick from. A trait multiplies its own
+   * league's running cost and income and the conversion rates in its country.
+   */
+  directors: z.strictObject({
+    salaryShare: byLeagueTier(unitInterval),
+    severanceQuarters: z.number().nonnegative(),
+    candidates: z.int().min(1),
+    traits: z
+      .record(
+        id,
+        z.strictObject({
+          runningCost: z.number().positive(),
+          income: z.number().positive(),
+          casualConversion: z.number().positive(),
+          hardcoreConversion: z.number().positive(),
+          scandals: z.boolean(),
+        }),
+      )
+      .refine((traits) => Object.keys(traits).length > 0, "needs at least one trait"),
+    scandal: z.strictObject({ chancePerYear: unitInterval, hardcoreLoss: unitInterval }),
+  }),
+  /**
    * National teams (GDD v1.37): a country with a league at minTier or above fields one. Strength
    * is tierBase for its league, plus hardcore.weight × the player's hardcore share of the
    * population (full at hardcore.fullShare), plus skillWeight × the skill of each of its best

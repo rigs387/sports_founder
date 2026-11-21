@@ -7,6 +7,7 @@ import { ChampionshipCard } from "../championship/ChampionshipCard";
 import { BulkPromotion } from "../components/BulkPromotion";
 import { TrophyCard } from "../culture/TrophyCard";
 import { DealsPanel } from "../deals/DealsPanel";
+import { DirectorsCard } from "../directors/DirectorsCard";
 import { Seat } from "../flagship/FlagshipScreen";
 import { StarsPanel } from "../flagship/StarsPanel";
 import { AmendRules } from "../identity/AmendRules";
@@ -98,6 +99,7 @@ export function OffseasonScreen({ snapshot, names, busy, active, onAction, onWor
         <div className="offseason-column">
           <VenueCard snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           <Promotions snapshot={snapshot} country={country} busy={busy} onAction={onAction} />
+          <DirectorsCard snapshot={snapshot} country={country} busy={busy} onAction={onAction} />
           <Seat snapshot={snapshot} names={names} busy={busy} onAction={onAction} />
           <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} />
           <ChampionshipCard snapshot={snapshot} country={country} busy={busy} onAction={onAction} />

@@ -188,9 +188,18 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
     return { years: costs > 0 ? league.cash / (4 * costs) : 0, health: league.health };
   };
   let levelSeason: number | null = null;
+  let directorSalary = 0;
+  let lastTurnQuarters = 1;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
   const observe = (current: GameState, turn: number) => {
+    // League directors' salaries over the turn just played (GDD v1.40), at today's rate.
+    if (turn > 0)
+      for (const director of current.directors.serving) {
+        const i = world.countries.findIndex((c) => c.id === director.countryId);
+        directorSalary += leagueCosts(current, world, i).director * lastTurnQuarters;
+      }
+    lastTurnQuarters = turnLengthQuarters(current.ppTier, world.config);
     // Over the next turn's quarters, as the fans stand now: the season-end pulse fades within a
     // turn, and seasons end on turn boundaries at long turns.
     let media = 0;
@@ -670,6 +679,25 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         modernized: state.landmarks.filter((l) => l.kind === "venueOpened" && l.modernized).length,
         records: state.landmarks.filter((l) => l.kind === "recordCrowd").length,
       },
+      directors: (() => {
+        const terms = [...state.directors.past, ...state.directors.serving];
+        const traits: Record<string, number> = {};
+        for (const term of terms) traits[term.trait] = (traits[term.trait] ?? 0) + 1;
+        return {
+          served: terms.length,
+          traits,
+          salaryPaid: directorSalary,
+          leagueCash: state.countries.reduce(
+            (sum, c) =>
+              c.countryId === state.flagship.countryId
+                ? sum
+                : sum + Math.max(0, c.league?.cash ?? 0),
+            0,
+          ),
+          replaced: state.directors.past.filter((t) => t.reason === "replaced").length,
+          scandals: state.landmarks.filter((l) => l.kind === "directorScandal").length,
+        };
+      })(),
       championship: (() => {
         const { founded, tournaments } = state.worldChampionship;
         const seed = (t: (typeof tournaments)[number]) =>

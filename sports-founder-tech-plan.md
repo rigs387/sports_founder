@@ -1685,6 +1685,19 @@ format starts campaigns fresh. One step per session; each ends with `npm run che
    The snapshot carries name, trait and term; the country card shows them, the offseason
    screen has the replace review. The runner prints directors served, traits and salary paid
    against league cash; measure that no trait dominates (the options experiment's share check).
+   *Built 2026-11-21.* Directors follow the focus slots when End Turn starts (the focus set that
+   turn decides who serves through its quarters) and again at its end (a league formed or
+   folded, the seat moved), where scandals are rolled. A trait multiplies its league's running
+   cost and income (never at the seat) and the casual and hardcore conversion in its country;
+   the salary is the `director` line of `leagueCosts`. Candidates are drawn once an offseason;
+   a league replaces at most once an offseason. The scandal is the `director-scandal` decision
+   (trigger `directorScandal`, a slot like any crisis) after the hardcore loss has landed; the
+   event record carries the director's name. A card in a director's country names them (the
+   advisor voice). Save format 34 (33 migrates with none serving). Smoke step:
+   `src/main/directors-smoke.ts`, after the agreement step. Measured (2 builder campaigns, 120
+   turns): 52 terms a campaign, traits drawn evenly, salary $4.7M against $740B of league cash.
+   The salary is no money sink yet, and bots never replace, so no trait can dominate: both wait
+   for tuning.
 2. **Proposal cards.** One a year at most, in the offseason, from a director or a flagship deal
    partner: an amendment chosen for the proposer's country or market fit. Accept applies it
    through the `amendRule` path with no PP price (counts toward the yearly limit, backlash as

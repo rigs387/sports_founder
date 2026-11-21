@@ -22,8 +22,19 @@ import {
   takesNoSlot,
 } from "./star-cards";
 import { birthPP, offerTraditionCards } from "./tradition-cards";
-import { type GameState, HEALTH_LEVELS, PLAYER_INDEX, type World } from "./types";
+import { type GameState, HEALTH_LEVELS, type Landmark, PLAYER_INDEX, type World } from "./types";
 import { offerVenueCards } from "./venue-cards";
+
+/** A director's scandal as a card tells it (GDD v1.40): the director by name, the fans lost. */
+function scandalFacts(
+  state: GameState,
+  fact: Extract<Landmark, { kind: "directorScandal" }>,
+): { name: string; demoted: number } {
+  const director = [...state.directors.serving, ...state.directors.past].find(
+    (d) => d.id === fact.directorId,
+  );
+  return { name: director?.name ?? "", demoted: fact.demoted };
+}
 
 export function eventFactors(
   state: Pick<GameState, "events" | "quarter">,
@@ -304,6 +315,7 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
           championship: null,
           legacy: null,
           stoppage: null,
+          ...(fact?.kind === "directorScandal" ? { director: scandalFacts(state, fact) } : {}),
         },
         resolution: null,
       });

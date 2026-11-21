@@ -4,6 +4,7 @@ import { type AgreementSnapshot, agreementSnapshot } from "./agreement";
 import { offseasonOpen, turnLengthQuarters, yearOfQuarter } from "./calendar";
 import { type CultureSnapshot, cultureSnapshot } from "./culture";
 import { leagueIncomePerQuarter } from "./deals";
+import { type DirectorsSnapshot, directorsSnapshot } from "./directors";
 import { type EventSnapshot, eventSnapshots } from "./events";
 import type { EventState } from "./events-state";
 import { fandomScore, localRank, type SportTotals, sportTotals } from "./fandom";
@@ -275,6 +276,8 @@ export interface TurnSnapshot {
   legacy: LegacySnapshot;
   /** The players' agreement and, while talks are open, the union's read of every offer. */
   agreement: AgreementSnapshot;
+  /** League directors serving, past terms, and this offseason's candidates (GDD v1.40). */
+  directors: DirectorsSnapshot;
   /** Whether the player may retire now: after the win, while the campaign runs (GDD v1.38). */
   canRetire: boolean;
   /** What a retired campaign looks back on (GDD v1.38); null until the player retires. */
@@ -570,6 +573,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     worldChampionship: championshipSnapshot(state, world),
     legacy: legacySnapshot(state, world),
     agreement: agreementSnapshot(state, world),
+    directors: directorsSnapshot(state, world),
     canRetire: state.outcome === null && state.win.won !== null,
     retrospective: retrospectiveSnapshot(state, world),
   };

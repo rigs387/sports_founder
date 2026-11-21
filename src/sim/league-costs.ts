@@ -1,5 +1,6 @@
 import { seasonStopped } from "./calendar";
 import { leagueIncomePerQuarter } from "./deals";
+import { directorFactors, directorSalary } from "./directors";
 import { capInForce, seatStars, starWage } from "./flagship";
 import { leagueTierIndex, nextVenuePrice, runningCostPerQuarter, venueUpkeep } from "./leagues";
 import { shapeFactors } from "./shape";
@@ -12,6 +13,8 @@ import type { AgreementTerms, CountryState, GameState, LeagueTierId, World } fro
 // From Professional up (GDD v1.39) the players are paid a share of the league's income instead
 // of the baseline: the flagship's agreement at the seat (its share and minimum wage), the fixed
 // share everywhere else.
+// A league director (GDD v1.40, never at the seat) is paid a salary and their trait scales the
+// running cost.
 
 export interface LeagueCosts {
   /** The running cost less the payroll baseline (all of it away from the seat below Professional). */
@@ -21,12 +24,24 @@ export interface LeagueCosts {
   /** Star wages at the seat. */
   wages: number;
   upkeep: number;
+  /** A league director's salary (GDD v1.40); never at the seat. */
+  director: number;
   total: number;
 }
 
-const NO_COSTS: LeagueCosts = { operations: 0, payroll: 0, wages: 0, upkeep: 0, total: 0 };
+const NO_COSTS: LeagueCosts = {
+  operations: 0,
+  payroll: 0,
+  wages: 0,
+  upkeep: 0,
+  director: 0,
+  total: 0,
+};
 
-type CostState = Pick<GameState, "countries" | "flagship" | "growthNodes" | "ppTier" | "agreement">;
+type CostState = Pick<
+  GameState,
+  "countries" | "flagship" | "growthNodes" | "ppTier" | "agreement" | "directors"
+>;
 
 /** The flagship's agreement in force (GDD v1.39), or the default before the first. */
 export function termsInForce(state: Pick<GameState, "agreement">, world: World): AgreementTerms {
@@ -68,23 +83,41 @@ export function leagueCosts(
 ): LeagueCosts {
   const league = country?.league;
   if (!league || tier === undefined) return NO_COSTS;
-  const running = runningCostPerQuarter(world, index, tier, state.growthNodes);
+  const countryId = world.countries[index]?.id ?? "";
+  const running =
+    runningCostPerQuarter(world, index, tier, state.growthNodes) *
+    directorFactors(state, world, countryId).runningCost;
   const upkeep = venueUpkeep(world, index, tier, league.venue.level, state.growthNodes);
-  const atSeat = world.countries[index]?.id === state.flagship.countryId;
+  const atSeat = countryId === state.flagship.countryId;
+  const director = directorSalary(state, world, index, tier);
   const share = playersShare(state, world, index, tier);
   if (!atSeat && share === null) {
-    return { operations: running, payroll: 0, wages: 0, upkeep, total: running + upkeep };
+    return {
+      operations: running,
+      payroll: 0,
+      wages: 0,
+      upkeep,
+      director,
+      total: running + upkeep + director,
+    };
   }
   const baseline = world.config.flagship.payroll.baselineShare * running;
   const operations = running - baseline;
   const players =
     share === null ? baseline : share * leagueIncomePerQuarter(state, world, index, country, tier);
   if (!atSeat) {
-    return { operations, payroll: players, wages: 0, upkeep, total: operations + players + upkeep };
+    return {
+      operations,
+      payroll: players,
+      wages: 0,
+      upkeep,
+      director,
+      total: operations + players + upkeep + director,
+    };
   }
   // Nobody is paid in a season lost to a stoppage (GDD v1.39).
   if (seasonStopped(state))
-    return { operations, payroll: 0, wages: 0, upkeep, total: operations + upkeep };
+    return { operations, payroll: 0, wages: 0, upkeep, director: 0, total: operations + upkeep };
   // The growth tree's salary cap or star pay scales star wages, and the payroll baseline below
   // Professional (GDD v1.35); from Professional up the agreement's share is what is paid
   // (GDD v1.39). The agreement's own cap limits each star's wage.
@@ -97,7 +130,14 @@ export function leagueCosts(
       (sum, star) => sum + starWage(star, state.flagship, running, world, capped),
       0,
     );
-  return { operations, payroll, wages, upkeep, total: operations + payroll + wages + upkeep };
+  return {
+    operations,
+    payroll,
+    wages,
+    upkeep,
+    director: 0,
+    total: operations + payroll + wages + upkeep,
+  };
 }
 
 /**

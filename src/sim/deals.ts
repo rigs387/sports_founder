@@ -1,6 +1,7 @@
 import { type AxisId, type DealSlot, GEAR_BRAND_ID, GENOME_AXES, LEAGUE_TIERS } from "../content";
 import { offseasonOpen, seasonStopped, tierEntry, yearOfQuarter } from "./calendar";
 import { hasCountermove, mediaRevenueFactor } from "./countermoves";
+import { directorFactors } from "./directors";
 import { growthFactorsAt } from "./growth";
 import { revenuePerQuarter, runningCostPerQuarter } from "./leagues";
 import { landmarks } from "./records";
@@ -469,7 +470,10 @@ export function exclusiveTv(flagship: FlagshipState): boolean {
  * default to the state's.
  */
 export function leagueIncomePerQuarter(
-  state: Pick<GameState, "countries" | "flagship" | "ppTier" | "growthNodes" | "agreement">,
+  state: Pick<
+    GameState,
+    "countries" | "flagship" | "ppTier" | "growthNodes" | "agreement" | "directors"
+  >,
   world: World,
   index: number,
   country: CountryState | undefined = state.countries[index],
@@ -492,7 +496,8 @@ export function leagueIncomePerQuarter(
       growthFactorsAt(world, state.growthNodes, index).countermoveEffect,
     ) * shapeFactors(world, state.growthNodes).mediaRevenue,
   );
-  if (!atSeat) return revenue.total;
+  // A league director's trait bends income away from the seat (GDD v1.40).
+  if (!atSeat) return revenue.total * directorFactors(state, world, country.countryId).income;
   if (seasonStopped(state))
     return payingDeals(state.flagship)
       .filter((deal) => deal.slot !== "tv")

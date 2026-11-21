@@ -7,6 +7,7 @@ import { verifyAlmanac } from "./almanac-smoke";
 import { verifyChampionshipCard } from "./contest-smoke";
 import { verifyTraditions } from "./culture-smoke";
 import { verifyDeals } from "./deals-smoke";
+import { verifyDirectors } from "./directors-smoke";
 import { verifyEvents } from "./event-smoke";
 import { verifyFlagship } from "./flagship-smoke";
 import { verifyRulebook } from "./identity-smoke";
@@ -176,6 +177,8 @@ async function run(
   const saves = await verifySaves(win, outDir, filePrompts, screenshot);
   const retirement = await verifyRetirement(win, outDir, filePrompts, screenshot);
   const agreement = await verifyAgreement(win, outDir, filePrompts, screenshot);
+  // Still in the late-game offseason: replace a league director (GDD v1.40).
+  const directors = await verifyDirectors(win, screenshot);
   const stoppage = await verifyStoppage(win, outDir, filePrompts, screenshot);
   const lateRewards = await verifyLateRewards(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
@@ -206,6 +209,7 @@ async function run(
     almanac,
     saves,
     agreement,
+    directors,
     stoppage,
     lateRewards,
     retirement,

@@ -7,6 +7,7 @@ export * from "./countermoves";
 export * from "./culture";
 export * from "./deal-clauses";
 export * from "./deals";
+export * from "./directors";
 export * from "./events";
 export * from "./events-state";
 export * from "./fandom";

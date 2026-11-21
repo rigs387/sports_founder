@@ -1036,6 +1036,29 @@ cards:
     choices: []
     defaultChoice: null
   # A season lost to a stoppage (GDD v1.39): a headline, no slot.
+  # League directors (GDD v1.40): a scandal-prone director's scandal has already cost hardcore
+  # fans there. Making amends wins commitment back for a year; riding it out is free.
+  - id: director-scandal
+    kind: decision
+    tone: pressure
+    priority: 90
+    trigger: directorScandal
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: country
+    cooldownTurns: 1
+    health: []
+    effects: []
+    defaultChoice: ride-it-out
+    choices:
+      - id: make-amends
+        quarters: 1
+        effects:
+          - { type: conversion, target: hardcore, factor: 1.3, quarters: 4 }
+      - { id: ride-it-out, quarters: 0, effects: [] }
   - id: season-lost
     kind: moment
     weight: headline

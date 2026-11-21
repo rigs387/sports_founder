@@ -776,6 +776,29 @@ standouts:
     flagshipWeight: 1.25
     form: 0.1
 
+# League directors (GDD v1.40, tech plan 2.26 step 1). A league in a focus country, other than the
+# seat's, has a director while the country holds a focus slot; when focus leaves, the term ends
+# with no severance. A quarter's salary is salaryShare of the league's running cost, by tier, paid
+# from league cash. Replacing a director (offseason only) pays severanceQuarters of salary, then
+# the player picks one of `candidates` drawn with their traits shown. Each trait multiplies its
+# own league's running cost and income (gate and media) and the casual and hardcore conversion in
+# its country. A director whose trait has scandals has one with chance scandal.chancePerYear: it
+# turns scandal.hardcoreLoss of the country's hardcore fans casual and is told as a card.
+directors:
+  salaryShare: { amateur: 0.04, semi-pro: 0.05, professional: 0.06, elite: 0.08 }
+  severanceQuarters: 4
+  candidates: 3
+  traits:
+    frugal:
+      { runningCost: 0.85, income: 1, casualConversion: 1, hardcoreConversion: 0.9, scandals: false }
+    showman:
+      { runningCost: 1.1, income: 1.15, casualConversion: 1.05, hardcoreConversion: 1, scandals: false }
+    grassroots:
+      { runningCost: 1, income: 0.9, casualConversion: 1, hardcoreConversion: 1.15, scandals: false }
+    scandal-prone:
+      { runningCost: 1, income: 1.1, casualConversion: 1.05, hardcoreConversion: 1.05, scandals: true }
+  scandal: { chancePerYear: 0.25, hardcoreLoss: 0.03 }
+
 # National teams (GDD v1.37). Any country with a league at minTier or above fields one; nothing is
 # saved between championships. Strength (never shown as a number) = tierBase for the league, plus
 # up to hardcore.weight for the player's hardcore share of the population (full at fullShare),

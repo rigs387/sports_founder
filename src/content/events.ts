@@ -163,6 +163,8 @@ const template = z
       "championship",
       "legacy",
       "stoppage",
+      /** A scandal-prone league director's scandal (GDD v1.40), told from the landmark. */
+      "directorScandal",
     ]),
     /** seasonEnd cards only: the season fact the card tells. */
     story: z.enum(SEASON_STORIES).nullable().default(null),

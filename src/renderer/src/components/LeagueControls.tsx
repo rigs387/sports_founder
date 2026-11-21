@@ -41,6 +41,7 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
       : [];
   const dialog = useRef<HTMLDialogElement>(null);
   const league = country.league;
+  const director = snapshot.directors.serving.find((d) => d.countryId === country.countryId);
   const hasLeague = !!league;
   useEffect(() => {
     const element = dialog.current;
@@ -254,6 +255,21 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
         <p className="league-finance-note" data-testid="league-cost-lines">
           {t("league.manage.costLines", { ...league.costs })}
         </p>
+      )}
+      {director ? (
+        <p className="league-finance-note" data-testid="league-director">
+          {t("league.manage.director", {
+            name: director.name,
+            trait: t(`directors.traits.${director.trait}.name`),
+            salary: director.salaryPerQuarter,
+            effect: t(`directors.traits.${director.trait}.effect`),
+          })}
+        </p>
+      ) : (
+        country.focused &&
+        country.countryId !== snapshot.flagship.countryId && (
+          <p className="league-finance-note">{t("league.manage.directorArrives")}</p>
+        )
       )}
       <p className="league-finance-note">{t("league.manage.forecastNote")}</p>
       {country.countryId === snapshot.anchorCountryId && !snapshot.win.won && (

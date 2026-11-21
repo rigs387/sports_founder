@@ -205,6 +205,19 @@ export interface CampaignResult {
       stoppage: boolean;
     }[];
   };
+  /** League directors (GDD v1.40). */
+  directors: {
+    /** Terms served, finished or not. */
+    served: number;
+    /** Terms by trait. */
+    traits: Record<string, number>;
+    /** Salary paid by every league over the campaign. */
+    salaryPaid: number;
+    /** League cash at the end, every league but the seat's. */
+    leagueCash: number;
+    replaced: number;
+    scandals: number;
+  };
   /** The World Championship (GDD v1.37). */
   championship: {
     /** The turn it was founded, if it was. */
@@ -510,6 +523,25 @@ export function championshipAggregate(results: CampaignResult[]) {
     seatTitles: total((r) => r.championship.seatTitles),
     topSeedTitles: total((r) => r.championship.topSeedTitles),
     champions: median(founded.map((r) => r.championship.champions)),
+  };
+}
+
+/** League directors across campaigns (GDD v1.40). */
+export function directorsAggregate(results: CampaignResult[]) {
+  const total = (pick: (r: CampaignResult) => number) =>
+    results.reduce((sum, r) => sum + pick(r), 0);
+  const traits: Record<string, number> = {};
+  for (const r of results)
+    for (const [trait, count] of Object.entries(r.directors.traits))
+      traits[trait] = (traits[trait] ?? 0) + count;
+  return {
+    served: total((r) => r.directors.served),
+    perCampaign: median(results.map((r) => r.directors.served)),
+    traits,
+    replaced: total((r) => r.directors.replaced),
+    scandals: total((r) => r.directors.scandals),
+    salaryPaid: total((r) => r.directors.salaryPaid),
+    leagueCash: total((r) => r.directors.leagueCash),
   };
 }
 

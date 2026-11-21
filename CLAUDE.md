@@ -289,6 +289,17 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   fans won near #1 fed the rivals' defense), and the card PP becomes base income ×
   `lateIncomeFactor` (`quarter.ts`, the snapshot; never `priceIncome`). Reward cash is not
   profit, so the payout leaves it. `resolution.reward` records it; the runner prints it.
+- League directors (GDD v1.40, tech plan 2.26 step 1) are `src/sim/directors.ts` and
+  `GameState.directors` (serving, past terms, the offseason's candidates, their own random
+  stream). A focus country's league other than the seat's has one; `syncDirectors` runs at
+  End Turn's start and end (scandals at the end). A trait (config `directors.traits`) scales
+  its league's running cost and income (`leagueCosts`, `leagueIncomePerQuarter`) and its
+  country's conversion (`quarter.ts`) through `directorFactors`; the salary is the costs'
+  `director` line. `replaceDirector` (offseason, severance, once a league an offseason).
+  A scandal is a `directorScandal` landmark and the `director-scandal` decision; event
+  records carry `facts.director`. The UI is `src/renderer/src/directors/DirectorsCard.tsx`
+  on the offseason screen and a line on the league card; its smoke step
+  (`src/main/directors-smoke.ts`) runs after the agreement step. Bots never replace.
 - Venues and payroll (GDD v1.30) are the flagship's only: `LeagueState.venue` (level 1–5, a build,
   the record crowd) on every league, built only at the seat. `src/sim/venues.ts` (capacity, the
   conversion lift), `src/sim/venue-actions.ts` (`buildVenue` in the offseason; `openVenues` when
@@ -516,6 +527,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   champion, and `WorldChampionshipState.lifts`. Format 29 migrates with no tournaments.
 - Save format 31 adds world titles to Hall inductees' facts (GDD v1.37). Format 30 migrates
   with none.
+- Save format 34 adds league directors (GDD v1.40): `GameState.directors`. Format 33 migrates
+  with none serving; focus countries' leagues draw theirs when the next turn ends.
 - Save format 33 adds the players' agreement (GDD v1.39): `GameState.agreement`. Format 32
   migrates with no union and the default terms. `LeagueState.paidOut` joined format 32
   without a bump (it defaults to 0).

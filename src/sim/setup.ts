@@ -2,6 +2,7 @@ import { genomeSchema, startingRivalFanCounts } from "../content";
 import { newAgreement } from "./agreement";
 import { tierEntry } from "./calendar";
 import { newCulture } from "./culture";
+import { newDirectors } from "./directors";
 import { emptyEvents } from "./events-state";
 import { newFlagship } from "./flagship";
 import { newHallOfFame } from "./hall-of-fame";
@@ -110,6 +111,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     | "worldChampionship"
     | "legacy"
     | "agreement"
+    | "directors"
   > = {
     seed: setup.seed,
     rng: createRngState(setup.seed),
@@ -158,6 +160,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     worldChampionship: newWorldChampionship(setup.seed),
     legacy: newLegacy(),
     agreement: newAgreement(setup.seed),
+    directors: newDirectors(setup.seed),
   };
 }
 

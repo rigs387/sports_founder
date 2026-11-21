@@ -157,6 +157,8 @@ export const eventRecordSchema = z.strictObject({
       .strictObject({ season: z.int().positive(), term: z.int().positive() })
       .nullable()
       .default(null),
+    /** A league director's scandal (GDD v1.40): who, and the hardcore fans it cost. */
+    director: z.strictObject({ name: z.string().min(1), demoted: z.int().positive() }).optional(),
   }),
   resolution: z
     .strictObject({

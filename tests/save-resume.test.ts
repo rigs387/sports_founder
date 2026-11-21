@@ -12,6 +12,7 @@ import {
   foundingClubOf,
   type GameState,
   newAgreement,
+  newDirectors,
   newFlagship,
   runTurns,
   SAVE_FORMAT_VERSION,
@@ -361,6 +362,7 @@ describe("saves with the growth tree (format 5)", () => {
         }),
         legacy: migratedLegacy(),
         agreement: newAgreement(withoutTree.seed),
+        directors: newDirectors(withoutTree.seed),
       }),
     );
     const later = playWithPolicy(loaded, 6);
@@ -392,6 +394,7 @@ describe("saves with the growth tree (format 5)", () => {
       standouts: migratedStandouts({ ...current, ...migratedFlagship(current) }),
       worldChampionship: migratedChampionship({ ...current, ...migratedFlagship(current) }),
       legacy: migratedLegacy(),
+      directors: newDirectors(current.seed),
     };
     expect(serializeSave(loaded)).toBe(serializeSave(migrated));
     expect(playWithPolicy(loaded, 6)).toStrictEqual(playWithPolicy(migrated, 6));

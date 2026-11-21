@@ -541,6 +541,15 @@ export type Landmark =
    * for it on the signing card.
    */
   | {
+      /** A scandal-prone director's scandal (GDD v1.40): hardcore fans there turned casual. */
+      kind: "directorScandal";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      directorId: number;
+      demoted: number;
+    }
+  | {
       kind: "talentJoined";
       turn: number;
       quarter: number;
@@ -914,6 +923,50 @@ export interface GameState {
   legacy: { done: { goalId: LegacyGoalId; turn: number; year: number }[] };
   /** The players' agreement at the flagship (GDD v1.39). */
   agreement: AgreementState;
+  /** League directors in focus countries' leagues, and every past term (GDD v1.40). */
+  directors: DirectorsState;
+}
+
+/** A league director serving now (GDD v1.40): in a focus country's league, never the seat's. */
+export interface Director {
+  id: number;
+  name: string;
+  countryId: string;
+  /** A trait id in config `directors.traits`. */
+  trait: string;
+  /** The quarter the term began. */
+  fromQuarter: number;
+  tierOnArrival: LeagueTierId;
+}
+
+/** Why a director's term ended. */
+export type DirectorLeaving = "focus" | "replaced" | "league" | "seat";
+
+/** A finished term, kept for the Builders wing (GDD v1.40). */
+export interface DirectorTerm extends Director {
+  toQuarter: number;
+  /** The league's tier when the term ended; null if it had folded. */
+  tierOnLeaving: LeagueTierId | null;
+  /** The league's promotions during the term. */
+  promotions: number;
+  reason: DirectorLeaving;
+}
+
+/** Someone who could replace a director, drawn when the offseason opens. */
+export interface DirectorCandidate {
+  name: string;
+  trait: string;
+}
+
+export interface DirectorsState {
+  /** The directors' own random stream: names, traits, candidates and scandals. */
+  rng: number[];
+  nextId: number;
+  serving: Director[];
+  /** Finished terms, oldest first. */
+  past: DirectorTerm[];
+  /** This offseason's candidates for each serving director's league; empty outside it. */
+  candidates: { countryId: string; options: DirectorCandidate[] }[];
 }
 
 export const MIN_WAGES = ["low", "standard", "high"] as const;

@@ -36,6 +36,7 @@ import {
   championshipAggregate,
   countriesCsv,
   dealsAggregate,
+  directorsAggregate,
   eventAggregate,
   flagshipAggregate,
   growthAggregate,
@@ -849,6 +850,15 @@ function main(): number {
         .join(
           ", ",
         )}; levels opened ${venues.opened}, modernized ${venues.modernized}; record crowds ${venues.records}; players' pay ${pct(venues.payrollShare.median ?? 0)} and star wages ${pct(venues.wagesShare.median ?? 0)} of the seat's costs (median)`,
+    );
+    const directors = directorsAggregate(results);
+    const millions = (cash: number) =>
+      `$${((cash * world.config.money.dollarsPerCash) / 1e6).toFixed(1)}M`;
+    const traitLine = Object.entries(directors.traits)
+      .map(([trait, count]) => `${trait} ${count}`)
+      .join(", ");
+    console.log(
+      `  Directors: ${directors.served} terms (median ${fmt(directors.perCampaign)} a campaign; ${traitLine || "none"}), ${directors.replaced} replaced, ${directors.scandals} scandals; salary paid ${millions(directors.salaryPaid)} against ${dollars(directors.leagueCash)} league cash at the end (seat excluded)`,
     );
     const cup = championshipAggregate(results);
     console.log(

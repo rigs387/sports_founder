@@ -203,6 +203,13 @@ export const landmarks = {
     clubId,
     backed,
   }),
+  directorScandal: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    directorId: number,
+    demoted: number,
+  ): Landmark => ({ kind: "directorScandal", turn, quarter, countryId, directorId, demoted }),
   talentJoined: (
     turn: number,
     quarter: number,

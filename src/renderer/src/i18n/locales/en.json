@@ -148,6 +148,14 @@
           "hold": "Stay with organic growth"
         }
       },
+      "director-scandal": {
+        "title": "A director in the headlines",
+        "body": "{{director}}, who directs the league in {{country}}, is caught up in a scandal, and {{demoted, number}} hardcore fans there have stepped back. Make amends to win their commitment back, or ride it out.",
+        "choices": {
+          "make-amends": "Make amends",
+          "ride-it-out": "Ride it out"
+        }
+      },
       "crowded-sidelines": {
         "title": "Bring them into the club",
         "body": "{{fans, number}} people follow the sport in {{country}}, but only {{hardcore, number}} are hardcore. Turn some of that interest into commitment, or devote the attention to fundraising at the cost of new casual recruitment.",
@@ -466,6 +474,7 @@
     },
     "arrived": "Already landed, whatever you choose:",
     "seasonLeader": "{{player}} led {{champion}}.",
+    "advisor": "League director: {{director}} ({{trait}}).",
     "seasonScorer_one": "{{player}} won {{crown}}: the {{seasonNoun}}'s top scorer, with {{count, number}} {{scoreNoun}}.",
     "seasonScorer_other": "{{player}} won {{crown}}: the {{seasonNoun}}'s top scorer, with {{count, number}} {{scoreNoun}}."
   },
@@ -800,6 +809,8 @@
       "paidOut": "Paid out to clubs",
       "reserveNote": "The league keeps a reserve of {{reserve, money}}. Profit above it is paid out to the clubs.",
       "costLines": "Operations {{operations, money}} · payroll {{payroll, money}} · star wages {{wages, money}} · venue upkeep {{upkeep, money}}.",
+      "director": "League director: {{name}} ({{trait}}), paid {{salary, money}} a quarter from league cash. {{effect}}",
+      "directorArrives": "A league director takes over when this turn ends: this country holds a focus slot.",
       "restructureLoss": "{{share, number(style: percent)}} of hardcore fans become casual ({{count, number}} fans). They remain fans of your sport.",
       "restructureCash": "No cash or Prestige is spent. The current cash reserve is kept.",
       "restructureHealth": "Health resets to Struggling. Recovery still depends on the league finances and following.",
@@ -1229,6 +1240,39 @@
     "back": "Back",
     "endTurnDefault": "If no offer is made, Next Turn signs the union's ask."
   },
+  "directors": {
+    "heading": "League directors",
+    "none": "No league directors. A league in a country with a focus slot gets one, except the seat's.",
+    "line": "directs the league in {{country}} since {{year}}: {{trait}}, paid {{salary, money}} a quarter.",
+    "candidates": "Replace them with one of these candidates. Severance: {{severance, money}} from league cash.",
+    "candidate": "{{name}}: {{trait}}",
+    "replaced": "Replaced this offseason.",
+    "review": "{{old}} leaves with {{severance, money}} in severance, from the league's {{cash, money}}. {{name}} takes over: {{trait}}. {{effect}}",
+    "confirm": "Appoint {{name}}",
+    "back": "Back",
+    "offseasonOnly": "Directors are replaced in the offseason.",
+    "blockers": {
+      "cash": "The league has {{cash, money}} and cannot pay {{severance, money}} in severance."
+    },
+    "traits": {
+      "frugal": {
+        "name": "Frugal",
+        "effect": "Runs the league for less, but wins hardcore fans more slowly."
+      },
+      "showman": {
+        "name": "Showman",
+        "effect": "Brings in more gate and media money and draws casual fans, but spends more."
+      },
+      "grassroots": {
+        "name": "Grassroots",
+        "effect": "Turns casual fans hardcore faster, but brings in less money."
+      },
+      "scandal-prone": {
+        "name": "Scandal-prone",
+        "effect": "Gets results on the field and at the gate, but scandals cost hardcore fans."
+      }
+    }
+  },
   "venue": {
     "heading": "The venue",
     "noLeague": "{{country}} has no league to play in.",
@@ -1377,6 +1421,7 @@
       "signDeal": "Deal signed. It pays from the next season.",
       "buildVenue": "Building has started. The new level opens in a later offseason.",
       "proposeAgreement": "The offer went to the union. Its answer is on the agreement card.",
+      "replaceDirector": "The new league director takes over.",
       "retire": "You have retired. The campaign is finished."
     },
     "lockForkFirst": "Choose {{nodes}} first: the fork before this level."

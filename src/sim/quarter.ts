@@ -2,6 +2,7 @@ import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { reclaimShare, rivalConversionBoosts } from "./countermoves";
 import { curseWeights, traditionShelter, traditionWeights, venueStrengths } from "./culture";
 import { leagueIncomePerQuarter } from "./deals";
+import { directorFactors } from "./directors";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
 import { backingEffects, broadcastEffects, closeOffseason, stepFlagshipQuarter } from "./flagship";
@@ -135,6 +136,8 @@ export function stepQuarter(
     const eventRates = eventFactors(state, world, country.id);
     // A World Championship lifts the sport where its teams came from (GDD v1.37).
     const cup = championshipFactors(state, country.id);
+    // A league director's trait bends the rates where they serve (GDD v1.40).
+    const director = directorFactors(state, world, country.id);
     const rivalry = similarityEffect(
       world,
       state.genome,
@@ -154,6 +157,7 @@ export function stepQuarter(
         factors.casualConversion *
         eventRates.casual *
         cup.casual *
+        director.casualConversion *
         (country.id === backing.countryId ? backing.casualConversion : 1) *
         // Pilgrimage to a famous ground (GDD v1.22).
         (1 + config.culture.pilgrimage * (venues[index] ?? 0)),
@@ -173,6 +177,7 @@ export function stepQuarter(
         factors.hardcoreConversion *
         eventRates.hardcore *
         cup.hardcore *
+        director.hardcoreConversion *
         venueConversion(state, world, index),
     };
     const moved = stepCountryFans(

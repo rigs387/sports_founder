@@ -316,6 +316,9 @@ export function useEventText() {
       tournament: names?.tournaments[event.facts.rivalId ?? ""] ?? "",
       health: event.facts.health ? t(`league.healthLevels.${event.facts.health}`) : "",
       tier: event.facts.leagueTier ? t(`league.tiers.${event.facts.leagueTier}`) : "",
+      // A league director's scandal (GDD v1.40).
+      director: event.facts.director?.name ?? "",
+      demoted: event.facts.director?.demoted ?? 0,
       ...textVars(event),
     });
   /** A Hall of Fame class's inductees, one line each, from the facts recorded at induction. */
@@ -368,6 +371,15 @@ export function useEventText() {
   const factLines = (event: EventRecord) => {
     const season = event.facts.season;
     const lines: string[] = hallLines(event);
+    // The advisor voice (GDD v1.40): a card in a director's country names them.
+    const director = snapshot.directors.serving.find((d) => d.countryId === event.countryId);
+    if (director)
+      lines.push(
+        t("events.advisor", {
+          director: director.name,
+          trait: t(`directors.traits.${director.trait}.name`),
+        }),
+      );
     if (season?.championPlayerId != null)
       lines.push(
         t("events.seasonLeader", {

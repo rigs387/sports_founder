@@ -9,6 +9,7 @@ import {
   renameTrophyBlocker,
 } from "./culture";
 import { breakDeals, signBlocker, signDeal } from "./deals";
+import { replaceBlocker, replaceDirector } from "./directors";
 import { eventBlocker, minorMomentIds, resolveEvent } from "./events";
 import { backBlocker, backStar, dropBlocker, dropStar, seatBlocker } from "./flagship";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
@@ -70,6 +71,8 @@ import {
 //                   offseason, one level at a time (GDD v1.30)
 //   proposeAgreement  put a players' agreement to the union, in the offseason while talks are
 //                   open (GDD v1.39); one roll against the union's read, a stoppage if refused
+//   replaceDirector  replace a focus country's league director with one of this offseason's
+//                   candidates; severance from league cash (GDD v1.40)
 //   retire          end the campaign, at any time after the win (GDD v1.38); it cannot be undone
 
 export type Action =
@@ -95,6 +98,7 @@ export type Action =
   | { type: "signDeal"; offerId: number }
   | { type: "buildVenue" }
   | { type: "proposeAgreement"; terms: AgreementTerms }
+  | { type: "replaceDirector"; countryId: string; candidate: number }
   | { type: "retire" };
 
 export class IllegalActionError extends Error {
@@ -292,6 +296,20 @@ export function checkAction(state: GameState, world: World, action: Action): str
         return "the agreement in force still covers next season";
       case "terms":
         return "those terms are not on the table";
+      case null:
+        return null;
+    }
+  }
+  if (action.type === "replaceDirector") {
+    switch (replaceBlocker(state, world, action.countryId, action.candidate)) {
+      case "offseason":
+        return "a director is replaced only in the offseason";
+      case "noDirector":
+        return "that league has no director";
+      case "candidate":
+        return "no such candidate this offseason";
+      case "cash":
+        return "the league cannot pay the severance";
       case null:
         return null;
     }
@@ -512,6 +530,8 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
       return buildVenue(state, world);
     case "proposeAgreement":
       return proposeAgreement(state, world, action.terms);
+    case "replaceDirector":
+      return replaceDirector(state, world, action.countryId, action.candidate);
     case "retire":
       return {
         ...state,

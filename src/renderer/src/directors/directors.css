@@ -1,0 +1,25 @@
+/* League directors (GDD v1.40): one row per focus country's league, candidates on the offseason. */
+.directors-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.directors-list > li {
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.directors-list > li:first-child {
+  border-top: 0;
+}
+.directors-card p {
+  margin: 6px 0;
+}
+.directors-candidates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.directors-candidates > p {
+  flex-basis: 100%;
+}

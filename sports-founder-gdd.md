@@ -229,6 +229,9 @@ no list or inbox anywhere:
   - *Advisor voice.* A league's cards in a director's country carry the director's name.
   - *Faces of the past.* Every director's term is recorded (league, tier on arrival and on
     leaving, promotions, years); the Builders wing reads those records.
+  - *Built 2026-11-21 (directors, tech plan 2.26 step 1):* arrival, departure, traits, salary,
+    replacing, the scandal card and the advisor voice. A director arrives when End Turn runs
+    with the country in a focus slot. Proposal cards and the Builders wing are not built.
 - **The player can always intervene** in any country directly. Delegation is a default, not a
   lock.
 

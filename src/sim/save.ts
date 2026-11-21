@@ -19,6 +19,7 @@ import { newAgreement } from "./agreement";
 import { tierEntry } from "./calendar";
 import { newCulture } from "./culture";
 import { newDeals } from "./deals";
+import { newDirectors } from "./directors";
 import { emptyEvents, eventStateSchema, LEGACY_GOAL_IDS } from "./events-state";
 import { newFlagship, staffFlagship } from "./flagship";
 import { inducteeFacts, newHallOfFame } from "./hall-of-fame";
@@ -33,13 +34,21 @@ import { type FlagshipState, type GameState, type Genome, MIN_WAGES, type World 
 import { newWorldChampionship } from "./world-championship";
 
 /** Bump when the save shape changes, and add a migration from the previous version. */
-export const SAVE_FORMAT_VERSION = 33;
+export const SAVE_FORMAT_VERSION = 34;
 
 export class SaveError extends Error {
   override name = "SaveError";
 }
 
 const count = z.int().min(0);
+const directorSchema = z.strictObject({
+  id: z.int().min(1),
+  name: z.string().min(1),
+  countryId: z.string().min(1),
+  trait: z.string().min(1),
+  fromQuarter: z.int().min(0),
+  tierOnArrival: leagueTierSchema,
+});
 const axisSchema = z.enum(AXIS_IDS as [AxisId, ...AxisId[]]);
 
 // Key order matches createCampaign and every state update, so a loaded state re-serializes
@@ -193,6 +202,14 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     playerId: z.int().min(1),
     clubId: z.int().min(1),
     backed: z.boolean(),
+  }),
+  z.strictObject({
+    kind: z.literal("directorScandal"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    directorId: z.int().min(1),
+    demoted: z.int().min(1),
   }),
   z.strictObject({
     kind: z.literal("talentJoined"),
@@ -772,6 +789,25 @@ const gameStateSchema = z.strictObject({
       .nullable(),
     stoppageSeason: z.int().min(1).nullable(),
   }),
+  directors: z.strictObject({
+    rng: z.array(z.number()).min(1),
+    nextId: z.int().min(1),
+    serving: z.array(directorSchema),
+    past: z.array(
+      directorSchema.extend({
+        toQuarter: count,
+        tierOnLeaving: leagueTierSchema.nullable(),
+        promotions: z.int().min(0),
+        reason: z.enum(["focus", "replaced", "league", "seat"]),
+      }),
+    ),
+    candidates: z.array(
+      z.strictObject({
+        countryId: z.string().min(1),
+        options: z.array(z.strictObject({ name: z.string().min(1), trait: z.string().min(1) })),
+      }),
+    ),
+  }),
 });
 
 const saveFileSchema = z.strictObject({
@@ -790,6 +826,12 @@ const rawCountries = (state: Record<string, unknown>): RawCountry[] =>
  * migrations[N], then migrations[N + 1], ... until it reaches the current version.
  */
 const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
+  // 33 → 34: league directors (GDD v1.40). None serving yet: focus countries' leagues draw theirs
+  // when the next turn ends.
+  33: (save) => ({
+    formatVersion: 34,
+    state: { ...save.state, directors: newDirectors(save.state.seed as number) },
+  }),
   // 32 → 33: the players' agreement (GDD v1.39). No union yet: talks open at the next offseason
   // with a Professional seat, and the default terms hold until then.
   32: (save) => ({
