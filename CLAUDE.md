@@ -139,6 +139,13 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   (`src/sim/seat-cards.ts`, candidates on `FlagshipState.orphan`); its choices have no effects
   and `settleOrphanedSeat` reads the answer (after every action and when End Turn starts) and
   moves the seat at once, free.
+- Ticket pricing (GDD v1.40, tech plan 2.29) is `src/sim/tickets.ts` and `FlagshipState.tickets`:
+  cheap, standard or premium at the seat (`flagship.tickets.stances`), multiplying gate per
+  seated fan (`leagueIncomePerQuarter`) and casual → hardcore conversion there (`quarter.ts`).
+  `setTickets` (offseason) asks for next season's; `applyTickets` at the end of
+  `closeOffseason` applies it, each step up demoting `raiseShare` of the seat's hardcore
+  fans (a `ticketsSet` landmark). `ticketStance` is standard wherever the seat moved. The card
+  is `src/renderer/src/tickets/TicketsCard.tsx` (offseason screen only; read-only elsewhere).
 - Club relocation (GDD v1.41, tech plan 2.33) is `src/sim/relocation.ts` and
   `FlagshipState.relocation`: a seat club in the bottom two of the last
   `flagship.relocation.badSeasons` summaries at the seat, with a bigger place in `places.yaml`

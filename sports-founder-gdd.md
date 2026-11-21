@@ -2109,7 +2109,9 @@ purchased traits and percentage modifiers alone do not make culture.
     contest or the gate share leaves its band. (2) When the seat moves, the stance resets to
     standard (choose pain): premium at a new seat costs its fans the raise again; dropping to
     standard on a move is free. (3) Bots: the builder goes cheap while the seat league holds more
-    than twice its reserve, standard otherwise; other bots stay standard.
+    than twice its reserve, standard otherwise; other bots stay standard. Built 2026-11-21 (tech
+    plan 2.29): the builder goes back to standard only below one reserve, since every raise costs
+    fans; the #1 contest and the gate share held.
 - **Venues, first build (decided 2026-10-07, v1.30).** Every number is config.
   - *Scope:* the flagship only; other leagues stay on the Phase 0 model. Youth programs are parked
     (their payoff, stronger national teams, waits for the World Championship). Designed in v1.40,
