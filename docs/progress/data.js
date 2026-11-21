@@ -1,13 +1,13 @@
 // The maintained progress snapshot. Edit this file when a feature lands; see README.md.
 // Counts describe the checklist below, not effort, time remaining, or release readiness.
 window.SF_PROGRESS = {
-  updated: "2026-11-01",
+  updated: "2026-11-21",
   design: "GDD v1.40",
   stage: "Phase 1 · make it matter",
   markets: 213,
   headline: "The world works. Give it a history.",
   summary:
-    "Creation, global growth, rival pressure, league management, events and saving are playable; the flagship league has clubs, seasons and stars; the sport has its identity and rulebook; traditions are born from what happens, shelter fans and resist betrayal; and the Almanac's Hall of Fame remembers the sport's legends and firsts.",
+    "Creation, global growth, rival pressure, league management, events and saving are playable; the flagship league has clubs, seasons and stars; the sport has its identity and rulebook; traditions are born from what happens, shelter fans and resist betrayal; the Almanac's Hall of Fame remembers the sport's legends and firsts; a World Championship plays national teams; and the late game has legacy goals, retiring, and a players' agreement that can cost a season.",
   milestone: "A flagship season the player remembers",
   milestoneDescription:
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
@@ -20,7 +20,7 @@ window.SF_PROGRESS = {
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click.",
   },
-  eventDeck: { current: 48, target: "40–60" },
+  eventDeck: { current: 49, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -32,7 +32,7 @@ window.SF_PROGRESS = {
       name: "Phase 1",
       title: "Make it matter",
       state: "Current",
-      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution, the first traditions, flagship deals, venues and payroll, and a lightweight Hall of Fame with chants are built.",
+      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution, the first traditions, flagship deals, venues and payroll, a lightweight Hall of Fame with chants, the world stage, legacy goals and retiring, and the late surplus (payouts, the players' agreement, stoppages, late card rewards) are built. Seven parked items are designed (tech plan 2.26–2.32), none built.",
     },
     {
       name: "Phase 2",
@@ -48,6 +48,18 @@ window.SF_PROGRESS = {
     },
   ],
   priorities: [
+    {
+      system: "leagues",
+      title: "Parked items, built in order",
+      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, nothing built: league directors in focus countries with yearly rule proposals and a Builders wing (2.26), seat follow-ups (2.27), youth programs (2.28), flagship ticket pricing (2.29), the founding family (2.30), regional name pools and outlet words (2.31), and anchor resentment as a stored value (2.32). Start with 2.26 step 1.",
+      tag: "Next build",
+    },
+    {
+      system: "business",
+      title: "The late surplus",
+      text: "Tech plan 2.25 (GDD v1.39): league reserves and payouts, the players' agreement and talks, the cap and minimum-wage levers, the stoppage, and late card rewards by kind. All five steps built by 2026-10-31.",
+      tag: "Done",
+    },
     {
       system: "championship",
       title: "The world stage",
@@ -106,6 +118,13 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-11-21",
+      type: "Review",
+      title: "Dashboard refreshed",
+      text: "No code since 2026-11-01. The headline, Phase 1 text and priorities now cover the world stage, the late game and the late surplus; the parked items (tech plan 2.26–2.32) are the next build. The event deck counts 49 cards. Checks were not rerun: the last run (2026-10-31) still matches the code.",
+      system: "release",
+    },
     {
       date: "2026-11-01",
       type: "Design",
