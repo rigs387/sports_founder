@@ -316,11 +316,12 @@ style gradations of maturity: **Amateur → Semi-Pro → Professional → Elite*
       hardcore fans. The move is immediate, outside the offseason, with no purist cost (the
       collapse is the pain). With no eligible league the seat waits dark at the anchor and the
       card returns once one qualifies. If a league re-forms at the anchor first, the seat stays
-      home with it.
+      home with it. Built 2026-11-21 (tech plan 2.27): up to three leagues offered.
     - *A seat league abroad that steps down below Professional loses the seat (choose pain).*
       The seat returns home when the offseason closes, and the league pays the purist cost of
       being left, as for any seat move. This closes the loophole around seat eligibility. The
-      anchor stays exempt: it holds the seat at any tier.
+      anchor stays exempt: it holds the seat at any tier. Built 2026-11-21: a move to another
+      eligible league asked for in that offseason still goes ahead instead.
     - *Too few decisions or nothing to get attached to?* Closed as a design question: the seat,
       stars, traditions and the offseason answer it. The next playtest watches for it.
   - *First build of the seat's depth:* named teams, results, standings and a few named stars

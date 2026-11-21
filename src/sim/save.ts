@@ -350,7 +350,7 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     quarter: count,
     from: z.string().min(1),
     countryId: z.string().min(1),
-    reason: z.enum(["moved", "returned"]),
+    reason: z.enum(["moved", "returned", "orphaned", "lost"]),
   }),
   z.strictObject({
     kind: z.literal("venueOpened"),
@@ -569,6 +569,11 @@ const flagshipSchema = z.strictObject({
     ),
   ),
   deals: dealsSchema,
+  // Joined format 34 without a bump (GDD v1.40).
+  orphan: z
+    .strictObject({ quarter: count, candidates: z.array(z.string().min(1)).min(1) })
+    .nullable()
+    .default(null),
 });
 
 const gameStateSchema = z.strictObject({

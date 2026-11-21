@@ -37,6 +37,7 @@ export { MAX_SEED, SEED_WARM_UP_DRAWS } from "./rng";
 export * from "./rules";
 export * from "./save";
 export * from "./season-stories";
+export * from "./seat-cards";
 export * from "./setup";
 export * from "./shape";
 export * from "./snapshot";

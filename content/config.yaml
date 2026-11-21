@@ -1097,6 +1097,9 @@ flagship:
   # The seat moves only to these league tiers (GDD v1.13); the anchor holds it from turn 1 at any
   # tier.
   seatEligibleTiers: [professional, elite]
+  # The birthplace outlived (GDD v1.40): when the anchor league folds after the win with the seat
+  # at home, a card offers this many eligible leagues, most hardcore fans first (the default).
+  seatOrphan: { choices: 3 }
   # The purist cost of moving the seat (GDD v1.14): this share of the player's hardcore fans in
   # the country the seat leaves demote to casual, more when it leaves the anchor.
   seatMove:

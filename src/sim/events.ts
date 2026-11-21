@@ -834,15 +834,20 @@ export function eventSnapshots(state: GameState, world: World) {
       effects: eventEffects(state, world, card, event, null),
       arrivalEffects: card.arrivalEffects,
       defaultChoice: card.defaultChoice,
-      choices: card.choices.map((choice) => ({
-        ...choice,
-        cost: eventChoiceCost(state, world, card, choice.id),
-        /** League cash the choice spends (keeping a star from moving). */
-        leagueCash: choice.effects.some((effect) => effect.type === "starKeep")
-          ? keepCost(state, world, event.countryId)
-          : 0,
-        blocker: eventBlocker(state, world, event.id, choice.id),
-      })),
+      choices: card.choices
+        .map((choice, rank) => ({
+          ...choice,
+          /** The league an orphaned seat's choice sends it to (GDD v1.40). */
+          countryId: event.facts.seat?.candidates[rank] ?? null,
+          cost: eventChoiceCost(state, world, card, choice.id),
+          /** League cash the choice spends (keeping a star from moving). */
+          leagueCash: choice.effects.some((effect) => effect.type === "starKeep")
+            ? keepCost(state, world, event.countryId)
+            : 0,
+          blocker: eventBlocker(state, world, event.id, choice.id),
+        }))
+        // An orphaned seat's card offers only as many leagues as qualify.
+        .filter((choice) => !event.facts.seat || choice.countryId !== null),
     };
   });
 }

@@ -369,6 +369,11 @@ export interface FlagshipState {
   seasons: SeasonSummary[];
   /** Sponsor and TV deals (GDD v1.28). */
   deals: DealsState;
+  /**
+   * The birthplace outlived (GDD v1.40): the seat is dark at an anchor with no league after the
+   * win, and a card offers these leagues (most hardcore fans first). Null otherwise.
+   */
+  orphan: { quarter: number; candidates: string[] } | null;
 }
 
 /** What a deal demands (GDD v1.28). Demands never block: doing the thing breaks the deal. */
@@ -691,14 +696,18 @@ export type Landmark =
       partnerId: string;
       slot: DealSlot;
     }
-  /** The commissioner's seat moved: by the player, or home after a flagship folded. */
+  /**
+   * The commissioner's seat moved: by the player, home after a flagship folded, abroad from an
+   * outlived birthplace (orphaned), or home from a seat league stepped down below Professional
+   * (lost, GDD v1.40).
+   */
   | {
       kind: "seatMoved";
       turn: number;
       quarter: number;
       from: string;
       countryId: string;
-      reason: "moved" | "returned";
+      reason: "moved" | "returned" | "orphaned" | "lost";
     }
   /** A venue level opened (GDD v1.30); at the modernization level it betrayed famous grounds. */
   | {

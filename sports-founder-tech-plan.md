@@ -1761,7 +1761,18 @@ format starts campaigns fresh. One step per session; each ends with `npm run che
 
 ### 2.27 Build Plan: Seat Follow-ups (GDD v1.40)
 
-Designed 2026-11-01 (parked items, topic 2). Not built. One session.
+Designed 2026-11-01 (parked items, topic 2). Built 2026-11-21.
+
+*As built:* the card's choices (`first`, `second`, `third`) are free and have no effects,
+because a decision's default must be free and effect-free; the candidates sit on
+`FlagshipState.orphan` and the card's `seat` facts, and `settleOrphanedSeat` reads the
+answer from the journal after every action and when End Turn starts (as directors' asks do),
+so the default (the first: most hardcore fans) moves the seat too. `offerOrphanedSeat`
+(`seat-cards.ts`) runs at End Turn's end. The seat-loss rule is `seatLost`
+(`flagship.ts`): `stepDownLeague` sets the seat home pending, `closeOffseason` sends it home
+unless a move to another eligible league was asked for, and `moveSeat` cannot keep it there.
+Landmark reasons `orphaned` and `lost`. No smoke step; neither the card nor the step-down
+warning (`stepDownLeague.terms.seatLoss`) has been seen on screen.
 
 1. **The birthplace outlived.** When `returnSeatIfFolded` (`flagship.ts`) finds the anchor
    holding the seat with no league after the win, offer the `seat-orphaned` decision card (no

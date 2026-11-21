@@ -11,7 +11,15 @@ import {
 import { breakDeals, signBlocker, signDeal } from "./deals";
 import { replaceBlocker, replaceDirector } from "./directors";
 import { eventBlocker, minorMomentIds, resolveEvent } from "./events";
-import { backBlocker, backStar, dropBlocker, dropStar, seatBlocker } from "./flagship";
+import {
+  backBlocker,
+  backStar,
+  dropBlocker,
+  dropStar,
+  seatBlocker,
+  seatLost,
+  settleOrphanedSeat,
+} from "./flagship";
 import { growthFactorsAt, growthNode, nodeBlocker, nodeCost } from "./growth";
 import { bulkPromotable, leagueActionReason, leagueActions } from "./league-actions";
 import {
@@ -346,6 +354,9 @@ export function checkAction(state: GameState, world: World, action: Action): str
   if (action.type === "moveSeat") {
     if (countryIndexOf(world, action.countryId) < 0) return `unknown country "${action.countryId}"`;
     if (action.countryId === state.flagship.countryId) {
+      // A seat league stepped down below Professional cannot keep the seat (GDD v1.40).
+      if (seatLost(state, world))
+        return "the seat's league is below Professional: the seat must leave";
       return state.flagship.pendingCountryId !== null ? null : "the seat is already there";
     }
     switch (seatBlocker(state, world, action.countryId, offseasonOpen(state))) {
@@ -394,7 +405,8 @@ export function checkAction(state: GameState, world: World, action: Action): str
 export function applyAction(state: GameState, world: World, action: Action): GameState {
   const reason = checkAction(state, world, action);
   if (reason !== null) throw new IllegalActionError(action, reason);
-  return breakDeals(applyLegal(state, world, action), world);
+  // An orphaned seat moves as soon as its card is answered (GDD v1.40).
+  return breakDeals(settleOrphanedSeat(applyLegal(state, world, action), world), world);
 }
 
 function applyLegal(state: GameState, world: World, action: Action): GameState {
@@ -475,8 +487,8 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
         (next, countryId) => applyLegal(next, world, { type: "promoteLeague", countryId }),
         state,
       );
-    case "stepDownLeague":
-      return updateLeague(state, world, action.countryId, (country) => {
+    case "stepDownLeague": {
+      const stepped = updateLeague(state, world, action.countryId, (country) => {
         const league = country.league;
         const to = league ? LEAGUE_TIERS[leagueTierIndex(league.tier) - 1] : undefined;
         if (!league || to === undefined) throw new Error("unreachable: step-down was checked");
@@ -506,6 +518,15 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
           ),
         };
       });
+      // A seat league abroad below Professional loses the seat (GDD v1.40): it goes home when the
+      // offseason closes, unless a move to another eligible league is asked for.
+      return seatLost(stepped, world) && stepped.flagship.pendingCountryId === null
+        ? {
+            ...stepped,
+            flagship: { ...stepped.flagship, pendingCountryId: stepped.anchorCountryId },
+          }
+        : stepped;
+    }
     case "amendRule":
       return amendRule(state, world, action.axis, action.option);
     case "nameTrophy":

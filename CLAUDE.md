@@ -132,6 +132,13 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   Matches roll on the flagship's own RNG stream, so the world's random sequence never depends on the
   flagship. `moveSeat` (offseason only, Professional or Elite league) moves the seat when the
   offseason closes, with a purist hardcore cost; a folded flagship abroad sends the seat home free.
+  Seat follow-ups (GDD v1.40, tech plan 2.27): a seat league abroad below Professional has lost
+  the seat (`seatLost`): `closeOffseason` sends it home with the leaving cost unless a move to
+  another eligible league was asked for, and `moveSeat` cannot keep it. After the win, a seat
+  dark at an anchor with no league (`seatOrphaned`) gets the `seat-orphaned` card
+  (`src/sim/seat-cards.ts`, candidates on `FlagshipState.orphan`); its choices have no effects
+  and `settleOrphanedSeat` reads the answer (after every action and when End Turn starts) and
+  moves the seat at once, free.
 - The offseason (GDD v1.24) is `FlagshipState.offseason`, read through `offseasonOpen`: it opens
   when a season ends (retired players are replaced then; no matches while it is open) and closes at
   the start of the next `endTurn` (`closeOffseason`: seat move, club count by tier, a season of a

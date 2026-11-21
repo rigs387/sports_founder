@@ -24,6 +24,7 @@
     "cost": "{{amount, number(maximumFractionDigits: 1)}} PP",
     "free": "No PP cost",
     "noChange": "Keep the current approach. No cost or added effect.",
+    "seatMove": "The seat moves there at once. No cost, and no purist backlash.",
     "review": "Review choice",
     "default": "If left unresolved, Next Turn chooses “{{choice}}” for free, with no added effect.",
     "defaultProposal": "If left unresolved, Next Turn chooses “{{choice}}”, and that counts as a missed clause on the deal.",
@@ -153,6 +154,15 @@
           "broadcast": "Buy local airtime",
           "neighbourhood": "Work the neighborhood",
           "hold": "Stay with organic growth"
+        }
+      },
+      "seat-orphaned": {
+        "title": "The commissioner's seat needs a new home",
+        "body": "The league in {{country}} has folded, and the seat cannot stay where no league plays. It moves at once, at no cost: the collapse was the price. Left alone it goes to {{first}}, where the sport has the most lifelong fans.",
+        "choices": {
+          "first": "Move the seat to {{choice}}",
+          "second": "Move the seat to {{choice}}",
+          "third": "Move the seat to {{choice}}"
         }
       },
       "partner-proposal": {
@@ -874,6 +884,8 @@
       "restructureLoss": "{{share, number(style: percent)}} of hardcore fans become casual ({{count, number}} fans). They remain fans of your sport.",
       "restructureCash": "No cash or Prestige is spent. The current cash reserve is kept.",
       "restructureHealth": "Health resets to Struggling. Recovery still depends on the league finances and following.",
+      "restructureSeat_one": "Below Professional this league loses the commissioner's seat: it goes home to {{home}} when the offseason closes, and {{count, number}} more hardcore fan here turns casual as it leaves.",
+      "restructureSeat_other": "Below Professional this league loses the commissioner's seat: it goes home to {{home}} when the offseason closes, and {{count, number}} more hardcore fans here turn casual as it leaves.",
       "bailoutBalance": "After payment: {{cash, money}} and {{pp, number(maximumFractionDigits: 1)}} Prestige.",
       "cooldown_one": "Another bailout must wait {{count}} quarter.",
       "cooldown_other": "Another bailout must wait {{count}} quarters.",

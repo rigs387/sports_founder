@@ -1,6 +1,7 @@
 import { offseasonOpen } from "./calendar";
 import { leagueIncomePerQuarter } from "./deals";
 import { holdingMoney } from "./directors";
+import { seatLeaveShare } from "./flagship";
 import { leagueCosts } from "./league-costs";
 import { bailoutTerms, leagueTierIndex, promotionTerms } from "./leagues";
 import {
@@ -51,6 +52,11 @@ export interface LeagueActions {
       hardcoreDemotionShare: number;
       hardcoreDemoted: number;
       runningCostPerQuarter: number;
+      /**
+       * A seat league abroad stepping below Professional loses the seat (GDD v1.40): where it
+       * goes when the offseason closes, and the hardcore fans then turning casual. Null otherwise.
+       */
+      seatLoss: { home: string; purists: number } | null;
     } | null;
   };
   bailoutLeague: {
@@ -179,6 +185,19 @@ export function leagueActions(state: GameState, world: World, index: number): Le
               hardcore * world.config.leagues.stepDown.hardcoreDemotionShare,
             ),
             runningCostPerQuarter: leagueCosts(state, world, index, undefined, to).total,
+            seatLoss:
+              country.countryId === state.flagship.countryId &&
+              country.countryId !== state.anchorCountryId &&
+              !world.config.flagship.seatEligibleTiers.includes(to)
+                ? {
+                    home: state.anchorCountryId,
+                    purists: Math.floor(
+                      hardcore *
+                        (1 - world.config.leagues.stepDown.hardcoreDemotionShare) *
+                        seatLeaveShare(state, world, country.countryId),
+                    ),
+                  }
+                : null,
           }
         : null,
     },

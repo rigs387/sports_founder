@@ -13,14 +13,14 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-11-21",
-    tests: 694,
-    files: 78,
-    note: "npm run check passed after the Builders wing was built (type checks, Biome, purity, 694 tests in 78 files). Lint has existing visual-study warnings.",
+    tests: 699,
+    files: 79,
+    note: "npm run check passed after the seat follow-ups were built (type checks, Biome, purity, 699 tests in 79 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-11-21",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click. On the late-game save's offseason it opens the director's ask on the board (declining states the patience it costs), finds five league directors, reviews a candidate (the review states the severance), appoints them, and checks the narrow layout. On the late-game save the Almanac shows a Builders plaque (one builder inducted).",
   },
-  eventDeck: { current: 57, target: "40–60" },
+  eventDeck: { current: 58, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -32,7 +32,7 @@ window.SF_PROGRESS = {
       name: "Phase 1",
       title: "Make it matter",
       state: "Current",
-      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution, the first traditions, flagship deals, venues and payroll, a lightweight Hall of Fame with chants, the world stage, legacy goals and retiring, and the late surplus (payouts, the players' agreement, stoppages, late card rewards) are built. Seven parked items are designed (tech plan 2.26–2.32); 2.31 and 2.26 (league directors, their asks, partners' rule proposals, the Builders wing) are built.",
+      text: "Flagship, people, deals, evolving rules and traditions. The flagship, its stars, rules evolution, the first traditions, flagship deals, venues and payroll, a lightweight Hall of Fame with chants, the world stage, legacy goals and retiring, and the late surplus (payouts, the players' agreement, stoppages, late card rewards) are built. Seven parked items are designed (tech plan 2.26–2.32); 2.31, 2.26 (league directors, their asks, partners' rule proposals, the Builders wing) and 2.27 (seat follow-ups) are built.",
     },
     {
       name: "Phase 2",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Parked items, built in order",
-      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), their asks with patience (step 2 built 2026-11-21), deal partners' rare rule proposals (step 3 built 2026-11-21) and a Builders wing (step 4 built 2026-11-21), so 2.26 is done; seat follow-ups (2.27), youth programs (2.28), flagship ticket pricing (2.29), the founding family (2.30), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
+      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), their asks with patience (step 2 built 2026-11-21), deal partners' rare rule proposals (step 3 built 2026-11-21) and a Builders wing (step 4 built 2026-11-21), so 2.26 is done; seat follow-ups (2.27, built 2026-11-21); youth programs (2.28), flagship ticket pricing (2.29), the founding family (2.30), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
       tag: "Next build",
     },
     {
@@ -124,6 +124,13 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-11-21",
+      type: "Built",
+      title: "Seat follow-ups",
+      text: "GDD v1.40, tech plan 2.27. When the anchor league folds after the win with the seat at home, a decision offers up to three Professional or Elite leagues, most hardcore fans first; answering moves the seat at once, free and with no purist cost, and left alone it goes to the first. With no eligible league the seat waits dark and the card comes when one qualifies; a league re-formed at home keeps it. A seat league abroad stepped down below Professional loses the seat: it goes home when the offseason closes with the usual purist cost of leaving, the step-down review says so first, and keeping it there is refused (a move to another eligible league is still allowed). The anchor holds the seat at any tier. npm run check passed (699 tests in 79 files) and the smoke passed; neither the card nor the step-down warning has been seen on screen (headless tests cover both).",
+      system: "flagship",
+    },
     {
       date: "2026-11-21",
       type: "Built",
@@ -920,7 +927,7 @@ window.SF_PROGRESS = {
           "Deeper player tiers, transfers and contracts beyond the flagship's leading players",
         ],
         [
-          "planned",
+          "built",
           "Seat follow-ups: a free forced move when the birthplace is outlived; stepping down below Professional loses the seat (tech plan 2.27, GDD v1.40)",
         ],
         [

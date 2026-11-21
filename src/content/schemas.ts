@@ -1543,6 +1543,8 @@ export const configFileSchema = z.strictObject({
       }),
     }),
     seatEligibleTiers: z.array(leagueTierSchema).min(1),
+    /** The birthplace outlived (GDD v1.40): leagues the seat-orphaned card offers, at most 3. */
+    seatOrphan: z.strictObject({ choices: z.int().min(1).max(3) }),
     seatMove: z.strictObject({
       hardcoreDemotionShare: unitInterval,
       anchorHardcoreDemotionShare: unitInterval,

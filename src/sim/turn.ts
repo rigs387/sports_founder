@@ -5,11 +5,12 @@ import { judgeClauses } from "./deal-clauses";
 import { breakDeals, offerDeals } from "./deals";
 import { syncDirectors } from "./directors";
 import { offerEvents, settleEvents } from "./events";
-import { closeOffseason, returnSeatIfFolded } from "./flagship";
+import { closeOffseason, returnSeatIfFolded, settleOrphanedSeat } from "./flagship";
 import { evaluateLeagues } from "./leagues";
 import { updateLegacy } from "./legacy";
 import { offerProposal, settleProposal } from "./proposals";
 import { stepQuarter } from "./quarter";
+import { offerOrphanedSeat } from "./seat-cards";
 import { updateStandouts } from "./standouts";
 import { pullTalent } from "./talent";
 import { applyDefaultSlotDrops, updateTierTrack } from "./tiers";
@@ -60,7 +61,13 @@ export function endTurn(state: GameState, world: World): GameState {
         // Talks still open take the union's ask (GDD v1.39).
         closeOffseason(
           settleAgreement(
-            settleHost(pullTalent(applyDefaultSlotDrops(settleEvents(state, world)), world), world),
+            settleHost(
+              pullTalent(
+                applyDefaultSlotDrops(settleOrphanedSeat(settleEvents(state, world), world)),
+                world,
+              ),
+              world,
+            ),
             world,
           ),
           world,
@@ -106,7 +113,8 @@ export function endTurn(state: GameState, world: World): GameState {
   next = offerProposal(next, world);
   // Legacy goals newly met go on record (GDD v1.38).
   next = updateLegacy(next, world);
-  return offerEvents({ ...next, turn: start.turn + 1 }, world, quarters);
+  // The birthplace outlived with the seat in it: where the seat goes (GDD v1.40).
+  return offerOrphanedSeat(offerEvents({ ...next, turn: start.turn + 1 }, world, quarters), world);
 }
 
 /** Plays up to `turns` turns in a row, calling `onTurn` after each; stops if the campaign ends. */

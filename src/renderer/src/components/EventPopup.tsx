@@ -80,7 +80,7 @@ export function EventLayer({
   const choice = current.choices.find((option) => option.id === confirming);
   const choose = (choiceId: string) =>
     void dispatchAction({ type: "chooseEvent", eventId: current.id, choiceId });
-  const choiceName = (id: string) => t(`events.cards.${current.templateId}.choices.${id}`);
+  const choiceName = (id: string) => text.choiceName(current, id);
   // Docked on the side of the map away from the card's country, so its outline stays in view.
   const x = geometry.markets[current.countryId]?.center[0] ?? 0;
   const dock = x < geometry.width / 2 ? "dock-right" : "dock-left";

@@ -212,9 +212,7 @@ export function EventBoard() {
                   <div className="event-receipt" role="status" data-testid="event-resolved">
                     <strong>
                       {selected.resolution.choiceId
-                        ? t(
-                            `events.cards.${selected.templateId}.choices.${selected.resolution.choiceId}`,
-                          )
+                        ? text.choiceName(selected, selected.resolution.choiceId)
                         : t("events.collected")}
                     </strong>
                     <p>
@@ -260,7 +258,7 @@ export function EventBoard() {
                           data-cost={option.cost}
                         >
                           <header>
-                            <h4>{t(`events.cards.${current.templateId}.choices.${option.id}`)}</h4>
+                            <h4>{text.choiceName(current, option.id)}</h4>
                             <b>
                               {t(option.cost ? "events.cost" : "events.free", {
                                 amount: option.cost,
@@ -301,9 +299,7 @@ export function EventBoard() {
                     </div>
                     <p className="event-default">
                       {(() => {
-                        const choice = t(
-                          `events.cards.${current.templateId}.choices.${current.defaultChoice}`,
-                        );
+                        const choice = text.choiceName(current, current.defaultChoice ?? "");
                         return (
                           text?.defaultNote(current, choice) ?? t("events.default", { choice })
                         );
@@ -317,7 +313,7 @@ export function EventBoard() {
                       >
                         <strong>
                           {t("events.confirm", {
-                            choice: t(`events.cards.${current.templateId}.choices.${choice.id}`),
+                            choice: text.choiceName(current, choice.id),
                             country: country(current.countryId),
                             amount: choice.cost,
                           })}

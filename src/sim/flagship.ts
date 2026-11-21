@@ -1130,6 +1130,7 @@ export function newFlagship(
     lastRound: [],
     seasons: [],
     deals: newDeals(seed),
+    orphan: null,
   };
   const fitted = fitClubs(empty, world, rng, tier);
   return { ...startSeason(fitted, world, quarter, scoring), rng: saveRng(rng) };
@@ -1715,6 +1716,99 @@ export function returnSeatIfFolded(state: GameState, world: World): GameState {
 }
 
 /**
+ * Whether a seat abroad has lost its claim (GDD v1.40): its league stepped down below the tiers
+ * that can take the seat. The seat goes home when the offseason closes; the anchor is exempt and
+ * holds the seat at any tier.
+ */
+export function seatLost(
+  state: Pick<GameState, "anchorCountryId" | "countries" | "flagship">,
+  world: World,
+): boolean {
+  const { countryId } = state.flagship;
+  if (countryId === state.anchorCountryId) return false;
+  const league = state.countries[indexOf(world, countryId)]?.league ?? null;
+  return league !== null && !seatEligible(league, world);
+}
+
+/**
+ * Whether the birthplace is outlived with the seat in it (GDD v1.40): after the win, the seat is
+ * at the anchor and the anchor has no league.
+ */
+export function seatOrphaned(state: GameState, world: World): boolean {
+  return (
+    state.win.won !== null &&
+    state.flagship.countryId === state.anchorCountryId &&
+    (state.countries[indexOf(world, state.anchorCountryId)]?.league ?? null) === null
+  );
+}
+
+/**
+ * The leagues an orphaned seat may go to (GDD v1.40): Professional and Elite leagues, most of the
+ * player's hardcore fans first (ties: content order), at most `flagship.seatOrphan.choices`.
+ */
+export function orphanCandidates(state: GameState, world: World): string[] {
+  return state.countries
+    .filter((c) => c.countryId !== state.anchorCountryId && seatEligible(c.league, world))
+    .map((c, order) => ({ id: c.countryId, hardcore: c.fans[PLAYER_INDEX]?.hardcore ?? 0, order }))
+    .sort((a, b) => b.hardcore - a.hardcore || a.order - b.order)
+    .slice(0, world.config.flagship.seatOrphan.choices)
+    .map((c) => c.id);
+}
+
+/** The orphaned-seat card's choices, in candidate order (content `seat-orphaned`). */
+export const ORPHAN_CHOICES = ["first", "second", "third"] as const;
+
+/**
+ * The orphaned seat's card answered (GDD v1.40): read from the journal after every action and when
+ * End Turn starts, so the move is immediate. The seat goes, free and with no purist cost, to the
+ * chosen league, or the next candidate still eligible; a league re-formed at the anchor first keeps
+ * it home. With no candidate left the offer lapses and a new card comes once one qualifies.
+ */
+export function settleOrphanedSeat(state: GameState, world: World): GameState {
+  const orphan = state.flagship.orphan;
+  if (orphan === null) return state;
+  const isCard = (e: { templateId: string; quarter: number }) =>
+    world.events.cards.find((c) => c.id === e.templateId)?.trigger === "seatOrphaned" &&
+    e.quarter === orphan.quarter;
+  if (state.events.pending.some(isCard)) return state;
+  const cleared = { ...state, flagship: { ...state.flagship, orphan: null } };
+  if (!seatOrphaned(state, world)) return cleared;
+  const answered = state.events.history.find(isCard);
+  const rank = Math.max(
+    0,
+    ORPHAN_CHOICES.indexOf(answered?.resolution?.choiceId as (typeof ORPHAN_CHOICES)[number]),
+  );
+  const ordered = [orphan.candidates[rank], ...orphan.candidates].filter(
+    (id): id is string => id !== undefined,
+  );
+  const target = ordered.find((id) =>
+    seatEligible(state.countries[indexOf(world, id)]?.league ?? null, world),
+  );
+  const league = target ? state.countries[indexOf(world, target)]?.league : null;
+  if (!target || !league) return cleared;
+  const rng = restoreRng(state.flagship.rng);
+  const moved = moveSeat(cleared.flagship, state.countries, world, target, 0);
+  let next = fitClubs(
+    moved.flagship,
+    world,
+    rng,
+    league.tier,
+    shapeFactors(world, state.growthNodes),
+  );
+  next = next.offseason
+    ? { ...next, rng: saveRng(rng) }
+    : startSeason({ ...next, rng: saveRng(rng) }, world, state.quarter, state.genome.scoring);
+  return {
+    ...cleared,
+    flagship: next,
+    landmarks: [
+      ...state.landmarks,
+      landmarks.seatMoved(state.turn, state.quarter, state.anchorCountryId, target, "orphaned"),
+    ],
+  };
+}
+
+/**
  * The league the seat has left drops straight to its market's ceiling (GDD v1.35), paying the
  * voluntary step-down's hardcore demotion for each tier it drops. Its health stands and its
  * hardcore trend starts clean, as after any restructure.
@@ -1764,10 +1858,19 @@ export function closeOffseason(state: GameState, world: World): GameState {
   let flagship = state.flagship;
   let countries = state.countries;
   const found: Landmark[] = [];
-  const pending = flagship.pendingCountryId;
+  // A seat league abroad below Professional loses the seat (GDD v1.40): home, unless a move to
+  // another eligible league was asked for.
+  const lost = seatLost(state, world);
+  const asked = flagship.pendingCountryId;
+  const pending =
+    asked !== null && seatEligible(countries[indexOf(world, asked)]?.league ?? null, world)
+      ? asked
+      : lost
+        ? state.anchorCountryId
+        : asked;
   if (pending !== null) {
     const target = countries[indexOf(world, pending)]?.league ?? null;
-    if (seatEligible(target, world)) {
+    if (seatEligible(target, world) || (lost && pending === state.anchorCountryId)) {
       const from = flagship.countryId;
       const moved = moveSeat(
         flagship,
@@ -1778,7 +1881,15 @@ export function closeOffseason(state: GameState, world: World): GameState {
       );
       flagship = moved.flagship;
       countries = moved.countries;
-      found.push(landmarks.seatMoved(state.turn, state.quarter, from, pending, "moved"));
+      found.push(
+        landmarks.seatMoved(
+          state.turn,
+          state.quarter,
+          from,
+          pending,
+          pending === state.anchorCountryId && lost ? "lost" : "moved",
+        ),
+      );
       const left = toCeiling(countries, world, from, state.turn, state.quarter);
       countries = left.countries;
       if (left.landmark) found.push(left.landmark);

@@ -159,7 +159,8 @@ export const eventRecordSchema = z.strictObject({
       .strictObject({ season: z.int().positive(), term: z.int().positive() })
       .nullable()
       .default(null),
-    /** A league director's scandal (GDD v1.40): who, and the hardcore fans it cost. */
+    /** The leagues an orphaned seat may go to (GDD v1.40), most hardcore fans first. */
+    seat: z.strictObject({ candidates: z.array(z.string().min(1)).min(1) }).optional(),
     /** A deal partner's rule proposal (GDD v1.41), and the backlash it would bring then. */
     proposal: z
       .strictObject({

@@ -175,6 +175,8 @@ const template = z
       "directorResigned",
       /** A flagship deal partner proposes a rule change (GDD v1.41), told from the landmark. */
       "ruleProposed",
+      /** The birthplace outlived with the seat in it (GDD v1.40): where the seat goes. */
+      "seatOrphaned",
     ]),
     /** directorAsk cards only: the ask the card tells. */
     ask: z.enum(DIRECTOR_ASKS).nullable().default(null),
@@ -335,6 +337,26 @@ const template = z
         card.cooldownTurns !== null
       )
         issue("A partner's proposal follows its own fact: campaign scope, no filters or cooldown");
+    }
+    // The birthplace outlived (GDD v1.40): one free choice per offered league, best first; the
+    // simulation reads the answer and moves the seat, so no choice has an effect.
+    if (card.trigger === "seatOrphaned") {
+      const ids = card.choices.map((c) => c.id).join();
+      if (
+        card.kind !== "decision" ||
+        ids !== "first,second,third" ||
+        card.defaultChoice !== "first"
+      )
+        issue("The orphaned seat is a decision: first, second, third, the first by default");
+      if (card.choices.some((c) => c.quarters !== 0 || c.effects.length))
+        issue("The orphaned seat's choices are free and move the seat through the simulation");
+      if (
+        card.scope !== "campaign" ||
+        card.anchorOnly ||
+        card.health.length ||
+        card.cooldownTurns !== null
+      )
+        issue("The orphaned seat follows its own fact: campaign scope, no filters or cooldown");
     }
     // A season lost to a stoppage (GDD v1.39): one moment told from the landmark.
     if (card.trigger === "stoppage") {

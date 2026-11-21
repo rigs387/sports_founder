@@ -186,10 +186,16 @@ export function useEventText() {
       club: club(venue.clubId ?? undefined),
     };
   };
+  // The orphaned seat (GDD v1.40) names the league it goes to if left alone.
+  const seatText = (event: EventRecord) => {
+    const seat = event.facts.seat;
+    if (!seat) return venueText(event);
+    return { first: country(seat.candidates[0] ?? "") };
+  };
   // A deal partner's rule proposal (GDD v1.41) names the partner, the change and its backlash.
   const proposalText = (event: EventRecord) => {
     const told = event.facts.proposal;
-    if (!told) return venueText(event);
+    if (!told) return seatText(event);
     return {
       partner: dealPartnerName(told.partnerId),
       slot: t(`deals.slots.${told.slot}`),
@@ -473,7 +479,16 @@ export function useEventText() {
     const director = snapshot.directors.serving.find((d) => d.id === told.directorId);
     return t("events.askDecline", { director: told.name, count: director?.patience ?? 1 });
   };
-  const noChange = (event: EventRecord) => askNote(event) ?? t("events.noChange");
+  const noChange = (event: EventRecord) =>
+    askNote(event) ?? t(event.facts.seat ? "events.seatMove" : "events.noChange");
+  /** A choice's name; an orphaned seat's choices name their league (GDD v1.40). */
+  const choiceName = (event: EventRecord, choiceId: string) => {
+    const rank = ["first", "second", "third"].indexOf(choiceId);
+    const league = event.facts.seat?.candidates[rank];
+    return t(`events.cards.${event.templateId}.choices.${choiceId}`, {
+      choice: league ? country(league) : "",
+    });
+  };
   const defaultNote = (event: EventRecord, choice: string) =>
     t(
       event.facts.proposal
@@ -483,5 +498,17 @@ export function useEventText() {
           : "events.default",
       { choice },
     );
-  return { country, club, player, title, body, factLines, dateOf, termVars, noChange, defaultNote };
+  return {
+    country,
+    club,
+    player,
+    title,
+    body,
+    factLines,
+    dateOf,
+    termVars,
+    noChange,
+    defaultNote,
+    choiceName,
+  };
 }

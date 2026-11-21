@@ -175,6 +175,14 @@ export function LeagueControls({ country, countryName, snapshot, busy, onAction 
             </li>
             <li>{t("league.manage.restructureCash")}</li>
             <li>{t("league.manage.restructureHealth")}</li>
+            {offer.seatLoss && (
+              <li className="deal-warning" data-testid="league-seat-loss">
+                {t("league.manage.restructureSeat", {
+                  home: names?.countries[offer.seatLoss.home] ?? offer.seatLoss.home,
+                  count: offer.seatLoss.purists,
+                })}
+              </li>
+            )}
             {floors.length > 0 && (
               <li className="deal-warning" data-testid="league-deal-warning">
                 {t("deals.warnStepDown", {

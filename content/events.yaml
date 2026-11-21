@@ -1181,6 +1181,28 @@ cards:
     choices:
       - { id: accept, quarters: 0, effects: [{ type: ruleProposal }] }
       - { id: decline, quarters: 0, effects: [] }
+  # The birthplace outlived (GDD v1.40): the anchor league folded after the win with the seat at
+  # home. Offered by the simulation with up to three eligible leagues on its facts (most hardcore
+  # fans first); the answer moves the seat at once, free, and the default is the first.
+  - id: seat-orphaned
+    kind: decision
+    tone: pressure
+    priority: 95
+    trigger: seatOrphaned
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    defaultChoice: first
+    choices:
+      - { id: first, quarters: 0, effects: [] }
+      - { id: second, quarters: 0, effects: [] }
+      - { id: third, quarters: 0, effects: [] }
   # A director out of patience resigns (GDD v1.41).
   - id: director-resigned
     kind: moment

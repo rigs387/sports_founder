@@ -408,7 +408,7 @@ export const landmarks = {
     quarter: number,
     from: string,
     countryId: string,
-    reason: "moved" | "returned",
+    reason: "moved" | "returned" | "orphaned" | "lost",
   ): Landmark => ({ kind: "seatMoved", turn, quarter, from, countryId, reason }),
   venueOpened: (
     turn: number,
