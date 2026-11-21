@@ -873,6 +873,9 @@ function main(): number {
       `  Remembers: Hall of Fame players per campaign median ${fmt(remembers.players.median)} (max ${fmt(remembers.players.max)}; in ${remembers.withPlayers}/${results.length} campaigns, the first at turn median ${fmt(remembers.firstPlayerTurn)}), a season from Professional on median ${(remembers.perProSeason ?? 0).toFixed(2)} (target about 1); anchor shrine weight median ${fmt(remembers.anchorShrine.median)}; chants per campaign median ${fmt(remembers.chants.median)}, ${remembers.chantsSpread} spread abroad; Culture nodes bought in ${remembers.boughtCulture}/${results.length} campaigns (median ${fmt(remembers.cultureNodes.median)})`,
     );
     console.log(
+      `  Builders: per campaign median ${fmt(remembers.builders.median)} (max ${fmt(remembers.builders.max)}; in ${remembers.withBuilders}/${results.length} campaigns); ${remembers.longTerms} terms long enough, ${remembers.builderTerms} that can earn, points min ${fmt(remembers.builderPoints.min)} / median ${fmt(remembers.builderPoints.median)} / p90 ${fmt(remembers.builderPoints.p90)} / max ${fmt(remembers.builderPoints.max)} against a bar of ${world.config.hallOfFame.builders.bar}`,
+    );
+    console.log(
       `  Traditions born per campaign (median): ${remembers.traditions
         .map((t) => `${t.type} ${fmt(t.born)}`)
         .join(

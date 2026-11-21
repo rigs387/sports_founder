@@ -346,6 +346,7 @@ export const landmarks = {
     season: number,
     inductees: number,
     nearMissId: number | null,
+    builders = 0,
   ): Landmark => ({
     kind: "hallOfFameClass",
     turn,
@@ -354,6 +355,7 @@ export const landmarks = {
     season,
     inductees,
     nearMissId,
+    builders,
   }),
   dealBroken: (
     turn: number,

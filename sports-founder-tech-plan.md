@@ -1745,6 +1745,19 @@ format starts campaigns fresh. One step per session; each ends with `npm run che
    `hallOfFame.builders`), a separate ballot and class cap, plaques in the Almanac, the class
    card naming builders. Measure classes per campaign so the wing is neither empty nor
    crowded.
+   *Built 2026-11-21.* Terms record `hardcoreOnArrival`, `hardcoreOnLeaving` and
+   `healthOnLeaving` (save format 34, defaults, no bump). `builderFacts` gates a term (at
+   least `minQuarters`, not replaced or resigned, league standing and not Near-Collapse) and
+   `builderPoints` scores it (promotions, reaching Elite, hardcore doublings up to
+   `maxDoublings`); `builderBallot`/`chooseBuilders` (`hall-of-fame.ts`) take each
+   director's best term after `waitYears`, at the bar, `perClass` a class, in culture's
+   `hallClass` beside the players. `HallOfFameState.builders`; the class landmark counts
+   `builders` and the card's facts may have no player inductees. Builder lines on the class
+   card (`event-text.tsx`), a Builders section in the Almanac, a late-game smoke check
+   (`retire-smoke.ts`, `60b-late-builders.png`), a runner Builders line. Measured (3 builder
+   campaigns, 200 turns): 151 terms a campaign, 70 long enough in all, points median 3, p90 20,
+   max 30; 5 builders a campaign (max 6, in 3 of 3) beside 81 players. Bar kept at 10. No
+   class card with a builder has been seen on screen yet.
 
 ### 2.27 Build Plan: Seat Follow-ups (GDD v1.40)
 

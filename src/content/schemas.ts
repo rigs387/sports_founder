@@ -1217,6 +1217,25 @@ export const configFileSchema = z.strictObject({
     firsts: z.array(hallFirstSchema),
     leaders: z.int().min(1),
     awardLeaders: z.int().min(1),
+    /**
+     * The Builders wing (GDD v1.40): league directors on points from their finished terms. A term
+     * counts once it lasted minQuarters, ended neither replaced nor resigned, and left the league
+     * standing and not Near-Collapse; its director is eligible waitYears after it ended. Points:
+     * each promotion, reaching Elite, and each doubling of the hardcore fans over the term (at
+     * most maxDoublings). The best at or above the bar go in, perClass a class, plaque only.
+     */
+    builders: z.strictObject({
+      points: z.strictObject({
+        promotion: z.number().min(0),
+        reachedElite: z.number().min(0),
+        hardcoreDoubling: z.number().min(0),
+      }),
+      maxDoublings: z.number().positive(),
+      minQuarters: z.int().min(1),
+      waitYears: z.int().min(0),
+      bar: z.number().positive(),
+      perClass: z.int().min(1),
+    }),
   }),
   /**
    * Standouts (GDD v1.37): named players in leagues other than the flagship. places is how many a

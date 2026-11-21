@@ -24,7 +24,7 @@ export function offerHallCards(
       .map((inductee) => inductee.id);
     const country = state.countries.find((c) => c.countryId === landmark.countryId);
     const fans = country?.fans[PLAYER_INDEX];
-    if (!country || !fans || inducteeIds.length === 0) continue;
+    if (!country || !fans || inducteeIds.length + landmark.builders === 0) continue;
     pending.push({
       id: nextId++,
       templateId: card.id,

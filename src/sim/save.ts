@@ -50,6 +50,8 @@ const directorSchema = z.strictObject({
   fromQuarter: z.int().min(0),
   tierOnArrival: leagueTierSchema,
   declines: z.int().min(0).default(0),
+  // Joined format 34 without a bump (GDD v1.40, the Builders wing).
+  hardcoreOnArrival: z.number().min(0).default(0),
 });
 const axisSchema = z.enum(AXIS_IDS as [AxisId, ...AxisId[]]);
 
@@ -398,8 +400,9 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     quarter: count,
     countryId: z.string().min(1),
     season: z.int().min(1),
-    inductees: z.int().min(1),
+    inductees: count,
     nearMissId: z.int().min(1).nullable(),
+    builders: count.default(0),
   }),
   z.strictObject({
     kind: z.literal("rivalRuleCopied"),
@@ -736,6 +739,31 @@ const gameStateSchema = z.strictObject({
     ),
     nextId: z.int().min(1),
     ballots: z.array(z.strictObject({ playerId: z.int().min(1), classes: z.int().min(1) })),
+    // Joined format 34 without a bump (GDD v1.40).
+    builders: z
+      .array(
+        z.strictObject({
+          directorId: z.int().min(1),
+          name: z.string().min(1),
+          countryId: z.string().min(1),
+          trait: z.string().min(1),
+          fromQuarter: count,
+          toQuarter: count,
+          season: z.int().min(1),
+          turn: z.int().min(1),
+          quarter: count,
+          facts: z.strictObject({
+            tierOnArrival: leagueTierSchema,
+            tierOnLeaving: leagueTierSchema,
+            promotions: count,
+            reachedElite: z.boolean(),
+            hardcoreOnArrival: z.number().min(0),
+            hardcoreOnLeaving: z.number().min(0),
+            quarters: count,
+          }),
+        }),
+      )
+      .default([]),
   }),
   standouts: z.strictObject({
     rng: z.array(z.number()).min(1),
@@ -836,6 +864,8 @@ const gameStateSchema = z.strictObject({
         tierOnLeaving: leagueTierSchema.nullable(),
         promotions: z.int().min(0),
         reason: z.enum(["focus", "replaced", "league", "seat", "resigned"]),
+        hardcoreOnLeaving: z.number().min(0).default(0),
+        healthOnLeaving: healthLevelSchema.nullable().default(null),
       }),
     ),
     candidates: z.array(

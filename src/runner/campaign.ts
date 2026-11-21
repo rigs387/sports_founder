@@ -2,6 +2,7 @@ import { performance } from "node:perf_hooks";
 import {
   type Action,
   broadcastEffects,
+  builderTerms,
   COUNTERMOVES,
   type CountermoveKind,
   checkInvariants,
@@ -778,6 +779,14 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           return pro ? state.flagship.seasons.filter((s) => s.quarter >= pro.quarter).length : 0;
         })(),
         firstPlayerTurn: state.hallOfFame.inductees[0]?.turn ?? null,
+        // The Builders wing (GDD v1.40): inducted, and the points of every finished term that can
+        // earn (wait ignored), with how many terms lasted long enough.
+        builders: state.hallOfFame.builders.length,
+        builderPoints: builderTerms(state, world, Number.POSITIVE_INFINITY).map((c) => c.points),
+        longTerms: state.directors.past.filter(
+          (term) =>
+            term.toQuarter - term.fromQuarter >= world.config.hallOfFame.builders.minQuarters,
+        ).length,
         chants: state.culture.traditions.filter((t) => t.type === "chant").length,
         chantsSpread: state.landmarks.filter((l) => l.kind === "chantSpread").length,
         anchorShrine: shrineWeights(state, world)[anchorIndex] ?? 0,

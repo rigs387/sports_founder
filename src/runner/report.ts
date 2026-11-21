@@ -244,6 +244,12 @@ export interface CampaignResult {
     proSeasons: number;
     /** The turn of the first player induction, if any. */
     firstPlayerTurn: number | null;
+    /** Builders wing inductees (GDD v1.40). */
+    builders: number;
+    /** Points of each director's best finished term that can earn. */
+    builderPoints: number[];
+    /** Finished terms at least hallOfFame.builders.minQuarters long. */
+    longTerms: number;
     chants: number;
     /** Chants that reached a country abroad (each tells it once). */
     chantsSpread: number;
@@ -578,6 +584,11 @@ export function remembersAggregate(results: CampaignResult[]) {
       ),
     ),
     withPlayers: results.filter((r) => r.remembers.players > 0).length,
+    builders: pick((r) => r.remembers.builders),
+    withBuilders: results.filter((r) => r.remembers.builders > 0).length,
+    builderPoints: distribution(results.flatMap((r) => r.remembers.builderPoints)),
+    builderTerms: results.reduce((sum, r) => sum + r.remembers.builderPoints.length, 0),
+    longTerms: results.reduce((sum, r) => sum + r.remembers.longTerms, 0),
     chants: pick((r) => r.remembers.chants),
     chantsSpread: results.reduce((sum, r) => sum + r.remembers.chantsSpread, 0),
     anchorShrine: pick((r) => r.remembers.anchorShrine),

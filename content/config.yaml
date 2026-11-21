@@ -743,6 +743,16 @@ hallOfFame:
   leaders: 10
   # The Almanac's most Player of the Season awards list (GDD v1.33).
   awardLeaders: 5
+  # The Builders wing (GDD v1.40): league directors whose league rose while they held the job.
+  # A term counts after minQuarters, unless replaced or resigned or the league was left folded or
+  # Near-Collapse; eligible waitYears after it ended. Plaque only (no shrine weight, no PP).
+  builders:
+    points: { promotion: 4, reachedElite: 6, hardcoreDoubling: 3 }
+    maxDoublings: 4
+    minQuarters: 12
+    waitYears: 2
+    bar: 10
+    perClass: 2
 
 # Sport identity (GDD v1.18): limits on the names typed at setup (the sport, the founding club's
 # name and its ground), counted after trimming.

@@ -2046,6 +2046,15 @@
     "classOf": "Class of {{year}}",
     "home": "Home: {{country}}",
     "recordHolder": "Once held the all-time scoring record",
+    "builders": {
+      "heading": "The Builders",
+      "empty": "No builder has been inducted yet. League directors whose league rose while they held the job go in a few years after they leave: promotions, reaching Elite, and growing the hardcore fans. A director replaced, or one who resigned, never does.",
+      "role": "Ran the {{country}} league, {{from}} to {{to}}",
+      "promotions": "Promotions",
+      "rise": "League",
+      "riseValue": "{{from}} to {{to}}",
+      "hardcore": "Hardcore fans grew"
+    },
     "players": {
       "heading": "Hall of Fame",
       "empty": "No player has been inducted yet. A class is chosen at every season's end from the records: star seasons, titles, seasons as top scorer, awards, the scoring record and the whole career. Players go in a few seasons after they retire."
@@ -2160,6 +2169,8 @@
     "nearMiss": "Missed out: {{player}}, {{points}} of the {{bar}} points needed.",
     "nearMissAgain": "{{player}} misses again: {{points}} of the {{bar}} points needed.",
     "nearMissLast": "{{player}} misses for the last time and leaves the ballot.",
+    "line_builder": "Builder: {{name}} ran the {{country}} league from {{from}} to {{to}} and took it from {{fromTier}} to {{toTier}}. Hardcore fans grew {{growth}}.",
+    "line_builder_flat": "Builder: {{name}} ran the {{country}} league from {{from}} to {{to}}. Hardcore fans grew {{growth}}.",
     "line_record": "{{player}} ({{club}}): {{count}} {{scoreNoun}}, once the league's all-time record, and {{seasons}} {{seasonsNoun}} as a star. Titles won: {{titles}}.",
     "firsts": {
       "foundingTitle": "{{year}}: {{club}}, the founding club, won its first title.",

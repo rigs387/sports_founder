@@ -1,10 +1,13 @@
 import type { HallFirst, LeagueTierId } from "../content";
-import { yearOfQuarter } from "./calendar";
+import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import type { EventRecord } from "./events-state";
 import { lostSeasons, scoreUnit } from "./flagship";
 import { landmarks } from "./records";
 import type {
   BallotEntry,
+  BuilderFacts,
+  BuilderInductee,
+  DirectorTerm,
   FlagshipState,
   GameState,
   HallOfFameState,
@@ -31,7 +34,7 @@ import { seasonMatchCrowd } from "./venues";
  * from `startSeason` on count.
  */
 export function newHallOfFame(startSeason: number): HallOfFameState {
-  return { startSeason, inductees: [], nextId: 1, ballots: [] };
+  return { startSeason, inductees: [], nextId: 1, ballots: [], builders: [] };
 }
 
 /**
@@ -191,6 +194,106 @@ export function hallBallot(state: GameState, world: World, season: number): Ball
     );
 }
 
+// ---- The Builders wing (GDD v1.40) -------------------------------------------------------------
+
+/**
+ * A finished term's facts, or null if it cannot earn: too short, ended replaced or resigned, or
+ * left its league folded or Near-Collapse (the harsher reading: a wreck earns nothing).
+ */
+export function builderFacts(term: DirectorTerm, world: World): BuilderFacts | null {
+  const config = world.config.hallOfFame.builders;
+  const quarters = term.toQuarter - term.fromQuarter;
+  if (quarters < config.minQuarters) return null;
+  if (term.reason === "replaced" || term.reason === "resigned") return null;
+  if (term.tierOnLeaving === null || term.healthOnLeaving === null) return null;
+  if (term.healthOnLeaving === "near-collapse") return null;
+  return {
+    tierOnArrival: term.tierOnArrival,
+    tierOnLeaving: term.tierOnLeaving,
+    promotions: term.promotions,
+    reachedElite: term.tierOnArrival !== "elite" && term.tierOnLeaving === "elite",
+    hardcoreOnArrival: term.hardcoreOnArrival,
+    hardcoreOnLeaving: term.hardcoreOnLeaving,
+    quarters,
+  };
+}
+
+/** A term's Builders points (config hallOfFame.builders.points). */
+export function builderPoints(facts: BuilderFacts, world: World): number {
+  const { points, maxDoublings } = world.config.hallOfFame.builders;
+  const ratio = facts.hardcoreOnLeaving / Math.max(1, facts.hardcoreOnArrival);
+  const doublings = ratio > 1 ? Math.min(maxDoublings, Math.floor(Math.log2(ratio))) : 0;
+  return (
+    facts.promotions * points.promotion +
+    (facts.reachedElite ? points.reachedElite : 0) +
+    doublings * points.hardcoreDoubling
+  );
+}
+
+/** A director on the Builders ballot: their best finished term and its points. */
+export interface BuilderCandidate {
+  term: DirectorTerm;
+  facts: BuilderFacts;
+  points: number;
+}
+
+/**
+ * Every finished term that can earn, scored, by director: the best term each (ties: the earlier).
+ * `quarter` is when the class is chosen; terms that ended less than waitYears before wait.
+ */
+export function builderTerms(state: GameState, world: World, quarter: number): BuilderCandidate[] {
+  const config = world.config.hallOfFame.builders;
+  const best = new Map<number, BuilderCandidate>();
+  for (const term of state.directors.past) {
+    if (quarter - term.toQuarter < config.waitYears * QUARTERS_PER_YEAR) continue;
+    const facts = builderFacts(term, world);
+    if (!facts) continue;
+    const points = builderPoints(facts, world);
+    const held = best.get(term.id);
+    if (!held || points > held.points) best.set(term.id, { term, facts, points });
+  }
+  return [...best.values()];
+}
+
+/**
+ * The Builders ballot at `quarter` (GDD v1.40): directors not yet inducted whose best earning
+ * term clears the bar, best first (ties: earlier end, then lower id). A director who never clears
+ * the bar never goes in; one who does waits only on the class cap.
+ */
+export function builderBallot(state: GameState, world: World, quarter: number): BuilderCandidate[] {
+  const inducted = new Set(state.hallOfFame.builders.map((b) => b.directorId));
+  const bar = world.config.hallOfFame.builders.bar;
+  return builderTerms(state, world, quarter)
+    .filter((c) => !inducted.has(c.term.id) && c.points >= bar)
+    .sort(
+      (a, b) => b.points - a.points || a.term.toQuarter - b.term.toQuarter || a.term.id - b.term.id,
+    );
+}
+
+/** The builders a class inducts (GDD v1.40): the ballot's best, up to perClass. */
+export function chooseBuilders(
+  state: GameState,
+  world: World,
+  summary: SeasonSummary,
+  turn: number,
+  quarter: number,
+): BuilderInductee[] {
+  return builderBallot(state, world, quarter)
+    .slice(0, world.config.hallOfFame.builders.perClass)
+    .map(({ term, facts }) => ({
+      directorId: term.id,
+      name: term.name,
+      countryId: term.countryId,
+      trait: term.trait,
+      fromQuarter: term.fromQuarter,
+      toQuarter: term.toQuarter,
+      season: summary.season,
+      turn,
+      quarter,
+      facts,
+    }));
+}
+
 /** A class: who goes in, the ballot after it, and its near-miss (the best left out), if any. */
 export interface HallClass {
   inductees: Inductee[];
@@ -244,13 +347,14 @@ export function chooseClass(
   };
 }
 
-/** A class's landmark, or none for an empty class. */
+/** A class's landmark, or none for an empty class (no players and no builders). */
 export function classLandmark(
   state: GameState,
   inductees: readonly Inductee[],
   nearMissId: number | null,
+  builders: readonly BuilderInductee[] = [],
 ): Landmark[] {
-  const [first] = inductees;
+  const first = inductees[0] ?? builders[0];
   if (!first) return [];
   return [
     landmarks.hallOfFameClass(
@@ -260,6 +364,7 @@ export function classLandmark(
       first.season,
       inductees.length,
       nearMissId,
+      builders.length,
     ),
   ];
 }
@@ -293,6 +398,13 @@ export function hallProblems(state: GameState): string[] {
   for (const entry of hall.ballots)
     if (players.has(entry.playerId) || entry.classes < 1)
       problems.push(`Hall of Fame ballot entry for ${entry.playerId} is invalid`);
+  const builders = new Set<number>();
+  for (const builder of hall.builders) {
+    const served = state.directors.past.some((term) => term.id === builder.directorId);
+    if (builders.has(builder.directorId) || !served)
+      problems.push(`Builders inductee ${builder.directorId} is not a past director inducted once`);
+    builders.add(builder.directorId);
+  }
   return problems;
 }
 
@@ -364,8 +476,24 @@ export interface HistorySnapshot {
   clubId: number | null;
 }
 
+/** A Builders wing plaque (GDD v1.40). */
+export interface BuilderSnapshot {
+  directorId: number;
+  name: string;
+  countryId: string;
+  trait: string;
+  /** The class's season and its year. */
+  season: number;
+  year: number;
+  fromYear: number;
+  toYear: number;
+  facts: BuilderFacts;
+  points: number;
+}
+
 export interface HallSnapshot {
   inductees: InducteeSnapshot[];
+  builders: BuilderSnapshot[];
   ballot: BallotSnapshot[];
   /** Points a player needs to go in. */
   bar: number;
@@ -492,8 +620,23 @@ export function hallSnapshot(state: GameState, world: World): HallSnapshot {
     if (drew !== null && (crowd === null || drew > crowd.crowd))
       crowd = { crowd: drew, season: s.season, year: year(s.quarter), countryId: s.countryId };
   }
+  const builders = hall.builders.map(
+    (b): BuilderSnapshot => ({
+      directorId: b.directorId,
+      name: b.name,
+      countryId: b.countryId,
+      trait: b.trait,
+      season: b.season,
+      year: year(b.quarter),
+      fromYear: yearOfQuarter(b.fromQuarter, world.config),
+      toYear: yearOfQuarter(b.toQuarter, world.config),
+      facts: b.facts,
+      points: builderPoints(b.facts, world),
+    }),
+  );
   return {
     inductees,
+    builders,
     ballot,
     bar: config.bar,
     history: historySnapshot(state, world),

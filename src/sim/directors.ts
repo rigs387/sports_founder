@@ -147,6 +147,11 @@ function tierIn(state: GameState, countryId: string): LeagueTierId | null {
   return state.countries.find((c) => c.countryId === countryId)?.league?.tier ?? null;
 }
 
+/** The player's hardcore fans in a country now. */
+function hardcoreIn(state: GameState, countryId: string): number {
+  return state.countries.find((c) => c.countryId === countryId)?.fans[PLAYER_INDEX]?.hardcore ?? 0;
+}
+
 /** Ends a term: the record the Builders wing reads. */
 function endTerm(state: GameState, director: Director, reason: DirectorLeaving): DirectorTerm {
   const promotions = state.landmarks.filter(
@@ -161,6 +166,9 @@ function endTerm(state: GameState, director: Director, reason: DirectorLeaving):
     tierOnLeaving: tierIn(state, director.countryId),
     promotions,
     reason,
+    hardcoreOnLeaving: hardcoreIn(state, director.countryId),
+    healthOnLeaving:
+      state.countries.find((c) => c.countryId === director.countryId)?.league?.health ?? null,
   };
 }
 
@@ -284,6 +292,7 @@ export function syncDirectors(state: GameState, world: World, quarters = 0): Gam
       fromQuarter: answered.quarter,
       tierOnArrival: tierIn(answered, countryId) ?? "amateur",
       declines: 0,
+      hardcoreOnArrival: hardcoreIn(answered, countryId),
     });
   }
   // Candidates for each league while the offseason is open, drawn once.
@@ -610,6 +619,7 @@ export function replaceDirector(
               fromQuarter: state.quarter,
               tierOnArrival: tierIn(state, countryId) ?? director.tierOnArrival,
               declines: 0,
+              hardcoreOnArrival: hardcoreIn(state, countryId),
             }
           : d,
       ),

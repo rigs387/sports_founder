@@ -758,6 +758,8 @@ export type Landmark =
       inductees: number;
       /** The best player on the ballot left out (GDD v1.35), if any. */
       nearMissId: number | null;
+      /** Builders inducted in the same class (GDD v1.40). */
+      builders: number;
     }
   | {
       kind: "rivalRuleCopied";
@@ -974,6 +976,8 @@ export interface Director {
   tierOnArrival: LeagueTierId;
   /** Asks declined in a row (GDD v1.41); at `directors.patience` they resign. */
   declines: number;
+  /** The player's hardcore fans in the country when the term began (the Builders wing). */
+  hardcoreOnArrival: number;
 }
 
 /** Why a director's term ended. */
@@ -987,6 +991,10 @@ export interface DirectorTerm extends Director {
   /** The league's promotions during the term. */
   promotions: number;
   reason: DirectorLeaving;
+  /** The player's hardcore fans in the country when the term ended. */
+  hardcoreOnLeaving: number;
+  /** The league's health when the term ended; null if it had folded. */
+  healthOnLeaving: HealthLevel | null;
 }
 
 /** Someone who could replace a director, drawn when the offseason opens. */
@@ -1176,6 +1184,34 @@ export interface BallotEntry {
   classes: number;
 }
 
+/** A director's term as the Builders wing reads it (GDD v1.40). */
+export interface BuilderFacts {
+  tierOnArrival: LeagueTierId;
+  tierOnLeaving: LeagueTierId;
+  promotions: number;
+  /** Whether the league reached Elite during the term. */
+  reachedElite: boolean;
+  hardcoreOnArrival: number;
+  hardcoreOnLeaving: number;
+  /** Quarters served. */
+  quarters: number;
+}
+
+/** A Builders wing inductee: a league director, inducted once, plaque only (GDD v1.40). */
+export interface BuilderInductee {
+  directorId: number;
+  name: string;
+  countryId: string;
+  trait: string;
+  fromQuarter: number;
+  toQuarter: number;
+  /** The flagship season whose end inducted them (their class). */
+  season: number;
+  turn: number;
+  quarter: number;
+  facts: BuilderFacts;
+}
+
 export interface HallOfFameState {
   /** Only players retiring in this flagship season or later are eligible (no retroactive ones). */
   startSeason: number;
@@ -1183,6 +1219,8 @@ export interface HallOfFameState {
   nextId: number;
   /** Everyone passed over so far; at ballotClasses they are off the ballot for good. */
   ballots: BallotEntry[];
+  /** The Builders wing (GDD v1.40), oldest class first. */
+  builders: BuilderInductee[];
 }
 
 export interface CampaignSetup {

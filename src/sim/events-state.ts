@@ -103,7 +103,8 @@ export const venueFactsSchema = z.strictObject({
 /** The Hall of Fame class a class card tells (GDD v1.31): its season and inductees' ids. */
 export const hallFactsSchema = z.strictObject({
   season: z.int().positive(),
-  inducteeIds: z.array(z.int().positive()).min(1),
+  /** Player inductees; empty for a class of builders only (GDD v1.40). */
+  inducteeIds: z.array(z.int().positive()),
   /** The best player on the ballot left out (GDD v1.35), if any. */
   nearMissId: z.int().positive().nullable().default(null),
 });

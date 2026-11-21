@@ -107,12 +107,19 @@ export function useEventText() {
     snapshot.flagship.players.find((p) => p.id === id)?.name ??
     snapshot.countries.flatMap((c) => c.standouts).find((p) => p.playerId === id)?.name ??
     "";
-  // The Hall of Fame's class card (GDD v1.31) names the class's year and size.
+  // The Hall of Fame's class card (GDD v1.31) names the class's year and size, builders
+  // included (GDD v1.40).
+  const classBuilders = (season: number) =>
+    snapshot.hallOfFame.builders.filter((builder) => builder.season === season);
   const hallText = (event: EventRecord) => {
     const hall = event.facts.hall;
     if (!hall) return {};
     const first = snapshot.hallOfFame.inductees.find((i) => hall.inducteeIds.includes(i.id));
-    return { year: first?.year ?? 0, count: hall.inducteeIds.length };
+    const builders = classBuilders(hall.season);
+    return {
+      year: first?.year ?? builders[0]?.year ?? 0,
+      count: hall.inducteeIds.length + builders.length,
+    };
   };
   // A season lost to a stoppage (GDD v1.39) names the season and the union's term.
   const stoppageText = (event: EventRecord) => {
@@ -366,8 +373,25 @@ export function useEventText() {
           rank: facts.allTimeRank,
         });
       })
-      .concat(nearMissLine(hall.nearMissId));
+      .concat(builderLines(hall.season), nearMissLine(hall.nearMissId));
   };
+  /** The class's builders (GDD v1.40), one line each: their league, its rise, the hardcore growth. */
+  const builderLines = (season: number): string[] =>
+    classBuilders(season).map((builder) => {
+      const { facts } = builder;
+      const rose = facts.tierOnLeaving !== facts.tierOnArrival;
+      return t(rose ? "hall.line_builder" : "hall.line_builder_flat", {
+        name: builder.name,
+        country: country(builder.countryId),
+        from: builder.fromYear,
+        to: builder.toYear,
+        fromTier: t(`league.tiers.${facts.tierOnArrival}`),
+        toTier: t(`league.tiers.${facts.tierOnLeaving}`),
+        growth: t("format.multiplier", {
+          value: facts.hardcoreOnLeaving / Math.max(1, facts.hardcoreOnArrival),
+        }),
+      });
+    });
   /** The class's near-miss (GDD v1.35): left out, passed over again, or off the ballot for good. */
   const nearMissLine = (playerId: number | null): string[] => {
     if (playerId === null) return [];

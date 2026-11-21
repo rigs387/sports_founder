@@ -300,6 +300,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   records carry `facts.director`. The UI is `src/renderer/src/directors/DirectorsCard.tsx`
   on the offseason screen and a line on the league card; its smoke step
   (`src/main/directors-smoke.ts`) runs after the agreement step. Bots never replace.
+  Finished terms (`DirectorsState.past`) record tiers, promotions, the hardcore fans at both
+  ends and the health at leaving: the Builders wing reads them.
   Asks (GDD v1.41, step 2): one an offseason, chosen at End Turn's end from config
   `directors.asks` by priority, trait and the league's facts; a `directorAsk` landmark and the
   card whose `ask` matches (no slot). Granting is the `directorAsk` effect (`grantAsk`); the
@@ -382,7 +384,13 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   units, an all-time top ten), the best who clear the bar up to a cap; the class landmark names
   its near-miss. Inductees add shrine weight at home inside the tradition weight cap
   (`shrineWeights`) and found their star legacy (culture's `legacy`). One `hall-of-fame-class`
-  card per class (`src/sim/hall-cards.ts`, no moment slot). The sport's firsts (`HALL_FIRSTS`,
+  card per class (`src/sim/hall-cards.ts`, no moment slot). The Builders wing (GDD v1.40, tech
+  plan 2.26 step 4) is `HallOfFameState.builders`: league directors chosen in the same class
+  (`chooseBuilders`) from their best finished term. `builderFacts` gates a term
+  (`hallOfFame.builders.minQuarters`, not replaced or resigned, league standing and not
+  Near-Collapse) and `builderPoints` scores it (promotions, reaching Elite, hardcore doublings).
+  Plaque only. The class landmark counts `builders`, so a class card may name builders only.
+  The sport's firsts (`HALL_FIRSTS`,
   config `hallOfFame.firsts`) are the Almanac's history (`historySnapshot`), never inducted. The
   Almanac tab (`src/renderer/src/almanac/`) reads `TurnSnapshot.hallOfFame`: plaques, the Ballot,
   "{Sport} history", Records; it is the home for later history (leaderboards, the timelapse).

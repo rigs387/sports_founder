@@ -89,6 +89,20 @@ export async function verifyRetirement(
       await delay();
     }
 
+    // The Builders wing (GDD v1.40): a long campaign has league directors on plaques.
+    await click(".game-nav [data-view=almanac]");
+    await wait(`!document.querySelector('[data-testid="almanac-screen"]').hidden`);
+    const builders = await count('[data-testid="hall-builders"] li');
+    if (builders === 0) throw new Error("The late-game Almanac has no Builders plaque.");
+    checkText("The Builders wing", await text('[data-testid="hall-builders"]'));
+    await evaluate(
+      `document.getElementById("almanac-builders-heading").scrollIntoView({ block: "start" })`,
+    );
+    await delay(200);
+    await screenshot("60b-late-builders.png");
+    await click(".game-nav [data-view=world]");
+    await delay();
+
     // Retire: offered on the objective card after the win, behind a confirmation.
     if (!(await exists('[data-testid="retire-open"]')))
       throw new Error("A won campaign does not offer Retire.");
@@ -163,7 +177,14 @@ export async function verifyRetirement(
     const reloaded = await count('[data-testid="retrospective-timeline"] li');
     if (reloaded !== sections.timeline)
       throw new Error("The retired save's retrospective differs after loading.");
-    return { loadedTurn, tournaments, ...sections, endTurnDisabled, reloadedOnRetrospective: true };
+    return {
+      loadedTurn,
+      tournaments,
+      builders,
+      ...sections,
+      endTurnDisabled,
+      reloadedOnRetrospective: true,
+    };
   } finally {
     prompts.save = original.save;
     prompts.open = original.open;

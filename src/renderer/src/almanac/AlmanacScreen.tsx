@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
-import type { InducteeFacts, InducteeSnapshot, TurnSnapshot } from "../../../sim";
+import type { BuilderSnapshot, InducteeFacts, InducteeSnapshot, TurnSnapshot } from "../../../sim";
 import { useAwardWords } from "../awards/words";
 import { Emblem } from "../identity/Emblem";
 import { useTermVars } from "../identity/terms";
@@ -32,6 +32,7 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
   const player = (id: number | null) =>
     snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
   const players = [...hall.inductees].reverse();
+  const builders = [...hall.builders].reverse();
   const { champions, scorers, crowd, mostAwards } = hall.records;
   // Seasons lost to a stoppage (GDD v1.39) keep their place in the roll, newest first.
   const roll = [
@@ -46,6 +47,7 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
       aria-labelledby="almanac-title"
       data-testid="almanac-screen"
       data-inductees={hall.inductees.length}
+      data-builders={hall.builders.length}
     >
       <div className="almanac-heading">
         <Emblem
@@ -84,6 +86,23 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
                     home={country(inductee.countryId)}
                     nouns={nouns}
                     onHome={() => onCountry(inductee.countryId)}
+                  />
+                ))}
+              </ul>
+            )}
+          </section>
+          <section className="almanac-card" aria-labelledby="almanac-builders-heading">
+            <h2 id="almanac-builders-heading">{t("almanac.builders.heading")}</h2>
+            {builders.length === 0 ? (
+              <p className="almanac-empty">{t("almanac.builders.empty")}</p>
+            ) : (
+              <ul className="plaques" data-testid="hall-builders">
+                {builders.map((builder) => (
+                  <BuilderPlaque
+                    key={builder.directorId}
+                    builder={builder}
+                    home={country(builder.countryId)}
+                    onHome={() => onCountry(builder.countryId)}
                   />
                 ))}
               </ul>
@@ -353,6 +372,57 @@ function Plaque({
         ))}
       </dl>
       {facts.record && <p className="plaque-record">{t("almanac.recordHolder")}</p>}
+      <button type="button" className="plaque-home" onClick={onHome}>
+        {t("almanac.home", { country: home })}
+      </button>
+    </li>
+  );
+}
+
+/** A builder's plaque (GDD v1.40): name, the league they ran and when, how it rose under them. */
+function BuilderPlaque({
+  builder,
+  home,
+  onHome,
+}: {
+  builder: BuilderSnapshot;
+  home: string;
+  onHome: () => void;
+}) {
+  const { t } = useTranslation();
+  const { facts } = builder;
+  const stats: [string, string][] = [
+    [
+      t("almanac.builders.rise"),
+      t("almanac.builders.riseValue", {
+        from: t(`league.tiers.${facts.tierOnArrival}`),
+        to: t(`league.tiers.${facts.tierOnLeaving}`),
+      }),
+    ],
+    [t("almanac.builders.promotions"), t("format.count", { value: facts.promotions })],
+    [
+      t("almanac.builders.hardcore"),
+      t("format.multiplier", {
+        value: facts.hardcoreOnLeaving / Math.max(1, facts.hardcoreOnArrival),
+      }),
+    ],
+  ];
+  return (
+    <li className="plaque plaque-builder" data-director={builder.directorId}>
+      <span className="plaque-class">{t("almanac.classOf", { year: builder.year })}</span>
+      <h3>{builder.name}</h3>
+      <p>
+        {t("almanac.builders.role", { country: home, from: builder.fromYear, to: builder.toYear })}
+      </p>
+      <p>{t(`directors.traits.${builder.trait}.name`)}</p>
+      <dl>
+        {stats.map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
       <button type="button" className="plaque-home" onClick={onHome}>
         {t("almanac.home", { country: home })}
       </button>

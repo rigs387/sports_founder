@@ -1,7 +1,7 @@
 import { type Config, RULE_AXES, TRADITION_TYPES, type TraditionType } from "../content";
 import { yearOfQuarter } from "./calendar";
 import { localRank } from "./fandom";
-import { chooseClass, classLandmark, shrineWeights } from "./hall-of-fame";
+import { chooseBuilders, chooseClass, classLandmark, shrineWeights } from "./hall-of-fame";
 import { tidyName } from "./identity";
 import { demoteHardcore } from "./leagues";
 import { landmarks } from "./records";
@@ -11,6 +11,7 @@ import { birthFactor, shapeFactors } from "./shape";
 import {
   type AxisId,
   type BallotEntry,
+  type BuilderInductee,
   type Club,
   type CultureState,
   type GameState,
@@ -332,6 +333,8 @@ class CultureUpdate {
   readonly inducted: Inductee[] = [];
   /** The Hall's ballot after this update's classes (GDD v1.35), if a class was chosen. */
   ballots: BallotEntry[] | null = null;
+  /** Builders wing inductees this update adds (GDD v1.40). */
+  readonly builders: BuilderInductee[] = [];
 
   readonly rng: Rng;
 
@@ -796,13 +799,22 @@ class CultureUpdate {
       inductees: [...state.hallOfFame.inductees, ...this.inducted],
       nextId: state.hallOfFame.nextId + this.inducted.length,
       ballots: this.ballots ?? state.hallOfFame.ballots,
+      builders: [...state.hallOfFame.builders, ...this.builders],
     };
     const chosen = chooseClass({ ...state, hallOfFame: hall }, world, summary, state.turn, quarter);
+    const builders = chooseBuilders(
+      { ...state, hallOfFame: hall },
+      world,
+      summary,
+      state.turn,
+      quarter,
+    );
     const year = seasonYear(summary, world);
     for (const inductee of chosen.inductees) this.legacy(inductee.playerId, year);
     this.inducted.push(...chosen.inductees);
     this.ballots = chosen.ballots;
-    this.found.push(...classLandmark(state, chosen.inductees, chosen.nearMissId));
+    this.builders.push(...builders);
+    this.found.push(...classLandmark(state, chosen.inductees, chosen.nearMissId, builders));
   }
 
   /**
@@ -1085,6 +1097,7 @@ export function updateCulture(state: GameState, world: World): GameState {
             inductees: [...state.hallOfFame.inductees, ...update.inducted],
             nextId: state.hallOfFame.nextId + update.inducted.length,
             ballots: update.ballots,
+            builders: [...state.hallOfFame.builders, ...update.builders],
           },
   };
 }

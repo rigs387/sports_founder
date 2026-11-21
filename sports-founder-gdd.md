@@ -233,7 +233,7 @@ no list or inbox anywhere:
     replacing, the scandal card and the advisor voice. A director arrives when End Turn runs
     with the country in a focus slot. Asks and patience built 2026-11-21 (tech plan 2.26 step
     2); partner rule proposals built 2026-11-21 (step 3), from partners whose deal has a
-    clause, so declining is a miss on that clause; the Builders wing is not built.
+    clause, so declining is a miss on that clause; the Builders wing built 2026-11-21 (step 4).
   - *Directors' asks (decided 2026-11-21, v1.41), replacing their rule proposals.* Directors care
     about their own league, not the global rulebook: the sport cannot be reshaped every decade.
     - *One ask an offseason across all directors:* the most pressing wins, so each stays an
@@ -1207,6 +1207,18 @@ lightweight build. Every number is config (`hallOfFame`).
   league rose while they held the job (promotions, reaching Elite, health and hardcore growth
   over their term) earn points from their recorded terms; retired directors reach a Builders
   ballot after a wait, with their own bar and class cap (config `hallOfFame.builders`).
+  - *Builders rules (decided 2026-11-21).* (1) Each term records the player's hardcore fans at
+    arrival and at leaving and the league's health at leaving; points are each promotion,
+    reaching Elite during the term, and each doubling of the hardcore fans (capped). Health is
+    not scored but is a gate: a term that leaves its league folded or Near-Collapse earns nothing
+    (choose pain). (2) Terms ended by focus leaving, the league folding or the seat arriving count;
+    a director replaced or one who resigned never earns. (3) A term must last a minimum (about 3
+    years) before it earns: short terms are the player moving focus, not the director's work.
+    (4) Plaque only: no shrine weight, no PP; administrators have no pilgrims. (5) Builders are
+    chosen in the same class as the players at each season's end and named on the same class
+    card; a class of builders only still gets the card. The near-miss stays players only.
+  - *Built 2026-11-21 (tech plan 2.26 step 4).* Measured in 3 builder campaigns of 200 turns:
+    about 5 builders a campaign (bar 10, 2 a class) beside about 80 players.
   Founding-family members get a Family wing outside the ballot (v1.40, see the founder across 120
   years).
 - *Players are inducted on points from retained records only:* star seasons, titles won while at
