@@ -1,3 +1,4 @@
+import type { DirectorAsk } from "../content";
 import type {
   AgreementTerms,
   AxisId,
@@ -203,6 +204,20 @@ export const landmarks = {
     clubId,
     backed,
   }),
+  directorAsk: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    directorId: number,
+    ask: DirectorAsk,
+    standoutId: number | null,
+  ): Landmark => ({ kind: "directorAsk", turn, quarter, countryId, directorId, ask, standoutId }),
+  directorResigned: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    directorId: number,
+  ): Landmark => ({ kind: "directorResigned", turn, quarter, countryId, directorId }),
   directorScandal: (
     turn: number,
     quarter: number,

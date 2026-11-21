@@ -2,6 +2,7 @@ import type { SeasonInterest, SeasonStory } from "../content";
 import { offseasonOpen, QUARTERS_PER_YEAR, seasonStopped, yearOfQuarter } from "./calendar";
 import { clubGround, ethosFactor, traditionWeights, weighs } from "./culture";
 import { type DealsSnapshot, dealsSnapshot, exclusiveTv, lapseOffers, newDeals } from "./deals";
+import { exhibitionsNow } from "./directors";
 import { demoteHardcore, leagueTierIndex, runningCostPerQuarter } from "./leagues";
 import { leadStory, type Outlet, outletOf } from "./press";
 import { ppPrice } from "./prices";
@@ -500,8 +501,19 @@ function followedReach(
   flagship: FlagshipState,
   world: World,
   reach: ReadonlyMap<number, number>,
+  exhibitions: readonly string[],
 ): ReadonlyMap<number, number> {
   const { link, starFactor } = world.config.standouts.follow;
+  // A flagship exhibition (GDD v1.41) airs where a director hosted it.
+  if (exhibitions.length > 0) {
+    const shown = new Map(reach);
+    const lift = world.config.directors.asks["host-something"].exhibitionLink;
+    for (const countryId of exhibitions) {
+      const at = indexOf(world, countryId);
+      if (countryId !== flagship.countryId) shown.set(at, Math.min(1, (shown.get(at) ?? 0) + lift));
+    }
+    return followedReach(flagship, world, shown, []);
+  }
   const active = new Set(activeClubs(flagship).map((club) => club.id));
   const abroad = flagship.players.filter(
     (player) =>
@@ -525,7 +537,7 @@ function followedReach(
  * of its own links: it pays for a failing league through the league.
  */
 export function broadcastEffects(
-  state: Pick<GameState, "flagship" | "countries" | "quarter" | "agreement">,
+  state: Pick<GameState, "flagship" | "countries" | "quarter" | "agreement" | "directors">,
   world: World,
 ): BroadcastEffects {
   const settings = world.config.flagship.broadcast;
@@ -554,7 +566,7 @@ export function broadcastEffects(
   const since = own ? state.quarter - (flagship.seasons[last]?.quarter ?? 0) : Infinity;
   const fade = Math.max(0, 1 - since / settings.pulse.fadeQuarters);
   const pulse = ceiling * settings.pulse.size * settings.pulse.story[interest] * health * fade;
-  const reach = followedReach(flagship, world, mediaReachFrom(world, seat));
+  const reach = followedReach(flagship, world, mediaReachFrom(world, seat), exhibitionsNow(state));
   const ripple =
     league.health === "near-collapse"
       ? new Map([...reach].map(([target, link]) => [target, settings.rippleShare * link]))

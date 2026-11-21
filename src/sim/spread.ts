@@ -68,7 +68,14 @@ export function unblockedMediaReach(
 export function computeExposure(
   state: Pick<
     GameState,
-    "countries" | "focus" | "growthNodes" | "events" | "quarter" | "flagship" | "agreement"
+    | "countries"
+    | "focus"
+    | "growthNodes"
+    | "events"
+    | "quarter"
+    | "flagship"
+    | "agreement"
+    | "directors"
   >,
   world: World,
 ): CountryExposure[] {

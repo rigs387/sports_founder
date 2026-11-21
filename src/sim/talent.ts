@@ -42,10 +42,14 @@ export function openings(state: GameState): Opening[] {
     .sort((a, b) => b.club.rating - a.club.rating || a.club.id - b.club.id);
 }
 
-/** The best standout abroad who is better than `skill` and not in their final season. */
+/**
+ * The best standout abroad who is better than `skill` and not in their final season, passing by
+ * those a director kept this offseason (GDD v1.41).
+ */
 export function bestAbroad(state: GameState, skill: number): Standout | null {
+  const kept = new Set(state.directors.kept);
   const candidates = state.standouts.players
-    .filter((player) => !player.finalSeason && player.skill > skill)
+    .filter((player) => !player.finalSeason && player.skill > skill && !kept.has(player.id))
     .sort((a, b) => b.skill - a.skill || a.id - b.id);
   return candidates[0] ?? null;
 }

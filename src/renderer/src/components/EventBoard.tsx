@@ -280,7 +280,7 @@ export function EventBoard() {
                                 />
                               ))
                             ) : (
-                              <li>{t("events.noChange")}</li>
+                              <li>{text?.noChange(current) ?? t("events.noChange")}</li>
                             )}
                           </ul>
                           {option.blocker && (
@@ -300,11 +300,14 @@ export function EventBoard() {
                       ))}
                     </div>
                     <p className="event-default">
-                      {t("events.default", {
-                        choice: t(
+                      {(() => {
+                        const choice = t(
                           `events.cards.${current.templateId}.choices.${current.defaultChoice}`,
-                        ),
-                      })}
+                        );
+                        return (
+                          text?.defaultNote(current, choice) ?? t("events.default", { choice })
+                        );
+                      })()}
                     </p>
                     {choice && (
                       <fieldset

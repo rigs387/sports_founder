@@ -26,6 +26,9 @@
     "noChange": "Keep the current approach. No cost or added effect.",
     "review": "Review choice",
     "default": "If left unresolved, Next Turn chooses “{{choice}}” for free, with no added effect.",
+    "defaultAsk": "If left unresolved, Next Turn chooses “{{choice}}”, and that counts as turning the director down.",
+    "askDecline_one": "{{director}} is out of patience: turn this down and they resign, and the league loses standing.",
+    "askDecline_other": "Uses up {{director}}'s patience: {{count}} asks turned down in a row and they resign.",
     "confirmHeading": "Confirm your decision",
     "confirm": "Choose “{{choice}}” in {{country}} for {{amount, number(maximumFractionDigits: 1)}} PP?",
     "confirmChoice": "Make the call",
@@ -97,6 +100,7 @@
       "starKeep": "Costs the league {{cash, money}}. The move is canceled.",
       "starBack": "Backs the star now: their influence grows each season they play here.",
       "starSign": "They join the club now as its leading player. The league's broadcast reaches further into their home country while they play.",
+      "directorAsk": "The director gets what they asked for.",
       "derbyStoke": "Counts as one more meeting toward a derby between these two clubs.",
       "leagueCash": "{{cash, money}} into the flagship league's reserve. It stays there: only profit above the reserve is paid out to the clubs.",
       "leagueCashAt": "{{cash, money}} into the reserve of the league in {{country}}. It stays there: only profit above the reserve is paid out to the clubs.",
@@ -147,6 +151,50 @@
           "neighbourhood": "Work the neighborhood",
           "hold": "Stay with organic growth"
         }
+      },
+      "director-keep-star": {
+        "title": "Keep our star",
+        "body": "{{director}}, who directs the league in {{country}}, has heard the flagship is after {{player}}, the best player there. They ask you to let them stay. Grant it and the talent pull passes them by this offseason; the club gets its young replacement.",
+        "choices": {
+          "grant": "Let them stay",
+          "decline": "Let the flagship have them"
+        }
+      },
+      "director-promotion": {
+        "title": "Go up now",
+        "body": "{{director}} wants the league in {{country}} to step up this offseason, before it has every fan it needs. Investors put in only half as much for a league that goes up early.",
+        "choices": {
+          "grant": "Promote the league now",
+          "decline": "Wait until it's ready"
+        }
+      },
+      "director-hold": {
+        "title": "Hold the money",
+        "body": "{{director}}, who directs the league in {{country}}, wants to bank its money for a year: no payout to the clubs and no promotion until then.",
+        "choices": {
+          "grant": "Bank it for a year",
+          "decline": "Keep the league moving"
+        }
+      },
+      "director-host": {
+        "title": "Bring the game here",
+        "body": "{{director}} wants {{country}} on the big stage: a bid for the World Championship if bids are open, otherwise a flagship exhibition there that puts the league on its screens for a year.",
+        "choices": {
+          "grant": "Make it happen",
+          "decline": "Not this year"
+        }
+      },
+      "director-community": {
+        "title": "A community drive",
+        "body": "{{director}} wants to take the game into the neighborhoods of {{country}}: a year of turning casual fans hardcore faster.",
+        "choices": {
+          "grant": "Fund the drive",
+          "decline": "Not this year"
+        }
+      },
+      "director-resigned": {
+        "title": "A director resigns",
+        "body": "{{director}} has resigned as director of the league in {{country}} after their asks were turned down. The turmoil has cost the league some of its standing, and a new director takes over."
       },
       "director-scandal": {
         "title": "A director in the headlines",
@@ -757,7 +805,8 @@
         "bottomTier": "—",
         "healthy": "—",
         "cooldown": "—",
-        "prestige": "—"
+        "prestige": "—",
+        "held": "Holding money"
       }
     },
     "heading": "The founding league",
@@ -837,7 +886,8 @@
         "healthy": "Only leagues in trouble can receive a bailout.",
         "cooldown_one": "Bailout cooldown: {{count}} quarter remaining.",
         "cooldown_other": "Bailout cooldown: {{count}} quarters remaining.",
-        "prestige": "A bailout costs {{cost, number(maximumFractionDigits: 1)}} Prestige; you have {{current, number(maximumFractionDigits: 1)}}."
+        "prestige": "A bailout costs {{cost, number(maximumFractionDigits: 1)}} Prestige; you have {{current, number(maximumFractionDigits: 1)}}.",
+        "held": "The league's director is holding its money: no promotion and no payout for now."
       }
     }
   },
@@ -1251,6 +1301,8 @@
     "confirm": "Appoint {{name}}",
     "back": "Back",
     "offseasonOnly": "Directors are replaced in the offseason.",
+    "patience_one": "Out of patience: turn down their next ask and they resign.",
+    "patience_other": "They resign if their next {{count}} asks are turned down.",
     "blockers": {
       "cash": "The league has {{cash, money}} and cannot pay {{severance, money}} in severance."
     },

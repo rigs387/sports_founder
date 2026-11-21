@@ -4,6 +4,7 @@ import { offerChampionshipCards } from "./championship-cards";
 import { offerCountermoveCards } from "./countermove-cards";
 import { venueStrength } from "./culture";
 import { offerDealCards } from "./deal-cards";
+import { askBlocker, grantAsk } from "./directors";
 import type { EventRecord, EventState } from "./events-state";
 import { activeClubs, backingPrice, moveClubRatings } from "./flagship";
 import { offerAwardCards, offerHallCards } from "./hall-cards";
@@ -25,6 +26,14 @@ import { birthPP, offerTraditionCards } from "./tradition-cards";
 import { type GameState, HEALTH_LEVELS, type Landmark, PLAYER_INDEX, type World } from "./types";
 import { offerVenueCards } from "./venue-cards";
 
+/** A director's name, serving or not. */
+function directorName(state: GameState, directorId: number): string {
+  return (
+    [...state.directors.serving, ...state.directors.past].find((d) => d.id === directorId)?.name ??
+    ""
+  );
+}
+
 /** A director's scandal as a card tells it (GDD v1.40): the director by name, the fans lost. */
 function scandalFacts(
   state: GameState,
@@ -34,6 +43,56 @@ function scandalFacts(
     (d) => d.id === fact.directorId,
   );
   return { name: director?.name ?? "", demoted: fact.demoted };
+}
+
+/** A league director's ask (GDD v1.41): its card, told from the landmark, takes no slot. */
+function offerDirectorAskCards(
+  state: GameState,
+  world: World,
+  recent: readonly Landmark[],
+  events: EventState,
+): EventState {
+  const pending = [...events.pending];
+  let nextId = events.nextId;
+  for (const landmark of recent) {
+    if (landmark.kind !== "directorAsk") continue;
+    const card = world.events.cards.find((c) => c.ask === landmark.ask);
+    const country = state.countries.find((c) => c.countryId === landmark.countryId);
+    const fans = country?.fans[PLAYER_INDEX];
+    if (!card || !country || !fans) continue;
+    pending.push({
+      id: nextId++,
+      templateId: card.id,
+      countryId: country.countryId,
+      turn: state.turn,
+      quarter: landmark.quarter,
+      facts: {
+        casual: fans.casual,
+        hardcore: fans.hardcore,
+        leagueTier: country.league?.tier ?? null,
+        health: country.league?.health ?? null,
+        rivalId: null,
+        season: null,
+        star: null,
+        tradition: null,
+        deal: null,
+        venue: null,
+        hall: null,
+        countermove: null,
+        championship: null,
+        legacy: null,
+        stoppage: null,
+        director: {
+          name: directorName(state, landmark.directorId),
+          directorId: landmark.directorId,
+          ask: landmark.ask,
+          ...(landmark.standoutId !== null ? { standoutId: landmark.standoutId } : {}),
+        },
+      },
+      resolution: null,
+    });
+  }
+  return { ...events, pending, nextId };
 }
 
 export function eventFactors(
@@ -198,27 +257,33 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
   // A World Championship's stories (GDD v1.37) take none either.
   // A legacy goal met (GDD v1.38) is told last, and takes none.
   // A season lost to a stoppage (GDD v1.39) takes none either.
-  const dealEvents = offerStoppageCards(
+  // A league director's ask (GDD v1.41), one an offseason, takes none either.
+  const dealEvents = offerDirectorAskCards(
     state,
     world,
     recent,
-    offerLegacyCards(
+    offerStoppageCards(
       state,
       world,
       recent,
-      offerChampionshipCards(
+      offerLegacyCards(
         state,
         world,
         recent,
-        offerCountermoveCards(
+        offerChampionshipCards(
           state,
           world,
           recent,
-          offerVenueCards(
+          offerCountermoveCards(
             state,
             world,
             recent,
-            offerDealCards(state, world, recent, traditionEvents),
+            offerVenueCards(
+              state,
+              world,
+              recent,
+              offerDealCards(state, world, recent, traditionEvents),
+            ),
           ),
         ),
       ),
@@ -239,7 +304,8 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
       card.trigger === "countermove" ||
       card.trigger === "championship" ||
       card.trigger === "legacy" ||
-      card.trigger === "stoppage"
+      card.trigger === "stoppage" ||
+      card.trigger === "directorAsk"
     )
       continue;
     if (state.quarter < card.minQuarter || state.ppTier < card.minTier) continue;
@@ -316,6 +382,14 @@ export function offerEvents(state: GameState, world: World, elapsedQuarters: num
           legacy: null,
           stoppage: null,
           ...(fact?.kind === "directorScandal" ? { director: scandalFacts(state, fact) } : {}),
+          ...(fact?.kind === "directorResigned"
+            ? {
+                director: {
+                  name: directorName(state, fact.directorId),
+                  directorId: fact.directorId,
+                },
+              }
+            : {}),
         },
         resolution: null,
       });
@@ -406,7 +480,9 @@ export type EventBlocker =
   | "flagship"
   | "star"
   | "slots"
-  | "ended";
+  | "ended"
+  /** A director's ask whose director is gone or whose facts no longer hold (GDD v1.41). */
+  | "director";
 export function eventBlocker(
   state: GameState,
   world: World,
@@ -436,6 +512,8 @@ export function eventBlocker(
       return "rival";
     const star = starEffectBlocker(state, world, event, effect);
     if (star !== null) return star;
+    if (effect.type === "directorAsk" && askBlocker(state, world, event) !== null)
+      return "director";
   }
   return null;
 }
@@ -463,6 +541,10 @@ function applyEffects(
       effect.type === "starSign"
     ) {
       next = applyStarEffect(next, world, event, effect);
+      continue;
+    }
+    if (effect.type === "directorAsk") {
+      next = grantAsk(next, world, event);
       continue;
     }
     if (effect.type === "leagueCash") {

@@ -13,14 +13,14 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-11-21",
-    tests: 684,
+    tests: 687,
     files: 76,
-    note: "npm run check passed after league directors were built (type checks, Biome, purity, 684 tests in 76 files). Lint has existing visual-study warnings.",
+    note: "npm run check passed after directors' asks were built (type checks, Biome, purity, 687 tests in 76 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-11-21",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click. On the late-game save's offseason it finds five league directors, reviews a candidate (the review states the severance), appoints them, and checks the narrow layout.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click. On the late-game save's offseason it opens the director's ask on the board (declining states the patience it costs), finds five league directors, reviews a candidate (the review states the severance), appoints them, and checks the narrow layout.",
   },
-  eventDeck: { current: 50, target: "40–60" },
+  eventDeck: { current: 56, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Parked items, built in order",
-      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), then their asks with patience (step 2, next), deal partners' rare rule proposals (step 3) and a Builders wing (step 4); seat follow-ups (2.27), youth programs (2.28), flagship ticket pricing (2.29), the founding family (2.30), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
+      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), their asks with patience (step 2 built 2026-11-21), then deal partners' rare rule proposals (step 3, next) and a Builders wing (step 4); seat follow-ups (2.27), youth programs (2.28), flagship ticket pricing (2.29), the founding family (2.30), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
       tag: "Next build",
     },
     {
@@ -124,6 +124,13 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-11-21",
+      type: "Built",
+      title: "Directors' asks and patience",
+      text: "GDD v1.41, tech plan 2.26 step 2 of 4. Once an offseason one director asks for something, chosen by trait and what their league's facts allow: keep our star from the flagship's talent pull, go up early for half the investment, hold the money for a year (no payout, no promotion), host something (a World Championship bid or a flagship exhibition that carries the broadcast there), or a paid community drive. Granting restores patience; declining, the default, uses it, and two declines in a row make the director resign with a health hit and a toast. The cards say what declining costs. Measured in 2 builder campaigns of 120 turns: 90 asks, 85 granted, no resignations; keep our star never came up (it needs a Professional seat pulling from a directed league). npm run check passed (687 tests in 76 files); the smoke opened an ask on the board.",
+      system: "leagues",
+    },
     {
       date: "2026-11-21",
       type: "Design",
@@ -854,7 +861,7 @@ window.SF_PROGRESS = {
       gdd: "GDD system 4 · commissioner's seat",
       icon: "05",
       summary: "The flagship plays real seasons with clubs in real places, on its own screen.",
-      next: "Directors' asks with patience (tech plan 2.26 step 2, GDD v1.41), partners' rare rule proposals (step 3), then the Builders wing (step 4) and the seat follow-ups (tech plan 2.27). Directors' salaries are tiny next to late league cash: tune them before calling them a money sink.",
+      next: "Partners' rare rule proposals (tech plan 2.26 step 3, GDD v1.41), then the Builders wing (step 4) and the seat follow-ups (tech plan 2.27). Directors' salaries are tiny next to late league cash: tune them before calling them a money sink.",
       depends: ["foundation"],
       sources: [
         ["League management", "../league-management/README.md"],
@@ -905,6 +912,10 @@ window.SF_PROGRESS = {
         [
           "built",
           "League directors in focus countries' leagues: one trait, salary, replaced in the offseason, scandals, the advisor voice (tech plan 2.26 step 1, GDD v1.40); standing policies cut",
+        ],
+        [
+          "built",
+          "Directors' asks: one an offseason (keep our star, promotion push, hold the money, host something, community drive), patience and resignation (tech plan 2.26 step 2, GDD v1.41)",
         ],
         [
           "partial",

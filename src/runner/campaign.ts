@@ -189,6 +189,8 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   };
   let levelSeason: number | null = null;
   let directorSalary = 0;
+  // Director asks granted (GDD v1.41): each answered card counted once.
+  const grantedAsks = new Set<number>();
   let lastTurnQuarters = 1;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
@@ -200,6 +202,9 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         directorSalary += leagueCosts(current, world, i).director * lastTurnQuarters;
       }
     lastTurnQuarters = turnLengthQuarters(current.ppTier, world.config);
+    for (const event of current.events.history)
+      if (event.facts.director?.ask && event.resolution?.choiceId === "grant")
+        grantedAsks.add(event.id);
     // Over the next turn's quarters, as the fans stand now: the season-end pulse fades within a
     // turn, and seasons end on turn boundaries at long turns.
     let media = 0;
@@ -696,6 +701,12 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           ),
           replaced: state.directors.past.filter((t) => t.reason === "replaced").length,
           scandals: state.landmarks.filter((l) => l.kind === "directorScandal").length,
+          asks: state.landmarks.reduce<Record<string, number>>((all, l) => {
+            if (l.kind === "directorAsk") all[l.ask] = (all[l.ask] ?? 0) + 1;
+            return all;
+          }, {}),
+          granted: grantedAsks.size,
+          resigned: state.landmarks.filter((l) => l.kind === "directorResigned").length,
         };
       })(),
       championship: (() => {

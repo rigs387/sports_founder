@@ -3,6 +3,7 @@ import type {
   DealClause,
   DealDemand,
   DealSlot,
+  DirectorAsk,
   EscalationLevel,
   Genome,
   HealthLevel,
@@ -541,6 +542,24 @@ export type Landmark =
    * for it on the signing card.
    */
   | {
+      /** A league director's ask (GDD v1.41); the standout for keep-our-star. */
+      kind: "directorAsk";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      directorId: number;
+      ask: DirectorAsk;
+      standoutId: number | null;
+    }
+  | {
+      /** A director resigned after declines in a row (GDD v1.41). */
+      kind: "directorResigned";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      directorId: number;
+    }
+  | {
       /** A scandal-prone director's scandal (GDD v1.40): hardcore fans there turned casual. */
       kind: "directorScandal";
       turn: number;
@@ -937,10 +956,12 @@ export interface Director {
   /** The quarter the term began. */
   fromQuarter: number;
   tierOnArrival: LeagueTierId;
+  /** Asks declined in a row (GDD v1.41); at `directors.patience` they resign. */
+  declines: number;
 }
 
 /** Why a director's term ended. */
-export type DirectorLeaving = "focus" | "replaced" | "league" | "seat";
+export type DirectorLeaving = "focus" | "replaced" | "league" | "seat" | "resigned";
 
 /** A finished term, kept for the Builders wing (GDD v1.40). */
 export interface DirectorTerm extends Director {
@@ -967,6 +988,16 @@ export interface DirectorsState {
   past: DirectorTerm[];
   /** This offseason's candidates for each serving director's league; empty outside it. */
   candidates: { countryId: string; options: DirectorCandidate[] }[];
+  /** The last ask, by director and the quarter it was asked, until its answer is read (v1.41). */
+  openAsk: { directorId: number; quarter: number } | null;
+  /** The flagship season of the offseason the last ask came in, so there is one an offseason. */
+  askedSeason: number | null;
+  /** Standouts the talent pull passes by this offseason (keep-our-star). */
+  kept: number[];
+  /** Leagues holding their money (hold-the-money): no payout, no promotion until endQuarter. */
+  holds: { countryId: string; endQuarter: number }[];
+  /** Flagship exhibitions (host-something): the broadcast reaches there until endQuarter. */
+  exhibitions: { countryId: string; endQuarter: number }[];
 }
 
 export const MIN_WAGES = ["low", "standard", "high"] as const;

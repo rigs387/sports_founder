@@ -798,6 +798,30 @@ directors:
     scandal-prone:
       { runningCost: 1, income: 1.1, casualConversion: 1.05, hardcoreConversion: 1.05, scandals: true }
   scandal: { chancePerYear: 0.25, hardcoreLoss: 0.03 }
+  # Asks (GDD v1.41): at most one card an offseason across all directors. The ask with the highest
+  # priority that some director's trait makes and their league's facts allow is asked, by the
+  # director of the league with the most hardcore fans. Declining counts against patience: after
+  # `patience` declines in a row the director resigns, the league's health drops
+  # resignation.healthSteps rungs (never into collapse) and a new director is drawn.
+  #   keep-our-star    the flagship's talent pull names their league's best standout: the pull
+  #                    passes them by this offseason.
+  #   promotion-push   the league qualifies, or has nearShare of the hardcore fans it needs: it
+  #                    goes up now, with investmentShare of the usual investment.
+  #   hold-the-money   the league is paying profit out or could go up: for `quarters` it pays
+  #                    nothing out and cannot be promoted.
+  #   host-something   with World Championship bids open, the country bids; otherwise a flagship
+  #                    exhibition there: the broadcast's link into it gains exhibitionLink (a share
+  #                    of the strongest) for exhibitionQuarters.
+  #   community-drive  the card's own PP price and conversion effect.
+  patience: 2
+  resignation: { healthSteps: 1 }
+  asks:
+    keep-our-star: { traits: [frugal, showman, grassroots, scandal-prone], priority: 5 }
+    promotion-push: { traits: [showman], priority: 4, nearShare: 0.8, investmentShare: 0.5 }
+    hold-the-money: { traits: [frugal], priority: 3, quarters: 4 }
+    host-something:
+      { traits: [showman], priority: 2, exhibitionQuarters: 4, exhibitionLink: 0.25 }
+    community-drive: { traits: [grassroots, scandal-prone], priority: 1 }
 
 # National teams (GDD v1.37). Any country with a league at minTier or above fields one; nothing is
 # saved between championships. Strength (never shown as a number) = tierBase for the league, plus

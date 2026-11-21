@@ -1,5 +1,6 @@
 import { offseasonOpen } from "./calendar";
 import { leagueIncomePerQuarter } from "./deals";
+import { holdingMoney } from "./directors";
 import { leagueCosts } from "./league-costs";
 import { bailoutTerms, leagueTierIndex, promotionTerms } from "./leagues";
 import {
@@ -24,7 +25,9 @@ export type LeagueActionBlocker =
   | { kind: "bottomTier" }
   | { kind: "healthy" }
   | { kind: "cooldown"; readyQuarter: number; remainingQuarters: number }
-  | { kind: "prestige"; cost: number; current: number };
+  | { kind: "prestige"; cost: number; current: number }
+  /** The league's director is holding its money (GDD v1.41): no promotion until then. */
+  | { kind: "held"; readyQuarter: number };
 
 export interface LeagueActions {
   promoteLeague: {
@@ -105,23 +108,33 @@ export function leagueActions(state: GameState, world: World, index: number): Le
         ? { kind: "window" }
         : !promotion
           ? { kind: "topTier", tier: league.tier }
-          : hardcore < promotion.hardcoreNeeded
+          : // A director holding the money (GDD v1.41) is a decision, said before what is short.
+            holdingMoney(state, country.countryId)
             ? {
-                kind: "hardcore",
-                to: promotion.to,
-                needed: promotion.hardcoreNeeded,
-                current: hardcore,
+                kind: "held",
+                readyQuarter: Math.max(
+                  ...state.directors.holds
+                    .filter((h) => h.countryId === country.countryId)
+                    .map((h) => h.endQuarter),
+                ),
               }
-            : venueNeeded > league.venue.level
+            : hardcore < promotion.hardcoreNeeded
               ? {
-                  kind: "venue",
+                  kind: "hardcore",
                   to: promotion.to,
-                  needed: venueNeeded,
-                  current: league.venue.level,
+                  needed: promotion.hardcoreNeeded,
+                  current: hardcore,
                 }
-              : league.health !== "healthy"
-                ? { kind: "unhealthy", health: league.health }
-                : null);
+              : venueNeeded > league.venue.level
+                ? {
+                    kind: "venue",
+                    to: promotion.to,
+                    needed: venueNeeded,
+                    current: league.venue.level,
+                  }
+                : league.health !== "healthy"
+                  ? { kind: "unhealthy", health: league.health }
+                  : null);
   const stepDownBlocker: LeagueActionBlocker | null =
     ended ??
     (league.health !== "near-collapse"
@@ -208,5 +221,7 @@ export function leagueActionReason(blocker: LeagueActionBlocker | null): string 
       return `bailout cooldown: available again at quarter ${blocker.readyQuarter}`;
     case "prestige":
       return `not enough PP: a bailout costs ${blocker.cost.toFixed(1)}, you have ${blocker.current.toFixed(1)}`;
+    case "held":
+      return `the league's director is holding its money until quarter ${blocker.readyQuarter}`;
   }
 }

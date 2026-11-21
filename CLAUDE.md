@@ -300,6 +300,14 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   records carry `facts.director`. The UI is `src/renderer/src/directors/DirectorsCard.tsx`
   on the offseason screen and a line on the league card; its smoke step
   (`src/main/directors-smoke.ts`) runs after the agreement step. Bots never replace.
+  Asks (GDD v1.41, step 2): one an offseason, chosen at End Turn's end from config
+  `directors.asks` by priority, trait and the league's facts; a `directorAsk` landmark and the
+  card whose `ask` matches (no slot). Granting is the `directorAsk` effect (`grantAsk`); the
+  answer is read back from the journal next sync (`openAsk`, `settlePatience`): declining,
+  the default, uses patience, and at `directors.patience` the director resigns. Their effects
+  live in `DirectorsState` (`kept`, `holds`, `exhibitions`), read by `bestAbroad`,
+  `quarter.ts`, the `held` promotion blocker and `followedReach`. Cards say what declining
+  costs (`noChange`, `defaultNote` in `event-text.tsx`).
 - Venues and payroll (GDD v1.30) are the flagship's only: `LeagueState.venue` (level 1–5, a build,
   the record crowd) on every league, built only at the seat. `src/sim/venues.ts` (capacity, the
   conversion lift), `src/sim/venue-actions.ts` (`buildVenue` in the offseason; `openVenues` when

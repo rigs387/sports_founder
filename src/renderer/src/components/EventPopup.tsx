@@ -150,7 +150,7 @@ export function EventLayer({
                     {first ? (
                       <Effect effect={first} star={star} />
                     ) : (
-                      <li>{t("events.noChange")}</li>
+                      <li>{text?.noChange(current) ?? t("events.noChange")}</li>
                     )}
                     {rest.length > 0 && (
                       <li className="choice-more">
@@ -166,7 +166,7 @@ export function EventLayer({
                         <Effect effect={effect} key={JSON.stringify(effect)} star={star} />
                       ))
                     ) : (
-                      <li>{t("events.noChange")}</li>
+                      <li>{text?.noChange(current) ?? t("events.noChange")}</li>
                     )}
                   </ul>
                   {option.blocker && (
@@ -210,7 +210,8 @@ export function EventLayer({
         <footer>
           <small>
             {current.defaultChoice &&
-              t("events.default", { choice: choiceName(current.defaultChoice) })}
+              (text?.defaultNote(current, choiceName(current.defaultChoice)) ??
+                t("events.default", { choice: choiceName(current.defaultChoice) }))}
           </small>
           <button
             type="button"

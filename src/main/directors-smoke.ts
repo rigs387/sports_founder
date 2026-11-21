@@ -1,9 +1,10 @@
 import type { BrowserWindow } from "electron";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /**
- * League directors (GDD v1.40, tech plan 2.26 step 1). Runs right after the agreement step, on
+ * League directors (GDD v1.40, v1.41; tech plan 2.26 steps 1-2). Runs right after the agreement step, on
  * the late-game campaign with its offseason still open: the bot that played it held focus slots
- * abroad, so leagues there have directors. Finds the directors card on the offseason screen,
+ * abroad, so leagues there have directors. Finds the offseason's ask card on the map, then the directors card on the offseason screen,
  * reviews a candidate (the review states the severance), appoints them, sees
  * the new director in place, and checks the narrow layout.
  */
@@ -25,12 +26,32 @@ export async function verifyDirectors(
   };
   const OFFSEASON = '[data-testid="offseason-screen"]';
   const CARD = `${OFFSEASON} [data-testid="directors-card"]`;
+  const exists = (selector: string) =>
+    evaluate<boolean>(`!!document.querySelector(${JSON.stringify(selector)})`);
   const text = (selector: string) =>
     evaluate<string>(`document.querySelector('${selector}')?.textContent ?? ""`);
   const checkText = (value: string) => {
     if (value.includes("{{") || /\bdirectors\.[a-z]/.test(value))
       throw new Error(`The directors card shows a missing string: ${value.slice(0, 300)}`);
   };
+
+  // The offseason's ask (GDD v1.41): earlier steps set the turn's decisions aside, so it waits on
+  // the board. Open it there and read it.
+  await click(".game-nav [data-view=world]");
+  await evaluate(COLLECT_NEWS);
+  await click('[data-testid="events-open"]');
+  await wait(`!!document.querySelector('[data-testid="event-board"]')`);
+  const TICKET = `[data-testid="event-board"] .event-ticket[data-event-template^="director-"]:not([data-event-template="director-scandal"]):not([data-event-template="director-resigned"])`;
+  if (!(await exists(TICKET))) throw new Error("No director's ask is waiting in the offseason.");
+  const ask = await evaluate<string>(`document.querySelector('${TICKET}').dataset.eventTemplate`);
+  await click(TICKET);
+  await wait(`!!document.querySelector('[data-testid="event-story"]')`);
+  const words = await text('[data-testid="event-story"]');
+  if (words.includes("{{") || /\bevents\.cards\./.test(words))
+    throw new Error(`The ask card shows a missing string: ${words.slice(0, 300)}`);
+  await screenshot("61-director-ask.png");
+  await click('[data-testid="events-close"]');
+  await delay();
 
   await click(".game-nav [data-view=offseason]");
   await wait(`!document.querySelector('${OFFSEASON}').hidden`);
@@ -74,5 +95,5 @@ export async function verifyDirectors(
   await delay();
   if (narrowOverflow) throw new Error("The directors card overflows on a narrow viewport.");
   await click(".game-nav [data-view=world]");
-  return { serving, countryId, before, after, review, narrowOverflow };
+  return { ask, serving, countryId, before, after, review, narrowOverflow };
 }

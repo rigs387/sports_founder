@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  DIRECTOR_ASKS,
   dealDemandSchema,
   dealSlotSchema,
   healthLevelSchema,
@@ -158,7 +159,17 @@ export const eventRecordSchema = z.strictObject({
       .nullable()
       .default(null),
     /** A league director's scandal (GDD v1.40): who, and the hardcore fans it cost. */
-    director: z.strictObject({ name: z.string().min(1), demoted: z.int().positive() }).optional(),
+    director: z
+      .strictObject({
+        name: z.string().min(1),
+        directorId: z.int().positive().optional(),
+        /** The hardcore fans a scandal cost. */
+        demoted: z.int().positive().optional(),
+        /** The ask an ask card tells (GDD v1.41), and the standout keep-our-star names. */
+        ask: z.enum(DIRECTOR_ASKS).optional(),
+        standoutId: z.int().positive().optional(),
+      })
+      .optional(),
   }),
   resolution: z
     .strictObject({

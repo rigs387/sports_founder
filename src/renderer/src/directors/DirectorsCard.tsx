@@ -54,6 +54,9 @@ export function DirectorsCard({
                   })}
                 </p>
                 <p className="flagship-empty">{t(`directors.traits.${director.trait}.effect`)}</p>
+                <p className="flagship-empty" data-testid="director-patience">
+                  {t("directors.patience", { count: director.patience })}
+                </p>
                 {!readOnly && options && options.options.length === 0 && (
                   <p className="flagship-empty">{t("directors.replaced")}</p>
                 )}

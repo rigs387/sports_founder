@@ -217,6 +217,10 @@ export interface CampaignResult {
     leagueCash: number;
     replaced: number;
     scandals: number;
+    /** Asks made, by ask (GDD v1.41), how many were granted, and resignations. */
+    asks: Record<string, number>;
+    granted: number;
+    resigned: number;
   };
   /** The World Championship (GDD v1.37). */
   championship: {
@@ -540,6 +544,13 @@ export function directorsAggregate(results: CampaignResult[]) {
     traits,
     replaced: total((r) => r.directors.replaced),
     scandals: total((r) => r.directors.scandals),
+    asks: results.reduce<Record<string, number>>((all, r) => {
+      for (const [ask, count] of Object.entries(r.directors.asks))
+        all[ask] = (all[ask] ?? 0) + count;
+      return all;
+    }, {}),
+    granted: total((r) => r.directors.granted),
+    resigned: total((r) => r.directors.resigned),
     salaryPaid: total((r) => r.directors.salaryPaid),
     leagueCash: total((r) => r.directors.leagueCash),
   };

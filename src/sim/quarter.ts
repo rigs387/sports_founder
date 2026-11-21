@@ -2,7 +2,7 @@ import { QUARTERS_PER_YEAR, yearOfQuarter } from "./calendar";
 import { reclaimShare, rivalConversionBoosts } from "./countermoves";
 import { curseWeights, traditionShelter, traditionWeights, venueStrengths } from "./culture";
 import { leagueIncomePerQuarter } from "./deals";
-import { directorFactors } from "./directors";
+import { directorFactors, holdingMoney } from "./directors";
 import { eventFactors } from "./events";
 import { fandomScore } from "./fandom";
 import { backingEffects, broadcastEffects, closeOffseason, stepFlagshipQuarter } from "./flagship";
@@ -199,7 +199,10 @@ export function stepQuarter(
       quarter,
       leagueIncomePerQuarter(state, world, index, moved),
       leagueCosts(state, world, index, moved).total,
-      leagueReserve(state, world, index, moved),
+      // A league holding its money (GDD v1.41) pays nothing out.
+      holdingMoney(state, country.id)
+        ? Number.POSITIVE_INFINITY
+        : leagueReserve(state, world, index, moved),
     );
     if (business.landmark) found.push(business.landmark);
     return business.country;

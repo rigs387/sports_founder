@@ -858,7 +858,11 @@ function main(): number {
       .map(([trait, count]) => `${trait} ${count}`)
       .join(", ");
     console.log(
-      `  Directors: ${directors.served} terms (median ${fmt(directors.perCampaign)} a campaign; ${traitLine || "none"}), ${directors.replaced} replaced, ${directors.scandals} scandals; salary paid ${millions(directors.salaryPaid)} against ${dollars(directors.leagueCash)} league cash at the end (seat excluded)`,
+      `  Directors: ${directors.served} terms (median ${fmt(directors.perCampaign)} a campaign; ${traitLine || "none"}), ${directors.replaced} replaced, ${directors.scandals} scandals; asks ${
+        Object.entries(directors.asks)
+          .map(([ask, n]) => `${ask} ${n}`)
+          .join(", ") || "none"
+      }, ${directors.granted} granted, ${directors.resigned} resignations; salary paid ${millions(directors.salaryPaid)} against ${dollars(directors.leagueCash)} league cash at the end (seat excluded)`,
     );
     const cup = championshipAggregate(results);
     console.log(

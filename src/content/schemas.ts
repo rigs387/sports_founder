@@ -542,6 +542,16 @@ export const dealClauseSchema = z.enum(DEAL_CLAUSES);
 export type DealClause = (typeof DEAL_CLAUSES)[number];
 export type DealDemand = z.infer<typeof dealDemandSchema>;
 
+/** What a league director may ask for (GDD v1.41), most pressing last in this list's config. */
+export const DIRECTOR_ASKS = [
+  "keep-our-star",
+  "promotion-push",
+  "hold-the-money",
+  "host-something",
+  "community-drive",
+] as const;
+export type DirectorAsk = (typeof DIRECTOR_ASKS)[number];
+const askSchema = z.strictObject({ traits: z.array(id).min(1), priority: z.int() });
 const byLeagueTier = <T extends z.ZodType>(value: T) =>
   z.strictObject({ amateur: value, "semi-pro": value, professional: value, elite: value });
 /** A rule a partner wants: one step of `axis` toward `toward`. Checked against the genome at load. */
@@ -1248,6 +1258,23 @@ export const configFileSchema = z.strictObject({
       )
       .refine((traits) => Object.keys(traits).length > 0, "needs at least one trait"),
     scandal: z.strictObject({ chancePerYear: unitInterval, hardcoreLoss: unitInterval }),
+    /** Declines in a row before a director resigns (GDD v1.41). */
+    patience: z.int().min(1),
+    resignation: z.strictObject({ healthSteps: z.int().min(0) }),
+    /** The asks (GDD v1.41): which traits make each, its priority, and its own numbers. */
+    asks: z.strictObject({
+      "keep-our-star": askSchema,
+      "promotion-push": askSchema.extend({
+        nearShare: unitInterval,
+        investmentShare: unitInterval,
+      }),
+      "hold-the-money": askSchema.extend({ quarters: z.int().min(1) }),
+      "host-something": askSchema.extend({
+        exhibitionQuarters: z.int().min(1),
+        exhibitionLink: unitInterval,
+      }),
+      "community-drive": askSchema,
+    }),
   }),
   /**
    * National teams (GDD v1.37): a country with a league at minTier or above fields one. Strength

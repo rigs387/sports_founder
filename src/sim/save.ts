@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   AXIS_IDS,
   type AxisId,
+  DIRECTOR_ASKS,
   dealClauseSchema,
   dealDemandSchema,
   dealSlotSchema,
@@ -48,6 +49,7 @@ const directorSchema = z.strictObject({
   trait: z.string().min(1),
   fromQuarter: z.int().min(0),
   tierOnArrival: leagueTierSchema,
+  declines: z.int().min(0),
 });
 const axisSchema = z.enum(AXIS_IDS as [AxisId, ...AxisId[]]);
 
@@ -202,6 +204,22 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     playerId: z.int().min(1),
     clubId: z.int().min(1),
     backed: z.boolean(),
+  }),
+  z.strictObject({
+    kind: z.literal("directorAsk"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    directorId: z.int().min(1),
+    ask: z.enum(DIRECTOR_ASKS),
+    standoutId: z.int().min(1).nullable(),
+  }),
+  z.strictObject({
+    kind: z.literal("directorResigned"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    directorId: z.int().min(1),
   }),
   z.strictObject({
     kind: z.literal("directorScandal"),
@@ -798,7 +816,7 @@ const gameStateSchema = z.strictObject({
         toQuarter: count,
         tierOnLeaving: leagueTierSchema.nullable(),
         promotions: z.int().min(0),
-        reason: z.enum(["focus", "replaced", "league", "seat"]),
+        reason: z.enum(["focus", "replaced", "league", "seat", "resigned"]),
       }),
     ),
     candidates: z.array(
@@ -807,6 +825,11 @@ const gameStateSchema = z.strictObject({
         options: z.array(z.strictObject({ name: z.string().min(1), trait: z.string().min(1) })),
       }),
     ),
+    openAsk: z.strictObject({ directorId: z.int().min(1), quarter: count }).nullable(),
+    askedSeason: z.int().min(1).nullable(),
+    kept: z.array(z.int().min(1)),
+    holds: z.array(z.strictObject({ countryId: z.string().min(1), endQuarter: count })),
+    exhibitions: z.array(z.strictObject({ countryId: z.string().min(1), endQuarter: count })),
   }),
 });
 

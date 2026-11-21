@@ -1,14 +1,20 @@
 import { describe, expect, it } from "vitest";
 import {
   applyAction,
+  bestAbroad,
+  broadcastEffects,
   createCampaign,
   directorFactors,
   directorIn,
+  type EventRecord,
   endTurn,
   type GameState,
+  grantAsk,
+  leagueActions,
   leagueCosts,
   leagueIncomePerQuarter,
   newLeague,
+  offerEvents,
   syncDirectors,
   type World,
 } from "../src/sim";
@@ -114,5 +120,123 @@ describe("league directors", () => {
     expect(scandal.demoted).toBeGreaterThan(0);
     const card = next.events.pending.find((e) => e.templateId === "director-scandal");
     expect(card?.facts.director?.name).toBe(directorIn(state, "argentina")?.name);
+  });
+});
+
+// Asks (GDD v1.41, tech plan 2.26 step 2).
+describe("directors' asks", () => {
+  /** Argentina directed by a grassroots director, with the offseason open. */
+  function offseason(trait = "grassroots"): { state: GameState; world: World } {
+    const only = onlyTrait(trait);
+    const state = syncDirectors(withArgentina(), only);
+    return { state: { ...state, flagship: { ...state.flagship, offseason: true } }, world: only };
+  }
+
+  /** The ask answered: its card resolved in the journal with `choiceId`. */
+  function answer(state: GameState, choiceId: string): GameState {
+    const card = state.events.pending.find((e) => e.facts.director?.ask);
+    if (!card) throw new Error("No ask card");
+    const resolved: EventRecord = {
+      ...card,
+      resolution: {
+        choiceId,
+        automatic: false,
+        turn: state.turn,
+        quarter: state.quarter,
+        cost: 0,
+        ppGained: 0,
+        reward: null,
+      },
+    };
+    return {
+      ...state,
+      events: {
+        ...state.events,
+        pending: state.events.pending.filter((e) => e.id !== card.id),
+        history: [...state.events.history, resolved],
+      },
+    };
+  }
+
+  it("one ask an offseason, told by name; two declines and the director resigns", () => {
+    const { state, world: only } = offseason();
+    const asked = offerEvents(syncDirectors(state, only, 1), only, 1);
+    const card = asked.events.pending.find((e) => e.templateId === "director-community");
+    expect(card?.facts.director?.name).toBe(directorIn(state, "argentina")?.name);
+    // Only one this offseason.
+    expect(
+      syncDirectors(asked, only, 1).landmarks.filter((l) => l.kind === "directorAsk"),
+    ).toHaveLength(1);
+    // Declined once: patience left.
+    const once = syncDirectors(answer(asked, "decline"), only);
+    expect(directorIn(once, "argentina")?.declines).toBe(1);
+    // Next offseason, declined again: they resign, the league loses a rung, a new one is drawn.
+    const again = offerEvents(
+      syncDirectors(
+        { ...once, flagship: { ...once.flagship, season: once.flagship.season + 1 } },
+        only,
+        1,
+      ),
+      only,
+      1,
+    );
+    const resigned = syncDirectors(answer(again, "decline"), only);
+    expect(resigned.directors.past.at(-1)).toMatchObject({ reason: "resigned" });
+    expect(resigned.countries[index]?.league?.health).toBe("struggling");
+    expect(directorIn(resigned, "argentina")?.declines).toBe(0);
+    expect(resigned.landmarks.at(-1)?.kind).toBe("directorResigned");
+  });
+
+  it("granting restores patience", () => {
+    const { state, world: only } = offseason();
+    const asked = offerEvents(syncDirectors(state, only, 1), only, 1);
+    const granted = syncDirectors(answer(asked, "grant"), only);
+    expect(directorIn(granted, "argentina")?.declines).toBe(0);
+    expect(granted.directors.openAsk).toBeNull();
+  });
+
+  it("each ask does what it says", () => {
+    const { state } = offseason("showman");
+    const director = directorIn(state, "argentina");
+    const card = (
+      ask: "promotion-push" | "hold-the-money" | "host-something",
+      standoutId?: number,
+    ) =>
+      ({
+        countryId: "argentina",
+        facts: { director: { name: "x", directorId: director?.id, ask, standoutId } },
+      }) as unknown as EventRecord;
+    // Promotion push: up now, with part of the usual investment.
+    const promoted = grantAsk(state, world, card("promotion-push"));
+    expect(promoted.countries[index]?.league?.tier).toBe("semi-pro");
+    const investment = leagueActions(state, world, index)?.promoteLeague.terms?.investment ?? 0;
+    expect(promoted.countries[index]?.league?.cash).toBeCloseTo(
+      (state.countries[index]?.league?.cash ?? 0) +
+        world.config.directors.asks["promotion-push"].investmentShare * investment,
+    );
+    // Hold the money: no promotion while it holds.
+    const held = grantAsk(state, world, card("hold-the-money"));
+    expect(leagueActions(held, world, index)?.promoteLeague.blocker?.kind).toBe("held");
+    // Host something, no bids open: a flagship exhibition airs there.
+    const hosted = grantAsk(state, world, card("host-something"));
+    expect(broadcastEffects(hosted, world).reach.get(index) ?? 0).toBeGreaterThan(
+      broadcastEffects(state, world).reach.get(index) ?? 0,
+    );
+    // Keep our star: the talent pull passes the kept standout by.
+    const star = {
+      id: 900,
+      name: "A B",
+      countryId: "argentina",
+      birthplace: "x",
+      birthSeason: 1,
+      peakSkill: 90,
+      skill: 90,
+      finalSeason: false,
+    };
+    const withStar = { ...state, standouts: { ...state.standouts, players: [star] } };
+    expect(bestAbroad(withStar, 10)?.id).toBe(900);
+    expect(
+      bestAbroad({ ...withStar, directors: { ...withStar.directors, kept: [900] } }, 10),
+    ).toBeNull();
   });
 });

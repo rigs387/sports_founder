@@ -163,6 +163,10 @@ function effectValue(
       const { casualConversion, mediaReach, influenceSeasons } = world.config.flagship.backing;
       return influenceSeasons * (casualConversion * weights.casual + mediaReach * weights.media);
     }
+    case "directorAsk":
+      // A director's ask (GDD v1.41): bots read it as goodwill worth half a league rung, since
+      // declining uses up the director's patience.
+      return 0.5 * weights.league;
     case "starSign": {
       // A player from abroad (GDD v1.37): the broadcast's link into their home market grows
       // while they play, for the seasons a backing takes to grow.

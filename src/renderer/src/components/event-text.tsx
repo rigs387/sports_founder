@@ -77,6 +77,7 @@ export function Effect({ effect, star = {} }: { effect: EventEffect; star?: Star
   if (effect.type === "derbyStoke") return <li>{t("events.effects.derbyStoke")}</li>;
   if (effect.type === "starBack") return <li>{t("events.effects.starBack")}</li>;
   if (effect.type === "starSign") return <li>{t("events.effects.starSign")}</li>;
+  if (effect.type === "directorAsk") return <li>{t("events.effects.directorAsk")}</li>;
   return (
     <li className={effect.type === "hardcoreDemotion" ? "event-tradeoff" : undefined}>
       {t(`events.effects.${effect.type === "fanShift" ? effect.target : effect.type}`, {
@@ -319,6 +320,7 @@ export function useEventText() {
       // A league director's scandal (GDD v1.40).
       director: event.facts.director?.name ?? "",
       demoted: event.facts.director?.demoted ?? 0,
+      player: player(event.facts.director?.standoutId),
       ...textVars(event),
     });
   /** A Hall of Fame class's inductees, one line each, from the facts recorded at induction. */
@@ -419,5 +421,18 @@ export function useEventText() {
       year: snapshot.year - Math.floor(snapshot.quarter / 4) + Math.floor(index / 4),
     });
   };
-  return { country, club, player, title, body, factLines, dateOf, termVars };
+  /**
+   * A director's ask (GDD v1.41): turning it down is not free, it uses up their patience. Said in
+   * place of "no change" on the decline, and in the note on what Next Turn picks.
+   */
+  const askNote = (event: EventRecord): string | null => {
+    const told = event.facts.director;
+    if (!told?.ask) return null;
+    const director = snapshot.directors.serving.find((d) => d.id === told.directorId);
+    return t("events.askDecline", { director: told.name, count: director?.patience ?? 1 });
+  };
+  const noChange = (event: EventRecord) => askNote(event) ?? t("events.noChange");
+  const defaultNote = (event: EventRecord, choice: string) =>
+    t(askNote(event) ? "events.defaultAsk" : "events.default", { choice });
+  return { country, club, player, title, body, factLines, dateOf, termVars, noChange, defaultNote };
 }

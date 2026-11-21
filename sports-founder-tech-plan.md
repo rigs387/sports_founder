@@ -1708,6 +1708,20 @@ format starts campaigns fresh. One step per session; each ends with `npm run che
    (`Director.declines`, config `directors.patience`): two declines in a row and they resign
    (a `directorResigned` landmark, a new director drawn, a health hit). Bots answer by their
    event weights; the runner prints asks offered, accepted and resignations.
+   *Built 2026-11-21.* The ask is chosen at End Turn's end (`syncDirectors` with quarters) in an
+   open offseason: the highest-priority ask (config `directors.asks`) a director's trait makes
+   and their league's facts allow, from the league with the most hardcore fans; a
+   `directorAsk` landmark, then the ask's card (`ask` on the template, no slot). Granting is
+   the `directorAsk` effect (`grantAsk`); `DirectorsState.openAsk` is read back from the
+   journal at the next sync (`settlePatience`): grant restores patience, decline (the default)
+   uses it. Keep-our-star needs the talent pull's signing offer to name the league's standout
+   (`kept`, skipped by `bestAbroad`); promotion-push promotes at `investmentShare`;
+   hold-the-money is `holds` (no payout in `quarter.ts`, the `held` promotion blocker);
+   host-something joins open World Championship bids, else an exhibition (`exhibitions`, read
+   by `followedReach`). A resignation is the minor `director-resigned` toast. Cards say that
+   declining uses patience. Measured (2 builder campaigns, 120 turns): 90 asks (host 42, hold 21,
+   community 16, promotion 11, keep-our-star 0: it needs a Professional seat pulling from a
+   directed league), 85 granted, no resignations: bots grant nearly everything.
 3. **Partner rule proposals** (revised 2026-11-21, GDD v1.41). At most one in
    `proposals.everySeasons` seasons, from a flagship deal partner: one step on one rule trait
    chosen for its market or product, never a trait amended within the window. Accept applies it
