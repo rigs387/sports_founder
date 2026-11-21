@@ -159,6 +159,18 @@ export const eventRecordSchema = z.strictObject({
       .strictObject({ season: z.int().positive(), term: z.int().positive() })
       .nullable()
       .default(null),
+    /** A relocation ask (GDD v1.41): the club and its old and new town. */
+    relocation: z
+      .strictObject({
+        clubId: z.int().positive(),
+        from: z.string().min(1),
+        to: z.string().min(1),
+        /** The owners' losses staying would cost the seat league, when asked (sim cash). */
+        loss: z.number().min(0),
+        /** The bad seasons running that made the ask. */
+        seasons: z.int().positive(),
+      })
+      .optional(),
     /** The leagues an orphaned seat may go to (GDD v1.40), most hardcore fans first. */
     seat: z.strictObject({ candidates: z.array(z.string().min(1)).min(1) }).optional(),
     /** A deal partner's rule proposal (GDD v1.41), and the backlash it would bring then. */

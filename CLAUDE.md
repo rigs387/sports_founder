@@ -139,6 +139,14 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   (`src/sim/seat-cards.ts`, candidates on `FlagshipState.orphan`); its choices have no effects
   and `settleOrphanedSeat` reads the answer (after every action and when End Turn starts) and
   moves the seat at once, free.
+- Club relocation (GDD v1.41, tech plan 2.33) is `src/sim/relocation.ts` and
+  `FlagshipState.relocation`: a seat club in the bottom two of the last
+  `flagship.relocation.badSeasons` summaries at the seat, with a bigger place in `places.yaml`
+  that has no club, has its owners ask (`offerRelocation` at End Turn's end, one an offseason, no
+  slot, `relocation` facts). Moving is the `clubMove` effect (`moveClub`: place, rating lift,
+  hardcore loss, `betrayClub`, a `clubMoved` landmark) plus the card's conversion effect;
+  `settleRelocation` (End Turn's start) charges the owners' losses for staying. The ask returns
+  only after a further bad season. `cardless` switches it off.
 - The offseason (GDD v1.24) is `FlagshipState.offseason`, read through `offseasonOpen`: it opens
   when a season ends (retired players are replaced then; no matches while it is open) and closes at
   the start of the next `endTurn` (`closeOffseason`: seat move, club count by tier, a season of a

@@ -79,6 +79,7 @@ export function Effect({ effect, star = {} }: { effect: EventEffect; star?: Star
   if (effect.type === "starSign") return <li>{t("events.effects.starSign")}</li>;
   if (effect.type === "directorAsk") return <li>{t("events.effects.directorAsk")}</li>;
   if (effect.type === "ruleProposal") return <li>{t("events.effects.ruleProposal")}</li>;
+  if (effect.type === "clubMove") return <li>{t("events.effects.clubMove")}</li>;
   return (
     <li className={effect.type === "hardcoreDemotion" ? "event-tradeoff" : undefined}>
       {t(`events.effects.${effect.type === "fanShift" ? effect.target : effect.type}`, {
@@ -186,10 +187,22 @@ export function useEventText() {
       club: club(venue.clubId ?? undefined),
     };
   };
+  // A relocation ask (GDD v1.41) names the club, both towns and the bad seasons.
+  const relocationText = (event: EventRecord) => {
+    const told = event.facts.relocation;
+    if (!told) return venueText(event);
+    const found = snapshot.flagship.clubs.find((c) => c.id === told.clubId);
+    return {
+      club: found ? t("flagship.club", { place: told.from, nickname: found.nickname }) : "",
+      from: told.from,
+      to: told.to,
+      seasons: told.seasons,
+    };
+  };
   // The orphaned seat (GDD v1.40) names the league it goes to if left alone.
   const seatText = (event: EventRecord) => {
     const seat = event.facts.seat;
-    if (!seat) return venueText(event);
+    if (!seat) return relocationText(event);
     return { first: country(seat.candidates[0] ?? "") };
   };
   // A deal partner's rule proposal (GDD v1.41) names the partner, the change and its backlash.
@@ -474,6 +487,9 @@ export function useEventText() {
     const proposal = event.facts.proposal;
     if (proposal)
       return t("events.proposalDecline", { partner: dealPartnerName(proposal.partnerId) });
+    // Club relocation (GDD v1.41): staying costs the owners' losses.
+    const relocation = event.facts.relocation;
+    if (relocation) return t("events.relocationStay", { loss: relocation.loss });
     const told = event.facts.director;
     if (!told?.ask) return null;
     const director = snapshot.directors.serving.find((d) => d.id === told.directorId);

@@ -12,6 +12,7 @@ import {
   type GameState,
   keepCost,
   optionNetDelta,
+  ownersLoss,
   PLAYER_INDEX,
   priceIncome,
   type World,
@@ -204,6 +205,17 @@ function effectValue(
       return proposal
         ? amendmentValue(state, world, proposal.axis as AxisId, proposal.to) * weights.hardcore
         : 0;
+    case "clubMove": {
+      // A club relocation (GDD v1.41): a stronger failing club and the owners' losses avoided,
+      // against the hardcore fans it costs at the seat.
+      const { ratingLift, hardcoreLoss } = world.config.flagship.relocation;
+      const cash = Math.max(1, country.league?.cash ?? 0);
+      return (
+        (ratingLift / world.config.flagship.stories.ratingStep) * weights.balance +
+        (ownersLoss(state, world) / cash) * weights.league -
+        hardcoreLoss * weights.hardcore
+      );
+    }
     case "directorAsk":
       // A director's ask (GDD v1.41): bots read it as goodwill worth half a league rung, since
       // declining uses up the director's patience.

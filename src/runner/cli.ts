@@ -44,6 +44,7 @@ import {
   moneyAggregate,
   nodeOutcomesCsv,
   optionOutcomesCsv,
+  relocationAggregate,
   remembersAggregate,
   rulesAggregate,
   type TurnRow,
@@ -863,6 +864,10 @@ function main(): number {
           .map(([ask, n]) => `${ask} ${n}`)
           .join(", ") || "none"
       }, ${directors.granted} granted, ${directors.resigned} resignations; partner rule proposals ${directors.proposals}, ${directors.proposalsAccepted} accepted; salary paid ${millions(directors.salaryPaid)} against ${dollars(directors.leagueCash)} league cash at the end (seat excluded)`,
+    );
+    const relocation = relocationAggregate(results);
+    console.log(
+      `  Club relocation: ${relocation.asks} asks (median ${fmt(relocation.perCampaign)} a campaign), ${relocation.moves} moves, owners' losses paid for staying ${millions(relocation.ownersLoss)}`,
     );
     const cup = championshipAggregate(results);
     console.log(

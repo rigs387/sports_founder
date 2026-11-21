@@ -264,6 +264,8 @@ no list or inbox anywhere:
     - *Declining (choose pain):* the owners' losses, a cash hit to the flagship league. The ask
       returns after the next bad season. Like declining a partner's rule proposal, the free
       default here is not free.
+    - *Built 2026-11-21 (tech plan 2.33).* Bots take every move, about 5 a campaign; the #1
+      contest holds (lead lost before the win in 19 of 35 pacing campaigns).
 - **The player can always intervene** in any country directly. Delegation is a default, not a
   lock.
 

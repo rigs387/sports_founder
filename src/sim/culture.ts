@@ -1253,6 +1253,22 @@ export function modernizeGrounds(state: GameState, world: World, index: number):
 }
 
 /**
+ * A club relocated (GDD v1.41): its derbies, chants, club rite and famous ground in the seat
+ * country are betrayed, as naming rights betray a ground.
+ */
+export function betrayClub(state: GameState, world: World, clubId: number): GameState {
+  const seat = world.countries.findIndex((country) => country.id === state.flagship.countryId);
+  const betrayed = state.culture.traditions.filter(
+    (t) =>
+      living(t) &&
+      t.countryId === state.flagship.countryId &&
+      (t.type === "derby" || t.type === "chant" || t.type === "rite" || t.type === "venue") &&
+      t.clubIds.includes(clubId),
+  );
+  return betrayGrounds(state, world, seat, betrayed, world.config.flagship.relocation.betrayal);
+}
+
+/**
  * Grounds betrayed in a country: each tradition wears by traditionWear, and hardcoreDemotionShare
  * × their held strength there × the ethos's rename factor of hardcore fans there turn casual.
  */

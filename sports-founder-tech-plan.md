@@ -1865,7 +1865,17 @@ measurement.
 
 ### 2.33 Build Plan: Club Relocation (GDD v1.41)
 
-Designed 2026-11-21. Not built. One session. Numbers in config `flagship.relocation`.
+Designed 2026-11-21. Built 2026-11-21. Numbers in config `flagship.relocation`.
+
+*As built:* `src/sim/relocation.ts`. `relocationAsk` reads the last `badSeasons` summaries
+played at the seat; `offerRelocation` (End Turn's end, after the season cards) pushes the
+`club-relocation` decision with the club, both towns, the owners' losses and the seasons on
+its `relocation` facts, and keeps the ask on `FlagshipState.relocation`. The move choice is
+`clubMove` (`moveClub`: place, `ratingLift`, `hardcoreLoss`, `betrayClub` in
+`culture.ts`, a `clubMoved` landmark) plus the card's own casual conversion effect (1.15 for
+4 quarters, in `events.yaml`). `settleRelocation` (End Turn's start) charges `ownersLoss`
+quarters of running cost for staying. Bots value the move in `event-policy.ts`; `cardless`
+switches the card off for the flagship isolation tests. Measured: 3 builder campaigns of 200 turns gave 15 asks, all taken. The 6-campaign comparison with asks switched off swung between 3 and 6 of 6 for the #1 lead lost before the win, so the pacing experiment was run (12 anchors × 3 seeds, 200 turns): it passes, the lead was lost before the win in 19 of 35 (54%, against 20 of 35 recorded), 185 asks and 185 moves (bots always move). Not seen on screen.
 
 1. **The ask.** In the offseason, `relocationAsk` finds an active seat club in the bottom two
    of each of the last `badSeasons` season summaries (lost seasons are gaps, read with

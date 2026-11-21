@@ -205,6 +205,8 @@ export interface CampaignResult {
       stoppage: boolean;
     }[];
   };
+  /** Club relocation (GDD v1.41): asks, moves, and the owners' losses paid for staying (cash). */
+  relocation: { asks: number; moves: number; ownersLoss: number };
   /** League directors (GDD v1.40). */
   directors: {
     /** Terms served, finished or not. */
@@ -564,6 +566,17 @@ export function directorsAggregate(results: CampaignResult[]) {
     proposalsAccepted: total((r) => r.directors.proposalsAccepted),
     salaryPaid: total((r) => r.directors.salaryPaid),
     leagueCash: total((r) => r.directors.leagueCash),
+  };
+}
+
+/** Club relocation across campaigns (GDD v1.41). */
+export function relocationAggregate(results: CampaignResult[]) {
+  const total = (f: (r: CampaignResult) => number) => results.reduce((sum, r) => sum + f(r), 0);
+  return {
+    asks: total((r) => r.relocation.asks),
+    moves: total((r) => r.relocation.moves),
+    ownersLoss: total((r) => r.relocation.ownersLoss),
+    perCampaign: median(results.map((r) => r.relocation.asks)),
   };
 }
 

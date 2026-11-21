@@ -14,6 +14,7 @@ import { offerLegacyCards } from "./legacy";
 import { outletOf, wireOutlet } from "./press";
 import { ppPrice } from "./prices";
 import { acceptProposal, proposalBlocker, proposalFacts } from "./proposals";
+import { moveClub, relocationBlocker } from "./relocation";
 import { seasonFacts, seasonStories } from "./season-stories";
 import {
   applyStarEffect,
@@ -571,6 +572,7 @@ export function eventBlocker(
       return "rules";
     if (effect.type === "directorAsk" && askBlocker(state, world, event) !== null)
       return "director";
+    if (effect.type === "clubMove" && relocationBlocker(state, event) !== null) return "flagship";
   }
   return null;
 }
@@ -606,6 +608,10 @@ function applyEffects(
     }
     if (effect.type === "directorAsk") {
       next = grantAsk(next, world, event);
+      continue;
+    }
+    if (effect.type === "clubMove") {
+      next = moveClub(next, world, event);
       continue;
     }
     if (effect.type === "leagueCash") {

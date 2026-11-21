@@ -189,7 +189,8 @@ export function cardless(base: World): World {
     events: {
       ...base.events,
       cards: base.events.cards.filter(
-        (card) => !["seasonEnd", "star", "tradition", "award"].includes(card.trigger),
+        // A club relocation (GDD v1.41) is asked from the table and moves fans.
+        (card) => !["seasonEnd", "star", "tradition", "award", "relocation"].includes(card.trigger),
       ),
     },
   };

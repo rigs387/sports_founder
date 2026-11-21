@@ -10,6 +10,7 @@ import { evaluateLeagues } from "./leagues";
 import { updateLegacy } from "./legacy";
 import { offerProposal, settleProposal } from "./proposals";
 import { stepQuarter } from "./quarter";
+import { offerRelocation, settleRelocation } from "./relocation";
 import { offerOrphanedSeat } from "./seat-cards";
 import { updateStandouts } from "./standouts";
 import { pullTalent } from "./talent";
@@ -63,7 +64,9 @@ export function endTurn(state: GameState, world: World): GameState {
           settleAgreement(
             settleHost(
               pullTalent(
-                applyDefaultSlotDrops(settleOrphanedSeat(settleEvents(state, world), world)),
+                applyDefaultSlotDrops(
+                  settleRelocation(settleOrphanedSeat(settleEvents(state, world), world), world),
+                ),
                 world,
               ),
               world,
@@ -114,7 +117,11 @@ export function endTurn(state: GameState, world: World): GameState {
   // Legacy goals newly met go on record (GDD v1.38).
   next = updateLegacy(next, world);
   // The birthplace outlived with the seat in it: where the seat goes (GDD v1.40).
-  return offerOrphanedSeat(offerEvents({ ...next, turn: start.turn + 1 }, world, quarters), world);
+  // A failing seat club's owners may ask to move, after the season cards (GDD v1.41).
+  return offerRelocation(
+    offerOrphanedSeat(offerEvents({ ...next, turn: start.turn + 1 }, world, quarters), world),
+    world,
+  );
 }
 
 /** Plays up to `turns` turns in a row, calling `onTurn` after each; stops if the campaign ends. */

@@ -1203,6 +1203,33 @@ cards:
       - { id: first, quarters: 0, effects: [] }
       - { id: second, quarters: 0, effects: [] }
       - { id: third, quarters: 0, effects: [] }
+  # Club relocation (GDD v1.41): a seat club in the bottom two for flagship.relocation.badSeasons
+  # seasons running asks to move to a bigger town with no club. Offered by the simulation (no
+  # slot), its facts name the club and both towns. Moving: the club moves (clubMove: rating lift,
+  # betrayal, hardcore loss) and a year of faster casual conversion at the seat. Staying, the
+  # default, costs the seat league the owners' losses, read back when End Turn starts.
+  - id: club-relocation
+    kind: decision
+    tone: pressure
+    priority: 85
+    trigger: relocation
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: campaign
+    cooldownTurns: null
+    health: []
+    effects: []
+    defaultChoice: stay
+    choices:
+      - id: move
+        quarters: 0
+        effects:
+          - { type: clubMove }
+          - { type: conversion, target: casual, factor: 1.15, quarters: 4 }
+      - { id: stay, quarters: 0, effects: [] }
   # A director out of patience resigns (GDD v1.41).
   - id: director-resigned
     kind: moment

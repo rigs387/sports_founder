@@ -1105,6 +1105,20 @@ flagship:
   seatMove:
     hardcoreDemotionShare: 0.03
     anchorHardcoreDemotionShare: 0.08
+  # Club relocation (GDD v1.41): a seat club in the bottom two of the table badSeasons seasons
+  # running, with a bigger real town in the seat country that has no club, has its owners ask to
+  # move (one ask an offseason). Moving adds ratingLift to the club, turns hardcoreLoss of the
+  # seat's hardcore fans casual, and betrays the club's derbies, chants, club rite and famous
+  # ground (each wears by traditionWear; hardcoreDemotionShare × their held strength × the
+  # ethos's rename factor turn casual, as naming rights do). The year of faster casual
+  # conversion is the card's own effect (events.yaml). Declining costs the seat league ownersLoss
+  # quarters of its running cost; the ask returns after the next bad season.
+  relocation:
+    badSeasons: 3
+    ratingLift: 6
+    hardcoreLoss: 0.02
+    ownersLoss: 2
+    betrayal: { hardcoreDemotionShare: 0.02, traditionWear: 0.3 }
   # The flagship season as cards (GDD v1.15). Read from the recorded season summary only.
   stories:
     # The champion moment's PP, by the flagship league's tier when the card arrives.

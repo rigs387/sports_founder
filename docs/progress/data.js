@@ -13,14 +13,14 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-11-21",
-    tests: 699,
-    files: 79,
-    note: "npm run check passed after the seat follow-ups were built (type checks, Biome, purity, 699 tests in 79 files). Lint has existing visual-study warnings.",
+    tests: 702,
+    files: 80,
+    note: "npm run check passed after club relocation was built (type checks, Biome, purity, 702 tests in 80 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-11-21",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click. On the late-game save's offseason it opens the director's ask on the board (declining states the patience it costs), finds five league directors, reviews a candidate (the review states the severance), appoints them, and checks the narrow layout. On the late-game save the Almanac shows a Builders plaque (one builder inducted).",
   },
-  eventDeck: { current: 58, target: "40–60" },
+  eventDeck: { current: 59, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -124,6 +124,13 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-11-21",
+      type: "Built",
+      title: "Club relocation",
+      text: "GDD v1.41, tech plan 2.33. A seat club in the bottom two for 3 seasons running, with a bigger real town at the seat that has no club, has its owners ask to move (one ask an offseason, no slot). Moving keeps the nickname and record, adds 6 to the club's rating and a year of faster casual conversion at the seat, betrays the club's derbies, chants, club rite and famous ground in the old town and turns 2% of the seat's hardcore fans casual. Staying, the default, costs the seat league 2 quarters of its running cost; the ask returns after the next bad season. Measured: 3 builder campaigns of 200 turns gave 15 asks, all taken. The 6-campaign comparison with asks switched off swung between 3 and 6 of 6 for the #1 lead lost before the win, so the pacing experiment was run (12 anchors × 3 seeds, 200 turns): it passes, the lead was lost before the win in 19 of 35 (54%, against 20 of 35 recorded), 185 asks and 185 moves (bots always move). npm run check passed (702 tests in 80 files) and the smoke passed; the card has not been seen on screen (the late-game save had none waiting).",
+      system: "flagship",
+    },
     {
       date: "2026-11-21",
       type: "Built",
@@ -911,7 +918,7 @@ window.SF_PROGRESS = {
           "Talent pull toward the flagship, the broadcast follow at home and a signing card (GDD v1.37)",
         ],
         [
-          "planned",
+          "built",
           "Club relocation: owners ask to move a failing club to a bigger town; moving betrays the old town, staying costs cash (tech plan 2.33, GDD v1.41)",
         ],
         [

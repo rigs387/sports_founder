@@ -1549,6 +1549,17 @@ export const configFileSchema = z.strictObject({
       hardcoreDemotionShare: unitInterval,
       anchorHardcoreDemotionShare: unitInterval,
     }),
+    /** Club relocation (GDD v1.41): a failing seat club's owners ask to move to a bigger town. */
+    relocation: z.strictObject({
+      badSeasons: z.int().min(1),
+      ratingLift: z.number().min(0),
+      hardcoreLoss: unitInterval,
+      ownersLoss: z.number().min(0),
+      betrayal: z.strictObject({
+        hardcoreDemotionShare: unitInterval,
+        traditionWear: unitInterval,
+      }),
+    }),
     /** The flagship season as cards (GDD v1.15). */
     stories: z
       .strictObject({

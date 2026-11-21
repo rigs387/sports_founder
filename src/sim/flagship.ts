@@ -1131,6 +1131,7 @@ export function newFlagship(
     seasons: [],
     deals: newDeals(seed),
     orphan: null,
+    relocation: null,
   };
   const fitted = fitClubs(empty, world, rng, tier);
   return { ...startSeason(fitted, world, quarter, scoring), rng: saveRng(rng) };

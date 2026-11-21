@@ -25,6 +25,7 @@
     "free": "No PP cost",
     "noChange": "Keep the current approach. No cost or added effect.",
     "seatMove": "The seat moves there at once. No cost, and no purist backlash.",
+    "relocationStay": "The owners' losses fall on the league: {{loss, money}}. They will ask again after another bad season.",
     "review": "Review choice",
     "default": "If left unresolved, Next Turn chooses “{{choice}}” for free, with no added effect.",
     "defaultProposal": "If left unresolved, Next Turn chooses “{{choice}}”, and that counts as a missed clause on the deal.",
@@ -105,6 +106,7 @@
       "starSign": "They join the club now as its leading player. The league's broadcast reaches further into their home country while they play.",
       "directorAsk": "The director gets what they asked for.",
       "ruleProposal": "The rule changes now, as this year's rule change. No Prestige; purists push back as usual.",
+      "clubMove": "The club moves and gets stronger; its old town's traditions are betrayed and some lifelong fans turn casual.",
       "derbyStoke": "Counts as one more meeting toward a derby between these two clubs.",
       "leagueCash": "{{cash, money}} into the flagship league's reserve. It stays there: only profit above the reserve is paid out to the clubs.",
       "leagueCashAt": "{{cash, money}} into the reserve of the league in {{country}}. It stays there: only profit above the reserve is paid out to the clubs.",
@@ -154,6 +156,14 @@
           "broadcast": "Buy local airtime",
           "neighbourhood": "Work the neighborhood",
           "hold": "Stay with organic growth"
+        }
+      },
+      "club-relocation": {
+        "title": "{{club}} want to move",
+        "body": "The owners of {{club}} have finished in the bottom two {{seasons}} seasons running. They want to take the club from {{from}} to {{to}}, a bigger town with no club. It would keep its name and its record, and new money would make it stronger. In {{from}} its derbies, chants and ground would be betrayed, and some lifelong fans would turn away.",
+        "choices": {
+          "move": "Let them move to {{to}}",
+          "stay": "Keep the club in {{from}}"
         }
       },
       "seat-orphaned": {

@@ -374,6 +374,18 @@ export interface FlagshipState {
    * win, and a card offers these leagues (most hardcore fans first). Null otherwise.
    */
   orphan: { quarter: number; candidates: string[] } | null;
+  /**
+   * The last relocation ask (GDD v1.41): the club, its old and new town, the quarter asked and the
+   * last bad season it was asked on; open until its answer is read when End Turn starts.
+   */
+  relocation: {
+    clubId: number;
+    from: string;
+    to: string;
+    quarter: number;
+    season: number;
+    open: boolean;
+  } | null;
 }
 
 /** What a deal demands (GDD v1.28). Demands never block: doing the thing breaks the deal. */
@@ -565,6 +577,16 @@ export type Landmark =
       dealId: number;
       partnerId: string;
       axis: AxisId;
+      to: string;
+    }
+  | {
+      /** A seat club moved to a bigger town at its owners' ask (GDD v1.41). */
+      kind: "clubMoved";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      clubId: number;
+      from: string;
       to: string;
     }
   | {

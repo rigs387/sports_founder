@@ -227,6 +227,15 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     to: z.string().min(1),
   }),
   z.strictObject({
+    kind: z.literal("clubMoved"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    clubId: z.int().min(1),
+    from: z.string().min(1),
+    to: z.string().min(1),
+  }),
+  z.strictObject({
     kind: z.literal("directorResigned"),
     turn: z.int().min(1),
     quarter: count,
@@ -572,6 +581,17 @@ const flagshipSchema = z.strictObject({
   // Joined format 34 without a bump (GDD v1.40).
   orphan: z
     .strictObject({ quarter: count, candidates: z.array(z.string().min(1)).min(1) })
+    .nullable()
+    .default(null),
+  relocation: z
+    .strictObject({
+      clubId: z.int().min(1),
+      from: z.string().min(1),
+      to: z.string().min(1),
+      quarter: count,
+      season: z.int().min(1),
+      open: z.boolean(),
+    })
     .nullable()
     .default(null),
 });

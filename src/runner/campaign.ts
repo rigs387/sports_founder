@@ -194,6 +194,8 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   const grantedAsks = new Set<number>();
   // Partner proposals accepted (GDD v1.41).
   const acceptedProposals = new Set<number>();
+  // Club relocation asks (GDD v1.41), by event id: the owners' losses staying cost, once answered.
+  const relocationAsks = new Map<number, number | null>();
   let lastTurnQuarters = 1;
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
@@ -205,6 +207,13 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         directorSalary += leagueCosts(current, world, i).director * lastTurnQuarters;
       }
     lastTurnQuarters = turnLengthQuarters(current.ppTier, world.config);
+    for (const event of [...current.events.pending, ...current.events.history]) {
+      const asked = event.facts.relocation;
+      if (!asked) continue;
+      if (!relocationAsks.has(event.id)) relocationAsks.set(event.id, null);
+      if (event.resolution)
+        relocationAsks.set(event.id, event.resolution.choiceId === "move" ? 0 : asked.loss);
+    }
     for (const event of current.events.history)
       if (event.facts.director?.ask && event.resolution?.choiceId === "grant")
         grantedAsks.add(event.id);
@@ -688,6 +697,15 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         opened: state.landmarks.filter((l) => l.kind === "venueOpened").length,
         modernized: state.landmarks.filter((l) => l.kind === "venueOpened" && l.modernized).length,
         records: state.landmarks.filter((l) => l.kind === "recordCrowd").length,
+      },
+      // Club relocation (GDD v1.41): asks, moves and the owners' losses paid for staying.
+      relocation: {
+        asks: relocationAsks.size,
+        moves: state.landmarks.filter((l) => l.kind === "clubMoved").length,
+        ownersLoss: [...relocationAsks.values()].reduce<number>(
+          (sum, loss) => sum + (loss ?? 0),
+          0,
+        ),
       },
       directors: (() => {
         const terms = [...state.directors.past, ...state.directors.serving];

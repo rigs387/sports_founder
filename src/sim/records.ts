@@ -221,6 +221,14 @@ export const landmarks = {
     axis: AxisId,
     to: string,
   ): Landmark => ({ kind: "ruleProposed", turn, quarter, countryId, dealId, partnerId, axis, to }),
+  clubMoved: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    clubId: number,
+    from: string,
+    to: string,
+  ): Landmark => ({ kind: "clubMoved", turn, quarter, countryId, clubId, from, to }),
   directorResigned: (
     turn: number,
     quarter: number,

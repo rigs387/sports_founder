@@ -49,6 +49,8 @@ export const eventEffectSchema = z.union([
   z.strictObject({ type: z.literal("directorAsk") }),
   /** Makes the rule change a deal partner proposed (GDD v1.41), with no PP price. */
   z.strictObject({ type: z.literal("ruleProposal") }),
+  /** Moves the failing seat club the card names to its bigger town (GDD v1.41). */
+  z.strictObject({ type: z.literal("clubMove") }),
   // The repeat-final card only (GDD v1.22): one extra meeting toward a derby between the two clubs.
   z.strictObject({ type: z.literal("derbyStoke") }),
   // Late rewards by kind (GDD v1.39): from settings.lateRewards.fromTier a card's PP becomes one of
@@ -177,6 +179,8 @@ const template = z
       "ruleProposed",
       /** The birthplace outlived with the seat in it (GDD v1.40): where the seat goes. */
       "seatOrphaned",
+      /** A failing seat club's owners ask to move it to a bigger town (GDD v1.41). */
+      "relocation",
     ]),
     /** directorAsk cards only: the ask the card tells. */
     ask: z.enum(DIRECTOR_ASKS).nullable().default(null),
@@ -358,6 +362,19 @@ const template = z
       )
         issue("The orphaned seat follows its own fact: campaign scope, no filters or cooldown");
     }
+    // Club relocation (GDD v1.41): move or stay; staying is the default and costs the owners' losses.
+    if (card.trigger === "relocation") {
+      const ids = card.choices.map((c) => c.id).sort();
+      if (card.kind !== "decision" || ids.join() !== "move,stay" || card.defaultChoice !== "stay")
+        issue("A relocation ask is a decision: move or stay, staying by default");
+      if (
+        card.scope !== "campaign" ||
+        card.anchorOnly ||
+        card.health.length ||
+        card.cooldownTurns !== null
+      )
+        issue("A relocation ask follows its own fact: campaign scope, no filters or cooldown");
+    }
     // A season lost to a stoppage (GDD v1.39): one moment told from the landmark.
     if (card.trigger === "stoppage") {
       if (card.kind !== "moment" || card.cooldownTurns !== null)
@@ -399,6 +416,8 @@ const template = z
         issue("derbyStoke belongs to the repeat-final season card only");
       if (effect.type === "clubRating" && !season)
         issue("Club rating effects belong to flagship season cards only");
+      if (effect.type === "clubMove" && card.trigger !== "relocation")
+        issue("clubMove belongs to the relocation card only");
       if (
         (effect.type === "starHonors" ||
           effect.type === "starMentor" ||
