@@ -8,6 +8,7 @@ import type {
   StandoutsState,
   World,
 } from "./types";
+import { youthSkillLift } from "./youth";
 
 // Standouts (GDD v1.37): the named players of Professional and Elite leagues other than the
 // flagship. They are people with a career curve and nothing else: no club, no matches, no scores
@@ -52,6 +53,7 @@ function newStandout(
   season: number,
   taken: ReadonlySet<string>,
   replacement: boolean,
+  lift = 0,
 ): Standout {
   const { foundingAge, skill, peakSkill, replacement: young } = world.config.flagship.players;
   const ages = replacement ? young.age : foundingAge;
@@ -59,7 +61,9 @@ function newStandout(
   const peak = clamp(
     peakSkill.mean +
       peakSkill.spread * (2 * nextFloat(rng) - 1) +
-      world.config.standouts.peakLean[tier],
+      world.config.standouts.peakLean[tier] +
+      // The country's youth program, at the level open now (GDD v1.40).
+      lift,
     skill.min,
     skill.max,
   );
@@ -189,6 +193,7 @@ export function updateStandouts(state: GameState, world: World): GameState {
         season,
         taken,
         young > 0,
+        youthSkillLift(world, country.league?.youth.level ?? 0),
       );
       young -= 1;
       nextPlayerId += 1;
@@ -236,6 +241,7 @@ export function departStandout(state: GameState, world: World, standoutId: numbe
     state.flagship.season,
     taken,
     true,
+    youthSkillLift(world, state.countries[index]?.league?.youth.level ?? 0),
   );
   return {
     ...state,

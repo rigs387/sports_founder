@@ -221,6 +221,14 @@ export interface CampaignResult {
     costs: number;
     lift: number;
     quarters: number;
+    homegrown: {
+      ranks: { with: number[]; without: number[] };
+      skill: { with: number[]; without: number[] };
+      fields: number;
+      fieldsWith: number;
+      titles: number;
+      titlesWith: number;
+    };
   };
   /** Club relocation (GDD v1.41): asks, moves, and the owners' losses paid for staying (cash). */
   relocation: { asks: number; moves: number; ownersLoss: number };
@@ -617,7 +625,27 @@ export function youthAggregate(results: CampaignResult[]) {
     upkeep: total((r) => r.youth.upkeep),
     upkeepShare: costs > 0 ? total((r) => r.youth.upkeep) / costs : 0,
     lift: quarters > 0 ? total((r) => r.youth.lift) / quarters : 0,
+    homegrown: {
+      rankWith: meanOf(results.flatMap((r) => r.youth.homegrown.ranks.with)),
+      rankWithout: meanOf(results.flatMap((r) => r.youth.homegrown.ranks.without)),
+      teamsWith: total((r) => r.youth.homegrown.ranks.with.length),
+      teamsWithout: total((r) => r.youth.homegrown.ranks.without.length),
+      skillWith: meanOf(results.flatMap((r) => r.youth.homegrown.skill.with)),
+      skillWithout: meanOf(results.flatMap((r) => r.youth.homegrown.skill.without)),
+      fieldShare:
+        total((r) => r.youth.homegrown.fieldsWith) /
+        Math.max(
+          1,
+          total((r) => r.youth.homegrown.fields),
+        ),
+      titles: total((r) => r.youth.homegrown.titles),
+      titlesWith: total((r) => r.youth.homegrown.titlesWith),
+    },
   };
+}
+
+function meanOf(values: number[]): number | null {
+  return values.length > 0 ? values.reduce((sum, v) => sum + v, 0) / values.length : null;
 }
 
 /** Club relocation across campaigns (GDD v1.41). */

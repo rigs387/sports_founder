@@ -146,7 +146,7 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   `closeOffseason` applies it, each step up demoting `raiseShare` of the seat's hardcore
   fans (a `ticketsSet` landmark). `ticketStance` is standard wherever the seat moved. The card
   is `src/renderer/src/tickets/TicketsCard.tsx` (offseason screen only; read-only elsewhere).
-- Youth programs (GDD v1.40, v1.42, tech plan 2.28; step 1 built) are `src/sim/youth.ts` and
+- Youth programs (GDD v1.40, v1.42, tech plan 2.28, built) are `src/sim/youth.ts` and
   `LeagueState.youth` (level 0–5, a build, `opened`: the season each level opened). The seat's
   league and focus leagues buy the next level (`buildYouth`, offseason, league cash); config
   `youth.maxLevel` caps it by tier. `settleYouth` runs at the end of `closeOffseason`: a
@@ -158,6 +158,10 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   `TurnSnapshot.youth` feeds `src/renderer/src/youth/YouthCard.tsx` (offseason screen; read-only
   on the Flagship tab) and the country card's line; its smoke step (`src/main/youth-smoke.ts`)
   runs after the directors step. Only the builder bot buys (above two reserves).
+  Homegrown quality (step 2): `youthSkillLift` × the level open at the draw is added to the peak
+  skill of standouts drawn in that country (`newStandout`) and the flagship's young
+  replacements born there (`newPlayer` via `staffClubs`/`fitClubs`, given `youthLevels`);
+  players already playing never change. The runner prints a Homegrown line.
 - The founding family (GDD v1.40, tech plan 2.30) is `src/sim/family.ts` and
   `SportIdentity.family`: flavor only, no number reads it. The founder and family name come
   from setup (`founderName`, `familyName`); `updateFamily` (End Turn's end, in the offseason,

@@ -14,6 +14,7 @@ import {
   runningCostPerQuarter,
   serializeSave,
   snapshot,
+  updateStandouts,
   youthConversion,
   youthTerms,
 } from "../src/sim";
@@ -161,5 +162,88 @@ describe("youth programs", () => {
     const legacy = text.replace(/,"youth":\{"level":0,"building":\{[^}]*\},"opened":\[\]\}/, "");
     expect(legacy).not.toBe(text);
     expect(youth(deserializeSave(legacy, world))?.building).toBeNull();
+  });
+});
+
+// Homegrown quality (tech plan 2.28 step 2): one anchor, direct calls, the same seed both ways.
+
+/** The campaign with a country's league at `tier` and its youth program at `level`. */
+function withProgram(state: GameState, index: number, tier: LeagueTierId, level: number) {
+  const seatLeague = state.countries[seat]?.league;
+  if (!seatLeague) throw new Error("no seat league");
+  return {
+    ...state,
+    countries: state.countries.map((c, i) =>
+      i === index
+        ? {
+            ...c,
+            league: {
+              ...(c.league ?? seatLeague),
+              tier,
+              youth: { level, building: null, opened: level > 0 ? [1] : [] },
+            },
+          }
+        : c,
+    ),
+  };
+}
+
+describe("homegrown quality", () => {
+  const lift = world.config.youth.skillLift;
+  const { max } = world.config.flagship.players.skill;
+
+  it("standouts drawn after a level opens peak higher; the same seed draws the same players", () => {
+    const base = createCampaign(world, setupFor(5, "brazil"));
+    const draw = (level: number) =>
+      updateStandouts(withProgram(base, abroad, "professional", level), world).standouts.players;
+    const none = draw(0);
+    const four = draw(4);
+    expect(none.length).toBeGreaterThan(0);
+    expect(four.map((p) => [p.id, p.name, p.birthSeason])).toEqual(
+      none.map((p) => [p.id, p.name, p.birthSeason]),
+    );
+    four.forEach((player, i) => {
+      const before = none[i]?.peakSkill ?? 0;
+      expect(player.peakSkill).toBeCloseTo(Math.min(max, before + 4 * lift));
+    });
+    const mean = (players: typeof none) =>
+      players.reduce((sum, p) => sum + p.peakSkill, 0) / players.length;
+    expect(mean(four)).toBeGreaterThan(mean(none));
+    expect(draw(4)).toEqual(four);
+  });
+
+  it("players already playing are unchanged when a level opens", () => {
+    const base = createCampaign(world, setupFor(5, "brazil"));
+    const drawn = updateStandouts(withProgram(base, abroad, "professional", 0), world);
+    const opened = updateStandouts(withProgram(drawn, abroad, "professional", 4), world);
+    expect(opened.standouts.players).toEqual(drawn.standouts.players);
+  });
+
+  it("the flagship's young replacement born at a program's country peaks higher", () => {
+    const base = offseason();
+    const club = base.flagship.players.find((p) => p.retiredSeason === null);
+    if (!club) throw new Error("no leading player");
+    const retiring = (level: number): GameState => {
+      const state = withProgram(base, seat, "professional", level);
+      return {
+        ...state,
+        flagship: {
+          ...state.flagship,
+          players: state.flagship.players.map((p) =>
+            p.id === club.id ? { ...p, retiredSeason: state.flagship.season - 1 } : p,
+          ),
+        },
+      };
+    };
+    const replacement = (level: number) => {
+      const closed = closeOffseason(retiring(level), world);
+      return closed.flagship.players.find(
+        (p) => p.clubId === club.clubId && p.retiredSeason === null,
+      );
+    };
+    const none = replacement(0);
+    const four = replacement(4);
+    expect(none?.id).toBe(four?.id);
+    expect(four?.peakSkill).toBeCloseTo(Math.min(max, (none?.peakSkill ?? 0) + 4 * lift));
   });
 });

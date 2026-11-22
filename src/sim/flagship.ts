@@ -42,7 +42,7 @@ import {
   venueTerms,
 } from "./venue-actions";
 import { seasonMatchCrowd, seatedCrowd } from "./venues";
-import { settleYouth } from "./youth";
+import { NO_YOUTH, settleYouth, youthLevels, youthSkillLift } from "./youth";
 
 // The flagship league (GDD v1.11 commissioner's seat, v1.13 seat rules, v1.14 flagship season).
 // The player runs one league in depth: named clubs based in real places, one season a year ending
@@ -209,6 +209,7 @@ function fitClubs(
   rng: Rng,
   tier: LeagueTierId,
   shape: ShapeFactors = NEUTRAL_SHAPE,
+  youth: ReadonlyMap<string, number> = NO_YOUTH,
 ) {
   const target = clubTarget(tier, world, shape);
   let next: FlagshipState = { ...flagship, clubs: flagship.clubs.map((club) => ({ ...club })) };
@@ -235,7 +236,7 @@ function fitClubs(
   for (const club of newestFirst.slice(0, Math.max(0, newestFirst.length - target))) {
     club.active = false;
   }
-  return staffClubs(next, world, rng);
+  return staffClubs(next, world, rng, youth);
 }
 
 // ---- Leading players (GDD v1.16) ------------------------------------------------------------
@@ -292,12 +293,15 @@ function newPlayer(
   club: Club,
   taken: ReadonlySet<string>,
   replacement: boolean,
+  youth: ReadonlyMap<string, number> = NO_YOUTH,
 ): Player {
   const { foundingAge, skill, peakSkill, replacement: young } = world.config.flagship.players;
   const ages = replacement ? young.age : foundingAge;
   const age = ages.min + Math.floor(nextFloat(rng) * (ages.max - ages.min + 1));
+  // A young replacement born where a youth program is open draws a higher peak (GDD v1.40).
   const lean = replacement
-    ? young.ratingLean * (club.rating - world.config.flagship.rating.start)
+    ? young.ratingLean * (club.rating - world.config.flagship.rating.start) +
+      youthSkillLift(world, youth.get(club.countryId) ?? 0)
     : 0;
   const peak = clamp(
     peakSkill.mean + peakSkill.spread * (2 * nextFloat(rng) - 1) + lean,
@@ -325,14 +329,19 @@ function newPlayer(
  * Gives every active club without a leading player one (GDD v1.16): founding and expansion clubs,
  * and clubs from saves made before players existed. Dormant clubs keep theirs.
  */
-function staffClubs(flagship: FlagshipState, world: World, rng: Rng): FlagshipState {
+function staffClubs(
+  flagship: FlagshipState,
+  world: World,
+  rng: Rng,
+  youth: ReadonlyMap<string, number> = NO_YOUTH,
+): FlagshipState {
   let next = flagship;
   const staffed = new Set(next.players.filter(playing).map((player) => player.clubId));
   const hadOne = new Set(next.players.map((player) => player.clubId));
   const taken = new Set(next.players.map((player) => player.name));
   for (const club of activeClubs(next)) {
     if (staffed.has(club.id)) continue;
-    const player = newPlayer(world, rng, next, club, taken, hadOne.has(club.id));
+    const player = newPlayer(world, rng, next, club, taken, hadOne.has(club.id), youth);
     taken.add(player.name);
     next = { ...next, players: [...next.players, player], nextPlayerId: next.nextPlayerId + 1 };
   }
@@ -1673,7 +1682,11 @@ export function stepFlagshipQuarter(
     // The offseason opens; the next season starts when it closes. Retired players are replaced
     // now, so every club has its leading player through the offseason; the season's tallies are
     // closed into careers.
-    flagship = { ...staffClubs(flagship, world, rng), offseason: true, tallies: [] };
+    flagship = {
+      ...staffClubs(flagship, world, rng, youthLevels(nextCountries)),
+      offseason: true,
+      tallies: [],
+    };
   }
   return {
     flagship: { ...flagship, rng: saveRng(rng) },
@@ -1699,7 +1712,14 @@ export function returnSeatIfFolded(state: GameState, world: World): GameState {
   let next = moved.flagship;
   const anchorLeague = state.countries[indexOf(world, state.anchorCountryId)]?.league ?? null;
   if (anchorLeague !== null)
-    next = fitClubs(next, world, rng, anchorLeague.tier, shapeFactors(world, state.growthNodes));
+    next = fitClubs(
+      next,
+      world,
+      rng,
+      anchorLeague.tier,
+      shapeFactors(world, state.growthNodes),
+      youthLevels(state.countries),
+    );
   // In the offseason the season starts when it closes.
   next = next.offseason
     ? { ...next, rng: saveRng(rng) }
@@ -1799,6 +1819,7 @@ export function settleOrphanedSeat(state: GameState, world: World): GameState {
     rng,
     league.tier,
     shapeFactors(world, state.growthNodes),
+    youthLevels(state.countries),
   );
   next = next.offseason
     ? { ...next, rng: saveRng(rng) }
@@ -1910,6 +1931,7 @@ export function closeOffseason(state: GameState, world: World): GameState {
       rng,
       seatLeague.tier,
       shapeFactors(world, state.growthNodes),
+      youthLevels(countries),
     );
   // Unsigned deal offers lapse (GDD v1.28).
   flagship = lapseOffers(startSeason(flagship, world, state.quarter, state.genome.scoring, true));
@@ -1966,6 +1988,7 @@ function dormantClubs(state: GameState, world: World): GameState {
     rng,
     seatLeague.tier,
     shapeFactors(world, state.growthNodes),
+    youthLevels(state.countries),
   );
   return {
     ...state,

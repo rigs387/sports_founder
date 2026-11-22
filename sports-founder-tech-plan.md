@@ -1790,7 +1790,7 @@ warning (`stepDownLeague.terms.seatLoss`) has been seen on screen.
 
 ### 2.28 Build Plan: Youth Programs (GDD v1.40)
 
-Designed 2026-11-01 (parked items, topic 3); sizes decided 2026-11-22 (GDD v1.42). Step 1 built 2026-11-22. Two sessions.
+Designed 2026-11-01 (parked items, topic 3); sizes decided 2026-11-22 (GDD v1.42). Both steps built 2026-11-22.
 
 1. **Levels, money and conversion.** `LeagueState.youth` (level 0–5, a build opening after a
    season, the season it opened), `src/sim/youth.ts`: the `buildYouth` action (offseason, the
@@ -1813,6 +1813,10 @@ Designed 2026-11-01 (parked items, topic 3); sizes decided 2026-11-22 (GDD v1.42
    `flagship.ts`) born in that country draws peak skill raised by the level then open
    (`youth.skillLift`). Skill stays out of the snapshot. Measure national team ranks and
    world titles for countries with programs over a 200-turn campaign.
+   *Built 2026-11-22.* `youthLevels` and `youthSkillLift` (`youth.ts`): `newStandout` (both
+   draws in `standouts.ts`) and the young replacements in `newPlayer` (through `staffClubs`
+   and every `fitClubs` call with state) add `skillLift` × the level open at the draw; the RNG
+   sequence is unchanged. Measured over 3 builder campaigns of 200 turns (Albania): 32 programs at the end (63 levels); named players born where a program is open peak at 59.8 against 56.5 elsewhere; their national teams rank worse (mean 160 against 98), because the builder's programs sit mostly in small focus markets with weak leagues; world titles 1 of 57 went to a country with a program open, which were 2% of the fields. The lift shows in the players, not yet in the results.
 
 ### 2.29 Build Plan: Flagship Ticket Pricing (GDD v1.40)
 

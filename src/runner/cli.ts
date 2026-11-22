@@ -879,6 +879,11 @@ function main(): number {
     console.log(
       `  Youth programs: ${youth.opened} levels opened, ${youth.lostUpkeep} lost to unpaid upkeep and ${youth.lostTier} to a tier drop; ${youth.programs} programs at the end (${youth.levels} levels); upkeep paid ${millions(youth.upkeep)} (${(youth.upkeepShare * 100).toFixed(1)}% of those leagues' costs), ${dollars(youth.cash)} league cash at the end; hardcore conversion +${(youth.lift * 100).toFixed(1)}% on average where open`,
     );
+    const home = youth.homegrown;
+    const one = (value: number | null) => (value === null ? "-" : value.toFixed(1));
+    console.log(
+      `  Homegrown: national team rank at the end, mean ${one(home.rankWith)} with a program (${home.teamsWith} teams) vs ${one(home.rankWithout)} without (${home.teamsWithout}); named players' peak skill ${one(home.skillWith)} vs ${one(home.skillWithout)}; world titles ${home.titlesWith} of ${home.titles} to a country with a program open, which were ${(home.fieldShare * 100).toFixed(0)}% of the fields`,
+    );
     const relocation = relocationAggregate(results);
     console.log(
       `  Club relocation: ${relocation.asks} asks (median ${fmt(relocation.perCampaign)} a campaign), ${relocation.moves} moves, owners' losses paid for staying ${millions(relocation.ownersLoss)}`,

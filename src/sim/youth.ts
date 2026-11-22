@@ -1,7 +1,7 @@
 import { offseasonOpen } from "./calendar";
 import { runningCostPerQuarter } from "./leagues";
 import { landmarks } from "./records";
-import type { GameState, Landmark, LeagueTierId, World, YouthState } from "./types";
+import type { CountryState, GameState, Landmark, LeagueTierId, World, YouthState } from "./types";
 
 // Youth programs (GDD v1.40, v1.42; tech plan 2.28). The seat's league and focus countries'
 // leagues, the places the player personally operates, buy levels with league cash in the
@@ -53,6 +53,27 @@ export function youthUpkeep(
 export function youthConversion(state: Pick<GameState, "countries">, world: World, index: number) {
   const level = state.countries[index]?.league?.youth.level ?? 0;
   return 1 + world.config.youth.conversionBoost * level;
+}
+
+/** No youth programs: what a skill draw reads where none applies. */
+export const NO_YOUTH: ReadonlyMap<string, number> = new Map();
+
+/** Each country's open youth level (step 2), for the skill draws; countries without are absent. */
+export function youthLevels(countries: readonly CountryState[]): ReadonlyMap<string, number> {
+  const levels = new Map<string, number>();
+  for (const country of countries) {
+    const level = country.league?.youth.level ?? 0;
+    if (level > 0) levels.set(country.countryId, level);
+  }
+  return levels;
+}
+
+/**
+ * Peak skill a youth program adds to a player drawn in its country now (GDD v1.40, step 2):
+ * skillLift × the level open at the draw. Players already playing never change.
+ */
+export function youthSkillLift(world: World, level: number): number {
+  return world.config.youth.skillLift * Math.max(0, level);
 }
 
 /** Whether the player operates this country's league now: the seat or a focus slot. */

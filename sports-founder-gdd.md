@@ -2115,7 +2115,10 @@ purchased traits and percentage modifiers alone do not make culture.
        card line.
     - *Built (2026-11-22, step 1):* measured, +2% conversion a level moved the #1 contest from
       19 to 23 of 35 (fans won near #1 feed the rivals' defense), so the boost is +1% a level
-      (21 of 35). Homegrown quality (step 2) is next.
+      (21 of 35). *Step 2, homegrown quality (2026-11-22):* standouts drawn there and the
+      flagship's young replacements born there add +2 peak skill a level open at the draw.
+      Measured over 200 turns: their named players peak at 59.8 against 56.5, but the bot's
+      programs sit mostly in small focus markets, so their national teams still rank low.
 - **Parked items, topic 4: flagship ticket pricing (decided 2026-11-01, v1.40).** Every number
   is config (`flagship.tickets`).
   - *Three stances at the seat only* (venues exist only there): cheap, standard (the default) and

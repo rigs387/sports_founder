@@ -13,9 +13,9 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-11-22",
-    tests: 715,
+    tests: 718,
     files: 83,
-    note: "npm run check passed after youth programs step 1 was built (type checks, Biome, purity, 715 tests in 83 files). Lint has existing visual-study warnings.",
+    note: "npm run check passed after youth programs step 2 was built (type checks, Biome, purity, 718 tests in 83 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-11-22",
     smoke:
       "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click. On the late-game save's offseason it opens the director's ask on the board (declining states the patience it costs), finds five league directors, reviews a candidate (the review states the severance), appoints them, and checks the narrow layout. On the late-game save the Almanac shows a Builders plaque (one builder inducted). On the offseason screen it reviews a ticket price raise (the review states the hardcore fans it costs) and asks for cheap prices, then puts them back. The founding page names the founder and family (side by side, the launch control still fits), the season in review is signed by the head of the family, and the late-game Almanac shows the Family wing (two heads handed over). On the late-game offseason the Youth programs card lists the seat and focus leagues (Amateur ones say they need a promotion, programs kept after focus left are read-only), reviews and funds a level (the review states the price, when it opens and that only later players benefit), checks the narrow layout and the Flagship tab's read-only card, and the seat's country card shows its youth level.",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Parked items, built in order",
-      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), their asks with patience (step 2 built 2026-11-21), deal partners' rare rule proposals (step 3 built 2026-11-21) and a Builders wing (step 4 built 2026-11-21), so 2.26 is done; seat follow-ups (2.27, built 2026-11-21); flagship ticket pricing (2.29, built 2026-11-21); the founding family (2.30, built 2026-11-21); youth programs (2.28 step 1 built 2026-11-22, step 2 next), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
+      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), their asks with patience (step 2 built 2026-11-21), deal partners' rare rule proposals (step 3 built 2026-11-21) and a Builders wing (step 4 built 2026-11-21), so 2.26 is done; seat follow-ups (2.27, built 2026-11-21); flagship ticket pricing (2.29, built 2026-11-21); the founding family (2.30, built 2026-11-21); youth programs (2.28, built 2026-11-22), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
       tag: "Next build",
     },
     {
@@ -124,6 +124,13 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-11-22",
+      type: "Built",
+      title: "Youth programs, step 2: homegrown quality",
+      text: "GDD v1.42, tech plan 2.28 step 2. A standout drawn in a country with a youth program, and a flagship young replacement born there, adds 2 peak skill per level open at the draw; players already playing never change, and the same seed draws the same players. Measured over 3 builder campaigns of 200 turns (Albania): 32 programs at the end (63 levels); named players born where a program is open peak at 59.8 against 56.5 elsewhere; their national teams rank worse (mean 160 against 98), because the builder's programs sit mostly in small focus markets with weak leagues; world titles 1 of 57 went to a country with a program open, which were 2% of the fields. The lift shows in the players, not yet in the results. npm run check passed (718 tests in 83 files); the smoke passed (no screen changed: skill stays hidden).",
+      system: "business",
+    },
     {
       date: "2026-11-22",
       type: "Built",
@@ -1218,8 +1225,8 @@ window.SF_PROGRESS = {
       gdd: "GDD system 9 · simple version in Phase 1",
       icon: "12",
       summary:
-        "The flagship builds its ground with league cash and sets its ticket prices; the seat and focus leagues fund youth programs that convert fans faster; homegrown talent is designed.",
-      next: "Homegrown quality from youth levels (tech plan 2.28 step 2); venues at other leagues stay flagship-only.",
+        "The flagship builds its ground with league cash and sets its ticket prices; the seat and focus leagues fund youth programs that convert fans faster and raise better homegrown players.",
+      next: "Venues at other leagues stay flagship-only; watch whether youth programs ever move national team results.",
       depends: ["business"],
       sources: [
         ["Venues and youth design", "../../sports-founder-gdd.md#progression--economy"],
@@ -1236,8 +1243,8 @@ window.SF_PROGRESS = {
           "Youth programs at the seat and in focus countries: levels, money and conversion (tech plan 2.28 step 1, GDD v1.40, v1.42)",
         ],
         [
-          "planned",
-          "Homegrown quality raises players drawn after a youth level opens (tech plan 2.28)",
+          "built",
+          "Homegrown quality raises players drawn after a youth level opens (tech plan 2.28 step 2)",
         ],
         [
           "built",

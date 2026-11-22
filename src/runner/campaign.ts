@@ -20,6 +20,7 @@ import {
   leagueCosts,
   leagueIncomePerQuarter,
   mediaReachFrom,
+  nationalTeams,
   PLAYER_INDEX,
   payingDeals,
   QUARTERS_PER_YEAR,
@@ -732,6 +733,42 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           0,
         ),
         ...youth,
+        // Homegrown quality (step 2): at the end, national team ranks and the peak skill of named
+        // players born where a program is open, against the rest; and world titles won by a
+        // country whose first level had opened by that tournament's season, against its share of
+        // the fields.
+        homegrown: (() => {
+          const opened = new Map<string, number>();
+          for (const country of state.countries) {
+            const first = country.league?.youth.opened[0];
+            if (first !== undefined && (country.league?.youth.level ?? 0) > 0)
+              opened.set(country.countryId, first);
+          }
+          const teams = nationalTeams(state, world);
+          const ranks = { with: [] as number[], without: [] as number[] };
+          teams.forEach((team, i) => {
+            (opened.has(team.countryId) ? ranks.with : ranks.without).push(i + 1);
+          });
+          const skill = { with: [] as number[], without: [] as number[] };
+          const named = [
+            ...state.flagship.players.filter((p) => p.retiredSeason === null),
+            ...state.standouts.players,
+          ];
+          for (const p of named)
+            (opened.has(p.countryId) ? skill.with : skill.without).push(p.peakSkill);
+          const before = (countryId: string, season: number) =>
+            (opened.get(countryId) ?? Number.POSITIVE_INFINITY) <= season;
+          let fields = 0;
+          let fieldsWith = 0;
+          let titlesWith = 0;
+          const { tournaments } = state.worldChampionship;
+          for (const t of tournaments) {
+            fields += t.teams.length;
+            fieldsWith += t.teams.filter((team) => before(team.countryId, t.season)).length;
+            if (before(t.championId, t.season)) titlesWith += 1;
+          }
+          return { ranks, skill, fields, fieldsWith, titles: tournaments.length, titlesWith };
+        })(),
       },
       // Club relocation (GDD v1.41): asks, moves and the owners' losses paid for staying.
       tickets: {
