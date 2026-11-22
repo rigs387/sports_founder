@@ -11,6 +11,7 @@ import {
 import { breakDeals, signBlocker, signDeal } from "./deals";
 import { replaceBlocker, replaceDirector } from "./directors";
 import { eventBlocker, minorMomentIds, resolveEvent } from "./events";
+import { stepDown } from "./family";
 import {
   backBlocker,
   backStar,
@@ -570,8 +571,9 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
     case "replaceDirector":
       return replaceDirector(state, world, action.countryId, action.candidate);
     case "retire":
+      // Retiring is the family's last head stepping down (GDD v1.40).
       return {
-        ...state,
+        ...stepDown(state),
         outcome: {
           kind: "retired",
           turn: state.turn,

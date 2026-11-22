@@ -2564,7 +2564,9 @@ the family across generations as flavor only — no succession mechanics.
     generation's tenure.
   - *Daughters and sons (decided 2026-11-21).* Every name pool gains a women's given-name list;
     the founder's default and each heir are drawn from both, so heads can be daughters or sons.
-    Flavor only, as the rest of the family.
+    Flavor only, as the rest of the family. Built 2026-11-21 (tech plan 2.30): a daughter takes
+    the feminine family name where the language has one (Slavic, Baltic, Greek, Czech and
+    Slovak pools); the commissioner's signature is on the season in review.
 
 ---
 

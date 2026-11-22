@@ -46,8 +46,9 @@ describe("retiring", () => {
     expect(() => endTurn(retired, world)).toThrow(CampaignOverError);
     expect(checkAction(retired, world, { type: "retire" })).toMatch(/ended/);
     expect(snapshot(retired, world).canRetire).toBe(false);
-    // Everything but the outcome is as it was.
-    expect({ ...retired, outcome: null }).toEqual(won);
+    // Everything but the outcome is as it was, and the family's last head has stepped down.
+    expect({ ...retired, outcome: null, identity: won.identity }).toEqual(won);
+    expect(retired.identity.family.heads.at(-1)?.handedOver).toBe(won.quarter);
   });
 
   it("stays loadable: the save round-trips with its retrospective", () => {
@@ -73,6 +74,7 @@ describe("the retrospective", () => {
       kind: "retired",
       turn: retired.turn,
       year: view?.retiredYear,
+      head: snapshot(retired, world).family.at(-1)?.name,
     });
   });
 

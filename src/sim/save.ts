@@ -23,6 +23,7 @@ import { newCulture } from "./culture";
 import { newDeals } from "./deals";
 import { newDirectors } from "./directors";
 import { emptyEvents, eventStateSchema, LEGACY_GOAL_IDS } from "./events-state";
+import { isDaughterName } from "./family";
 import { newFlagship, staffFlagship } from "./flagship";
 import { inducteeFacts, newHallOfFame } from "./hall-of-fame";
 import { defaultGroundName, defaultIdentitySetup, foundingClubOf } from "./identity";
@@ -226,6 +227,13 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     partnerId: z.string().min(1),
     axis: axisSchema,
     to: z.string().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal("familyHandoff"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    generation: z.int().min(1),
   }),
   z.strictObject({
     kind: z.literal("ticketsSet"),
@@ -704,6 +712,20 @@ const gameStateSchema = z.strictObject({
       primary: z.string().min(1),
       secondary: z.string().min(1),
     }),
+    // Joined format 34 without a bump (GDD v1.40): older saves have no family on record.
+    family: z
+      .strictObject({
+        name: z.string(),
+        heads: z.array(
+          z.strictObject({
+            given: z.string().min(1),
+            daughter: z.boolean(),
+            tookOver: count,
+            handedOver: count.nullable(),
+          }),
+        ),
+      })
+      .default({ name: "", heads: [] }),
   }),
   rules: z.strictObject({
     amendments: z.array(
@@ -1318,6 +1340,19 @@ const migrations: Record<number, (save: RawSave, world: World) => RawSave> = {
           ethos: defaults.ethos,
           terms: defaults.terms,
           emblem: defaults.emblem,
+          // The founding family (GDD v1.40) from the same defaults, its founder leading from the
+          // start, as a campaign founded with them has it.
+          family: {
+            name: defaults.familyName,
+            heads: [
+              {
+                given: defaults.founderName,
+                daughter: isDaughterName(world, anchor, defaults.founderName),
+                tookOver: 0,
+                handedOver: null,
+              },
+            ],
+          },
         },
       },
     };

@@ -240,7 +240,7 @@ function fitClubs(
 // ---- Leading players (GDD v1.16) ------------------------------------------------------------
 
 /** The invented-name pool a market's players are named from. */
-function namePool(world: World, countryId: string) {
+export function namePool(world: World, countryId: string) {
   const { playerNames } = world.names;
   const sphere = world.countries.find((c) => c.id === countryId)?.languages.primary ?? "";
   const pool = playerNames.pools[playerNames.countries[countryId] ?? sphere];

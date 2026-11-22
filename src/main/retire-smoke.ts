@@ -100,6 +100,15 @@ export async function verifyRetirement(
     );
     await delay(200);
     await screenshot("60b-late-builders.png");
+    // The Family wing (GDD v1.40): two centuries in, heads of the founding family have handed over.
+    const familyPlaques = await count('[data-testid="hall-family"] li.plaque');
+    if (familyPlaques === 0) throw new Error("The late-game Almanac has no Family wing plaque.");
+    checkText("The Family wing", await text('[data-testid="hall-family"]'));
+    await evaluate(
+      `document.getElementById("almanac-family-heading").scrollIntoView({ block: "start" })`,
+    );
+    await delay(200);
+    await screenshot("60c-late-family.png");
     await click(".game-nav [data-view=world]");
     await delay();
 
@@ -181,6 +190,7 @@ export async function verifyRetirement(
       loadedTurn,
       tournaments,
       builders,
+      familyPlaques,
       ...sections,
       endTurnDisabled,
       reloadedOnRetrospective: true,

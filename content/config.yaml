@@ -756,6 +756,11 @@ hallOfFame:
 
 # Sport identity (GDD v1.18): limits on the names typed at setup (the sport, the founding club's
 # name and its ground), counted after trimming.
+# The founding family (GDD v1.40): flavor only, no number reads it. The head of the family hands
+# over in the first offseason generationYears after taking over.
+family:
+  generationYears: 30
+
 identity:
   nameMinLength: 2
   sportNameMaxLength: 24
@@ -763,6 +768,8 @@ identity:
   groundNameMaxLength: 32
   # The trophy's name (GDD v1.22), given on the first champion card or in a rename.
   trophyNameMaxLength: 32
+  # The founder's given name and the family name (GDD v1.40).
+  personNameMaxLength: 24
 
 # The flagship league (GDD v1.11 commissioner's seat, v1.14 flagship season). The player runs one
 # league in depth: named clubs, a season a year that ends in the seasonal window, a champion. Its

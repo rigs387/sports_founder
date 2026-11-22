@@ -11,6 +11,7 @@ import {
   endTurn,
   foundingClubOf,
   type GameState,
+  isDaughterName,
   newAgreement,
   newDirectors,
   newFlagship,
@@ -59,6 +60,17 @@ function migratedFlagship(
       ethos: defaults.ethos,
       terms: defaults.terms,
       emblem: defaults.emblem,
+      family: {
+        name: defaults.familyName,
+        heads: [
+          {
+            given: defaults.founderName,
+            daughter: isDaughterName(world, state.anchorCountryId, defaults.founderName),
+            tookOver: 0,
+            handedOver: null,
+          },
+        ],
+      },
     },
   };
 }

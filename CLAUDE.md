@@ -146,6 +146,13 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   `closeOffseason` applies it, each step up demoting `raiseShare` of the seat's hardcore
   fans (a `ticketsSet` landmark). `ticketStance` is standard wherever the seat moved. The card
   is `src/renderer/src/tickets/TicketsCard.tsx` (offseason screen only; read-only elsewhere).
+- The founding family (GDD v1.40, tech plan 2.30) is `src/sim/family.ts` and
+  `SportIdentity.family`: flavor only, no number reads it. The founder and family name come
+  from setup (`founderName`, `familyName`); `updateFamily` (End Turn's end, in the offseason,
+  every `family.generationYears`) draws an heir on the family's own stream, a daughter or a son
+  (name pools' `women` and `feminine` rules, `headName`), with a `familyHandoff` landmark and
+  the minor `family-handoff` card; retiring is `stepDown`. `TurnSnapshot.family` feeds the
+  Almanac's Family wing, the season in review's signature and the retrospective.
 - Club relocation (GDD v1.41, tech plan 2.33) is `src/sim/relocation.ts` and
   `FlagshipState.relocation`: a seat club in the bottom two of the last
   `flagship.relocation.badSeasons` summaries at the seat, with a bigger place in `places.yaml`

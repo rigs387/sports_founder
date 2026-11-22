@@ -19,6 +19,8 @@ export function nameProblems(identity: IdentitySetup, options: IdentityOptions) 
     sportName: bad(identity.sportName, limits.sportNameMaxLength),
     clubName: bad(identity.clubName, limits.clubNameMaxLength),
     groundName: bad(identity.groundName, limits.groundNameMaxLength),
+    founderName: bad(identity.founderName, limits.personNameMaxLength),
+    familyName: bad(identity.familyName, limits.personNameMaxLength),
     colors: identity.emblem.primary === identity.emblem.secondary,
   };
 }
@@ -200,6 +202,36 @@ export function SetupIdentity({
               ))}
             </div>
           </fieldset>
+          {/* The founding family (GDD v1.40): flavor; heirs keep the family name. */}
+          <div className="setup-pair">
+            <label className="setup-field">
+              <span>{t("identity.setup.founderName")}</span>
+              <input
+                type="text"
+                value={identity.founderName}
+                maxLength={options.limits.personNameMaxLength + 8}
+                aria-invalid={problems.founderName}
+                data-testid="setup-founder-name"
+                onChange={(event) => set({ founderName: event.currentTarget.value })}
+              />
+            </label>
+            <label className="setup-field">
+              <span>{t("identity.setup.familyName")}</span>
+              <input
+                type="text"
+                value={identity.familyName}
+                maxLength={options.limits.personNameMaxLength + 8}
+                aria-invalid={problems.familyName}
+                data-testid="setup-family-name"
+                onChange={(event) => set({ familyName: event.currentTarget.value })}
+              />
+            </label>
+          </div>
+          <small className={problems.founderName || problems.familyName ? "invalid" : undefined}>
+            {problems.founderName || problems.familyName
+              ? lengthHint(options.limits.personNameMaxLength)
+              : t("identity.setup.familyHelp")}
+          </small>
         </div>
         <div className="setup-preview" data-testid="setup-identity-preview">
           <div className="setup-preview-heading">

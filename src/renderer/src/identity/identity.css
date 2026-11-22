@@ -401,3 +401,10 @@
   font-size: 13px;
   line-height: 1.5;
 }
+
+/* The founder and the family name side by side (GDD v1.40). */
+.setup-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}

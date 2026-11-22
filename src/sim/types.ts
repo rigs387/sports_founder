@@ -586,6 +586,14 @@ export type Landmark =
       to: string;
     }
   | {
+      /** The founding family's torch passed (GDD v1.40): `generation` is the new head's index. */
+      kind: "familyHandoff";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      generation: number;
+    }
+  | {
       /** Ticket prices changed at the seat (GDD v1.40); a raise turned `demoted` fans casual. */
       kind: "ticketsSet";
       turn: number;
@@ -857,6 +865,9 @@ export interface Emblem {
 /** What the player chooses at setup. */
 export interface IdentitySetup {
   sportName: string;
+  /** The founder's given name and the family name (GDD v1.40). */
+  founderName: string;
+  familyName: string;
   /** A real place of the anchor (places.yaml) where the founding club is based. */
   foundingPlace: string;
   clubName: string;
@@ -865,6 +876,22 @@ export interface IdentitySetup {
   ethos: string;
   terms: SportTerms;
   emblem: Emblem;
+}
+
+/** One head of the founding family (GDD v1.40): flavor only. */
+export interface FamilyHead {
+  given: string;
+  /** Daughters take the feminine family name where the language has one. */
+  daughter: boolean;
+  /** The quarter they took over, and the one they handed over (null while they lead). */
+  tookOver: number;
+  handedOver: number | null;
+}
+
+/** The founding family (GDD v1.40): the family name and its heads, the founder first. */
+export interface FoundingFamily {
+  name: string;
+  heads: FamilyHead[];
 }
 
 /** The sport's identity in a campaign. The founding club's place and name live on the club. */
@@ -877,6 +904,7 @@ export interface SportIdentity {
   ethos: string;
   terms: SportTerms;
   emblem: Emblem;
+  family: FoundingFamily;
 }
 
 // ---- Rules evolution (GDD v1.20; src/sim/rules.ts) -------------------------------------------

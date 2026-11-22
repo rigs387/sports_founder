@@ -1230,6 +1230,26 @@ cards:
           - { type: clubMove }
           - { type: conversion, target: casual, factor: 1.15, quarters: 4 }
       - { id: stay, quarters: 0, effects: [] }
+  # The founding family's torch passes (GDD v1.40): flavor only, a minor moment from the
+  # familyHandoff landmark that names the head stepping down and the heir.
+  - id: family-handoff
+    kind: moment
+    weight: minor
+    noSlot: true
+    tone: positive
+    priority: 80
+    trigger: familyHandoff
+    minQuarter: 0
+    minFans: 0
+    minHardcore: 0
+    minTier: 1
+    anchorOnly: false
+    scope: country
+    cooldownTurns: 1
+    health: []
+    effects: []
+    defaultChoice: null
+    choices: []
   # A director out of patience resigns (GDD v1.41).
   - id: director-resigned
     kind: moment

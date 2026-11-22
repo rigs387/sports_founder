@@ -5,6 +5,7 @@ import { judgeClauses } from "./deal-clauses";
 import { breakDeals, offerDeals } from "./deals";
 import { syncDirectors } from "./directors";
 import { offerEvents, settleEvents } from "./events";
+import { updateFamily } from "./family";
 import { closeOffseason, returnSeatIfFolded, settleOrphanedSeat } from "./flagship";
 import { evaluateLeagues } from "./leagues";
 import { updateLegacy } from "./legacy";
@@ -116,6 +117,8 @@ export function endTurn(state: GameState, world: World): GameState {
   next = offerProposal(next, world);
   // Legacy goals newly met go on record (GDD v1.38).
   next = updateLegacy(next, world);
+  // The founding family's torch passes once a generation, in the offseason (GDD v1.40).
+  next = updateFamily(next, world);
   // The birthplace outlived with the seat in it: where the seat goes (GDD v1.40).
   // A failing seat club's owners may ask to move, after the season cards (GDD v1.41).
   return offerRelocation(

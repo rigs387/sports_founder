@@ -63,3 +63,12 @@
   justify-content: space-between;
   gap: 8px;
 }
+
+/* The founding family head signs the season (GDD v1.40). */
+.recap-signature {
+  margin: 0;
+  padding: 0 16px 12px;
+  font-style: italic;
+  color: var(--muted);
+  text-align: right;
+}

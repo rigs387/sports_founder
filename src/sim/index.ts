@@ -10,6 +10,7 @@ export * from "./deals";
 export * from "./directors";
 export * from "./events";
 export * from "./events-state";
+export * from "./family";
 export * from "./fandom";
 export * from "./flagship";
 export * from "./genome";

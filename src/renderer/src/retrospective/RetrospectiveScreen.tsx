@@ -48,6 +48,12 @@ export function RetrospectiveScreen({ snapshot, names, active, onWorld }: Props)
       country: "countryId" in entry ? country(entry.countryId) : "",
       name: entry.kind === "tier" ? t(`tiers.${entry.tier}`) : (founded?.name ?? ""),
       player: entry.kind === "firstStar" ? player(entry.playerId) : "",
+      // The founding family (GDD v1.40): who founded, who handed over to whom, who stepped down.
+      head: entry.kind === "founded" || entry.kind === "retired" ? entry.head : "",
+      from: entry.kind === "familyHandoff" ? entry.from : "",
+      to: entry.kind === "familyHandoff" ? entry.to : "",
+      context:
+        (entry.kind === "founded" || entry.kind === "retired") && entry.head ? "head" : undefined,
       rival: entry.kind === "rankOneLost" ? (names.sports[entry.sportId] ?? entry.sportId) : "",
       goal:
         entry.kind === "legacyGoal"

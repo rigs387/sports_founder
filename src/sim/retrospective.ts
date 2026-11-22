@@ -1,4 +1,5 @@
 import { yearOfQuarter } from "./calendar";
+import { headName } from "./family";
 import type { GameState, LegacyGoalId, World } from "./types";
 
 // The retrospective (GDD v1.38): what a retired campaign looks back on. Everything else on the
@@ -7,8 +8,13 @@ import type { GameState, LegacyGoalId, World } from "./types";
 // landmarks and nothing else.
 
 /** One line of the timeline: a turning point of the campaign, with what it names. */
-export type TimelineEntry = { turn: number; year: number } & (
-  | { kind: "founded"; countryId: string }
+export type TimelineEntry = {
+  turn: number;
+  year: number;
+} /** `head` is the founder (GDD v1.40), empty for a save from before the family. */ & (
+  | { kind: "founded"; countryId: string; head: string }
+  /** The founding family's torch passed (GDD v1.40). */
+  | { kind: "familyHandoff"; from: string; to: string }
   /** The first league outside the birthplace. */
   | { kind: "firstLeagueAbroad"; countryId: string }
   /** A PP tier reached for the first time. */
@@ -22,7 +28,8 @@ export type TimelineEntry = { turn: number; year: number } & (
   | { kind: "championshipFounded" }
   | { kind: "birthplaceOutlived"; countryId: string }
   | { kind: "legacyGoal"; goalId: LegacyGoalId }
-  | { kind: "retired" }
+  /** `head` is the head of the family who stepped down. */
+  | { kind: "retired"; head: string }
 );
 
 export interface RetrospectiveSnapshot {
@@ -36,8 +43,10 @@ export interface RetrospectiveSnapshot {
 /** The campaign's turning points so far, oldest first, from the landmarks. */
 export function timeline(state: GameState, world: World): TimelineEntry[] {
   const year = (quarter: number) => yearOfQuarter(quarter, world.config);
+  const { family } = state.identity;
+  const head = (index: number) => headName(world, state.anchorCountryId, family, index);
   const entries: TimelineEntry[] = [
-    { kind: "founded", turn: 1, year: year(0), countryId: state.anchorCountryId },
+    { kind: "founded", turn: 1, year: year(0), countryId: state.anchorCountryId, head: head(0) },
   ];
   let peakTier = 1;
   const once = new Set<string>();
@@ -81,6 +90,14 @@ export function timeline(state: GameState, world: World): TimelineEntry[] {
       case "legacyGoal":
         entries.push({ ...at, kind: "legacyGoal", goalId: landmark.goalId });
         break;
+      case "familyHandoff":
+        entries.push({
+          ...at,
+          kind: "familyHandoff",
+          from: head(landmark.generation - 1),
+          to: head(landmark.generation),
+        });
+        break;
     }
   }
   if (state.outcome?.kind === "retired")
@@ -88,6 +105,7 @@ export function timeline(state: GameState, world: World): TimelineEntry[] {
       kind: "retired",
       turn: state.outcome.turn,
       year: year(state.outcome.quarter),
+      head: head(family.heads.length - 1),
     });
   return entries;
 }

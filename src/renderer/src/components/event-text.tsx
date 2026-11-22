@@ -188,9 +188,15 @@ export function useEventText() {
     };
   };
   // A relocation ask (GDD v1.41) names the club, both towns and the bad seasons.
+  // The founding family's torch (GDD v1.40): the head stepping down and the heir.
+  const familyText = (event: EventRecord) => {
+    if (event.templateId !== "family-handoff") return venueText(event);
+    const at = snapshot.family.findIndex((head) => head.tookOver === event.quarter);
+    return { from: snapshot.family[at - 1]?.name ?? "", to: snapshot.family[at]?.name ?? "" };
+  };
   const relocationText = (event: EventRecord) => {
     const told = event.facts.relocation;
-    if (!told) return venueText(event);
+    if (!told) return familyText(event);
     const found = snapshot.flagship.clubs.find((c) => c.id === told.clubId);
     return {
       club: found ? t("flagship.club", { place: told.from, nickname: found.nickname }) : "",

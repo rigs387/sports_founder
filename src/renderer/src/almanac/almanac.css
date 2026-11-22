@@ -313,3 +313,10 @@
     text-align: left;
   }
 }
+
+/* The Family wing (GDD v1.40): what happened on a head's watch. */
+.plaque-watch {
+  margin: 6px 0 0;
+  padding-left: 16px;
+  font-size: 0.9em;
+}

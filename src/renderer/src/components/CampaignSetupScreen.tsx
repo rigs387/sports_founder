@@ -63,6 +63,8 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
   // The ground's default ("<town> Park") follows the founding town until the player edits it.
   const [groundWord, setGroundWord] = useState("");
   const [groundEdited, setGroundEdited] = useState(false);
+  // The founder's names follow the birthplace country's names until the player edits them.
+  const [founderEdited, setFounderEdited] = useState(false);
   const [rerolls, setRerolls] = useState(0);
   // Two pages, each fitting the window: the birthplace and the sport, then the founding.
   const [stage, setStage] = useState<"sport" | "founding">("sport");
@@ -103,7 +105,8 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
   }, [hintRequest]);
 
   // Choosing a birthplace country fills the founding panel from the seed's defaults the first time;
-  // afterwards it moves only the founding town (and an unedited ground name) to the new country.
+  // afterwards it moves only the founding town (and an unedited ground name and founder) to the
+  // new country.
   // biome-ignore lint/correctness/useExhaustiveDependencies: only a new country reloads the places
   useEffect(() => {
     let active = true;
@@ -119,6 +122,8 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
               ...current,
               foundingPlace: defaults.foundingPlace,
               groundName: groundEdited ? current.groundName : defaults.groundName,
+              founderName: founderEdited ? current.founderName : defaults.founderName,
+              familyName: founderEdited ? current.familyName : defaults.familyName,
             }
           : defaults,
       );
@@ -130,6 +135,8 @@ function SetupForm({ options, names }: { options: SetupOptions; names: Names }) 
 
   const changeIdentity = (next: IdentitySetup) => {
     if (!identity) return;
+    if (next.founderName !== identity.founderName || next.familyName !== identity.familyName)
+      setFounderEdited(true);
     if (next.groundName !== identity.groundName) setGroundEdited(true);
     else if (next.foundingPlace !== identity.foundingPlace && !groundEdited)
       next = { ...next, groundName: `${next.foundingPlace} ${groundWord}` };

@@ -353,6 +353,10 @@ export const namesFileSchema = z.strictObject({
         order: z.enum(["givenFirst", "familyFirst"]).default("givenFirst"),
         given: z.array(z.string().min(1)),
         family: z.array(z.string().min(1)),
+        /** The founding family's daughters' given names (GDD v1.40). */
+        women: z.array(z.string().min(1)).min(10),
+        /** A daughter's family name: the first suffix rule that matches (GDD v1.40). */
+        feminine: z.array(z.strictObject({ from: z.string(), to: z.string() })).default([]),
       }),
     ),
   }),
@@ -1378,12 +1382,16 @@ export const configFileSchema = z.strictObject({
     heartlands: z.strictObject({ sportId: z.string().min(1), countries: z.int().min(1) }),
   }),
   /** Sport identity (GDD v1.18): limits on the names the player types, after trimming. */
+  /** The founding family (GDD v1.40): flavor only. The torch passes every generationYears. */
+  family: z.strictObject({ generationYears: z.int().min(1) }),
   identity: z.strictObject({
     nameMinLength: z.int().min(1),
     sportNameMaxLength: z.int().min(1),
     clubNameMaxLength: z.int().min(1),
     groundNameMaxLength: z.int().min(1),
     trophyNameMaxLength: z.int().min(1),
+    /** The founder's given name and the family name (GDD v1.40). */
+    personNameMaxLength: z.int().min(1),
   }),
   flagship: z.strictObject({
     clubs: z.strictObject({

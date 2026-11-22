@@ -181,6 +181,8 @@ const template = z
       "seatOrphaned",
       /** A failing seat club's owners ask to move it to a bigger town (GDD v1.41). */
       "relocation",
+      /** The founding family's torch passed (GDD v1.40), told from the landmark. */
+      "familyHandoff",
     ]),
     /** directorAsk cards only: the ask the card tells. */
     ask: z.enum(DIRECTOR_ASKS).nullable().default(null),

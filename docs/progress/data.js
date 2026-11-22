@@ -13,14 +13,14 @@ window.SF_PROGRESS = {
     "Recognizable teams, an emerging star, a consequential choice, and a recorded achievement that helps the sport spread.",
   verification: {
     date: "2026-11-21",
-    tests: 705,
-    files: 81,
-    note: "npm run check passed after flagship ticket pricing was built (type checks, Biome, purity, 705 tests in 81 files). Lint has existing visual-study warnings.",
+    tests: 709,
+    files: 82,
+    note: "npm run check passed after the founding family was built (type checks, Biome, purity, 709 tests in 82 files). Lint has existing visual-study warnings.",
     smokeDate: "2026-11-21",
     smoke:
-      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click. On the late-game save's offseason it opens the director's ask on the board (declining states the patience it costs), finds five league directors, reviews a candidate (the review states the severance), appoints them, and checks the narrow layout. On the late-game save the Almanac shows a Builders plaque (one builder inducted). On the offseason screen it reviews a ticket price raise (the review states the hardcore fans it costs) and asks for cheap prices, then puts them back.",
+      "UI smoke passed: after a star card it opens the flagship's Stars panel in both layouts (no overflow, every table row naming its leading player), plays to the offseason, backs a star through the review step, sees the influence bar, and finds the backed star named in Brazil's map tooltip; it founds the sport on the new second setup page (name, club in a real town, terms, emblem), opens the Rulebook in both layouts, sees star cards in the sport's terms, opens the soccer world championship card, and amends a rule through the review step late in the campaign; it then finds traditions in the Rulebook, the trophy card and tradition tags on the flagship screen, and the seat country's traditions with map pennants, in both layouts with no overflow; save/resume continued identically. On the world map a decision pops up with its country outlined and the selection untouched; hover shows the full effects, a paid choice asks first, a free one answers at once, Decide later answers nothing and a moment toast collects; the next offseason opens its own screen on the season in review, with no overflow in either layout. The flagship screen shows its Broadcast card, and the United States tooltip names the broadcast from Brazil's seat. On the offseason screen it signs a deal through the review (a demand states what a breach costs), sees it in its slot in both layouts with no overflow, and finds the Flagship tab's Deals card read-only. It then reviews and builds the next venue level on the offseason screen (the review states the price and when it opens), checks the narrow layout, and finds the Flagship tab's venue card read-only. Last, it plays on until a Hall of Fame class is inducted, shoots the class card, opens the Almanac (plaques, the Moments wing, the Waiting list, records) in both layouts with no overflow, and follows a plaque to its country, whose card names its Hall of Fame players. The pop-up step also sees a minor story collected automatically (Auto-collect on by default) and, with it off, a toast collected by click. On the late-game save's offseason it opens the director's ask on the board (declining states the patience it costs), finds five league directors, reviews a candidate (the review states the severance), appoints them, and checks the narrow layout. On the late-game save the Almanac shows a Builders plaque (one builder inducted). On the offseason screen it reviews a ticket price raise (the review states the hardcore fans it costs) and asks for cheap prices, then puts them back. The founding page names the founder and family (side by side, the launch control still fits), the season in review is signed by the head of the family, and the late-game Almanac shows the Family wing (two heads handed over).",
   },
-  eventDeck: { current: 59, target: "40–60" },
+  eventDeck: { current: 60, target: "40–60" },
   phases: [
     {
       name: "Phase 0",
@@ -51,7 +51,7 @@ window.SF_PROGRESS = {
     {
       system: "leagues",
       title: "Parked items, built in order",
-      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), their asks with patience (step 2 built 2026-11-21), deal partners' rare rule proposals (step 3 built 2026-11-21) and a Builders wing (step 4 built 2026-11-21), so 2.26 is done; seat follow-ups (2.27, built 2026-11-21); flagship ticket pricing (2.29, built 2026-11-21); youth programs (2.28), the founding family (2.30), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
+      text: "Tech plan 2.26–2.32 (GDD v1.40), designed 2026-11-01, in the order 2.31, 2.26, then the rest: regional name pools and outlet words (2.31, built 2026-11-21); league directors in focus countries (2.26 step 1 built 2026-11-21), their asks with patience (step 2 built 2026-11-21), deal partners' rare rule proposals (step 3 built 2026-11-21) and a Builders wing (step 4 built 2026-11-21), so 2.26 is done; seat follow-ups (2.27, built 2026-11-21); flagship ticket pricing (2.29, built 2026-11-21); the founding family (2.30, built 2026-11-21); youth programs (2.28), and anchor resentment as a stored value last (2.32), since it moves collapse and the #1 contest.",
       tag: "Next build",
     },
     {
@@ -124,6 +124,13 @@ window.SF_PROGRESS = {
     },
   ],
   history: [
+    {
+      date: "2026-11-21",
+      type: "Built",
+      title: "The founding family",
+      text: "GDD v1.40, tech plan 2.30. Flavor only: no number reads it. The founder and the family name are typed on the founding page (defaults from the birthplace country's names, following it until edited). Every 30 years, in the offseason, the torch passes to an heir drawn from the country's names on the family's own random stream; heirs are daughters or sons (every name pool gained 20 women's given names, and Slavic, Baltic, Greek and Czech-Slovak pools a feminine surname rule, so an Ivanov's daughter is an Ivanova). A minor card names the heir; the season in review is signed by the head of the family; each head who hands over, or steps down by retiring, joins the Hall's Family wing with a plaque of their watch (tier reached, leagues abroad, #1 taken and lost, the championship founded, the win); the retrospective names the founder, each handover and the head who stepped down. npm run check passed (709 tests in 82 files); the smoke passed with the Family wing on the late-game save (two heads handed over). The handoff card has not been seen on screen.",
+      system: "culture",
+    },
     {
       date: "2026-11-21",
       type: "Built",
@@ -1239,7 +1246,7 @@ window.SF_PROGRESS = {
       icon: "13",
       summary:
         "A Hall of Fame voted each season from a ballot of retired careers, with a Builders wing for league directors, and an Almanac tab with plaques, the Ballot, the sport's history and records.",
-      next: "The founding family's Family wing (tech plan 2.30); all-time leaderboards, the heatmap timelapse and history charts in the Almanac.",
+      next: "All-time leaderboards, the heatmap timelapse and history charts in the Almanac.",
       depends: ["stars", "leagues"],
       sources: [
         ["History and Hall of Fame design", "../../sports-founder-gdd.md#progression--economy"],
@@ -1261,8 +1268,8 @@ window.SF_PROGRESS = {
         ],
         ["built", "The sport's firsts as dated history in the Almanac, never inducted (GDD v1.35)"],
         [
-          "partial",
-          "Players and Builders wings built (Builders: tech plan 2.26 step 4, GDD v1.40); the founding family's Family wing is designed (tech plan 2.30, GDD v1.40)",
+          "built",
+          "Players, Builders and Family wings (Builders: tech plan 2.26 step 4; Family: tech plan 2.30; GDD v1.40)",
         ],
         [
           "partial",

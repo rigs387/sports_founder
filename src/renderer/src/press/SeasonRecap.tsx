@@ -71,6 +71,7 @@ export function SeasonRecap({
   if (legends.length > 0) culture.push(t("press.items.hall", { names: list(legends) }));
   else if (inductees.length > 0) culture.push(t("press.items.hallMoment"));
 
+  const head = snapshot.family.at(-1);
   return (
     <article className="season-recap" data-testid="season-recap" data-story={page.story ?? "none"}>
       <header className="recap-header">
@@ -165,6 +166,12 @@ export function SeasonRecap({
           </section>
         )}
       </div>
+      {/* The head of the founding family signs the commissioner's season (GDD v1.40). */}
+      {head && (
+        <p className="recap-signature" data-testid="recap-signature">
+          {t("press.signature", { head: head.name })}
+        </p>
+      )}
     </article>
   );
 }

@@ -158,6 +158,10 @@
           "hold": "Stay with organic growth"
         }
       },
+      "family-handoff": {
+        "title": "{{to}} takes over",
+        "body": "After a generation at the head of the sport, {{from}} hands the family's place to {{to}}. The office, the archive and the old arguments come with it."
+      },
       "club-relocation": {
         "title": "{{club}} want to move",
         "body": "The owners of {{club}} have finished in the bottom two {{seasons}} seasons running. They want to take the club from {{from}} to {{to}}, a bigger town with no club. It would keep its name and its record, and new money would make it stronger. In {{from}} its derbies, chants and ground would be betrayed, and some lifelong fans would turn away.",
@@ -759,6 +763,8 @@
     "timeline": {
       "heading": "Timeline",
       "founded": "{{sport}} is founded in {{country}}.",
+      "founded_head": "{{head}} founds {{sport}} in {{country}}.",
+      "familyHandoff": "{{from}} hands the family's place at the head of the sport to {{to}}.",
       "firstLeagueAbroad": "The first league abroad forms, in {{country}}.",
       "tier": "The sport reaches a new tier: {{name}}.",
       "firstElite": "{{country}} has the sport's first Elite league.",
@@ -770,7 +776,8 @@
       "championshipFounded": "{{name}} is founded.",
       "birthplaceOutlived": "The league in {{country}} collapses. The sport outlives its birthplace.",
       "legacyGoal": "Legacy goal met: {{goal}}.",
-      "retired": "The founder retires."
+      "retired": "The founder retires.",
+      "retired_head": "{{head}} steps down, and the family's long watch over the sport ends."
     },
     "legacy": {
       "heading": "Legacy goals: {{met, number}} of {{of, number}} met"
@@ -1919,6 +1926,9 @@
       "clubName": "Club name",
       "clubPreview": "Your founding club: {{club}}",
       "groundName": "Home ground",
+      "founderName": "Founder",
+      "familyName": "Family name",
+      "familyHelp": "You are the founding family. Leadership passes to an heir once a generation; heirs keep the family name.",
       "birthplace": "First played on",
       "ethos": "Character",
       "terms": "What it calls things",
@@ -2085,6 +2095,24 @@
     "classOf": "Class of {{year}}",
     "home": "Home: {{country}}",
     "recordHolder": "Once held the all-time scoring record",
+    "family": {
+      "heading": "The Family",
+      "leading": "Head of the family since {{year}}: {{name}}.",
+      "empty": "No head of the founding family has handed over yet. Each one joins the Hall here when they pass the sport to an heir, or step down.",
+      "tenure": "Led the sport from {{from}} to {{to}}",
+      "watch": {
+        "tier": "Took the sport to {{name}}",
+        "leaguesAbroad_one": "{{count}} league formed abroad",
+        "leaguesAbroad_other": "{{count, number}} leagues formed abroad",
+        "rankOne_one": "Made it the world's #1",
+        "rankOne_other": "Made it the world's #1 {{count}} times",
+        "rankOneLost_one": "Lost #1 once",
+        "rankOneLost_other": "Lost #1 {{count}} times",
+        "championship": "Founded the World Championship",
+        "won": "Held #1 long enough to win",
+        "quiet": "A quiet watch: the sport held its ground"
+      }
+    },
     "builders": {
       "heading": "The Builders",
       "empty": "No builder has been inducted yet. League directors whose league rose while they held the job go in a few years after they leave: promotions, reaching Elite, and growing the hardcore fans. A director replaced, or one who resigned, never does.",
@@ -2174,6 +2202,7 @@
     "recapPlayoffs": "Playoffs",
     "recapMatch": "{{home}} {{homeScore}}–{{awayScore}} {{away}}",
     "recapAwards": "Awards",
+    "signature": "For the league, {{head}}, commissioner",
     "recapCulture": "Records and culture",
     "lead": {
       "default": "{{club}} are {{seasonNoun}} {{season}} champions",

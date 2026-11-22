@@ -1,3 +1,4 @@
+import { defaultFounder, isDaughterName } from "./family";
 import { createRngState, nextFloat, restoreRng } from "./rng";
 import type { Club, GameState, Genome, IdentitySetup, SportIdentity, World } from "./types";
 
@@ -54,6 +55,8 @@ export function defaultIdentitySetup(
   const first = (list: readonly string[]) => list[0] ?? "";
   return {
     sportName: suggestSportName(world, seed),
+    // The founder (GDD v1.40), on the family's own stream so the other defaults stay as they were.
+    ...defaultFounder(world, seed, anchorCountryId),
     foundingPlace: place,
     clubName: pick(rng, world.names.clubNicknames),
     groundName: defaultGroundName(world, seed, place),
@@ -95,6 +98,8 @@ export function identityProblems(
   checkName("sportName", setup.sportName, limits.sportNameMaxLength);
   checkName("clubName", setup.clubName, limits.clubNameMaxLength);
   checkName("groundName", setup.groundName, limits.groundNameMaxLength);
+  checkName("founderName", setup.founderName, limits.personNameMaxLength);
+  checkName("familyName", setup.familyName, limits.personNameMaxLength);
   if (!(world.places[anchorCountryId] ?? []).some((place) => place.name === setup.foundingPlace))
     problems.push(`"${setup.foundingPlace}" is not a place in ${anchorCountryId}`);
   const known = (field: string, value: string, list: readonly string[]) => {
@@ -186,6 +191,17 @@ export function foundSport(
       ethos: setup.ethos,
       terms: { ...setup.terms },
       emblem: { ...setup.emblem },
+      family: {
+        name: tidyName(setup.familyName),
+        heads: [
+          {
+            given: tidyName(setup.founderName),
+            daughter: isDaughterName(world, state.anchorCountryId, tidyName(setup.founderName)),
+            tookOver: state.quarter,
+            handedOver: null,
+          },
+        ],
+      },
     },
   };
 }
@@ -199,12 +215,22 @@ export function identityStateProblems(state: GameState, world: World): string[] 
       ...identity,
       foundingPlace: club?.place ?? "",
       clubName: club?.nickname ?? "",
+      founderName: identity.family.heads[0]?.given ?? "",
+      familyName: identity.family.name,
     },
     world,
     state.anchorCountryId,
   )
-    // An older save's founding club keeps the name it had, whatever today's limits say.
-    .filter((problem) => !problem.startsWith("clubName"));
+    // An older save's founding club keeps the name it had, whatever today's limits say, and a save
+    // from before the family (GDD v1.40) has none.
+    .filter(
+      (problem) =>
+        !problem.startsWith("clubName") &&
+        !(
+          identity.family.heads.length === 0 &&
+          (problem.startsWith("founderName") || problem.startsWith("familyName"))
+        ),
+    );
   if (!club || club.countryId !== state.anchorCountryId)
     problems.push(`founding club #${identity.foundingClubId} is not a club of the anchor`);
   return problems.map((problem) => `identity: ${problem}`);

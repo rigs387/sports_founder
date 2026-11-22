@@ -1,6 +1,12 @@
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
-import type { BuilderSnapshot, InducteeFacts, InducteeSnapshot, TurnSnapshot } from "../../../sim";
+import type {
+  BuilderSnapshot,
+  FamilyHeadSnapshot,
+  InducteeFacts,
+  InducteeSnapshot,
+  TurnSnapshot,
+} from "../../../sim";
 import { useAwardWords } from "../awards/words";
 import { Emblem } from "../identity/Emblem";
 import { useTermVars } from "../identity/terms";
@@ -33,6 +39,9 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
     snapshot.flagship.players.find((p) => p.id === id)?.name ?? "";
   const players = [...hall.inductees].reverse();
   const builders = [...hall.builders].reverse();
+  // The Family wing (GDD v1.40): heads who handed over, newest first; the current head apart.
+  const family = snapshot.family.filter((head) => head.inducted).reverse();
+  const leading = snapshot.family.find((head) => !head.inducted);
   const { champions, scorers, crowd, mostAwards } = hall.records;
   // Seasons lost to a stoppage (GDD v1.39) keep their place in the roll, newest first.
   const roll = [
@@ -104,6 +113,23 @@ export function AlmanacScreen({ snapshot, names, active, onCountry }: Props) {
                     home={country(builder.countryId)}
                     onHome={() => onCountry(builder.countryId)}
                   />
+                ))}
+              </ul>
+            )}
+          </section>
+          <section className="almanac-card" aria-labelledby="almanac-family-heading">
+            <h2 id="almanac-family-heading">{t("almanac.family.heading")}</h2>
+            {leading && (
+              <p data-testid="family-leading">
+                {t("almanac.family.leading", { name: leading.name, year: leading.fromYear })}
+              </p>
+            )}
+            {family.length === 0 ? (
+              <p className="almanac-empty">{t("almanac.family.empty")}</p>
+            ) : (
+              <ul className="plaques" data-testid="hall-family">
+                {family.map((head) => (
+                  <FamilyPlaque key={head.tookOver} head={head} />
                 ))}
               </ul>
             )}
@@ -426,6 +452,39 @@ function BuilderPlaque({
       <button type="button" className="plaque-home" onClick={onHome}>
         {t("almanac.home", { country: home })}
       </button>
+    </li>
+  );
+}
+
+/** A Family wing plaque (GDD v1.40): a head of the founding family and what happened on their watch. */
+function FamilyPlaque({ head }: { head: FamilyHeadSnapshot }) {
+  const { t } = useTranslation();
+  const { watch } = head;
+  const top = watch.tiers.length > 0 ? Math.max(...watch.tiers) : null;
+  const lines = [
+    top !== null ? t("almanac.family.watch.tier", { name: t(`tiers.${top}`) }) : null,
+    watch.leaguesAbroad > 0
+      ? t("almanac.family.watch.leaguesAbroad", { count: watch.leaguesAbroad })
+      : null,
+    watch.rankOneTaken > 0
+      ? t("almanac.family.watch.rankOne", { count: watch.rankOneTaken })
+      : null,
+    watch.rankOneLost > 0
+      ? t("almanac.family.watch.rankOneLost", { count: watch.rankOneLost })
+      : null,
+    watch.championshipFounded ? t("almanac.family.watch.championship") : null,
+    watch.won ? t("almanac.family.watch.won") : null,
+  ].filter((line): line is string => line !== null);
+  return (
+    <li className="plaque plaque-family" data-head={head.tookOver}>
+      <span className="plaque-class">{t("almanac.classOf", { year: head.toYear ?? 0 })}</span>
+      <h3>{head.name}</h3>
+      <p>{t("almanac.family.tenure", { from: head.fromYear, to: head.toYear ?? 0 })}</p>
+      <ul className="plaque-watch">
+        {(lines.length > 0 ? lines : [t("almanac.family.watch.quiet")]).map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
     </li>
   );
 }

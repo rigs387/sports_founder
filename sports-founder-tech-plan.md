@@ -1827,8 +1827,19 @@ Flagship tab); the venue smoke step reviews a raise and asks for cheap. Measured
 
 ### 2.30 Build Plan: The Founding Family (GDD v1.40)
 
-Designed 2026-11-01 (parked items, topic 6). Not built. One session. Flavor only: no number
+Designed 2026-11-01 (parked items, topic 6). Built 2026-11-21. Flavor only: no number
 reads the family.
+
+*As built:* `src/sim/family.ts` and `SportIdentity.family` (the family name and its heads:
+given name, daughter, took over, handed over). `IdentitySetup` gains `founderName` and
+`familyName` (`defaultFounder`, the family's own stream; the setup screen follows the
+birthplace until edited). Name pools gained `women` (20 each) and `feminine` surname rules
+(`feminineName`; the founder's surname stands as typed). `updateFamily` runs at End Turn's end
+(`familyHandoff` landmark, the minor `family-handoff` card through the generic landmark
+offer); `stepDown` on retiring. `familySnapshot` (`TurnSnapshot.family`) gives each head's
+watch, read from the landmarks of their tenure; the Almanac's Family wing, the season in
+review's signature and the retrospective's timeline read it. The late-game smoke step requires a
+Family wing plaque (`60c-late-family.png`). The handoff card has not been seen on screen.
 
 1. `GameState.identity.family` (heads in order: name, took over, handed over); the founder's
    name on the founding setup page (default from the birthplace's name pool on identity's

@@ -7,6 +7,7 @@ import { leagueIncomePerQuarter } from "./deals";
 import { type DirectorsSnapshot, directorsSnapshot } from "./directors";
 import { type EventSnapshot, eventSnapshots } from "./events";
 import type { EventState } from "./events-state";
+import { type FamilyHeadSnapshot, familySnapshot } from "./family";
 import { fandomScore, localRank, type SportTotals, sportTotals } from "./fandom";
 import { activeClubs, broadcastEffects, type FlagshipSnapshot, flagshipSnapshot } from "./flagship";
 import { leverMultipliers, similarityEffect } from "./genome";
@@ -266,6 +267,11 @@ export interface TurnSnapshot {
   culture: CultureSnapshot;
   /** The Hall of Fame and the Almanac's records (GDD v1.31). */
   hallOfFame: HallSnapshot;
+  /**
+   * The founding family (GDD v1.40): every head, the founder first, the current head last; those
+   * who handed over are the Hall's Family wing.
+   */
+  family: FamilyHeadSnapshot[];
   /** Each season's Player of the Year, oldest first (GDD v1.37); empty until standouts exist. */
   playersOfYear: PlayerOfYear[];
   /** Every national team that could be fielded now, strongest first (GDD v1.37). */
@@ -568,6 +574,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     rules: rulesSnapshot(state, world),
     culture: cultureSnapshot(state, world, offseasonOpen(state)),
     hallOfFame: hallSnapshot(state, world),
+    family: familySnapshot(state, world),
     playersOfYear: state.standouts.playersOfYear,
     nationalTeams: nationalTeamSnapshots(state, world),
     worldChampionship: championshipSnapshot(state, world),
