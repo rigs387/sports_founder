@@ -477,6 +477,8 @@ export function App() {
             seat={snapshot.flagship.countryId}
             turn={snapshot.turn}
             culture={snapshot.culture}
+            youth={snapshot.youth.find((row) => row.countryId === selected.countryId)}
+            terms={snapshot.identity.terms}
             inductees={snapshot.hallOfFame.inductees
               .filter((i) => i.countryId === selected.countryId)
               .map((i) => snapshot.flagship.players.find((p) => p.id === i.playerId)?.name ?? "")}

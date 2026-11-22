@@ -146,6 +146,18 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   `closeOffseason` applies it, each step up demoting `raiseShare` of the seat's hardcore
   fans (a `ticketsSet` landmark). `ticketStance` is standard wherever the seat moved. The card
   is `src/renderer/src/tickets/TicketsCard.tsx` (offseason screen only; read-only elsewhere).
+- Youth programs (GDD v1.40, v1.42, tech plan 2.28; step 1 built) are `src/sim/youth.ts` and
+  `LeagueState.youth` (level 0–5, a build, `opened`: the season each level opened). The seat's
+  league and focus leagues buy the next level (`buildYouth`, offseason, league cash); config
+  `youth.maxLevel` caps it by tier. `settleYouth` runs at the end of `closeOffseason`: a
+  league with cash under `lossYears` of youth upkeep loses its top level and build, a tier
+  drop trims to the cap, then due levels open (`youthOpened`/`youthLost` landmarks). Upkeep
+  is the costs' `youth` line, focus or not; `youthConversion` lifts hardcore conversion
+  (`quarter.ts`). A granted `community-drive` ask sets up the next level free in place of its
+  conversion year where `youthBlocker(..., free)` allows (`applyEffects`, `grantAsk`).
+  `TurnSnapshot.youth` feeds `src/renderer/src/youth/YouthCard.tsx` (offseason screen; read-only
+  on the Flagship tab) and the country card's line; its smoke step (`src/main/youth-smoke.ts`)
+  runs after the directors step. Only the builder bot buys (above two reserves).
 - The founding family (GDD v1.40, tech plan 2.30) is `src/sim/family.ts` and
   `SportIdentity.family`: flavor only, no number reads it. The founder and family name come
   from setup (`founderName`, `familyName`); `updateFamily` (End Turn's end, in the offseason,
@@ -356,8 +368,8 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   fame facts and `recordCrowd` landmarks; venue news is `src/sim/venue-cards.ts`. The UI is
   `src/renderer/src/venues/VenueCard.tsx` (building only on the offseason screen). On screen
   (GDD v1.34) capacity is Max capacity a game per ground (`groundSize`) and Attendance a game
-  (`matchCrowd`); the sim's capacity still caps the gate and decides when a game is sold out. Youth programs,
-  standing policies and ticket pricing are parked.
+  (`matchCrowd`); the sim's capacity still caps the gate and decides when a game is sold out. Youth programs
+  and ticket pricing are their own sections; standing policies were cut (GDD v1.40).
 - Sport identity (GDD v1.18) lives in `src/sim/identity.ts` and `GameState.identity`: the sport's
   name, founding club (a real flagship club at the anchor) and ground, birthplace, ethos, terms and
   emblem. Option lists are ids in `content/identity.yaml`; words are in the locale file. Defaults
@@ -578,6 +590,7 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   champion, and `WorldChampionshipState.lifts`. Format 29 migrates with no tournaments.
 - Save format 31 adds world titles to Hall inductees' facts (GDD v1.37). Format 30 migrates
   with none.
+- `LeagueState.youth` joined format 34 without a bump (GDD v1.40): older leagues load with none.
 - Save format 34 adds league directors (GDD v1.40): `GameState.directors`. Format 33 migrates
   with none serving; focus countries' leagues draw theirs when the next turn ends.
 - Save format 33 adds the players' agreement (GDD v1.39): `GameState.agreement`. Format 32

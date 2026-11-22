@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
-import type { CountrySnapshot, CultureSnapshot } from "../../../sim";
+import type { CountrySnapshot, CultureSnapshot, SportTerms, YouthRow } from "../../../sim";
 import { TraditionList } from "../culture/traditions";
+import { useTermVars } from "../identity/terms";
 import { geometry } from "../map/model";
 import { SPORT_COLORS, sportName } from "../standings/StandingsPanel";
 import { useGameStore } from "../state/game-store";
@@ -24,6 +25,10 @@ interface Props {
   culture?: CultureSnapshot;
   /** Hall of Fame players from here (GDD v1.31), by name. */
   inductees?: string[];
+  /** The youth program here (GDD v1.40), where there is one or the player operates the league. */
+  youth?: YouthRow;
+  /** The sport's terms, for the youth line. */
+  terms: SportTerms;
 }
 export function CountryCard({
   country,
@@ -38,6 +43,8 @@ export function CountryCard({
   leagueControls,
   culture,
   inductees = [],
+  youth,
+  terms,
 }: Props) {
   const { t, i18n } = useTranslation();
   const compact = (value: number) => t("format.compact", { value });
@@ -109,6 +116,7 @@ export function CountryCard({
                 })}
               </p>
             )}
+            {youth && <YouthLine youth={youth} terms={terms} />}
             {country.standouts.length > 0 && (
               <p className="wealth-level" data-testid="country-standouts">
                 {t("map.standouts", {
@@ -293,5 +301,25 @@ function CountrySports({ country }: { country: CountrySnapshot }) {
         ))}
       </ul>
     </div>
+  );
+}
+
+/** One line on the country card for its youth program (GDD v1.40). */
+function YouthLine({ youth, terms }: { youth: YouthRow; terms: SportTerms }) {
+  const { t } = useTranslation();
+  const nouns = useTermVars(terms)();
+  return (
+    <p className="wealth-level" data-testid="country-youth" data-level={youth.level}>
+      {youth.building
+        ? t("youth.countryLineBuilding", {
+            ...nouns,
+            level: youth.level,
+            next: youth.building.level,
+            season: youth.building.opensSeason,
+          })
+        : youth.level > 0
+          ? t("youth.countryLine", { level: youth.level, upkeep: youth.upkeep })
+          : t("youth.countryNone")}
+    </p>
   );
 }

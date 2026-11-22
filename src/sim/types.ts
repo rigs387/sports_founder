@@ -87,6 +87,18 @@ export interface LeagueState {
   bailoutReadyQuarter: number;
   /** The league's venue (GDD v1.30). Only the flagship's league builds; others stay at level 1. */
   venue: VenueState;
+  /** The league's youth program (GDD v1.40): level 0 is none. */
+  youth: YouthState;
+}
+
+/** A league's youth program (GDD v1.40, v1.42): a level, no individual academies. */
+export interface YouthState {
+  /** 0–5; the league's tier caps it. */
+  level: number;
+  /** A level being set up, opening when the offseason before `opensSeason` closes. */
+  building: { level: number; opensSeason: number } | null;
+  /** The flagship season each open level opened in, level 1 first. */
+  opened: number[];
 }
 
 /** A league's venue capacity level (GDD v1.30): no individual stadiums. */
@@ -763,6 +775,23 @@ export type Landmark =
       countryId: string;
       level: number;
       modernized: boolean;
+    }
+  /** A youth program level opened (GDD v1.40). */
+  | {
+      kind: "youthOpened";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      level: number;
+    }
+  /** A youth program lost a level (GDD v1.42): unpaid upkeep, or the league's tier fell. */
+  | {
+      kind: "youthLost";
+      turn: number;
+      quarter: number;
+      countryId: string;
+      level: number;
+      reason: "upkeep" | "tier";
     }
   /** A flagship season's crowd set the league's attendance record (GDD v1.30). */
   | {

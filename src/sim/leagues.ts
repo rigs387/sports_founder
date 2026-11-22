@@ -18,6 +18,7 @@ import {
   type World,
 } from "./types";
 import { newVenue } from "./venues";
+import { newYouth } from "./youth";
 
 // Abstract leagues (GDD League tiers, Business Layer Phase 0 subset, League Health Ladder).
 // One top league per country. Cash is per country, accrues per quarter, and never produces PP.
@@ -174,6 +175,7 @@ export function newLeague(
     formedQuarter: quarter,
     bailoutReadyQuarter: quarter,
     venue: newVenue(),
+    youth: newYouth(),
   };
 }
 

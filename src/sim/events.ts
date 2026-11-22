@@ -27,6 +27,7 @@ import {
 import { birthPP, offerTraditionCards } from "./tradition-cards";
 import { type GameState, HEALTH_LEVELS, type Landmark, PLAYER_INDEX, type World } from "./types";
 import { offerVenueCards } from "./venue-cards";
+import { youthBlocker } from "./youth";
 
 /** A director's name, serving or not. */
 function directorName(state: GameState, directorId: number): string {
@@ -581,9 +582,16 @@ function applyEffects(
   state: GameState,
   world: World,
   event: EventRecord,
-  effects: EventEffect[],
+  chosen: EventEffect[],
 ): GameState {
   let next = state;
+  // A granted community drive sets up the next youth level free where the league can start one,
+  // in place of its year of faster conversion (GDD v1.42).
+  const drive =
+    event.facts.director?.ask === "community-drive" &&
+    chosen.some((effect) => effect.type === "directorAsk") &&
+    youthBlocker(state, world, event.countryId, true) === null;
+  const effects = drive ? chosen.filter((effect) => effect.type !== "conversion") : chosen;
   const index = world.countries.findIndex((country) => country.id === event.countryId);
   const population = world.countries[index]?.population;
   if (population === undefined) throw new Error("Unknown event market");

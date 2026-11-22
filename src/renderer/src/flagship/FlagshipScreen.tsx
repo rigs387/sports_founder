@@ -10,6 +10,7 @@ import { Emblem } from "../identity/Emblem";
 import { useTermVars } from "../identity/terms";
 import { TicketsCard } from "../tickets/TicketsCard";
 import { VenueCard } from "../venues/VenueCard";
+import { YouthCard } from "../youth/YouthCard";
 import "./flagship.css";
 import { StarsPanel } from "./StarsPanel";
 
@@ -105,6 +106,7 @@ export function FlagshipScreen({ snapshot, names, busy, active, onAction }: Prop
           <Broadcast snapshot={snapshot} seatName={seatName} nouns={nouns} />
           <VenueCard snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
           <TicketsCard snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
+          <YouthCard snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
           <DealsPanel snapshot={snapshot} names={names} busy={busy} onAction={onAction} readOnly />
           <LatestRound results={flagship.lastRound} clubName={clubName} nouns={nouns} />
           <TrophyCard snapshot={snapshot} busy={busy} onAction={onAction} readOnly />

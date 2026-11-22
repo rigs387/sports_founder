@@ -43,6 +43,7 @@ function withLeague(index: number, tier: LeagueTierId, cash: number): GameState 
       formedQuarter: 0,
       bailoutReadyQuarter: 0,
       venue: newVenue(),
+      youth: { level: 0, building: null, opened: [] },
     },
   };
   return { ...state, countries };

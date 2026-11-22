@@ -21,6 +21,7 @@ import {
   PLAYER_INDEX,
   type World,
 } from "./types";
+import { buildYouth, youthBlocker } from "./youth";
 
 // League directors (GDD v1.40, tech plan 2.26 step 1). A league in a focus country, other than
 // the seat's, has a director while the country holds a focus slot: focus made a person. Each has
@@ -561,7 +562,10 @@ export function grantAsk(state: GameState, world: World, event: EventRecord): Ga
         },
       };
     case "community-drive":
-      return state;
+      // The next youth level, free, where the league can start one (GDD v1.42).
+      return youthBlocker(state, world, countryId, true) === null
+        ? buildYouth(state, world, countryId, true)
+        : state;
   }
 }
 

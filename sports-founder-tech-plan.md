@@ -88,6 +88,7 @@ surface before playtesting or during it.
 | 2026-10-08 | Awards and press, topic 1 (GDD v1.33): flagship Player of the Season (composite of scores, club finish, playoff and final scores) and the top scorer as a named prize; Hall of Fame points, no other effect; named after the first Hall of Fame player, fixed; lines on existing screens, the first award a toast; Player of the Year parked | Decided |
 | 2026-10-08 | Awards and press, topic 2 (GDD v1.33): an invented outlet per country (biggest place + sports-paper word) once its league forms, the sport's paper before; outlet mastheads with family sections; 2–3 headline variants for frequent cards by stable hash; the offseason's season in review becomes the seat outlet's front page; presentation only, nothing saved | Decided |
 | 2026-11-01 | Parked items, topic 1 (GDD v1.40): league directors only in focus countries' leagues (not the seat's), drawn when focus lands, gone when it leaves; one trait bending the simple model, salary from league cash, replaced in the offseason for severance; one proposal card a year from a director or a deal partner (no PP price, counts toward the limit; declining a partner is a clause miss); a Builders wing in the Hall; standing policies cut | Decided |
+| 2026-11-22 | Youth program sizes (GDD v1.42): levels 0–5 capped by tier (Amateur 0, Semi-Pro 2, Professional 4, Elite 5); price 2/3/5/8/12 quarters of the league's running cost, upkeep 2.5% per level; a level lost when the offseason closes with cash under a year's upkeep (build cancelled, later draws only); a tier drop trims to the cap; a granted community drive sets up the next level free in place of its conversion year; only the builder buys, above two reserves; one Youth card and a country card line. Conversion +1% a level after measuring | Decided |
 | 2026-11-21 | Club relocation (GDD v1.41): a flagship club in the bottom two for about 3 seasons running, with a bigger real town at the seat without a club, has its owners ask to move (a decision card, one an offseason); moving keeps nickname and record, lifts the club's rating and a year of casual conversion, betrays the old town's traditions and demotes some hardcore fans; declining costs the league the owners' losses and the ask returns after the next bad season | Decided |
 | 2026-11-21 | Directors' asks (GDD v1.41): directors no longer propose rules; one ask an offseason across all directors from a content list by trait (promotion push, hold the money, community drive, keep our star, host something); patience: two declines in a row and the director resigns with a health hit; rule proposals from deal partners only, one in about 8 seasons, one step, never a recently amended trait; scandals stay | Decided |
 | 2026-11-01 | Parked items, topic 2 (GDD v1.40): only the flagship ever signs deals; when the anchor league folds after the win, a decision card moves the seat free to an eligible league (default: most hardcore fans); a seat league abroad stepping down below Professional loses the seat at the offseason's close with the purist cost; the playtest-thinness question closed | Decided |
@@ -1789,7 +1790,7 @@ warning (`stepDownLeague.terms.seatLoss`) has been seen on screen.
 
 ### 2.28 Build Plan: Youth Programs (GDD v1.40)
 
-Designed 2026-11-01 (parked items, topic 3). Not built. Two sessions.
+Designed 2026-11-01 (parked items, topic 3); sizes decided 2026-11-22 (GDD v1.42). Step 1 built 2026-11-22. Two sessions.
 
 1. **Levels, money and conversion.** `LeagueState.youth` (level 0–5, a build opening after a
    season, the season it opened), `src/sim/youth.ts`: the `buildYouth` action (offseason, the
@@ -1798,6 +1799,15 @@ Designed 2026-11-01 (parked items, topic 3). Not built. Two sessions.
    cash cannot cover it, and the hardcore conversion factor in `quarter.ts`. A card on the
    offseason screen (review step) and a line on the country card. The runner prints levels
    bought, upkeep against league cash, and conversion added; measure the #1 contest is unmoved.
+   *Built 2026-11-22.* Config `youth`: levels capped by tier (0/2/4/5), price 2/3/5/8/12 quarters
+   of running cost, upkeep 2.5% of it per level, `lossYears` 1; `settleYouth` runs at the end of
+   `closeOffseason` (loss, tier cap, openings; `youthOpened`/`youthLost` landmarks); the
+   community drive sets up the next level free in place of its conversion year where it can;
+   the builder buys above two reserves. Measured (pacing, 12 anchors × 3 seeds, 200 turns): at
+   +2% conversion a level the lead was lost before the win in 23 of 35, against 19 of 35 with
+   youth switched off on the same build, so `conversionBoost` was halved to 0.01: 21 of 35 (60%),
+   pacing passes; 415 levels opened, none lost; upkeep 0.8% of those leagues' costs (cheap: a
+   watch item). The smoke funds a level on the late-game offseason.
 2. **Homegrown quality.** Each youth level records when it opened; a player drawn after that
    (standouts in `standouts.ts`, the flagship's young replacements in `newPlayer`,
    `flagship.ts`) born in that country draws peak skill raised by the level then open

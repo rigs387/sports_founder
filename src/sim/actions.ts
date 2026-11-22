@@ -53,6 +53,7 @@ import {
   hostBlocker,
   pickHost,
 } from "./world-championship";
+import { buildYouth, youthBlocker } from "./youth";
 
 // The player's legal actions. Every action, from the UI or a bot, goes through applyAction, which
 // validates legality first, so nothing can bypass the rules.
@@ -79,6 +80,8 @@ import {
 //                   withdrawn (GDD v1.28)
 //   buildVenue      start building the seat's next venue level with league cash, in the
 //                   offseason, one level at a time (GDD v1.30)
+//   buildYouth      start setting up a league's next youth program level with its cash, in the
+//                   offseason, at the seat or a focus country, one level at a time (GDD v1.40)
 //   setTickets      next season's ticket stance at the seat, in the offseason (GDD v1.40); a
 //                   raise turns some hardcore fans casual when the offseason closes
 //   proposeAgreement  put a players' agreement to the union, in the offseason while talks are
@@ -109,6 +112,7 @@ export type Action =
   | { type: "pickHost"; countryId: string }
   | { type: "signDeal"; offerId: number }
   | { type: "buildVenue" }
+  | { type: "buildYouth"; countryId: string }
   | { type: "setTickets"; stance: TicketStance }
   | { type: "proposeAgreement"; terms: AgreementTerms }
   | { type: "replaceDirector"; countryId: string; candidate: number }
@@ -349,6 +353,24 @@ export function checkAction(state: GameState, world: World, action: Action): str
         return null;
     }
   }
+  if (action.type === "buildYouth") {
+    switch (youthBlocker(state, world, action.countryId)) {
+      case "window":
+        return "youth programs are built only in the offseason";
+      case "league":
+        return "that country has no league";
+      case "focus":
+        return "only the seat and focus countries can build youth programs";
+      case "cap":
+        return "the youth program is at the top level for its league tier";
+      case "building":
+        return "a youth level is already being set up";
+      case "cash":
+        return "the league cannot afford the next youth level";
+      case null:
+        return null;
+    }
+  }
   if (action.type === "buildVenue") {
     switch (venueBlocker(state, world)) {
       case "window":
@@ -564,6 +586,8 @@ function applyLegal(state: GameState, world: World, action: Action): GameState {
       return dropStar(state, world, action.playerId);
     case "buildVenue":
       return buildVenue(state, world);
+    case "buildYouth":
+      return buildYouth(state, world, action.countryId);
     case "setTickets":
       return setTickets(state, action.stance);
     case "proposeAgreement":

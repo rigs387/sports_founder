@@ -32,6 +32,7 @@ import {
   ticketStance,
   turnLengthQuarters,
   type World,
+  youthConversion,
 } from "../sim";
 import { type BotId, runBot } from "./policy";
 import {
@@ -202,6 +203,9 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   // Ticket stances at the seat (GDD v1.40): quarters played at each.
   const stanceQuarters: Record<string, number> = { cheap: 0, standard: 0, premium: 0 };
   let lastTurnQuarters = 1;
+  // Youth programs (GDD v1.40): upkeep and all costs at leagues with an open level, and the
+  // conversion lift there, over the quarters played.
+  const youth = { upkeep: 0, costs: 0, lift: 0, quarters: 0 };
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
   const observe = (current: GameState, turn: number) => {
@@ -211,6 +215,16 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         const i = world.countries.findIndex((c) => c.id === director.countryId);
         directorSalary += leagueCosts(current, world, i).director * lastTurnQuarters;
       }
+    if (turn > 0)
+      current.countries.forEach((country, i) => {
+        const level = country.league?.youth.level ?? 0;
+        if (level === 0) return;
+        const costs = leagueCosts(current, world, i);
+        youth.upkeep += costs.youth * lastTurnQuarters;
+        youth.costs += costs.total * lastTurnQuarters;
+        youth.lift += (youthConversion(current, world, i) - 1) * lastTurnQuarters;
+        youth.quarters += lastTurnQuarters;
+      });
     lastTurnQuarters = turnLengthQuarters(current.ppTier, world.config);
     if (turn > 0) {
       const stance = ticketStance(current);
@@ -702,6 +716,22 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         opened: state.landmarks.filter((l) => l.kind === "venueOpened").length,
         modernized: state.landmarks.filter((l) => l.kind === "venueOpened" && l.modernized).length,
         records: state.landmarks.filter((l) => l.kind === "recordCrowd").length,
+      },
+      youth: {
+        opened: state.landmarks.filter((l) => l.kind === "youthOpened").length,
+        lostUpkeep: state.landmarks.filter((l) => l.kind === "youthLost" && l.reason === "upkeep")
+          .length,
+        lostTier: state.landmarks.filter((l) => l.kind === "youthLost" && l.reason === "tier")
+          .length,
+        levels: state.countries
+          .map((country) => country.league?.youth.level ?? 0)
+          .filter((level) => level > 0),
+        cash: state.countries.reduce(
+          (sum, country) =>
+            sum + ((country.league?.youth.level ?? 0) > 0 ? (country.league?.cash ?? 0) : 0),
+          0,
+        ),
+        ...youth,
       },
       // Club relocation (GDD v1.41): asks, moves and the owners' losses paid for staying.
       tickets: {

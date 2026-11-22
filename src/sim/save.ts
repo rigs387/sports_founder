@@ -76,6 +76,16 @@ const leagueSchema = z.strictObject({
       .nullable(),
     record: count.nullable(),
   }),
+  // Joined format 34 without a bump (GDD v1.40, youth programs): older leagues have none.
+  youth: z
+    .strictObject({
+      level: z.int().min(0).max(5),
+      building: z
+        .strictObject({ level: z.int().min(1).max(5), opensSeason: z.int().min(1) })
+        .nullable(),
+      opened: z.array(z.int().min(0)),
+    })
+    .default({ level: 0, building: null, opened: [] }),
 });
 
 const agreementTermsSchema = z.strictObject({
@@ -386,6 +396,21 @@ const landmarkSchema = z.discriminatedUnion("kind", [
     countryId: z.string().min(1),
     level: z.int().min(2).max(5),
     modernized: z.boolean(),
+  }),
+  z.strictObject({
+    kind: z.literal("youthOpened"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    level: z.int().min(1).max(5),
+  }),
+  z.strictObject({
+    kind: z.literal("youthLost"),
+    turn: z.int().min(1),
+    quarter: count,
+    countryId: z.string().min(1),
+    level: z.int().min(0).max(5),
+    reason: z.enum(["upkeep", "tier"]),
   }),
   z.strictObject({
     kind: z.literal("recordCrowd"),

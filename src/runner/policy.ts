@@ -46,6 +46,9 @@ import {
   venueCapacity,
   venueTerms,
   type World,
+  youthBlocker,
+  youthRows,
+  youthTerms,
 } from "../sim";
 import { amendmentValue, chooseEvents, EVENT_WEIGHTS, type EventWeights } from "./event-policy";
 
@@ -522,6 +525,27 @@ function buildVenues(step: BotStep, world: World, full: number, reserveQuarters:
   attempt(step, world, { type: "buildVenue" });
 }
 
+/** League cash, as multiples of its reserve, the builder keeps after a youth level's price. */
+const YOUTH_RESERVES = 2;
+
+/**
+ * Youth programs (GDD v1.42): the builder sets up the next level at the seat and in each focus
+ * league when its cash after the price still holds YOUTH_RESERVES reserves. At the seat venues
+ * were built first; ticket prices read the cash left after.
+ */
+function buildYouthLevels(step: BotStep, world: World): void {
+  for (const row of youthRows(step.state, world)) {
+    if (youthBlocker(step.state, world, row.countryId) !== null) continue;
+    const index = indexOf(world, row.countryId);
+    const league = step.state.countries[index]?.league;
+    const terms = youthTerms(step.state, world, row.countryId);
+    if (!league || !terms) continue;
+    if (league.cash - terms.price < YOUTH_RESERVES * leagueReserve(step.state, world, index))
+      continue;
+    attempt(step, world, { type: "buildYouth", countryId: row.countryId });
+  }
+}
+
 /**
  * The seat league's cash, as multiples of its reserve: the builder prices cheap above `cheap` and
  * goes back to standard (a raise, which costs fans) only below `standard`.
@@ -589,6 +613,7 @@ function builderTurn(state: GameState, world: World, options: BotOptions): BotSt
     amendRules(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   backStars(step, world, bailoutReserve(step.state, world, BUILDER_RESERVE_BAILOUTS));
   buildVenues(step, world, VENUE_FULL.builder, VENUE_RESERVE_QUARTERS.builder);
+  buildYouthLevels(step, world);
   priceTickets(step, world);
   signDeals(step, world);
   negotiate(step, world, AGREEMENT_RISK.builder, BUILDER_CAP_WORTH);

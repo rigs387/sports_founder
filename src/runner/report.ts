@@ -207,6 +207,21 @@ export interface CampaignResult {
   };
   /** Ticket pricing (GDD v1.40): quarters at each stance, raises and the fans they turned casual. */
   tickets: { quarters: Record<string, number>; raises: number; demoted: number };
+  /**
+   * Youth programs (GDD v1.40): levels opened and lost, open levels at the end, and the upkeep,
+   * all costs and conversion lift summed over quarters at leagues with a level open.
+   */
+  youth: {
+    opened: number;
+    lostUpkeep: number;
+    lostTier: number;
+    levels: number[];
+    cash: number;
+    upkeep: number;
+    costs: number;
+    lift: number;
+    quarters: number;
+  };
   /** Club relocation (GDD v1.41): asks, moves, and the owners' losses paid for staying (cash). */
   relocation: { asks: number; moves: number; ownersLoss: number };
   /** League directors (GDD v1.40). */
@@ -584,6 +599,24 @@ export function ticketsAggregate(results: CampaignResult[]) {
     ),
     raises: results.reduce((sum, r) => sum + r.tickets.raises, 0),
     demoted: results.reduce((sum, r) => sum + r.tickets.demoted, 0),
+  };
+}
+
+/** Youth programs across campaigns (GDD v1.40). */
+export function youthAggregate(results: CampaignResult[]) {
+  const total = (f: (r: CampaignResult) => number) => results.reduce((sum, r) => sum + f(r), 0);
+  const quarters = total((r) => r.youth.quarters);
+  const costs = total((r) => r.youth.costs);
+  return {
+    opened: total((r) => r.youth.opened),
+    lostUpkeep: total((r) => r.youth.lostUpkeep),
+    lostTier: total((r) => r.youth.lostTier),
+    programs: total((r) => r.youth.levels.length),
+    levels: total((r) => r.youth.levels.reduce((sum, level) => sum + level, 0)),
+    cash: total((r) => r.youth.cash),
+    upkeep: total((r) => r.youth.upkeep),
+    upkeepShare: costs > 0 ? total((r) => r.youth.upkeep) / costs : 0,
+    lift: quarters > 0 ? total((r) => r.youth.lift) / quarters : 0,
   };
 }
 

@@ -439,6 +439,20 @@ export const landmarks = {
     level: number,
     modernized: boolean,
   ): Landmark => ({ kind: "venueOpened", turn, quarter, countryId, level, modernized }),
+  youthOpened: (turn: number, quarter: number, countryId: string, level: number): Landmark => ({
+    kind: "youthOpened",
+    turn,
+    quarter,
+    countryId,
+    level,
+  }),
+  youthLost: (
+    turn: number,
+    quarter: number,
+    countryId: string,
+    level: number,
+    reason: "upkeep" | "tier",
+  ): Landmark => ({ kind: "youthLost", turn, quarter, countryId, level, reason }),
   recordCrowd: (
     turn: number,
     quarter: number,

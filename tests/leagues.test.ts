@@ -59,6 +59,7 @@ function withCountry(
         formedQuarter: 0,
         bailoutReadyQuarter: 0,
         venue: newVenue(),
+        youth: { level: 0, building: null, opened: [] },
         ...country.league,
         ...change.league,
       };

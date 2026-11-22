@@ -1321,6 +1321,24 @@ export const configFileSchema = z.strictObject({
     }),
   }),
   /**
+   * Youth programs (GDD v1.40, v1.42): levels 0 to maxLevel by league tier, priced in quarters of
+   * the league's running cost, upkeep a share of it per level, a conversion boost per level, a
+   * level lost when cash is below lossYears of upkeep, and the skill lift per level (step 2).
+   */
+  youth: z
+    .strictObject({
+      maxLevel: byLeagueTier(z.int().min(0).max(5)),
+      priceQuarters: z.array(z.number().min(0)).length(5),
+      buildSeasons: z.int().min(1),
+      upkeepShare: z.number().min(0),
+      conversionBoost: z.number().min(0),
+      lossYears: z.number().min(0),
+      skillLift: z.number().min(0),
+    })
+    .refine((y) => y.maxLevel.amateur <= y.maxLevel["semi-pro"], "caps must rise with the tier")
+    .refine((y) => y.maxLevel["semi-pro"] <= y.maxLevel.professional, "caps must rise")
+    .refine((y) => y.maxLevel.professional <= y.maxLevel.elite, "caps must rise"),
+  /**
    * National teams (GDD v1.37): a country with a league at minTier or above fields one. Strength
    * is tierBase for its league, plus hardcore.weight × the player's hardcore share of the
    * population (full at hardcore.fullShare), plus skillWeight × the skill of each of its best

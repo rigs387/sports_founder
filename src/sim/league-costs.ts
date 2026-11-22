@@ -5,6 +5,7 @@ import { capInForce, seatStars, starWage } from "./flagship";
 import { leagueTierIndex, nextVenuePrice, runningCostPerQuarter, venueUpkeep } from "./leagues";
 import { shapeFactors } from "./shape";
 import type { AgreementTerms, CountryState, GameState, LeagueTierId, World } from "./types";
+import { youthUpkeep } from "./youth";
 
 // A league's costs a quarter (GDD v1.30). Every league pays its running cost (tier × wealth ×
 // size, cut by growth nodes) and upkeep on venue levels above 1. At the seat the running cost is
@@ -14,7 +15,7 @@ import type { AgreementTerms, CountryState, GameState, LeagueTierId, World } fro
 // of the baseline: the flagship's agreement at the seat (its share and minimum wage), the fixed
 // share everywhere else.
 // A league director (GDD v1.40, never at the seat) is paid a salary and their trait scales the
-// running cost.
+// running cost. A youth program (GDD v1.40) pays upkeep on every open level, seat or not.
 
 export interface LeagueCosts {
   /** The running cost less the payroll baseline (all of it away from the seat below Professional). */
@@ -24,6 +25,8 @@ export interface LeagueCosts {
   /** Star wages at the seat. */
   wages: number;
   upkeep: number;
+  /** Youth program upkeep (GDD v1.40), paid in a lost season too. */
+  youth: number;
   /** A league director's salary (GDD v1.40); never at the seat. */
   director: number;
   total: number;
@@ -34,6 +37,7 @@ const NO_COSTS: LeagueCosts = {
   payroll: 0,
   wages: 0,
   upkeep: 0,
+  youth: 0,
   director: 0,
   total: 0,
 };
@@ -88,6 +92,7 @@ export function leagueCosts(
     runningCostPerQuarter(world, index, tier, state.growthNodes) *
     directorFactors(state, world, countryId).runningCost;
   const upkeep = venueUpkeep(world, index, tier, league.venue.level, state.growthNodes);
+  const youth = youthUpkeep(world, index, tier, league.youth.level, state.growthNodes);
   const atSeat = countryId === state.flagship.countryId;
   const director = directorSalary(state, world, index, tier);
   const share = playersShare(state, world, index, tier);
@@ -97,8 +102,9 @@ export function leagueCosts(
       payroll: 0,
       wages: 0,
       upkeep,
+      youth,
       director,
-      total: running + upkeep + director,
+      total: running + upkeep + youth + director,
     };
   }
   const baseline = world.config.flagship.payroll.baselineShare * running;
@@ -111,13 +117,22 @@ export function leagueCosts(
       payroll: players,
       wages: 0,
       upkeep,
+      youth,
       director,
-      total: operations + players + upkeep + director,
+      total: operations + players + upkeep + youth + director,
     };
   }
   // Nobody is paid in a season lost to a stoppage (GDD v1.39).
   if (seasonStopped(state))
-    return { operations, payroll: 0, wages: 0, upkeep, director: 0, total: operations + upkeep };
+    return {
+      operations,
+      payroll: 0,
+      wages: 0,
+      upkeep,
+      youth,
+      director: 0,
+      total: operations + upkeep + youth,
+    };
   // The growth tree's salary cap or star pay scales star wages, and the payroll baseline below
   // Professional (GDD v1.35); from Professional up the agreement's share is what is paid
   // (GDD v1.39). The agreement's own cap limits each star's wage.
@@ -135,8 +150,9 @@ export function leagueCosts(
     payroll,
     wages,
     upkeep,
+    youth,
     director: 0,
-    total: operations + payroll + wages + upkeep,
+    total: operations + payroll + wages + upkeep + youth,
   };
 }
 

@@ -42,6 +42,7 @@ import {
   venueTerms,
 } from "./venue-actions";
 import { seasonMatchCrowd, seatedCrowd } from "./venues";
+import { settleYouth } from "./youth";
 
 // The flagship league (GDD v1.11 commissioner's seat, v1.13 seat rules, v1.14 flagship season).
 // The player runs one league in depth: named clubs based in real places, one season a year ending
@@ -1931,15 +1932,19 @@ export function closeOffseason(state: GameState, world: World): GameState {
     );
   }
   // Venue levels due by the new season open (GDD v1.30); next season's ticket prices take
-  // effect at the seat, a new seat from standard (GDD v1.40).
-  return openVenues(
-    applyTickets(
-      {
-        ...state,
-        flagship: { ...flagship, rng: saveRng(rng) },
-        countries,
-        landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
-      },
+  // effect at the seat, a new seat from standard (GDD v1.40); youth programs lose unpaid or
+  // over-cap levels and open the levels due (GDD v1.42).
+  return settleYouth(
+    openVenues(
+      applyTickets(
+        {
+          ...state,
+          flagship: { ...flagship, rng: saveRng(rng) },
+          countries,
+          landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
+        },
+        world,
+      ),
       world,
     ),
     world,

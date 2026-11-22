@@ -852,6 +852,24 @@ directors:
       { traits: [showman], priority: 2, exhibitionQuarters: 4, exhibitionLink: 0.25 }
     community-drive: { traits: [grassroots, scandal-prone], priority: 1 }
 
+# Youth programs (GDD v1.40, v1.42; tech plan 2.28). The seat's league and focus countries'
+# leagues buy levels with league cash in the offseason, one at a time; a level opens when the
+# offseason closes one season later. A league's tier caps its level (maxLevel). Level L costs
+# priceQuarters[L - 1] quarters of the league's own running cost; upkeep a quarter is upkeepShare
+# × the running cost per level open, paid from league cash, focus or not. Hardcore conversion in
+# the country × (1 + conversionBoost × level). When the offseason closes a league whose cash is
+# below lossYears of its youth upkeep loses its top level (a build under way is cancelled, no
+# refund), and a league above its tier's cap drops to it. Programs stay when focus leaves but
+# cannot be upgraded. skillLift (step 2) raises the peak skill of players drawn there later.
+youth:
+  maxLevel: { amateur: 0, semi-pro: 2, professional: 4, elite: 5 }
+  priceQuarters: [2, 3, 5, 8, 12]
+  buildSeasons: 1
+  upkeepShare: 0.025
+  conversionBoost: 0.01
+  lossYears: 1
+  skillLift: 2
+
 # National teams (GDD v1.37). Any country with a league at minTier or above fields one; nothing is
 # saved between championships. Strength (never shown as a number) = tierBase for the league, plus
 # up to hardcore.weight for the player's hardcore share of the population (full at fullShare),

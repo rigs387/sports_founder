@@ -51,6 +51,7 @@ import {
   ticketsAggregate,
   turnsCsv,
   venuesAggregate,
+  youthAggregate,
 } from "./report";
 
 const EXPERIMENTS = [
@@ -873,6 +874,10 @@ function main(): number {
         .join(
           ", ",
         )}; ${tickets.raises} raises turned ${tickets.demoted.toLocaleString("en-US")} hardcore fans casual`,
+    );
+    const youth = youthAggregate(results);
+    console.log(
+      `  Youth programs: ${youth.opened} levels opened, ${youth.lostUpkeep} lost to unpaid upkeep and ${youth.lostTier} to a tier drop; ${youth.programs} programs at the end (${youth.levels} levels); upkeep paid ${millions(youth.upkeep)} (${(youth.upkeepShare * 100).toFixed(1)}% of those leagues' costs), ${dollars(youth.cash)} league cash at the end; hardcore conversion +${(youth.lift * 100).toFixed(1)}% on average where open`,
     );
     const relocation = relocationAggregate(results);
     console.log(

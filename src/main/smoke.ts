@@ -27,6 +27,7 @@ import { verifyStarCards } from "./star-smoke";
 import { verifyStarsPanel } from "./stars-smoke";
 import { verifyStoppage } from "./stoppage-smoke";
 import { verifyVenue } from "./venue-smoke";
+import { verifyYouth } from "./youth-smoke";
 
 // Development-only self-check, enabled by the SF_SMOKE_OUT environment variable (see
 // `npm run smoke`). It drives the real window: waits for the first campaign snapshot from the
@@ -179,6 +180,8 @@ async function run(
   const agreement = await verifyAgreement(win, outDir, filePrompts, screenshot);
   // Still in the late-game offseason: replace a league director (GDD v1.40).
   const directors = await verifyDirectors(win, screenshot);
+  // Same offseason: fund a youth program level (GDD v1.40).
+  const youth = await verifyYouth(win, screenshot);
   const stoppage = await verifyStoppage(win, outDir, filePrompts, screenshot);
   const lateRewards = await verifyLateRewards(win, outDir, filePrompts, screenshot);
   if (errors.length || remoteRequests.length)
@@ -210,6 +213,7 @@ async function run(
     saves,
     agreement,
     directors,
+    youth,
     stoppage,
     lateRewards,
     retirement,

@@ -1,0 +1,20 @@
+/* Youth programs (GDD v1.40): one row a league, the seat first. */
+.youth-card p {
+  margin: 6px 0;
+}
+.youth-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.youth-row {
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.youth-row:first-child {
+  border-top: 0;
+}
+.youth-building {
+  font-weight: 700;
+  color: var(--second);
+}

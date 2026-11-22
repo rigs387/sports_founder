@@ -221,7 +221,7 @@
       },
       "director-community": {
         "title": "A community drive",
-        "body": "{{director}} wants to take the game into the neighborhoods of {{country}}: a year of turning casual fans hardcore faster.",
+        "body": "{{director}} wants to take the game into the neighborhoods of {{country}}: the league's next youth program level, set up free of league cash, or, where none can be started, a year of turning casual fans hardcore faster.",
         "choices": {
           "grant": "Fund the drive",
           "decline": "Not this year"
@@ -1410,6 +1410,37 @@
       "cash": "The league has {{cash, money}} of the {{price, money}} it needs."
     }
   },
+  "youth": {
+    "heading": "Youth programs",
+    "intro": "The seat and your focus countries can fund a youth program. Each level turns casual fans hardcore a little faster there, and raises better players, but only those who come through after it opens.",
+    "none": "No league can run a youth program yet.",
+    "row": "{{country}}",
+    "rowSeat": "{{country}} (the seat)",
+    "level": "Level {{level}} of {{cap}}.",
+    "running": "Upkeep {{upkeep, money}} a quarter; hardcore conversion +{{lift, number(style: percent; maximumFractionDigits: 1)}}.",
+    "building": "Level {{level}} is being set up. It opens before {{seasonNoun}} {{season}}.",
+    "kept": "No longer in focus: the program keeps running and its upkeep is paid, but it can't grow.",
+    "top": "At the top level this league tier allows.",
+    "closedTier": "A league at this tier can't run a youth program yet: it needs a promotion first.",
+    "next": "Level {{level}}: {{price, money}}, then {{upkeep, money}} a quarter more in upkeep; hardcore conversion +{{lift, number(style: percent; maximumFractionDigits: 1)}} more.",
+    "offseasonOnly": "Youth programs are funded on the offseason screen.",
+    "build": "Review level {{level}}",
+    "review": "The league pays {{price, money}} of its {{cash, money}} now. Level {{level}} opens before {{seasonNoun}} {{season}}; from then it costs {{upkeep, money}} a quarter more, in focus or not. A league short of a year's upkeep when the offseason closes loses a level.",
+    "reviewFuture": "Players already playing don't get better: only those who come through after it opens.",
+    "confirm": "Fund level {{level}}",
+    "back": "Back",
+    "countryLine": "Youth program: level {{level}}, {{upkeep, money}} a quarter.",
+    "countryLineBuilding": "Youth program: level {{level}}, level {{next}} opens before {{seasonNoun}} {{season}}.",
+    "countryNone": "Youth program: none yet.",
+    "blockers": {
+      "window": "Youth programs are funded only in the offseason.",
+      "league": "There is no league here.",
+      "focus": "Only the seat and focus countries can grow a program.",
+      "cap": "At the top level this league tier allows.",
+      "building": "A level is already being set up.",
+      "cash": "The league has {{cash, money}} of the {{price, money}} it needs."
+    }
+  },
   "deals": {
     "gearBrand": "{{sport}} Supply Co.",
     "slots": {
@@ -1528,6 +1559,7 @@
       "pickHost": "{{country}} will host the next tournament.",
       "signDeal": "Deal signed. It pays from the next season.",
       "buildVenue": "Building has started. The new level opens in a later offseason.",
+      "buildYouth": "The youth level is being set up. It opens in a later offseason.",
       "setTickets": "Next season's ticket prices are set. They take effect when the offseason closes.",
       "proposeAgreement": "The offer went to the union. Its answer is on the agreement card.",
       "replaceDirector": "The new league director takes over.",

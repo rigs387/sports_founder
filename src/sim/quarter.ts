@@ -32,6 +32,7 @@ import {
 } from "./types";
 import { venueConversion } from "./venues";
 import { championshipFactors } from "./world-championship";
+import { youthConversion } from "./youth";
 
 // Quarterly simulation (GDD Fan Model, Sport Genome, Spread Model, Rival AI, Business Layer). Every
 // rate is config.
@@ -180,6 +181,8 @@ export function stepQuarter(
         cup.hardcore *
         director.hardcoreConversion *
         venueConversion(state, world, index) *
+        // A youth program in the country (GDD v1.40).
+        youthConversion(state, world, index) *
         // Ticket prices at the seat (GDD v1.40).
         ticketFactors(state, world, country.id).conversion,
     };

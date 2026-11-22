@@ -58,6 +58,7 @@ import {
 import { groundSize, matchCrowd, seasonMatchCrowd, seatedCrowd, venueCapacity } from "./venues";
 import { countsTowardHold, standing } from "./win";
 import { type ChampionshipSnapshot, championshipSnapshot } from "./world-championship";
+import { type YouthRow, youthRows } from "./youth";
 
 const QUARTERS_PER_YEAR = 4;
 
@@ -272,6 +273,11 @@ export interface TurnSnapshot {
    * who handed over are the Hall's Family wing.
    */
   family: FamilyHeadSnapshot[];
+  /**
+   * Youth programs (GDD v1.40): the seat, focus countries, then programs kept after focus left.
+   * Skill never appears here.
+   */
+  youth: YouthRow[];
   /** Each season's Player of the Year, oldest first (GDD v1.37); empty until standouts exist. */
   playersOfYear: PlayerOfYear[];
   /** Every national team that could be fielded now, strongest first (GDD v1.37). */
@@ -575,6 +581,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     culture: cultureSnapshot(state, world, offseasonOpen(state)),
     hallOfFame: hallSnapshot(state, world),
     family: familySnapshot(state, world),
+    youth: youthRows(state, world),
     playersOfYear: state.standouts.playersOfYear,
     nationalTeams: nationalTeamSnapshots(state, world),
     worldChampionship: championshipSnapshot(state, world),
