@@ -1675,7 +1675,7 @@ step per session; each ends with `npm run check`, `npm run smoke`, the docs and 
 ### 2.26 Build Plan: Other Leagues' People (GDD v1.40)
 
 Designed 2026-11-01 (parked items, topic 1). Five decisions, all in the GDD (Delegation, Rules
-Evolution, Hall of Fame). Not built. No save migration (only the designer plays): the new save
+Evolution, Hall of Fame). All four steps built 2026-11-21. No save migration (only the designer plays): the new save
 format starts campaigns fresh. One step per session; each ends with `npm run check`,
 `npm run smoke`, the docs and a commit.
 
