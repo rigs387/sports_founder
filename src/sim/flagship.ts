@@ -8,6 +8,7 @@ import { demoteHardcore, leagueTierIndex, runningCostPerQuarter } from "./league
 import { leadStory, type Outlet, outletOf } from "./press";
 import { ppPrice } from "./prices";
 import { landmarks } from "./records";
+import { anchorSeatLeaveShare } from "./resentment";
 import { createRngState, nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { seasonStories } from "./season-stories";
 import { NEUTRAL_SHAPE, type ShapeFactors, shapeFactors } from "./shape";
@@ -1424,18 +1425,21 @@ export function seatEligible(league: LeagueState | null, world: World): boolean 
 
 /**
  * The share of a country's player hardcore fans who turn casual when the seat leaves it (GDD
- * v1.14, v1.22): a config share, larger at the anchor, × (1 + seat weight × the ethos × the
+ * v1.14, v1.22): a config share, at the anchor one scaled by its resentment (GDD v1.40), × (1 + seat weight × the ethos × the
  * tradition weight there), at most all of them.
  */
 export function seatLeaveShare(
-  state: Pick<GameState, "anchorCountryId" | "culture" | "growthNodes" | "hallOfFame" | "identity">,
+  state: Pick<
+    GameState,
+    "anchorCountryId" | "culture" | "growthNodes" | "hallOfFame" | "identity" | "resentment"
+  >,
   world: World,
   countryId: string,
 ): number {
   const { seatMove } = world.config.flagship;
   const base =
     countryId === state.anchorCountryId
-      ? seatMove.anchorHardcoreDemotionShare
+      ? anchorSeatLeaveShare(state.resentment.value, world)
       : seatMove.hardcoreDemotionShare;
   const weight = traditionWeights(state, world)[indexOf(world, countryId)] ?? 0;
   const held = world.config.culture.seatWeight * ethosFactor(world, state.identity, "seat");

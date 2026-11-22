@@ -24,6 +24,7 @@ import {
   PLAYER_INDEX,
   payingDeals,
   QUARTERS_PER_YEAR,
+  resentmentDrag,
   revenuePerQuarter,
   seasonStories,
   seatedCrowd,
@@ -207,6 +208,8 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
   // Youth programs (GDD v1.40): upkeep and all costs at leagues with an open level, and the
   // conversion lift there, over the quarters played.
   const youth = { upkeep: 0, costs: 0, lift: 0, quarters: 0 };
+  // Anchor resentment (GDD v1.40): its peak, and turns with a focus slot home and with a drag.
+  const resentment = { peak: 0, focusTurns: 0, dragTurns: 0, turns: 0 };
 
   /** Tracks peaks and lows after each turn (turn 0 is the starting state). */
   const observe = (current: GameState, turn: number) => {
@@ -227,6 +230,12 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
         youth.quarters += lastTurnQuarters;
       });
     lastTurnQuarters = turnLengthQuarters(current.ppTier, world.config);
+    if (turn > 0) {
+      resentment.turns += 1;
+      resentment.peak = Math.max(resentment.peak, current.resentment.value);
+      if (current.focus.includes(current.anchorCountryId)) resentment.focusTurns += 1;
+      if (resentmentDrag(current.resentment.value, world) > 0) resentment.dragTurns += 1;
+    }
     if (turn > 0) {
       const stance = ticketStance(current);
       stanceQuarters[stance] = (stanceQuarters[stance] ?? 0) + lastTurnQuarters;
@@ -782,6 +791,11 @@ function playOneCampaign(world: World, plan: CampaignPlan): PlayedCampaign {
           (sum, l) => sum + (l.kind === "ticketsSet" ? l.demoted : 0),
           0,
         ),
+      },
+      resentment: {
+        ...resentment,
+        end: state.resentment.value,
+        anchorCollapse: state.outcome?.kind === "anchorCollapse",
       },
       relocation: {
         asks: relocationAsks.size,

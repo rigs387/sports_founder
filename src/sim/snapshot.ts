@@ -27,6 +27,7 @@ import { type LeagueCosts, leagueCosts, leagueReserve } from "./league-costs";
 import { type LegacySnapshot, legacySnapshot } from "./legacy";
 import { type NationalTeamSnapshot, nationalTeamSnapshots } from "./national-teams";
 import { ppWeights, quarterPpIncome } from "./prices";
+import { type ResentmentSnapshot, resentmentSnapshot } from "./resentment";
 import { type RetrospectiveSnapshot, retrospectiveSnapshot } from "./retrospective";
 import { type RulesSnapshot, rulesSnapshot } from "./rules";
 import { shapeFactors } from "./shape";
@@ -290,6 +291,8 @@ export interface TurnSnapshot {
   agreement: AgreementSnapshot;
   /** League directors serving, past terms, and this offseason's candidates (GDD v1.40). */
   directors: DirectorsSnapshot;
+  /** Anchor resentment and its reasons (GDD v1.40), shown on the anchor's country card. */
+  resentment: ResentmentSnapshot;
   /** Whether the player may retire now: after the win, while the campaign runs (GDD v1.38). */
   canRetire: boolean;
   /** What a retired campaign looks back on (GDD v1.38); null until the player retires. */
@@ -588,6 +591,7 @@ export function snapshot(state: GameState, world: World): TurnSnapshot {
     legacy: legacySnapshot(state, world),
     agreement: agreementSnapshot(state, world),
     directors: directorsSnapshot(state, world),
+    resentment: resentmentSnapshot(state, world),
     canRetire: state.outcome === null && state.win.won !== null,
     retrospective: retrospectiveSnapshot(state, world),
   };

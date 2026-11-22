@@ -478,6 +478,9 @@ export function App() {
             turn={snapshot.turn}
             culture={snapshot.culture}
             youth={snapshot.youth.find((row) => row.countryId === selected.countryId)}
+            resentment={
+              selected.countryId === snapshot.anchorCountryId ? snapshot.resentment : undefined
+            }
             terms={snapshot.identity.terms}
             inductees={snapshot.hallOfFame.inductees
               .filter((i) => i.countryId === selected.countryId)

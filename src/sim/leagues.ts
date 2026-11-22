@@ -2,6 +2,7 @@ import { tierEntry } from "./calendar";
 import { growthFactorsAt } from "./growth";
 import { ppPrice } from "./prices";
 import { landmarks } from "./records";
+import { draggedSeverity } from "./resentment";
 import {
   type Config,
   type CountryState,
@@ -379,7 +380,14 @@ export function evaluateLeagues(
       previousFlowPerQuarter: prior.lastFlowPerQuarter,
       hardcoreRatePerQuarter: (fans.hardcore - league.hardcoreAtLastEval) / base / quarters,
     };
-    const step = stepHealth(prior.health, targetSeverity(signals, world.config));
+    const severity = targetSeverity(signals, world.config);
+    // Anchor resentment drags the anchor league down the ladder (GDD v1.40).
+    const step = stepHealth(
+      prior.health,
+      country.countryId === start.anchorCountryId
+        ? draggedSeverity(severity, end.resentment.value, world)
+        : severity,
+    );
     const evaluated: LeagueState = {
       ...league,
       paidOut: 0,

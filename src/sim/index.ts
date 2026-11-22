@@ -33,6 +33,7 @@ export * from "./proposals";
 export * from "./quarter";
 export * from "./records";
 export * from "./relocation";
+export * from "./resentment";
 export * from "./retrospective";
 export * from "./rivals";
 export { MAX_SEED, SEED_WARM_UP_DRAWS } from "./rng";

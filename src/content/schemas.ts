@@ -1043,6 +1043,22 @@ export const configFileSchema = z.strictObject({
     .refine((w) => w.thresholds.every((t, i) => i === 0 || t > (w.thresholds[i - 1] ?? 0)), {
       message: "thresholds must rise",
     }),
+  /** Anchor resentment (GDD v1.40, tech plan 2.32): see content/config.yaml. */
+  anchorResentment: z.strictObject({
+    graceQuarters: z.int().min(0),
+    neglectPerQuarter: unitInterval,
+    seatAwayPerQuarter: unitInterval,
+    focusDecayPerQuarter: unitInterval,
+    homeDecayPerQuarter: unitInterval,
+    amendmentStep: unitInterval,
+    /** The casual-friendly option of each trait it watches. */
+    casualRules: z.record(z.string(), z.string()),
+    hardcoreDemotionPerQuarter: unitInterval,
+    healthDrag: z.array(z.strictObject({ from: unitInterval, severity: z.int().min(1).max(2) })),
+    collapseFrom: unitInterval,
+    backlashFactor: z.strictObject({ min: z.number().min(1), max: z.number().min(1) }),
+    seatLeaveShare: z.strictObject({ min: unitInterval, max: unitInterval }),
+  }),
   /** Rules evolution, first build (GDD v1.20). */
   rulesEvolution: z.strictObject({
     /** PP price per jump, in quarters of income (GDD v1.34). */
@@ -1052,7 +1068,6 @@ export const configFileSchema = z.strictObject({
     backlash: z.strictObject({
       sharePerJump: unitInterval,
       fullAgeYears: z.number().positive(),
-      anchorFactor: z.number().min(1),
       fitWeight: z.number().min(0),
       /** Per step the new rule sits from the sport's founding rule. */
       driftWeight: z.number().min(0),
@@ -1577,7 +1592,6 @@ export const configFileSchema = z.strictObject({
     seatOrphan: z.strictObject({ choices: z.int().min(1).max(3) }),
     seatMove: z.strictObject({
       hardcoreDemotionShare: unitInterval,
-      anchorHardcoreDemotionShare: unitInterval,
     }),
     /**
      * Flagship ticket pricing (GDD v1.40): each stance multiplies gate per seated fan and casual

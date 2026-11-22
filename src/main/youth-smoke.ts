@@ -106,5 +106,23 @@ export async function verifyYouth(win: BrowserWindow, screenshot: (name: string)
   if (!/^Youth program: level \d/.test(countryLine))
     throw new Error(`The seat's country card must show its youth level: ${countryLine}`);
   await screenshot("61g-youth-country.png");
-  return { rows, target, review, narrowOverflow, countryLine };
+
+  // The anchor's country card shows its resentment and why (GDD v1.40, tech plan 2.32).
+  const anchor = await evaluate<string>(
+    `document.querySelector('[data-testid="game"]').dataset.anchor`,
+  );
+  await evaluate(`(() => {
+    const picker = document.querySelector('[data-testid="market-picker"]');
+    picker.value = ${JSON.stringify(anchor)};
+    picker.dispatchEvent(new Event('change', { bubbles: true }));
+  })()`);
+  await wait(
+    `document.querySelector('[data-testid="country-card"]')?.dataset.country === ${JSON.stringify(anchor)} && !!document.querySelector('[data-testid="country-resentment"]')`,
+  );
+  const resentment = await text('[data-testid="country-resentment"]');
+  checkText(resentment);
+  if (!/Resentment at home|resentment at home/i.test(resentment))
+    throw new Error(`The anchor's country card must show its resentment: ${resentment}`);
+  await screenshot("61h-resentment-country.png");
+  return { rows, target, review, narrowOverflow, countryLine, resentment };
 }

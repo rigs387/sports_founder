@@ -975,6 +975,10 @@ const gameStateSchema = z.strictObject({
       .array(z.strictObject({ countryId: z.string().min(1), endQuarter: count }))
       .default([]),
   }),
+  // Joined format 34 without a bump (GDD v1.40, anchor resentment): older saves start at none.
+  resentment: z
+    .strictObject({ value: z.number().min(0).max(1), tendedQuarter: count })
+    .default({ value: 0, tendedQuarter: 0 }),
 });
 
 const saveFileSchema = z.strictObject({

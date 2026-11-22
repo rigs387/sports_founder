@@ -1,4 +1,5 @@
 import type { BrowserWindow } from "electron";
+import { COLLECT_NEWS } from "./smoke-news";
 
 /**
  * The flagship screen (GDD v1.14): a main screen, not a dialog. Late in the smoke campaign the
@@ -10,6 +11,21 @@ export async function verifyFlagship(
 ) {
   const evaluate = <T>(code: string) => win.webContents.executeJavaScript(code) as Promise<T>;
   const delay = (ms = 150) => new Promise((resolve) => setTimeout(resolve, ms));
+  // The action step moved the anchor's focus slot to Tonga and nothing brought it back, so its
+  // purists resent it (GDD v1.40) and can drag the seat league into trouble, which silences the
+  // broadcast. Tend home as a player would, and play on until the broadcast reaches abroad again.
+  const tended = await tendHome(win);
+  let broadcastTooltip = await hoverBroadcast(win, screenshot);
+  let recoveryTurns = 0;
+  while (!broadcastTooltip?.includes("Flagship broadcast") && recoveryTurns < 20) {
+    await advance(win);
+    recoveryTurns += 1;
+    broadcastTooltip = await hoverBroadcast(win, screenshot);
+  }
+  if (!broadcastTooltip?.includes("Flagship broadcast"))
+    throw new Error(
+      `The United States tooltip must name the flagship broadcast (GDD v1.23), even after tending home for ${recoveryTurns} turns.`,
+    );
   await evaluate(`document.querySelector('.game-nav [data-view=flagship]').click()`);
   await delay();
   const view = await evaluate<{
@@ -61,10 +77,61 @@ export async function verifyFlagship(
   if (narrowOverflow) throw new Error("The flagship screen overflows on a narrow viewport.");
   await evaluate(`document.querySelector('.game-nav [data-view=world]').click()`);
   await delay();
-  const broadcastTooltip = await hoverBroadcast(win, screenshot);
-  if (!broadcastTooltip?.includes("Flagship broadcast"))
-    throw new Error("The United States tooltip must name the flagship broadcast (GDD v1.23).");
-  return { ...view, narrowOverflow, broadcastTooltip };
+  return { ...view, narrowOverflow, broadcastTooltip, tended, recoveryTurns };
+}
+
+/** Puts focus slot 1 back on the anchor through its country card, if it is not focused yet. */
+async function tendHome(win: BrowserWindow): Promise<boolean> {
+  const evaluate = <T>(code: string) => win.webContents.executeJavaScript(code) as Promise<T>;
+  await evaluate(`document.querySelector('.game-nav [data-view=world]').click()`);
+  await evaluate(`(() => {
+    const anchor = document.querySelector('[data-testid="game"]').dataset.anchor;
+    const picker = document.querySelector('[data-testid="market-picker"]');
+    picker.value = anchor;
+    picker.dispatchEvent(new Event('change', { bubbles: true }));
+  })()`);
+  await new Promise((resolve) => setTimeout(resolve, 150));
+  if (await evaluate<boolean>(`!!document.querySelector('[data-testid="focused-market"]')`))
+    return true;
+  const assigned = await evaluate<boolean>(`(() => {
+    const button = document.querySelector('[data-testid="assign-focus"]');
+    if (!button || button.disabled) return false;
+    button.click();
+    return true;
+  })()`);
+  if (!assigned) return false;
+  await waitReady(win);
+  await evaluate(`document.querySelector('.card-close')?.click()`);
+  return true;
+}
+
+async function waitReady(win: BrowserWindow, turn?: number) {
+  const deadline = Date.now() + 15000;
+  while (Date.now() < deadline) {
+    const now = (await win.webContents.executeJavaScript(
+      `(() => { const g = document.querySelector('[data-testid="game"]'); return { status: g.dataset.status, turn: Number(g.dataset.turn) }; })()`,
+    )) as { status: string; turn: number };
+    if (now.status === "ready" && (turn === undefined || now.turn === turn)) return;
+    await new Promise((resolve) => setTimeout(resolve, 60));
+  }
+  throw new Error("The game did not become ready");
+}
+
+/** Ends one turn from the world map. */
+async function advance(win: BrowserWindow) {
+  const turn = Number(
+    await win.webContents.executeJavaScript(
+      `document.querySelector('[data-testid="game"]').dataset.turn`,
+    ),
+  );
+  await win.webContents.executeJavaScript(COLLECT_NEWS, true);
+  await win.webContents.executeJavaScript(
+    `document.querySelector('[data-testid="end-turn"]').click()`,
+  );
+  await waitReady(win, turn + 1);
+  await win.webContents.executeJavaScript(
+    `document.querySelector('.game-nav [data-view=world]')?.click()`,
+  );
 }
 
 /**

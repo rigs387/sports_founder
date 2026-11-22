@@ -1881,8 +1881,35 @@ country's primary sphere fails content validation.
 
 ### 2.32 Build Plan: Anchor Resentment (GDD v1.40)
 
-Designed 2026-11-01 (parked items, topic 8). Not built. Two sessions; the second is mostly
-measurement.
+Designed 2026-11-01 (parked items, topic 8). Both steps built 2026-11-22.
+
+*As built:* `src/sim/resentment.ts` and `GameState.resentment` (`value`, `tendedQuarter`:
+the neglect clock's start, the last quarter the anchor held a focus slot or the sport had no
+league abroad; joined format 34 defaulted, no bump). `stepResentment` runs in `stepQuarter`
+from the quarter's starting state; `amendRule` applies `amendedResentment` (config
+`casualRules`: short matches, high scoring, simple rules; steps toward raise, steps away lower,
+raising only with a league abroad). The anchor starts in a focus slot (setup), so neglect
+starts when the player moves it. Effects: `resentmentDemotionShare` turns hardcore fans
+casual at the anchor each quarter before league business; `draggedSeverity` in
+`evaluateLeagues` adds the `healthDrag` step's severity (capped at Near-Collapse) and from
+`collapseFrom` targets collapse, so a full turn at Near-Collapse still warns first.
+`anchorBacklashFactor` (1 to 3) replaces `rulesEvolution.backlash.anchorFactor` (2) and
+`anchorSeatLeaveShare` (3% to 12%) replaces `seatMove.anchorHardcoreDemotionShare` (8%): at
+zero the anchor is treated like any market. `TurnSnapshot.resentment` gives the value, the
+change a quarter and the reasons; the anchor's country card shows them (`ResentmentLines`,
+`country-resentment`). Bots: builder and media-rush put a slot on the anchor from 30% and keep
+it until 5%; greedy-spread (the naive bot) never tends home. The runner prints an Anchor
+resentment line. The youth smoke step checks the late-game anchor's card
+(`61h-resentment-country.png`).
+*Measured 2026-11-22* (first numbers kept: grace 8 quarters, neglect +1%, seat away +1.5%,
+focus −2% or −4% with the seat home, ±10% an amendment step, demotion 1% × the value a quarter,
+drag Struggling from 50% and Near-Collapse from 80%, folding from 95%). Greedy-spread at Brazil,
+3 × 200 turns: 3 of 3 anchor collapses (turns 97–102, after tier 5, before #1) against 0 of 3
+and 3 wins with resentment off; peak 96%. Collapse experiment (Brazil and Germany, random
+genomes, 150 turns): greedy-spread 30 of 30 against 15 of 30 off (the new folds late, turns
+90–125), builder 1 of 10 both; no safe anchor passes. Pacing (12 anchors × 3 seeds, 200 turns):
+passes, the lead lost before the win in 20 of 35 (57%, recorded 19–21), builder peak resentment
+median 30%, a slot home 50% of turns, no drag in 36 campaigns.
 
 1. **The value.** `GameState.resentment` (0–1 and the quarter the anchor last held focus);
    `src/sim/resentment.ts` steps it each quarter in `quarter.ts` (neglect after

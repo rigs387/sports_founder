@@ -2427,8 +2427,8 @@ snowballing. Works alongside tier-scaled costs, tier-scaled negative events, and
 - **Anchor resentment.** As the sport globalizes, anchor-country purists feel abandoned. Driven by
   time since the anchor last held a focus slot and by the number of TV/casual-friendly rule
   changes. Expressed as hardcore demotion and league health drag at home.
-  - *Parked items, topic 8 (decided 2026-11-01, v1.40).* Every number is config
-    (`anchorResentment`).
+  - *Parked items, topic 8 (decided 2026-11-01, v1.40; built 2026-11-22, tech plan 2.32).*
+    Every number is config (`anchorResentment`).
     - *A stored value* from 0 to 1 in the game state, shown on the anchor's country card with
       the reasons, so the player sees it coming.
     - *What raises it:* each quarter the anchor holds no focus slot (after a grace period), each

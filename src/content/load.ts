@@ -428,6 +428,27 @@ function checkCrossReferences(world: World, sources: ContentSources, issues: Con
     issue(sources.config, "flagship.match", "minRate must not exceed maxRate");
   }
 
+  // Anchor resentment watches rule traits only, each at one of its options (GDD v1.40).
+  const resentment = world.config.anchorResentment;
+  for (const [axis, option] of Object.entries(resentment.casualRules)) {
+    const known = GENOME_AXES[axis as keyof typeof GENOME_AXES];
+    if (!known || known.kind !== "rule") {
+      issue(sources.config, `anchorResentment.casualRules.${axis}`, "is not a rule trait");
+    } else if (!(known.options as readonly string[]).includes(option)) {
+      issue(sources.config, `anchorResentment.casualRules.${axis}`, `has no option "${option}"`);
+    }
+  }
+  const drag = resentment.healthDrag;
+  if (drag.some((step, i) => i > 0 && step.from <= (drag[i - 1]?.from ?? 0))) {
+    issue(sources.config, "anchorResentment.healthDrag", "steps must rise in from");
+  }
+  if (resentment.backlashFactor.min > resentment.backlashFactor.max) {
+    issue(sources.config, "anchorResentment.backlashFactor", "min must not exceed max");
+  }
+  if (resentment.seatLeaveShare.min > resentment.seatLeaveShare.max) {
+    issue(sources.config, "anchorResentment.seatLeaveShare", "min must not exceed max");
+  }
+
   // ---- Genome ------------------------------------------------------------------------------
   // Design rule (GDD "No universal best option"): every option helps in a real share of the
   // actual countries and hurts in a real share of them (net lever delta: affinity + accessibility +

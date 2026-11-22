@@ -230,6 +230,18 @@ export interface CampaignResult {
       titlesWith: number;
     };
   };
+  /**
+   * Anchor resentment (GDD v1.40): its peak and value at the end, turns played, turns with a
+   * focus slot on the anchor and with a health drag, and whether the anchor collapsed.
+   */
+  resentment: {
+    peak: number;
+    end: number;
+    turns: number;
+    focusTurns: number;
+    dragTurns: number;
+    anchorCollapse: boolean;
+  };
   /** Club relocation (GDD v1.41): asks, moves, and the owners' losses paid for staying (cash). */
   relocation: { asks: number; moves: number; ownersLoss: number };
   /** League directors (GDD v1.40). */
@@ -649,6 +661,25 @@ function meanOf(values: number[]): number | null {
 }
 
 /** Club relocation across campaigns (GDD v1.41). */
+/** Anchor resentment across campaigns (GDD v1.40). */
+export function resentmentAggregate(results: CampaignResult[]) {
+  const total = (f: (r: CampaignResult) => number) => results.reduce((sum, r) => sum + f(r), 0);
+  const turns = Math.max(
+    1,
+    total((r) => r.resentment.turns),
+  );
+  return {
+    peak: median(results.map((r) => r.resentment.peak)),
+    maxPeak: Math.max(0, ...results.map((r) => r.resentment.peak)),
+    end: median(results.map((r) => r.resentment.end)),
+    focusShare: total((r) => r.resentment.focusTurns) / turns,
+    dragShare: total((r) => r.resentment.dragTurns) / turns,
+    dragged: results.filter((r) => r.resentment.dragTurns > 0).length,
+    collapses: results.filter((r) => r.resentment.anchorCollapse).length,
+    campaigns: results.length,
+  };
+}
+
 export function relocationAggregate(results: CampaignResult[]) {
   const total = (f: (r: CampaignResult) => number) => results.reduce((sum, r) => sum + f(r), 0);
   return {

@@ -20,6 +20,7 @@ import {
   stepQuarter,
   type World,
 } from "../src/sim";
+import { anchorBacklashFactor } from "../src/sim/resentment";
 import {
   awardless,
   crowdless,
@@ -131,7 +132,7 @@ describe("amending", () => {
     );
   });
 
-  it("costs almost nothing in fans for a new rule and more as it ages, heavier in the anchor", () => {
+  it("costs almost nothing in fans for a new rule and more as it ages, heavier in a resentful anchor", () => {
     const young = inWindow(0);
     const old = inWindow(30);
     const option = old.genome.contact === "none" ? "full" : "none";
@@ -143,11 +144,15 @@ describe("amending", () => {
     expect(oldShares[anchor] ?? 0).toBeGreaterThan(youngShares[anchor] ?? 0);
     const { backlash } = content.config.rulesEvolution;
     expect(Math.max(...oldShares)).toBeLessThanOrEqual(backlash.maxShare);
-    // The anchor's share carries the anchor factor over its fit-adjusted base.
-    const base = oldShares.filter((_, i) => i !== anchor);
-    expect(oldShares[anchor] ?? 0).toBeGreaterThanOrEqual(
-      Math.min(...base) * backlash.anchorFactor - 1e-12,
+    // The anchor's share carries its resentment factor (GDD v1.40): none when home is tended.
+    const resentful = { ...old, resentment: { ...old.resentment, value: 1 } };
+    const angry = backlashShares(resentful, content, "contact", option);
+    const factor =
+      anchorBacklashFactor(1, content) / anchorBacklashFactor(old.resentment.value, content);
+    expect(angry[anchor] ?? 0).toBeCloseTo(
+      Math.min(backlash.maxShare, (oldShares[anchor] ?? 0) * factor),
     );
+    expect(angry.filter((_, i) => i !== anchor)).toEqual(oldShares.filter((_, i) => i !== anchor));
   });
 
   it("remembers the founding rule: moving back costs less than moving further away", () => {

@@ -112,6 +112,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     | "legacy"
     | "agreement"
     | "directors"
+    | "resentment"
   > = {
     seed: setup.seed,
     rng: createRngState(setup.seed),
@@ -161,6 +162,7 @@ export function createCampaign(world: World, setup: CampaignSetup): GameState {
     legacy: newLegacy(),
     agreement: newAgreement(setup.seed),
     directors: newDirectors(setup.seed),
+    resentment: { value: 0, tendedQuarter: 0 },
   };
 }
 

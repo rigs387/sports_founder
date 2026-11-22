@@ -1410,6 +1410,28 @@
       "cash": "The league has {{cash, money}} of the {{price, money}} it needs."
     }
   },
+  "resentment": {
+    "value_rising": "Resentment at home: {{value, number(style: percent; maximumFractionDigits: 0)}}, rising.",
+    "value_falling": "Resentment at home: {{value, number(style: percent; maximumFractionDigits: 0)}}, easing.",
+    "value_steady": "Resentment at home: {{value, number(style: percent; maximumFractionDigits: 0)}}.",
+    "none_rising": "Resentment at home has begun.",
+    "none_falling": "No resentment at home.",
+    "none_steady": "No resentment at home.",
+    "noAbroad": "The purists here can't feel abandoned until the sport has a league abroad.",
+    "grace_one": "Without a focus slot here, they start to feel neglected next quarter.",
+    "grace_other": "Without a focus slot here, they start to feel neglected in {{count}} quarters.",
+    "neglect_one": "No focus slot here for {{count}} quarter.",
+    "neglect_other": "No focus slot here for {{count}} quarters.",
+    "seatAway": "The flagship's seat is abroad.",
+    "focused": "A focus slot here eases it.",
+    "focusedHome": "A focus slot here eases it, faster with the seat home.",
+    "casualRules_one": "{{count}} rule change made for casual fans.",
+    "casualRules_other": "{{count}} rule changes made for casual fans.",
+    "demotes": "Each quarter it turns some of the hardcore fans here casual.",
+    "drag1": "It drags the league's health here down to Struggling.",
+    "drag2": "It drags the league's health here down to Near-Collapse.",
+    "folds": "It can fold the league here: a full turn at Near-Collapse and it collapses."
+  },
   "youth": {
     "heading": "Youth programs",
     "intro": "The seat and your focus countries can fund a youth program. Each level turns casual fans hardcore a little faster there, and raises better players, but only those who come through after it opens.",

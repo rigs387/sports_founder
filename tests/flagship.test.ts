@@ -22,6 +22,7 @@ import {
   stepQuarter,
   totalRounds,
 } from "../src/sim";
+import { anchorSeatLeaveShare } from "../src/sim/resentment";
 import { cardless, countryIndex, setupFor, venueless, withConfig, world } from "./helpers";
 
 const start = (format: "european" | "american" = "european", anchor = "brazil", seed = 11) =>
@@ -225,7 +226,7 @@ describe("the commissioner's seat", () => {
     const clubs = activeClubs(after.flagship);
     expect(clubs).toHaveLength(world.config.flagship.clubs.professional);
     expect(clubs.every((club) => club.countryId === "argentina")).toBe(true);
-    const share = world.config.flagship.seatMove.anchorHardcoreDemotionShare;
+    const share = anchorSeatLeaveShare(state.resentment.value, world);
     const lost = stayed - (closed.countries[brazil]?.fans[PLAYER_INDEX]?.hardcore ?? 0);
     expect(lost).toBeGreaterThan(0);
     expect(Math.abs(lost - stayed * share)).toBeLessThanOrEqual(1);

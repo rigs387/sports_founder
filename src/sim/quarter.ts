@@ -10,10 +10,11 @@ import { leverMultipliers, similarityEffect } from "./genome";
 import { type GrowthFactors, growthFactors } from "./growth";
 import { lateIncomeFactor } from "./late-rewards";
 import { leagueCosts, leagueReserve } from "./league-costs";
-import { stepLeagueQuarter } from "./leagues";
+import { demoteHardcore, stepLeagueQuarter } from "./leagues";
 import { poachableHardcore, poachingRates } from "./poaching";
 import { ppWeights, quarterPpIncome } from "./prices";
 import { landmarks, yearlySnapshot } from "./records";
+import { resentmentDemotionShare, stepResentment } from "./resentment";
 import { stepRivals } from "./rivals";
 import { nextFloat, type Rng, restoreRng, saveRng } from "./rng";
 import { shapeFactors } from "./shape";
@@ -197,18 +198,30 @@ export function stepQuarter(
       config,
       rng,
     );
+    // Anchor resentment turns purists casual at home (GDD v1.40).
+    const resented =
+      country.id === state.anchorCountryId && state.resentment.value > 0
+        ? {
+            ...moved,
+            fans: moved.fans.map((fans, f) =>
+              f === PLAYER_INDEX
+                ? demoteHardcore(fans, resentmentDemotionShare(state.resentment.value, world))
+                : fans,
+            ),
+          }
+        : moved;
     const business = stepLeagueQuarter(
-      moved,
+      resented,
       index,
       world,
       state,
       quarter,
-      leagueIncomePerQuarter(state, world, index, moved),
-      leagueCosts(state, world, index, moved).total,
+      leagueIncomePerQuarter(state, world, index, resented),
+      leagueCosts(state, world, index, resented).total,
       // A league holding its money (GDD v1.41) pays nothing out.
       holdingMoney(state, country.id)
         ? Number.POSITIVE_INFINITY
-        : leagueReserve(state, world, index, moved),
+        : leagueReserve(state, world, index, resented),
     );
     if (business.landmark) found.push(business.landmark);
     return business.country;
@@ -237,6 +250,7 @@ export function stepQuarter(
     rivals: defended.rivals,
     countries,
     flagship: flagshipQuarter.flagship,
+    resentment: stepResentment(state, world, quarter),
     landmarks: found.length > 0 ? [...state.landmarks, ...found] : state.landmarks,
     yearly: yearEnded
       ? [...state.yearly, yearlySnapshot({ countries }, yearOfQuarter(quarter - 1, config))]

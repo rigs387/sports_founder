@@ -495,6 +495,17 @@ would run more than about 5 minutes, make it smaller or ask first. Never play ca
   `endTurn`; a goal once met stays met, with a `legacyGoal` landmark and the headline
   `legacy-goal` card (trigger `legacy`, no slot). No reward. The Almanac lists them from the
   start.
+- Anchor resentment (GDD v1.40, tech plan 2.32) is `src/sim/resentment.ts` and
+  `GameState.resentment` (0–1 and `tendedQuarter`, the neglect clock's start). Config
+  `anchorResentment`. `stepResentment` runs each quarter in `stepQuarter`: neglect after
+  `graceQuarters` without a focus slot home and the seat abroad raise it, only once the sport has
+  a league abroad; a focus slot home lowers it, faster with the seat home. `amendRule` moves it
+  by `casualRules` steps. It demotes the anchor's hardcore fans each quarter (`quarter.ts`),
+  drags the anchor league's health target (`draggedSeverity` in `evaluateLeagues`; from
+  `collapseFrom` it can fold the league, before the win ending the campaign) and scales the
+  anchor's backlash factor (`rules.ts`) and seat-leaving share (`seatLeaveShare`): there are
+  no fixed anchor stand-ins. The anchor starts in a focus slot. `TurnSnapshot.resentment` feeds
+  the anchor's country card. Builder and media-rush tend home from 30%; greedy-spread never does.
 - Retiring and the retrospective (GDD v1.38): the `retire` action is legal once `win.won` is
   set and sets `outcome` to kind `retired` (no landmark, no save format change), so `endTurn`
   and every action refuse as after a collapse. Check `outcome.kind`, not just `outcome`, when

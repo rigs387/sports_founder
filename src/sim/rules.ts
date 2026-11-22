@@ -6,6 +6,7 @@ import { optionNetDelta } from "./hints";
 import { demoteHardcore } from "./leagues";
 import { ppPrice } from "./prices";
 import { landmarks } from "./records";
+import { amendedResentment, anchorBacklashFactor } from "./resentment";
 import {
   type Amendment,
   type AxisId,
@@ -99,7 +100,7 @@ export function amendBlocker(
  * The share of the player's hardcore fans in each country who turn casual if `axis` changes to
  * `option` now (GDD v1.20): base × jump × the rule's age (capped), × (1 + drift weight × how far
  * the new option is from the founding rule), × the return factor when it moves back toward the
- * founding rule, × the anchor factor in the anchor, × (1 + fit weight × how much worse the new
+ * founding rule, × the anchor's resentment factor there (GDD v1.40), × (1 + fit weight × how much worse the new
  * option fits there), capped. Purists remember the sport as it was founded.
  */
 export function backlashShares(
@@ -132,7 +133,10 @@ export function backlashShares(
       0,
       optionNetDelta(world, axis, from, index) - optionNetDelta(world, axis, option, index),
     );
-    const anchor = country.countryId === state.anchorCountryId ? backlash.anchorFactor : 1;
+    const anchor =
+      country.countryId === state.anchorCountryId
+        ? anchorBacklashFactor(state.resentment.value, world)
+        : 1;
     const held = 1 + tradition * (offended[index] ?? 0);
     return Math.min(backlash.maxShare, base * anchor * (1 + backlash.fitWeight * fitLoss) * held);
   });
@@ -219,6 +223,8 @@ export function amendRule(
     genome: { ...state.genome, [axis]: option } as Genome,
     countries,
     rules: { ...state.rules, amendments: [...state.rules.amendments, amendment] },
+    // Casual-friendly changes feed anchor resentment; purist-friendly ones ease it (GDD v1.40).
+    resentment: amendedResentment(state, world, axis, from, option),
     landmarks: [
       ...state.landmarks,
       landmarks.ruleAmended(state.turn, state.quarter, axis, from, option, demoted),

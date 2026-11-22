@@ -1066,6 +1066,18 @@ export interface GameState {
   agreement: AgreementState;
   /** League directors in focus countries' leagues, and every past term (GDD v1.40). */
   directors: DirectorsState;
+  /** Anchor resentment (GDD v1.40, tech plan 2.32). */
+  resentment: ResentmentState;
+}
+
+/**
+ * Anchor resentment (GDD v1.40): the anchor's purists feeling abandoned, from 0 to 1.
+ * `tendedQuarter` starts the neglect clock: the last quarter the anchor held a focus slot, or
+ * the sport had no league abroad.
+ */
+export interface ResentmentState {
+  value: number;
+  tendedQuarter: number;
 }
 
 /** A league director serving now (GDD v1.40): in a focus country's league, never the seat's. */

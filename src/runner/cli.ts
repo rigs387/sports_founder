@@ -46,6 +46,7 @@ import {
   optionOutcomesCsv,
   relocationAggregate,
   remembersAggregate,
+  resentmentAggregate,
   rulesAggregate,
   type TurnRow,
   ticketsAggregate,
@@ -883,6 +884,10 @@ function main(): number {
     const one = (value: number | null) => (value === null ? "-" : value.toFixed(1));
     console.log(
       `  Homegrown: national team rank at the end, mean ${one(home.rankWith)} with a program (${home.teamsWith} teams) vs ${one(home.rankWithout)} without (${home.teamsWithout}); named players' peak skill ${one(home.skillWith)} vs ${one(home.skillWithout)}; world titles ${home.titlesWith} of ${home.titles} to a country with a program open, which were ${(home.fieldShare * 100).toFixed(0)}% of the fields`,
+    );
+    const resent = resentmentAggregate(results);
+    console.log(
+      `  Anchor resentment: median peak ${pct(resent.peak ?? 0)} (highest ${pct(resent.maxPeak)}), median at the end ${pct(resent.end ?? 0)}; a focus slot home ${pct(resent.focusShare)} of turns; a health drag ${pct(resent.dragShare)} of turns, in ${resent.dragged} of ${resent.campaigns} campaigns; anchor collapses ${resent.collapses}`,
     );
     const relocation = relocationAggregate(results);
     console.log(

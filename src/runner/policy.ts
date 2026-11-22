@@ -112,6 +112,12 @@ export function isBotId(value: string): value is BotId {
 
 /** Greedy-spread moves a slot on once its country's Fandom Score share reaches this. */
 const SATURATED_SHARE = 0.15;
+/**
+ * Anchor resentment (GDD v1.40): builder and media-rush put a focus slot on the anchor from this
+ * resentment and keep it there until it falls to TEND_HOME_UNTIL. Greedy-spread never tends home.
+ */
+const TEND_HOME_FROM = 0.3;
+const TEND_HOME_UNTIL = 0.05;
 /** Anchor-turtle promotes only with this multiple of the hardcore and cash requirements. */
 const TURTLE_MARGIN = 1.5;
 /** Chance per turn that the random bot tries an action. */
@@ -374,13 +380,31 @@ function countriesByFit(state: GameState, world: World) {
     .sort((a, b) => b.score - a.score || b.population - a.population);
 }
 
-/** Moves saturated or empty slots onto the first affordable candidates, in the given order. */
-function spreadFocus(state: GameState, world: World, candidates: { id: string }[]): BotStep {
+/**
+ * Moves saturated or empty slots onto the first affordable candidates, in the given order. With
+ * `tendHome`, a resentful anchor (GDD v1.40) takes the first slot first and keeps it until calm.
+ */
+function spreadFocus(
+  state: GameState,
+  world: World,
+  candidates: { id: string }[],
+  tendHome = false,
+): BotStep {
   const step: BotStep = { state, actions: [] };
   dropSlots(step, world, (id) => fandomShare(step.state, world, id));
+  const anchor = step.state.anchorCountryId;
+  const resentment = step.state.resentment.value;
+  const tending = tendHome && step.state.focus.includes(anchor) && resentment > TEND_HOME_UNTIL;
+  const assigned =
+    tendHome &&
+    !step.state.focus.includes(anchor) &&
+    resentment >= TEND_HOME_FROM &&
+    attempt(step, world, { type: "assignFocus", slot: 0, countryId: anchor });
+  const kept = tending || assigned ? anchor : null;
 
   for (let slot = 0; slot < step.state.focus.length; slot += 1) {
     const here = step.state.focus[slot] ?? null;
+    if (here !== null && here === kept) continue;
     if (here !== null && fandomShare(step.state, world, here) < SATURATED_SHARE) continue;
     for (const candidate of candidates) {
       if (step.state.focus.includes(candidate.id)) continue;
@@ -606,7 +630,7 @@ export interface BotOptions {
 }
 
 function builderTurn(state: GameState, world: World, options: BotOptions): BotStep {
-  const spread = spreadFocus(state, world, countriesByFit(state, world));
+  const spread = spreadFocus(state, world, countriesByFit(state, world), true);
   const step: BotStep = { state: spread.state, actions: [...spread.actions] };
   manageLeagues(step, world);
   if (options.amend)
@@ -712,7 +736,7 @@ function mediaRushTurn(state: GameState, world: World): BotStep {
       exposure: exposure[index]?.organic ?? 0,
     }))
     .sort((a, b) => b.market - a.market || b.exposure - a.exposure);
-  const step = spreadFocus(state, world, byMarket);
+  const step = spreadFocus(state, world, byMarket, true);
   manageLeagues(step, world);
 
   // The Media nodes it wants: every Media node except a fork side with less reach than a sibling.

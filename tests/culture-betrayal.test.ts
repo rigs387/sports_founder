@@ -15,6 +15,7 @@ import {
   updateCulture,
   type World,
 } from "../src/sim";
+import { anchorSeatLeaveShare } from "../src/sim/resentment";
 import { clubIds, ofType, withSeason, withTradition } from "./culture-helpers";
 import { countryIndex, setupFor, withConfig, world } from "./helpers";
 
@@ -105,7 +106,7 @@ describe("the seat move", () => {
   it("costs more purists where traditions are held, by the ethos", () => {
     const base = inWindow("working-class-game");
     const plain = seatLeaveShare(base, content, ANCHOR);
-    expect(plain).toBe(content.config.flagship.seatMove.anchorHardcoreDemotionShare);
+    expect(plain).toBe(anchorSeatLeaveShare(base.resentment.value, content));
     const held = withTradition(base, "trophy", ANCHOR);
     const { seatWeight } = content.config.culture;
     const seat = content.identity.culture.ethos["working-class-game"]?.seat ?? 0;

@@ -144,6 +144,7 @@ export function foundSport(
     | "legacy"
     | "agreement"
     | "directors"
+    | "resentment"
   >,
   world: World,
   setup: IdentitySetup,
@@ -157,6 +158,7 @@ export function foundSport(
   | "legacy"
   | "agreement"
   | "directors"
+  | "resentment"
 > {
   const founding = foundingClubOf(state.flagship.clubs, state.anchorCountryId);
   if (!founding) throw new Error(`No flagship club at "${state.anchorCountryId}"`);

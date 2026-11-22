@@ -1,7 +1,13 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { Names } from "../../../content";
-import type { CountrySnapshot, CultureSnapshot, SportTerms, YouthRow } from "../../../sim";
+import type {
+  CountrySnapshot,
+  CultureSnapshot,
+  ResentmentSnapshot,
+  SportTerms,
+  YouthRow,
+} from "../../../sim";
 import { TraditionList } from "../culture/traditions";
 import { useTermVars } from "../identity/terms";
 import { geometry } from "../map/model";
@@ -29,6 +35,8 @@ interface Props {
   youth?: YouthRow;
   /** The sport's terms, for the youth line. */
   terms: SportTerms;
+  /** Anchor resentment and its reasons (GDD v1.40), on the anchor's card only. */
+  resentment?: ResentmentSnapshot;
 }
 export function CountryCard({
   country,
@@ -45,6 +53,7 @@ export function CountryCard({
   inductees = [],
   youth,
   terms,
+  resentment,
 }: Props) {
   const { t, i18n } = useTranslation();
   const compact = (value: number) => t("format.compact", { value });
@@ -117,6 +126,7 @@ export function CountryCard({
               </p>
             )}
             {youth && <YouthLine youth={youth} terms={terms} />}
+            {resentment && <ResentmentLines resentment={resentment} />}
             {country.standouts.length > 0 && (
               <p className="wealth-level" data-testid="country-standouts">
                 {t("map.standouts", {
@@ -300,6 +310,45 @@ function CountrySports({ country }: { country: CountrySnapshot }) {
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+/**
+ * Anchor resentment on the birthplace's card (GDD v1.40): the value, which way it is going and
+ * why, so the player sees it coming.
+ */
+function ResentmentLines({ resentment }: { resentment: ResentmentSnapshot }) {
+  const { t } = useTranslation();
+  const r = resentment;
+  const reasons: string[] = [];
+  if (!r.abroad) reasons.push(t("resentment.noAbroad"));
+  if (r.neglectQuarters > 0) reasons.push(t("resentment.neglect", { count: r.neglectQuarters }));
+  if (r.graceLeft > 0) reasons.push(t("resentment.grace", { count: r.graceLeft }));
+  if (r.abroad && !r.seatHome) reasons.push(t("resentment.seatAway"));
+  if (r.focused) reasons.push(t(r.seatHome ? "resentment.focusedHome" : "resentment.focused"));
+  if (r.casualAmendments > 0)
+    reasons.push(t("resentment.casualRules", { count: r.casualAmendments }));
+  if (r.value > 0) reasons.push(t("resentment.demotes"));
+  if (r.folds) reasons.push(t("resentment.folds"));
+  else if (r.drag > 0) reasons.push(t(`resentment.drag${r.drag}`));
+  const trend =
+    r.perQuarter > 0 ? "rising" : r.perQuarter < 0 && r.value > 0 ? "falling" : "steady";
+  return (
+    <div
+      className="wealth-level"
+      data-testid="country-resentment"
+      data-value={r.value.toFixed(3)}
+      data-trend={trend}
+    >
+      <p>
+        {r.value > 0
+          ? t(`resentment.value_${trend}`, { value: r.value })
+          : t(`resentment.none_${trend}`)}
+      </p>
+      {reasons.map((reason) => (
+        <p key={reason}>{reason}</p>
+      ))}
     </div>
   );
 }

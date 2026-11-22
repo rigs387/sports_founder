@@ -48,6 +48,11 @@ export function invariantsOf(state: GameState, world: World): string[] {
     problems.push(`quarter ${state.quarter} is invalid`);
   }
   if (!Number.isFinite(state.pp) || state.pp < 0) problems.push(`pp ${state.pp} is invalid`);
+  const { resentment } = state;
+  if (!(resentment.value >= 0 && resentment.value <= 1))
+    problems.push(`anchor resentment ${resentment.value} is outside 0–1`);
+  if (resentment.tendedQuarter > state.quarter)
+    problems.push(`anchor last tended at quarter ${resentment.tendedQuarter}, in the future`);
   const tier = world.config.ppTiers.find((entry) => entry.tier === state.ppTier);
   if (!tier) problems.push(`ppTier ${state.ppTier} is not in the tier table`);
   const anchorIndex = world.countries.findIndex((country) => country.id === state.anchorCountryId);

@@ -576,13 +576,43 @@ wealthLevels:
     - { id: comfortable, ppWeight: 1, defenseWeight: 1 }
     - { id: affluent, ppWeight: 1.5, defenseWeight: 1.5 }
 
+# Anchor resentment (GDD v1.40, Late-Game Pressure; tech plan 2.32). A stored value from 0 to 1.
+# Each quarter, once the sport has a league abroad, it rises by neglectPerQuarter while the anchor
+# has held no focus slot for more than graceQuarters (the clock starts at the last focus, or the
+# last quarter with no league abroad), and by seatAwayPerQuarter while the seat is abroad. It falls
+# by focusDecayPerQuarter while the anchor holds a focus slot, homeDecayPerQuarter instead when the
+# seat is home too. An amendment toward a casualRules option raises it amendmentStep a step (once
+# a league abroad exists: shorter matches, more scoring, less complexity); one away from it lowers
+# it amendmentStep a step.
+# Effects: hardcoreDemotionPerQuarter × the value of the anchor's player hardcore fans turn casual
+# each quarter. The anchor league's health target severity rises by the severity of the highest
+# healthDrag step the value reaches (capped at Near-Collapse); from collapseFrom the drag can fold
+# the league, still only after a full turn at Near-Collapse. The anchor's amendment backlash
+# factor runs from backlashFactor.min (no resentment) to .max (full), and the share of its
+# hardcore fans turned casual when the seat leaves it from seatLeaveShare.min to .max.
+anchorResentment:
+  graceQuarters: 8
+  neglectPerQuarter: 0.01
+  seatAwayPerQuarter: 0.015
+  focusDecayPerQuarter: 0.02
+  homeDecayPerQuarter: 0.04
+  amendmentStep: 0.1
+  casualRules: { matchLength: short, scoring: high, complexity: simple }
+  hardcoreDemotionPerQuarter: 0.01
+  healthDrag:
+    - { from: 0.5, severity: 1 }
+    - { from: 0.8, severity: 2 }
+  collapseFrom: 0.95
+  backlashFactor: { min: 1, max: 3 }
+  seatLeaveShare: { min: 0.03, max: 0.12 }
+
 # Rules evolution, first build (GDD v1.20). In the seasonal window the player may amend one rule
 # trait a year to any of its options. The jump is the number of steps between the options, or
 # fixedJump for traits whose options have no order. Price = priceQuarters of PP income (ppPrices)
 # × jump. Purist backlash: in every country a share of the player's hardcore fans turn
-# casual: sharePerJump × jump × min(1, the rule's age in years ÷ fullAgeYears), × anchorFactor in
-# the anchor, × (1 + fitWeight × how much the new option's net lever delta there falls short of the
-# old one's), capped at maxShare. Purists remember the founding rules (decided 2026-10-04): the
+# casual: sharePerJump × jump × min(1, the rule's age in years ÷ fullAgeYears), × the resentment
+# factor in the anchor (anchorResentment.backlashFactor), × (1 + fitWeight × how much the new
+# option's net lever delta there falls short of the old one's), capped at maxShare. Purists remember the founding rules (decided 2026-10-04): the
 # share is also × (1 + driftWeight × steps from the trait's founding rule to the new one), and
 # × returnFactor for a move back toward it, so sports keep their founding identity (without it
 # every sport amended toward the same rulebook and the differentiation experiment failed). A
@@ -593,7 +623,6 @@ rulesEvolution:
   backlash:
     sharePerJump: 0.03
     fullAgeYears: 40
-    anchorFactor: 2
     fitWeight: 2
     driftWeight: 1.5
     returnFactor: 0.5
@@ -1129,7 +1158,6 @@ flagship:
   # the country the seat leaves demote to casual, more when it leaves the anchor.
   seatMove:
     hardcoreDemotionShare: 0.03
-    anchorHardcoreDemotionShare: 0.08
   # Flagship ticket pricing (GDD v1.40): set in the offseason for the next season, at the seat
   # only. A stance multiplies gate per seated fan and casual → hardcore conversion at the seat.
   # Each step up (cheap → standard → premium) turns raiseDemotion × (1 + the seat's tradition
